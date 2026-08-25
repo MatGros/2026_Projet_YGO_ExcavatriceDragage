@@ -26,7 +26,7 @@
 ## 1. Rôle et profil
 
 🎯 Produit les cinq capteurs de position M3 par progression continue de Trémie vers Maintenance,
-à une vitesse dérivée de `SpeedRefPct`/`FullTravelTimeS`. Le modèle ne publie que les six mots
+à une vitesse dérivée de `SpeedTgt_Pct`/`FullTravelTimeS`. Le modèle ne publie que les six mots
 valides attendus par `FB_Translation_PositionDecoder` (Partie 11) — jamais un mot incohérent, ce
 FB simule un capteur sain, pas un défaut câblage.
 
@@ -46,7 +46,7 @@ stricte entre le modèle dynamique et l'injection ponctuelle opérateur.
 |---|---|---|
 | `Enable` | BOOL | Modèle actif |
 | `Direction` | INT | `+1` = vers Trémie, `-1` = vers Maintenance, `0` = maintien |
-| `SpeedRefPct` | REAL | Magnitude commande 0..100 %, bornée avant calcul |
+| `SpeedTgt_Pct` | REAL | Magnitude commande 0..100 %, bornée avant calcul |
 | `FullTravelTimeS` | REAL | Temps complet Trémie→Maintenance à 100 % (simulation seulement, défaut 8.0s) |
 
 | Sortie | Type | Sens |

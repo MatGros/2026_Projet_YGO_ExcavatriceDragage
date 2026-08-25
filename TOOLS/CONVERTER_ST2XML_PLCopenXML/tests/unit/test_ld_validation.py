@@ -34,7 +34,7 @@ def test_ld_body_uses_type_context_for_boolean_coil_and_typed_pdos():
     st_code = """
     M1_RelayFwd_Up_DQ := M1RelayFwd;
     M3_CommandWord := PRG_07_TranslationControl.instTranslationOutputInterlock_LD.DriveControlWord;
-    M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationOutputInterlock_LD.DriveFreqRefHz * 100.0);
+    M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationOutputInterlock_LD.DriveFreqCmd_Hz * 100.0);
     """
 
     ld_xml = build_ld_body(st_code, boolean_identifiers={"M1RelayFwd"})
@@ -48,7 +48,7 @@ def test_ld_body_uses_type_context_for_boolean_coil_and_typed_pdos():
     assert "M1_RelayFwd_Up_DQ" in coil_variables
     assert "M1_RelayFwd_Up_DQ" not in output_expressions
     assert "PRG_07_TranslationControl.instTranslationOutputInterlock_LD.DriveControlWord" in input_expressions
-    assert "REAL_TO_UINT(PRG_07_TranslationControl.instTranslationOutputInterlock_LD.DriveFreqRefHz * 100.0)" in input_expressions
+    assert "REAL_TO_UINT(PRG_07_TranslationControl.instTranslationOutputInterlock_LD.DriveFreqCmd_Hz * 100.0)" in input_expressions
     assert "M3_CommandWord" in output_expressions
     assert "M3_SetpointFrequencyHz" in output_expressions
     assert "M3_CommandWord" not in contact_variables + coil_variables

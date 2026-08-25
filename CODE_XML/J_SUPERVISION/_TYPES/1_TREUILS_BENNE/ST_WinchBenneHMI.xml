@@ -828,12 +828,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Palier limité par vitesse réelle</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne de vitesse finale après rampe (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Commande de vitesse finale après rampe (%)</xhtml>
               </documentation>
             </variable>
             <variable name="StepNumber">

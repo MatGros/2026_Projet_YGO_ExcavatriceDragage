@@ -48,7 +48,7 @@ la commande physique autorisée (mot AC600 + frein). 1 instance dans `PRG_06_Out
 | `RequestedDriveControlWord` | Mot AC600 (0/1/2/7) |
 | `RequestedDriveFreqHz` | Fréquence demandée (Hz) |
 
-**Sorties** : `DriveControlWord` (WORD), `DriveFreqRefHz` (REAL), `BrakeCmd` (Q physiques),
+**Sorties** : `DriveControlWord` (WORD), `DriveFreqCmd_Hz` (REAL), `BrakeCmd` (Q physiques),
 `State`, `Reason` (`E_TranslationFinalInterlockReason`), `RestartInhibit`, `ErrorId`.
 
 ---
@@ -63,7 +63,7 @@ AND NOT RestartInhibit`. Timeout ⇒ bit0 `ErrorId`, `RestartInhibit:=TRUE`,
 
 ## 4. Gate final double condition obligatoire
 
-`DriveControlWord`+`DriveFreqRefHz` autorisés **seulement si** :
+`DriveControlWord`+`DriveFreqCmd_Hz` autorisés **seulement si** :
 `MovementRequested AND BrakeReleaseRequest AND BrakeCommandOpenConfirmed`
 
 Si une seule des deux conditions manque : `State=INIT` (attente confirmation), **sans** défaut

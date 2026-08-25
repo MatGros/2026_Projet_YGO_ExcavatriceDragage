@@ -48,7 +48,7 @@ instSimBench(
     // (alimentés par la sortie PRG_06). Gate direction + vitesse = demande réelle (rampe/arrêt).
     M3_Direction             := SEL(PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord <> 0,
                                     PRG_05_Translation.M3_Direction_Active, 0),
-    M3_SpeedRefPct           := LIMIT(0.0,
+    M3_SpeedCmd_Pct           := LIMIT(0.0,
                                       PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,

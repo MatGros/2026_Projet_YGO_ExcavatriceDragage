@@ -99,6 +99,7 @@ def scan_naming(target_dir: Path, repo_root: Path) -> tuple[dict, dict]:
         "NC-050": {"conf": 0, "legacy": 0, "recenses": [], "total": 0},
         "NC-060": {"conf": 0, "exemptes": 0, "recenses": [], "total": 0},
         "NC-070": {"conf": 0, "recenses": [], "total": 0},
+        "NC-080": {"conf": 0, "recenses": [], "total": 0},
     }
 
     for fpath in st_files:
@@ -250,6 +251,20 @@ def scan_naming(target_dir: Path, repo_root: Path) -> tuple[dict, dict]:
                             "file": rel_path, "line": idx, "name": vname, "snippet": line_str
                         })
 
+            # --- NC-080 : Bannissement de Ref pour les consignes (IEC/PLCopen) ---
+            if in_var or in_struct:
+                m_d = re_decl.search(line)
+                if m_d:
+                    vname = m_d.group(1)
+                    results["NC-080"]["total"] += 1
+                    is_banned_ref = any(term in vname for term in ["SpeedRef", "DriveFreqRef", "CablePosRef", "PosRef", "ActiveSpeedRef", "Ref_Pct", "RefPct"])
+                    if is_banned_ref:
+                        results["NC-080"]["recenses"].append({
+                            "file": rel_path, "line": idx, "name": vname, "snippet": line_str
+                        })
+                    else:
+                        results["NC-080"]["conf"] += 1
+
     return results, {}
 
 
@@ -311,7 +326,7 @@ def main() -> int:
     total_base = 0
     total_new = 0
 
-    for rule in ["NC-010", "NC-020", "NC-030", "NC-050", "NC-060", "NC-070"]:
+    for rule in ["NC-010", "NC-020", "NC-030", "NC-050", "NC-060", "NC-070", "NC-080"]:
         data = results[rule]
         conf = data["conf"]
         ex_leg = data.get("legacy", 0) + data.get("exemptes", 0)
@@ -334,11 +349,12 @@ def main() -> int:
             "NC-050": "Cmd/Req toujours en préfixe (hors legacy)",
             "NC-060": "Champs ST_*HMI préfixés (hors exemptés)",
             "NC-070": "GVL_PERSISTENT préfixé '_'",
+            "NC-080": "Zéro 'Ref' pour consigne (SpeedTgt/Cmd/SP)",
         }
         print(f"{rule:<8} | {desc_map[rule]:<52} | {conf:<9} | {ex_leg:<15} | {rule_base:<9} | {rule_new:<8}")
 
     print("-" * 100)
-    print(f"{'TOTAL':<8} | {'Ensemble des 6 règles analysées':<52} | {total_conf:<9} | {total_ex_leg:<15} | {total_base:<9} | {total_new:<8}")
+    print(f"{'TOTAL':<8} | {'Ensemble des 7 règles analysées':<52} | {total_conf:<9} | {total_ex_leg:<15} | {total_base:<9} | {total_new:<8}")
     print("=" * 100)
 
     if new_count > 0:

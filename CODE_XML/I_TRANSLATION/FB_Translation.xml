@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.371388" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.371388">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:15:05.042445" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:15:05.042445">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -369,7 +369,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -916,8 +916,8 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     IF NOT BypassLimitSwitch AND ((Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev)) THEN
         RampTargetPct := 0.0;
     ELSE
-        RampTargetPct := ABS(SpeedRefPct);
-        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedRefPct &gt; 0.0), la consigne est au moins égale à 1.0 Hz
+        RampTargetPct := ABS(SpeedTgt_Pct);
+        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedTgt_Pct &gt; 0.0), la consigne est au moins égale à 1.0 Hz
         IF RampTargetPct &gt; 0.0 THEN
             RampTargetPct := MAX(RampTargetPct, (1.0 / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
         END_IF;

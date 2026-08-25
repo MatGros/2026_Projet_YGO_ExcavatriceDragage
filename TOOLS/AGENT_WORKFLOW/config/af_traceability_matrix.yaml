@@ -337,7 +337,7 @@ domains:
           TRUE en production — trou réel, voir §8 alerte 1 et Q1 QUESTIONS_OUVERTES_PRG02_v0.1.md)*
       F08.06:
         fonction: Détecter un défaut capteur hors plage
-        description: RawX/RawY hors plage ⇒ arrêt (SpeedRef=0) + ErrorId bit1 (Warning)
+        description: RawX/RawY hors plage ⇒ arrêt (SpeedTgt=0) + ErrorId bit1 (Warning)
           sur les 2 axes
         realisee_par: FB_Joystick
         criticite: C3
@@ -368,7 +368,7 @@ domains:
       TC-P08-001:
         intention: Perte contacteur / CAN ➔ désarmer, annuler axes, et lever Error
           (ErrorId bit2, auto-effacé au retour)
-        preuve: SpeedRef=0, DeadmanArmed=FALSE, Error=TRUE
+        preuve: SpeedTgt=0, DeadmanArmed=FALSE, Error=TRUE
         type: 💻 AUTO
         ref: §3
       TC-P08-002:
@@ -407,10 +407,10 @@ domains:
         type: 💻 AUTO
         ref: §5
       TC-P08-007:
-        intention: SpeedRef signée [-100;+100] ; si RawX/RawY sort de la plage capteur
-          (défaut/fil coupé) ⇒ arrêt (SpeedRef=0) + ErrorId bit1 (Warning), pas de
+        intention: SpeedTgt signée [-100;+100] ; si RawX/RawY sort de la plage capteur
+          (défaut/fil coupé) ⇒ arrêt (SpeedTgt=0) + ErrorId bit1 (Warning), pas de
           commande à pleine vitesse (voir exemple §5bis)
-        preuve: SpeedRef=0, ErrorId bit1 actif
+        preuve: SpeedTgt=0, ErrorId bit1 actif
         type: 💻 AUTO
         ref: §1, §2, §5bis
       TC-P08-008:
@@ -440,7 +440,7 @@ domains:
       TC-P08-014:
         intention: Mise à l'échelle proportionnelle sur valeurs intermédiaires (RawX=9000→80%,
           RawY=300→-94%), pas seulement correcte aux bornes 0/10000/neutre
-        preuve: SpeedRef exact ±0.01%, Direction cohérent
+        preuve: SpeedTgt exact ±0.01%, Direction cohérent
         type: 💻 AUTO
         ref: §1, §2
   AF-09:
@@ -660,7 +660,7 @@ domains:
     functions: {}
     validation_points:
       TC-P13-030:
-        intention: RelayFwd/RelayRev font compter RawPos de SpeedRefPct * 0.1 * SpeedScaleFactor
+        intention: RelayFwd/RelayRev font compter RawPos de SpeedTgt_Pct * 0.1 * SpeedScaleFactor
           par scan
         type: 💻 AUTO
       TC-P13-031:

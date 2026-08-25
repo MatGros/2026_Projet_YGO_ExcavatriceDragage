@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.371895" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.371895">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:15:20.391891" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:15:20.391891">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -335,7 +335,7 @@ ErrorId bit0: "timeout desserrage frein".</xhtml>
 &lt;-- [ACT] Mot de commande variateur valide</xhtml>
               </documentation>
             </variable>
-            <variable name="DriveFreqRefHz">
+            <variable name="DriveFreqCmd_Hz">
               <type>
                 <REAL />
               </type>
@@ -343,7 +343,7 @@ ErrorId bit0: "timeout desserrage frein".</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Frequence de consigne variateur valide (Hz)</xhtml>
               </documentation>
             </variable>
-            <variable name="DriveFreqRefWord">
+            <variable name="DriveFreqCmdWord">
               <type>
                 <WORD />
               </type>
@@ -505,8 +505,8 @@ ResetEdge(CLK := Reset);
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     DriveControlWord := 0;
-    DriveFreqRefHz := 0.0;
-    DriveFreqRefWord := 0;
+    DriveFreqCmd_Hz := 0.0;
+    DriveFreqCmdWord := 0;
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
@@ -575,8 +575,8 @@ END_IF;
 
 // ── 4. Décision finale : zéro couple utile sans confirmation frein ──────
 DriveControlWord := 0;
-DriveFreqRefHz := 0.0;
-DriveFreqRefWord := 0;
+DriveFreqCmd_Hz := 0.0;
+DriveFreqCmdWord := 0;
 // SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
 // maintenu. La commande/frein suivent cette rampe jusqu'à demande nulle ; seul
 // un gate dur, timeout ou défaut final impose ici la coupure immédiate.
@@ -601,7 +601,7 @@ ELSIF MovementRequested THEN
     // couple ou fréquence AC600.
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
-        DriveFreqRefHz := MAX(0.0, RequestedDriveFreqHz);
+        DriveFreqCmd_Hz := MAX(0.0, RequestedDriveFreqHz);
         Status.Busy := TRUE;
         Status.State := E_State.BUSY;
     ELSE
@@ -612,8 +612,8 @@ END_IF;
 
 // ── 5. Mise à l'échelle finale REAL Hz -&gt; WORD registre PDO 0x3100 ──────
 // Conversion unique en sortie de chaîne, quelle que soit la branche qui a fixé
-// DriveFreqRefHz ci-dessus — jamais recalculée ailleurs (producteur unique).
-DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) * DriveFreqWordScale);
+// DriveFreqCmd_Hz ci-dessus — jamais recalculée ailleurs (producteur unique).
+DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz) * DriveFreqWordScale);
 </xhtml>
           </ST>
         </body>

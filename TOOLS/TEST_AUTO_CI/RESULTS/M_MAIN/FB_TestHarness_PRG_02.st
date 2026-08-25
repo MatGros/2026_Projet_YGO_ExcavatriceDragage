@@ -133,7 +133,7 @@ Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
 Data.JoystickXNeutral     := instJoystick.AxisCmdX.AtNeutral;
 Data.JoystickYNeutral     := instJoystick.AxisCmdY.AtNeutral;
 Data.JoystickDirectionX   := instJoystick.DirectionX;
-Data.JoystickSpeedPctX    := instJoystick.AxisCmdX.SpeedRef;
+Data.JoystickSpeedPctX    := instJoystick.AxisCmdX.SpeedTgt;
 
 
 // 3. Traitement Codeurs Treuils M1 / M2

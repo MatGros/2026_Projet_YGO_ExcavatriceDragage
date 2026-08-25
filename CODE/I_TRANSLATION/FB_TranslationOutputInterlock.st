@@ -31,8 +31,8 @@ VAR_OUTPUT
 
     // === ORDRES ACTIONNEURS VALIDES ===
     DriveControlWord             : WORD;   // <-- [ACT] Mot de commande variateur valide
-    DriveFreqRefHz               : REAL;   // <-- [ACT] Frequence de consigne variateur valide (Hz)
-    DriveFreqRefWord             : WORD;   // <-- [ACT] Frequence mise a l'echelle registre PDO 0x3100
+    DriveFreqCmd_Hz              : REAL;   // <-- [ACT] Frequence de consigne variateur valide (Hz)
+    DriveFreqCmdWord             : WORD;   // <-- [ACT] Frequence mise a l'echelle registre PDO 0x3100
     BrakeCmd                     : BOOL;   // <-- [ACT] Ordre ouverture frein valide
 
     // === DIAGNOSTICS & TEMPORISATIONS ===
@@ -71,8 +71,8 @@ ResetEdge(CLK := Reset);
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     DriveControlWord := 0;
-    DriveFreqRefHz := 0.0;
-    DriveFreqRefWord := 0;
+    DriveFreqCmd_Hz := 0.0;
+    DriveFreqCmdWord := 0;
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
@@ -141,8 +141,8 @@ END_IF;
 
 // ── 4. Décision finale : zéro couple utile sans confirmation frein ──────
 DriveControlWord := 0;
-DriveFreqRefHz := 0.0;
-DriveFreqRefWord := 0;
+DriveFreqCmd_Hz := 0.0;
+DriveFreqCmdWord := 0;
 // SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
 // maintenu. La commande/frein suivent cette rampe jusqu'à demande nulle ; seul
 // un gate dur, timeout ou défaut final impose ici la coupure immédiate.
@@ -167,7 +167,7 @@ ELSIF MovementRequested THEN
     // couple ou fréquence AC600.
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
-        DriveFreqRefHz := MAX(0.0, RequestedDriveFreqHz);
+        DriveFreqCmd_Hz := MAX(0.0, RequestedDriveFreqHz);
         Status.Busy := TRUE;
         Status.State := E_State.BUSY;
     ELSE
@@ -178,5 +178,5 @@ END_IF;
 
 // ── 5. Mise à l'échelle finale REAL Hz -> WORD registre PDO 0x3100 ──────
 // Conversion unique en sortie de chaîne, quelle que soit la branche qui a fixé
-// DriveFreqRefHz ci-dessus — jamais recalculée ailleurs (producteur unique).
-DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) * DriveFreqWordScale);
+// DriveFreqCmd_Hz ci-dessus — jamais recalculée ailleurs (producteur unique).
+DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz) * DriveFreqWordScale);

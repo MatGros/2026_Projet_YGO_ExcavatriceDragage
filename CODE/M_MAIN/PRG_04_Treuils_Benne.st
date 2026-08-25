@@ -70,11 +70,11 @@ VAR
 
     M1LogicRequestStartStop     : BOOL;
     M1LogicRequestDirection     : INT;
-    M1LogicRequestSpeedRef_Pct      : REAL;
+    M1LogicRequestSpeedCmd_Pct      : REAL;
 
     M2LogicRequestStartStop     : BOOL;
     M2LogicRequestDirection     : INT;
-    M2LogicRequestSpeedRef_Pct      : REAL;
+    M2LogicRequestSpeedCmd_Pct      : REAL;
     M2_SpeedStepTableActive : ST_SpeedStepTable;
 
     SpeedGuardEnableM1 : BOOL := FALSE;
@@ -410,28 +410,28 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M1LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
     M1LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
-    M1LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
+    M1LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
 ELSE
     IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Mode Boutons IHM
         IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
             M1LogicRequestDirection := 1;
-            M1LogicRequestSpeedRef_Pct  := 100.0;
+            M1LogicRequestSpeedCmd_Pct  := 100.0;
         ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
             M1LogicRequestDirection := -1;
-            M1LogicRequestSpeedRef_Pct  := 100.0;
+            M1LogicRequestSpeedCmd_Pct  := 100.0;
         ELSE
             M1LogicRequestDirection := 0;
-            M1LogicRequestSpeedRef_Pct  := 0.0;
+            M1LogicRequestSpeedCmd_Pct  := 0.0;
         END_IF;
     ELSE
         // Mode Joystick Maître
         IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
             M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
-            M1LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
+            M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
         ELSE
             M1LogicRequestDirection := 0;
-            M1LogicRequestSpeedRef_Pct  := 0.0;
+            M1LogicRequestSpeedCmd_Pct  := 0.0;
         END_IF;
     END_IF;
 
@@ -448,34 +448,34 @@ END_IF;
 IF instBucket.Status.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestStartStop := instBucket.M2_StartStop;
     M2LogicRequestDirection := instBucket.M2_Direction;
-    M2LogicRequestSpeedRef_Pct  := 15.0;
+    M2LogicRequestSpeedCmd_Pct  := 15.0;
 ELSE
     IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
         // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
         M2LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
         M2LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
-        M2LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+        M2LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
     ELSE
         IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
             // Mode Boutons IHM
             IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
                 M2LogicRequestDirection := 1;
-                M2LogicRequestSpeedRef_Pct  := 100.0;
+                M2LogicRequestSpeedCmd_Pct  := 100.0;
             ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
                 M2LogicRequestDirection := -1;
-                M2LogicRequestSpeedRef_Pct  := 100.0;
+                M2LogicRequestSpeedCmd_Pct  := 100.0;
             ELSE
                 M2LogicRequestDirection := 0;
-                M2LogicRequestSpeedRef_Pct  := 0.0;
+                M2LogicRequestSpeedCmd_Pct  := 0.0;
             END_IF;
         ELSE
             // Mode Joystick Maître
             IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
                 M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
-                M2LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
+                M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
             ELSE
                 M2LogicRequestDirection := 0;
-                M2LogicRequestSpeedRef_Pct  := 0.0;
+                M2LogicRequestSpeedCmd_Pct  := 0.0;
             END_IF;
         END_IF;
 
@@ -828,7 +828,7 @@ instWinchM1(
     DescendPermit           := EffectivePermitM1_Descend,
     AscentPermit            := EffectivePermitM1_Ascent,
     Direction               := M1LogicRequestDirection,
-    SpeedRefPct             := M1LogicRequestSpeedRef_Pct,
+    SpeedTgt_Pct            := M1LogicRequestSpeedCmd_Pct,
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := SEL(instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
     // Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
@@ -859,7 +859,7 @@ instWinchM2(
     DescendPermit           := EffectivePermitM2_Descend,
     AscentPermit            := EffectivePermitM2_Ascent,
     Direction               := M2LogicRequestDirection,
-    SpeedRefPct             := M2LogicRequestSpeedRef_Pct,
+    SpeedTgt_Pct            := M2LogicRequestSpeedCmd_Pct,
     SpeedStepTable          := M2_SpeedStepTableActive,
     // instBucket.M2_ForceSlowSpeed
     // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) plafonne le palier
@@ -937,7 +937,7 @@ WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M1_Speed_Mps - M1_Prev
 M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
 
 WinchM1State.Position_M := PRG_02_Acquisition.Data.CablePosM1;
-WinchM1State.SpeedRef_Pct := M1LogicRequestSpeedRef_Pct;
+WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
 WinchM1State.FBState := instWinchM1.Status.State;
 WinchM1State.Ready := instWinchM1.Ready;
@@ -994,7 +994,7 @@ WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M2_Speed_Mps - M2_Prev
 M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
 
 WinchM2State.Position_M := PRG_02_Acquisition.Data.CablePosM2;
-WinchM2State.SpeedRef_Pct := M2LogicRequestSpeedRef_Pct;
+WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
 WinchM2State.FBState := instWinchM2.Status.State;
 WinchM2State.Ready := instWinchM2.Ready;
@@ -1151,8 +1151,8 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
 // Copie des structs internes vers le bus de sortie (producteur unique).
 Data.WinchM1FinalInterlockRequest := WinchM1FinalInterlockRequest;
 Data.WinchM2FinalInterlockRequest := WinchM2FinalInterlockRequest;
-Data.M1LogicRequestSpeedRef_Pct   := M1LogicRequestSpeedRef_Pct;
-Data.M2LogicRequestSpeedRef_Pct   := M2LogicRequestSpeedRef_Pct;
+Data.M1LogicRequestSpeedCmd_Pct   := M1LogicRequestSpeedCmd_Pct;
+Data.M2LogicRequestSpeedCmd_Pct   := M2LogicRequestSpeedCmd_Pct;
 Data.KoboldContactorCmdArbitrated := KoboldContactorCmdArbitrated;
 Data.WinchM1State                 := WinchM1State;
 Data.WinchM2State                 := WinchM2State;

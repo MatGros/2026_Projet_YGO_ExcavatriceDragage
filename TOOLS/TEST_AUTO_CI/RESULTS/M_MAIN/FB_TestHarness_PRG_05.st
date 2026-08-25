@@ -103,7 +103,7 @@ instTranslationM3(
     StartStop               := m3StartStop,
     SafeStop                := Data.TranslationSafety.SafeStop,
     Direction               := m3Direction,
-    SpeedRefPct             := m3SpeedRef,
+    SpeedCmd_Pct             := m3SpeedRef,
     PositionSensorTarget    := FALSE,
     SlowdownSensorTremie    := AcqData.TranslationAtPV,
     SlowdownSensorMaintenance := AcqData.TranslationAtP1,
@@ -131,7 +131,7 @@ Data.TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslati
 Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz      := instTranslationM3.RequestedDriveFreqHz;
 
 Data.TranslationState.ActiveDirection                          := m3Direction;
-Data.TranslationState.ActiveSpeedRef_Pct                       := m3SpeedRef;
+Data.TranslationState.ActiveSpeedCmd_Pct                       := m3SpeedRef;
 Data.TranslationState.Busy                                     := instTranslationM3.Status.Busy;
 {endregion}
 END_FUNCTION_BLOCK
