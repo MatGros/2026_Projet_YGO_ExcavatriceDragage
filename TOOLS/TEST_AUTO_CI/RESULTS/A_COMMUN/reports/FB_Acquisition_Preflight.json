@@ -1,27 +1,59 @@
 {
   "version": 1,
-  "file": "test_fb_acquisition_preflight.st",
+  "file": "test_fb_fbstatus.st",
   "results": [
     {
-      "name": "BootPending declenche automatiquement un verdict au 1er scan si la machine est deja a l arret",
+      "name": "TC-P03-001 Enable=FALSE neutralise le statut (gate)",
       "passed": true
     },
     {
-      "name": "Execute pendant que la machine roule differe le verdict jusqu a l arret complet",
+      "name": "Nominal : Enable=TRUE sans cause -> Ready, aucun defaut ni warning",
       "passed": true
     },
     {
-      "name": "Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant",
+      "name": "TC-P03-007 Warning auto-efface sans Reset des que la cause disparait",
       "passed": true
     },
     {
-      "name": "Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple)",
+      "name": "TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute)",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage)",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-014 Reset MAINTENU + cause disparait pendant le maintien : PAS d acquittement silencieux (T148, verrou)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 4,
-    "passed": 4,
+    "total": 12,
+    "passed": 12,
     "failed": 0
   }
 }

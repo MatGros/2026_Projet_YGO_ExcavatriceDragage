@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-25 07:05:05</div>
+    <div class="exec-time">2026-08-25 16:45:56</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (5 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-brake-0">Gate : Enable=FALSE colle le frein immediatement (securite positive)</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-1">Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms)</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-2">Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable)</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-3">Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-4">Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu</a></li></ul>
+        <summary>📋 Sommaire (12 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-brake-0">TC-P03-001 Enable=FALSE neutralise le statut (gate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-1">Nominal : Enable=TRUE sans cause -&gt; Ready, aucun defaut ni warning</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-2">TC-P03-007 Warning auto-efface sans Reset des que la cause disparait</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-3">TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-4">TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute)</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-5">TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-6">TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-7">TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-8">TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-9">TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-10">TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage)</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-11">TC-P03-014 Reset MAINTENU + cause disparait pendant le maintien : PAS d acquittement silencieux (T148, verrou)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +204,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/5 vérifications validées
+            12/12 vérifications validées
         </div>
     </div>
     
@@ -401,60 +401,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 14 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BRAKECMD</code> jamais câblé en production</li><li>Pin <code>BRAKECOMMANDOPENCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>CONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>CONTACTORFEEDBACK</code> jamais câblé en production</li><li>Pin <code>DELAYCONTACTCLOSE</code> jamais câblé en production</li><li>Pin <code>DELAYMAGNETISE</code> jamais câblé en production</li><li>Pin <code>DELAYMOTORDECEL</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FEEDBACKTIMEOUT</code> jamais câblé en production</li><li>Pin <code>MOVEMENTREQUESTED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MOVEMENTREQUESTED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CONTACTORFEEDBACK <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSCONTACTORCHECK <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DELAYCONTACTCLOSE <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DELAYMAGNETISE <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DELAYMOTORDECEL <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">FEEDBACKTIMEOUT <span class="pin-type">IEC_TIME</span></div>
-        </div></div>
-            <div class="pin-block">FB_Brake</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STATUS <span class="pin-type">ST_FBSTATUS</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BRAKECOMMANDOPENCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTORCHECK <span class="pin-type">ST_CONTACTORCHECK</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -532,70 +478,136 @@
     </details>
     
     <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 12 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-brake-0" class="test-card test-card-pass test-card-contract">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>Gate : Enable=FALSE colle le frein immediatement (securite positive) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3>TC-P03-001 Enable=FALSE neutralise le statut (gate) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (2)</span><ul><li>Enable=FALSE : FB non pret</li><li>Enable=FALSE : frein colle (BrakeCmd=FALSE) quelle que soit la demande de mouvement</li></ul></div>
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-1" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Nominal : Enable=TRUE sans cause -&gt; Ready, aucun defaut ni warning <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-2" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-007 Warning auto-efface sans Reset des que la cause disparait <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-3" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-4" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-5" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-6" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-7" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-8" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-9" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-10" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-brake-11" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-014 Reset MAINTENU + cause disparait pendant le maintien : PAS d acquittement silencieux (T148, verrou) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
             
             
         </article>
         </div>
     </details>
     
-    <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-brake-1" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms) </h3>
-            </header>
-            <div class="comments"><p class='comment'>Bypass du controle contacteur : ce test se concentre sur le seul timing de magnetisation</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (6)</span><ul><li>t=0 : magnetisation demarre, frein encore colle</li><li>sequence en cours -&gt; BUSY</li><li>t=399ms &lt; 400ms requis : toujours colle</li><li>t=401ms &gt;= 400ms : magnetisation acquise, frein relache</li><li>sequence terminee -&gt; DONE</li><li>bypass actif : confirmation = image de BrakeCmd</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-brake-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable) </h3>
-            </header>
-            <div class="comments"><p class='comment'>A VERIFIER intentionnellement : DelayMotorDecel/TonDecel sont declares et documentes
-       (&quot;Delai deceleration avant collage frein&quot;) mais TonDecel.IN est TOUJOURS force a FALSE
-       dans FB_Brake.st (§1/§3) -- aucune temporisation n est reellement appliquee avant que le
-       frein ne colle. Ce test documente le comportement REEL actuel (immediat), pas une exigence
-       validee -- a confirmer avec l utilisateur si une temporisation etait pourtant voulue.</p><p class='comment'>mouvement arrete : meme scan, frein colle instantanement -- DelayMotorDecel (500ms) ignore</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (3)</span><ul><li>precondition : frein ouvert</li><li>MovementRequested retombe : frein colle DES CE SCAN, aucun delai observe</li><li>retour a READY immediat</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-brake-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture </h3>
-            </header>
-            <div class="comments"><p class='comment'>1s de plus (FeedbackTimeout) : le retour n a jamais confirme -&gt; defaut</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (5)</span><ul><li>magnetisation acquise : commande ouverture emise (ContactorFeedback ne confirme pas encore)</li><li>commande ouverture emise mais jamais confirmee -&gt; StuckClosed</li><li>defaut visible sur Status.Error</li><li>bit0 : incoherence retour contacteur</li><li>sortie sure sur defaut : BrakeCmd force a FALSE malgre la sequence terminee</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-brake-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu </h3>
-            </header>
-            <div class="comments"><p class='comment'>la cause disparait (le retour confirme enfin), mais SANS Reset : le defaut reste affiche</p><p class='comment'>front Reset, cause deja disparue : acquitte</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (4)</span><ul><li>precondition : defaut StuckClosed actif</li><li>cause disparue mais pas acquittee : le defaut reste affiche (pas d auto-effacement)</li><li>Reset avec cause disparue (retour coherent) : defaut acquitte</li><li>plus de defaut : frein a nouveau relache (mouvement toujours demande)</li></ul></div>
-            
-            
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test métier)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Composant technique / socle transverse : non rattaché à un catalogue de tests métier ou de procédé spécifique.
         </div>
     </details>
     <details>

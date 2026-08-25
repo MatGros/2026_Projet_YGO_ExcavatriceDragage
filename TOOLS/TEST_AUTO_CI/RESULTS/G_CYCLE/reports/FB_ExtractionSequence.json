@@ -1,19 +1,15 @@
 {
   "version": 1,
-  "file": "test_prg_02_acquisition.st",
+  "file": "test_fb_extractionsequence.st",
   "results": [
     {
-      "name": "PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)",
-      "passed": true
-    },
-    {
-      "name": "PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position",
+      "name": "Extraction : Enable=FALSE neutralise les permis",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 1,
+    "passed": 1,
     "failed": 0
   }
 }
