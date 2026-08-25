@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_main_end_to_end.st",
+  "file": "test_prg_04_treuils_benne.st",
   "results": [
     {
-      "name": "MAIN_GLOBAL : Chaine Complete - Qualification Neutre vers Montee Treuils Couples",
+      "name": "PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth",
       "passed": true
     },
     {
-      "name": "MAIN_GLOBAL : Coupure Puissance AU Propagee a tous les Actionneurs",
+      "name": "PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)",
       "passed": true
     }
   ],
