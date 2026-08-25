@@ -20,4 +20,4 @@ Règle d'or : **un gabarit/standard s'écrit une seule fois** et est référenc�
 
 - [`SKILL_BANNER_TEMPLATE.md`](SKILL_BANNER_TEMPLATE.md) — **gabarit unique** des bannières de
   déclenchement (format 60 `=`, émoji + titre, 1 ligne d'action). Appliqué par `task-planner`,
-  `troubleshooting`, `codesys-workflow` et le briefing session `AGENTS.md`.
+  `troubleshooting` et le briefing session `AGENTS.md`.

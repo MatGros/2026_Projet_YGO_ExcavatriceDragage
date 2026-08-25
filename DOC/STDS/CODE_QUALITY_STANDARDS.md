@@ -15,7 +15,7 @@
 | <nobr>Comment on **teste/vérifie**</nobr> | `DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md` |
 | <nobr>Contrats FB, DUT et CFC</nobr> | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` |
 | <nobr>Ce que fait la machine</nobr> | `DOC/` — voir `DOC/README.md` pour l'index complet |
-| <nobr>Comment on exécute une modif</nobr> | `.claude/skills/codesys-workflow.md` |
+| <nobr>Comment on exécute une modif</nobr> | `AGENTS.md` (§ Workflow d'édition) |
 
 ---
 
@@ -849,7 +849,6 @@ fait plus partie des nouveaux contrats LD.
 ## 📖 Comment ce document vit
 
 - `AGENTS.md` (point d'entrée unique) y renvoie au même niveau que `NAMING_CONVENTION.md`.
-- `.claude/skills/codesys-workflow.md` **applique** ce référentiel, ne le recopie pas.
 - `TOOLS/AGENT_WORKFLOW/docs/CODE_WRITING_POLICY.md` renvoie ici pour §POO et §organisation.
 - Les prompts de sous-agents le citent via `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md`.
 - Toute règle ajoutée ici après un incident vient **avec son garde-fou** dans

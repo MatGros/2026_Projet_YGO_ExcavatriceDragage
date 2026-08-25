@@ -28,7 +28,7 @@ demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) 
 1. Lire les points d'entrée : `README.md` (racine), `DOC/README.md`, `TOOLS/README.md`,
    `TOOLS/AGENT_WORKFLOW/README.md` — pas tout le détail, juste repérer où chercher ensuite.
 2. Restituer un briefing court :
-   - Tableau des 4 skills projet (`codesys-workflow`, `task-planner`, `troubleshooting`,
+   - Tableau des 3 skills projet (`task-planner`, `troubleshooting`,
      `create-pr`) — rôle + déclencheur, voir [DOC/README.md](DOC/README.md) et `.claude/skills/`.
    - Snapshot rapide de [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml) : combien de tâches
      verrouillées 🔒 / en cours ⏳ / à faire ⬜.
@@ -90,7 +90,7 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 
 ## 🔒 GUARDRAILS — avant toute modif `CODE/`, `FB_`, `PRG_` ou « codesys »
 
-1. ✅ Charger la skill [`codesys-workflow`](.claude/skills/codesys-workflow.md)
+1. ✅ Appliquer le workflow d'édition standard (§ Workflow d'édition ci-dessous)
 2. ✅ Lire les documents 1 à 5 ci-dessus (ajuster la spec métier : Joystick=P08, Encoder/Homing=P09,
    Treuils **Benne incluse**=P10, Translation=P11, Diagnostic=P12, Simulation=P13, Troubleshooting=P14
 3. ✅ Vérifier que la spec est complète → sinon **demander**, ne pas deviner
@@ -206,7 +206,7 @@ git config core.hooksPath TOOLS/AGENT_WORKFLOW/hooks
 
 ---
 
-## 🛠️ Workflow d'édition (détail : [`codesys-workflow`](.claude/skills/codesys-workflow.md))
+## 🛠️ Workflow d'édition
 
 `0.` règles → `1.` architecture → `2.` existant → `3.` plan **validé** → `4.` code ST + note
 d'application → `4bis.` vérification mécanique **bloquante** → `5.` REX versionné → `6.` nouvel export
