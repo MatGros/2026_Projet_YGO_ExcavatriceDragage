@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_prg_02_acquisition.st",
+  "file": "test_fb_modes.st",
   "results": [
     {
-      "name": "PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)",
+      "name": "Modes : Enable=FALSE desactive le FB",
       "passed": true
     },
     {
-      "name": "PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position",
+      "name": "Modes : Nominal Maint N1",
       "passed": true
     }
   ],

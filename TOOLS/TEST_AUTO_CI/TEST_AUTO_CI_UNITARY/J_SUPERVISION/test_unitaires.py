@@ -1,4 +1,4 @@
-"""Test Pytest pour PRG_06_Outputs (M_MAIN)."""
+"""Tests unitaires Pytest pour le domaine J_SUPERVISION."""
 
 import subprocess
 import sys
@@ -40,5 +40,5 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_PRG_06_Outputs():
-    _run_fb_test("PRG_06_Outputs")
+def test_FB_Hmi_BannerFormatter():
+    _run_fb_test("FB_Hmi_BannerFormatter")

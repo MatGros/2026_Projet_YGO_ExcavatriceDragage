@@ -1,4 +1,4 @@
-"""Test Pytest pour PRG_07_Supervision (M_MAIN)."""
+"""Tests unitaires Pytest pour le domaine E_CODEURS."""
 
 import subprocess
 import sys
@@ -40,5 +40,5 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_PRG_07_Supervision():
-    _run_fb_test("PRG_07_Supervision")
+def test_FB_Encoder():
+    _run_fb_test("FB_Encoder")

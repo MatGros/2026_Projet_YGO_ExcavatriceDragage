@@ -1,4 +1,4 @@
-"""Test Pytest pour FB_Bucket (H_TREUILS_BENNE)."""
+"""Tests unitaires Pytest pour le domaine F_MODES."""
 
 import subprocess
 import sys
@@ -40,5 +40,5 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_FB_Bucket():
-    _run_fb_test("FB_Bucket")
+def test_FB_Modes():
+    _run_fb_test("FB_Modes")

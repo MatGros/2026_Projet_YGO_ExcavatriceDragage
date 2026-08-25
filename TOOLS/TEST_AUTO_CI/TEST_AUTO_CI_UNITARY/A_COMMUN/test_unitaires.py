@@ -1,4 +1,4 @@
-"""Test Pytest pour PRG_04_Treuils_Benne (M_MAIN)."""
+"""Tests unitaires Pytest pour le domaine A_COMMUN."""
 
 import subprocess
 import sys
@@ -40,5 +40,35 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_PRG_04_Treuils_Benne():
-    _run_fb_test("PRG_04_Treuils_Benne")
+def test_FB_CycleTime():
+    _run_fb_test("FB_CycleTime")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_Ramp():
+    _run_fb_test("FB_Ramp")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_Acquisition_Preflight():
+    _run_fb_test("FB_Acquisition_Preflight")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_FbStatus():
+    _run_fb_test("FB_FbStatus")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_Filter():
+    _run_fb_test("FB_Filter")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_Brake():
+    _run_fb_test("FB_Brake")

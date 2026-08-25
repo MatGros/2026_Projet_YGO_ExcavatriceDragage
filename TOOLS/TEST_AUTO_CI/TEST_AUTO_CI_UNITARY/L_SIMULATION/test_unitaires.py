@@ -1,4 +1,4 @@
-"""Test Pytest pour PRG_05_Translation (M_MAIN)."""
+"""Tests unitaires Pytest pour le domaine L_SIMULATION."""
 
 import subprocess
 import sys
@@ -40,5 +40,5 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_PRG_05_Translation():
-    _run_fb_test("PRG_05_Translation")
+def test_FB_SimBench():
+    _run_fb_test("FB_SimBench")

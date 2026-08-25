@@ -1,4 +1,4 @@
-"""Test Pytest pour FB_ExtractionSequence (G_CYCLE)."""
+"""Tests unitaires Pytest pour le domaine B_AU_SECURITE."""
 
 import subprocess
 import sys
@@ -40,5 +40,5 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_FB_ExtractionSequence():
-    _run_fb_test("FB_ExtractionSequence")
+def test_FB_Safety_EmergencyManagement():
+    _run_fb_test("FB_Safety_EmergencyManagement")
