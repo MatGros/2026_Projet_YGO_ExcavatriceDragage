@@ -2,7 +2,7 @@
    ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des modes d'exploitation et maintenance
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
    ======================================================================= *)
 TYPE E_Mode :
 ENUM

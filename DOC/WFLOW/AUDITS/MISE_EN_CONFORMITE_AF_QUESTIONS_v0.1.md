@@ -12,7 +12,8 @@
 | AF-01 | ✅ Fait | `b599d031` | 2 tours, tous défauts corrigés |
 | AF-02 | ✅ Fait | `777cb424` | 1 tour, 4 gaps ingénierie corrigés |
 | AF-03 | ✅ Fait | `3ed051bd` | 1 tour, 5 gaps ingénierie corrigés |
-| AF-04 | ✅ Fait | (à suivre) | 1 tour, bug version titre + réécriture §5 synchro (fausse phase de rattrapage) |
+| AF-04 | ✅ Fait | `0e7e54f2` | 1 tour, bug version titre + réécriture §5 synchro (fausse phase de rattrapage) |
+| AF-05 | ✅ Fait | (à suivre) | 1 tour, nom de variable inexistant corrigé (`TglMaintenanceZoneAccess`→`SelMaintenanceZoneAccess`) |
 | AF-03 | ⬜ | — | — |
 | AF-04 | ⬜ | — | — |
 | AF-05 | ⬜ | — | — |
