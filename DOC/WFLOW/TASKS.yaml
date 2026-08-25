@@ -1355,6 +1355,20 @@ tasks:
     objectifs: []
     bloque_par: []
 
+  - id: "T150-H"
+    parent_id: "T150"
+    statut: "✅"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "CC"
+    date: "2026-08-25T17:29:58"
+    titre: "Finir la migration templates/ (T150-G incomplète)"
+    contexte: "T150-G (2026-08-24) prétendait avoir déplacé les gabarits projet de TOOLS/AGENT_WORKFLOW/templates/ vers DOC/WFLOW/TEMPLATE/, mais n'avait en réalité déplacé que SKILL_BANNER_TEMPLATE.md — trouvé en challengeant une demande de déplacement de af_spec.md pendant le refactor AF-08."
+    description: "✅ 6 fichiers déplacés et renommés (git mv, historique préservé) vers DOC/WFLOW/TEMPLATE/ : af_spec.md→AF_SPEC_TEMPLATE.md, fb_header.st→FB_HEADER_TEMPLATE.st, gvl_header.st→GVL_HEADER_TEMPLATE.st, motion_fb_header.st→MOTION_FB_HEADER_TEMPLATE.st, program_header.st→PROGRAM_HEADER_TEMPLATE.st, type_header.st→TYPE_HEADER_TEMPLATE.st. Référence corrigée dans GUIDE_EDITION_AF_v1.0.md:247. DOC/WFLOW/TEMPLATE/README.md mis à jour (liste + note migration). G340 (doc-links) et check_skill_stubs.py PASS. Aucun script cassé (0 référence trouvée en dehors de mentions historiques TASKS.yaml/TASK_VIEWER.html)."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
   - id: "T151"
     parent_id: ""
     statut: "✅"
@@ -1568,5 +1582,36 @@ tasks:
       - "Aligner les émoji de section sur la légende fixe de GUIDE_EDITION_AF_v1.0 §4"
       - "Pour AF-09/10/11/12 : trancher d'abord si le pattern chapô+sous-fiches reste la norme pour ces domaines ou si AF-08 (monolithique) doit devenir la référence unique — ne pas mélanger les deux approches sans décision explicite"
       - "G340 PASS après chaque AF traité, un commit par AF (pas un méga-commit de 13 fichiers)"
+    bloque_par: []
+
+  - id: "T156"
+    parent_id: ""
+    statut: "✅"
+    criticite: "C1"
+    domaine: "STANDARDS"
+    agent: "CC"
+    date: "2026-08-25T19:00:44"
+    titre: "Formaliser section IHM, Configuration & Dépannage dans GUIDE_EDITION_AF_v1.0"
+    contexte: "Le refactor AF-08 a fait ressortir que Cfg/Bypass/Dépannage étaient traités de façon incohérente entre les fiches AF (pas de section dédiée, contenu dispersé ou absent). Décision de grouper ces 3 aspects dans une section normée par fiche, en excluant explicitement la Simulation (hors périmètre exigence machine — reste dans Pipeline/AF13)."
+    description: "✅ GUIDE_EDITION_AF_v1.0.md §4 (trame canonique point 7 + légende émoji fixe 🖥️), AF_SPEC_TEMPLATE.md §7 mis à jour (squelette Cmd/State/Cfg/Bypass/pointeur Troubleshooting), première application AF_Partie-08_Fonction_Joystick_v2.2.md §8. Règle complémentaire actée la même session : titre de paragraphe référence les codes F<NN>.<seq> couverts entre parenthèses (guide §4 point 6)."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T157"
+    parent_id: ""
+    statut: "⏸️"
+    criticite: "C4"
+    domaine: "SÉCURITÉ"
+    agent: "—"
+    date: "2026-08-25T19:00:44"
+    titre: "Câblage réel ArmingPermit (Q1) + asymétrie homme-mort treuils boutons IHM (Q2)"
+    contexte: "ArmingPermit câblé en dur TRUE dans PRG_02_Acquisition.st:303 (aucun producteur réel, câblage temporaire). PRG_04_Treuils_Benne.st:442,486 n'exige DeadmanArmed qu'en mode Joystick Maître, contrairement à Translation qui l'exige dans tous les modes (PRG_05_Translation.st:186-187) — asymétrie non tranchée, bug ou voulu (trouvé en revue indépendante 2026-08-25)."
+    description: "Étude de conception livrée (lecture seule, aucun code touché) : DOC/WFLOW/AUDITS/PRG02_20260824/PROPOSITION_ArmingPermit_Cablage_v0.1.md. Piste retenue : calculer ArmingPermit dans PRG_04_Treuils_Benne (réutilise le F_TRIG BenneBusyFallEdge déjà écrit, Mode déjà à jour à ce rang), publier sur le bus Data, PRG_02_Acquisition consomme avec 1 scan de retard explicite. Points non tranchés avant tout code : acceptabilité du retard (10-20ms) sur un signal de désarmement homme-mort — filet de sécurité potentiel (PRG_04/05 réarbitrent chaque consigne contre Auth.Mode du scan courant) à prouver par audit, pas supposé ; modification de contrat DUT Data (AF03) à documenter ; asymétrie Q2 à trancher (bug ou voulu) avant de modifier PRG_04. ⏸️ En attente d'arbitrage humain — pas d'autorisation de coder. Documenté dans AF_Partie-08_Fonction_Joystick_v2.2.md §10 (Q1, Q2)."
+    contrat: ""
+    objectifs:
+      - "Décision humaine : Q1 (producteur ArmingPermit) et Q2 (asymétrie treuils/translation) tranchés"
+      - "Si validé : audit du filet de sécurité PRG_04/PRG_05 (réarbitrage contre Auth.Mode du scan courant) avant tout code"
+      - "Contrat de tâche C4 rédigé avant implémentation (task_contract.yaml)"
     bloque_par: []
 

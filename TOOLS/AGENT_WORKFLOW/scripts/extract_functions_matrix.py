@@ -156,9 +156,9 @@ def normalize_validation_item(row: dict[str, str]) -> dict[str, Any]:
     item: dict[str, Any] = {}
     for k, v in row.items():
         k_lower = k.lower()
-        if "id" == k_lower:
+        if "id" in k_lower:
             item["id"] = v
-        elif "intention" in k_lower:
+        elif "intention" in k_lower or "comportement" in k_lower:
             item["intention"] = v
         elif "preuve" in k_lower:
             item["preuve"] = v

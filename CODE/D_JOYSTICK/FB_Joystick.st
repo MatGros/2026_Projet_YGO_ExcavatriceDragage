@@ -9,7 +9,7 @@
                   Désarmement sur neutre prolongé ; le changement de mode / fin de
                   cycle benne est géré par l'externe via ArmingPermit (vue joystick).
    📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md (F08.01, F08.03-F08.07)
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.2.md (F08.01, F08.03-F08.07)
    ===================================================================== *)
 
 FUNCTION_BLOCK FB_Joystick

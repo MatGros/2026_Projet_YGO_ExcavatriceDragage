@@ -2,7 +2,7 @@
 
 📅 2026-08-25 · 🧑‍💻 T153-B · Intègre les 5 conditions du challenge indépendant (v0.1 §🕵️) +
 tranche Q-TF1 à Q-TF6. v0.1 conservée telle quelle (historique, non écrasée).
-🚦 Prérequis T153-A (resynchro AF-08) : **fait** — voir `DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md`.
+🚦 Prérequis T153-A (resynchro AF-08) : **fait** — voir `DOC/AF/AF_Partie-08_Fonction_Joystick_v2.2.md`.
 
 ## ✅ Décisions actées (Q-TF1 à Q-TF6)
 

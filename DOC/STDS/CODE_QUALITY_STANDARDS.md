@@ -68,7 +68,7 @@
        `G340_check_doc_links.py --fix` reconnaît et maintient à jour automatiquement (D1/D2).
        Si la Table des fonctions de l'AF existe, ajouter le(s) code(s) `F<NN>.<seq>` **en
        suffixe entre parenthèses**, jamais en remplacement du chemin :
-       `📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md (F08.02)`. Un FB qui
+       `📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.2.md (F08.02)`. Un FB qui
        porte plusieurs fonctions liste plusieurs codes (`F08.01, F08.03-F08.07`).
      - `🛡️` = Bloc ou fonction de Sécurité Machine.
      - `🔒` = Polarité, invariant de sécurité ou verrouillage / interlock.
