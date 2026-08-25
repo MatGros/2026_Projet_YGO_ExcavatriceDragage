@@ -13,11 +13,8 @@
 | AF-02 | ✅ Fait | `777cb424` | 1 tour, 4 gaps ingénierie corrigés |
 | AF-03 | ✅ Fait | `3ed051bd` | 1 tour, 5 gaps ingénierie corrigés |
 | AF-04 | ✅ Fait | `0e7e54f2` | 1 tour, bug version titre + réécriture §5 synchro (fausse phase de rattrapage) |
-| AF-05 | ✅ Fait | (à suivre) | 1 tour, nom de variable inexistant corrigé (`TglMaintenanceZoneAccess`→`SelMaintenanceZoneAccess`) |
-| AF-03 | ⬜ | — | — |
-| AF-04 | ⬜ | — | — |
-| AF-05 | ⬜ | — | — |
-| AF-06 | ⬜ | — | — |
+| AF-05 | ✅ Fait | `98cf96ee` | 1 tour, nom de variable inexistant corrigé (`TglMaintenanceZoneAccess`→`SelMaintenanceZoneAccess`) |
+| AF-06 | ✅ Fait | (à suivre) | 1 tour, ⛔ P0 sécurité trouvé (EncoderIncoherent non consommé par Modes/Safety) |
 | AF-07 | ⬜ | — | — |
 | AF-08 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
 | AF-09 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
@@ -86,6 +83,24 @@ d'étape générique si `CycleMotionPermit=TRUE`) ?
 `VERSION_HISTORY.md:129` mentionne "AF_Partie-04 v1.5 · v1.4 archivée" mais aucun fichier v1.5
 n'existe (archive saute v1.4→v2.0 directement). Trouvé lors de la review AF-04, sans lien avec le
 bug de titre "v3.0" corrigé cette session. À nettoyer un jour, pas bloquant.
+
+### Q7 — ⛔ P0 SÉCURITÉ : `EncoderIncoherent` n'atteint ni Modes ni Safety (trouvé 2026-08-26)
+**Contexte** : `AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3ter` affirmait (avant cette
+révision) que le trou P0 historique (AF09 §6 alerte 8 : perte bus → position gelée → dans la
+plage → incohérence jamais vue → `SEMI_AUTO` reste autorisé) était "corrigé par conception" via
+`ST_EncoderMeasurements`/`EncoderFault := NOT EncoderAvailable OR EncoderIncoherent`. **Faux en
+pratique** : `PRG_03_Modes_Cycle.st:43` câble `FB_Modes.EncoderFaultPresent` sur
+`COD1/COD2_DeviceState <> RUNNING` uniquement — `EncoderIncoherent` n'atteint jamais cette porte.
+`FB_Safety_Winch` ne consomme que `EncoderAvailable`, pas `EncoderIncoherent` non plus.
+**Conséquence** : une incohérence codeur SANS perte de bus (`EncoderIncoherent=TRUE`,
+`EncoderAvailable=TRUE`) n'est bloquée nulle part — ni Modes ni Safety. Le doc a été corrigé pour
+refléter l'état réel (marqué ⛔ non résolu), mais **le code lui-même n'a pas été touché** (hors
+périmètre de ce chantier documentaire).
+**Décision requise** : câbler `FB_Modes`/`FB_Safety_Winch` sur l'agrégat `EncoderFault` (formule
+déjà correcte dans `FB_EncoderReliability`, juste jamais consommée en aval), ou documenter
+explicitement pourquoi une incohérence seule ne doit pas bloquer `SEMI_AUTO`/déclencher `SafeStop`
+si c'est volontaire. **Criticité C4 proposée** (sécurité, comportement machine). Documenté en TBD
+`AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §9`.
 
 ---
 

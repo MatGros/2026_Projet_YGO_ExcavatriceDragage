@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📤 PRG_06_Outputs — Barrière finale des sorties physiques (ST pur)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §5
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §5
    ⚙️ Exécuté en position 6 (après PRG_05_Translation).
    🛡️ Interlocks finaux M1/M2/M3 + agrégation PowerCutOff + chaîne AU.
    🔒 SafetyStructureNotValidated reste TRUE : aucune sortie moteur/frein

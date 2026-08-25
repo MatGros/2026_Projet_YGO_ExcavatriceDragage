@@ -1615,3 +1615,20 @@ tasks:
       - "Contrat de tâche C4 rédigé avant implémentation (task_contract.yaml)"
     bloque_par: []
 
+  - id: "T158"
+    parent_id: ""
+    statut: "⏸️"
+    criticite: "C4"
+    domaine: "SÉCURITÉ"
+    agent: "—"
+    date: "2026-08-26T00:00:00"
+    titre: "EncoderIncoherent n'atteint ni FB_Modes ni FB_Safety_Winch (bug P0 historique non résolu)"
+    contexte: "Trouvé en revue indépendante (sous-agent expert automatisme) durant la mise en conformité AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3ter. Le document affirmait ce trou P0 (AF09 §6 alerte 8 : perte bus → position gelée dans la plage → incohérence jamais vue → SEMI_AUTO reste autorisé) 'corrigé par conception'. Faux en pratique : PRG_03_Modes_Cycle.st:43 câble FB_Modes.EncoderFaultPresent sur COD1/COD2_DeviceState<>RUNNING uniquement (EncoderIncoherent jamais consommé) ; FB_Safety_Winch (CODE/H_TREUILS_BENNE/FB_Safety_Winch.st:252) ne consomme que EncoderAvailable, pas EncoderIncoherent non plus."
+    description: "Une incohérence codeur SANS perte de bus (EncoderIncoherent=TRUE, EncoderAvailable=TRUE) n'est bloquée nulle part côté Modes/Safety aujourd'hui. La formule agrégée correcte existe déjà (FB_EncoderReliability.st:30, EncoderFault := NOT EncoderAvailable OR EncoderIncoherent) mais n'est consommée par aucun des deux consommateurs sécurité concernés. Documentation corrigée pour refléter l'état réel (AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3ter/§9, marqué ⛔ non résolu) — le code lui-même n'a pas été touché (hors périmètre du chantier documentaire en cours). ⏸️ En attente d'arbitrage humain avant tout code."
+    contrat: ""
+    objectifs:
+      - "Décision humaine : câbler FB_Modes/FB_Safety_Winch sur l'agrégat EncoderFault, ou documenter explicitement pourquoi une incohérence seule ne doit pas bloquer SEMI_AUTO/déclencher SafeStop"
+      - "Si câblage requis : contrat de tâche C4 rédigé avant implémentation (task_contract.yaml)"
+      - "Vérifier l'absence d'impact sur TC-P06-* et sur les tests non-régression existants avant tout changement"
+    bloque_par: []
+
