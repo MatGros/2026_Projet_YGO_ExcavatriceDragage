@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🎚️ ST_Modes_Autorisations — Bus d'autorisations du mode machine
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
                    DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
    🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
       Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
