@@ -11,7 +11,8 @@
 |---|---|---|---|
 | AF-01 | ✅ Fait | `b599d031` | 2 tours, tous défauts corrigés |
 | AF-02 | ✅ Fait | `777cb424` | 1 tour, 4 gaps ingénierie corrigés |
-| AF-03 | ✅ Fait | (à suivre) | 1 tour, 5 gaps ingénierie corrigés |
+| AF-03 | ✅ Fait | `3ed051bd` | 1 tour, 5 gaps ingénierie corrigés |
+| AF-04 | ✅ Fait | (à suivre) | 1 tour, bug version titre + réécriture §5 synchro (fausse phase de rattrapage) |
 | AF-03 | ⬜ | — | — |
 | AF-04 | ⬜ | — | — |
 | AF-05 | ⬜ | — | — |
@@ -72,6 +73,18 @@ lui-même « ce FB remonte-t-il un défaut ? » à partir de son corps. Un FB `l
 documenté en note dans `AF_Partie-03_Contrats_Composants_v2.2.md §3`. **Correctif proposé**
 (pas fait, hors périmètre doc) : renforcer le test pour détecter l'écriture d'un champ
 défaut-like dans un FB classé `light`.
+
+### Q6 — Timeout séquence Kobold (`FB_DiveSearch`) : attente indéfinie voulue ou oubli ?
+`FB_DiveSearch.st` ne porte aucun `TON`/timer — si le front d'immersion n'arrive jamais, le FB
+attend indéfiniment (défaut uniquement par violation de séquence). Trouvé lors de la review AF-04.
+Documenté en TBD `AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md §8`. **Non tranché** : ajouter un
+timeout explicite, ou l'attente indéfinie est-elle réellement voulue (couverte par le tempo max
+d'étape générique si `CycleMotionPermit=TRUE`) ?
+
+### Note — `VERSION_HISTORY.md` : historique AF-04 incohérent (non bloquant)
+`VERSION_HISTORY.md:129` mentionne "AF_Partie-04 v1.5 · v1.4 archivée" mais aucun fichier v1.5
+n'existe (archive saute v1.4→v2.0 directement). Trouvé lors de la review AF-04, sans lien avec le
+bug de titre "v3.0" corrigé cette session. À nettoyer un jour, pas bloquant.
 
 ---
 
