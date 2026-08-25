@@ -25,8 +25,11 @@
    - Toute spécification vit sous `DOC/AF/`.
    - Une modification d'exigence métier impose une nouvelle version (`_vX.Y.md`). L'ancienne version est déplacée dans `ARCHIVES/Doc/`.
 2. **Structure d'une AF** :
-   - 📌 Sommaire & Rôle Machine
-   - 🧪 **Points de Validation (`TC-Pxx-nnn`)** (juste après le sommaire, obligatoire)
+   - 📌 Sommaire
+   - 🎯 **§1 Rôle et périmètre + Table des fonctions** (`F<NN>.<seq>`) — catalogue des fonctions
+     du domaine, **avant** la Table des points de validation (convention `GUIDE_EDITION_AF.md §2bis`,
+     document `DESIGN_TABLE_FONCTIONS_AF`)
+   - 🧪 **Table des points de validation — Cas de Test (`TC-Pxx-nnn`)** (juste après §1, obligatoire)
    - 🧱 Interfaces & DUTs
    - ⚙️ Chronogrammes & Logique métier
 3. **Règle des Identifiants de Validation (`TC-Pxx-nnn`)** :
@@ -60,7 +63,13 @@
      ```
    - **Guide des Émojis Blanchis Autorisés (whitelist CODESYS projet)** :
      - `🎯` = Rôle principal du composant (recopié de l'AF).
-     - `📄` = Référence exacte à la spec métier active dans `DOC/AF/`.
+     - `📄` = Référence exacte à la spec métier active dans `DOC/AF/` — **chemin complet
+       versionné obligatoire** (`DOC/AF/AF_Partie-NN_..._vX.Y.md`), c'est le seul format que
+       `G340_check_doc_links.py --fix` reconnaît et maintient à jour automatiquement (D1/D2).
+       Si la Table des fonctions de l'AF existe, ajouter le(s) code(s) `F<NN>.<seq>` **en
+       suffixe entre parenthèses**, jamais en remplacement du chemin :
+       `📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md (F08.02)`. Un FB qui
+       porte plusieurs fonctions liste plusieurs codes (`F08.01, F08.03-F08.07`).
      - `🛡️` = Bloc ou fonction de Sécurité Machine.
      - `🔒` = Polarité, invariant de sécurité ou verrouillage / interlock.
      - `🔌` = Interface matérielle ou bus de données DUT.
