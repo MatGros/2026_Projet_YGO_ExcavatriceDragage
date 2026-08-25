@@ -1,10 +1,108 @@
-# Convention de Nommage — Projet Excavatrice Dragage
- 
-## Principes
-- **Sans hongrois** : le type se lit dans la déclaration, pas dans le nom.
-- **Sémantique** : le nom décrit le rôle, l'unité ou l'état.
-- **PascalCase** partout. Abréviations anglaises courtes acceptées.
-- **Suffixes d'unité** : seule exception aux abréviations (pour lever ambiguïtés métier).
+# Convention de Nommage PLC — Machine Industrielle & Dragage
+
+> **Références normatives** :
+> - **IEC 61131-3** : Programmation des automates programmables industriels.
+> - **PLCopen** : Bonnes pratiques et vocabulaire Motion Control.
+> - **IEC 81346** : Structuration et identification des systèmes et équipements industriels.
+>
+> Les conventions ci-dessous constituent le référentiel normatif du projet : elles garantissent une portabilité totale (**Siemens / Schneider / Beckhoff / CODESYS**) et une sémantique claire indépendante des constructeurs.
+
+---
+
+## 🎯 1. Principes Généraux
+
+1. **Noms en anglais, courts mais explicites** : PascalCase partout.
+2. **Zéro notation hongroise** : Le type de données (*datatype*) ne doit **jamais** apparaître dans le nom d'une variable. Le type se lit dans la déclaration ou l'IDE, pas dans le nom.
+   - `xDriveReady` ❌ | `bDriveReady` ❌ | `rSpeed` ❌ | `fbDrumDrive` ❌ | `stAxisStatus` ❌
+   - `DriveIsReady` ✅ | `SpeedAct` ✅ | `DrumDrive` ✅ | `AxisStatus` ✅
+3. **Sémantique > Implémentation** : Le nom décrit la fonction, le rôle physique ou l'état, jamais son adresse ou sa technique d'implémentation.
+4. **Bannissement de `Ref` pour les consignes** : Éviter absolument le terme `Ref` pour désigner une consigne (trop ambigu avec le *référencement / Homing* d'axe).
+5. **Cohérence globale (1 notion = 1 nom)** : Une même notion garde exactement le même nom dans tout le projet (code ST, structures DUT, E/S, supervision IHM et documentation AF).
+6. **Suffixes d'unité standardisés** : Précédés d'un underscore `_` (`_M`, `_Pct`, `_Hz`, `_Ms`, `_Mps`).
+
+---
+
+## 📐 1bis. Structure des Grandeurs, Commandes & Chaîne Fonctionnelle
+
+### Structure privilégiée : `Object + Property + Qualifier`
+
+| Suffixe / Qualifier | Signification | Utilisation |
+|---|---|---|
+| `Req` | **Requested** | Demande provenant d'une séquence, de l'opérateur ou du niveau supérieur (non arbitrée) |
+| `Tgt` | **Target** | Valeur cible finale à atteindre |
+| `Cmd` | **Command / Commanded** | Commande effectivement appliquée, arbitrée et envoyée à l'actionneur |
+| `Act` | **Actual** | Valeur réelle mesurée / retour capteur |
+| `SP` | **Setpoint** | Consigne de régulation process (boucle fermée PID) |
+| `PV` | **Process Value** | Grandeur réglée / mesurée d'une boucle process |
+| `Min` | **Minimum** | Limite / Seuil bas |
+| `Max` | **Maximum** | Limite / Seuil haut |
+
+#### Exemples Motion Control :
+- Position câble : `CablePosReq` → `CablePosTgt` → `CablePosCmd` → `CablePosAct`
+- Vitesse tambour : `DrumSpeedTgt` → `DrumSpeedCmd` → `DrumSpeedAct`
+- Couple tambour : `DrumTorqueCmd` → `DrumTorqueAct`
+
+> 💡 **Règle de simplicité** : Tous les niveaux ne doivent pas être créés artificiellement. Si seuls cible et mesure existent : `CablePosTgt` et `CablePosAct`.
+
+### 🔄 Chaîne fonctionnelle
+Lorsqu'ils existent réellement dans le pipeline de commande :
+```text
+Req  ──►  Tgt  ──►  Cmd  ──►  Act
+```
+- **`Req`** : ce qui est demandé (brut)
+- **`Tgt`** : ce que la fonction cherche à atteindre (après consigne/profil)
+- **`Cmd`** : ce qui est effectivement commandé (après verrous/sécurité)
+- **`Act`** : ce qui est réellement obtenu (mesure physique)
+
+---
+
+## ⚡ 1ter. Variables BOOL — Prédicats & Séparation Commande vs État
+
+Un état booléen (`BOOL`) doit idéalement pouvoir être lu comme une **affirmation positive (prédicat)**.
+
+### Prédicats d'état (`Is...`, `Has...`, `Can...`)
+- `BrakeIsOpen` / `BrakeIsClosed`
+- `DriveIsReady` / `DriveIsEnabled`
+- `AxisIsMoving` / `AxisIsHomed`
+- `TankIsEmpty` / `DoorIsClosed`
+- `AxisCanMove` *(aptitude au mouvement)*
+- `DriveHasFault` / `MachineHasWarning` *(présence défaut/alarme)*
+
+### Différenciation nette : Commande vs État
+Permet d'éliminer toute ambiguïté à la lecture du code :
+- `BrakeOpenCmd` *(Pilotage / Ordre)* vs `BrakeIsOpen` *(État physique validé)*
+- `DriveEnableCmd` *(Ordre de mise sous tension)* vs `DriveIsEnabled` *(État variateur sous puissance)*
+
+### Modèle équipement complet : Demande / Commande / Capteur / État
+- `BrakeOpenReq` *(Demande fonctionnelle amont)*
+- `BrakeOpenCmd` *(Commande finale envoyée)*
+- `BrakeOpenSensor` *(Signal physique TOR brut, si distinction requise)*
+- `BrakeIsOpen` *(État validé / interprété)*
+
+*(🚫 On évite volontairement l'abréviation obscure `Fbk`).*
+
+---
+
+## ⚙️ 1quater. Process vs Motion & Homing
+
+### Distinction Motion vs Process
+- **Motion / Grandeur Machine** : Utiliser **`Tgt`** et **`Act`** (`PositionTgt` / `PositionAct`, `SpeedTgt` / `SpeedAct`, `TorqueTgt` / `TorqueAct`).
+- **Process / Boucle de régulation** : Utiliser **`SP`** et **`PV`** (`PressureSP` / `PressurePV`, `TemperatureSP` / `TemperaturePV`, `FlowSP` / `FlowPV`).
+- **Commande Équipement** : **`Cmd`**.
+- **Demande Fonctionnelle** : **`Req`**.
+
+### Homing / Référencement (Vocabulaire réservé)
+> 🚨 **Le terme `Ref` est strictement banni pour désigner une consigne.**
+
+Le vocabulaire réservé exclusivement au référencement mécanique / calage d'axe est :
+- `HomeReq` / `AxisHomeReq` *(Demande de prise d'origine)*
+- `Homing` / `AxisIsHoming` *(Prise d'origine en cours)*
+- `Homed` / `AxisIsHomed` *(Axe référencé / Zéro calé)*
+- `HomePos` / `AxisHomePos` *(Position de référence physique)*
+- `HomingRefRaw` *(Offset brut codeur figé au zéro)*
+
+### Règle Centrale
+Le nom doit permettre de comprendre ce que représente la donnée **sans connaître son datatype, son adresse PLC ou le constructeur utilisé**. La convention reste 100% portable Siemens / Schneider / Beckhoff / CODESYS.
 
 ---
 
@@ -166,27 +264,25 @@ historiquement documentées n'étaient en réalité **jamais utilisées** (le co
 complet) : retirées de la liste "autorisée", déplacées en "à éviter" ci-dessous.
 
 ### Rôle / catégorie
-| Abrév. | Sens | Exemple réel dans `CODE/` |
+| Abrév. | Sens | Exemple réel / cible |
 |---|---|---|
-| `Cmd` | Commande (signal final vers actionneur/bus — Niveau 2, préfixe) | `CmdReset`, `CmdOpen`/`CmdClose` (Bucket), `BrakeCmd` (legacy, suffixe) |
-| `Req` | Requête brute, pas encore arbitrée (Niveau 2, préfixe) | `OpenReq`/`CloseReq` (legacy, suffixe) — voir §`Req` vs `Cmd`, pas de préfixe `Req` en usage actuellement |
-| `Ref` | Consigne | `SpeedRef`, `CablePosRef`, `RefPosM` |
-| `Act` | Valeur mesurée/actuelle | `SpeedAct`, `CablePosAct` |
+| `Cmd` | Commande effective (signal final vers actionneur/bus) | `CmdReset`, `BrakeOpenCmd`, `DrumSpeedCmd` |
+| `Req` | Requête / Demande fonctionnelle brute (non arbitrée) | `BrakeOpenReq`, `OpenReq` |
+| `Tgt` | Cible à atteindre (Motion Control) | `CablePosTgt`, `DrumSpeedTgt` |
+| `Act` | Valeur réelle mesurée / retour capteur | `SpeedAct`, `CablePosAct`, `DrumTorqueAct` |
+| `SP` / `PV` | Setpoint / Process Value (Boucle de régulation process) | `PressureSP`, `PressurePV`, `TemperatureSP` |
 | `Diag` | Diagnostic | `FB_Diag_CanOpen`, `FB_Diag_Ethercat`, `ST_Diag_Device` |
 | `Calc` | Calcul / calculateur (nom d'instance) | `CycleTimeCalc` (instance de `FB_CycleTime`) |
 | `Fwd` / `Rev` | Avant / Arrière (forward/reverse) | `RelayFwd`, `LimitSwitchFwd`, `BtnFwd` |
-| `Min` / `Max` | Limite basse / haute | `MaxStepDescente`, `LimitLegalDepthMinAllowed` |
-| `Pos` | Position — coexiste avec la forme complète (les deux existent dans le code, pas de règle stricte) | `CablePos_M`, `TranslationPosP1` **et** `Position_M`, `PositionSensorTarget` |
+| `Min` / `Max` | Limite basse / haute | `MaxStepDescent`, `LimitLegalDepthMinAllowed` |
+| `Pos` | Position — coexiste avec la forme complète | `CablePos_M`, `TranslationPosP1` **et** `Position_M`, `PositionSensorTarget` |
 
-### ⚠️ Dans l'ancien doc mais PAS utilisées dans le code — préférer le mot complet
-| Abrév. (à éviter) | Toujours écrire |
-|---|---|
-| `En` | `Enable` |
-| `Rdy` | `Ready` |
-| `Err` | `Error` / `ErrorId` |
-| `Sts` | `State` (ou `Ready`/`Busy`/`Done`/`Error` directement, pas de préfixe générique — voir Niveau 2) |
-| `Spd` | `Speed` |
-| `Lim` | `Limit` (ex. `LimitSwitchFwd`, jamais `LimSwitchFwd`) |
+### ⚠️ Termes à éviter ou bannis
+| Terme | Statut | Règle / Remplacement |
+|---|---|---|
+| `Ref` | 🚫 **Banni pour les consignes** | Trop ambigu avec le *Référencement / Homing*. Remplacer par `Tgt`, `Cmd` ou `SP`. Réservé uniquement au Homing (`HomingRefRaw`). |
+| `Fbk` | 🚫 **À éviter** | Remplacer par `IsOpen`, `IsEnabled` (état) ou `Sensor` (capteur physique brut). |
+| `En` / `Rdy` / `Err` / `Sts` / `Spd` / `Lim` | ❌ **Non utilisées** | Écrire `Enable`, `Ready`, `Error`/`ErrorId`, `State`, `Speed`, `Limit`. |
 
 ### Suffixes hardware `_DI`/`_DQ`/`_RQ` — mapping I/O physique, différent du `ReqX` (Niveau 2)
 Trois suffixes déjà établis pour les variables globales **mappées directement sur le matériel**
@@ -340,17 +436,24 @@ troubleshooting (jamais comme source d'autorisation) : `us401_MotionAllowed`, `S
 pour dire "je ne coupe pas", `ForbidX` pour un "PermitX") — voir le contre-exemple
 `PowerCutOff_A_RQ` plus haut et la décision T117 (élimination des `Forbid*`).
 
-### Consignes (références)
+### Cibles & Commandes de mouvement (Motion)
 ```
-SpeedRef          → consigne de vitesse
-CablePosRef       → position câble consignée
+SpeedTgt, DrumSpeedTgt      → vitesse cible à atteindre (rampe/profil)
+SpeedCmd, DrumSpeedCmd      → commande de vitesse effective vers l'actionneur
+CablePosTgt, PositionTgt    → position cible
+```
+
+### Consignes de régulation process (Boucles fermées)
+```
+PressureSP                  → consigne pression
+TemperatureSP               → consigne température
 ```
  
-### Mesures (actual)
+### Mesures physiques réelles (Actual)
 ```
-SpeedAct          → vitesse mesurée
-CablePosAct       → position câble mesurée (déroulé)
-DrumPos           → position tambour codeur
+SpeedAct, DrumSpeedAct      → vitesse mesurée réelle
+CablePosAct, PositionAct    → position réelle mesurée
+DrumTorqueAct               → couple réel mesuré
 ```
  
 ### Sorties d'état / feedback
@@ -412,11 +515,11 @@ Différence 3 vs 4 : `CableLimitAscentReached` dit juste "on est arrivé au seui
 existent souvent en paire, mais pas toujours 1:1 — un même "actif" peut agréger plusieurs
 "atteint"/conditions (ex. `FdcBucketOpenActive` dépend d'un seuil ET d'un `Enable` de config).
 
-**Paramètres/réglages (Config)** vs **Consignes (`Ref`)** : un paramètre change rarement (RETAIN,
+**Paramètres/réglages (Config)** vs **Cibles & Commandes (`Tgt` / `Cmd` / `SP`)** : un paramètre change rarement (RETAIN,
 réglage banc/mise en service — `RampAccelRate`, `TopSensorPosition_M`, `Config : ST_BucketConfig`) ;
-une consigne (`Ref`) est recalculée à chaque cycle par la logique (`SpeedRef`, `CablePosRef`).
-Les deux peuvent partager un suffixe d'unité (`M`, `Pct`) mais ne sont pas la même catégorie —
-un paramètre ne doit pas s'appeler `XxxRef`, une consigne calculée ne doit pas ressembler à un
+une consigne/cible est recalculée à chaque cycle par la logique (`SpeedTgt`, `CablePosTgt`, `SpeedCmd`).
+Les deux peuvent partager un suffixe d'unité (`_M`, `_Pct`) mais ne sont pas la même catégorie —
+un paramètre ne doit pas s'appeler `XxxTgt` ou `XxxCmd`, et une commande calculée ne doit pas ressembler à un
 réglage figé.
 
 ### Booléens : convention d'état
@@ -577,7 +680,7 @@ requête, voir `Req`/`Cmd` plus haut). Les catégories déjà univoques gardent 
 **sans** préfixe de rôle, ajouter un préfixe n'apporterait rien :
 - `Ready`/`Busy`/`Done`/`Error` (état) — pas `StsReady`
 - `RelayFwd`/`RelayRev` (sortie physique relais)
-- `SpeedRef`/`CablePosRef` (consigne)
+- `SpeedTgt`/`CablePosTgt` (cible) / `SpeedCmd` (commande)
 
 ⚠️ **Ne jamais répéter le Repère du niveau 1 à l'intérieur du champ** — le nom du struct porte
 déjà le contexte matériel :
@@ -606,7 +709,7 @@ TYPE ST_Joystick_AxisCmd :
 STRUCT
     Enable      : BOOL;       (* Autorisation *)
     StartStop   : BOOL;       (* TRUE = rampe accel, FALSE = rampe decel normale *)
-    SpeedRef    : REAL;       (* Consigne vitesse 0..100% *)
+    SpeedTgt    : REAL;       (* Vitesse cible 0..100% *)
     Direction   : INT;        (* -1=Rev, 0=Neutre, +1=Fwd *)
     PowerContactorEngaged : BOOL;   (* Chaine AU réarmée / contacteur puissance OK *)
 END_STRUCT
@@ -633,7 +736,7 @@ END_TYPE
 ## En Ladder : lisibilité flux
 ```
 [FB_Joystick]     →  (.Done)  →  [FB_Treuil.Enable]
-     ↓ SpeedRef        + StartStop ↓ SpeedRef
+     ↓ SpeedTgt        + StartStop ↓ SpeedTgt
 [FB_Encodeur]     ←  (.CablePosAct)
 ```
 → Chaînes d'instance, flux d'info immédiatement visible pour maintenance. ✅
@@ -641,11 +744,14 @@ END_TYPE
 ---
  
 ## Résumé règles
-1. ❌ Pas de `bFlag`, `iCounter`, `rValue`.
-2. ✅ `Enable`, `Ready`, `CablePosM`, `SpeedPct`.
-3. Type se découvre dans l'IDE → le nom parle du rôle.
-4. Instance = `<Mécanisme>[<Repère>]` (repère seulement si plusieurs instances du même mécanisme).
-5. Champ = `<Rôle><Fonction>` **seulement si ambigu** (`Req`/`Cmd`) ; sinon forme établie sans préfixe (`Ready`, `RelayFwd`, `SpeedRef`).
-6. Seuil logiciel = 4 maillons : Paramètre (`XxxM`) → Mesure → `XxxReached` (fait) → `XxxActive` (conséquence).
-7. Structures + Enums = organisation, pas typage du nom.
+1. ❌ Pas de `bFlag`, `iCounter`, `rValue` (Zéro notation hongroise).
+2. ✅ `Enable`, `Ready`, `CablePos_M`, `Speed_Pct`.
+3. Type se découvre dans l'IDE → le nom parle du rôle sémantique.
+4. Chaîne fonctionnelle : `Req` (demande) → `Tgt` (cible) → `Cmd` (commande) → `Act` (mesure).
+5. Booléens d'état : prédicats affirmatifs (`IsOpen`, `IsReady`, `IsMoving`, `HasFault`, `CanMove`).
+6. Motion vs Process : `Tgt`/`Act` pour le Motion, `SP`/`PV` pour la régulation.
+7. Homing réservé : `HomeReq`, `Homing`, `Homed`, `HomePos` (bannissement de `Ref` pour les consignes).
+8. Instance = `<Mécanisme>[<Repère>]` (repère seulement si plusieurs instances du même mécanisme).
+9. Seuil logiciel = 4 maillons : Paramètre (`_M`) → Mesure → `XxxReached` (fait) → `XxxActive` (conséquence).
+10. Structures + Enums = organisation, pas typage du nom.
  
