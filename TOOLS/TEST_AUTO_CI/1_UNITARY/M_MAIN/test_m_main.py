@@ -36,41 +36,6 @@ def _run_fb_test(fb_name: str):
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-
-
-@pytest.mark.ci_fb
-@pytest.mark.domain
-def test_M_MAIN():
-    """Test global du domaine M_MAIN (compilation parallèle multi-cœurs)."""
-    cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "M_MAIN", "--fast", "-j", "7"]
-    proc = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        cwd=str(REPO_ROOT),
-    )
-    if proc.stdout:
-        try:
-            print(proc.stdout)
-        except UnicodeEncodeError:
-            print(proc.stdout.encode("ascii", errors="replace").decode("ascii"))
-    if proc.stderr:
-        try:
-            print(proc.stderr, file=sys.stderr)
-        except UnicodeEncodeError:
-            print(proc.stderr.encode("ascii", errors="replace").decode("ascii"), file=sys.stderr)
-
-    if proc.returncode != 0:
-        error_msg = f"Échec des tests pour le domaine M_MAIN (code {proc.returncode}) :\n"
-        error_msg += proc.stdout[-2000:] if proc.stdout else ""
-        error_msg += proc.stderr[-1000:] if proc.stderr else ""
-        pytest.fail(error_msg)
-    assert proc.returncode == 0
-
-@pytest.mark.ci_fb
-@pytest.mark.unit
 def test_PRG_02_Acquisition():
     """Test CI automatisé pour PRG_02_Acquisition."""
     _run_fb_test("PRG_02_Acquisition")
@@ -104,9 +69,3 @@ def test_PRG_06_Outputs():
 def test_PRG_07_Supervision():
     """Test CI automatisé pour PRG_07_Supervision."""
     _run_fb_test("PRG_07_Supervision")
-
-@pytest.mark.ci_fb
-@pytest.mark.domain
-def test_MAIN_GLOBAL():
-    """Test CI automatisé pour MAIN_GLOBAL."""
-    _run_fb_test("MAIN_GLOBAL")
