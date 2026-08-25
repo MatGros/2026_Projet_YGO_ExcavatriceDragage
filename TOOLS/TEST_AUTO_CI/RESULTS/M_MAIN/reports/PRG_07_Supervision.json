@@ -1,23 +1,19 @@
 {
   "version": 1,
-  "file": "test_prg_07_supervision.st",
+  "file": "test_main_end_to_end.st",
   "results": [
     {
-      "name": "PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut",
+      "name": "MAIN_GLOBAL : Chaine Complete - Qualification Neutre vers Montee Treuils Couples",
       "passed": true
     },
     {
-      "name": "PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil",
-      "passed": true
-    },
-    {
-      "name": "PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau",
+      "name": "MAIN_GLOBAL : Coupure Puissance AU Propagee a tous les Actionneurs",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 2,
+    "passed": 2,
     "failed": 0
   }
 }

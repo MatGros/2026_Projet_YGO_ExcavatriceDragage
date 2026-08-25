@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-25 06:48:48</div>
+    <div class="exec-time">2026-08-25 07:10:08</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-0">PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-1">PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -1664,20 +1664,20 @@
         <article id="test-prg-02-acquisition-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X) </h3>
+                <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (7)</span><ul><li>Structure Data: Homme-mort arme avec succes</li><li>Structure Data: Position cable M1 = 2.0m</li><li>Structure Data: Codeur M1 fiabilise</li><li>Sens X positif detecte (Translation Droite)</li><li>Consigne de vitesse non nulle transmise sur le bus Data</li><li>Structure HwIn: JoyXRaw_ANA1 transmis</li><li>Structure HwIn: JoyBtnRaw transmis</li></ul></div>
+            
             
             
         </article>
         <article id="test-prg-02-acquisition-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position </h3>
+                <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (6)</span><ul><li>Structure Data: Position exacte Tremie atteinte</li><li>Structure Data: Fin de course avant actif a la tremie</li><li>Structure Data: Mot capteurs coherent</li><li>Structure HwIn: Capteur Tremie transmis</li><li>Structure HwIn: Retour frein M1 recopie</li><li>Structure HwIn: Retour frein M3 recopie</li></ul></div>
+            
             
             
         </article>
