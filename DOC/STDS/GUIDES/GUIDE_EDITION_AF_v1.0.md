@@ -170,7 +170,7 @@ Pour assurer la lisibilité visuelle et supprimer tout risque de dérive entre l
 | **Sécurité & Verrouillages** | 🛡️ | Rouge (`#f43f5e`) | `FB_Safety_Translation`, `FB_Safety_Winch`, `FB_Safety_EmergencyManagement` |
 | **Mouvement & Commandes** | ⚙️ | Jaune (`#fbbf24`) | `FB_Translation`, `FB_Winch`, `PRG_04_Treuils_Benne` |
 | **Barrière Finale Sorties** | 🔒 | Vert (`#4ade80`) | `FB_TranslationOutputInterlock`, `PRG_06_Outputs` |
-| **Supervision & Dépannage** | 🖥️ / 🩺 | Bleu-Gris | `PRG_07_Supervision_CFC`, `FB_Acquisition_Preflight` |
+| **Supervision & Dépannage** | 🖥️ / 🩺 | Bleu-Gris | `PRG_07_Supervision`, `FB_Acquisition_Preflight` |
 
 - **Alignement Strict des Titres et Rôles** : Le nom du FB, la description de son rôle et l'émoji du cartouche `.st` doivent être **exactement identiques** à ceux présentés dans le tableau de composition de la spec AF (`DOC/AF/`).
 

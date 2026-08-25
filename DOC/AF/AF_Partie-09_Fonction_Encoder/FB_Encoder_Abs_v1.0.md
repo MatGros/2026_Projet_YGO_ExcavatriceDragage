@@ -2,7 +2,7 @@
 
 > Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §2.  
 > Rôle de **ce** document : acquisition brute bus EtherCAT, gestion de la disponibilité et des requêtes de preset.  
-> Source code : `CODE/E_CODEURS/FB_Encoder_Abs.st` · instances `instEncoderAbsM1/M2` dans `Acquisition (CFC)`.  
+> Source code : `CODE/E_CODEURS/FB_Encoder_Abs.st` · instances `instEncoderAbsM1/M2` dans `PRG_02_Acquisition`.  
 
 ## 🧭 Sommaire
 

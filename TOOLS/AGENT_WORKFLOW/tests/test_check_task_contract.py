@@ -282,23 +282,23 @@ def test_raw_scope_allowed_empty_refuse(tmp_path: Path) -> None:
 
 
 def test_campaign_raw_fallback(tmp_path: Path) -> None:
-    """Les six contrats de campagne restent valides sans PyYAML.
+    """Les contrats du projet restent valides sans PyYAML.
 
     Ils emploient des champs YAML replies (``statement: >`` / ``verified_by:``)
     et protegeaient donc le defaut de decalage statements/preuves du repli.
     """
     root = Path(__file__).resolve().parents[3]
     names = (
-        "TASK_CONTEXT_LOT1_GATES_STRUCTURE_CODE.yaml",
-        "TASK_CONTEXT_LOT2_DOC_CFC_NUMEROTATION.yaml",
-        "TASK_CONTEXT_LOT3_CONTRATS_AGENTS.yaml",
-        "TASK_CONTEXT_LOT4A_RENOMMAGE_PROGRAMMES.yaml",
-        "TASK_CONTEXT_LOT4B_CONVERSION_CFC_NATIF.yaml",
-        "TASK_CONTEXT_LOT5_VERIFICATION_FINALE.yaml",
+        "TASK_CONTRACT_T130.yaml",
+        "TASK_CONTRACT_T137.yaml",
+        "TASK_CONTRACT_T151_NETTOYAGE_PI_CODING.yaml",
+        "TASK_CONTRACT_T152A_BANNERFORMATTER_STYLE.yaml",
+        "TASK_CONTRACT_T152B_REGIONS_PREFIXE.yaml",
+        "TASK_CONTRACT_T152C_VOCABULAIRE_ABANDONNE.yaml",
     )
     for name in names:
         result = run(
-            root / "ARCHIVES" / "Doc" / "CONTRACTS" / name,
+            root / "DOC" / "WFLOW" / "CONTRACTS" / name,
             disable_pyyaml=True,
         )
         assert result.returncode == 0, f"{name}: {result.stdout}{result.stderr}"

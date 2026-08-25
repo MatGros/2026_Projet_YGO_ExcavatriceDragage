@@ -2,7 +2,7 @@
 
 > Diagnostic bus CANopen + esclave Joystick.
 > Profil AF03 : brique métier non-mouvement.
-> Source : `CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st` · instance : `PRG_01_Diagnostics.instDiagCanOpen` (ST actuel) ; cible `PRG_02_Acquisition_CFC.instDiagCanOpen`.
+> Source : `CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st` · instance : `PRG_02_Acquisition.instDiagCanOpen`.
 
 ## 🎯 Rôle
 

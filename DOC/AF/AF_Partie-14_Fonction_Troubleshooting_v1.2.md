@@ -16,18 +16,17 @@ Orientee Fonctions Machine / Utilisation Operateur.
 
 | | POU | Statut |
 |---|---|---|
-| Code actuel | `PRG_TROUBLESHOOTING_CFC` (ST) | page d'observation distincte de `PRG_SUPERVISION_CFC` |
-| Cible | `PRG_07_Supervision_CFC` (rang 07) | **absorbe le troubleshooting** : observation et diagnostic au meme endroit |
+| POU actuel | `PRG_07_Supervision` (ST pur, rang 07) | **absorbe le troubleshooting** : observation et diagnostic au même endroit |
 
-Il n'existe **pas** de POU `PRG_11_Troubleshooting` dans l'architecture cible : ce nom
-appartient au decoupage transverse abandonne. Observer un fonctionnement et le publier a l'IHM
-est une seule responsabilite, portee par une page unique executee en dernier.
+Il n'existe **pas** de POU `PRG_11_Troubleshooting` dans l'architecture : ce nom
+appartient au découpage transverse abandonné. Observer un fonctionnement et le publier à l'IHM
+est une seule responsabilité, portée par un programme unique exécuté en dernier.
 
 ### Invariant opposable
 
-Le troubleshooting **n'ecrit jamais** une commande, une configuration ou un interlock.
-`PRG_07_Supervision_CFC` est en **lecture seule stricte**. Cette regle est inchangee par la
-migration : elle est deja l'invariant du POU actuel.
+Le troubleshooting **n'écrit jamais** une commande, une configuration ou un interlock.
+`PRG_07_Supervision` est en **lecture seule stricte**. Cette règle est inchangée :
+elle est l'invariant fondamental du POU.
 
 Le contenu fonctionnel des 5 fonctions machine ci-dessus, ses seuils et ses observateurs
 (`FB_Acquisition_Preflight`, `FB_Winch_Symmetry`) ne sont pas modifies par le changement de POU.

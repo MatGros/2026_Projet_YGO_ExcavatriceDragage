@@ -28,7 +28,7 @@
 | <nobr><code>TC-P06-003</code></nobr> | Bascule réel/simulation centralisée | `HwIn` source unique par domaine | `💻 AUTO` | <small>§2</small> |
 | <nobr><code>TC-P06-004</code></nobr> | Diag CANopen/EtherCAT publié en ligne | Statuts dispos pour Modes/Safety/IHM | `💻 AUTO` | <small>§3</small> |
 | <nobr><code>TC-P06-005</code></nobr> | Noms des signaux de puissance validés | `PowerKeepAlive_A/B_RQ`, `EmergencyChainClosed_DI` | `🟢 SITE` | <small>§4</small> |
-| <nobr><code>TC-P06-006</code></nobr> | Écriture des sorties physiques centralisée | `PRG_OUTPUTS_LD` seul producteur final | `💻 AUTO` | <small>§5</small> |
+| <nobr><code>TC-P06-006</code></nobr> | Écriture des sorties physiques centralisée | `PRG_06_Outputs` seul producteur final | `💻 AUTO` | <small>§5</small> |
 
 ---
 
@@ -96,12 +96,12 @@ Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte s
 sa validite est **une seule responsabilite**. La cible reunit donc dans une page unique ce que le
 code actuel eclate en quatre POU — ce qui supprime les instances codeurs et joystick dupliquees.
 
-| Ce qui est absorbe par `PRG_02_Acquisition` | POU actuel | Contenu concerne |
+| Ce qui est absorbe par `PRG_02_Acquisition` | Ancien POU | Contenu concerne |
 |---|---|---|
-| Frontiere E/S, selection reel/simule, joystick | `PRG_ACQUISITION_CFC` | `HwReal` / `FB_SimBench` / `HwIn`, `instJoystick` |
+| Frontiere E/S, selection reel/simule, joystick | `PRG_Acquisition` | `HwReal` / `FB_SimBench` / `HwIn`, `instJoystick` |
 | Chaine de mesure codeurs M1/M2/M3 | `PRG_02_Encoders` | acquisition brute, echelle, position, vitesse, validite et disponibilite |
 | Diagnostics devices et bus | `PRG_01_Diagnostics` | `instDiagCanOpen`, `instDiagEthercat`, `instIhmHeartbeat` |
-| Retours auxiliaires qualifies | `PRG_AUXILIARY_CFC` | retour thermique centrale hydraulique |
+| Retours auxiliaires qualifies | `PRG_Auxiliary` | retour thermique centrale hydraulique |
 | **Etat AU qualifie** | chaine AU | ⚠️ **acquisition de l'etat seulement** |
 
 ### 🛑 Etat AU : acquis ici, agissant en sortie
@@ -117,13 +117,13 @@ PLC ne remplace jamais cette chaine.
 ### ⚠️ Ce que l'acquisition n'absorbe pas
 
 - Aucune decision `SafeStop`, mode, interdiction ou commande actionneur. La safety de chaque
-  procede vit **dans la page de son procede** (`PRG_04_Treuils_Benne_CFC`, `PRG_05_Translation_CFC`),
+  procede vit **dans son programme dédié** (`PRG_04_Treuils_Benne`, `PRG_05_Translation`),
   pas ici et pas dans un POU safety global — qui n'existe pas dans la cible.
 - Aucune sortie physique : elles restent produites uniquement par `PRG_06_Outputs`.
 
 📌 Lot de migration : **M1** (C4, rebuild) — migration 7 POU soldée, historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 Le référencement (`FB_Encoder_Homing`) n'appartient pas à cette frontière de mesure : il rejoint
-`PRG_04_Treuils_Benne_CFC`, où les autorisations de maintenance et la visibilité opérateur sont
+`PRG_04_Treuils_Benne`, où les autorisations de maintenance et la visibilité opérateur sont
 disponibles. Il consomme les faits publiés par l'acquisition (`RawPos`, `EncoderAvailable`, retours
 d'arrêt) et publie sa calibration/requête de preset vers la chaîne EtherCAT.
 
@@ -152,7 +152,7 @@ d'arrêt) et publie sa calibration/requête de preset vers la chaîne EtherCAT.
 | `Operator` | `ST_HwOperator` | Joystick analogique `INT` + état bus CAN | — | — |
 | `Machine` | `ST_HwMachine` | Sécurités/commun machine (AU, phases, thermiques, Kobold) | — | `TRUE` = état sûr/OK |
 
-**Sélection par domaine** (une seule bascule, visible dans le CFC Acquisition) :
+**Sélection par domaine** (une seule bascule, visible dans `PRG_02_Acquisition`) :
 
 ```text
 HwIn.<Domaine> := SEL(SimActive.<Domaine>, HwReal.<Domaine>, HwSim.<Domaine>)
@@ -160,7 +160,7 @@ HwIn.<Domaine> := SEL(SimActive.<Domaine>, HwReal.<Domaine>, HwSim.<Domaine>)
 
 - Domaine réel → source = `HwReal`.
 - Domaine simulé → source = `HwSim` **sans filtrage supplémentaire** (valeurs simulées normalisées, AF13 §4).
-- 🧪 Tous les domaines ont la même logique visible : pas de bascule cachée dans un Ladder.
+- 🧪 Tous les domaines ont la même logique visible : pas de bascule cachée.
 
 **Invalidité** : un sous-domaine simulé n'a pas de notion d'erreur physique propre ; les faits de
 disponibilité (device, communication) restent évalués sur la source réelle par `PRG_02` (voir §3).
@@ -198,7 +198,7 @@ Facts de la chaîne de mesure pure (Abs → Scale → Safety → SpeedMeasure), 
 |---|---|
 | Propriétaire / producteur | `PRG_02_Acquisition` (chaîne de mesure pure, rang 02) |
 | Écrivain unique | `PRG_02_Acquisition` |
-| Lecteurs | `PRG_04_Treuils_Benne_CFC` (conduite + `FB_Safety_Winch`), `PRG_03_Modes_Cycle_CFC` (`EncoderIncoherent` → blocage SEMI_AUTO), Supervision/IHM |
+| Lecteurs | `PRG_04_Treuils_Benne` (conduite + `FB_Safety_Winch`), `PRG_03_Modes_Cycle` (`EncoderIncoherent` → blocage SEMI_AUTO), Supervision/IHM |
 | Cadence | tâche `T01_Acquisition`, cycle rapide |
 
 **Structure** (1 sous-DUT par treuil, M1 et M2) :
@@ -253,11 +253,11 @@ EncoderFault.<Treuil> := NOT EncoderAvailable OR EncoderIncoherent
 
 | Consommateur | Action sur `EncoderFault` | Bypass |
 |---|---|---|
-| `PRG_03_Modes_Cycle_CFC` (`FB_Modes`) | Refuse `SEMI_AUTO` (repli `MAINT_N1`, `Auth.ErrorId` bit0) — **agrégat M1 OR M2** | aucun (SEMI_AUTO ne tolère aucun codeur faux) |
-| `PRG_04_Treuils_Benne_CFC` (`FB_Safety_Winch`) | `SafeStop` du treuil concerné (bit2 `ErrorId`) | individuel `EncoderFaultBypass`, **MAINT_N2 uniquement** |
-| `PRG_03_Modes_Cycle_CFC` (`Auth.SyncEnable` / `Sync`) | Synchro refusée si l'un des 2 codeurs faux | — |
+| `PRG_03_Modes_Cycle` (`FB_Modes`) | Refuse `SEMI_AUTO` (repli `MAINT_N1`, `Auth.ErrorId` bit0) — **agrégat M1 OR M2** | aucun (SEMI_AUTO ne tolère aucun codeur faux) |
+| `PRG_04_Treuils_Benne` (`FB_Safety_Winch`) | `SafeStop` du treuil concerné (bit2 `ErrorId`) | individuel `EncoderFaultBypass`, **MAINT_N2 uniquement** |
+| `PRG_03_Modes_Cycle` (`Auth.SyncEnable` / `Sync`) | Synchro refusée si l'un des 2 codeurs faux | — |
 | `PRG_06_Outputs` / `PRG_04` (commande) | Interdit toute commande reposant sur la position tant que `EncoderFault` | via Modes/Safety uniquement |
-| `PRG_07_Supervision_CFC` (IHM) | `EncoderFault` par treuil → alarme/animation | — |
+| `PRG_07_Supervision` (IHM) | `EncoderFault` par treuil → alarme/animation | — |
 
 **Producteur unique de l'agrégat** : `PRG_02_Acquisition` produit `ST_EncoderMeasurements`
 (avec `EncoderAvailable` par treuil) ; l'agrégat `EncoderFaultPresent` (M1 OR M2, incluant la
@@ -416,8 +416,7 @@ Ces signaux sont directement projetés dans `GVL_IHM` via `ST_SafetyWinch` (`M1T
 `FB_Acquisition_Preflight` vérifie 16 conditions mécaniques/électriques quand la machine est
 arrêtée. Observateur pur : aucune écriture de commande, sécurité ou mouvement.
 
-Instance : `PRG_TROUBLESHOOTING_CFC.instPreflight` (ST actuel).
-Cible : `PRG_07_Supervision_CFC`, qui absorbe le troubleshooting en lecture seule stricte.
+Instance : `PRG_07_Supervision.instPreflight` (ST pur, en lecture seule stricte).
 
 ### PreflightErrorId (16 bits)
 
@@ -443,7 +442,7 @@ Cible : `PRG_07_Supervision_CFC`, qui absorbe le troubleshooting en lecture seul
 - Diagnostic par canal (`FB_Input.ChannelOk`) : non disponible avec le materiel actuel
   (`GetDeviceState()` = etat carte, pas etat voie) — a revisiter si un module diagnostiquant
   chaque canal individuellement est installe.
-- ~~Contrat exact des structures de publication internes vers les pages CFC.~~ ✅ **Résolu** — §2ter : `ST_HardwareImage` (HwReal/HwSim/HwIn), diagnostic modules et `ST_EncoderMeasurements` (M1/M2, lecteurs Treuils/Modes/Supervision).
+- ~~Contrat exact des structures de publication internes vers les programmes.~~ ✅ **Résolu** — §2ter : `ST_HardwareImage` (HwReal/HwSim/HwIn), diagnostic modules et `ST_EncoderMeasurements` (M1/M2, lecteurs Treuils/Modes/Supervision).
 
 ## 📚 Documents lies
 

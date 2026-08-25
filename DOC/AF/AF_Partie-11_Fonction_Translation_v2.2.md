@@ -78,7 +78,7 @@ Catalogue synthétique des **6 grands tests macro fonctionnels** du domaine Tran
 
 ## ⚙️ 2. Intégration programme & Architecture
 
-- **POU cible unique** : `PRG_05_Translation` (ST/CFC).
+- **POU cible unique** : `PRG_05_Translation` (ST pur).
 - **Source des autorisations** : `ST_Modes_Autorisations` distribué par `PRG_03_Modes_Cycle`.
 - **Image des sorties** : Transmise à `PRG_06_Outputs` pour la barrière finale matérielle.
 

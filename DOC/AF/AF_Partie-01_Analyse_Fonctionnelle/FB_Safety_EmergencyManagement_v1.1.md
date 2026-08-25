@@ -297,8 +297,8 @@ porter dans `PRG_02_Acquisition`. `FB_Input`/`PRG_01_Inputs_LD` sont en retrait 
 ## 5. Intégration programme (architecture cible)
 
 > ⚠️ **Architecture en cours de migration** : le code actuel utilise encore des PRG séquentiels
-> (`Acquisition`…`Outputs`). L'architecture cible (AF02 v3) prévoit des **pages CFC** avec chargeurs :
-> `PRG_ACQUISITION_CFC`, `PRG_MODES_CFC`, `PRG_SAFETY_CFC`, `PRG_OUTPUTS_LD`, etc.
+> (`Acquisition`…`Outputs`). L'architecture programme (AF02 v3) organise l'exécution en 7 programmes :
+> `PRG_02_Acquisition`, `PRG_03_Modes_Cycle`, `PRG_04_Treuils_Benne`, `PRG_05_Translation`, `PRG_06_Outputs`, `PRG_07_Supervision`.
 > Le flux logique reste identique ; seuls les conteneurs changent.
 
 ### 5.1 Chaîne d'appels (logique, indépendante du conteneur)
@@ -314,7 +314,7 @@ Modes / Cycle
    ▼
 Agrégation PowerCutOff (OR des 3 safety) → PowerCutOffRequest
    ▼
-Sorties (Outputs)          ← UNIQUE appel du composite :
+Sorties (PRG_06_Outputs)    ← UNIQUE appel du composite :
    instSafetyEmergencyManagement (composite)
      ├─ Logic   (interne)
      └─ Output  (interne)
@@ -327,9 +327,9 @@ Sorties (Outputs)          ← UNIQUE appel du composite :
 |---|---|---|
 | Acquisition DI | `PRG_02_Acquisition` | Produit les faits `HwIn` et diagnostics ; filtrage à prouver |
 | `FB_Input` | Retrait contrôlé | Aucun nouveau consommateur |
-| `FB_Safety_Winch` M1/M2 | Safety CFC | Avant mouvements |
-| `FB_Safety_Translation` | Safety CFC | Avant mouvements |
-| `FB_Safety_EmergencyManagement` | **Outputs LD** seulement | Fin — après agrégat OR PowerCutOff |
+| `FB_Safety_Winch` M1/M2 | `PRG_04_Treuils_Benne` | Avant mouvements |
+| `FB_Safety_Translation` | `PRG_05_Translation` | Avant mouvements |
+| `FB_Safety_EmergencyManagement` | `PRG_06_Outputs` seulement | Fin — après agrégat OR PowerCutOff |
 | Logic / Output | **Jamais hors composite** | Même scan que le parent |
 | `FB_Sim_Safety` | via SimBench dans Acquisition | Début (boucle sim) |
 
@@ -337,13 +337,13 @@ Sorties (Outputs)          ← UNIQUE appel du composite :
 
 | Élément | Emplacement |
 |---|---|
-| Instance | `PRG_OUTPUTS_LD.instSafetyEmergencyManagement` |
-| Agrégation PowerCutOff | Bus `ST_Safety_PowerCutOffRequest` depuis Safety CFC |
-| Publication Q | Juste après l'appel FB dans Outputs LD |
+| Instance | `PRG_06_Outputs.instSafetyEmergencyManagement` |
+| Agrégation PowerCutOff | Bus `ST_Safety_PowerCutOffRequest` depuis Safety |
+| Publication Q | Juste après l'appel FB dans `PRG_06_Outputs` |
 | Portail mouvement | `PowerContactorEngaged` (**lu** par le FB, pas produit par lui) |
 
-Conformité AF02 : AU en **chaîne sortie**, pas de page CFC AU orpheline.
-Cible : rester dans `PRG_OUTPUTS_LD`.
+Conformité AF02 : AU en **chaîne sortie**, pas de page AU orpheline.
+Cible : rester dans `PRG_06_Outputs`.
 
 ### 5.4 Démarrage — autotest au premier boot (Start-up Self-Check)
 
@@ -409,7 +409,7 @@ reste le nom matériel historique (identique).
 | `EmergencyArmingFailed` | sortie FB |
 
 **✅ État 2026-07-30** : les 7 champs manquants de `ST_ModesState` sont désormais alimentés
-depuis `ST_Safety_Emergency_State`/`ST_Safety_Emergency_Diag` (via `PRG_SUPERVISION_CFC`). Écart résolu.
+depuis `ST_Safety_Emergency_State`/`ST_Safety_Emergency_Diag` (via `PRG_07_Supervision`). Écart résolu.
 
 ---
 
@@ -448,7 +448,7 @@ Alignement AF02/AF03 + synthèse 5 bus. **À valider avant implémentation.**
 
 | DUT | Producteur | Contenu minimal | Lecteurs |
 |---|---|---|---|
-| `ST_Safety_PowerCutOffRequest` | `PRG_SAFETY_CFC` (agrégateur) | `Request : BOOL`, optionnel masque sources | `PRG_OUTPUTS_LD` → `PowerCutOffRequest` |
+| `ST_Safety_PowerCutOffRequest` | Safety (`PRG_04`/`PRG_05`) | `Request : BOOL`, optionnel masque sources | `PRG_06_Outputs` → `PowerCutOffRequest` |
 | `ST_HwMachine` (sous-image de `ST_HardwareImage`) | Acquisition | DI chain + contactor déjà dans `ST_HwMachine` | FB via Acquisition qualifiée |
 | `ST_Safety_Emergency_State` | Outputs / composite | Step, Busy, Armable, ChainOk, ContactorOk | Supervision, troubleshooting |
 | `ST_Safety_Emergency_Diag` | Outputs / composite | Error, ErrorId, RedundancyFail, ArmingFail, Lockout | Supervision, IHM State |
@@ -461,7 +461,7 @@ Alignement AF02/AF03 + synthèse 5 bus. **À valider avant implémentation.**
 | **L1 Sim** | Corriger câblage `FB_SimBench` KeepAlive/Arming | Faible | ✅ Fait |
 | **L2 IHM map** | Alimenter tous les champs `ST_ModesState` armement depuis FB | Faible | ✅ Fait |
 | **L3 DUT State/Diag** | Introduire `ST_Safety_Emergency_State`, `ST_Safety_Emergency_Diag` ; retirer dépendance `GVL_Global` armement | Moyen | ✅ Fait (code + bus) |
-| **L4 Agrégat PowerCutOff** | DUT `ST_Safety_PowerCutOffRequest` depuis Safety ; OR hors Outputs anonyme | Moyen | ⬜ Planifié (dépend CFC Safety) |
+| **L4 Agrégat PowerCutOff** | DUT `ST_Safety_PowerCutOffRequest` depuis Safety ; OR hors Outputs anonyme | Moyen | ⬜ Planifié |
 | **L5 Noms polarité** | Renommage partiel `PowerCutOff_A/B_Cmd` → `MaintainA/B_Cmd`, `EmergencyArming_Cmd` → `ArmPulse_Cmd` | Moyen | ✅ Fait (ST_Safety_Emergency_InternalCmd + code) ; reste `PowerKeepAlive_*_RQ` côté Q (nom matériel conservé) |
 
 ### 8.4 Hors scope de ce FB
@@ -491,7 +491,7 @@ Les résultats d'exécution restent hors AF (scripts / checklists / registres).
 | Doc | Lien |
 |---|---|
 | AF01 §5 | Règles **machine** AU/réarmement (sans dupliquer interfaces ni TC) |
-| AF02 | Instance dans `PRG_OUTPUTS_LD` ; pas de page AU orpheline |
+| AF02 | Instance dans `PRG_06_Outputs` ; pas de page AU orpheline |
 | AF03 | Profil barrière / Reset front / intégrité liaisons (pas d'ID bus) |
 | AF06 | Noms DI/DQ puissance |
 | AF07 | Champs `ST_Modes*` |
@@ -511,6 +511,6 @@ Fichiers code de référence :
 - `CODE/M_MAIN/PRG_02_Acquisition.st` (ST pur)
 - `CODE/M_MAIN/PRG_06_Outputs.st` (sorties)
 - `ARCHIVES/Code/TESTS/PRG_AU_TestBench.st` (banc de test manuel, archivé 2026-08-01 — voir `DOC/WFLOW/TASKS.yaml`)
-- `CODE/MAIN/Outputs (Ladder).st` (cible)
-- Cible de migration : `PRG_02_Acquisition.st` (ST pur, dans `CODE/MAIN`)
+- `CODE/M_MAIN/PRG_06_Outputs.st` (cible)
+- `CODE/M_MAIN/PRG_02_Acquisition.st` (ST pur, dans `CODE/M_MAIN`)
 - `CODE/L_SIMULATION/FB_Sim_Safety.st`

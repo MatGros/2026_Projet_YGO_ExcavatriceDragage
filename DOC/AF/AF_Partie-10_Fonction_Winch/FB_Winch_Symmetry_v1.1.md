@@ -2,7 +2,7 @@
 
 > Mesure passive de symétrie M1/M2 (MES-008).
 > Profil AF03 : brique métier non-mouvement, observateur pur.
-> Source : `CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st` · instance : `PRG_TROUBLESHOOTING_CFC.instWinchSymmetry`.
+> Source : `CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st` · instance : `PRG_07_Supervision.instWinchSymmetry`.
 
 ## 🎯 Rôle
 
@@ -15,8 +15,8 @@ Aucune écriture de commande, sécurité ou mouvement. Observateur pur.
 | Port | Type | Producteur |
 |---|---|---|
 | `Reset` | BOOL | `GVL_IHM.Commun.WinchSymmetry.BtnReset` |
-| `M1/M2CommandActive` | BOOL | `PRG_TREUILS_CFC` |
-| `M1/M2Direction` | INT | `PRG_TREUILS_CFC` |
+| `M1/M2CommandActive` | BOOL | `PRG_04_Treuils_Benne` |
+| `M1/M2Direction` | INT | `PRG_04_Treuils_Benne` |
 | `M1/M2BrakeCmd` / `M1/M2BrakeApplied` | BOOL | `PRG_04_Treuils_Benne` / `PRG_02_Acquisition.HwIn` |
 | `M1/M2Position_M` / `M1/M2Speed_Mps` | REAL | `FB_Encoder_Scale` / `FB_Encoder_SpeedMeasure` |
 | `SyncDeviation_M` | REAL | `FB_WinchSync` |

@@ -4,7 +4,7 @@
 > Rôle de **ce** document : directeur mouvement treuil (rampe, palier, sens, frein) — et
 > **catalogue unique** des `TC-P10-011`, `017`, `018`, `019`.
 > Compose `FB_SpeedStep` (§5), `FB_Brake` (§6), `FB_Ramp` (résumés ici, pas de fiche séparée).
-> Source code : `CODE/H_TREUILS_BENNE/FB_Winch.st` · instances `instWinchM1/M2` dans `Treuils (CFC)`.
+> Source code : `CODE/H_TREUILS_BENNE/FB_Winch.st` · instances `instWinchM1/M2` dans `PRG_04_Treuils_Benne`.
 
 ## 🧭 Sommaire
 
@@ -24,7 +24,7 @@
 | <nobr><code>TC-P10-011</code></nobr> | Interlock sens & temporisations d'inversion / redémarrage 1s | `💻 AUTO` |
 | <nobr><code>TC-P10-017</code></nobr> | Config palier invalide (`FB_SpeedStep`) ➔ palier 0, sorties sûres | `💻 AUTO` |
 | <nobr><code>TC-P10-018</code></nobr> | `StuckClosed` : contacteurs off non confirmés 500ms ➔ bit1 | `💻 AUTO` |
-| <nobr><code>TC-P10-019</code></nobr> | Ordre MainTask : Safety ➔ WinchControl ➔ Outputs_LD | `⚡ SITE+AUTO` |
+| <nobr><code>TC-P10-019</code></nobr> | Ordre MainTask : Safety ➔ WinchControl ➔ PRG_06_Outputs | `⚡ SITE+AUTO` |
 
 ---
 
