@@ -16,7 +16,7 @@ FUNCTION_BLOCK PUBLIC FB_SpeedStep
 VAR_INPUT
     // === COMMANDES ET CONSIGNES ===
     Enable                          : BOOL;                           // --> [CMD] Pilotage actif (FALSE = palier 0 / arret)
-    SpeedRefPct                     : REAL;                           // --> [CMD] Consigne vitesse 0..100%
+    SpeedTgt_Pct                    : REAL;                           // --> [CMD] Consigne vitesse 0..100%
 
     // === REGLAGES ET CONFIGURATION ===
     Table                           : ST_SpeedStepTable;              // --> [CFG] Table des 5 paliers propre au treuil
@@ -52,7 +52,7 @@ VAR
     _ConfigErrorTrig                : R_TRIG;                         // * [INST] Front montant erreur configuration
 
     // === VARIABLES LOCALES INTERNES ===
-    SpeedRefInt                     : INT;                            // . [LOC] Consigne convertie en INT pour Hysteresis
+    SpeedTgtInt                     : INT;                            // . [LOC] Consigne convertie en INT pour Hysteresis
     _ConfigValid                    : BOOL;                           // . [LOC] Resultat validation table et MaxStep
     _ConfigValidPrev                : BOOL;                           // . [LOC] Memoire cycle precedent validation
     _ConfigErrorIdInt               : WORD;                           // . [LOC] Accumulateur interne defauts config
@@ -182,12 +182,12 @@ END_IF;
 //    IN > HIGH (régime "haut" confirmé) ; maintien entre LOW et HIGH (anti-battement).
 //    => NOT Hyst_n.OUT = "on a franchi le seuil n vers le haut" (palier n+1 atteint).
 // ─────────────────────────────────────────────────────────────────────────
-SpeedRefInt := REAL_TO_INT(SpeedRefPct);
+SpeedTgtInt := REAL_TO_INT(SpeedTgt_Pct);
 
-Hyst1(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
-Hyst2(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[2] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[2] - HystMargin));
-Hyst3(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[3] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[3] - HystMargin));
-Hyst4(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[4] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[4] - HystMargin));
+Hyst1(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
+Hyst2(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[2] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[2] - HystMargin));
+Hyst3(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[3] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[3] - HystMargin));
+Hyst4(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[4] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[4] - HystMargin));
 
 StepNumber := 1;                          // Palier mini dès qu'Enable est actif
 IF NOT Hyst1.OUT THEN StepNumber := 2; END_IF;

@@ -42,7 +42,7 @@ seulement un FB. `Statut` saisi à la main tant que l'outillage d'extraction n'e
 | `F08.03` | Armer l'homme-mort par maintien | Appui continu `DeadmanArmHoldTime` (100ms) **et** `ArmingPermit=TRUE` au terme du maintien | `FB_Joystick` | **C4** | <nobr><code>TC-P08-002</code></nobr> | ✅ |
 | `F08.04` | Désarmer sur neutre prolongé | Neutre tenu `NeutralHoldTime` (100ms), applicable seulement après `DeadmanArmGraceTime` (3s) écoulées depuis l'armement | `FB_Joystick` | **C4** | <nobr><code>TC-P08-004</code></nobr> | ✅ |
 | `F08.05` | Désarmer sur perte de permission | `ArmingPermit=FALSE` ⇒ désarmement immédiat (niveau, pas front), axes à 0 | `FB_Joystick` | **C4** | <nobr><code>TC-P08-005</code></nobr>, <nobr><code>TC-P08-011</code></nobr>, <nobr><code>TC-P08-012</code></nobr> | ⚠️ *(logique FB testée ✅, mais producteur `ArmingPermit` câblé en dur `TRUE` en production — trou réel, voir §8 alerte 1 et Q1 `QUESTIONS_OUVERTES_PRG02_v0.1.md`)* |
-| `F08.06` | Détecter un défaut capteur hors plage | `RawX`/`RawY` hors plage ⇒ arrêt (`SpeedRef=0`) + `ErrorId` bit1 (Warning) sur les 2 axes | `FB_Joystick` | C3 | <nobr><code>TC-P08-007</code></nobr> | ✅ |
+| `F08.06` | Détecter un défaut capteur hors plage | `RawX`/`RawY` hors plage ⇒ arrêt (`SpeedTgt=0`) + `ErrorId` bit1 (Warning) sur les 2 axes | `FB_Joystick` | C3 | <nobr><code>TC-P08-007</code></nobr> | ✅ |
 | `F08.07` | Calibrer le neutre capteur | Bouton calibration mémorise le neutre si axes en zone [2000;8000], persistant au redémarrage, accessible depuis l'écran HMI | `FB_Joystick` | C2 | <nobr><code>TC-P08-006</code></nobr>, <nobr><code>TC-P08-009</code></nobr>, <nobr><code>TC-P08-010</code></nobr> | ⚠️ *(TC-P08-009/010 = type SITE, non exécutés automatiquement)* |
 | `F08.08` | Interdire tout mouvement sans armement homme-mort | Gate combinant `AxisCmd*.StartStop AND DeadmanArmed` avant d'autoriser une commande treuil/translation | `PRG_04_Treuils_Benne` (**gate**, pas un FB) | **C4** | <nobr><code>TC-P08-008</code></nobr> | ✅ *(vérifié par `G375_check_deadman_arming_gate.py`, pas `TEST_AUTO_CI`)* |
 
@@ -52,18 +52,18 @@ seulement un FB. `Statut` saisi à la main tant que l'outillage d'extraction n'e
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| <nobr><code>TC-P08-001</code></nobr> | Perte contacteur / CAN ➔ désarmer, annuler axes, et lever `Error` (`ErrorId` bit2, auto-effacé au retour) | `SpeedRef=0`, `DeadmanArmed=FALSE`, `Error=TRUE` | `💻 AUTO` | <small>§3</small> |
+| <nobr><code>TC-P08-001</code></nobr> | Perte contacteur / CAN ➔ désarmer, annuler axes, et lever `Error` (`ErrorId` bit2, auto-effacé au retour) | `SpeedTgt=0`, `DeadmanArmed=FALSE`, `Error=TRUE` | `💻 AUTO` | <small>§3</small> |
 | <nobr><code>TC-P08-002</code></nobr> | Armement homme-mort par maintien `DeadmanArmHoldTime` (100ms) **ET** `ArmingPermit=TRUE` ; relâchement **avant** la fin du maintien annule la tentative (pas d'armement différé) | Tenu 100ms + permis ➔ armé / relâché avant ➔ `DeadmanArmed` reste `FALSE`, nouvel appui exigé | `💻 AUTO` | <small>§4</small> |
 | <nobr><code>TC-P08-003</code></nobr> | ⛔ **RETIRÉ (v2.1)** — testait `DeadmanReconfEnable`/`DeadmanRearmTimeout` (reconfirmation périodique 10s), ports supprimés du FB. La sémantique « bouton relâché en mouvement » n'existe plus : le FB ne surveille plus le bouton après armement, seul le neutre prolongé désarme (§4). ID non réattribué (immutabilité `CODE_QUALITY_STANDARDS.md §0`). | — | — | <small>§4</small> |
 | <nobr><code>TC-P08-004</code></nobr> | Neutre tenu `NeutralHoldTime` (100ms) après le délai de grâce `DeadmanArmGraceTime` (3s) désarme ; neutre bref ou pendant la grâce conserve l'armement | Armement conservé / perdu | `💻 AUTO` | <small>§4</small> |
 | <nobr><code>TC-P08-005</code></nobr> | Retrait de `ArmingPermit` (niveau, pas front) désarme **immédiatement** — le FB ne connaît plus `Mode`/`BenneBusy` en interne, c'est l'appelant qui pilote `ArmingPermit` | `DeadmanArmed=FALSE` dès `ArmingPermit=FALSE` | `💻 AUTO` | <small>§4</small> |
 | <nobr><code>TC-P08-006</code></nobr> | Calibration hors [2000;8000] ➔ alarme `ErrorId` bit0 (Fault, à acquitter) | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | <small>§5</small> |
-| <nobr><code>TC-P08-007</code></nobr> | `SpeedRef` signée [-100;+100] ; si `RawX`/`RawY` sort de la plage capteur (défaut/fil coupé) ⇒ arrêt (`SpeedRef=0`) + `ErrorId` bit1 (Warning), pas de commande à pleine vitesse (voir exemple §5bis) | `SpeedRef=0`, `ErrorId` bit1 actif | `💻 AUTO` | <small>§1, §2, §5bis</small> |
+| <nobr><code>TC-P08-007</code></nobr> | `SpeedTgt` signée [-100;+100] ; si `RawX`/`RawY` sort de la plage capteur (défaut/fil coupé) ⇒ arrêt (`SpeedTgt=0`) + `ErrorId` bit1 (Warning), pas de commande à pleine vitesse (voir exemple §5bis) | `SpeedTgt=0`, `ErrorId` bit1 actif | `💻 AUTO` | <small>§1, §2, §5bis</small> |
 | <nobr><code>TC-P08-008</code></nobr> | Winch, Translation et Cycle exigent `DeadmanArmed` | ⚠️ gate câblé dans le PRG de collage, pas dans un FB — vérifié par `G375` (note ↓), pas par `test_fb_joystick.st` | `🔒 GATE` | <small>§6</small> |
 | <nobr><code>TC-P08-011</code></nobr> | Retrait d'`ArmingPermit` (ex. fin de cycle benne) pendant un geste armé désarme **immédiatement**, sans attendre le neutre | `DeadmanArmed=FALSE` dès `ArmingPermit=FALSE`, même bouton relâché | `💻 AUTO` | <small>§4</small> |
 | <nobr><code>TC-P08-012</code></nobr> | Maintien d'`ArmingPermit=TRUE` (ex. exception CLOSING Extraction) conserve l'armement même bouton relâché | `DeadmanArmed` reste `TRUE` tant que `ArmingPermit=TRUE` | `💻 AUTO` | <small>§4</small> |
 | <nobr><code>TC-P08-013</code></nobr> | `ArmingPermitDenied` (sortie diagnostic) : `TRUE` pendant tout appui bouton alors que `ArmingPermit=FALSE`, `FALSE` sinon | `ArmingPermitDenied = RawButton AND NOT ArmingPermit` | `⬜ GAP` | <small>§4</small> |
-| <nobr><code>TC-P08-014</code></nobr> | Mise à l'échelle **proportionnelle** sur valeurs intermédiaires (`RawX=9000`→80%, `RawY=300`→-94%), pas seulement correcte aux bornes 0/10000/neutre | `SpeedRef` exact ±0.01%, `Direction` cohérent | `💻 AUTO` | <small>§1, §2</small> |
+| <nobr><code>TC-P08-014</code></nobr> | Mise à l'échelle **proportionnelle** sur valeurs intermédiaires (`RawX=9000`→80%, `RawY=300`→-94%), pas seulement correcte aux bornes 0/10000/neutre | `SpeedTgt` exact ±0.01%, `Direction` cohérent | `💻 AUTO` | <small>§1, §2</small> |
 
 > ⚠️ **TC-P08-008 — pourquoi ce n'est PAS un test de FB**
 >
@@ -116,8 +116,8 @@ Raw ─► FB_AxisScale ─► Homme-Mort (0 si non armé) ─► ST_Joystick_Ax
 | Champ | Sens |
 |---|---|
 | `Enable` | TRUE quand pipeline actif (`NOT RawOutOfRange AND ArmingPermit`) |
-| `StartStop` | TRUE si `ABS(SpeedRef) > 0.1` |
-| `SpeedRef` | % **signé** −100..+100 |
+| `StartStop` | TRUE si `ABS(SpeedTgt) > 0.1` |
+| `SpeedTgt` | % **signé** −100..+100 |
 | `Direction` | −1 / 0 / +1 (seuil ±0,1) |
 
 ---
@@ -222,12 +222,12 @@ Distinct du §5 (calibration, front `BtnCalibrate` uniquement) : ici la surveill
 |---|---|
 | Détection | `RawX`/`RawY` hors `[0 - RawOutOfRangeMargin ; 10000 + RawOutOfRangeMargin]`, évalué en continu |
 | Marge de tolérance | `RawOutOfRangeMargin := 500` — évite un faux défaut sur simple bruit ADC près des bornes nominales |
-| Effet immédiat | `AxisCmdX/Y.SpeedRef := 0` sur **les 2 axes** (confiance perdue dans tout le geste, pas seulement l'axe en défaut) |
+| Effet immédiat | `AxisCmdX/Y.SpeedTgt := 0` sur **les 2 axes** (confiance perdue dans tout le geste, pas seulement l'axe en défaut) |
 | Diagnostic | `ErrorId` bit1, Warning auto-effacé — cause brute évaluée en continu |
 
 **Exemples** (`Neutral = 5000`) :
 
-| `RawX` | Zone | `SpeedRef` attendu |
+| `RawX` | Zone | `SpeedTgt` attendu |
 |---|---|---|
 | `10000` | Plage nominale (max) | `100` |
 | `11000` | Hors plage + marge | `0` |
@@ -240,7 +240,7 @@ Distinct du §5 (calibration, front `BtnCalibrate` uniquement) : ici la surveill
 | 1 | Manche **relâché physiquement** (repos mécanique) | — |
 | 2 | Front `BtnCalibrate` (IHM) | `NeutralXAct`/`NeutralYAct` ← `RawX`/`RawY` courants |
 | 3 | Vérifier `NeutralXAct`/`NeutralYAct` proches de **5000** ±quelques centaines | Sinon jeu mécanique/capteur à investiguer |
-| 4 | Débattement complet des 2 axes, les 4 directions | `SpeedRef` atteint ±100 % de façon symétrique |
+| 4 | Débattement complet des 2 axes, les 4 directions | `SpeedTgt` atteint ±100 % de façon symétrique |
 | 5 | Redémarrage/download PLC | Neutre **conservé** (persistant) |
 
 ⚠️ **Point ouvert** : présence confirmée d'un bouton `BtnCalibrate` sur l'écran HMI **non

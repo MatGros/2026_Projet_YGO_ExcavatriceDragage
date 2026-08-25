@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.396576" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.396576">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:13:08.218774" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:13:08.218774">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -43,7 +43,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Demande finale et interlocks treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M1LogicRequestSpeedRef_Pct">
+            <variable name="M1LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -51,7 +51,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)</xhtml>
               </documentation>
             </variable>
-            <variable name="M2LogicRequestSpeedRef_Pct">
+            <variable name="M2LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -858,12 +858,12 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Palier limité par vitesse réelle</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne de vitesse finale après rampe (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Commande de vitesse finale après rampe (%)</xhtml>
               </documentation>
             </variable>
             <variable name="StepNumber">

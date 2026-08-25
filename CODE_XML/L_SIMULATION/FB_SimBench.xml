@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.443376" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.443376">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:15:38.692494" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:15:38.692494">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -522,7 +522,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M1</xhtml>
               </documentation>
             </variable>
-            <variable name="M1_SpeedRefPct">
+            <variable name="M1_SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -610,7 +610,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_SpeedRefPct">
+            <variable name="M2_SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -658,7 +658,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] 1 = Avant, -1 = Arrière, 0 = Arrêt</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_SpeedRefPct">
+            <variable name="M3_SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -1231,7 +1231,7 @@ M3_RelayRev := (M3_Direction = -1);
 instSimTranslation(
     Enable          := TRUE,
     Direction       := M3_Direction,
-    SpeedRefPct     := M3_SpeedRefPct,
+    SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS
 );
 
@@ -1265,7 +1265,7 @@ Translation.M3_ThermalOK_DI      := TRUE;
 // aucune régression de mouvement possible.
 IF (M3_Direction &lt;&gt; 0) THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
-    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedRefPct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
+    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedCmd_Pct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
     M3_ActualFreqHz  := 0;
@@ -2382,7 +2382,7 @@ SimContactorOk := ContactorLatch;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -2603,7 +2603,7 @@ END_IF;
 
 {region "§3 Progression"}
 instCycleTime(DefaultValueS := 0.010);
-SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
+SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
 
 // Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
 // Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.

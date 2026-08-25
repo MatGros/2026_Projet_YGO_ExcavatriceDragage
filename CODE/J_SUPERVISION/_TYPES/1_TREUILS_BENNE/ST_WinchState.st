@@ -17,7 +17,7 @@ STRUCT
     EstimatedLoadPct        : REAL;             (* 📊 Estimation empirique, non certifiée *)
     LoadEstimateConfigured  : BOOL;             (* 🟢 Table charge validée pour lecture *)
     SpeedGuardLimited       : BOOL;             (* 🛡️ Palier limité par vitesse réelle *)
-    SpeedRef_Pct            : REAL;             (* 📈 Consigne de vitesse finale après rampe (%) *)
+    SpeedCmd_Pct            : REAL;             (* 📈 Commande de vitesse finale après rampe (%) *)
     StepNumber              : INT;              (* 🔢 Palier de vitesse actif (0..5) *)
     FBState                 : E_State;          (* 🤖 État de l'automate interne (FB_Winch) *)
     Ready                   : BOOL;             (* 🟢 Treuil prêt à fonctionner *)

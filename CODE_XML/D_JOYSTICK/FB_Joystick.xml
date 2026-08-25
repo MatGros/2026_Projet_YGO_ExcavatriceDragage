@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T00:16:38.929428" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T00:16:38.929428">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:30:10.719683" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:30:10.719683">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -276,12 +276,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef">
+            <variable name="SpeedTgt">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionNegative">
@@ -320,7 +320,7 @@
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedRef + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md
    =======================================================================</xhtml>
         </documentation>
@@ -677,12 +677,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Point neutre Y actuel pour IHM/Test</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedXPct">
+            <variable name="SpeedTgtX_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse cible axe X signee (-100..+100 %), miroir AxisCmdX.SpeedTgt</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionX">
@@ -693,12 +693,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdX.DirectionPositive/Negative</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedYPct">
+            <variable name="SpeedTgtY_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse cible axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedTgt</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionY">
@@ -946,12 +946,12 @@ Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT 
 {region "§2 Gate securite (neutralisation pipeline, n efface pas le statut)"}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0;
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
-    SpeedXPct := 0.0; DirectionX := 0;
-    SpeedYPct := 0.0; DirectionY := 0;
+    SpeedTgtX_Pct := 0.0; DirectionX := 0;
+    SpeedTgtY_Pct := 0.0; DirectionY := 0;
     Button := FALSE;
     AtNeutral := TRUE;
     DeadmanArmed := FALSE;
@@ -1008,16 +1008,16 @@ IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdX.SpeedRef := CmdXVal;
+AxisCmdX.SpeedTgt := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
 
 AxisCmdX.DirectionPositive := (CmdXVal &gt; 0.1);
 AxisCmdX.DirectionNegative := (CmdXVal &lt; -0.1);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
-IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedRef := 0.0; END_IF;
+IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedXPct := AxisCmdX.SpeedRef;
+SpeedTgtX_Pct := AxisCmdX.SpeedTgt;
 IF AxisCmdX.DirectionPositive THEN DirectionX := 1;
 ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
 ELSE DirectionX := 0; END_IF;
@@ -1027,16 +1027,16 @@ ELSE DirectionX := 0; END_IF;
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdY.SpeedRef := CmdYVal;
+AxisCmdY.SpeedTgt := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
 
 AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
 AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
-IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedRef := 0.0; END_IF;
+IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedYPct := AxisCmdY.SpeedRef;
+SpeedTgtY_Pct := AxisCmdY.SpeedTgt;
 IF AxisCmdY.DirectionPositive THEN DirectionY := 1;
 ELSIF AxisCmdY.DirectionNegative THEN DirectionY := -1;
 ELSE DirectionY := 0; END_IF;

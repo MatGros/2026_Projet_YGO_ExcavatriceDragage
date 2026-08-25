@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.445976" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.445976">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:15:26.667263" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:15:26.667263">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -43,7 +43,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -264,7 +264,7 @@ END_IF;
 
 {region "§3 Progression"}
 instCycleTime(DefaultValueS := 0.010);
-SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
+SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
 
 // Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
 // Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.

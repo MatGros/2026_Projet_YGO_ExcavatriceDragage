@@ -217,12 +217,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef">
+            <variable name="SpeedTgt">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionNegative">
@@ -261,7 +261,7 @@
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedRef + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md
    =======================================================================</xhtml>
         </documentation>

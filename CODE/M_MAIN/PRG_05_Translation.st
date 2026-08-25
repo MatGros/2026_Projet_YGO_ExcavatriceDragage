@@ -31,7 +31,7 @@ VAR
 
     M3_StartStop_Active     : BOOL;
     M3_Direction_Active     : INT;
-    M3_SpeedRef_Active      : REAL;
+    M3_SpeedCmd_Active      : REAL;
     M3_PositioningActive    : BOOL;
     M3_PositionSensorTarget : BOOL;
 
@@ -150,7 +150,7 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
     // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
     IF M3_StartStop_Active THEN
-        M3_SpeedRef_Active := 100.0;
+        M3_SpeedCmd_Active := 100.0;
         // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
         IF SelTarget = 1 THEN
             M3_Direction_Active := 1;
@@ -158,7 +158,7 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
             M3_Direction_Active := -1;
         END_IF;
     ELSE
-        M3_SpeedRef_Active := 0.0;
+        M3_SpeedCmd_Active := 0.0;
         M3_Direction_Active := 0;
     END_IF;
 ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
@@ -190,7 +190,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
                   100.0,
                   (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz > 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
     // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
-    M3_SpeedRef_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
+    M3_SpeedCmd_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
                               FreqPct,
                               (PRG_02_Acquisition.Data.JoystickSpeedPctX / 100.0) * FreqPct);
 ELSE
@@ -198,13 +198,13 @@ ELSE
     SelTarget    := 0;
     M3_StartStop_Active  := FALSE;
     M3_Direction_Active  := 0;
-    M3_SpeedRef_Active   := 0.0;
+    M3_SpeedCmd_Active   := 0.0;
 END_IF;
 
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
 // de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
 
-M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
+M3_SpeedCmd_Active := LIMIT(0.0, ABS(M3_SpeedCmd_Active), 100.0);
 
 IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
     SelTarget := 0;
@@ -301,7 +301,7 @@ instTranslationM3(
     SafeStop                := M3_SafeStop_Aggregate,
     Direction               := M3_Direction_Active,
     InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
-    SpeedRefPct             := M3_SpeedRef_Active,
+    SpeedTgt_Pct            := M3_SpeedCmd_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.Data.TranslationPosPV,
     // Les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
@@ -385,13 +385,13 @@ TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
 TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationState.PositionReached := instTranslationM3.TargetReached;
 TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
-TranslationState.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
-// 🎯 Cohérence sim : ActiveDirection/ActiveSpeedRef_Pct n'affichent la
+TranslationState.DriveFreqCmd_Hz := instTranslationM3.RequestedDriveFreqHz;
+// 🎯 Cohérence sim : ActiveDirection/ActiveSpeedCmd_Pct n'affichent la
 // consigne QUE si la commande variateur est réellement émise (RequestedDriveControlWord <> 0).
 // Sinon, un interlock bloquant (hauteur, SafeStop…) laisserait l'IHM suggérer un mouvement
 // qui n'a pas lieu ("je bouge mais ça bouge pas"). Affiche 0 quand c'est bloqué.
 TranslationState.ActiveDirection := SEL(instTranslationM3.RequestedDriveControlWord <> 0, M3_Direction_Active, 0);
-TranslationState.ActiveSpeedRef_Pct := SEL(instTranslationM3.RequestedDriveControlWord <> 0, M3_SpeedRef_Active, 0.0);
+TranslationState.ActiveSpeedCmd_Pct := SEL(instTranslationM3.RequestedDriveControlWord <> 0, M3_SpeedCmd_Active, 0.0);
 TranslationState.PositionTremie := PRG_02_Acquisition.Data.TranslationPosTremie;
 TranslationState.PositionPV := PRG_02_Acquisition.Data.TranslationPosPV;
 TranslationState.PositionP2 := PRG_02_Acquisition.Data.TranslationPosP2;

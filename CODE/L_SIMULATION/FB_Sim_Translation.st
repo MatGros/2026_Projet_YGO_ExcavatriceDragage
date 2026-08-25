@@ -19,7 +19,7 @@ FUNCTION_BLOCK PUBLIC FB_Sim_Translation
 VAR_INPUT
     Enable          : BOOL;              (* --> [CMD] TRUE = modèle actif *)
     Direction       : INT;               (* --> [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position *)
-    SpeedRefPct     : REAL;              (* --> [CMD] Magnitude commande 0..100 %, bornée avant calcul *)
+    SpeedTgt_Pct    : REAL;              (* --> [CMD] Magnitude commande 0..100 %, bornée avant calcul *)
     FullTravelTimeS : REAL := 8.0;       (* --> [CFG] Temps complet Trémie→Maintenance à 100 %, simulation seulement *)
 END_VAR
 VAR_OUTPUT
@@ -73,7 +73,7 @@ END_IF;
 
 {region "§3 Progression"}
 instCycleTime(DefaultValueS := 0.010);
-SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
+SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
 
 // Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
 // Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.

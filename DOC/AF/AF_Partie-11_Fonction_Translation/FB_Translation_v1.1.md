@@ -51,7 +51,7 @@ contrairement aux treuils à contacteurs discrets).
 | `Enable/Reset/PowerContactorEngaged/Mode` | — | Standard |
 | `StartStop/SafeStop` | BOOL | Standard mouvement |
 | `Direction` | INT | -1/0/+1 (sens **sémantique réel** — +1=vers Trémie, -1=vers Maintenance, quel que soit le câblage moteur) |
-| `SpeedRefPct` | REAL | Magnitude 0..100% |
+| `SpeedTgt_Pct` | REAL | Magnitude 0..100% |
 | `PositionSensorTarget` | BOOL | Capteur position cible courante (verrou bistable §0quater PRG_05, voir fiche PositionDecoder §3bis) |
 | `SlowdownSensorTremie` | BOOL | Capteur PV — ralentissement avant Trémie (`Direction=1`) |
 | `SlowdownSensorMaintenance` | BOOL | 🆕 Zone P1→Maintenance — ralentissement avant Maintenance (`Direction=-1`) |

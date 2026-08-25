@@ -15,7 +15,7 @@ STRUCT
     SelJoystickWinch   : INT := 0; (* 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement *)
 
     // — bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
-    // SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
+    // SpeedTgt_Pct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
     // sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
     // 🔀 Switch machine unique — pilote aussi Translation M3.
     TglJoystickMaster  : BOOL := TRUE; (* 🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev) *)

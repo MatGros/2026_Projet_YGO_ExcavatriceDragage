@@ -130,7 +130,7 @@ cf. audit de session : `RelayFwd`, `Contactor1-4`, `BrakeCmd`, `FinalInterlockSt
 
 ⚠️ Deux champs bruts n'ont **pas d'équivalent public actuel** et sont hors périmètre sans
 nouveau producteur : `Idx101_EncoderRawPos` (points bruts codeur) et `Idx208/209_Arbitrated*`
-(consigne avant sécurité, aujourd'hui variable interne `PRG_04_Treuils_Benne.M1_SpeedRef_Active`,
+(consigne avant sécurité, aujourd'hui variable interne `PRG_04_Treuils_Benne.M1_SpeedTgt_Active`,
 non publiée en `VAR_OUTPUT`). Ce sont des `TBD` (§6), pas des valeurs à deviner.
 
 ### 5.4 `BenneOuvertureFermeture : ST_ChainBucket`

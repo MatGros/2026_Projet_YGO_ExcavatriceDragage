@@ -211,7 +211,7 @@ instSimBench(
     M1_SpeedContactor_2      := PRG_06_Outputs.Data.M1SpeedContactor2,
     M1_SpeedContactor_3      := PRG_06_Outputs.Data.M1SpeedContactor3,
     M1_SpeedContactor_4      := PRG_06_Outputs.Data.M1SpeedContactor4,
-    M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
+    M1_SpeedCmd_Pct          := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct,
     M1_StepNumber            := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
     M1_PresetTriggerCmd      := instEncoderM1.HwOut.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderM1.HwOut.PresetValueOut,
@@ -222,7 +222,7 @@ instSimBench(
     M2_SpeedContactor_2      := PRG_06_Outputs.Data.M2SpeedContactor2,
     M2_SpeedContactor_3      := PRG_06_Outputs.Data.M2SpeedContactor3,
     M2_SpeedContactor_4      := PRG_06_Outputs.Data.M2SpeedContactor4,
-    M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
+    M2_SpeedCmd_Pct          := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedCmd_Pct,
     M2_StepNumber            := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
     M2_PresetTriggerCmd      := instEncoderM2.HwOut.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderM2.HwOut.PresetValueOut,
@@ -233,7 +233,7 @@ instSimBench(
     // (alimentés par la sortie PRG_06). Gate direction + vitesse = demande réelle (rampe/arrêt).
     M3_Direction             := SEL(PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord <> 0,
                                     PRG_05_Translation.M3_Direction_Active, 0),
-    M3_SpeedRefPct           := LIMIT(0.0,
+    M3_SpeedCmd_Pct          := LIMIT(0.0,
                                       PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
@@ -320,7 +320,7 @@ instJoystick(
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
 Data.JoystickYNeutral     := (instJoystick.DirectionY = 0);
 Data.JoystickDirectionX   := instJoystick.DirectionX;
-Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedXPct);
+Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedTgtX_Pct);
 Data.JoystickXNeutral     := (instJoystick.DirectionX = 0);
 {endregion}
 

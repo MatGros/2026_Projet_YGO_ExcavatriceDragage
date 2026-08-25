@@ -1986,7 +1986,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">— bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
-SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
+SpeedTgt_Pct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
 sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
 🔀 Switch machine unique — pilote aussi Translation M3.
 🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>
@@ -3040,12 +3040,12 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Mot de commande AC600 réellement appliqué</xhtml>
               </documentation>
             </variable>
-            <variable name="DriveFreqRef_Hz">
+            <variable name="DriveFreqCmd_Hz">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence réellement appliquée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Commande fréquence réellement appliquée</xhtml>
               </documentation>
             </variable>
             <variable name="ActiveDirection">
@@ -3056,12 +3056,12 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveSpeedRef_Pct">
+            <variable name="ActiveSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Consigne active après arbitrage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande active après arbitrage</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockState">
@@ -3995,12 +3995,12 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Palier limité par vitesse réelle</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne de vitesse finale après rampe (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Commande de vitesse finale après rampe (%)</xhtml>
               </documentation>
             </variable>
             <variable name="StepNumber">
@@ -4566,12 +4566,12 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef">
+            <variable name="SpeedTgt">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionNegative">
@@ -4610,7 +4610,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedRef + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md
    =======================================================================</xhtml>
         </documentation>

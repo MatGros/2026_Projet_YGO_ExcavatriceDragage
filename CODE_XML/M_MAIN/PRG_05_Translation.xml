@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.451923" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.451923">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:21:57.630977" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:21:57.630977">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -398,12 +398,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Mot de commande AC600 réellement appliqué</xhtml>
               </documentation>
             </variable>
-            <variable name="DriveFreqRef_Hz">
+            <variable name="DriveFreqCmd_Hz">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence réellement appliquée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Commande fréquence réellement appliquée</xhtml>
               </documentation>
             </variable>
             <variable name="ActiveDirection">
@@ -414,12 +414,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveSpeedRef_Pct">
+            <variable name="ActiveSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Consigne active après arbitrage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande active après arbitrage</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockState">
@@ -992,7 +992,7 @@
                 <INT />
               </type>
             </variable>
-            <variable name="M3_SpeedRef_Active">
+            <variable name="M3_SpeedCmd_Active">
               <type>
                 <REAL />
               </type>
@@ -1215,7 +1215,7 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
     // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
     IF M3_StartStop_Active THEN
-        M3_SpeedRef_Active := 100.0;
+        M3_SpeedCmd_Active := 100.0;
         // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
         IF SelTarget = 1 THEN
             M3_Direction_Active := 1;
@@ -1223,7 +1223,7 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
             M3_Direction_Active := -1;
         END_IF;
     ELSE
-        M3_SpeedRef_Active := 0.0;
+        M3_SpeedCmd_Active := 0.0;
         M3_Direction_Active := 0;
     END_IF;
 ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
@@ -1255,7 +1255,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
                   100.0,
                   (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz &gt; 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
     // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
-    M3_SpeedRef_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
+    M3_SpeedCmd_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
                               FreqPct,
                               (PRG_02_Acquisition.Data.JoystickSpeedPctX / 100.0) * FreqPct);
 ELSE
@@ -1263,13 +1263,13 @@ ELSE
     SelTarget    := 0;
     M3_StartStop_Active  := FALSE;
     M3_Direction_Active  := 0;
-    M3_SpeedRef_Active   := 0.0;
+    M3_SpeedCmd_Active   := 0.0;
 END_IF;
 
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
 // de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
 
-M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
+M3_SpeedCmd_Active := LIMIT(0.0, ABS(M3_SpeedCmd_Active), 100.0);
 
 IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
     SelTarget := 0;
@@ -1366,7 +1366,7 @@ instTranslationM3(
     SafeStop                := M3_SafeStop_Aggregate,
     Direction               := M3_Direction_Active,
     InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
-    SpeedRefPct             := M3_SpeedRef_Active,
+    SpeedTgt_Pct            := M3_SpeedCmd_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.Data.TranslationPosPV,
     // Les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
@@ -1450,13 +1450,13 @@ TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
 TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationState.PositionReached := instTranslationM3.TargetReached;
 TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
-TranslationState.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
-// 🎯 Cohérence sim : ActiveDirection/ActiveSpeedRef_Pct n'affichent la
+TranslationState.DriveFreqCmd_Hz := instTranslationM3.RequestedDriveFreqHz;
+// 🎯 Cohérence sim : ActiveDirection/ActiveSpeedCmd_Pct n'affichent la
 // consigne QUE si la commande variateur est réellement émise (RequestedDriveControlWord &lt;&gt; 0).
 // Sinon, un interlock bloquant (hauteur, SafeStop…) laisserait l'IHM suggérer un mouvement
 // qui n'a pas lieu ("je bouge mais ça bouge pas"). Affiche 0 quand c'est bloqué.
 TranslationState.ActiveDirection := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_Direction_Active, 0);
-TranslationState.ActiveSpeedRef_Pct := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_SpeedRef_Active, 0.0);
+TranslationState.ActiveSpeedCmd_Pct := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_SpeedCmd_Active, 0.0);
 TranslationState.PositionTremie := PRG_02_Acquisition.Data.TranslationPosTremie;
 TranslationState.PositionPV := PRG_02_Acquisition.Data.TranslationPosPV;
 TranslationState.PositionP2 := PRG_02_Acquisition.Data.TranslationPosP2;
@@ -2278,7 +2278,7 @@ Status.State := E_State.READY;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -2825,8 +2825,8 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     IF NOT BypassLimitSwitch AND ((Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev)) THEN
         RampTargetPct := 0.0;
     ELSE
-        RampTargetPct := ABS(SpeedRefPct);
-        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedRefPct &gt; 0.0), la consigne est au moins égale à 1.0 Hz
+        RampTargetPct := ABS(SpeedTgt_Pct);
+        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedTgt_Pct &gt; 0.0), la consigne est au moins égale à 1.0 Hz
         IF RampTargetPct &gt; 0.0 THEN
             RampTargetPct := MAX(RampTargetPct, (1.0 / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
         END_IF;

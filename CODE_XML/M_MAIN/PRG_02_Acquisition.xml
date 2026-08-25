@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.448907" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.448907">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:30:13.009458" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:30:13.009458">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1012,12 +1012,12 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef">
+            <variable name="SpeedTgt">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionNegative">
@@ -1056,7 +1056,7 @@ TRUE des qu'un referencement a reussi</xhtml>
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedRef + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md
    =======================================================================</xhtml>
         </documentation>
@@ -1923,7 +1923,7 @@ instSimBench(
     M1_SpeedContactor_2      := PRG_06_Outputs.Data.M1SpeedContactor2,
     M1_SpeedContactor_3      := PRG_06_Outputs.Data.M1SpeedContactor3,
     M1_SpeedContactor_4      := PRG_06_Outputs.Data.M1SpeedContactor4,
-    M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
+    M1_SpeedCmd_Pct          := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct,
     M1_StepNumber            := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
     M1_PresetTriggerCmd      := instEncoderM1.HwOut.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderM1.HwOut.PresetValueOut,
@@ -1934,7 +1934,7 @@ instSimBench(
     M2_SpeedContactor_2      := PRG_06_Outputs.Data.M2SpeedContactor2,
     M2_SpeedContactor_3      := PRG_06_Outputs.Data.M2SpeedContactor3,
     M2_SpeedContactor_4      := PRG_06_Outputs.Data.M2SpeedContactor4,
-    M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
+    M2_SpeedCmd_Pct          := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedCmd_Pct,
     M2_StepNumber            := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
     M2_PresetTriggerCmd      := instEncoderM2.HwOut.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderM2.HwOut.PresetValueOut,
@@ -1945,7 +1945,7 @@ instSimBench(
     // (alimentés par la sortie PRG_06). Gate direction + vitesse = demande réelle (rampe/arrêt).
     M3_Direction             := SEL(PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord &lt;&gt; 0,
                                     PRG_05_Translation.M3_Direction_Active, 0),
-    M3_SpeedRefPct           := LIMIT(0.0,
+    M3_SpeedCmd_Pct          := LIMIT(0.0,
                                       PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
@@ -2032,7 +2032,7 @@ instJoystick(
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
 Data.JoystickYNeutral     := (instJoystick.DirectionY = 0);
 Data.JoystickDirectionX   := instJoystick.DirectionX;
-Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedXPct);
+Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedTgtX_Pct);
 Data.JoystickXNeutral     := (instJoystick.DirectionX = 0);
 {endregion}
 
@@ -3631,12 +3631,12 @@ Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHom
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Point neutre Y actuel pour IHM/Test</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedXPct">
+            <variable name="SpeedTgtX_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse cible axe X signee (-100..+100 %), miroir AxisCmdX.SpeedTgt</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionX">
@@ -3647,12 +3647,12 @@ Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHom
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdX.DirectionPositive/Negative</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedYPct">
+            <variable name="SpeedTgtY_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse cible axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedTgt</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionY">
@@ -3900,12 +3900,12 @@ Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT 
 {region "§2 Gate securite (neutralisation pipeline, n efface pas le statut)"}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0;
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
-    SpeedXPct := 0.0; DirectionX := 0;
-    SpeedYPct := 0.0; DirectionY := 0;
+    SpeedTgtX_Pct := 0.0; DirectionX := 0;
+    SpeedTgtY_Pct := 0.0; DirectionY := 0;
     Button := FALSE;
     AtNeutral := TRUE;
     DeadmanArmed := FALSE;
@@ -3962,16 +3962,16 @@ IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdX.SpeedRef := CmdXVal;
+AxisCmdX.SpeedTgt := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
 
 AxisCmdX.DirectionPositive := (CmdXVal &gt; 0.1);
 AxisCmdX.DirectionNegative := (CmdXVal &lt; -0.1);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
-IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedRef := 0.0; END_IF;
+IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedXPct := AxisCmdX.SpeedRef;
+SpeedTgtX_Pct := AxisCmdX.SpeedTgt;
 IF AxisCmdX.DirectionPositive THEN DirectionX := 1;
 ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
 ELSE DirectionX := 0; END_IF;
@@ -3981,16 +3981,16 @@ ELSE DirectionX := 0; END_IF;
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdY.SpeedRef := CmdYVal;
+AxisCmdY.SpeedTgt := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
 
 AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
 AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
-IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedRef := 0.0; END_IF;
+IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedYPct := AxisCmdY.SpeedRef;
+SpeedTgtY_Pct := AxisCmdY.SpeedTgt;
 IF AxisCmdY.DirectionPositive THEN DirectionY := 1;
 ELSIF AxisCmdY.DirectionNegative THEN DirectionY := -1;
 ELSE DirectionY := 0; END_IF;
@@ -4071,7 +4071,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M1</xhtml>
               </documentation>
             </variable>
-            <variable name="M1_SpeedRefPct">
+            <variable name="M1_SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -4159,7 +4159,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_SpeedRefPct">
+            <variable name="M2_SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -4207,7 +4207,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] 1 = Avant, -1 = Arrière, 0 = Arrêt</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_SpeedRefPct">
+            <variable name="M3_SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -4780,7 +4780,7 @@ M3_RelayRev := (M3_Direction = -1);
 instSimTranslation(
     Enable          := TRUE,
     Direction       := M3_Direction,
-    SpeedRefPct     := M3_SpeedRefPct,
+    SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS
 );
 
@@ -4814,7 +4814,7 @@ Translation.M3_ThermalOK_DI      := TRUE;
 // aucune régression de mouvement possible.
 IF (M3_Direction &lt;&gt; 0) THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
-    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedRefPct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
+    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedCmd_Pct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
     M3_ActualFreqHz  := 0;
@@ -8251,7 +8251,7 @@ SimContactorOk := ContactorLatch;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -8472,7 +8472,7 @@ END_IF;
 
 {region "§3 Progression"}
 instCycleTime(DefaultValueS := 0.010);
-SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
+SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
 
 // Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
 // Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.

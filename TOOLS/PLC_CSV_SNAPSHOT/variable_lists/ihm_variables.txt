@@ -120,11 +120,11 @@ GVL_IHM.JOY1Joystick.State.RawY
 GVL_IHM.JOY1Joystick.State.RawButton
 GVL_IHM.JOY1Joystick.State.AxisCmdX.Enable
 GVL_IHM.JOY1Joystick.State.AxisCmdX.StartStop
-GVL_IHM.JOY1Joystick.State.AxisCmdX.SpeedRef
+GVL_IHM.JOY1Joystick.State.AxisCmdX.SpeedTgt
 GVL_IHM.JOY1Joystick.State.AxisCmdX.Direction
 GVL_IHM.JOY1Joystick.State.AxisCmdY.Enable
 GVL_IHM.JOY1Joystick.State.AxisCmdY.StartStop
-GVL_IHM.JOY1Joystick.State.AxisCmdY.SpeedRef
+GVL_IHM.JOY1Joystick.State.AxisCmdY.SpeedTgt
 GVL_IHM.JOY1Joystick.State.AxisCmdY.Direction
 GVL_IHM.JOY1Joystick.State.NeutralXAct
 GVL_IHM.JOY1Joystick.State.NeutralYAct
@@ -165,7 +165,7 @@ GVL_IHM.M1TreuilRetenue.State.SpeedMonitorErrorId
 GVL_IHM.M1TreuilRetenue.State.EstimatedLoadPct
 GVL_IHM.M1TreuilRetenue.State.LoadEstimateConfigured
 GVL_IHM.M1TreuilRetenue.State.SpeedGuardLimited
-GVL_IHM.M1TreuilRetenue.State.SpeedRef_Pct
+GVL_IHM.M1TreuilRetenue.State.SpeedCmd_Pct
 GVL_IHM.M1TreuilRetenue.State.StepNumber
 GVL_IHM.M1TreuilRetenue.State.FBState
 GVL_IHM.M1TreuilRetenue.State.Ready
@@ -296,7 +296,7 @@ GVL_IHM.M2TreuilBenne.State.SpeedMonitorErrorId
 GVL_IHM.M2TreuilBenne.State.EstimatedLoadPct
 GVL_IHM.M2TreuilBenne.State.LoadEstimateConfigured
 GVL_IHM.M2TreuilBenne.State.SpeedGuardLimited
-GVL_IHM.M2TreuilBenne.State.SpeedRef_Pct
+GVL_IHM.M2TreuilBenne.State.SpeedCmd_Pct
 GVL_IHM.M2TreuilBenne.State.StepNumber
 GVL_IHM.M2TreuilBenne.State.FBState
 GVL_IHM.M2TreuilBenne.State.Ready
@@ -543,9 +543,9 @@ GVL_IHM.TranslationM3.State.PositionReached
 GVL_IHM.TranslationM3.State.JoystickDeflection_Pct
 GVL_IHM.TranslationM3.State.DriveActualFreq_Hz
 GVL_IHM.TranslationM3.State.DriveControlWord
-GVL_IHM.TranslationM3.State.DriveFreqRef_Hz
+GVL_IHM.TranslationM3.State.DriveFreqCmd_Hz
 GVL_IHM.TranslationM3.State.ActiveDirection
-GVL_IHM.TranslationM3.State.ActiveSpeedRef_Pct
+GVL_IHM.TranslationM3.State.ActiveSpeedCmd_Pct
 GVL_IHM.TranslationM3.State.FinalInterlockState
 GVL_IHM.TranslationM3.State.FinalInterlockReason
 GVL_IHM.TranslationM3.State.FinalInterlockError

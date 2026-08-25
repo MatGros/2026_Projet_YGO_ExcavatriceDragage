@@ -54,9 +54,9 @@ VAR_OUTPUT
     // === MESURES & MIROIRS MAINTENANCE ===
     NeutralXAct               : INT;        // <-- [STAT] Point neutre X actuel pour IHM/Test
     NeutralYAct               : INT;        // <-- [STAT] Point neutre Y actuel pour IHM/Test
-    SpeedXPct                 : REAL;       // <-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef
+    SpeedTgtX_Pct             : REAL;       // <-- [STAT] Vitesse cible axe X signee (-100..+100 %), miroir AxisCmdX.SpeedTgt
     DirectionX                : INT;        // <-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdX.DirectionPositive/Negative
-    SpeedYPct                 : REAL;       // <-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef
+    SpeedTgtY_Pct             : REAL;       // <-- [STAT] Vitesse cible axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedTgt
     DirectionY                : INT;        // <-- [STAT] Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdY.DirectionPositive/Negative
     DeadmanArmed              : BOOL;       // <-- [STAT] Geste arme (bouton appuye au neutre) - IHM/diagnostic
     AtNeutral                 : BOOL;       // <-- [STAT] TRUE si les 2 axes sont en zone morte (position centrale)
@@ -139,12 +139,12 @@ Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT 
 {region "§2 Gate securite (neutralisation pipeline, n efface pas le statut)"}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0;
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
-    SpeedXPct := 0.0; DirectionX := 0;
-    SpeedYPct := 0.0; DirectionY := 0;
+    SpeedTgtX_Pct := 0.0; DirectionX := 0;
+    SpeedTgtY_Pct := 0.0; DirectionY := 0;
     Button := FALSE;
     AtNeutral := TRUE;
     DeadmanArmed := FALSE;
@@ -201,16 +201,16 @@ IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdX.SpeedRef := CmdXVal;
+AxisCmdX.SpeedTgt := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) > 0.1);
 
 AxisCmdX.DirectionPositive := (CmdXVal > 0.1);
 AxisCmdX.DirectionNegative := (CmdXVal < -0.1);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
-IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedRef := 0.0; END_IF;
+IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedXPct := AxisCmdX.SpeedRef;
+SpeedTgtX_Pct := AxisCmdX.SpeedTgt;
 IF AxisCmdX.DirectionPositive THEN DirectionX := 1;
 ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
 ELSE DirectionX := 0; END_IF;
@@ -220,16 +220,16 @@ ELSE DirectionX := 0; END_IF;
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdY.SpeedRef := CmdYVal;
+AxisCmdY.SpeedTgt := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) > 0.1);
 
 AxisCmdY.DirectionPositive := (CmdYVal > 0.1);
 AxisCmdY.DirectionNegative := (CmdYVal < -0.1);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
-IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedRef := 0.0; END_IF;
+IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedYPct := AxisCmdY.SpeedRef;
+SpeedTgtY_Pct := AxisCmdY.SpeedTgt;
 IF AxisCmdY.DirectionPositive THEN DirectionY := 1;
 ELSIF AxisCmdY.DirectionNegative THEN DirectionY := -1;
 ELSE DirectionY := 0; END_IF;

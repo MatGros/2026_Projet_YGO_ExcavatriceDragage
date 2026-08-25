@@ -21,7 +21,7 @@ réels** qui bloquent ou dégradent un essai M3 — à ne pas confondre avec un 
 |---|---|---|---|---|
 | 1 | `SafetyStructureNotValidated := TRUE` (garde-fou global, `PRG_06_Outputs.st`) | 🔴 **Toujours bloquant, non touché par ces lots** | **Aucune sortie moteur/frein M1/M2/M3 n'est autorisée**, quoi que fasse l'opérateur — c'est une seule variable partagée par M1/M2/M3 : la lever pour tester M3 arme aussi M1/M2 | `PRG_06_Outputs.st:45` |
 | 2 | `FB_Safety_Translation` jamais instancié | ✅ **Résolu (lot M4)** | `SafeStop` M3 réagit désormais aux 8 mécanismes (perte comm, rotation phase, thermique frein, Méca A/B, butées, incohérence capteurs), plus `InputModuleFault` | AF_Partie-11 v2.1 §5 alerte 5 (résolue), PLAN_TASK T104 |
-| 3 | Commande AC600 (`DriveControlWord`/`DriveFreqRefHz`) jamais écrite en sortie physique | ✅ **Résolu côté ST (lot LOT2)** — ⚠️ **mapping E/S CODESYS manuel restant** | `DriveControlWord`/`DriveFreqRefWord` calculés et capturés dans `PRG_06_Outputs` (`M3_DriveControlWord`/`M3_DriveFreqRefWord`), mais le raccordement final aux registres PDO (`M3_CommandWord` %QW6, `M3_SetpointFrequencyHz` %QW7) est un geste **manuel CODESYS** (I/O mapping dialog) — tant qu'il n'est pas fait, le moteur ne tourne toujours pas | AF_Partie-11 v2.1 §5 alerte 6 (résolue), PLAN_TASK T105, `PRG_06_Outputs.st` §2 |
+| 3 | Commande AC600 (`DriveControlWord`/`DriveFreqCmd_Hz`) jamais écrite en sortie physique | ✅ **Résolu côté ST (lot LOT2)** — ⚠️ **mapping E/S CODESYS manuel restant** | `DriveControlWord`/`DriveFreqCmdWord` calculés et capturés dans `PRG_06_Outputs` (`M3_DriveControlWord`/`M3_DriveFreqCmdWord`), mais le raccordement final aux registres PDO (`M3_CommandWord` %QW6, `M3_SetpointFrequencyHz` %QW7) est un geste **manuel CODESYS** (I/O mapping dialog) — tant qu'il n'est pas fait, le moteur ne tourne toujours pas | AF_Partie-11 v2.1 §5 alerte 6 (résolue), PLAN_TASK T105, `PRG_06_Outputs.st` §2 |
 | 4 | 🆕 `PowerCutOff` M3 est une impasse (`PRG_06_Outputs.st:229`, `PowerCutOffReq := FALSE` figé) | 🔴 **Trouvé par l'audit sécurité 2026-08-05, non résolu** | `instSafetyTranslationM3.PowerCutOff` (5 mécanismes/8 : thermique frein, Méca A/B, butées, incohérence capteurs) est calculé mais **rien ne le transmet à la coupure amont réelle** — seul `SafeStop` (rampe + frein) réagit concrètement. Le seul actuateur de coupure puissance existant est la chaîne AU/sécurité mécanique (`instSafetyEmergencyManagement`) | Audit sécurité 2026-08-05, `TASK_CONTEXT_M5_OUTPUTS_POWERCUTOFF.yaml` |
 | 5 | 🆕 Homme-mort (`DeadmanArmed`) exigé sur M3 seul | ✅ **Résolu (lot LOT3)**, ⚠️ écart M1/M2 non traité | `M3_StartStop_Active` exige `JoystickDeadmanArmed` en MAINT_N1/N2. **M1/M2 (treuils) n'ont pas cette exigence** — écart entre domaines, hors périmètre de ce document | PLAN_TASK T106 |
 
@@ -166,7 +166,7 @@ automatique après défaut, règle non négociable du projet).
 
 ✅ **Calculée et câblée côté ST jusqu'à `PRG_06_Outputs` (lot LOT2).** ⚠️ **Mapping E/S CODESYS
 manuel restant** (prérequis #3) : `M3_CommandWord` (%QW6) et `M3_SetpointFrequencyHz` (%QW7) ne
-sont PAS automatiquement reliés à `M3_DriveControlWord`/`M3_DriveFreqRefWord` — ce sont des noms
+sont PAS automatiquement reliés à `M3_DriveControlWord`/`M3_DriveFreqCmdWord` — ce sont des noms
 auto-créés par le mapping E/S `Device.export`, jamais touchés par le bundle. **Tant que ce mapping
 manuel n'est pas fait dans CODESYS (onglet I/O mapping du device `AC600_ECAT_Drive`), le moteur ne
 reçoit aucune consigne réelle, quel que soit l'état du reste de la chaîne.**
@@ -176,10 +176,10 @@ reçoit aucune consigne réelle, quel que soit l'état du reste de la chaîne.**
 | `PRG_05_Translation.TranslationStateHMI.DriveControlWord` | `1`=Fwd, `2`=Rev, `7`=Reset, `0`=arrêt | Mot demandé par `FB_Translation`, **avant** barrière finale |
 | `PRG_06_Outputs.instTranslationOutputInterlockM3.DriveControlWord` | Idem, **après** barrière finale | Mot réellement autorisé (zéro si frein non confirmé, `RestartInhibit`, ou `Error`) |
 | `PRG_06_Outputs.M3_DriveControlWord` | Copie locale du mot ci-dessus | **À vérifier lié à `M3_CommandWord` dans le mapping E/S CODESYS** — sinon aucun effet variateur |
-| `PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqRefWord` | Échelle ×100 : `5000`=50,00 Hz | Consigne fréquence après barrière finale, format registre PDO 0x3100 |
-| `PRG_06_Outputs.M3_DriveFreqRefWord` | Copie locale de la consigne ci-dessus | **À vérifier lié à `M3_SetpointFrequencyHz` dans le mapping E/S CODESYS** — sinon aucun effet variateur |
+| `PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqCmdWord` | Échelle ×100 : `5000`=50,00 Hz | Consigne fréquence après barrière finale, format registre PDO 0x3100 |
+| `PRG_06_Outputs.M3_DriveFreqCmdWord` | Copie locale de la consigne ci-dessus | **À vérifier lié à `M3_SetpointFrequencyHz` dans le mapping E/S CODESYS** — sinon aucun effet variateur |
 | `PRG_02_Acquisition.M3_StatusWord_Filtered` | Bit variable selon état AC600 | Mot d'état retourné par le variateur (protocole constructeur AC600, `0x3102` côté retour) |
-| `PRG_05_Translation.TranslationStateHMI.DriveActualFreq_Hz` | Proportionnel à la consigne | Vitesse réelle mesurée — comparer à `DriveFreqRef_Hz` pour détecter un décrochage |
+| `PRG_05_Translation.TranslationStateHMI.DriveActualFreq_Hz` | Proportionnel à la consigne | Vitesse réelle mesurée — comparer à `DriveFreqCmd_Hz` pour détecter un décrochage |
 | `PRG_02_Acquisition.HwIn.Translation.M3_ThermalFeedback_DI` | `TRUE` (OK) | Diagnostic seul (T96, résolu) — l'AC600 se protège lui-même, aucune réaction PLC |
 
 **Premier essai recommandé (utilisateur, 2026-08-05)** : consigne à 10 Hz (marge large sous 50 Hz
@@ -227,9 +227,9 @@ avant validation finale.
 5. `SafetyStructureNotValidated` = `FALSE` (§9) — sinon rien ne sortira physiquement, c'est attendu
 6. **Mapping E/S CODESYS M3 fait et vérifié** (`M3_CommandWord`/`M3_SetpointFrequencyHz`, §8) —
    sinon le mot/la fréquence calculés n'atteignent jamais le variateur
-7. Observer `TranslationStateHMI.ActiveDirection`/`ActiveSpeedRef_Pct` — reflète la demande AVANT
+7. Observer `TranslationStateHMI.ActiveDirection`/`ActiveSpeedCmd_Pct` — reflète la demande AVANT
    barrière finale
-8. Observer `instTranslationOutputInterlockM3.State`/`.Reason`/`.DriveControlWord`/`.DriveFreqRefWord`
+8. Observer `instTranslationOutputInterlockM3.State`/`.Reason`/`.DriveControlWord`/`.DriveFreqCmdWord`
    — barrière finale, valeurs réellement autorisées (§8, §9)
 9. Premier essai à **10 Hz** (marge de sécurité), pas 50 Hz nominal (décision utilisateur)
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.450918" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.450918">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:21:10.541435" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:21:10.541435">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -859,7 +859,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Demande finale et interlocks treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M1LogicRequestSpeedRef_Pct">
+            <variable name="M1LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -867,7 +867,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)</xhtml>
               </documentation>
             </variable>
-            <variable name="M2LogicRequestSpeedRef_Pct">
+            <variable name="M2LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -1056,12 +1056,12 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Palier limité par vitesse réelle</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne de vitesse finale après rampe (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Commande de vitesse finale après rampe (%)</xhtml>
               </documentation>
             </variable>
             <variable name="StepNumber">
@@ -2458,7 +2458,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <INT />
               </type>
             </variable>
-            <variable name="M1LogicRequestSpeedRef_Pct">
+            <variable name="M1LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -2473,7 +2473,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <INT />
               </type>
             </variable>
-            <variable name="M2LogicRequestSpeedRef_Pct">
+            <variable name="M2LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -3026,28 +3026,28 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M1LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
     M1LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
-    M1LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
+    M1LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
 ELSE
     IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Mode Boutons IHM
         IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
             M1LogicRequestDirection := 1;
-            M1LogicRequestSpeedRef_Pct  := 100.0;
+            M1LogicRequestSpeedCmd_Pct  := 100.0;
         ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
             M1LogicRequestDirection := -1;
-            M1LogicRequestSpeedRef_Pct  := 100.0;
+            M1LogicRequestSpeedCmd_Pct  := 100.0;
         ELSE
             M1LogicRequestDirection := 0;
-            M1LogicRequestSpeedRef_Pct  := 0.0;
+            M1LogicRequestSpeedCmd_Pct  := 0.0;
         END_IF;
     ELSE
         // Mode Joystick Maître
         IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
             M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
-            M1LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
+            M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
         ELSE
             M1LogicRequestDirection := 0;
-            M1LogicRequestSpeedRef_Pct  := 0.0;
+            M1LogicRequestSpeedCmd_Pct  := 0.0;
         END_IF;
     END_IF;
 
@@ -3064,34 +3064,34 @@ END_IF;
 IF instBucket.Status.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestStartStop := instBucket.M2_StartStop;
     M2LogicRequestDirection := instBucket.M2_Direction;
-    M2LogicRequestSpeedRef_Pct  := 15.0;
+    M2LogicRequestSpeedCmd_Pct  := 15.0;
 ELSE
     IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
         // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
         M2LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
         M2LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
-        M2LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+        M2LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
     ELSE
         IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
             // Mode Boutons IHM
             IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
                 M2LogicRequestDirection := 1;
-                M2LogicRequestSpeedRef_Pct  := 100.0;
+                M2LogicRequestSpeedCmd_Pct  := 100.0;
             ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
                 M2LogicRequestDirection := -1;
-                M2LogicRequestSpeedRef_Pct  := 100.0;
+                M2LogicRequestSpeedCmd_Pct  := 100.0;
             ELSE
                 M2LogicRequestDirection := 0;
-                M2LogicRequestSpeedRef_Pct  := 0.0;
+                M2LogicRequestSpeedCmd_Pct  := 0.0;
             END_IF;
         ELSE
             // Mode Joystick Maître
             IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
                 M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
-                M2LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
+                M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
             ELSE
                 M2LogicRequestDirection := 0;
-                M2LogicRequestSpeedRef_Pct  := 0.0;
+                M2LogicRequestSpeedCmd_Pct  := 0.0;
             END_IF;
         END_IF;
 
@@ -3444,7 +3444,7 @@ instWinchM1(
     DescendPermit           := EffectivePermitM1_Descend,
     AscentPermit            := EffectivePermitM1_Ascent,
     Direction               := M1LogicRequestDirection,
-    SpeedRefPct             := M1LogicRequestSpeedRef_Pct,
+    SpeedTgt_Pct            := M1LogicRequestSpeedCmd_Pct,
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := SEL(instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
     // Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
@@ -3475,7 +3475,7 @@ instWinchM2(
     DescendPermit           := EffectivePermitM2_Descend,
     AscentPermit            := EffectivePermitM2_Ascent,
     Direction               := M2LogicRequestDirection,
-    SpeedRefPct             := M2LogicRequestSpeedRef_Pct,
+    SpeedTgt_Pct            := M2LogicRequestSpeedCmd_Pct,
     SpeedStepTable          := M2_SpeedStepTableActive,
     // instBucket.M2_ForceSlowSpeed
     // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) plafonne le palier
@@ -3553,7 +3553,7 @@ WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M1_Speed_Mps - M1_Prev
 M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
 
 WinchM1State.Position_M := PRG_02_Acquisition.Data.CablePosM1;
-WinchM1State.SpeedRef_Pct := M1LogicRequestSpeedRef_Pct;
+WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
 WinchM1State.FBState := instWinchM1.Status.State;
 WinchM1State.Ready := instWinchM1.Ready;
@@ -3610,7 +3610,7 @@ WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M2_Speed_Mps - M2_Prev
 M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
 
 WinchM2State.Position_M := PRG_02_Acquisition.Data.CablePosM2;
-WinchM2State.SpeedRef_Pct := M2LogicRequestSpeedRef_Pct;
+WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
 WinchM2State.FBState := instWinchM2.Status.State;
 WinchM2State.Ready := instWinchM2.Ready;
@@ -3767,8 +3767,8 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
 // Copie des structs internes vers le bus de sortie (producteur unique).
 Data.WinchM1FinalInterlockRequest := WinchM1FinalInterlockRequest;
 Data.WinchM2FinalInterlockRequest := WinchM2FinalInterlockRequest;
-Data.M1LogicRequestSpeedRef_Pct   := M1LogicRequestSpeedRef_Pct;
-Data.M2LogicRequestSpeedRef_Pct   := M2LogicRequestSpeedRef_Pct;
+Data.M1LogicRequestSpeedCmd_Pct   := M1LogicRequestSpeedCmd_Pct;
+Data.M2LogicRequestSpeedCmd_Pct   := M2LogicRequestSpeedCmd_Pct;
 Data.KoboldContactorCmdArbitrated := KoboldContactorCmdArbitrated;
 Data.WinchM1State                 := WinchM1State;
 Data.WinchM2State                 := WinchM2State;
@@ -6625,12 +6625,12 @@ Status.Done := FALSE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse % (0.0 a 100.0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible % (0.0 a 100.0)</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -7177,7 +7177,7 @@ Code erreur bitmask.</xhtml>
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-    SpeedStep(Enable := FALSE, SpeedRefPct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
+    SpeedStep(Enable := FALSE, SpeedTgt_Pct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
     RequestedStep := SpeedStep.StepNumber;
     StepNumber := 0;
     BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
@@ -7225,7 +7225,7 @@ EffectiveSafeStop := SafeStop
 
 RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
-    RampTargetPct := ABS(SpeedRefPct);
+    RampTargetPct := ABS(SpeedTgt_Pct);
 END_IF;
 
 // RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect) — permet d'approcher
@@ -7302,7 +7302,7 @@ END_IF;
 {endregion}
 
 {region "§3 Selection et temporisation paliers"}
-SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedRefPct := RampTargetPct,
+SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedTgt_Pct := RampTargetPct,
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
           MaxStepNumber := ActiveMaxStep,
           MeasuredSpeedBand := MeasuredSpeedBand,
@@ -8166,7 +8166,7 @@ TimeLast := TimeCurrent;
 --&gt; [CMD] Pilotage actif (FALSE = palier 0 / arret)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -8351,7 +8351,7 @@ TimeLast := TimeCurrent;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant erreur configuration</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefInt">
+            <variable name="SpeedTgtInt">
               <type>
                 <INT />
               </type>
@@ -8531,12 +8531,12 @@ END_IF;
 //    IN &gt; HIGH (régime "haut" confirmé) ; maintien entre LOW et HIGH (anti-battement).
 //    =&gt; NOT Hyst_n.OUT = "on a franchi le seuil n vers le haut" (palier n+1 atteint).
 // ─────────────────────────────────────────────────────────────────────────
-SpeedRefInt := REAL_TO_INT(SpeedRefPct);
+SpeedTgtInt := REAL_TO_INT(SpeedTgt_Pct);
 
-Hyst1(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
-Hyst2(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[2] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[2] - HystMargin));
-Hyst3(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[3] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[3] - HystMargin));
-Hyst4(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[4] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[4] - HystMargin));
+Hyst1(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
+Hyst2(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[2] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[2] - HystMargin));
+Hyst3(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[3] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[3] - HystMargin));
+Hyst4(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[4] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[4] - HystMargin));
 
 StepNumber := 1;                          // Palier mini dès qu'Enable est actif
 IF NOT Hyst1.OUT THEN StepNumber := 2; END_IF;

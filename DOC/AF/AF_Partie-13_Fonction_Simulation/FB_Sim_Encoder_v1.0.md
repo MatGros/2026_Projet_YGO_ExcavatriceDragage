@@ -16,7 +16,7 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| <nobr><code>TC-P13-030</code></nobr> | `RelayFwd`/`RelayRev` font compter `RawPos` de `SpeedRefPct * 0.1 * SpeedScaleFactor` par scan | `💻 AUTO` |
+| <nobr><code>TC-P13-030</code></nobr> | `RelayFwd`/`RelayRev` font compter `RawPos` de `SpeedTgt_Pct * 0.1 * SpeedScaleFactor` par scan | `💻 AUTO` |
 | <nobr><code>TC-P13-031</code></nobr> | `PresetCmd=TRUE` charge `PresetValue` directement (priorité sur Fwd/Rev) | `💻 AUTO` |
 | <nobr><code>TC-P13-032</code></nobr> | `RawPos` ne descend jamais sous 0 (borne explicite en soustraction) | `💻 AUTO` |
 | <nobr><code>TC-P13-033</code></nobr> | `RawPos` survit à un reset froid (via `VAR_IN_OUT` référençant `GVL_PERSISTENT`) | `👁️ MANUEL` |
@@ -41,7 +41,7 @@ Deux instances : une par treuil (M1/M2), câblées depuis `FB_SimBench`.
 |---|---|---|
 | `Enable` | BOOL | Simulation active (`SimulationModeActive AND NOT BusEncoderMxIsReal`) |
 | `RelayFwd`/`RelayRev` | BOOL | Sens commandé (contacteurs de sens du treuil) |
-| `SpeedRefPct` | REAL | Vitesse rampée courante (magnitude, %) |
+| `SpeedTgt_Pct` | REAL | Vitesse rampée courante (magnitude, %) |
 | `PresetCmd` | BOOL | TRUE le cycle où un preset (homing) doit être appliqué |
 | `PresetValue` | UDINT | Valeur brute à charger lors du preset |
 | `SpeedScaleFactor` | REAL | Multiplicateur confort de test banc (défaut 1.0), `GVL_Simulation.SimEncoderSpeedFactor` |
