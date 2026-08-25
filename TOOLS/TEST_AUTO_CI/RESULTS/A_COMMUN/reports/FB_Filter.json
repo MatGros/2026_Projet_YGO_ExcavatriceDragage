@@ -1,55 +1,31 @@
 {
   "version": 1,
-  "file": "test_fb_joystick.st",
+  "file": "test_fb_brake.st",
   "results": [
     {
-      "name": "TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)",
+      "name": "Gate : Enable=FALSE colle le frein immediatement (securite positive)",
       "passed": true
     },
     {
-      "name": "Nominal : Enable=TRUE au neutre -> Ready, aucun defaut",
+      "name": "Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms)",
       "passed": true
     },
     {
-      "name": "TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)",
+      "name": "Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable)",
       "passed": true
     },
     {
-      "name": "TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant",
+      "name": "Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture",
       "passed": true
     },
     {
-      "name": "TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace",
-      "passed": true
-    },
-    {
-      "name": "TC-P08-005 Changement de mode desarme le geste, nouvel appui exige",
-      "passed": true
-    },
-    {
-      "name": "TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu",
-      "passed": true
-    },
-    {
-      "name": "TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)",
-      "passed": true
-    },
-    {
-      "name": "TC-P08-011 Fin de cycle benne desarme le geste par defaut",
-      "passed": true
-    },
-    {
-      "name": "TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE",
-      "passed": true
-    },
-    {
-      "name": "TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes",
+      "name": "Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu",
       "passed": true
     }
   ],
   "summary": {
-    "total": 11,
-    "passed": 11,
+    "total": 5,
+    "passed": 5,
     "failed": 0
   }
 }
