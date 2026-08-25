@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:28:44</div>
+    <div class="exec-time">2026-08-25 06:48:48</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-bucket-0">Safety_Winch : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-bucket-1">Winch : Enable=FALSE neutralise les sorties</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-bucket-0">PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X)</a></li><li class="toc-item toc-pass"><a href="#test-fb-bucket-1">PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -479,37 +479,37 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-bucket-0" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Safety_Winch : Enable=FALSE neutralise les autorisations <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-bucket-1" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Winch : Enable=FALSE neutralise les sorties <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            
-            
-            
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
         </div>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test métier)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Composant technique / socle transverse : non rattaché à un catalogue de tests métier ou de procédé spécifique.
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-bucket-0" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-bucket-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position </h3>
+            </header>
+            
+            
+            
+            
+        </article>
         </div>
     </details>
     <details>
@@ -520,7 +520,7 @@
         <summary>Code source ST original (6)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -542,7 +542,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -578,7 +578,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\F_MODES\E_Mode.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
@@ -596,7 +596,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketConfig.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\BENNE\ST_BucketConfig.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
@@ -615,7 +615,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\BENNE\ST_BucketState.st</code></summary>
                 <pre>(* =======================================================================
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
@@ -637,7 +637,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\FB_Bucket.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\BENNE\FB_Bucket.st</code></summary>
                 <pre>(* =======================================================================
    🪣 FB_Bucket — Commande d&#x27;ouverture et de fermeture du benne
    ───────────────────────────────────────────────────────────────
@@ -1136,7 +1136,7 @@ END_IF;
 DeltaPosition_M := CablePosM2 - CablePosM1;
 
 // Détermination de l&#x27;offset actif pour le synchronisme de FB_WinchSync ET pour l&#x27;affichage IHM
-// (M2PositionCorrected, côté PRG_SUPERVISION_CFC).
+// (M2PositionCorrected, côté PRG_07_Supervision).
 // CloseReq/OpenReq sont pris en compte (pas seulement IsClosed/IsOpen, qui sont FALSE pendant
 // TOUT le trajet depuis l&#x27;état transitoire) pour que la position corrigée de M2 converge
 // progressivement vers M1 pendant l&#x27;enroulage.

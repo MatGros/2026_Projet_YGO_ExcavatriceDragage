@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_J_SUPERVISION():
     """Test global du domaine J_SUPERVISION (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "J_SUPERVISION", "--fast", "-j", "1"]
@@ -69,6 +70,7 @@ def test_J_SUPERVISION():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Hmi_BannerFormatter():
     """Test CI automatisé pour FB_Hmi_BannerFormatter."""
     _run_fb_test("FB_Hmi_BannerFormatter")

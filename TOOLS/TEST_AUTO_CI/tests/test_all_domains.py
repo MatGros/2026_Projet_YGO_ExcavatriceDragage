@@ -10,6 +10,7 @@ RUN_TESTS_PY = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI" / "run_tests.py"
 
 
 @pytest.mark.ci_fb
+@pytest.mark.all_domains
 def test_ALL_DOMAINS():
     """Exécute l'intégralité des 28 blocs fonctionnels du projet en parallèle sur 12 cœurs CPU."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--all", "--fast", "-j", "12"]

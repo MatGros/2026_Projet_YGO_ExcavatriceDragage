@@ -42,7 +42,7 @@ VAR
     
     m3StartStop             : BOOL;
     m3Direction             : INT;
-    m3SpeedRef              : REAL;
+    m3SpeedTgt              : REAL;
     m3HeightOk              : BOOL;
 END_VAR
 
@@ -82,16 +82,16 @@ m3StartStop := (AcqData.JoystickDeadmanArmed AND (AcqData.JoystickDirectionX <> 
 
 IF BtnTranslationFwd THEN
     m3Direction := 1;
-    m3SpeedRef  := 50.0;
+    m3SpeedTgt  := 50.0;
 ELSIF BtnTranslationRev THEN
     m3Direction := -1;
-    m3SpeedRef  := 50.0;
+    m3SpeedTgt  := 50.0;
 ELSIF AcqData.JoystickDeadmanArmed AND (AcqData.JoystickDirectionX <> 0) AND m3HeightOk THEN
     m3Direction := AcqData.JoystickDirectionX;
-    m3SpeedRef  := AcqData.JoystickSpeedPctX;
+    m3SpeedTgt  := AcqData.JoystickSpeedPctX;
 ELSE
     m3Direction := 0;
-    m3SpeedRef  := 0.0;
+    m3SpeedTgt  := 0.0;
 END_IF;
 
 // 4. Pilotage M3
@@ -103,7 +103,7 @@ instTranslationM3(
     StartStop               := m3StartStop,
     SafeStop                := Data.TranslationSafety.SafeStop,
     Direction               := m3Direction,
-    SpeedCmd_Pct             := m3SpeedRef,
+    SpeedTgt_Pct            := m3SpeedTgt,
     PositionSensorTarget    := FALSE,
     SlowdownSensorTremie    := AcqData.TranslationAtPV,
     SlowdownSensorMaintenance := AcqData.TranslationAtP1,
@@ -131,7 +131,7 @@ Data.TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslati
 Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz      := instTranslationM3.RequestedDriveFreqHz;
 
 Data.TranslationState.ActiveDirection                          := m3Direction;
-Data.TranslationState.ActiveSpeedCmd_Pct                       := m3SpeedRef;
+Data.TranslationState.ActiveSpeedCmd_Pct                       := m3SpeedTgt;
 Data.TranslationState.Busy                                     := instTranslationM3.Status.Busy;
 {endregion}
 END_FUNCTION_BLOCK

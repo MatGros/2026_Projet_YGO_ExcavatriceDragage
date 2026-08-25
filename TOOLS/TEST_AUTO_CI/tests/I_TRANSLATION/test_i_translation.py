@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_I_TRANSLATION():
     """Test global du domaine I_TRANSLATION (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "I_TRANSLATION", "--fast", "-j", "1"]
@@ -69,6 +70,7 @@ def test_I_TRANSLATION():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Translation():
     """Test CI automatisé pour FB_Translation."""
     _run_fb_test("FB_Translation")

@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_C_DIAG_RESEAUX():
     """Test global du domaine C_DIAG_RESEAUX (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "C_DIAG_RESEAUX", "--fast", "-j", "3"]
@@ -69,16 +70,19 @@ def test_C_DIAG_RESEAUX():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Diag_CanOpen():
     """Test CI automatisé pour FB_Diag_CanOpen."""
     _run_fb_test("FB_Diag_CanOpen")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Diag_Ethercat():
     """Test CI automatisé pour FB_Diag_Ethercat."""
     _run_fb_test("FB_Diag_Ethercat")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Diag_IhmHeartbeat():
     """Test CI automatisé pour FB_Diag_IhmHeartbeat."""
     _run_fb_test("FB_Diag_IhmHeartbeat")

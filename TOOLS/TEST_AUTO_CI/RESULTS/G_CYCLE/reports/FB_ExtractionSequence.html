@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:28:35</div>
+    <div class="exec-time">2026-08-25 06:48:51</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (5 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-0">TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape</a></li><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-1">TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start</a></li><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-2">TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape</a></li><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-3">TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle</a></li><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-4">TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-0">PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X)</a></li><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-1">PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +204,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/5 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
@@ -495,13 +495,13 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-extractionsequence-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape </h3>
+                <h3>PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X) </h3>
             </header>
             
             
@@ -511,37 +511,7 @@
         <article id="test-fb-extractionsequence-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-extractionsequence-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-extractionsequence-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-extractionsequence-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC </h3>
+                <h3>PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position </h3>
             </header>
             
             
@@ -558,7 +528,7 @@
         <summary>Code source ST original (5)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -580,7 +550,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -616,7 +586,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\F_MODES\E_Mode.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
@@ -634,7 +604,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
    ───────────────────────────────────────────────────────────────
@@ -655,7 +625,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_ExtractionSequence.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\FB_ExtractionSequence.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_ExtractionSequence — Fermeture benne et remontée assistée
    ───────────────────────────────────────────────────────────────

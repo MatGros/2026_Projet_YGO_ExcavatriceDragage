@@ -160,7 +160,7 @@ instWinchM1(
     SafeStop                := Data.WinchM1Safety.SafeStop,
     StartStop               := m1StartStop,
     Direction               := m1Direction,
-    SpeedCmd_Pct             := m1SpeedTgt,
+    SpeedTgt_Pct            := m1SpeedTgt,
     Mode                    := ModesAuth.Mode,
     DescendPermit           := Data.WinchM1Safety.DescendPermit,
     AscentPermit            := Data.WinchM1Safety.AscentPermit,

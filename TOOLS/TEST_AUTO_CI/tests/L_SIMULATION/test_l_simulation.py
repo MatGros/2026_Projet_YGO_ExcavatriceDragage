@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_L_SIMULATION():
     """Test global du domaine L_SIMULATION (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "L_SIMULATION", "--fast", "-j", "1"]
@@ -69,6 +70,7 @@ def test_L_SIMULATION():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_SimBench():
     """Test CI automatisé pour FB_SimBench."""
     _run_fb_test("FB_SimBench")

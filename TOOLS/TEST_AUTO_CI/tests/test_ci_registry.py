@@ -10,6 +10,7 @@ REGISTRY_FILE = TEST_AUTO_CI / "registry.yaml"
 CONFIG_FILE = TEST_AUTO_CI / "config.yaml"
 
 
+@pytest.mark.registry
 def test_ci_registry_exists_and_valid():
     """Vérifie que registry.yaml est présent et bien formé."""
     assert REGISTRY_FILE.exists(), f"Fichier {REGISTRY_FILE} introuvable"
@@ -18,6 +19,7 @@ def test_ci_registry_exists_and_valid():
     assert "groups" in data or "tests" in data or len(data) > 0, "registry.yaml ne doit pas être vide"
 
 
+@pytest.mark.registry
 def test_ci_all_referenced_source_files_exist():
     """Vérifie que tous les fichiers sources ST référencés dans registry.yaml existent bien sur disque."""
     data = yaml.safe_load(REGISTRY_FILE.read_text(encoding="utf-8"))
@@ -40,6 +42,7 @@ def test_ci_all_referenced_source_files_exist():
     assert not missing, f"Fichiers référencés dans registry.yaml introuvables sur disque :\n" + "\n".join(missing[:20])
 
 
+@pytest.mark.registry
 def test_ci_config_is_valid():
     """Vérifie que config.yaml est valide."""
     if CONFIG_FILE.exists():

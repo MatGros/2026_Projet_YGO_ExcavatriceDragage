@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:32:10</div>
+    <div class="exec-time">2026-08-25 06:48:48</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-0">PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-1">PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -667,7 +667,7 @@
         <article id="test-prg-03-modes-cycle-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+                <h3>PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X) </h3>
             </header>
             
             
@@ -677,7 +677,7 @@
         <article id="test-prg-03-modes-cycle-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+                <h3>PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position </h3>
             </header>
             
             
@@ -694,7 +694,7 @@
         <summary>Code source ST original (23)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
                 <pre>(* =======================================================================
    📊 Type CODESYS système pour tests STruCpp
    ======================================================================= *)
@@ -716,7 +716,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -738,7 +738,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -774,7 +774,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbCause.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
    ───────────────────────────────────────────────────────────────
@@ -798,7 +798,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
@@ -818,7 +818,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_CycleTime.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_CycleTime.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
@@ -879,13 +879,13 @@ TimeLast := TimeCurrent;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Ramp.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Ramp.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Ramp — Rampe d&#x27;accélération et décélération asymétrique
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Limitation de variation anti-à-coups (%/s) sur signal analogique
    🔒 Polarité : Distingue l&#x27;éloignement de zéro (Accel) et le retour à zéro (Decel)
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md §2
    ======================================================================= *)
 FUNCTION_BLOCK FB_Ramp
 VAR_INPUT
@@ -932,7 +932,7 @@ Current := LIMIT(-100.0, Current, 100.0);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Acquisition_Preflight.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Acquisition_Preflight.st</code></summary>
                 <pre>(* =======================================================================
    📊 FB_Acquisition_Preflight — Verdict passif machine arrêtée
    ───────────────────────────────────────────────────────────────
@@ -1025,7 +1025,7 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -1166,7 +1166,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Filter.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Filter.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Filter — Filtre passe-bas premier ordre (PT1 numérique)
    ───────────────────────────────────────────────────────────────
@@ -1203,7 +1203,7 @@ END_IF;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\F_MODES\E_Mode.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
@@ -1221,7 +1221,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\FB_Modes.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\F_MODES\FB_Modes.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
@@ -1416,7 +1416,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_CycleStep.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_CycleStep.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_CycleStep — Étapes de la machine d&#x27;état du cycle automatique
    ───────────────────────────────────────────────────────────────
@@ -1445,7 +1445,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_DiveSearchState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_DiveSearchState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_DiveSearchState — Phases internes de recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
@@ -1466,7 +1466,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
    ───────────────────────────────────────────────────────────────
@@ -1487,7 +1487,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\ST_WinchCmdDemand.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\ST_WinchCmdDemand.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_WinchCmdDemand — Structure de demande de commande treuil
    ───────────────────────────────────────────────────────────────
@@ -1503,7 +1503,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketCmdDemand.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\BENNE\ST_BucketCmdDemand.st</code></summary>
                 <pre>(* =======================================================================
    🪣 ST_BucketCmdDemand — Demande de commande benne
    ───────────────────────────────────────────────────────────────
@@ -1519,7 +1519,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\ST_TranslationCmdDemand.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\I_TRANSLATION\ST_TranslationCmdDemand.st</code></summary>
                 <pre>(* =======================================================================
    🎯 ST_TranslationCmdDemand — Demande de commande translation M3
    ───────────────────────────────────────────────────────────────
@@ -1535,7 +1535,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_DiveSearch.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\FB_DiveSearch.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_DiveSearch — Assistance plongée et recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
@@ -1714,7 +1714,7 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_ExtractionSequence.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\FB_ExtractionSequence.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_ExtractionSequence — Fermeture benne et remontée assistée
    ───────────────────────────────────────────────────────────────
@@ -1889,7 +1889,7 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_Cycle.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\FB_Cycle.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Cycle — Séquenceur du cycle automatique (Grafcet de dragage)
    ───────────────────────────────────────────────────────────────
@@ -2407,15 +2407,15 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_Modes_Autorisations.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_Modes_Autorisations.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎚️ ST_Modes_Autorisations — Bus d&#x27;autorisations du mode machine
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
                    DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §2
-   🎯 Produit par FB_Modes (via PRG_MODES_CFC)
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
       Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_MODES_CFC)
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
    ═══════════════════════════════════════════════════════════════ *)
 
 TYPE ST_Modes_Autorisations :
@@ -2431,7 +2431,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_TestHarness_PRG_03.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_TestHarness_PRG_03.st</code></summary>
                 <pre>(* =======================================================================
    🧱 FB_TestHarness_PRG_03 : Banc d&#x27;essai unitaire pour PRG_03_Modes_Cycle
    ───────────────────────────────────────────────────────────────

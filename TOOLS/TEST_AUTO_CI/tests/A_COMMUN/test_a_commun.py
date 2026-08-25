@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_A_COMMUN():
     """Test global du domaine A_COMMUN (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "A_COMMUN", "--fast", "-j", "6"]
@@ -69,31 +70,37 @@ def test_A_COMMUN():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_CycleTime():
     """Test CI automatisé pour FB_CycleTime."""
     _run_fb_test("FB_CycleTime")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Ramp():
     """Test CI automatisé pour FB_Ramp."""
     _run_fb_test("FB_Ramp")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Acquisition_Preflight():
     """Test CI automatisé pour FB_Acquisition_Preflight."""
     _run_fb_test("FB_Acquisition_Preflight")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_FbStatus():
     """Test CI automatisé pour FB_FbStatus."""
     _run_fb_test("FB_FbStatus")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Filter():
     """Test CI automatisé pour FB_Filter."""
     _run_fb_test("FB_Filter")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Brake():
     """Test CI automatisé pour FB_Brake."""
     _run_fb_test("FB_Brake")

@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:29:00</div>
+    <div class="exec-time">2026-08-25 06:48:47</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-simbench-0">SimBench : instanciation et neutralisation sans Enable</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-1">Sim_Safety : neutralisation sans Enable</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-simbench-0">PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-1">PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -1085,7 +1085,7 @@
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_M3FullTravelTimeS</b> : REAL := 8.0</span></div>
         </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedRefPct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedRefPct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_Direction <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_SpeedRefPct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_A <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_B <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyArming_RQ <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimEncoderSpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationOffset_M <span class="pin-type" style="color:var(--muted);">REAL := 0.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWordOverrideActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWord <span class="pin-type" style="color:var(--muted);">BYTE := 16#07</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickLeft_Rev_TREMIE_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRight_Fwd_MAINT_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickFwd_Up_Close_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRev_Down_Open_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawX <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawY <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawButton <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickOvershoot_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickBagotement_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimKoboldContactValue <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnEmergencyStop <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HwReal <span class="pin-type" style="color:var(--muted);">ST_HardwareImage</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM1 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM2 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_Direction <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_A <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_B <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyArming_RQ <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimEncoderSpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationOffset_M <span class="pin-type" style="color:var(--muted);">REAL := 0.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWordOverrideActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWord <span class="pin-type" style="color:var(--muted);">BYTE := 16#07</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickLeft_Rev_TREMIE_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRight_Fwd_MAINT_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickFwd_Up_Close_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRev_Down_Open_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawX <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawY <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawButton <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickOvershoot_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickBagotement_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimKoboldContactValue <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnEmergencyStop <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HwReal <span class="pin-type" style="color:var(--muted);">ST_HardwareImage</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM1 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM2 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
@@ -1347,186 +1347,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 56 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BTNEMERGENCYSTOP</code> jamais câblé en production</li><li>Pin <code>BUSY</code> jamais câblé en production</li><li>Pin <code>DONE</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMING_RQ</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>HWREAL</code> jamais câblé en production</li><li>Pin <code>M1_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M1_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M1_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDREFPCT</code> jamais câblé en production</li><li>Pin <code>M1_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M2_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M2_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M2_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDREFPCT</code> jamais câblé en production</li><li>Pin <code>M2_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M3_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M3_DIRECTION</code> jamais câblé en production</li><li>Pin <code>M3_SPEEDREFPCT</code> jamais câblé en production</li><li>Pin <code>MACHINE</code> jamais câblé en production</li><li>Pin <code>OPERATOR</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_A</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_B</code> jamais câblé en production</li><li>Pin <code>RAWPOSM1</code> jamais câblé en production</li><li>Pin <code>RAWPOSM2</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>SIMENCODERSPEEDFACTOR</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKBAGOTEMENT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKFWD_UP_CLOSE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKLEFT_REV_TREMIE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKOVERSHOOT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWBUTTON</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWX</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWY</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKREV_DOWN_OPEN_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRIGHT_FWD_MAINT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMKOBOLDCONTACTVALUE</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORD</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORDOVERRIDEACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM1</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM2</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONOFFSET_M</code> jamais câblé en production</li><li>Pin <code>TRANSLATION</code> jamais câblé en production</li><li>Pin <code>WINCH</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_RELAYFWD <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_RELAYREV <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDCONTACTOR_1 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDCONTACTOR_2 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDCONTACTOR_3 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDCONTACTOR_4 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDREFPCT <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_STEPNUMBER <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_PRESETTRIGGERCMD <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_PRESETVALUEOUT <span class="pin-type">IEC_UDINT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_RELAYFWD <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_RELAYREV <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDCONTACTOR_1 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDCONTACTOR_2 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDCONTACTOR_3 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDCONTACTOR_4 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDREFPCT <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_STEPNUMBER <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_PRESETTRIGGERCMD <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_PRESETVALUEOUT <span class="pin-type">IEC_UDINT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M3_DIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M3_SPEEDREFPCT <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M3_BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERKEEPALIVE_A <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERKEEPALIVE_B <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EMERGENCYARMING_RQ <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMENCODERSPEEDFACTOR <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMSYNCDEVIATIONINJECTM1 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMSYNCDEVIATIONINJECTM2 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMSYNCDEVIATIONOFFSET_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMM3SENSORSWORDOVERRIDEACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMM3SENSORSWORD <span class="pin-type">IEC_BYTE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKLEFT_REV_TREMIE_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKRIGHT_FWD_MAINT_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKFWD_UP_CLOSE_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKREV_DOWN_OPEN_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKRAWX <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKRAWY <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKRAWBUTTON <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKOVERSHOOT_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKBAGOTEMENT_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMKOBOLDCONTACTVALUE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BTNEMERGENCYSTOP <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HWREAL <span class="pin-type">ST_HARDWAREIMAGE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RAWPOSM1<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_UDINT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RAWPOSM2<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_UDINT</span></div>
-        </div></div>
-            <div class="pin-block">FB_SimBench</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BUSY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DONE <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">WINCH <span class="pin-type">ST_HWWINCH</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">TRANSLATION <span class="pin-type">ST_HWTRANSLATION</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">OPERATOR <span class="pin-type">ST_HWOPERATOR</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">MACHINE <span class="pin-type">ST_HWMACHINE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 7 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -1659,20 +1479,20 @@
         <article id="test-fb-simbench-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>SimBench : instanciation et neutralisation sans Enable </h3>
+                <h3>PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X) </h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (1)</span><ul><li>Ready doit etre FALSE sans Enable</li></ul></div>
+            
             
             
         </article>
         <article id="test-fb-simbench-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>Sim_Safety : neutralisation sans Enable </h3>
+                <h3>PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position </h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (2)</span><ul><li>AU non ferme</li><li>Contacteur coupe</li></ul></div>
+            
             
             
         </article>
@@ -1686,7 +1506,7 @@
         <summary>Code source ST original (107)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
                 <pre>(* =======================================================================
    📊 Type CODESYS système pour tests STruCpp
    ======================================================================= *)
@@ -1708,7 +1528,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -1730,7 +1550,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -1766,7 +1586,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbCause.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
    ───────────────────────────────────────────────────────────────
@@ -1790,7 +1610,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
@@ -1810,7 +1630,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_CycleTime.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_CycleTime.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
@@ -1871,13 +1691,13 @@ TimeLast := TimeCurrent;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Ramp.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Ramp.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Ramp — Rampe d&#x27;accélération et décélération asymétrique
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Limitation de variation anti-à-coups (%/s) sur signal analogique
    🔒 Polarité : Distingue l&#x27;éloignement de zéro (Accel) et le retour à zéro (Decel)
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md §2
    ======================================================================= *)
 FUNCTION_BLOCK FB_Ramp
 VAR_INPUT
@@ -1924,7 +1744,7 @@ Current := LIMIT(-100.0, Current, 100.0);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\B_AU_SECURITE\ST_Safety_Emergency_State.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Safety_Emergency_State — État public de la chaîne d&#x27;arrêt d&#x27;urgence
    ───────────────────────────────────────────────────────────────
@@ -1945,7 +1765,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_Diag.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\B_AU_SECURITE\ST_Safety_Emergency_Diag.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
@@ -1966,7 +1786,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
                 <pre>(* =======================================================================
    📊 E_Diag_State — Enumération des états du cycle de diagnostic réseau
    ───────────────────────────────────────────────────────────────
@@ -1986,7 +1806,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Diag_Device — Structure diagnostic d&#x27;un esclave ou bus
    ───────────────────────────────────────────────────────────────
@@ -2006,13 +1826,13 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_Joystick_AxisCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\D_JOYSTICK\ST_Joystick_AxisCmd.st</code></summary>
                 <pre>(* =======================================================================
    🕹️ ST_Joystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedRef + direction en bits (DirectionPositive/Negative, AtNeutral).
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md
    ======================================================================= *)
 
 TYPE ST_Joystick_AxisCmd :
@@ -2020,7 +1840,7 @@ STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
     StartStop   : BOOL;   // --&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)
-    SpeedRef    : REAL;   // --&gt; [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)
+    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)
     DirectionNegative   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     DirectionPositive   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     AtNeutral   : BOOL;   // --&gt; [CMD] TRUE si axes en zone morte (position centrale)
@@ -2030,7 +1850,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\F_MODES\E_Mode.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
@@ -2048,7 +1868,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_CycleStep.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_CycleStep.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_CycleStep — Étapes de la machine d&#x27;état du cycle automatique
    ───────────────────────────────────────────────────────────────
@@ -2077,7 +1897,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_DiveSearchState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_DiveSearchState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_DiveSearchState — Phases internes de recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
@@ -2098,7 +1918,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
    ───────────────────────────────────────────────────────────────
@@ -2119,7 +1939,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockReason.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockReason.st</code></summary>
                 <pre>(* =======================================================================
    🔒 E_WinchFinalInterlockReason — Raisons de blocage barrière finale
    ───────────────────────────────────────────────────────────────
@@ -2137,7 +1957,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_WinchFinalInterlockState — États machine barrière finale treuil
    ───────────────────────────────────────────────────────────────
@@ -2158,7 +1978,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketConfig.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\BENNE\ST_BucketConfig.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
@@ -2177,7 +1997,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\BENNE\ST_BucketState.st</code></summary>
                 <pre>(* =======================================================================
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
@@ -2199,7 +2019,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\E_TranslationFinalInterlockReason.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\I_TRANSLATION\E_TranslationFinalInterlockReason.st</code></summary>
                 <pre>(* =======================================================================
    🛡️ E_TranslationFinalInterlockReason — Raisons d&#x27;interlock M3
    ───────────────────────────────────────────────────────────────
@@ -2217,7 +2037,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketCfg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketCfg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_BucketCfg — Configuration de la benne (M2)
    ═══════════════════════════════════════════════════════════════ *)
@@ -2231,7 +2051,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketCmd.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎮 ST_BucketCmd — Commandes IHM pour la benne (M2)
    ═══════════════════════════════════════════════════════════════ *)
@@ -2253,7 +2073,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ⚙️ ST_BucketHMI — Données d&#x27;échange IHM pour la benne (M2)
    ───────────────────────────────────────────────────────────────
@@ -2270,7 +2090,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketHMIState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketHMIState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_BucketHMIState — États et diagnostics IHM de la benne (M2)
    ═══════════════════════════════════════════════════════════════ *)
@@ -2302,7 +2122,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BypassBucket.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BypassBucket.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_BypassBucket — Bypass de la surveillance benne (M2)
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
@@ -2319,7 +2139,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BypassWinch.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BypassWinch.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
    ───────────────────────────────────────────────────────────────
@@ -2365,7 +2185,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_ChainBucket.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_ChainBucket.st</code></summary>
                 <pre>TYPE ST_ChainBucket :
 STRUCT
     Idx101_BucketIsOpen          : BOOL; // 1 = Benne Mécaniquement Ouvert | 0 = Non Confirmé
@@ -2406,7 +2226,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_ChainWinch.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_ChainWinch.st</code></summary>
                 <pre>TYPE ST_ChainWinch :
 STRUCT
     Inputs_100    : ST_Chain_Winch_Inputs;
@@ -2418,7 +2238,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_ChainWinchSync.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_ChainWinchSync.st</code></summary>
                 <pre>TYPE ST_ChainWinchSync :
 STRUCT
     Idx101_M1_CablePos_M         : REAL; // [mètres] Position Câble M1 Retenue
@@ -2444,28 +2264,28 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Control.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Control.st</code></summary>
                 <pre>TYPE ST_Chain_Winch_Control :
 STRUCT
     Idx401_MotionAllowed         : BOOL; // 1 = Prêt / Mouvement Autorisé | 0 = Bloqué
     Idx402_SpeedStepCalculated   : INT;  // Palier Vitesse Calculé (0, 1, 2, 3, 4)
     Idx403_SpeedRamp_Pct         : REAL; // [%] Consigne Vitesse après Rampe
     Idx404_BrakeReleaseAuthorized: BOOL; // 1 = Ordre Ouverture Frein | 0 = Ordre Serrage
-    Idx405_FinalInterlockState   : E_WinchFinalInterlockState; // 🛡️ État frontière _LD
+    Idx405_FinalInterlockState   : E_WinchFinalInterlockState; // 🛡️ État frontière
     Idx406_FinalInterlockReason  : E_WinchFinalInterlockReason; // 🛡️ Cause mémorisée
     Idx407_FinalAuthorizedStep   : INT;  // 🪜 Palier réellement autorisé
     Idx408_BrakeCommandOpenConfirmed : BOOL; // 🔌 Contacteur/bobine, pas frein mécanique
     Idx409_BrakeTimeoutElapsed   : TIME; // ⏱️ Watchdog 500ms écoulé
     Idx410_RestartDelayElapsed   : TIME; // ⏱️ Verrou 900ms écoulé
     Idx411_StepDelayElapsed      : TIME; // ⏱️ Délai palier 1s250 écoulé
-    Idx412_InTopSlowdownZone     : BOOL; // : Palier plafonné à 1, approche limite haute
-    Idx413_InBottomSlowdownZone  : BOOL; // : Palier plafonné à 1, approche limite basse (câble ou légale)
+    Idx412_InTopSlowdownZone     : BOOL; // 🐢 Palier plafonné à 1, approche limite haute
+    Idx413_InBottomSlowdownZone  : BOOL; // 🐢 Palier plafonné à 1, approche limite basse (câble ou légale)
     Idx414_BottomLimitActiveM    : REAL; // : Limite basse active (m) — câble physique OU légale, la plus restrictive
 END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Demandes.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Demandes.st</code></summary>
                 <pre>TYPE ST_Chain_Winch_Demandes :
 STRUCT
     Idx201_JoyRawPhysical_ANA    : INT;  // [pts] Bruts convertisseur (-2048 à +2048)
@@ -2483,7 +2303,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Inputs.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Inputs.st</code></summary>
                 <pre>TYPE ST_Chain_Winch_Inputs :
 STRUCT
     Idx101_EncoderRawPos         : DINT; // [Valeur brutes pts] Codeur connecté
@@ -2496,7 +2316,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Outputs.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Outputs.st</code></summary>
                 <pre>TYPE ST_Chain_Winch_Outputs :
 STRUCT
     Idx501_CmdRelayFwd_Up_DQ     : BOOL; // 1 = Relais Montée ON | 0 = OFF
@@ -2508,7 +2328,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Safety.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Safety.st</code></summary>
                 <pre>TYPE ST_Chain_Winch_Safety :
 STRUCT
     Idx301_EmergencyChainClosed  : BOOL; // 1 = Boucle Urgence OK (Armé) | 0 = Arrêt d&#x27;Urgence Appuyé
@@ -2548,7 +2368,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_HwWinch.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_HwWinch.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
    ───────────────────────────────────────────────────────────────
@@ -2581,7 +2401,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_OutputsInterPrg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_OutputsInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    📤 ST_OutputsInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_06_Outputs
    ───────────────────────────────────────────────────────────────
@@ -2625,7 +2445,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_SafetyWinch.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_SafetyWinch.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🛡️ ST_SafetyWinch — Diagnostics de sécurité pour un treuil
    ───────────────────────────────────────────────────────────────
@@ -2668,7 +2488,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchBenneHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchBenneHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ⚙️ ST_WinchBenneHMI — Données d&#x27;échange IHM pour le treuil Benne (M2 uniquement)
    ───────────────────────────────────────────────────────────────
@@ -2702,7 +2522,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchCfg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchCfg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
@@ -2724,7 +2544,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchCmd.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎮 ST_WinchCmd — Commandes IHM pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
@@ -2746,12 +2566,12 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchFinalInterlockRequest.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchFinalInterlockRequest.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🪝 ST_WinchFinalInterlockRequest — Demande brute vers frontière Q M1/M2
    ───────────────────────────────────────────────────────────────
-   📤 Producteur unique : PRG_TREUILS_CFC (VAR_OUTPUT).
-   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock.
+   📤 Producteur unique : PRG_04_Treuils_Benne (VAR_OUTPUT).
+   📥 Consommateur unique : PRG_06_Outputs, avant FB_WinchOutputInterlock.
    🔒 Ne contient jamais une sortie Q autorisée : les C1..C4 restent les
       demandes exactes de FB_Winch / ST_SpeedStepTable.
    ═══════════════════════════════════════════════════════════════ *)
@@ -2780,7 +2600,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ⚙️ ST_WinchHMI — Données d&#x27;échange IHM pour un treuil (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
@@ -2808,7 +2628,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchInterPrg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🪝 ST_WinchInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_04_Treuils_Benne
    ───────────────────────────────────────────────────────────────
@@ -2826,8 +2646,8 @@ STRUCT
     // === ⚡ Demandes finales M1/M2 (interlocks &amp; consigne vitesse arbitrée) ===
     WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // 🪝 Demande finale et interlocks treuil M1
     WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // 🪝 Demande finale et interlocks treuil M2
-    M1LogicRequestSpeedRef_Pct   : REAL; // 📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)
-    M2LogicRequestSpeedRef_Pct   : REAL; // 📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)
+    M1LogicRequestSpeedCmd_Pct   : REAL; // 📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)
+    M2LogicRequestSpeedCmd_Pct   : REAL; // 📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)
     KoboldContactorCmdArbitrated : BOOL; // 🪝 Ordre contacteur capteur fond Kobold (consommé PRG_06)
 
     // === 📊 États publics des treuils ===
@@ -2849,7 +2669,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_WinchState — États, mesures et diagnostics HMI pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
@@ -2869,7 +2689,7 @@ STRUCT
     EstimatedLoadPct        : REAL;             (* 📊 Estimation empirique, non certifiée *)
     LoadEstimateConfigured  : BOOL;             (* 🟢 Table charge validée pour lecture *)
     SpeedGuardLimited       : BOOL;             (* 🛡️ Palier limité par vitesse réelle *)
-    SpeedRef_Pct            : REAL;             (* 📈 Consigne de vitesse finale après rampe (%) *)
+    SpeedCmd_Pct            : REAL;             (* 📈 Commande de vitesse finale après rampe (%) *)
     StepNumber              : INT;              (* 🔢 Palier de vitesse actif (0..5) *)
     FBState                 : E_State;          (* 🤖 État de l&#x27;automate interne (FB_Winch) *)
     Ready                   : BOOL;             (* 🟢 Treuil prêt à fonctionner *)
@@ -2886,7 +2706,7 @@ STRUCT
     Contactor3              : BOOL;             (* 🔌 Contacteur vitesse palier 3 *)
     Contactor4              : BOOL;             (* 🔌 Contacteur vitesse palier 4 *)
     BrakeCmd                : BOOL;             (* 🔓 Commande frein (TRUE = desserré / libre) *)
-    FinalInterlockState     : E_WinchFinalInterlockState; (* 🛡️ État final _LD lecture seule *)
+    FinalInterlockState     : E_WinchFinalInterlockState; (* 🛡️ État final lecture seule *)
     FinalInterlockReason    : E_WinchFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
     FinalInterlockError     : BOOL;             (* 🛡️ Défaut final mémorisé *)
     FinalInterlockErrorId   : WORD;             (* 🛡️ Bitfield final *)
@@ -2919,7 +2739,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchSymmetryHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchSymmetryHMI.st</code></summary>
                 <pre>TYPE ST_WinchSymmetryHMI :
 STRUCT
     BtnReset : BOOL;
@@ -2936,7 +2756,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_BypassTranslation.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_BypassTranslation.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_BypassTranslation — Bypass maintenance dédiés à Translation M3
    ───────────────────────────────────────────────────────────────
@@ -2972,7 +2792,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_ChainTranslation.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_ChainTranslation.st</code></summary>
                 <pre>TYPE ST_ChainTranslation :
 STRUCT
     Inputs_100    : ST_Chain_Translation_Inputs;
@@ -2984,13 +2804,13 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Control.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Control.st</code></summary>
                 <pre>TYPE ST_Chain_Translation_Control :
 STRUCT
     Idx401_MotionAllowed         : BOOL; // 1 = Mouvement Translation Autorisé | 0 = Bloqué
     Idx402_SetpointFreq_Hz       : REAL; // [Hz] Consigne Fréquence Calculée
     Idx403_DriveControlWord      : WORD; // Mot de Commande Calculé Variateur AC600
-    Idx404_FinalInterlockState   : E_State; // 🛡️ État frontière _LD
+    Idx404_FinalInterlockState   : E_State; // 🛡️ État frontière
     Idx405_FinalInterlockReason  : E_TranslationFinalInterlockReason; // 🛡️ Cause mémorisée
     Idx406_BrakeCommandOpenConfirmed : BOOL; // 🔌 Contacteur/bobine, pas frein mécanique
     Idx407_BrakeTimeoutElapsed   : TIME; // ⏱️ Watchdog 500ms écoulé
@@ -2998,7 +2818,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Demandes.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Demandes.st</code></summary>
                 <pre>TYPE ST_Chain_Translation_Demandes :
 STRUCT
     Idx201_JoyXRaw_ANA           : INT;  // [pts] Bruts Joystick Axe X
@@ -3014,7 +2834,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Inputs.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Inputs.st</code></summary>
                 <pre>TYPE ST_Chain_Translation_Inputs :
 STRUCT
     Idx101_PosTremie_DI          : BOOL; // 1 = Position Trémie Atteinte | 0 = Absent
@@ -3031,7 +2851,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Outputs.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Outputs.st</code></summary>
                 <pre>TYPE ST_Chain_Translation_Outputs :
 STRUCT
     Idx501_CmdDriveControlWord   : WORD; // Mot de Commande Transmis EtherCAT AC600
@@ -3041,7 +2861,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Safety.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_Chain_Translation_Safety.st</code></summary>
                 <pre>TYPE ST_Chain_Translation_Safety :
 STRUCT
     Idx301_EmergencyChainClosed  : BOOL; // 1 = Boucle Urgence OK | 0 = Arrêt d&#x27;Urgence Appuyé
@@ -3065,7 +2885,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_HwTranslation.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_HwTranslation.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🏗️ ST_HwTranslation — Image matérielle brute des entrées Translation M3
    ───────────────────────────────────────────────────────────────
@@ -3088,7 +2908,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_SafetyTranslation.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_SafetyTranslation.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🛡️ ST_SafetyTranslation — Diagnostics de sécurité pour la Translation M3
    ───────────────────────────────────────────────────────────────
@@ -3116,7 +2936,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationCfg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationCfg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
    ───────────────────────────────────────────────────────────────
@@ -3136,7 +2956,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationCmd.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎮 ST_TranslationCmd — Commandes IHM pour la Translation M3
    ───────────────────────────────────────────────────────────────
@@ -3150,7 +2970,7 @@ STRUCT
     SelTarget          : INT;     (* 🔢 Numéro de la cible de position sélectionnée *)
     BtnFwd             : BOOL;    (* ↔️ Requête marche avant (→ Trémie), pilotage IHM exclusif *)
     BtnRev             : BOOL;    (* ↔️ Requête marche arrière (→ Maintenance), pilotage IHM exclusif *)
-    SetFreq_Hz         : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs_LD *)
+    SetFreq_Hz         : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], limitée par PRG_06_Outputs *)
     // 🔀 Switch machine unique : GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
     InvertDirection    : BOOL;    (* 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service) *)
     TglMaintenanceZoneAccess : BOOL; (* : autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable) *)
@@ -3160,7 +2980,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationFinalInterlockRequest.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationFinalInterlockRequest.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ↔️ ST_TranslationFinalInterlockRequest — Demande brute vers PDO M3
    ───────────────────────────────────────────────────────────────
@@ -3190,7 +3010,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ↔️ ST_TranslationHMI — Données d&#x27;échange IHM pour le Translation M3
    ───────────────────────────────────────────────────────────────
@@ -3206,7 +3026,7 @@ STRUCT
     (* 🚦 États &amp; diagnostics *)
     State                   : ST_TranslationState;
 
-    (* Configurations et limites — , manquait (contrairement à ST_WinchHMI) *)
+    (* Configurations et limites — champ Cfg manquait initialement (contrairement à ST_WinchHMI) *)
     Cfg                     : ST_TranslationCfg;
 
     (* Bypass maintenance *)
@@ -3219,7 +3039,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationInterPrg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ↔️ ST_TranslationInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_05_Translation
    ───────────────────────────────────────────────────────────────
@@ -3246,7 +3066,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_TranslationState — États et retours IHM pour la Translation M3
    ───────────────────────────────────────────────────────────────
@@ -3268,10 +3088,10 @@ STRUCT
     JoystickDeflection_Pct  : REAL;    (* 🕹️ Axe X fonctionnel -100..+100 %, 0 = neutre ; animation IHM M3 *)
     DriveActualFreq_Hz      : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
     DriveControlWord        : WORD;    (* ⚙️ Mot de commande AC600 réellement appliqué *)
-    DriveFreqRef_Hz         : REAL;    (* 🎯 Consigne fréquence réellement appliquée *)
+    DriveFreqCmd_Hz         : REAL;    (* 🎯 Commande fréquence réellement appliquée *)
     ActiveDirection         : INT;     (* ↔️ Sens arbitré : -1 / 0 / +1 *)
-    ActiveSpeedRef_Pct      : REAL;    (* 📊 Consigne active après arbitrage *)
-    FinalInterlockState     : E_State; (* 🛡️ État final _LD lecture seule *)
+    ActiveSpeedCmd_Pct      : REAL;    (* 📊 Commande active après arbitrage *)
+    FinalInterlockState     : E_State; (* 🛡️ État final lecture seule *)
     FinalInterlockReason    : E_TranslationFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
     FinalInterlockError     : BOOL;    (* 🛡️ Défaut final mémorisé *)
     FinalInterlockErrorId   : WORD;    (* 🛡️ Bitfield final *)
@@ -3308,7 +3128,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ChainCycleSemiAuto.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ChainCycleSemiAuto.st</code></summary>
                 <pre>(* =======================================================================
    🔄 ST_ChainCycleSemiAuto — Diagnostic chronologique Séquenceur Semi-Auto
    ───────────────────────────────────────────────────────────────
@@ -3351,7 +3171,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_CycleCfg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_CycleCfg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
    SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
@@ -3366,7 +3186,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_CycleCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_CycleCmd.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎮 ST_CycleCmd — Commandes IHM pour le cycle semi-automatique
    ═══════════════════════════════════════════════════════════════ *)
@@ -3381,7 +3201,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_CycleHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_CycleHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🔄 ST_CycleHMI — Données d&#x27;échange IHM du cycle semi-automatique
    ───────────────────────────────────────────────────────────────
@@ -3398,7 +3218,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_CycleState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_CycleState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_CycleState — États et diagnostics IHM du cycle semi-automatique
    ═══════════════════════════════════════════════════════════════ *)
@@ -3433,7 +3253,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ModesCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ModesCmd.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎮 ST_ModesCmd — Commandes IHM pour les modes de marche
    ═══════════════════════════════════════════════════════════════ *)
@@ -3451,7 +3271,7 @@ STRUCT
     SelJoystickWinch   : INT := 0; (* 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement *)
 
     // — bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
-    // SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l&#x27;unique autorité de
+    // SpeedTgt_Pct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l&#x27;unique autorité de
     // sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
     // 🔀 Switch machine unique — pilote aussi Translation M3.
     TglJoystickMaster  : BOOL := TRUE; (* 🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev) *)
@@ -3460,7 +3280,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ModesHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ModesHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎚️ ST_ModesHMI — Données d&#x27;échange IHM pour les modes de marche
    ───────────────────────────────────────────────────────────────
@@ -3476,7 +3296,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ModesState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ModesState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_ModesState — États et diagnostics IHM des modes de marche
    ═══════════════════════════════════════════════════════════════ *)
@@ -3505,15 +3325,15 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_Modes_Autorisations.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_Modes_Autorisations.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎚️ ST_Modes_Autorisations — Bus d&#x27;autorisations du mode machine
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
                    DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §2
-   🎯 Produit par FB_Modes (via PRG_MODES_CFC)
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
       Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_MODES_CFC)
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
    ═══════════════════════════════════════════════════════════════ *)
 
 TYPE ST_Modes_Autorisations :
@@ -3529,7 +3349,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionInterPrg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧲 ST_AcquisitionInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_02_Acquisition
    ───────────────────────────────────────────────────────────────
@@ -3597,7 +3417,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_EncoderHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_EncoderHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧲 ST_EncoderHMI — Données d&#x27;échange IHM pour les codeurs absolus
    ───────────────────────────────────────────────────────────────
@@ -3629,7 +3449,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_HardwareImage.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_HardwareImage.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🏗️ ST_HardwareImage — Structure globale d&#x27;image matérielle (Frontière HwIn)
    ───────────────────────────────────────────────────────────────
@@ -3646,7 +3466,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_HwMachine.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_HwMachine.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🏗️ ST_HwMachine — Image matérielle brute des entrées communes Machine
    ───────────────────────────────────────────────────────────────
@@ -3669,7 +3489,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_HwOperator.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_HwOperator.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🏗️ ST_HwOperator — Image matérielle brute des entrées Opérateur / Joystick
    ───────────────────────────────────────────────────────────────
@@ -3687,7 +3507,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_JoystickChecklist.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_JoystickChecklist.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🕹️ ST_JoystickChecklist — Diagnostic chronologique communication &amp; prise en main Joystick
    ───────────────────────────────────────────────────────────────
@@ -3726,7 +3546,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_JoystickCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_JoystickCmd.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎮 ST_JoystickCmd — Commandes IHM pour le Joystick
    ═══════════════════════════════════════════════════════════════ *)
@@ -3738,7 +3558,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_JoystickHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_JoystickHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🕹️ ST_JoystickHMI — Données d&#x27;échange IHM pour le Joystick
    ───────────────────────────────────────────────────────────────
@@ -3755,7 +3575,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_JoystickState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_JoystickState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_JoystickState — États et diagnostics IHM du Joystick
    ═══════════════════════════════════════════════════════════════ *)
@@ -3779,7 +3599,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_ChainDredgingAssist.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_ChainDredgingAssist.st</code></summary>
                 <pre>TYPE ST_ChainDredgingAssist :
 STRUCT
     Idx101_EnableDiveSearch          : BOOL; // 1 = Assistance Plongée Armée (IHM) | 0 = Désarmée
@@ -3817,7 +3637,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_DredgingAssistCfg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_DredgingAssistCfg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
    📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
@@ -3837,7 +3657,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_DredgingAssistCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_DredgingAssistCmd.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎮 ST_DredgingAssistCmd — Sélections IHM assistance prélèvement
    ═══════════════════════════════════════════════════════════════ *)
@@ -3864,7 +3684,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_DredgingAssistHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_DredgingAssistHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🪨 ST_DredgingAssistHMI — Échange IHM assistants prélèvement
    ═══════════════════════════════════════════════════════════════ *)
@@ -3878,7 +3698,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_DredgingAssistState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_DredgingAssistState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_DredgingAssistState — États publics assistance prélèvement
    ═══════════════════════════════════════════════════════════════ *)
@@ -3913,7 +3733,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_ChainContextGlobal.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_ChainContextGlobal.st</code></summary>
                 <pre>TYPE ST_ChainContextGlobal :
 STRUCT
     Idx101_ModeActive             : E_Mode; // Mode de marche actif (MANUEL, SEMI_AUTO, MAINT_N1, MAINT_N2)
@@ -3935,7 +3755,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_HomingChecklist.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_HomingChecklist.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎯 ST_HomingChecklist — Diagnostic chronologique de référencement (Dépannage)
    ───────────────────────────────────────────────────────────────
@@ -3975,7 +3795,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_InputModuleDiagHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_InputModuleDiagHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
    ───────────────────────────────────────────────────────────────
@@ -3996,7 +3816,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_MotionChecklist.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_MotionChecklist.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ⚙️ ST_MotionChecklist — Diagnostic chronologique de commande de mouvement
    ───────────────────────────────────────────────────────────────
@@ -4035,7 +3855,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_NetworkDiagHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_NetworkDiagHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    📡 ST_NetworkDiagHMI — Données d&#x27;échange IHM pour les diagnostics réseau
    ───────────────────────────────────────────────────────────────
@@ -4064,7 +3884,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_SafetyChecklist.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_SafetyChecklist.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🛡️ ST_SafetyChecklist — Diagnostic chronologique réarmement chaîne de sécurité / AU
    ───────────────────────────────────────────────────────────────
@@ -4114,7 +3934,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_BypassCommun.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_BypassCommun.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
    ───────────────────────────────────────────────────────────────
@@ -4142,7 +3962,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_BypassNetwork.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_BypassNetwork.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🌐 ST_BypassNetwork — Bypass général du diagnostic réseau
    ───────────────────────────────────────────────────────────────
@@ -4168,7 +3988,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_BypassSync.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_BypassSync.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_BypassSync — Bypass de la surveillance synchronisation M1/M2
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
@@ -4183,7 +4003,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_CommunCfg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_CommunCfg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_CommunCfg — Configuration des paramètres communs machine
    ═══════════════════════════════════════════════════════════════ *)
@@ -4215,7 +4035,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_CommunHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_CommunHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🌐 ST_CommunHMI — Données d&#x27;échange IHM COMMUNES (pas propres à un axe)
    ───────────────────────────────────────────────────────────────
@@ -4233,11 +4053,11 @@ TYPE ST_CommunHMI :
 STRUCT
     TopPositionSensorActive   : BOOL; (* ⚠️ Capteur de position haute commun M1+M2 détecté *)
     BrakeThermalFault         : BOOL; (* 🌡️ Défaut/perte thermique frein — retour unique commun M1/M2/M3, escalade PowerCutOff *)
-    PhaseRotationFault        : BOOL; (* : rotation de phase incorrecte — retour unique commun M1/M2/M3
+    PhaseRotationFault        : BOOL; (* ⚡ Rotation de phase incorrecte — retour unique commun M1/M2/M3
                                           (auparavant invisible IHM, seulement décodable via SafetyErrorId bit4/bit2) *)
     LimitLegalReached         : BOOL; (* 📐 Limite légale de profondeur de dragage atteinte (globale) *)
-    HydraulicThermalFault     : BOOL; (* : défaut/perte thermique centrale hydraulique
-                                          (PRG_AUXILIARY_CFC, diagnostic seul — aucune commande PLC) *)
+    HydraulicThermalFault     : BOOL; (* 🌡️ Défaut/perte thermique centrale hydraulique
+                                          (PRG_02_Acquisition, diagnostic seul — aucune commande PLC) *)
 
     (* 🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur *)
     SimTopSensorBypassActive  : BOOL; (* 🩺 Capteur haut ignoré car simulation active *)
@@ -4257,7 +4077,7 @@ STRUCT
 
     // Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
     // struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
-    // (doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
+    // (doctrine reset=front, PRG_07_Supervision.st §2bis). Vérifier les valeurs avant reprise cycle.
     ConfigRestoredFromPersistent : BOOL; (* ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier *)
     BtnAckConfigRestored         : BOOL; (* 🔘 IHM→PLC : acquittement opérateur (front) *)
 
@@ -4272,13 +4092,13 @@ STRUCT
     Cfg : ST_CommunCfg;
 
     (* 🔒 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)) *)
-    Bypass : ST_BypassCommun;    (* : granulaire, applique le bypass aux 2 treuils simultanément (pilotage &quot;both&quot;) — OR avec le bypass individuel M1/M2 dans PRG_04 *)
+    Bypass : ST_BypassCommun;    (* 🔒 Granulaire, applique le bypass aux 2 treuils simultanément (pilotage &quot;both&quot;) — OR avec le bypass individuel M1/M2 dans PRG_04 *)
 END_STRUCT
 END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncCfg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncCfg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_SyncCfg — Configuration de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════ *)
@@ -4292,7 +4112,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncCmd.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎮 ST_SyncCmd — Commandes IHM pour la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════ *)
@@ -4304,7 +4124,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ⚙️ ST_SyncHMI — Données d&#x27;échange IHM pour la synchronisation M1/M2
    ───────────────────────────────────────────────────────────────
@@ -4321,7 +4141,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_SyncState — États et diagnostics de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════ *)
@@ -4340,7 +4160,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\8_BANDEAU_ET_IHM\ST_AlarmBanner.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\8_BANDEAU_ET_IHM\ST_AlarmBanner.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚨 ST_AlarmBanner — Bandeau d&#x27;alarme defilant (carrousel n/N)
    ───────────────────────────────────────────────────────────────
@@ -4359,7 +4179,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\8_BANDEAU_ET_IHM\ST_HmiBanner.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\8_BANDEAU_ET_IHM\ST_HmiBanner.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🖥️ ST_HmiBanner — Bandeau d&#x27;information et messages opérateur
    ───────────────────────────────────────────────────────────────
@@ -4379,7 +4199,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\8_BANDEAU_ET_IHM\ST_PreflightHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\8_BANDEAU_ET_IHM\ST_PreflightHMI.st</code></summary>
                 <pre>TYPE ST_PreflightHMI :
 STRUCT
     BtnRun : BOOL;
@@ -4392,7 +4212,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_Sim_Encoder.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\L_SIMULATION\FB_Sim_Encoder.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d&#x27;un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
@@ -4518,7 +4338,7 @@ RawPosOut := RawPos;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_Sim_Joystick.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\L_SIMULATION\FB_Sim_Joystick.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
    ───────────────────────────────────────────────────────────────
@@ -4754,7 +4574,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_Sim_Safety.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\L_SIMULATION\FB_Sim_Safety.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Safety — Simulation de la chaîne d&#x27;AU et du contacteur de puissance
    ───────────────────────────────────────────────────────────────
@@ -4820,7 +4640,7 @@ SimContactorOk := ContactorLatch;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_Sim_Translation.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\L_SIMULATION\FB_Sim_Translation.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Translation — Progression capteurs simulés M3
    ───────────────────────────────────────────────────────────────
@@ -4842,7 +4662,7 @@ FUNCTION_BLOCK PUBLIC FB_Sim_Translation
 VAR_INPUT
     Enable          : BOOL;              (* --&gt; [CMD] TRUE = modèle actif *)
     Direction       : INT;               (* --&gt; [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position *)
-    SpeedRefPct     : REAL;              (* --&gt; [CMD] Magnitude commande 0..100 %, bornée avant calcul *)
+    SpeedTgt_Pct    : REAL;              (* --&gt; [CMD] Magnitude commande 0..100 %, bornée avant calcul *)
     FullTravelTimeS : REAL := 8.0;       (* --&gt; [CFG] Temps complet Trémie→Maintenance à 100 %, simulation seulement *)
 END_VAR
 VAR_OUTPUT
@@ -4896,7 +4716,7 @@ END_IF;
 
 {region &quot;§3 Progression&quot;}
 instCycleTime(DefaultValueS := 0.010);
-SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
+SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
 
 // Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
 // Direction sémantique : +1 réduit la progression vers Trémie ; -1 l&#x27;augmente vers Maintenance.
@@ -4949,7 +4769,7 @@ END_IF;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_SimBench.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\L_SIMULATION\FB_SimBench.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d&#x27;essai
    ───────────────────────────────────────────────────────────────
@@ -4984,7 +4804,7 @@ VAR_INPUT
     M1_SpeedContactor_2        : BOOL;   (* --&gt; [HW] Contacteur palier 2 M1 *)
     M1_SpeedContactor_3        : BOOL;   (* --&gt; [HW] Contacteur palier 3 M1 *)
     M1_SpeedContactor_4        : BOOL;   (* --&gt; [HW] Contacteur palier 4 M1 *)
-    M1_SpeedRefPct             : REAL;   (* --&gt; [CMD] Consigne vitesse M1 *)
+    M1_SpeedCmd_Pct            : REAL;   (* --&gt; [CMD] Consigne vitesse M1 *)
     M1_StepNumber              : INT;    (* --&gt; [CMD] Palier vitesse courant M1 (1..5) *)
     M1_PresetTriggerCmd        : WORD;   (* --&gt; [CMD] Trigger preset M1 *)
     M1_PresetValueOut          : UDINT;   (* --&gt; [CFG] Valeur preset M1 *)
@@ -4996,14 +4816,14 @@ VAR_INPUT
     M2_SpeedContactor_2        : BOOL;   (* --&gt; [HW] Contacteur palier 2 M2 *)
     M2_SpeedContactor_3        : BOOL;   (* --&gt; [HW] Contacteur palier 3 M2 *)
     M2_SpeedContactor_4        : BOOL;   (* --&gt; [HW] Contacteur palier 4 M2 *)
-    M2_SpeedRefPct             : REAL;   (* --&gt; [CMD] Consigne vitesse M2 *)
+    M2_SpeedCmd_Pct            : REAL;   (* --&gt; [CMD] Consigne vitesse M2 *)
     M2_StepNumber              : INT;    (* --&gt; [CMD] Palier vitesse courant M2 (1..5) *)
     M2_PresetTriggerCmd        : WORD;   (* --&gt; [CMD] Trigger preset M2 *)
     M2_PresetValueOut          : UDINT;   (* --&gt; [CFG] Valeur preset M2 *)
     M2_BrakeCmd                : BOOL;             (* --&gt; [CMD] TRUE = commande desserrage frein M2 *)
 
     M3_Direction               : INT;              (* --&gt; [CMD] 1 = Avant, -1 = Arrière, 0 = Arrêt *)
-    M3_SpeedRefPct             : REAL;   (* --&gt; [CMD] Consigne vitesse M3 *)
+    M3_SpeedCmd_Pct            : REAL;   (* --&gt; [CMD] Consigne vitesse M3 *)
     M3_BrakeCmd                : BOOL;             (* --&gt; [CMD] TRUE = commande desserrage frein M3 *)
 
     PowerKeepAlive_A           : BOOL;             (* --&gt; [SAFE] TRUE = relais A maintenu sagement par le PLC *)
@@ -5185,7 +5005,7 @@ M3_RelayRev := (M3_Direction = -1);
 instSimTranslation(
     Enable          := TRUE,
     Direction       := M3_Direction,
-    SpeedRefPct     := M3_SpeedRefPct,
+    SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS
 );
 
@@ -5219,7 +5039,7 @@ Translation.M3_ThermalOK_DI      := TRUE;
 // aucune régression de mouvement possible.
 IF (M3_Direction &lt;&gt; 0) THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
-    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedRefPct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
+    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedCmd_Pct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
     M3_ActualFreqHz  := 0;

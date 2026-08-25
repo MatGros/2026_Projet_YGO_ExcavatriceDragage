@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_H_TREUILS_BENNE():
     """Test global du domaine H_TREUILS_BENNE (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "H_TREUILS_BENNE", "--fast", "-j", "2"]
@@ -69,11 +70,13 @@ def test_H_TREUILS_BENNE():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Winch():
     """Test CI automatisé pour FB_Winch."""
     _run_fb_test("FB_Winch")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Bucket():
     """Test CI automatisé pour FB_Bucket."""
     _run_fb_test("FB_Bucket")

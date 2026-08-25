@@ -191,7 +191,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:28:15</div>
+    <div class="exec-time">2026-08-25 06:48:33</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (11 tests)</summary>
@@ -383,7 +383,7 @@
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Joystick_AxisCmd</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>AxisCmdX</b>.SpeedRef</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>AxisCmdX</b>.SpeedTgt</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Joystick_AxisCmd</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -416,7 +416,7 @@
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Joystick_AxisCmd</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>AxisCmdY</b>.SpeedRef</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>AxisCmdY</b>.SpeedTgt</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Joystick_AxisCmd</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -433,7 +433,7 @@
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>SpeedXPct</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-name"><b>SpeedTgtX_Pct</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
@@ -441,7 +441,7 @@
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>SpeedYPct</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-name"><b>SpeedTgtY_Pct</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
@@ -463,7 +463,7 @@
         <summary>🔌 Interface & câblage production</summary>
         <div class="af-warning-banner">
             <div class="af-warning-title">⚠️ 5 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ARMINGPERMITDENIED</code> jamais câblé en production</li><li>Pin <code>BUTTON</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>SPEEDYPCT</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li></ul>
+            <ul><li>Pin <code>ARMINGPERMITDENIED</code> jamais câblé en production</li><li>Pin <code>BUTTON</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>SPEEDTGTY_PCT</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li></ul>
         </div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired">
@@ -539,7 +539,7 @@
             <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.instJoystick.AxisCmdX;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.instJoystick.AxisCmdX;</code></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">AXISCMDY <span class="pin-type">ST_JOYSTICK_AXISCMD</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_04_Treuils_Benne.st: M1LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);" onclick="copyPinExpr(this)">M_MAIN/PRG_04_Treuils_Benne.st: M1LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);</code> <span class='pin-more'>(+2)</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_04_Treuils_Benne.st: M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);" onclick="copyPinExpr(this)">M_MAIN/PRG_04_Treuils_Benne.st: M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);</code> <span class='pin-more'>(+2)</span></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">NEUTRALXACT <span class="pin-type">IEC_INT</span></div>
             <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;</code></div>
@@ -547,13 +547,13 @@
             <div class="pin-name">NEUTRALYACT <span class="pin-type">IEC_INT</span></div>
             <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;</code></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">SPEEDXPCT <span class="pin-type">IEC_REAL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedXPct);" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedXPct);</code></div>
+            <div class="pin-name">SPEEDTGTX_PCT <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedTgtX_Pct);" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedTgtX_Pct);</code></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">DIRECTIONX <span class="pin-type">IEC_INT</span></div>
             <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickDirectionX   := instJoystick.DirectionX;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickDirectionX   := instJoystick.DirectionX;</code> <span class='pin-more'>(+1)</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">SPEEDYPCT <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-name">SPEEDTGTY_PCT <span class="pin-type">IEC_REAL</span></div>
             <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">DIRECTIONY <span class="pin-type">IEC_INT</span></div>
@@ -800,7 +800,7 @@
         <summary>Code source ST original (10)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\F_MODES\E_Mode.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
@@ -818,7 +818,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
                 <pre>(* =======================================================================
    📊 E_Diag_State — Enumération des états du cycle de diagnostic réseau
    ───────────────────────────────────────────────────────────────
@@ -838,7 +838,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Diag_Device — Structure diagnostic d&#x27;un esclave ou bus
    ───────────────────────────────────────────────────────────────
@@ -858,7 +858,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -880,7 +880,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -916,7 +916,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbCause.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
    ───────────────────────────────────────────────────────────────
@@ -940,7 +940,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -1081,13 +1081,13 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_Joystick_AxisCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\D_JOYSTICK\ST_Joystick_AxisCmd.st</code></summary>
                 <pre>(* =======================================================================
    🕹️ ST_Joystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedRef + direction en bits (DirectionPositive/Negative, AtNeutral).
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md
    ======================================================================= *)
 
 TYPE ST_Joystick_AxisCmd :
@@ -1095,7 +1095,7 @@ STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
     StartStop   : BOOL;   // --&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)
-    SpeedRef    : REAL;   // --&gt; [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)
+    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)
     DirectionNegative   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     DirectionPositive   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     AtNeutral   : BOOL;   // --&gt; [CMD] TRUE si axes en zone morte (position centrale)
@@ -1105,14 +1105,14 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\FB_AxisScale.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\D_JOYSTICK\FB_AxisScale.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_AxisScale — Normalisation et zone morte d&#x27;un axe joystick
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Normalise une valeur brute (0..10000) selon le neutre calibré
              et applique une zone morte en unités brutes (compte ADC).
    🛡️ Garde-fou : Saturation stricte de la consigne à +/-100.0 %.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md (F08.02)
    ======================================================================= *)
 
 FUNCTION_BLOCK FB_AxisScale
@@ -1158,7 +1158,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\FB_Joystick.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\D_JOYSTICK\FB_Joystick.st</code></summary>
                 <pre>(* =======================================================================
    🕹️ FB_Joystick — Acquisition &amp; conditionnement du geste opérateur
    ───────────────────────────────────────────────────────────────
@@ -1170,7 +1170,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                   Désarmement sur neutre prolongé ; le changement de mode / fin de
                   cycle benne est géré par l&#x27;externe via ArmingPermit (vue joystick).
    📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md (F08.01, F08.03-F08.07)
    ===================================================================== *)
 
 FUNCTION_BLOCK FB_Joystick
@@ -1215,9 +1215,9 @@ VAR_OUTPUT
     // === MESURES &amp; MIROIRS MAINTENANCE ===
     NeutralXAct               : INT;        // &lt;-- [STAT] Point neutre X actuel pour IHM/Test
     NeutralYAct               : INT;        // &lt;-- [STAT] Point neutre Y actuel pour IHM/Test
-    SpeedXPct                 : REAL;       // &lt;-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef
+    SpeedTgtX_Pct             : REAL;       // &lt;-- [STAT] Vitesse cible axe X signee (-100..+100 %), miroir AxisCmdX.SpeedTgt
     DirectionX                : INT;        // &lt;-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdX.DirectionPositive/Negative
-    SpeedYPct                 : REAL;       // &lt;-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef
+    SpeedTgtY_Pct             : REAL;       // &lt;-- [STAT] Vitesse cible axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedTgt
     DirectionY                : INT;        // &lt;-- [STAT] Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdY.DirectionPositive/Negative
     DeadmanArmed              : BOOL;       // &lt;-- [STAT] Geste arme (bouton appuye au neutre) - IHM/diagnostic
     AtNeutral                 : BOOL;       // &lt;-- [STAT] TRUE si les 2 axes sont en zone morte (position centrale)
@@ -1248,7 +1248,7 @@ VAR
     instCauses                : ARRAY[0..15] OF ST_FbCause;   // . [LOC] Liste des causes pour le socle FB_FbStatus
 END_VAR
 
-{region &quot;S0 CAUSES + SOCLE (appele AVANT le gate)&quot;}
+{region &quot;§1 CAUSES + SOCLE (appele AVANT le gate)&quot;}
 // 🎯 CAUSES exprimées en CLAIR (liste ST_FbCause) — plus de bitfield WORD.
 //    - CalibFail : fault à acquitter (IsWarning=FALSE).
 //    - RawOutOfRange / BusLost : warning auto-effacés (décision utilisateur).
@@ -1297,15 +1297,15 @@ ErrorId := Status.ErrorId;    // miroir
 Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT Error;
 {endregion}
 
-{region &quot;S1 Gate securite (neutralisation pipeline, n efface pas le statut)&quot;}
+{region &quot;§2 Gate securite (neutralisation pipeline, n efface pas le statut)&quot;}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0;
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
-    SpeedXPct := 0.0; DirectionX := 0;
-    SpeedYPct := 0.0; DirectionY := 0;
+    SpeedTgtX_Pct := 0.0; DirectionX := 0;
+    SpeedTgtY_Pct := 0.0; DirectionY := 0;
     Button := FALSE;
     AtNeutral := TRUE;
     DeadmanArmed := FALSE;
@@ -1320,7 +1320,7 @@ IF NOT Enable OR BusLost THEN
 END_IF;
 {endregion}
 
-{region &quot;S2 Acquisition bouton + mise a l echelle&quot;}
+{region &quot;§3 Acquisition bouton + mise a l echelle&quot;}
 Button := RawButton;
 
 // Mise a l&#x27;echelle (deadband) - le neutre s&#x27;evalue sur les 2 axes
@@ -1329,7 +1329,7 @@ ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic - position centrale
 {endregion}
 
-{region &quot;S5 Armement homme mort&quot;}
+{region &quot;§4 Armement homme mort&quot;}
 // Bouton homme-mort : armement par MAINTIEN (DeadmanArmHoldTime), independant de la position.
 DeadmanEdge(CLK := RawButton);
 IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
@@ -1358,39 +1358,39 @@ NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q, PT
 IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 {endregion}
 
-{region &quot;S6 Pipeline axe X&quot;}
+{region &quot;§5 Pipeline axe X&quot;}
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdX.SpeedRef := CmdXVal;
+AxisCmdX.SpeedTgt := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
 
 AxisCmdX.DirectionPositive := (CmdXVal &gt; 0.1);
 AxisCmdX.DirectionNegative := (CmdXVal &lt; -0.1);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
-IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedRef := 0.0; END_IF;
+IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedXPct := AxisCmdX.SpeedRef;
+SpeedTgtX_Pct := AxisCmdX.SpeedTgt;
 IF AxisCmdX.DirectionPositive THEN DirectionX := 1;
 ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
 ELSE DirectionX := 0; END_IF;
 {endregion}
 
-{region &quot;S7 Pipeline axe Y et sorties&quot;}
+{region &quot;§6 Pipeline axe Y et sorties&quot;}
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdY.SpeedRef := CmdYVal;
+AxisCmdY.SpeedTgt := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
 
 AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
 AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
-IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedRef := 0.0; END_IF;
+IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedYPct := AxisCmdY.SpeedRef;
+SpeedTgtY_Pct := AxisCmdY.SpeedTgt;
 IF AxisCmdY.DirectionPositive THEN DirectionY := 1;
 ELSIF AxisCmdY.DirectionNegative THEN DirectionY := -1;
 ELSE DirectionY := 0; END_IF;
