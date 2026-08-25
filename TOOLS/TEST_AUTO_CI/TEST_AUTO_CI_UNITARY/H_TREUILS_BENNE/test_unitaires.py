@@ -1,4 +1,4 @@
-"""Test Pytest pour FB_Brake (A_COMMUN)."""
+"""Tests unitaires Pytest pour le domaine H_TREUILS_BENNE."""
 
 import subprocess
 import sys
@@ -40,5 +40,11 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_FB_Brake():
-    _run_fb_test("FB_Brake")
+def test_FB_Bucket():
+    _run_fb_test("FB_Bucket")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_Winch():
+    _run_fb_test("FB_Winch")

@@ -1,4 +1,4 @@
-"""Test Pytest pour FB_Winch (H_TREUILS_BENNE)."""
+"""Tests unitaires Pytest pour le domaine M_MAIN."""
 
 import subprocess
 import sys
@@ -40,5 +40,35 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_FB_Winch():
-    _run_fb_test("FB_Winch")
+def test_PRG_02_Acquisition():
+    _run_fb_test("PRG_02_Acquisition")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_PRG_03_Modes_Cycle():
+    _run_fb_test("PRG_03_Modes_Cycle")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_PRG_04_Treuils_Benne():
+    _run_fb_test("PRG_04_Treuils_Benne")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_PRG_05_Translation():
+    _run_fb_test("PRG_05_Translation")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_PRG_06_Outputs():
+    _run_fb_test("PRG_06_Outputs")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_PRG_07_Supervision():
+    _run_fb_test("PRG_07_Supervision")

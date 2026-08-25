@@ -1,4 +1,4 @@
-"""Test Pytest pour FB_Diag_Ethercat (C_DIAG_RESEAUX)."""
+"""Tests unitaires Pytest pour le domaine C_DIAG_RESEAUX."""
 
 import subprocess
 import sys
@@ -40,5 +40,17 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
+def test_FB_Diag_CanOpen():
+    _run_fb_test("FB_Diag_CanOpen")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Diag_Ethercat():
     _run_fb_test("FB_Diag_Ethercat")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_Diag_IhmHeartbeat():
+    _run_fb_test("FB_Diag_IhmHeartbeat")

@@ -1,4 +1,4 @@
-"""Test Pytest pour FB_Joystick (D_JOYSTICK)."""
+"""Tests unitaires Pytest pour le domaine I_TRANSLATION."""
 
 import subprocess
 import sys
@@ -40,5 +40,5 @@ def _run_fb_test(fb_name: str):
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_FB_Joystick():
-    _run_fb_test("FB_Joystick")
+def test_FB_Translation():
+    _run_fb_test("FB_Translation")
