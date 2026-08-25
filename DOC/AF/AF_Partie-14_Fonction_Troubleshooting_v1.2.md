@@ -12,7 +12,7 @@ Orientee Fonctions Machine / Utilisation Operateur.
 
 ## Integration programme
 
-> Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
+> Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md` §2 et §4.
 
 | | POU | Statut |
 |---|---|---|

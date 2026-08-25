@@ -3,7 +3,7 @@
 > Role : definir la frontiere unique d'acquisition de `PRG_02_Acquisition` (ST).
 > Statut : décision documentaire préalable au retrait de `PRG_01_Inputs_LD` et `FB_Input`.
 > Les décisions de mouvement restent hors de ce document.
-> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
+> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md` §2 et §4.
 
 **Décision v2.2 :** `PRG_02_Acquisition` devient l'unique producteur de `HwReal`,
 `HwSim`, `HwIn` et des diagnostics d'acquisition. Le filtrage TOR applicatif non requis a été retiré.

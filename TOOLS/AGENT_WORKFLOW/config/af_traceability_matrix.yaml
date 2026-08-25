@@ -18,7 +18,7 @@ domains:
         type: 💻 AUTO
         ref: §1
       TC-P02-003:
-        intention: Sorties physiques via PRG_OUTPUTS_LD
+        intention: Sorties physiques via PRG_06_Outputs
         preuve: Aucun autre POU n'écrit les Q/PDO finaux
         type: 💻 AUTO
         ref: §2
@@ -234,7 +234,7 @@ domains:
         ref: §4
       TC-P06-006:
         intention: Écriture des sorties physiques centralisée
-        preuve: PRG_OUTPUTS_LD seul producteur final
+        preuve: PRG_06_Outputs seul producteur final
         type: 💻 AUTO
         ref: §5
   AF-07:

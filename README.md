@@ -18,7 +18,7 @@ Point d'entrée agents (guardrails, workflow, délégation) : **[AGENTS.md](AGEN
 |---|---|
 | Nommage (PascalCase, préfixes, unités, polarité) | [DOC/STDS/NAMING_CONVENTION.md](DOC/STDS/NAMING_CONVENTION.md) |
 | Déclaration, liaison, POO, non-régression | [DOC/STDS/CODE_QUALITY_STANDARDS.md](DOC/STDS/CODE_QUALITY_STANDARDS.md) |
-| Architecture programme (7 POU, tâches, flux) | [DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md](DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md) |
+| Architecture programme (7 POU, tâches, flux) | [DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md](DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md) |
 | Contrats FB, DUT et composants | [DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md](DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md) |
 | Fonctions métier (une par FB, 08+) | Joystick · Encoder/Homing · Treuils (Benne incluse) · Translation · Simulation · Troubleshooting — voir [DOC/README.md](DOC/README.md) |
 | Pilotage projet (tâches, reliquats, TBD) | [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml) |
