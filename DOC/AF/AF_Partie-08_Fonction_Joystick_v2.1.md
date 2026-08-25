@@ -3,12 +3,6 @@
 > Rôle : acquisition et conditionnement du geste opérateur (Hall CANopen → consignes d'axe).
 > **Pas** un FB de mouvement : pas de `SafeStop` / pas de pilotage Q.
 > Source code : `CODE/D_JOYSTICK/FB_Joystick.st` · instance `PRG_02_Acquisition.instJoystick`.
-> v2.0 archivée : `ARCHIVES/Doc/AF_Partie-08_Fonction_Joystick_v2.0.md`.
-> 🔧 **v2.1 (2026-08-25)** : resynchronisation avec le code réel — §3/§4 réécrits sur l'interface
-> actuelle `ArmingPermit` (l'ancienne interface `Mode`/`BenneBusy`/`PreserveArmingAfterBucket`/
-> `DeadmanReconfEnable`/`DeadmanRearmTimeout` documentée en v2.0 n'existe plus dans le FB).
-> Profil AF03 corrigé (`standard`, pas `light` — le FB remonte des défauts et porte
-> `Status : ST_FbStatus`).
 
 ## 🧭 Sommaire
 
@@ -20,10 +14,11 @@
 6. Intégration programme
 7. IHM
 8. Alertes et écarts
-8bis. TBD — Filtre par défaut et double rampe Joystick↔FB de mouvement
+8bis. Suivi historique
+8ter. TBD — Filtre par défaut et double rampe Joystick↔FB de mouvement
 9. Documents liés
 
-## 1. Rôle et périmètre
+## 🎯 1. Rôle et périmètre
 
 Producteur d'**intention** de conduite (pas un actionneur) : 2 axes bruts 0..10000 + 1 bouton
 (nœud CANopen ou sim amont) + `ArmingPermit` externe ➔ `ST_Joystick_AxisCmd` X/Y +
@@ -32,9 +27,7 @@ limites machine, frein, `PowerCutOff`, Q physiques — **ni** la décision de qu
 d'armer (`ArmingPermit` est calculé par l'appelant).
 
 Profil AF03 : contrat **`standard`** (remonte des défauts — calibration, capteur hors plage,
-perte bus — via `Status : ST_FbStatus`, socle `FB_FbStatus`). ⚠️ Correction v2.1 : la v2.0
-classait ce FB en contrat `light`, ce qui était déjà inexact au moment de sa rédaction (le FB
-avait toujours un `Reset` et remontait des défauts).
+perte bus — via `Status : ST_FbStatus`, socle `FB_FbStatus`).
 
 ### 🎯 Table des fonctions
 
@@ -304,26 +297,32 @@ instance, gate fail-safe.
 
 ---
 
-## 8bis. TBD — Filtre par défaut et double rampe Joystick↔FB de mouvement
+## 📜 8bis. Suivi historique
+
+- **v2.0 archivée** : `ARCHIVES/Doc/AF_Partie-08_Fonction_Joystick_v2.0.md`.
+- **v2.1 (2026-08-25)** — resynchronisation avec le code réel : §3/§4 réécrits sur l'interface
+  actuelle `ArmingPermit` (l'ancienne interface `Mode`/`BenneBusy`/`PreserveArmingAfterBucket`/
+  `DeadmanReconfEnable`/`DeadmanRearmTimeout` documentée en v2.0 n'existe plus dans le FB).
+- **Profil AF03 corrigé (v2.1)** : `standard`, pas `light` — la v2.0 classait ce FB en contrat
+  `light`, ce qui était déjà inexact au moment de sa rédaction (le FB avait toujours un `Reset`
+  et remontait des défauts).
+- **TC-P08-011/012 corrigés (2026-08-25)** : marqués à tort « RETIRÉ » alors que des tests vivants
+  existent (`test_fb_joystick.st:451,492`) ; TC-P08-013 reclassé `⬜ GAP` (non testé, faussement
+  marqué `AUTO` auparavant).
+- **Filtre PT1 supprimé** : `FB_Filter_PT1` retiré du pipeline Joystick (le joystick est stable et
+  ne doit pas être ralenti) ; fonction généraliste toujours dispo dans `CODE/A_COMMUN/FB_Filter`.
+- **Double rampe en cascade — constat périmé** : `FB_Joystick.st` actuel n'instancie **aucun**
+  `FB_Ramp` (pipeline réel : `FB_AxisScale` → homme-mort, voir §2). Les paramètres de rampe
+  historiques côté joystick n'existent plus dans le code — le TBD original décrivait un état
+  antérieur du code.
+
+## ❓ 8ter. TBD — Filtre par défaut et double rampe Joystick↔FB de mouvement
 
 > ⛔ **Non tranché, pas d'autorisation de coder.** Risque d'interférence entre une éventuelle
-> rampe côté Joystick et la rampe/tempo palier de `FB_Winch`/`FB_Translation`. Section de suivi,
-> décision et code dans un lot dédié, contrat de tâche requis (C3/C4 — accélération/décélération
-> treuil = sécurité machine).
-
-### 8bis.1 Filtre PT1 — supprimé
-
-`FB_Filter_PT1` retiré du pipeline Joystick : le joystick est stable et ne doit pas être ralenti.
-Fonction de filtrage disponible en généraliste dans `CODE/A_COMMUN/FB_Filter` si besoin ailleurs.
-
-### 8bis.2 Double rampe en cascade — constat périmé
-
-`FB_Joystick.st` actuel n'instancie **aucun** `FB_Ramp` (pipeline réel : `FB_AxisScale` →
-homme-mort, voir §2). Les paramètres de rampe historiques côté joystick n'existent plus dans le
-code actuel — le TBD original décrivait un état antérieur du code, conservé pour mémoire.
-
-**TBD à trancher** (si un jour une rampe est réintroduite côté Joystick) :
-- Devenir de la rampe côté `FB_Winch`/`FB_Translation` en cas de double-lissage — lié à AF10.
+> rampe côté Joystick et la rampe/tempo palier de `FB_Winch`/`FB_Translation` si une rampe est un
+> jour réintroduite côté Joystick — devenir de la rampe `FB_Winch`/`FB_Translation` en cas de
+> double-lissage, lié à AF10. Décision et code dans un lot dédié, contrat de tâche requis
+> (C3/C4 — accélération/décélération treuil = sécurité machine).
 
 ---
 

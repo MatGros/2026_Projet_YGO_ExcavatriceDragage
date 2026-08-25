@@ -28,6 +28,11 @@ Toute fiche AF doit commencer par un paragraphe **court, clair et synthétique (
 - **Type de composant** : [Producteur d'intention / Brique E/S / Commande Mouvement / Safety]
 ```
 
+> ⛔ **Ne pas y mettre l'historique** : versions archivées, notes de resynchronisation, corrections
+> de profil, décisions passées — tout ça va dans `📜 Suivi historique` (§4bis), **jamais** dans
+> `Rôle et périmètre` ni dans le chapô sous le titre H1. Ce paragraphe décrit **l'état actuel**
+> uniquement ; le passé et les questions ouvertes ont chacun leur section dédiée en fin de fiche.
+
 ---
 
 ## 🛡️ 2. Philosophie des Modes & Sécurités Machine (ISO 13849)
@@ -150,6 +155,7 @@ Exemple de référence : document `AF_Partie-08_Fonction_Joystick` §1 (8 foncti
     🔒 &nbsp;<b>FB_OutputInterlock_LD</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Barrière finale matérielle outputs</span>
   </div>
 </div>
+```
 
 ---
 
@@ -172,17 +178,38 @@ Pour assurer la lisibilité visuelle et supprimer tout risque de dérive entre l
 
 ## 🧱 4. Structure d'un Dossier AF
 
+### 🏷️ Légende des émoji de section (fixe, ne pas varier d'une fiche à l'autre)
+
+| Émoji | Section | Émoji | Section |
+|---|---|---|---|
+| 📑 | Sommaire | 📜 | Suivi historique |
+| 🎯 | Rôle et périmètre (+ Table des fonctions) | ❓ | TBD (À définir) |
+| 🧪 | Table des points de validation (TC) | 📚 | Documents liés |
+| 🔄 | Pipeline et composition | 🔌 | Interface publique |
+
+Un émoji identifie **le type de section**, pas la fiche : `🔄 Pipeline et composition` porte le
+même émoji sur toutes les AF, exactement comme `🧪` identifie toujours les points de validation.
+Ne pas en inventer un nouveau par fiche.
+
 ### Trame canonique d'une fiche `AF_Partie-XX_*.md`
 
-Ordre attendu (adapter le libellé au domaine, garder l'ordre) :
+Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
 
 1. `📑 Sommaire` (§0)
-2. `🎯 Rôle et périmètre` (§1, inclut la `Table des fonctions` §2bis)
+2. `🎯 Rôle et périmètre` (§1, inclut la `Table des fonctions` §2bis) — état actuel seulement, voir règle §1
 3. `🧪 Table des points de validation (Cas de Test — TC)` (§3)
-4. `Pipeline et composition` — schéma/diagramme du flux de données et des FB traversés (§3bis)
-5. `Interface publique` — **table des entrées** et **table des sorties** (nom, type, unité, rôle)
+4. `🔄 Pipeline et composition` — schéma/diagramme du flux de données et des FB traversés (§3bis)
+5. `🔌 Interface publique` — **table des entrées** et **table des sorties** (nom, type, unité, rôle)
 6. Paragraphes de détail par fonction — libre, un paragraphe par comportement notable (homme-mort, calibration, défauts, intégration programme, IHM, alertes...)
-7. `Documents liés` — table des documents référencés ou référençant cette fiche. **Obligatoire même vide** : garder le paragraphe et écrire « aucun » plutôt que de le supprimer.
+7. `📜 Suivi historique` — chronologie factuelle : versions archivées, resynchronisations
+   doc↔code, corrections de profil, décisions tranchées et leur date. C'est ici, **pas** dans
+   `Rôle et périmètre` ni sous le titre H1, que vit tout ce qui est daté/révolu. Facultatif si la
+   fiche n'a encore aucun historique.
+8. `❓ TBD (À définir - To Be Define)` — **paragraphe unique, listing court** des points ouverts et
+   questions **non tranchées**. Pas de détail ici — le détail d'une question ouverte connue vit
+   dans le corps (§6) ou en `Suivi historique` une fois tranchée ; ce paragraphe ne liste que
+   « quoi trancher », pas « pourquoi ». Facultatif si la fiche n'a aucun point ouvert.
+9. `📚 Documents liés` — table des documents référencés ou référençant cette fiche. **Obligatoire même vide** : garder le paragraphe et écrire « aucun » plutôt que de le supprimer.
 
 ### Répartition chapô / sous-fiches (anti-duplication)
 
