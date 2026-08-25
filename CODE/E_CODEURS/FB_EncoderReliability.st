@@ -9,7 +9,7 @@
       HomedAndReliable = EncoderAvailable AND Homed AND NOT EncoderIncoherent (gate STRICT M3)
    🧩 Responsabilite scindee (D-A2bis) : Homing = referencement, Safety = coherence,
       ce FB = « le codeur est fiable ». Aucune recomposition chez les consommateurs.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_EncoderReliability

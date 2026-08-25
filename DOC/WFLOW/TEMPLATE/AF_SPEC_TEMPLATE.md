@@ -50,13 +50,26 @@ historique. État actuel uniquement, 3-4 lignes max.
 
 ## 🔄 3. Pipeline et composition
 
-```text
-[Entrée] ─► [FB_A] ─► [FB_B] ─► [Sortie]
-```
+> Format : Mermaid `flowchart TD` (vertical, flèches étiquetées par le flux de données) —
+> voir `DOC/STDS/GUIDES/GUIDE_EDITION_AF_v1.0.md §3bis` pour le style complet (couleurs par
+> domaine, plein=donnée/pointillé=commande). Table de flux vertical en alternative si 2-3 blocs
+> linéaires suffisent (même §3bis).
 
-| Brique | Rôle |
-|---|---|
-| `FB_XXX` | [rôle en 1 ligne] |
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px'}}}%%
+flowchart TD
+    A["📡 [FB_Entrée]<br/>[rôle]"]
+    B["⚙️ [FB_A]<br/>[rôle]"]
+    C["🔌 [Sortie]<br/>[rôle]"]
+
+    A ==>|"[donnée transmise]"| B
+    B ==>|"[donnée transmise]"| C
+
+    classDef acq fill:#0c1e2e,stroke:#38bdf8,stroke-width:2px,color:#e2e8f0
+    classDef outp fill:#0f2b17,stroke:#4ade80,stroke-width:2px,color:#e2e8f0
+    class A acq
+    class C outp
+```
 
 ## 🔌 4. Interface publique
 

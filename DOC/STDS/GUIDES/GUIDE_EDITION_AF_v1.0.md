@@ -115,51 +115,100 @@ Exemple de référence : document `AF_Partie-08_Fonction_Joystick` §1 (8 foncti
 
 ---
 
-## 🔄 3bis. Représentation du Flux de Données & Séquencement FB (Cartes Compactes & Flèches Vectorielles SVG)
+## 🔄 3bis. Représentation du Flux de Données & Séquencement FB
 
-- **Design Hybride Ultra-Compact & Vectoriel** :
-  - **Cartes ultra-étroites (`padding: 6px 10px`)** : Suppression de 100% du vide des générateurs automatiques.
-  - **Émoji collé directement à gauche** : `🛡️ &nbsp;<b>FB_Safety_Translation</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Rôle</span>`.
-  - **Vraies Flèches Vectorielles SVG** : Éléments vectoriels SVG (`<svg>`) assortis à la couleur de chaque bloc, avec étiquette explicite du signal transmis.
+> 🚩 **Décision (2026-08-25)** : les cartes HTML/SVG (ancienne version de ce paragraphe) sont
+> **trop lourdes** à écrire/maintenir (40+ lignes pour 3 blocs) — remplacées par **Mermaid**
+> comme format par défaut. Mermaid est déjà un format prouvé dans ce projet (rendu natif VS Code +
+> GitHub, sans dépendance) : `GUIDE_SEQUENCEUR_v1.2.md` (`stateDiagram-v2`),
+> `AF_Partie-07_Interface_IHM_v2.1.md` (`flowchart`).
 
-```html
-<div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
-  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">
-    📡 &nbsp;<b>FB_Acquisition</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Acquisition position qualifiée</span>
-  </div>
+### Format par défaut : `flowchart TD` (vertical)
 
-  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Signaux qualifiés & Défauts</span>
-  </div>
+**Vertical (`TD`), pas horizontal (`LR`)** : une page ne doit jamais forcer un lecteur à scroller
+horizontalement — un flux vertical s'empile proprement quel que soit le nombre de blocs. Chaque
+flèche porte le **flux de données transmis**, pas juste une ligne muette :
 
-  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #f43f5e; padding:6px 10px; border-radius:4px; font-size:12px;">
-    🛡️ &nbsp;<b>FB_Safety</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Verrouillages & chaînes de sécurité</span>
-  </div>
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px'}}}%%
+flowchart TD
+    A["📡 FB_Acquisition<br/>Acquisition position qualifiée"]
+    B["🛡️ FB_Safety<br/>Verrouillages & chaînes de sécurité"]
+    C["⚙️ FB_Commande<br/>Génération intention & rampes"]
+    D["🔒 FB_OutputInterlock_LD<br/>Barrière finale matérielle outputs"]
 
-  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Autorisations & Bypass</span>
-  </div>
+    A ==>|"Signaux qualifiés & Défauts"| B
+    B ==>|"Autorisations & Bypass"| C
+    C ==>|"Consigne vitesse & Sens"| D
 
-  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #fbbf24; padding:6px 10px; border-radius:4px; font-size:12px;">
-    ⚙️ &nbsp;<b>FB_Commande</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Génération intention & rampes</span>
-  </div>
+    classDef acq fill:#0c1e2e,stroke:#38bdf8,stroke-width:2px,color:#e2e8f0
+    classDef safe fill:#2b0f14,stroke:#f43f5e,stroke-width:2px,color:#e2e8f0
+    classDef cmd fill:#2b230a,stroke:#fbbf24,stroke-width:2px,color:#e2e8f0
+    classDef outp fill:#0f2b17,stroke:#4ade80,stroke-width:2px,color:#e2e8f0
 
-  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Consigne vitesse & Sens physiques</span>
-  </div>
+    class A acq
+    class B safe
+    class C cmd
+    class D outp
 
-  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
-    🔒 &nbsp;<b>FB_OutputInterlock_LD</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Barrière finale matérielle outputs</span>
-  </div>
-</div>
+    linkStyle 0 stroke:#38bdf8,stroke-width:3px
+    linkStyle 1 stroke:#f43f5e,stroke-width:3px
+    linkStyle 2 stroke:#fbbf24,stroke-width:3px
 ```
+
+**Style obligatoire** (validé sur `AF_Partie-08_Fonction_Joystick_v2.3.md`) :
+- `%%{init...}%%` en première ligne — thème `base`, sans quoi Mermaid applique son thème neutre
+  terne par défaut (flèches grises fades).
+- **Trait plein épais (`==>`)** = flux de **donnée** transformée entre blocs métier. **Pointillé
+  (`-.->`)** = signal de **commande/permission** qui ne transite pas de calcul (ex. `Enable`,
+  `ArmingPermit`, un bouton) — distinction visuelle immédiate donnée vs commande.
+- `classDef` + `class` : chaque bloc coloré par domaine, **même palette que §3quater**
+  (cyan `#38bdf8` acquisition, rouge `#f43f5e` sécurité, jaune `#fbbf24` commande/mouvement, vert
+  `#4ade80` sortie/barrière finale) — fond sombre + bordure teintée, jamais de nœud gris par défaut.
+- `linkStyle N` (index 0-based de l'arête dans l'ordre d'écriture) coloré selon le **bloc source**
+  de l'arête — cohérence visuelle bloc→flèche.
+
+Émoji du bloc = même dictionnaire que §3quater, cohérent avec le cartouche `.st` du FB.
+
+### Alternative légère : tableau de flux vertical
+
+Si même Mermaid est disproportionné pour un pipeline à 2-3 étapes simples (cas fréquent en
+sous-fiche FB), un tableau suffit — même info, zéro rendu à vérifier :
+
+| Étape | Bloc | Flux produit |
+|---|---|---|
+| 1 | 📡 `FB_Acquisition` | Signaux qualifiés & Défauts |
+| 2 | 🛡️ `FB_Safety` | Autorisations & Bypass |
+| 3 | ⚙️ `FB_Commande` | Consigne vitesse & Sens |
+| 4 | 🔒 `FB_OutputInterlock_LD` | *(barrière finale, rien en aval)* |
+
+Choix entre les deux formats : au jugement du rédacteur (nombre de blocs, présence de branches/
+bypass qui justifient un vrai graphe Mermaid vs séquence strictement linéaire → tableau).
 
 ---
 
-## 🏷️ 3ter. Dictionnaire des Émojis Standards & Cartouche ST
+## ⏱️ 3ter. Chronogramme (état d'une variable dans le temps)
+
+> Utile pour expliquer une séquence temporelle (armement, palier, homing...) sans mur de texte.
+> **Tableau texte uniquement** — un vrai graphique créneaux/carrés (type WaveDrom) dépend d'un
+> rendu JS non garanti dans tous les viewers Markdown ; ce format graphique reste dans les
+> rapports `TEST_AUTO_CI` (HTML généré, lu au navigateur), jamais dans une fiche AF.
+
+| Instant | `RawButton` | `DeadmanArmPending` | `DeadmanArmed` |
+|---|---|---|---|
+| t0 — repos | FALSE | FALSE | FALSE |
+| t1 — appui bouton (↑) | TRUE ↑ | TRUE | FALSE |
+| t2 — +100ms (`DeadmanArmHoldTime`) | TRUE | FALSE | **TRUE** |
+| t3 — relâche (↓) | FALSE ↓ | FALSE | TRUE *(pas de reconfirmation)* |
+
+Une ligne = un instant notable (front, expiration de tempo, changement d'état) — pas un pas de
+temps fixe. Colonnes = signaux pertinents à la séquence, dans l'ordre où le lecteur les lira.
+**Notation de front** : `↑` = front montant, `↓` = front descendant, collé à la valeur qui vient
+de changer (`TRUE ↑`, `FALSE ↓`) — jamais de flèche textuelle ambiguë (`TRUE→`, `→FALSE`).
+
+---
+
+## 🏷️ 3quater. Dictionnaire des Émojis Standards & Cartouche ST
 
 Pour assurer la lisibilité visuelle et supprimer tout risque de dérive entre les schémas AF et le code ST :
 
@@ -225,7 +274,7 @@ Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
 ### Répartition chapô / sous-fiches (anti-duplication)
 
 - **Chapô principal (`AF_Partie-XX_*.md`)** : porte le résumé machine, l'intégration programme et le **Catalogue Synthétique des TC Macro**.
-- **Fiches FB sous-dossier (`AF_Partie-XX_*/FB_*.md`)** : si un détail technique est nécessaire, il décline sous forme d'étapes `TC-Pxx-010.1`, `TC-Pxx-010.2` sans inventer de nouveaux identifiants racine.
+- **Fiches FB sous-dossier (`AF_Partie-XX_*/FB_*.md`)** : si un détail technique est nécessaire, il décline sous forme d'étapes `TC-Pxx-010.1`, `TC-Pxx-010.2` sans inventer de nouveaux identifiants racine. Squelette : `DOC/WFLOW/TEMPLATE/FB_SPEC_TEMPLATE.md`.
 - ⛔ **Jamais les deux à la fois** : soit le détail complet d'une fonction vit **uniquement** dans le
   chapô (pas de sous-fiche FB pour ce domaine), soit le chapô ne garde qu'un **squelette** qui
   renvoie vers la fiche FB détaillée. Dupliquer le détail des deux côtés rend les mises à jour

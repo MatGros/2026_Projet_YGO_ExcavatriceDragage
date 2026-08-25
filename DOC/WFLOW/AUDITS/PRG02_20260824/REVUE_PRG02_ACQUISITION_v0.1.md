@@ -23,7 +23,7 @@ codeurs M1/M2 (`FB_Encoder` + 6 sous-FB), décodage position translation M3.
 | `CODE/E_CODEURS/FB_Encoder_Safety.st` | 1-106 (complet) |
 | `CODE/E_CODEURS/FB_Encoder_Scale.st` | 1-41 (complet) |
 | `CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st` | 1-142 (complet) |
-| `CODE/E_CODEURS/FB_Encoder_SpeedMonitor.st` | 1-124 (complet) |
+| `ARCHIVES/Code/E_CODEURS/FB_Encoder_SpeedMonitor.st` | 1-124 (complet) — ⚠️ retiré 2026-08-25 (legacy, jamais instancié), chemin d'origine `CODE/E_CODEURS/` au moment de cette revue |
 | `CODE/E_CODEURS/FB_EncoderReliability.st` | 1-35 (complet) |
 | `CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st` | 1-118 (complet) |
 

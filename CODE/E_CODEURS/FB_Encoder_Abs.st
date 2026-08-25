@@ -4,7 +4,7 @@
    🎯 Rôle : Accès bus EtherCAT, extraction positions brutes et séquence de Preset SDO
    🔒 Polarité : EncoderAvailable=TRUE si communication bus et esclave OK
    🔌 Architecture : Module d'acquisition codeur absolu
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===

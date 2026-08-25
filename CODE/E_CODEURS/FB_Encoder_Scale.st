@@ -4,7 +4,7 @@
    🎯 Rôle : Calcul de la position câble en mètres par conversion arithmétique signée
    🔒 Polarité : CablePosM signée (+ enroulé, - sous l'eau)
    🔌 Architecture : Convertisseur de mesure unitaire par treuil
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===

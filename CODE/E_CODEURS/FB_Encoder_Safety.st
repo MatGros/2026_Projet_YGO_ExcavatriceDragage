@@ -4,7 +4,7 @@
    🎯 Rôle : Bornage physique absolu [-99; +99]m et relais d'incohérence redémarrage
    🔒 Polarité : EncoderIncoherent=TRUE en cas de hors bornes ou HomingSuspect
    🛡️ Sécurité : Verrouillage de la position câble sûre
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_Safety
