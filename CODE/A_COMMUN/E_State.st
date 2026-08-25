@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des phases opérationnelles d'un FB métier
    ⚙️ Machine d'état : Un seul état actif à la fois (orthogonal à Error)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md §3
    ======================================================================= *)
 
 TYPE E_State :

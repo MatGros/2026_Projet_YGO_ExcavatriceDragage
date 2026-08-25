@@ -13,7 +13,7 @@
 | <nobr>Comment on **déclare, encapsule, relie**</nobr> | **ce document** |
 | <nobr>Comment on **édite une AF**</nobr> | **ce document §0** |
 | <nobr>Comment on **teste/vérifie**</nobr> | `DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md` |
-| <nobr>Contrats FB, DUT et CFC</nobr> | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` |
+| <nobr>Contrats FB, DUT et CFC</nobr> | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md` |
 | <nobr>Ce que fait la machine</nobr> | `DOC/` — voir `DOC/README.md` pour l'index complet |
 | <nobr>Comment on exécute une modif</nobr> | `AGENTS.md` (§ Workflow d'édition) |
 

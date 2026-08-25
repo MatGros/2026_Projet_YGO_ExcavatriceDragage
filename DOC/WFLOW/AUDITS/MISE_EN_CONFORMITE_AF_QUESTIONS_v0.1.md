@@ -10,7 +10,8 @@
 | AF | Statut | Commit | Review sous-agent |
 |---|---|---|---|
 | AF-01 | ✅ Fait | `b599d031` | 2 tours, tous défauts corrigés |
-| AF-02 | ✅ Fait | (à suivre) | 1 tour, 4 gaps ingénierie corrigés |
+| AF-02 | ✅ Fait | `777cb424` | 1 tour, 4 gaps ingénierie corrigés |
+| AF-03 | ✅ Fait | (à suivre) | 1 tour, 5 gaps ingénierie corrigés |
 | AF-03 | ⬜ | — | — |
 | AF-04 | ⬜ | — | — |
 | AF-05 | ⬜ | — | — |
@@ -63,6 +64,14 @@ programme exécuté plus tard dans le même cycle (règle §7 d'AF-02). Repose s
 Trouvé lors de la review AF-02. Documenté en TBD `AF_Partie-02_Architecture_Programme_v3.2.md §8`.
 **Correctif proposé** (pas fait) : nouveau gate d'analyse statique des dépendances de lecture/
 écriture entre POU dans l'ordre `MainTask`.
+
+### Q5 — Test `light`/`standard` ne dérive pas le critère sémantique
+`test_fb_interface_guard.py` vérifie l'interface d'un FB déjà classé, mais ne dérive pas
+lui-même « ce FB remonte-t-il un défaut ? » à partir de son corps. Un FB `light` mal classé
+(qui écrirait quand même un défaut) passerait sans alerte. Trouvé lors de la review AF-03,
+documenté en note dans `AF_Partie-03_Contrats_Composants_v2.2.md §3`. **Correctif proposé**
+(pas fait, hors périmètre doc) : renforcer le test pour détecter l'écriture d'un champ
+défaut-like dans un FB classé `light`.
 
 ---
 
