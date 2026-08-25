@@ -1,11 +1,11 @@
-"""Tests Pytest automatiques pour le domaine I_TRANSLATION."""
+"""Tests Pytest automatiques pour le domaine F_MODES."""
 
 import subprocess
 import sys
 from pathlib import Path
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 RUN_TESTS_PY = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI" / "run_tests.py"
 
 
@@ -36,6 +36,6 @@ def _run_fb_test(fb_name: str):
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-def test_FB_Translation():
-    """Test CI automatisé pour FB_Translation."""
-    _run_fb_test("FB_Translation")
+def test_FB_Modes():
+    """Test CI automatisé pour FB_Modes."""
+    _run_fb_test("FB_Modes")
