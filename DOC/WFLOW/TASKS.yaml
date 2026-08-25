@@ -1551,3 +1551,22 @@ tasks:
       - "Décider du format de restitution (rapport seul, ou nouveau gate bloquant intégré à run_all_gates.py)"
     bloque_par: []
 
+  - id: "T155"
+    parent_id: ""
+    statut: "⬜"
+    criticite: "C1"
+    domaine: "DOC"
+    agent: "—"
+    date: "2026-08-25T06:00:00"
+    titre: "Standardisation progressive des 13 autres AF sur le format GUIDE_EDITION_AF_v1.0"
+    contexte: "AF_Partie-08 (T153) sert de pilote au nouveau standard GUIDE_EDITION_AF_v1.0 (légende émoji fixe par type de section, Table des fonctions, Table des points de validation, Suivi historique séparé du Rôle et périmètre, TBD court = liste des questions non tranchées uniquement). Audit du 2026-08-25 (survol des headings des 14 AF) montre 3 familles distinctes, pas un seul écart uniforme : (1) AF-01/02/03 = docs méta/architecture, structure légitimement différente (pas de découpage 1 FB = 1 fiche) ; (2) AF-04/05/06/07 = domaines transverses déjà proches du standard (Sommaire ✅, Points de validation ✅, `❓ N. TBD` court ✅) — il manque juste Table des fonctions + Suivi historique + fixation des émoji ; (3) AF-09/10/11/12 = pattern chapô + sous-fiches FB, différent d'AF-08 qui est monolithique (à vérifier si voulu ou dérive) ; AF-13/14 sont les plus éloignés (pas de Sommaire, structure numérotation+émoji différente). Décision utilisateur (2026-08-25) : ne rien réécrire dans ce lot, tracer la tâche et traiter un AF à la fois plus tard, chaque lot validé séparément."
+    description: "⬜ Non commencée. Piloté par T153 (AF-08, fait). Traiter les familles dans l'ordre de proximité au standard : (2) AF-04-07 d'abord (le plus proche), puis (3) AF-09-12 après décision sur chapô/sous-fiche, (1) AF-01-03 et AF-13/14 en dernier (structure la plus différente, à challenger avant de forcer le moule)."
+    contrat: ""
+    objectifs:
+      - "Par AF traité : ajouter Table des fonctions (§2bis) si absente, ajouter Suivi historique (émoji 📜) et en extraire tout contenu daté/historique actuellement mélangé au Rôle et périmètre ou au chapô sous le H1"
+      - "Recadrer TBD sur un listing court des seules questions non tranchées (déplacer le détail résolu vers Suivi historique)"
+      - "Aligner les émoji de section sur la légende fixe de GUIDE_EDITION_AF_v1.0 §4"
+      - "Pour AF-09/10/11/12 : trancher d'abord si le pattern chapô+sous-fiches reste la norme pour ces domaines ou si AF-08 (monolithique) doit devenir la référence unique — ne pas mélanger les deux approches sans décision explicite"
+      - "G340 PASS après chaque AF traité, un commit par AF (pas un méga-commit de 13 fichiers)"
+    bloque_par: []
+
