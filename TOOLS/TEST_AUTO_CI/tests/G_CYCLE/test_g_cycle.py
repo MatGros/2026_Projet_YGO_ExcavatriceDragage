@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_G_CYCLE():
     """Test global du domaine G_CYCLE (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "G_CYCLE", "--fast", "-j", "3"]
@@ -69,16 +70,19 @@ def test_G_CYCLE():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Cycle():
     """Test CI automatisé pour FB_Cycle."""
     _run_fb_test("FB_Cycle")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_DiveSearch():
     """Test CI automatisé pour FB_DiveSearch."""
     _run_fb_test("FB_DiveSearch")
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_ExtractionSequence():
     """Test CI automatisé pour FB_ExtractionSequence."""
     _run_fb_test("FB_ExtractionSequence")

@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_B_AU_SECURITE():
     """Test global du domaine B_AU_SECURITE (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "B_AU_SECURITE", "--fast", "-j", "1"]
@@ -69,6 +70,7 @@ def test_B_AU_SECURITE():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Safety_EmergencyManagement():
     """Test CI automatisé pour FB_Safety_EmergencyManagement."""
     _run_fb_test("FB_Safety_EmergencyManagement")

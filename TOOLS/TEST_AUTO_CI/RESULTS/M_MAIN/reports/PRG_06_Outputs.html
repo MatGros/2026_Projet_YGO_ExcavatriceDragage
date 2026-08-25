@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:32:09</div>
+    <div class="exec-time">2026-08-25 06:48:56</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-0">PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-1">PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-2">PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +204,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -995,7 +995,7 @@
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>M3_DriveFreqRefWord</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">WORD</span></div>
+                <div class="pin-name"><b>M3_DriveFreqCmdWord</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">WORD</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
@@ -1110,13 +1110,13 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-06-outputs-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+                <h3>PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut </h3>
             </header>
             
             
@@ -1126,7 +1126,17 @@
         <article id="test-prg-06-outputs-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+                <h3>PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-prg-06-outputs-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau </h3>
             </header>
             
             
@@ -1143,7 +1153,7 @@
         <summary>Code source ST original (25)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
                 <pre>(* =======================================================================
    📊 Type CODESYS système pour tests STruCpp
    ======================================================================= *)
@@ -1165,7 +1175,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -1187,7 +1197,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -1223,7 +1233,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbCause.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
    ───────────────────────────────────────────────────────────────
@@ -1247,7 +1257,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
@@ -1267,7 +1277,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -1408,7 +1418,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_WinchFinalInterlockState — États machine barrière finale treuil
    ───────────────────────────────────────────────────────────────
@@ -1429,7 +1439,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockReason.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockReason.st</code></summary>
                 <pre>(* =======================================================================
    🔒 E_WinchFinalInterlockReason — Raisons de blocage barrière finale
    ───────────────────────────────────────────────────────────────
@@ -1447,7 +1457,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\FB_WinchOutputInterlock.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\FB_WinchOutputInterlock.st</code></summary>
                 <pre>(* =======================================================================
    🛡️ FB_WinchOutputInterlock — Barrière finale frein / puissance M1 ou M2
    ───────────────────────────────────────────────────────────────
@@ -1699,7 +1709,7 @@ END_IF;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\E_TranslationFinalInterlockReason.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\I_TRANSLATION\E_TranslationFinalInterlockReason.st</code></summary>
                 <pre>(* =======================================================================
    🛡️ E_TranslationFinalInterlockReason — Raisons d&#x27;interlock M3
    ───────────────────────────────────────────────────────────────
@@ -1717,7 +1727,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\FB_TranslationOutputInterlock.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\I_TRANSLATION\FB_TranslationOutputInterlock.st</code></summary>
                 <pre>(* =======================================================================
    🛡️ FB_TranslationOutputInterlock — Barrière finale frein / AC600 M3
    ───────────────────────────────────────────────────────────────
@@ -1751,8 +1761,8 @@ VAR_OUTPUT
 
     // === ORDRES ACTIONNEURS VALIDES ===
     DriveControlWord             : WORD;   // &lt;-- [ACT] Mot de commande variateur valide
-    DriveFreqRefHz               : REAL;   // &lt;-- [ACT] Frequence de consigne variateur valide (Hz)
-    DriveFreqRefWord             : WORD;   // &lt;-- [ACT] Frequence mise a l&#x27;echelle registre PDO 0x3100
+    DriveFreqCmd_Hz              : REAL;   // &lt;-- [ACT] Frequence de consigne variateur valide (Hz)
+    DriveFreqCmdWord             : WORD;   // &lt;-- [ACT] Frequence mise a l&#x27;echelle registre PDO 0x3100
     BrakeCmd                     : BOOL;   // &lt;-- [ACT] Ordre ouverture frein valide
 
     // === DIAGNOSTICS &amp; TEMPORISATIONS ===
@@ -1791,8 +1801,8 @@ ResetEdge(CLK := Reset);
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     DriveControlWord := 0;
-    DriveFreqRefHz := 0.0;
-    DriveFreqRefWord := 0;
+    DriveFreqCmd_Hz := 0.0;
+    DriveFreqCmdWord := 0;
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
@@ -1861,8 +1871,8 @@ END_IF;
 
 // ── 4. Décision finale : zéro couple utile sans confirmation frein ──────
 DriveControlWord := 0;
-DriveFreqRefHz := 0.0;
-DriveFreqRefWord := 0;
+DriveFreqCmd_Hz := 0.0;
+DriveFreqCmdWord := 0;
 // SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
 // maintenu. La commande/frein suivent cette rampe jusqu&#x27;à demande nulle ; seul
 // un gate dur, timeout ou défaut final impose ici la coupure immédiate.
@@ -1887,7 +1897,7 @@ ELSIF MovementRequested THEN
     // couple ou fréquence AC600.
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
-        DriveFreqRefHz := MAX(0.0, RequestedDriveFreqHz);
+        DriveFreqCmd_Hz := MAX(0.0, RequestedDriveFreqHz);
         Status.Busy := TRUE;
         Status.State := E_State.BUSY;
     ELSE
@@ -1898,12 +1908,12 @@ END_IF;
 
 // ── 5. Mise à l&#x27;échelle finale REAL Hz -&gt; WORD registre PDO 0x3100 ──────
 // Conversion unique en sortie de chaîne, quelle que soit la branche qui a fixé
-// DriveFreqRefHz ci-dessus — jamais recalculée ailleurs (producteur unique).
-DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) * DriveFreqWordScale);
+// DriveFreqCmd_Hz ci-dessus — jamais recalculée ailleurs (producteur unique).
+DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz) * DriveFreqWordScale);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\BENNE\ST_BucketState.st</code></summary>
                 <pre>(* =======================================================================
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
@@ -1925,12 +1935,12 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchFinalInterlockRequest.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchFinalInterlockRequest.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🪝 ST_WinchFinalInterlockRequest — Demande brute vers frontière Q M1/M2
    ───────────────────────────────────────────────────────────────
-   📤 Producteur unique : PRG_TREUILS_CFC (VAR_OUTPUT).
-   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock.
+   📤 Producteur unique : PRG_04_Treuils_Benne (VAR_OUTPUT).
+   📥 Consommateur unique : PRG_06_Outputs, avant FB_WinchOutputInterlock.
    🔒 Ne contient jamais une sortie Q autorisée : les C1..C4 restent les
       demandes exactes de FB_Winch / ST_SpeedStepTable.
    ═══════════════════════════════════════════════════════════════ *)
@@ -1959,7 +1969,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_SafetyWinch.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_SafetyWinch.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🛡️ ST_SafetyWinch — Diagnostics de sécurité pour un treuil
    ───────────────────────────────────────────────────────────────
@@ -2002,7 +2012,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketHMIState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketHMIState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_BucketHMIState — États et diagnostics IHM de la benne (M2)
    ═══════════════════════════════════════════════════════════════ *)
@@ -2034,7 +2044,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_EncoderHMI.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_EncoderHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧲 ST_EncoderHMI — Données d&#x27;échange IHM pour les codeurs absolus
    ───────────────────────────────────────────────────────────────
@@ -2066,7 +2076,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_SyncState — États et diagnostics de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════ *)
@@ -2085,7 +2095,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_WinchState — États, mesures et diagnostics HMI pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
@@ -2105,7 +2115,7 @@ STRUCT
     EstimatedLoadPct        : REAL;             (* 📊 Estimation empirique, non certifiée *)
     LoadEstimateConfigured  : BOOL;             (* 🟢 Table charge validée pour lecture *)
     SpeedGuardLimited       : BOOL;             (* 🛡️ Palier limité par vitesse réelle *)
-    SpeedRef_Pct            : REAL;             (* 📈 Consigne de vitesse finale après rampe (%) *)
+    SpeedCmd_Pct            : REAL;             (* 📈 Commande de vitesse finale après rampe (%) *)
     StepNumber              : INT;              (* 🔢 Palier de vitesse actif (0..5) *)
     FBState                 : E_State;          (* 🤖 État de l&#x27;automate interne (FB_Winch) *)
     Ready                   : BOOL;             (* 🟢 Treuil prêt à fonctionner *)
@@ -2122,7 +2132,7 @@ STRUCT
     Contactor3              : BOOL;             (* 🔌 Contacteur vitesse palier 3 *)
     Contactor4              : BOOL;             (* 🔌 Contacteur vitesse palier 4 *)
     BrakeCmd                : BOOL;             (* 🔓 Commande frein (TRUE = desserré / libre) *)
-    FinalInterlockState     : E_WinchFinalInterlockState; (* 🛡️ État final _LD lecture seule *)
+    FinalInterlockState     : E_WinchFinalInterlockState; (* 🛡️ État final lecture seule *)
     FinalInterlockReason    : E_WinchFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
     FinalInterlockError     : BOOL;             (* 🛡️ Défaut final mémorisé *)
     FinalInterlockErrorId   : WORD;             (* 🛡️ Bitfield final *)
@@ -2155,7 +2165,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchInterPrg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🪝 ST_WinchInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_04_Treuils_Benne
    ───────────────────────────────────────────────────────────────
@@ -2173,8 +2183,8 @@ STRUCT
     // === ⚡ Demandes finales M1/M2 (interlocks &amp; consigne vitesse arbitrée) ===
     WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // 🪝 Demande finale et interlocks treuil M1
     WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // 🪝 Demande finale et interlocks treuil M2
-    M1LogicRequestSpeedRef_Pct   : REAL; // 📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)
-    M2LogicRequestSpeedRef_Pct   : REAL; // 📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)
+    M1LogicRequestSpeedCmd_Pct   : REAL; // 📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)
+    M2LogicRequestSpeedCmd_Pct   : REAL; // 📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)
     KoboldContactorCmdArbitrated : BOOL; // 🪝 Ordre contacteur capteur fond Kobold (consommé PRG_06)
 
     // === 📊 États publics des treuils ===
@@ -2196,7 +2206,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationFinalInterlockRequest.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationFinalInterlockRequest.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ↔️ ST_TranslationFinalInterlockRequest — Demande brute vers PDO M3
    ───────────────────────────────────────────────────────────────
@@ -2226,7 +2236,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_SafetyTranslation.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_SafetyTranslation.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🛡️ ST_SafetyTranslation — Diagnostics de sécurité pour la Translation M3
    ───────────────────────────────────────────────────────────────
@@ -2254,7 +2264,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationState.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🚦 ST_TranslationState — États et retours IHM pour la Translation M3
    ───────────────────────────────────────────────────────────────
@@ -2276,10 +2286,10 @@ STRUCT
     JoystickDeflection_Pct  : REAL;    (* 🕹️ Axe X fonctionnel -100..+100 %, 0 = neutre ; animation IHM M3 *)
     DriveActualFreq_Hz      : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
     DriveControlWord        : WORD;    (* ⚙️ Mot de commande AC600 réellement appliqué *)
-    DriveFreqRef_Hz         : REAL;    (* 🎯 Consigne fréquence réellement appliquée *)
+    DriveFreqCmd_Hz         : REAL;    (* 🎯 Commande fréquence réellement appliquée *)
     ActiveDirection         : INT;     (* ↔️ Sens arbitré : -1 / 0 / +1 *)
-    ActiveSpeedRef_Pct      : REAL;    (* 📊 Consigne active après arbitrage *)
-    FinalInterlockState     : E_State; (* 🛡️ État final _LD lecture seule *)
+    ActiveSpeedCmd_Pct      : REAL;    (* 📊 Commande active après arbitrage *)
+    FinalInterlockState     : E_State; (* 🛡️ État final lecture seule *)
     FinalInterlockReason    : E_TranslationFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
     FinalInterlockError     : BOOL;    (* 🛡️ Défaut final mémorisé *)
     FinalInterlockErrorId   : WORD;    (* 🛡️ Bitfield final *)
@@ -2316,7 +2326,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationInterPrg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ↔️ ST_TranslationInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_05_Translation
    ───────────────────────────────────────────────────────────────
@@ -2343,7 +2353,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_OutputsInterPrg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_OutputsInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    📤 ST_OutputsInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_06_Outputs
    ───────────────────────────────────────────────────────────────
@@ -2387,7 +2397,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_TestHarness_PRG_06.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_TestHarness_PRG_06.st</code></summary>
                 <pre>(* =======================================================================
    🧱 FB_TestHarness_PRG_06 : Banc d&#x27;essai unitaire pour PRG_06_Outputs
    ───────────────────────────────────────────────────────────────

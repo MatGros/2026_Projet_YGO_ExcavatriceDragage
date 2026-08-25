@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_E_CODEURS():
     """Test global du domaine E_CODEURS (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "E_CODEURS", "--fast", "-j", "1"]
@@ -69,6 +70,7 @@ def test_E_CODEURS():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Encoder():
     """Test CI automatisé pour FB_Encoder."""
     _run_fb_test("FB_Encoder")

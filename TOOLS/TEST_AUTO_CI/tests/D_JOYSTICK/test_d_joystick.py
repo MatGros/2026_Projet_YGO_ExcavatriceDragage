@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_D_JOYSTICK():
     """Test global du domaine D_JOYSTICK (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "D_JOYSTICK", "--fast", "-j", "1"]
@@ -69,6 +70,7 @@ def test_D_JOYSTICK():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Joystick():
     """Test CI automatisé pour FB_Joystick."""
     _run_fb_test("FB_Joystick")

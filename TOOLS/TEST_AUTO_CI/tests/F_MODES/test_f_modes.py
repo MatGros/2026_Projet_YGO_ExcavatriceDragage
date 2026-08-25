@@ -39,6 +39,7 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
+@pytest.mark.domain
 def test_F_MODES():
     """Test global du domaine F_MODES (compilation parallèle multi-cœurs)."""
     cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "F_MODES", "--fast", "-j", "1"]
@@ -69,6 +70,7 @@ def test_F_MODES():
     assert proc.returncode == 0
 
 @pytest.mark.ci_fb
+@pytest.mark.unit
 def test_FB_Modes():
     """Test CI automatisé pour FB_Modes."""
     _run_fb_test("FB_Modes")

@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_winch.st",
+  "file": "test_prg_02_acquisition.st",
   "results": [
     {
-      "name": "Safety_Winch : Enable=FALSE neutralise les autorisations",
+      "name": "PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)",
       "passed": true
     },
     {
-      "name": "Winch : Enable=FALSE neutralise les sorties",
+      "name": "PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position",
       "passed": true
     }
   ],
