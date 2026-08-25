@@ -16,7 +16,7 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 **Déclenchement** : automatique au 1er message de toute session sur ce repo. Rejouable à la
 demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) — même séquence.
 
-**Séquence :**
+**Séquence de Restitution Obligatoire :**
 0. **Afficher immédiatement la bannière de briefing** (format standard, gabarit
    `DOC/WFLOW/TEMPLATE/SKILL_BANNER_TEMPLATE.md`) :
    ```text
@@ -25,21 +25,43 @@ demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) 
    ============================================================
    ```
    Puis 1 ligne : *« Briefing session <projet> — reprise par <agent> »*.
+
 1. **Restituer le tableau des 2 skills actives du projet** :
    - `task-planner` : Pilotage catalogue `TASKS.yaml` & contrats `CONTRACTS/` · Déclencheur : « planifie tâche », « état des tâches », « tasks ».
    - `troubleshooting` : Diagnostic formel, arbre de causes & traçage inverse · Déclencheur : « cherche le blocage », « diagnostic », « panne ».
-2. **Snapshot rapide de [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml)** : combien de tâches
+
+2. **Snapshot rapide de [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml)** : nombre de tâches
    verrouillées 🔒 / en cours ⏳ / à faire ⬜.
+
 3. **Preuve de repérage des 3 piliers projet (Niveau 1 — systématique)** :
-   - 📐 **Standards & Guides (`DOC/STDS/`)** : `CODE_QUALITY_STANDARDS.md` (POO, encapsulation), `NAMING_CONVENTION.md` (PascalCase, NC-010..080), guides (`GUIDE_GATES_ET_TESTS`, `GUIDE_SEQUENCEUR`, `GUIDE_IDE_CODESYS`).
+   - 📐 **Standards & Guides (`DOC/STDS/`)** : `CODE_QUALITY_STANDARDS.md` (POO, encapsulation), `NAMING_CONVENTION.md` (PascalCase, NC-010..080, zéro Ref pour consignes), guides (`GUIDE_GATES_ET_TESTS`, `GUIDE_SEQUENCEUR`, `GUIDE_IDE_CODESYS`).
    - 🏗️ **Architecture & Specs (`DOC/AF/` & `CODE/`)** : Architecture 7 POU (`PRG_02_Acquisition` ➔ `PRG_07_Supervision`, tâches 4ms/20ms/10ms), Fondations (AF01-03), Transverses (AF04-06), Métiers (AF08-14).
    - 🛠️ **Outillage CI/CD & Validation mécanique (`TOOLS/`)** : Bundle PLCopenXML (`generate_codesys_bundle.py`), Vérification liaison bloquante (`G200_check_linkage.py`), Suite de 21 Gates (`run_all_gates.py`), Tests unitaires CI (`TOOLS/TEST_AUTO_CI/`).
-4. **Rappel des guardrails essentiels & Posture** :
-   - 🔒 Aucun commit sans validation humaine explicite.
-   - 🛑 Posture Anti-Yes-Man : Devoir d'alerte et esprit critique sur toute ambiguïté.
-   - ⚡ Sécurité machine réelle : AU matériel indépendant de `PowerCutOff`, Reset sur front uniquement.
-5. **Niveau 2 (si tâche C2+ ou ambiguë)** : répondre à une question précise liée à la tâche en
-   cours avec du concret tiré des fichiers réels (pas une réponse générique apprise par cœur).
+
+4. **Diagramme du Workflow Standard d'Implémentation** :
+   ```text
+   1. Cadrage & Tâche (ID, criticité C0-C4, stratégie Patch / Rebuild)
+      ↓
+   2. Contrat de tâche (Objectifs testables, scope, critères d'acceptation — obligatoire dès C2)
+      ↓
+   3. Plan technique & Validation humaine (Arrêt obligatoire avant de toucher au code)
+      ↓
+   4. Implémentation ST (Respect AF_Partie-02/03 + NAMING_CONVENTION)
+      ↓
+   5. Gates mécaniques bloquants (G200 Liaison, G310 Structure, Bundle XML, 21 Gates)
+      ↓
+   6. Restitution (Bandeau de conformité + intégration CODESYS manuelle par tes soins)
+   ```
+
+5. **Cas pratique & Justification de conception (Niveau 2 — Anti-Récitation)** :
+   - L'agent ne doit jamais réciter des phrases génériques apprises par cœur.
+   - Sur toute question de nommage, d'architecture ou de variable, il doit **justifier son cheminement technique** : citer la règle exacte (`NC-xxx`), nommer la documentation source (`NAMING_CONVENTION.md`, `AF_Partie-xx`), et expliquer la sémantique de la chaîne (`Req` ➔ `Tgt` ➔ `Cmd` ➔ `Act`).
+
+6. **Proposer les options d'action réelles (Menu de démarrage)** :
+   - 🔹 **Option 1 : Tâche du catalogue (`task-planner`)** — Sélectionner et verrouiller une tâche existante de `TASKS.yaml`.
+   - 🔹 **Option 2 : Dépannage / Diagnostic (`troubleshooting`)** — Lancer une analyse causale structurée sur un blocage ou un comportement inattendu.
+   - 🔹 **Option 3 : Cadrer un nouveau besoin / refactor** — Qualifier la criticité (C1..C4), rédiger le contrat `TASK_CONTRACT_*.yaml` et planifier.
+   - 🔹 **Option 4 : Contrôle outillage & Gates** — Exécuter la suite complète des 21 gates (`run_all_gates.py`) ou un audit mécanique spécifique.
 
 ---
 
