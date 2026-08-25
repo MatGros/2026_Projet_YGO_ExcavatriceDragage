@@ -80,8 +80,8 @@ excavatrice-dragage/
 
 ## 🔄 Workflow Édition
 
-**⚠️ Important :** Voir [`AGENTS.md`](AGENTS.md) pour le workflow complet avec guardrails, règles
-DOC et skill `codesys-workflow`. L'utilisateur applique **tout manuellement** dans CODESYS 3.5
+**⚠️ Important :** Voir [`AGENTS.md`](AGENTS.md) pour le workflow complet avec guardrails et règles
+DOC. L'utilisateur applique **tout manuellement** dans CODESYS 3.5
 (copie du ST puis import PLCopenXML) — aucun outil ici n'écrit dans CODESYS.
 
 Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
@@ -132,7 +132,7 @@ restitution bloquante).
 
 1. **Lire [NAMING_CONVENTION.md](DOC/STDS/NAMING_CONVENTION.md)** ← commence ici
 2. Consulter [DOC/README.md](DOC/README.md) pour l'index complet des spécifications actives
-3. Charger la skill [`codesys-workflow`](.claude/skills/codesys-workflow.md) avant toute modif `CODE/`
+3. Consulter [`AGENTS.md`](AGENTS.md) avant toute modif `CODE/` (guardrails & standards)
 4. Consulter [PLAN_TASK (v1.0)](DOC/WFLOW/TASKS.yaml) pour savoir ce qu'il reste à faire, trancher ou demander au client
 
 ---
@@ -141,6 +141,6 @@ restitution bloquante).
 
 - **Git** : branche `main`
 - **Langage** : CODESYS 3.5 (ST / Ladder / FBD)
-- **Outillage** : Skill `codesys-workflow` (`.claude/skills/codesys-workflow.md`) + `TOOLS/`
+- **Outillage** : [`AGENTS.md`](AGENTS.md) + `TOOLS/`
 - **Auteur** : Mathieu Gros
 - **Dernière mise à jour** : 2026-07-31
