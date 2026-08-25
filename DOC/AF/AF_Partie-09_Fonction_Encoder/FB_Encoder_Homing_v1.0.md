@@ -2,7 +2,7 @@
 
 > Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §3.  
 > Rôle de **ce** document : gestion du référencement (homing nominal et unitaire), mémorisation RETAIN et qualification du doute.  
-> Source code : `CODE/E_CODEURS/FB_Encoder_Homing.st` · instances cibles `instHomingM1/M2` dans `PRG_04_Treuils_Benne_CFC`.  
+> Source code : `CODE/E_CODEURS/FB_Encoder_Homing.st` · instances cibles `instHomingM1/M2` dans `PRG_04_Treuils_Benne`.  
 
 ## 🧭 Sommaire
 
@@ -30,8 +30,8 @@
 
 Brique de **référencement et calibration** : orchestre le preset EtherCAT et calcule la référence
 brute (`HomingRefRaw`) pour qu'une hauteur cible donnée (`CfgHomingTargetM`) corresponde exactement
-à la cote physique. La mesure position/vitesse reste produite par `PRG_02_Acquisition_CFC` ; ce FB
-est placé dans le CFC Treuils/Benne pour rendre l'état de maintenance immédiatement lisible.
+à la cote physique. La mesure position/vitesse reste produite par `PRG_02_Acquisition` ; ce FB
+est placé dans `PRG_04_Treuils_Benne` pour rendre l'état de maintenance immédiatement lisible.
 
 ### Référence de preset EtherCAT
 
@@ -130,7 +130,7 @@ usage mise en service/essais uniquement, jamais un état permanent d'exploitatio
   exposé à l'IHM via `ST_WinchState` (pas un défaut acquittable, une information) ; **(2)** le
   treuil doit rester manœuvrable en `MAINT_N1` à **vitesse forcée palier 1** pour exécuter le
   cycle de référencement lui-même — même mécanisme que `ForceMinSpeedStep` déjà utilisé par
-  `FB_ExtractionSequence` (`PRG_TREUILS_CFC.st`, `SEL(Force..., EffectiveMaxStepAscent, 1)`).
+  `FB_ExtractionSequence` (`PRG_04_Treuils_Benne.st`, `SEL(Force..., EffectiveMaxStepAscent, 1)`).
   🔧 **Non encore câblé** : aucune instance actuelle du forçage palier n'est conditionnée par
   `Homed`. Reste du périmètre de migration (lot Winch, cross-ref `AF_Partie-10 §9bis`), pas de
   ce FB directement (`Homed` est ici seulement produit, pas consommé).

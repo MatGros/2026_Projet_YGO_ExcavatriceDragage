@@ -38,7 +38,7 @@
 | `E_` | Enum / énumération | `E_Mode`, `E_State`, `E_CycleStep` |
 | `FB_` | Function Block (type) | `FB_Joystick`, `FB_Winch` |
 | `inst` | Instance d'un FB (variable) | `instJoystick`, `instWinchM1`, `instModes` |
-| `PRG_` | Programme (POU principal) | `PRG_ACQUISITION_CFC`, `PRG_OUTPUTS_LD` |
+| `PRG_` | Programme (POU principal) | `PRG_02_Acquisition`, `PRG_06_Outputs` |
 
 ### Tags de Rôle & Flèches de Flux en Déclaration ST (Fenêtre Watch CODESYS)
 

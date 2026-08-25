@@ -1,7 +1,7 @@
 # Fiche `FB_TroubleshootingView` v1.2
 
 > 🎯 Brique unique de mise en forme du dépannage. Lecture seule stricte, aucune écriture de
-> commande, configuration ou interlock. Profil `👁️ Programme CFC` au sens `AF_Partie-03 §2`
+> commande, configuration ou interlock. Profil `👁️ Observateur passif` au sens `AF_Partie-03 §2`
 > allégé : ici un FB (pas une page), instancié une seule fois dans `PRG_07_Supervision`.
 > 📄 Source : `CODE/J_SUPERVISION/FB_TroubleshootingView.st`
 > 📄 GVL alimentée : `CODE/J_SUPERVISION/GVL_Troubleshooting.st`

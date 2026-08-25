@@ -149,7 +149,7 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 
 | DUT | Producteur | Consommateur |
 |---|---|---|
-| `ST_WinchFinalInterlockRequest` | `PRG_TREUILS_CFC.st` actuel ; cible `PRG_04_Treuils_Benne.xml` absente | `PRG_OUTPUTS_LD.st` actuel ; cible `PRG_06_Outputs` |
+| `ST_WinchFinalInterlockRequest` | `PRG_04_Treuils_Benne` | `PRG_06_Outputs` |
 | `ST_SpeedStepTable` | config IHM/RETAIN | `FB_Winch`/`FB_SpeedStep` |
 | `ST_SafetyWinch` | `Supervision` (agrège) | IHM |
 | `ST_BypassWinch` | IHM RETAIN | `FB_Safety_Winch` |
@@ -159,11 +159,10 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 
 ## 4. Intégration programme
 
-### 4.1 État actuel du code (ST, avant migration)
+### 4.1 Organisation de l'exécution (ST pur)
 
 ```text
-Safety ST actuel (`PRG_SAFETY_CFC.st`)        instSafetyWinchM1/M2, instSpeedMonitorM1/M2, instLoadEstimatorM1/M2
-Treuils ST actuel (`PRG_TREUILS_CFC.st`)
+PRG_04_Treuils_Benne (ST)
   §1  instBucket (Benne, appelé EN PREMIER — évite fenêtre de commande manuelle parasite)
   §2  Arbitrage M1 (SEMI_AUTO / MAINT / joystick / boutons)
   §3  Arbitrage M2 (Benne prioritaire > SEMI_AUTO > joystick/boutons)
@@ -171,9 +170,9 @@ Treuils ST actuel (`PRG_TREUILS_CFC.st`)
   §3ter Coupure immédiate M1/M2 en fin de cycle benne
   instWinchSync (lu 1 scan après arbitrage)
   §5  Limites basses + couplage croisé
-  §6/7 Exécution instWinchM1/M2
+  §6/7 Exécution instWinchM1/M2 + Safety instSafetyWinchM1/M2
   §8  Publication ST_WinchFinalInterlockRequest → Outputs
-Outputs Ladder (`PRG_OUTPUTS_LD.st`)      instWinchOutputInterlockM1/M2_LD (Q finales)
+PRG_06_Outputs (LD généré)  instWinchOutputInterlockM1/M2 (Q finales)
 ```
 
 **Dépendances** : Joystick (`AxisCmdY`, `DeadmanArmed`), Modes (`JoystickWinchSelectArbitrated`,
@@ -185,10 +184,10 @@ Découpage **par ensemble mécanique**. M1 (retenue) et M2 (benne) sont indissoc
 est suspendue entre les deux, et l'ouverture, la fermeture, la synchro et le câble mou dépendent
 de leur **combinaison**. Une seule page les porte, avec leur safety.
 
-| Ce qui migre dans `PRG_04_Treuils_Benne` | Provenance actuelle |
+| Ce qui est porté par `PRG_04_Treuils_Benne` | Rôle |
 |---|---|
-| Arbitrages M1/M2, benne, synchro, assistants plongée/extraction | `PRG_TREUILS_CFC` |
-| `instSafetyWinchM1/M2`, `instSpeedMonitorM1/M2`, `instLoadEstimatorM1/M2` | partie M1/M2/benne de `PRG_SAFETY_CFC` |
+| Arbitrages M1/M2, benne, synchro, assistants plongée/extraction | Conduite treuils |
+| `instSafetyWinchM1/M2`, `instSpeedMonitorM1/M2`, `instLoadEstimatorM1/M2` | Safety treuils & benne |
 
 ⚠️ **Aucune sémantique safety ne change** : les mécanismes Méca A→E, les bits `ErrorId` 14/15,
 `AscentPermit`/`DescendPermit` (logique positive fail-safe), les seuils et les polarités restent ceux décrits dans les fiches FB.
@@ -208,7 +207,7 @@ machine globale » n'existe dans la cible.
 | # | Gravité | Point | Détail |
 |---|---|---|---|
 | 1 | info | 7 mécanismes (A-G), pas 5 | `FB_Safety_Winch` §6 |
-| 2 | info | Doc AF02 legacy décrit CFC générique ≠ PRG réels | Architecture cible à part |
+| 2 | info | Doc AF02 legacy décrit l'architecture historique | Architecture 7 POU actuelle |
 
 Écarts spécifiques à un FB (double délai palier, `DelayMotorDecel` code mort, garde-fou non
 persistant) : voir la fiche FB concernée (§7 de chaque fiche) et §6 ci-dessous.
@@ -218,12 +217,6 @@ persistant) : voir la fiche FB concernée (§7 de chaque fiche) et §6 ci-dessou
 ## 6. Commande vitesse par palier — DÉCIDÉ et implémenté (retour terrain 2026-08-06)
 
 > ✅ **Décision prise et codée le 2026-08-06**, en connaissance de cause et **sans les essais en
-> charge réels** initialement posés comme préalable (`PLAN_TASK.md` Lot 4, T91) : retour terrain
-> répété d'un délai joystick→contacteur de plusieurs secondes, tracé à la rampe %/s
-> (`CfgRampAccelRate=10%/s`) qui retardait `RequestedStep>0`. Décision utilisateur explicite de
-> remplacer immédiatement la rampe par une temporisation fixe par palier, asymétrique
-> montée/descente, plutôt que d'attendre une campagne d'essais en charge. À surveiller au
-> prochain cycle d'essais réels (T91 reste un point de vigilance, pas classé clos).
 
 ### 6.1 Mécanisme implémenté (`FB_Winch.st`, commit 2026-08-06)
 
@@ -276,7 +269,7 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 
 **Objectif** : Identifier passivement si un décalage entre les deux treuils (M1 et M2) provient d'un retard d'automatisme/contacteur ou d'un problème mécanique/frein.
 
-**Métriques mesurées passivement (exécuté dans le ST actuel `PRG_TROUBLESHOOTING_CFC.st`, cible `PRG_07_Supervision` qui absorbe le troubleshooting en lecture seule stricte)** :
+**Métriques mesurées passivement (exécuté dans `PRG_07_Supervision`, en lecture seule stricte)** :
 - `DeltaStartDelay_Ms` : Écart de temps au démarrage des mouvements M1/M2.
 - `DeltaBrakeReleaseTime_Ms` & `DeltaBrakeApplyTime_Ms` : Écart de temps d'ouverture/fermeture effective des freins.
 - `DeltaStopTime_Ms` & `DeltaStopDistance_Mm` : Écart de temps et de distance parcourue lors de la phase d'arrêt.

@@ -2,7 +2,7 @@
 
 > Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §5.  
 > Rôle de **ce** document : conversion cinématique des points bruts codeur en mètres de câble déroulé/enroulé.  
-> Source code : `CODE/E_CODEURS/FB_Encoder_Scale.st` · instances `instEncoderScaleM1/M2` dans `Acquisition (CFC)`.  
+> Source code : `CODE/E_CODEURS/FB_Encoder_Scale.st` · instances `instEncoderScaleM1/M2` dans `PRG_02_Acquisition`.  
 
 ## 🧭 Sommaire
 

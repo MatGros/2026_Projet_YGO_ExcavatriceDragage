@@ -83,7 +83,7 @@
   </div>
 
   <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
-    🖥️ &nbsp;<b>PRG_07_Supervision_CFC & IHM Network</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Publication des états de diagnostic, Preflight & Symétrie M1/M2</span>
+    🖥️ &nbsp;<b>PRG_07_Supervision & IHM Network</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Publication des états de diagnostic, Preflight & Symétrie M1/M2</span>
   </div>
 </div>
 
