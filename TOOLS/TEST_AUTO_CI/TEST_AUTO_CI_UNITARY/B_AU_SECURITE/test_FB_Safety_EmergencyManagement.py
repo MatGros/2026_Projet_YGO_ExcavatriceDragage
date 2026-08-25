@@ -1,4 +1,4 @@
-"""Tests Pytest automatiques pour le domaine L_SIMULATION."""
+"""Test Pytest pour FB_Safety_EmergencyManagement (B_AU_SECURITE)."""
 
 import subprocess
 import sys
@@ -36,6 +36,9 @@ def _run_fb_test(fb_name: str):
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-def test_FB_SimBench():
-    """Test CI automatisé pour FB_SimBench."""
-    _run_fb_test("FB_SimBench")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_Safety_EmergencyManagement():
+    _run_fb_test("FB_Safety_EmergencyManagement")

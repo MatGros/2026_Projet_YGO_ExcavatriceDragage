@@ -1,4 +1,4 @@
-"""Tests Pytest automatiques pour le domaine I_TRANSLATION."""
+"""Test Pytest pour PRG_07_Supervision (M_MAIN)."""
 
 import subprocess
 import sys
@@ -36,6 +36,9 @@ def _run_fb_test(fb_name: str):
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-def test_FB_Translation():
-    """Test CI automatisé pour FB_Translation."""
-    _run_fb_test("FB_Translation")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_PRG_07_Supervision():
+    _run_fb_test("PRG_07_Supervision")

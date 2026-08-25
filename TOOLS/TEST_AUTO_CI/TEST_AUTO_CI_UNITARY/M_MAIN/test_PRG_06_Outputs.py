@@ -1,4 +1,4 @@
-"""Tests Pytest automatiques pour le domaine B_AU_SECURITE."""
+"""Test Pytest pour PRG_06_Outputs (M_MAIN)."""
 
 import subprocess
 import sys
@@ -36,6 +36,9 @@ def _run_fb_test(fb_name: str):
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-def test_FB_Safety_EmergencyManagement():
-    """Test CI automatisé pour FB_Safety_EmergencyManagement."""
-    _run_fb_test("FB_Safety_EmergencyManagement")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_PRG_06_Outputs():
+    _run_fb_test("PRG_06_Outputs")
