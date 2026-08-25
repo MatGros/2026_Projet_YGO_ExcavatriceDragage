@@ -2,7 +2,7 @@
    📡 PRG_02_Acquisition — Programme d'Acquisition et Conditionnement I/O
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 1 (premier POU du cycle).
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §2
    🎯 Rôle unique : Produire les images HwReal/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
       et publier les retours.
