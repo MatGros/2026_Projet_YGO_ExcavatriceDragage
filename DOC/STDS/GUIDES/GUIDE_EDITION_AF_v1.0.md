@@ -23,7 +23,7 @@ Toute fiche AF doit commencer par un paragraphe **court, clair et synthétique (
 # AF_Partie-XX : [Nom du Domaine / Fonction]
 
 ## 🎯 Rôle et périmètre
-- **Problème résolu** : [Expliquer le besoin physique/opérateur résolu par la fonction]
+- **Rôle** : [Expliquer le besoin physique/opérateur résolu par la fonction]
 - **Périmètre strict** : [Ce que la fonction fait / Ce qu'elle ne fait absolument pas]
 - **Type de composant** : [Producteur d'intention / Brique E/S / Commande Mouvement / Safety]
 ```
@@ -63,7 +63,7 @@ Toute fiche AF doit commencer par un paragraphe **court, clair et synthétique (
 
 | Colonne | Contenu |
 |---|---|
-| `ID` | `F<NN>.<seq>` — `NN` = numéro de Partie AF, `seq` = compteur plat `01`, `02`… |
+| `ID` | `F<NN>.<seq>` — `NN` = numéro de Partie AF, `seq` = compteur plat `01`, `02`… (**pas-de-1**, volontairement différent du pas-de-10 des `TC-Pxx-nnn` §3 : une fonction est un catalogue **exhaustif figé à la rédaction** de l'AF, pas un flux qui grossit pendant une campagne de test comme les TC — pas besoin de marge d'insertion. Une fonction oubliée s'ajoute en fin de séquence plate (ex. `F08.09`), jamais insérée en pas-de-10) |
 | `Fonction` | Nom court, verbe d'action |
 | `Description` | 1-3 phrases complètes (toutes les conditions pertinentes citées) |
 | `Réalisée par` | `FB` / `PRG` (câblage de collage) / `gate` (script de vérification) |
@@ -186,6 +186,7 @@ Pour assurer la lisibilité visuelle et supprimer tout risque de dérive entre l
 | 🎯 | Rôle et périmètre (+ Table des fonctions) | ❓ | TBD (À définir) |
 | 🧪 | Table des points de validation (TC) | 📚 | Documents liés |
 | 🔄 | Pipeline et composition | 🔌 | Interface publique |
+| 🖥️ | IHM, Configuration & Dépannage | | |
 
 Un émoji identifie **le type de section**, pas la fiche : `🔄 Pipeline et composition` porte le
 même émoji sur toutes les AF, exactement comme `🧪` identifie toujours les points de validation.
@@ -200,16 +201,26 @@ Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
 3. `🧪 Table des points de validation (Cas de Test — TC)` (§3)
 4. `🔄 Pipeline et composition` — schéma/diagramme du flux de données et des FB traversés (§3bis)
 5. `🔌 Interface publique` — **table des entrées** et **table des sorties** (nom, type, unité, rôle)
-6. Paragraphes de détail par fonction — libre, un paragraphe par comportement notable (homme-mort, calibration, défauts, intégration programme, IHM, alertes...)
-7. `📜 Suivi historique` — chronologie factuelle : versions archivées, resynchronisations
+6. Paragraphes de détail par fonction — libre, un paragraphe par comportement notable (homme-mort, calibration, défauts, intégration programme, alertes...). **Si la fiche porte une Table des fonctions (§2bis)**, le titre de chaque paragraphe référence le(s) code(s) `F<NN>.<seq>` qu'il couvre, entre parenthèses (ex. `## 5. Homme-mort (F08.03, F08.04)`) — le lecteur retrouve depuis le sommaire quelle fonction du catalogue est traitée où, sans deviner. Un paragraphe qui ne couvre aucune fonction du catalogue (ex. Suivi historique, TBD) n'en porte pas.
+7. `🖥️ IHM, Configuration & Dépannage` — section groupée recommandée (famille Fonctions métier) :
+   contrat IHM (`Cmd`/`State`), réglages (`Cfg` s'il existe, ou table réglage/persistance/réglable-
+   IHM sinon), `Bypass` (même produit ailleurs — dire ce qu'il masque et où il vit réellement) et
+   **un pointeur** (pas une duplication) vers la fiche de dépannage chronologique (AF14,
+   `GVL_Troubleshooting.XXX`). 🚫 **La simulation n'y entre pas** : elle vit dans `Pipeline et
+   composition` (§4, production du geste/mesure réel vs simulé) ou dans AF13 — l'AF décrit le
+   fonctionnement machine réel destiné à l'exploitation, la simulation est un outil de mise en
+   service pour l'équipe technique, pas une exigence métier au même niveau. Squelette :
+   `DOC/WFLOW/TEMPLATE/AF_SPEC_TEMPLATE.md §6`. Décision T156 (2026-08-25), première application :
+   `AF_Partie-08_Fonction_Joystick_v2.2.md §8`.
+8. `📜 Suivi historique` — chronologie factuelle : versions archivées, resynchronisations
    doc↔code, corrections de profil, décisions tranchées et leur date. C'est ici, **pas** dans
    `Rôle et périmètre` ni sous le titre H1, que vit tout ce qui est daté/révolu. Facultatif si la
    fiche n'a encore aucun historique.
-8. `❓ TBD (À définir - To Be Define)` — **paragraphe unique, listing court** des points ouverts et
+9. `❓ TBD (À définir - To Be Define)` — **paragraphe unique, listing court** des points ouverts et
    questions **non tranchées**. Pas de détail ici — le détail d'une question ouverte connue vit
-   dans le corps (§6) ou en `Suivi historique` une fois tranchée ; ce paragraphe ne liste que
+   dans le corps (§6/§7) ou en `Suivi historique` une fois tranchée ; ce paragraphe ne liste que
    « quoi trancher », pas « pourquoi ». Facultatif si la fiche n'a aucun point ouvert.
-9. `📚 Documents liés` — table des documents référencés ou référençant cette fiche. **Obligatoire même vide** : garder le paragraphe et écrire « aucun » plutôt que de le supprimer.
+10. `📚 Documents liés` — table des documents référencés ou référençant cette fiche. **Obligatoire même vide** : garder le paragraphe et écrire « aucun » plutôt que de le supprimer.
 
 ### Répartition chapô / sous-fiches (anti-duplication)
 
@@ -219,3 +230,30 @@ Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
   chapô (pas de sous-fiche FB pour ce domaine), soit le chapô ne garde qu'un **squelette** qui
   renvoie vers la fiche FB détaillée. Dupliquer le détail des deux côtés rend les mises à jour
   ingérables — une info corrigée d'un côté et oubliée de l'autre devient une source d'erreur.
+
+---
+
+## 🗂️ 5. Familles de fiches AF (quelle section pour quelle AF)
+
+> 📌 Toutes les AF ne se ressemblent pas — inutile de forcer un moule unique. Trois familles,
+> reprises du plan de numérotation (`AGENTS.md`) : **1-3 Fondations** (vue machine, architecture
+> programme, contrats composants — méta, pas de FB unique), **4-7 Transverses** (Cycle/Modes/E-S/
+> IHM — domaine partagé par plusieurs FB), **8+ Fonctions métier** (une AF = un domaine/FB,
+> ex. AF-08 Joystick). Un seul guide, une applicabilité par famille — pas trois documents qui
+> divergent avec le temps (cf. leçon `CLAUDE.md`/`AGENTS.md` de ce projet).
+
+| Section (§4) | 🏛️ Fondations (01-03) | 🔀 Transverses (04-07) | 🔧 Fonctions métier (08+) |
+|---|---|---|---|
+| Sommaire | ✅ | ✅ | ✅ |
+| Rôle et périmètre | ✅ (périmètre machine/architecture) | ✅ | ✅ |
+| Table des fonctions | ❌ (pas de découpage F<NN>.<seq> pertinent) | recommandé si la fiche décrit plusieurs comportements | ✅ obligatoire |
+| Table des points de validation (TC) | ✅ si la fiche a des invariants vérifiables | ✅ | ✅ |
+| Pipeline et composition | selon pertinence | ✅ | ✅ |
+| Interface publique (Entrées/Sorties) | ❌ (pas de FB unique à interfacer) | selon domaine | ✅ |
+| Suivi historique | ✅ | ✅ | ✅ |
+| TBD | ✅ | ✅ | ✅ |
+| Documents liés | ✅ | ✅ | ✅ |
+
+Squelette prêt à copier pour la famille **Fonctions métier** (la plus fréquente, pilotée par
+AF-08) : `DOC/WFLOW/TEMPLATE/AF_SPEC_TEMPLATE.md`. Pour Fondations/Transverses, partir du même
+squelette et retirer les sections marquées ❌ ci-dessus.

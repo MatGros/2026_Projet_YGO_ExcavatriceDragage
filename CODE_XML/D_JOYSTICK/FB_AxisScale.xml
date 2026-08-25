@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T00:16:44.029763" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T00:16:44.029763">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T15:11:46.287771" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T15:11:46.287771">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -82,7 +82,7 @@
    🎯 Rôle : Normalise une valeur brute (0..10000) selon le neutre calibré
              et applique une zone morte en unités brutes (compte ADC).
    🛡️ Garde-fou : Saturation stricte de la consigne à +/-100.0 %.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md (F08.02)
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.2.md (F08.02)
    =======================================================================</xhtml>
           </documentation>
         </interface>

@@ -44,18 +44,22 @@ def test_extract_functions_matrix_af08(tmp_path: Path) -> None:
         }
 
         # Vérifier que les TC couvrants sont bien renseignés
-        assert "TC-P08-014" in functions["F08.02"]["tc_couvrants"]
-        assert "TC-P08-002" in functions["F08.03"]["tc_couvrants"]
-        assert "TC-P08-006" in functions["F08.07"]["tc_couvrants"]
-        assert "TC-P08-009" in functions["F08.07"]["tc_couvrants"]
-        assert "TC-P08-010" in functions["F08.07"]["tc_couvrants"]
+        assert "TC-P08-010" in functions["F08.01"]["tc_couvrants"]
+        assert "TC-P08-010" in functions["F08.02"]["tc_couvrants"]
+        assert "TC-P08-020" in functions["F08.03"]["tc_couvrants"]
+        assert "TC-P08-020" in functions["F08.04"]["tc_couvrants"]
+        assert "TC-P08-030" in functions["F08.05"]["tc_couvrants"]
+        assert "TC-P08-040" in functions["F08.06"]["tc_couvrants"]
+        assert "TC-P08-050" in functions["F08.07"]["tc_couvrants"]
+        assert "TC-P08-060" in functions["F08.08"]["tc_couvrants"]
 
         # validation_points egalement filtrable par ID
         validation_points = af08["validation_points"]
-        assert "TC-P08-002" in validation_points
+        assert "TC-P08-010" in validation_points
+        assert "TC-P08-020" in validation_points
     else:
         # Fallback vérification textuelle
         for i in range(1, 9):
             assert f"F08.0{i}" in content
-        assert "TC-P08-014" in content
+        assert "TC-P08-010" in content
         assert "TC-P08-002" in content
