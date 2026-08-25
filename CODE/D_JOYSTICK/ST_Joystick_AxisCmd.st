@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
    📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.3.md
    ======================================================================= *)
 
 TYPE ST_Joystick_AxisCmd :

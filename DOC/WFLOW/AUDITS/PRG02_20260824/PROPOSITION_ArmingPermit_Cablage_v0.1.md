@@ -2,7 +2,7 @@
 
 > ⚠️ Ne constitue **pas** une autorisation de coder. Étude de conception seule, plusieurs points
 > restent à trancher par un humain avant tout lot C4. Déplacé depuis
-> `DOC/AF/AF_Partie-08_Fonction_Joystick_v2.2.md` §7 (2026-08-25, audit critique demandant de garder
+> `DOC/AF/AF_Partie-08_Fonction_Joystick_v2.3.md` §7 (2026-08-25, audit critique demandant de garder
 > l'AF centrée sur les exigences machine, pas sur l'exploration de conception).
 
 ## Contexte
@@ -37,5 +37,5 @@ explicite** (`PRG_04` s'exécute après `PRG_02` dans la `MainTask`).
 
 | Doc | Lien |
 |---|---|
-| AF08 | `DOC/AF/AF_Partie-08_Fonction_Joystick_v2.2.md` §10 Q1 |
+| AF08 | `DOC/AF/AF_Partie-08_Fonction_Joystick_v2.3.md` §10 Q1 |
 | Questions ouvertes | `QUESTIONS_OUVERTES_PRG02_v0.1.md` |

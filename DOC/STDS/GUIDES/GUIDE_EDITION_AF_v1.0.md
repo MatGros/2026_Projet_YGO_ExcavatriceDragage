@@ -284,25 +284,38 @@ Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
 
 ## 🗂️ 5. Familles de fiches AF (quelle section pour quelle AF)
 
-> 📌 Toutes les AF ne se ressemblent pas — inutile de forcer un moule unique. Trois familles,
-> reprises du plan de numérotation (`AGENTS.md`) : **1-3 Fondations** (vue machine, architecture
-> programme, contrats composants — méta, pas de FB unique), **4-7 Transverses** (Cycle/Modes/E-S/
-> IHM — domaine partagé par plusieurs FB), **8+ Fonctions métier** (une AF = un domaine/FB,
-> ex. AF-08 Joystick). Un seul guide, une applicabilité par famille — pas trois documents qui
-> divergent avec le temps (cf. leçon `CLAUDE.md`/`AGENTS.md` de ce projet).
+> 📌 Toutes les AF ne se ressemblent pas — inutile de forcer un moule unique. Quatre familles,
+> reprises du plan de numérotation (`AGENTS.md`) : **AF-01** (vue machine — équipements,
+> fonctions, sécurité électrique/réarmement : décrit un comportement réel, testable, porté par
+> `FB_Safety_EmergencyManagement`), **AF-02/03 Fondations méta** (architecture programme, contrats
+> composants — règles transverses **sans FB unique**, mais déjà couvertes par leurs propres TC
+> racine), **4-7 Transverses** (Cycle/Modes/E-S/IHM — domaine partagé par plusieurs FB), **8+
+> Fonctions métier** (une AF = un domaine/FB, ex. AF-08 Joystick). Un seul guide, une applicabilité
+> par famille — pas trois documents qui divergent avec le temps (cf. leçon `CLAUDE.md`/`AGENTS.md`
+> de ce projet).
+>
+> 🚩 **Décision (2026-08-25)** : AF-01 a été retirée de la colonne "Fondations" — bien que numérotée
+> 1-3, elle décrit un comportement machine réel et vérifiable (chaîne AU, réarmement), à la
+> différence d'AF-02 (architecture) et AF-03 (contrats) qui sont de purs documents de convention.
+> Le chapô AF-01 doit donc porter une vraie table TC macro **et** une Table des fonctions (IDs
+> racine existants, pas de nouveaux IDs inventés) — voir `AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+> §1` pour l'application. **Correctif** : la chaîne AU/réarmement (§7) est un besoin fonctionnel
+> propre à AF-01 (au même titre que le homme-mort du Joystick, F08.xx) — distinct des tables §4
+> (Fonctions métier/transverses) qui ne sont qu'un index vers d'autres AF et ne portent pas de
+> codes `F<NN>.<seq>`.
 
-| Section (§4) | 🏛️ Fondations (01-03) | 🔀 Transverses (04-07) | 🔧 Fonctions métier (08+) |
-|---|---|---|---|
-| Sommaire | ✅ | ✅ | ✅ |
-| Rôle et périmètre | ✅ (périmètre machine/architecture) | ✅ | ✅ |
-| Table des fonctions | ❌ (pas de découpage F<NN>.<seq> pertinent) | recommandé si la fiche décrit plusieurs comportements | ✅ obligatoire |
-| Table des points de validation (TC) | ✅ si la fiche a des invariants vérifiables | ✅ | ✅ |
-| Pipeline et composition | selon pertinence | ✅ | ✅ |
-| Interface publique (Entrées/Sorties) | ❌ (pas de FB unique à interfacer) | selon domaine | ✅ |
-| Suivi historique | ✅ | ✅ | ✅ |
-| TBD | ✅ | ✅ | ✅ |
-| Documents liés | ✅ | ✅ | ✅ |
+| Section (§4) | 🎯 AF-01 (machine/sécurité) | 🏛️ AF-02/03 (méta) | 🔀 Transverses (04-07) | 🔧 Fonctions métier (08+) |
+|---|---|---|---|---|
+| Sommaire | ✅ | ✅ | ✅ | ✅ |
+| Rôle et périmètre | ✅ (périmètre machine) | ✅ (périmètre architecture/contrat) | ✅ | ✅ |
+| Table des fonctions | ✅ **obligatoire** — catalogue `F01.xx` de la chaîne AU/réarmement (§7), mappé aux `TC-P01-*` existants ; les tables §4 (index vers d'autres AF) ne comptent pas comme ce catalogue | ❌ (pas de découpage F<NN>.<seq> pertinent) | recommandé si la fiche décrit plusieurs comportements | ✅ obligatoire |
+| Table des points de validation (TC) | ✅ **obligatoire** — table macro chapô avec IDs racine réels (`TC-P01-*`), sous-fiche décline le détail | ✅ (déjà satisfait par `TC-P02-*`/`TC-P03-*` en chapô) | ✅ | ✅ |
+| Pipeline et composition | selon pertinence | selon pertinence | ✅ | ✅ |
+| Interface publique (Entrées/Sorties) | ❌ (pas de FB unique à interfacer) | ❌ (pas de FB unique à interfacer) | selon domaine | ✅ |
+| Suivi historique | ✅ | ✅ | ✅ | ✅ |
+| TBD | ✅ | ✅ | ✅ | ✅ |
+| Documents liés | ✅ | ✅ | ✅ | ✅ |
 
 Squelette prêt à copier pour la famille **Fonctions métier** (la plus fréquente, pilotée par
-AF-08) : `DOC/WFLOW/TEMPLATE/AF_SPEC_TEMPLATE.md`. Pour Fondations/Transverses, partir du même
+AF-08) : `DOC/WFLOW/TEMPLATE/AF_SPEC_TEMPLATE.md`. Pour AF-01/02/03/Transverses, partir du même
 squelette et retirer les sections marquées ❌ ci-dessus.
