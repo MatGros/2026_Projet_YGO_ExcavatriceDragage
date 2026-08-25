@@ -71,7 +71,7 @@ demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) 
 |---|---|---|
 | 1 | [CODE_QUALITY_STANDARDS](DOC/STDS/CODE_QUALITY_STANDARDS.md) | **Déclaration, liaison, POO, non-régression** — référentiel universel |
 | 2 | [NAMING_CONVENTION](DOC/STDS/NAMING_CONVENTION.md) | Nommage (PascalCase, préfixes, unités, polarité) |
-| 3 | [AF_Partie-03](DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md) | Contrats FB, DUT et CFC |
+| 3 | [AF_Partie-03](DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md) | Contrats FB, DUT et CFC |
 | 4 | [AF_Partie-02](DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md) | Architecture CFC, tâches et flux |
 | 5 | La spec métier concernée | `AF_Partie-08` à `-14` (une par fonction) |
 
@@ -124,7 +124,7 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 
 - Spec manquante, incomplète ou ambiguë
 - Nommage ambigu ou non-PascalCase
-- Interface FB incomplète (profils `AF_Partie-03 §1bis`)
+- Interface FB incomplète (profils `AF_Partie-03 §3` — Profils de composants)
 - `Reset` pas sur front · redémarrage automatique après défaut
 - `SafeStop`/`StartStop` sur un FB qui **n'est pas** un FB de mouvement (ex. `FB_Joystick`, briques E/S, diag)
 - `CoupeEnable` réintroduit (vocabulaire abandonné — n'a jamais été une variable)

@@ -75,7 +75,7 @@ FB_Acquisition_Preflight:
 
 FB_FbStatus:
   domain: A_COMMUN
-  af_doc: DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+  af_doc: DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md
   # TC-P03-004 (pas de SafeStop/StartStop hors mouvement) et TC-P03-005 (encapsulation stricte)
   # sont des regles transverses a TOUS les composants du catalogue AF_Partie-03, pas specifiques
   # a FB_FbStatus -- TC-P03-005 est deja prouve mecaniquement par encapsulation_check.py (section

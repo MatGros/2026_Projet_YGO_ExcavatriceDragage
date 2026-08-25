@@ -176,6 +176,6 @@ Ce FB ne doit pas être bloqué par ces 4 points : ils sont publiés à `0`/`FAL
 ## 9. Documents liés
 
 - `AF_Partie-02_Architecture_Programme_v3.2.md` §2/§5 — décision architecture, lecture seule.
-- `AF_Partie-03_Contrats_Composants_v2.1.md` §1bis/§4 — profil FB, fiche contrat obligatoire.
+- `AF_Partie-03_Contrats_Composants_v2.2.md` §1bis/§4 — profil FB, fiche contrat obligatoire.
 - `AF_Partie-07_Interface_IHM_v2.0.md` §5 — principe troubleshooting lecture seule.
 - `AF_Partie-14_Fonction_Troubleshooting_v1.1.md` — chapô, table de visu acquisition existante.

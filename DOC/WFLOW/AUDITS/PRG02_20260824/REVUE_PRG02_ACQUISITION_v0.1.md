@@ -28,7 +28,7 @@ codeurs M1/M2 (`FB_Encoder` + 6 sous-FB), décodage position translation M3.
 | `CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st` | 1-118 (complet) |
 
 Référentiels normatifs consultés : `CODE_QUALITY_STANDARDS.md`, `NAMING_CONVENTION.md`,
-`AF_Partie-03_Contrats_Composants_v2.1.md`, `AF_Partie-08` (Joystick), `AF_Partie-09` (Encoder,
+`AF_Partie-03_Contrats_Composants_v2.2.md`, `AF_Partie-08` (Joystick), `AF_Partie-09` (Encoder,
 chapô + 6 fiches FB).
 
 ## ✅ Synthèse par fichier

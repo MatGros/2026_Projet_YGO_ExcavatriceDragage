@@ -5,7 +5,7 @@
    🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur
    🔌 Interface : Standard composant d'arbitrage applicatif
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Modes
