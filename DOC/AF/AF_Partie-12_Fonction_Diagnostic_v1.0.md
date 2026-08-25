@@ -6,7 +6,7 @@
 > Source code : `CODE/DIAG/*.st` · instances dans `PRG_01_Diagnostics` et `PRG_TROUBLESHOOTING_CFC` (ST actuels).
 > Cible : les diagnostics devices/bus rejoignent `PRG_02_Acquisition`, les observateurs passifs rejoignent `PRG_07_Supervision` — voir §5.
 > Détail par FB : voir les fiches dédiées (§1).
-> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
+> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md` §2 et §4.
 
 ## 🧭 Sommaire
 
