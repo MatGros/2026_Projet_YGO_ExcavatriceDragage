@@ -2,7 +2,7 @@
    ⚙️ E_CycleStep — Étapes de la machine d'état du cycle automatique
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des étapes du cycle automatique de dragage (X0 à X13 + STABILIZING)
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
    ======================================================================= *)
 
 TYPE E_CycleStep :

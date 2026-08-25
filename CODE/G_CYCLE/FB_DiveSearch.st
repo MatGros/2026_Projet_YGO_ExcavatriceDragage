@@ -4,7 +4,7 @@
    🎯 Rôle : Qualification du capteur Kobold et autorisation de descente
    🛡️ Sécurité : Verrouillage si séquence d'immersion 0->1->0 invalide
    🔌 Interface : Intention de descente et mesures vers permis de descente
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
    ======================================================================= *)
 FUNCTION_BLOCK FB_DiveSearch
 VAR_INPUT

@@ -4,7 +4,7 @@
    🎯 Rôle : Automate de cycle automatique de dragage (X0 à X13 + STABILIZING)
    🔒 Sécurité : Gating par mode et homme-mort, repli STABILIZING sur défaut
    🔌 Interface : Demandes de mouvements (treuils, translation, benne)
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Cycle
