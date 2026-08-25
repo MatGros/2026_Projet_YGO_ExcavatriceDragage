@@ -1,11 +1,11 @@
-"""Tests Pytest automatiques pour le domaine B_AU_SECURITE."""
+"""Tests Pytest automatiques pour le domaine H_TREUILS_BENNE."""
 
 import subprocess
 import sys
 from pathlib import Path
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 RUN_TESTS_PY = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI" / "run_tests.py"
 
 
@@ -36,6 +36,12 @@ def _run_fb_test(fb_name: str):
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-def test_FB_Safety_EmergencyManagement():
-    """Test CI automatisé pour FB_Safety_EmergencyManagement."""
-    _run_fb_test("FB_Safety_EmergencyManagement")
+def test_FB_Winch():
+    """Test CI automatisé pour FB_Winch."""
+    _run_fb_test("FB_Winch")
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_Bucket():
+    """Test CI automatisé pour FB_Bucket."""
+    _run_fb_test("FB_Bucket")

@@ -1,16 +1,19 @@
-"""Tests Pytest automatiques pour le domaine H_TREUILS_BENNE."""
+"""Test Pytest global : exécution de tous les blocs fonctionnels du projet en parallèle."""
 
 import subprocess
 import sys
 from pathlib import Path
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 RUN_TESTS_PY = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI" / "run_tests.py"
 
 
-def _run_fb_test(fb_name: str):
-    cmd = [sys.executable, str(RUN_TESTS_PY), "--fb", fb_name, "--fast"]
+@pytest.mark.ci_fb
+@pytest.mark.all_domains
+def test_ALL_DOMAINS():
+    """Exécute l'intégralité des 28 blocs fonctionnels du projet en parallèle sur 12 cœurs CPU."""
+    cmd = [sys.executable, str(RUN_TESTS_PY), "--all", "--fast", "-j", "12"]
     proc = subprocess.run(
         cmd,
         capture_output=True,
@@ -31,17 +34,8 @@ def _run_fb_test(fb_name: str):
             print(proc.stderr.encode("ascii", errors="replace").decode("ascii"), file=sys.stderr)
 
     if proc.returncode != 0:
-        error_msg = f"Échec du test pour {fb_name} (code {proc.returncode}) :\n"
-        error_msg += proc.stdout[-1500:] if proc.stdout else ""
+        error_msg = f"Échec de l'exécution globale (code {proc.returncode}) :\n"
+        error_msg += proc.stdout[-2500:] if proc.stdout else ""
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-def test_FB_Winch():
-    """Test CI automatisé pour FB_Winch."""
-    _run_fb_test("FB_Winch")
-
-@pytest.mark.ci_fb
-@pytest.mark.unit
-def test_FB_Bucket():
-    """Test CI automatisé pour FB_Bucket."""
-    _run_fb_test("FB_Bucket")
