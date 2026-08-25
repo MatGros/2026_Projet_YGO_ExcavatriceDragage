@@ -1,4 +1,4 @@
-"""Tests Pytest automatiques pour le domaine D_JOYSTICK."""
+"""Test Pytest pour FB_ExtractionSequence (G_CYCLE)."""
 
 import subprocess
 import sys
@@ -36,6 +36,9 @@ def _run_fb_test(fb_name: str):
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-def test_FB_Joystick():
-    """Test CI automatisé pour FB_Joystick."""
-    _run_fb_test("FB_Joystick")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_ExtractionSequence():
+    _run_fb_test("FB_ExtractionSequence")

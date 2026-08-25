@@ -1,4 +1,4 @@
-"""Tests Pytest automatiques pour le domaine E_CODEURS."""
+"""Test Pytest pour FB_FbStatus (A_COMMUN)."""
 
 import subprocess
 import sys
@@ -36,6 +36,9 @@ def _run_fb_test(fb_name: str):
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-def test_FB_Encoder():
-    """Test CI automatisé pour FB_Encoder."""
-    _run_fb_test("FB_Encoder")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_FbStatus():
+    _run_fb_test("FB_FbStatus")

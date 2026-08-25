@@ -1,4 +1,4 @@
-"""Tests Pytest automatiques pour le domaine G_CYCLE."""
+"""Test Pytest pour FB_Winch (H_TREUILS_BENNE)."""
 
 import subprocess
 import sys
@@ -36,18 +36,9 @@ def _run_fb_test(fb_name: str):
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
-def test_FB_Cycle():
-    """Test CI automatisé pour FB_Cycle."""
-    _run_fb_test("FB_Cycle")
+
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_FB_DiveSearch():
-    """Test CI automatisé pour FB_DiveSearch."""
-    _run_fb_test("FB_DiveSearch")
-
-@pytest.mark.ci_fb
-@pytest.mark.unit
-def test_FB_ExtractionSequence():
-    """Test CI automatisé pour FB_ExtractionSequence."""
-    _run_fb_test("FB_ExtractionSequence")
+def test_FB_Winch():
+    _run_fb_test("FB_Winch")
