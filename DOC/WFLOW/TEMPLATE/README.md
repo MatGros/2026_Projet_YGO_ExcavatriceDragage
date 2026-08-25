@@ -21,8 +21,12 @@ Règle d'or : **un gabarit/standard s'écrit une seule fois** et est référenc�
 - [`SKILL_BANNER_TEMPLATE.md`](SKILL_BANNER_TEMPLATE.md) — **gabarit unique** des bannières de
   déclenchement (format 60 `=`, émoji + titre, 1 ligne d'action). Appliqué par `task-planner`,
   `troubleshooting` et le briefing session `AGENTS.md`.
-- [`AF_SPEC_TEMPLATE.md`](AF_SPEC_TEMPLATE.md) — squelette de fiche AF (famille Fonctions métier,
+- [`AF_SPEC_TEMPLATE.md`](AF_SPEC_TEMPLATE.md) — squelette de **chapô** AF (famille Fonctions métier,
   08+), conforme à `DOC/STDS/GUIDES/GUIDE_EDITION_AF_v1.0.md`.
+- [`FB_SPEC_TEMPLATE.md`](FB_SPEC_TEMPLATE.md) — squelette de **sous-fiche FB** (détail technique
+  d'un composant, `AF_Partie-NN_*/FB_XXX_vX.Y.md`) — construit à partir des 2 fiches les plus
+  abouties du projet (`FB_Safety_EmergencyManagement`, `FB_Translation`), TC déclinées en
+  `TC-Pxx-0N0.1`/`.2` du macro-TC du chapô (jamais un nouvel identifiant racine).
 - [`FB_HEADER_TEMPLATE.st`](FB_HEADER_TEMPLATE.st), [`GVL_HEADER_TEMPLATE.st`](GVL_HEADER_TEMPLATE.st),
   [`MOTION_FB_HEADER_TEMPLATE.st`](MOTION_FB_HEADER_TEMPLATE.st),
   [`PROGRAM_HEADER_TEMPLATE.st`](PROGRAM_HEADER_TEMPLATE.st),

@@ -8,7 +8,7 @@
       par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
       de vitesse au meme scan. HomedAndReliable = gate strict interlock M3.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder
