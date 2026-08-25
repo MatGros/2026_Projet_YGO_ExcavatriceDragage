@@ -10,8 +10,8 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 ## 🎬 Démarrage de session — briefing obligatoire
 
-> Concerne **tout agent** (Claude Code, Codex, autre) et tout humain qui reprend le projet —
-> `AGENTS.md` est justement le point d'entrée commun, lu par tous les outils.
+> Concerne **tout agent** (Claude Code, Codex, Antigravity, autre) et tout humain qui reprend le projet —
+> `AGENTS.md` est la source unique commune à tous les outils.
 
 **Déclenchement** : automatique au 1er message de toute session sur ce repo. Rejouable à la
 demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) — même séquence.
@@ -21,25 +21,25 @@ demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) 
    `DOC/WFLOW/TEMPLATE/SKILL_BANNER_TEMPLATE.md`) :
    ```text
    ============================================================
-   🎬 BRIEFING SESSION / AGENTS.MD ACTIF
+   🎬 BRIEFING SESSION WORKFLOW PROJET / AGENTS.MD ACTIF
    ============================================================
    ```
    Puis 1 ligne : *« Briefing session <projet> — reprise par <agent> »*.
-1. Lire les points d'entrée : `README.md` (racine), `DOC/README.md`, `TOOLS/README.md`,
-   `TOOLS/AGENT_WORKFLOW/README.md` — pas tout le détail, juste repérer où chercher ensuite.
-2. Restituer un briefing court :
-   - Tableau des 3 skills projet (`task-planner`, `troubleshooting`,
-     `create-pr`) — rôle + déclencheur, voir [DOC/README.md](DOC/README.md) et `.claude/skills/`.
-   - Snapshot rapide de [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml) : combien de tâches
-     verrouillées 🔒 / en cours ⏳ / à faire ⬜.
-   - Rappel des guardrails essentiels : jamais de commit sans validation humaine, AU physique
-     + `PowerCutOff` séparés, jamais de redémarrage auto après défaut.
-3. **Niveau 1 (systématique)** : lister les documents lus à l'étape 1, chemin + 1 ligne sur leur
-   rôle réel — preuve de repérage, pas de lecture exhaustive.
-4. **Niveau 2 (si tâche C2+ ou ambiguë)** : répondre à une question précise liée à la tâche en
-   cours, avec du concret tiré des fichiers réels (pas une réponse générique apprise par cœur).
-   Signal d'alerte : si l'agent doit grep tout le repo pour répondre à une question simple/évidente
-   après le briefing → soit le briefing était insuffisant, soit l'agent a zappé l'étape 1.
+1. **Restituer le tableau des 2 skills actives du projet** :
+   - `task-planner` : Pilotage catalogue `TASKS.yaml` & contrats `CONTRACTS/` · Déclencheur : « planifie tâche », « état des tâches », « tasks ».
+   - `troubleshooting` : Diagnostic formel, arbre de causes & traçage inverse · Déclencheur : « cherche le blocage », « diagnostic », « panne ».
+2. **Snapshot rapide de [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml)** : combien de tâches
+   verrouillées 🔒 / en cours ⏳ / à faire ⬜.
+3. **Preuve de repérage des 3 piliers projet (Niveau 1 — systématique)** :
+   - 📐 **Standards & Guides (`DOC/STDS/`)** : `CODE_QUALITY_STANDARDS.md` (POO, encapsulation), `NAMING_CONVENTION.md` (PascalCase, NC-010..080), guides (`GUIDE_GATES_ET_TESTS`, `GUIDE_SEQUENCEUR`, `GUIDE_IDE_CODESYS`).
+   - 🏗️ **Architecture & Specs (`DOC/AF/` & `CODE/`)** : Architecture 7 POU (`PRG_02_Acquisition` ➔ `PRG_07_Supervision`, tâches 4ms/20ms/10ms), Fondations (AF01-03), Transverses (AF04-06), Métiers (AF08-14).
+   - 🛠️ **Outillage CI/CD & Validation mécanique (`TOOLS/`)** : Bundle PLCopenXML (`generate_codesys_bundle.py`), Vérification liaison bloquante (`G200_check_linkage.py`), Suite de 21 Gates (`run_all_gates.py`), Tests unitaires CI (`TOOLS/TEST_AUTO_CI/`).
+4. **Rappel des guardrails essentiels & Posture** :
+   - 🔒 Aucun commit sans validation humaine explicite.
+   - 🛑 Posture Anti-Yes-Man : Devoir d'alerte et esprit critique sur toute ambiguïté.
+   - ⚡ Sécurité machine réelle : AU matériel indépendant de `PowerCutOff`, Reset sur front uniquement.
+5. **Niveau 2 (si tâche C2+ ou ambiguë)** : répondre à une question précise liée à la tâche en
+   cours avec du concret tiré des fichiers réels (pas une réponse générique apprise par cœur).
 
 ---
 
