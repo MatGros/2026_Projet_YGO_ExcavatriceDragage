@@ -1,0 +1,737 @@
+domains:
+  AF-01:
+    file: AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    functions: {}
+    validation_points: {}
+  AF-02:
+    file: AF_Partie-02_Architecture_Programme_v3.1.md
+    functions: {}
+    validation_points:
+      TC-P02-001:
+        intention: Un seul producteur par donnée
+        preuve: Aucun écouteur/écrivain multiple sur un contrat
+        type: 💻 AUTO
+        ref: §1
+      TC-P02-002:
+        intention: Page CFC sans logique métier
+        preuve: Zéro IF/calcul inline dans le CFC
+        type: 💻 AUTO
+        ref: §1
+      TC-P02-003:
+        intention: Sorties physiques via PRG_OUTPUTS_LD
+        preuve: Aucun autre POU n'écrit les Q/PDO finaux
+        type: 💻 AUTO
+        ref: §2
+      TC-P02-004:
+        intention: Ordre d'exécution MainTask conforme
+        preuve: Tâche CODESYS + G200_check_linkage.py PASS
+        type: 💻 AUTO
+        ref: §4
+      TC-P02-005:
+        intention: Troubleshooting lecture seule
+        preuve: Aucune écriture commande/config/interlock
+        type: 💻 AUTO
+        ref: §2
+  AF-03:
+    file: AF_Partie-03_Contrats_Composants_v2.1.md
+    functions: {}
+    validation_points:
+      TC-P03-001:
+        intention: Priorité Enable > SafeStop > StartStop
+        preuve: SafeStop impose la rampe rapide même si StartStop=TRUE
+        type: 💻 AUTO
+        ref: §3
+      TC-P03-002:
+        intention: Reset inconditionnel (Cause/Ack)
+        preuve: Front Reset efface l'affichage (interlock reste sur Cause)
+        type: 💻 AUTO
+        ref: §3
+      TC-P03-003:
+        intention: Pas de redémarrage auto après Ack
+        preuve: Retour READY, nouvel ordre explicite requis
+        type: 💻 AUTO
+        ref: §3
+      TC-P03-004:
+        intention: Pas de SafeStop/StartStop hors mouvement
+        preuve: Absents des briques E/S, joystick et diag
+        type: 💻 AUTO
+        ref: §2
+      TC-P03-005:
+        intention: Encapsulation stricte
+        preuve: Échanges via interfaces/DUTs publics uniquement
+        type: 💻 AUTO
+        ref: §1
+      TC-P03-006:
+        intention: Re-latch sur ré-apparition Cause
+        preuve: Nouveau front Cause ➔ Ack=FALSE
+        type: 💻 AUTO
+        ref: §3
+      TC-P03-007:
+        intention: Warning auto-effaçable vs Fault latché
+        preuve: Warning s'efface sans Reset, Fault exige Ack
+        type: 💻 AUTO
+        ref: §3
+      TC-P03-008:
+        intention: Cumul de plusieurs Fault latchés
+        preuve: 2 bits distincts apparus à des instants différents s'accumulent dans
+          ErrorId, Reset les acquitte ensemble
+        type: 💻 AUTO
+        ref: §3.1
+      TC-P03-009:
+        intention: Sélection du texte IHM si Fault+Warning actifs ensemble
+        preuve: Texte IHM = première cause active (index le plus bas) par parcours
+          de la liste Causes ; le warning reste dans WarningIdTxt, jamais dans ErrorId
+        type: 💻 AUTO
+        ref: §3.1
+      TC-P03-010:
+        intention: Bornes de la liste de causes Causes[0..15]
+        preuve: Causes[0] et Causes[15] correctement gérés, pas d'off-by-one
+        type: 💻 AUTO
+        ref: §3.1
+      TC-P03-011:
+        intention: Reset sans historique de défaut
+        preuve: Aucun effet parasite, ResetRequested reste FALSE
+        type: 💻 AUTO
+        ref: §3.1
+      TC-P03-012:
+        intention: Reset maintenu (niveau haut) pendant plusieurs scans
+        preuve: '⚠️ Faille identifiée (T148) : si la cause disparaît pendant que Reset
+          reste haut sans nouveau front, l''acquittement se fait sans confirmation
+          au moment réel — comportement actuel prouvé, pas validé comme cible'
+        type: 💻 AUTO
+        ref: §3.1
+      TC-P03-013:
+        intention: Texte IHM pour un bit actif sans texte configuré
+        preuve: Chaîne vide, pas de plantage ni de texte résiduel d'un autre bit
+        type: 💻 AUTO
+        ref: §3.1
+  AF-04:
+    file: AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+    functions: {}
+    validation_points:
+      TC-P04-001:
+        intention: Relâchement manche (retour centre) stoppe sans perte d'étape
+        preuve: StartStop=FALSE, étape inchangée
+        type: 💻 AUTO
+        ref: §1
+      TC-P04-002:
+        intention: Cycle produit des demandes, zéro sortie physique
+        preuve: Aucune Q/PDO écrite par FB_Cycle
+        type: 💻 AUTO
+        ref: §1
+      TC-P04-003:
+        intention: STABILIZING fige l'étape (hold sur)
+        preuve: Étape figée, pas de reprise auto
+        type: 💻 AUTO
+        ref: §3
+      TC-P04-004:
+        intention: 'Reprise après STABILIZING : Cause + Reset + nouvel ordre'
+        preuve: 3 conditions nécessaires
+        type: 💻 AUTO
+        ref: §1
+      TC-P04-005:
+        intention: Intention maintenue sur Diving/Extraction
+        preuve: Descente/montée bloquées sans manche défléchi
+        type: ⚡ SITE+AUTO
+        ref: §2
+      TC-P04-006:
+        intention: Pas d'asservissement continu de vitesse en synchro
+        preuve: Même commande M1/M2, pas de boucle fermée
+        type: 💻 AUTO
+        ref: §4
+      TC-P04-007:
+        intention: Seuil synchro 1 ➔ arrêt mouvement principal
+        preuve: M1/M2 stoppés, rattrapage dédié
+        type: ⚡ SITE+AUTO
+        ref: §4
+      TC-P04-008:
+        intention: Écart persistant ➔ escalade safety
+        preuve: SafeStop/PowerCutOff selon contrat
+        type: 💻 AUTO
+        ref: §4
+      TC-P04-009:
+        intention: 'Tempo max d''étape : défaut seulement si pilotage joystick actif'
+        preuve: Pas de défaut au repos (manche centre)
+        type: 💻 AUTO
+        ref: §3
+      TC-P04-010:
+        intention: CycleStepAtError mémorise l'étape spécifique au défaut
+        preuve: Étape affichée IHM, pas E_State générique
+        type: 💻 AUTO
+        ref: §3
+      TC-P04-011:
+        intention: Deux instances (MAINT + SEMI_AUTO) sans impact croisé
+        preuve: Gating sorties par mode, non-régression MAINT
+        type: 💻 AUTO
+        ref: §3
+      TC-P04-012:
+        intention: Compteur de prélèvements RETAIN, reset MAINT only
+        preuve: Survit à la coupure ; reset utilisateur en MAINT
+        type: 💻 AUTO
+        ref: §3
+  AF-05:
+    file: AF_Partie-05_Modes_Maintenance_v2.0.md
+    functions: {}
+    validation_points:
+      TC-P05-001:
+        intention: Modes machine restreints (Manuel, N1, N2, SEMI_AUTO)
+        preuve: SyncEnable, Diving, Extraction hors E_Mode
+        type: 💻 AUTO
+        ref: §1-2
+      TC-P05-002:
+        intention: 'Mode nominal : joystick pilote M1+M2 conjointement'
+        preuve: M1 et M2 reçoivent la même intention
+        type: 💻 AUTO
+        ref: §3
+      TC-P05-003:
+        intention: 'Mode MAINT_N2 M1 seul : M2 bloqué, frein serré'
+        preuve: Safety reste active sur M2
+        type: 💻 AUTO
+        ref: §3
+      TC-P05-004:
+        intention: Refus mode SEMI_AUTO si codeurs invalides
+        preuve: Bascule refusée + message IHM
+        type: 💻 AUTO
+        ref: §5
+      TC-P05-005:
+        intention: Limite légale = blocage exploitation, pas safety
+        preuve: Pas de PowerCutOff sur simple limite légale
+        type: 💻 AUTO
+        ref: §4
+      TC-P05-006:
+        intention: Pas de redémarrage automatique après défaut
+        preuve: Reset + nouvel ordre explicite requis
+        type: 💻 AUTO
+        ref: §5
+  AF-06:
+    file: AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+    functions: {}
+    validation_points:
+      TC-P06-001:
+        intention: Aucune lecture d'E/S brute dans les FB métier
+        preuve: Consommateurs lisent des faits qualifiés
+        type: 💻 AUTO
+        ref: §2
+      TC-P06-002:
+        intention: Polarité normalisée une seule fois à l'acquisition
+        preuve: Zéro ré-inversion dans les FB métier
+        type: 💻 AUTO
+        ref: §2
+      TC-P06-003:
+        intention: Bascule réel/simulation centralisée
+        preuve: HwIn source unique par domaine
+        type: 💻 AUTO
+        ref: §2
+      TC-P06-004:
+        intention: Diag CANopen/EtherCAT publié en ligne
+        preuve: Statuts dispos pour Modes/Safety/IHM
+        type: 💻 AUTO
+        ref: §3
+      TC-P06-005:
+        intention: Noms des signaux de puissance validés
+        preuve: PowerKeepAlive_A/B_RQ, EmergencyChainClosed_DI
+        type: 🟢 SITE
+        ref: §4
+      TC-P06-006:
+        intention: Écriture des sorties physiques centralisée
+        preuve: PRG_OUTPUTS_LD seul producteur final
+        type: 💻 AUTO
+        ref: §5
+  AF-07:
+    file: AF_Partie-07_Interface_IHM_v2.1.md
+    functions: {}
+    validation_points:
+      TC-P07-001:
+        intention: IHM et PLC partagent les mêmes DUTs
+        preuve: Aucun miroir parallèle de variables
+        type: 💻 AUTO
+        ref: §1
+      TC-P07-002:
+        intention: Structures Cmd/State/Cfg par domaine
+        preuve: Convention respectée dans GVL_IHM
+        type: 💻 AUTO
+        ref: §3
+      TC-P07-003:
+        intention: IHM limitée aux variables de GVL_IHM
+        preuve: Zéro accès direct aux internes des FB
+        type: 💻 AUTO
+        ref: §1
+      TC-P07-004:
+        intention: Producteur unique par champ State
+        preuve: Un seul écrivain PLC par variable d'état
+        type: 💻 AUTO
+        ref: §1
+      TC-P07-005:
+        intention: Page Troubleshooting en lecture seule
+        preuve: Zéro écriture de commande/config/bypass
+        type: 💻 AUTO
+        ref: §5
+      TC-P07-006:
+        intention: Séparation messages action vs état
+        preuve: 2 familles distinctes, alarmes sur ErrorId
+        type: ⚡ SITE+AUTO
+        ref: §4
+      TC-P07-007:
+        intention: Warning auto-effaçable vs Fault sur Reset
+        preuve: Warning s'efface seul, Fault exige Ack
+        type: ⚡ SITE+AUTO
+        ref: §4
+      TC-P07-008:
+        intention: Carrousel d'alarmes un message à la fois, index n/N
+        preuve: Banner.AlarmBanner.Index/Count cohérents
+        type: 💻 AUTO
+        ref: §4bis
+      TC-P07-009:
+        intention: Aucun défaut actif → bandeau d'alarme vide
+        preuve: HasAlarm=FALSE, Text='', Index=0, Count=0
+        type: 💻 AUTO
+        ref: §4bis
+  AF-08:
+    file: AF_Partie-08_Fonction_Joystick_v2.1.md
+    functions:
+      F08.01:
+        fonction: Acquérir les axes bruts + bouton
+        description: Lit RawX/RawY/RawButton depuis le bus CANopen (ou l'image simulée)
+        realisee_par: FB_Joystick
+        criticite: C2
+        tc_couvrants: []
+        statut: ❌
+      F08.02:
+        fonction: Mettre à l'échelle proportionnellement
+        description: Convertit le compte brut ADC en % signé ±100, avec deadband centrée
+          sur le neutre persistant
+        realisee_par: FB_AxisScale
+        criticite: C2
+        tc_couvrants:
+        - TC-P08-014
+        statut: ✅
+      F08.03:
+        fonction: Armer l'homme-mort par maintien
+        description: Appui continu DeadmanArmHoldTime (100ms) et ArmingPermit=TRUE
+          au terme du maintien
+        realisee_par: FB_Joystick
+        criticite: C4
+        tc_couvrants:
+        - TC-P08-002
+        statut: ✅
+      F08.04:
+        fonction: Désarmer sur neutre prolongé
+        description: Neutre tenu NeutralHoldTime (100ms), applicable seulement après
+          DeadmanArmGraceTime (3s) écoulées depuis l'armement
+        realisee_par: FB_Joystick
+        criticite: C4
+        tc_couvrants:
+        - TC-P08-004
+        statut: ✅
+      F08.05:
+        fonction: Désarmer sur perte de permission
+        description: ArmingPermit=FALSE ⇒ désarmement immédiat (niveau, pas front),
+          axes à 0
+        realisee_par: FB_Joystick
+        criticite: C4
+        tc_couvrants:
+        - TC-P08-005
+        - TC-P08-011
+        - TC-P08-012
+        statut: ⚠️ *(logique FB testée ✅, mais producteur ArmingPermit câblé en dur
+          TRUE en production — trou réel, voir §8 alerte 1 et Q1 QUESTIONS_OUVERTES_PRG02_v0.1.md)*
+      F08.06:
+        fonction: Détecter un défaut capteur hors plage
+        description: RawX/RawY hors plage ⇒ arrêt (SpeedRef=0) + ErrorId bit1 (Warning)
+          sur les 2 axes
+        realisee_par: FB_Joystick
+        criticite: C3
+        tc_couvrants:
+        - TC-P08-007
+        statut: ✅
+      F08.07:
+        fonction: Calibrer le neutre capteur
+        description: Bouton calibration mémorise le neutre si axes en zone [2000;8000],
+          persistant au redémarrage, accessible depuis l'écran HMI
+        realisee_par: FB_Joystick
+        criticite: C2
+        tc_couvrants:
+        - TC-P08-006
+        - TC-P08-009
+        - TC-P08-010
+        statut: ⚠️ *(TC-P08-009/010 = type SITE, non exécutés automatiquement)*
+      F08.08:
+        fonction: Interdire tout mouvement sans armement homme-mort
+        description: Gate combinant AxisCmd*.StartStop AND DeadmanArmed avant d'autoriser
+          une commande treuil/translation
+        realisee_par: PRG_04_Treuils_Benne (gate, pas un FB)
+        criticite: C4
+        tc_couvrants:
+        - TC-P08-008
+        statut: ✅ *(vérifié par G375_check_deadman_arming_gate.py, pas TEST_AUTO_CI)*
+    validation_points:
+      TC-P08-001:
+        intention: Perte contacteur / CAN ➔ désarmer, annuler axes, et lever Error
+          (ErrorId bit2, auto-effacé au retour)
+        preuve: SpeedRef=0, DeadmanArmed=FALSE, Error=TRUE
+        type: 💻 AUTO
+        ref: §3
+      TC-P08-002:
+        intention: Armement homme-mort par maintien DeadmanArmHoldTime (100ms) ET
+          ArmingPermit=TRUE ; relâchement avant la fin du maintien annule la tentative
+          (pas d'armement différé)
+        preuve: Tenu 100ms + permis ➔ armé / relâché avant ➔ DeadmanArmed reste FALSE,
+          nouvel appui exigé
+        type: 💻 AUTO
+        ref: §4
+      TC-P08-003:
+        intention: '⛔ RETIRÉ (v2.1) — testait DeadmanReconfEnable/DeadmanRearmTimeout
+          (reconfirmation périodique 10s), ports supprimés du FB. La sémantique «
+          bouton relâché en mouvement » n''existe plus : le FB ne surveille plus le
+          bouton après armement, seul le neutre prolongé désarme (§4). ID non réattribué
+          (immutabilité CODE_QUALITY_STANDARDS.md §0).'
+        preuve: —
+        type: —
+        ref: §4
+      TC-P08-004:
+        intention: Neutre tenu NeutralHoldTime (100ms) après le délai de grâce DeadmanArmGraceTime
+          (3s) désarme ; neutre bref ou pendant la grâce conserve l'armement
+        preuve: Armement conservé / perdu
+        type: 💻 AUTO
+        ref: §4
+      TC-P08-005:
+        intention: Retrait de ArmingPermit (niveau, pas front) désarme immédiatement
+          — le FB ne connaît plus Mode/BenneBusy en interne, c'est l'appelant qui
+          pilote ArmingPermit
+        preuve: DeadmanArmed=FALSE dès ArmingPermit=FALSE
+        type: 💻 AUTO
+        ref: §4
+      TC-P08-006:
+        intention: Calibration hors [2000;8000] ➔ alarme ErrorId bit0 (Fault, à acquitter)
+        preuve: Bit0 actif, Reset sur cause disparue
+        type: 💻 AUTO
+        ref: §5
+      TC-P08-007:
+        intention: SpeedRef signée [-100;+100] ; si RawX/RawY sort de la plage capteur
+          (défaut/fil coupé) ⇒ arrêt (SpeedRef=0) + ErrorId bit1 (Warning), pas de
+          commande à pleine vitesse (voir exemple §5bis)
+        preuve: SpeedRef=0, ErrorId bit1 actif
+        type: 💻 AUTO
+        ref: §1, §2, §5bis
+      TC-P08-008:
+        intention: Winch, Translation et Cycle exigent DeadmanArmed
+        preuve: ⚠️ gate câblé dans le PRG de collage, pas dans un FB — vérifié par
+          G375 (note ↓), pas par test_fb_joystick.st
+        type: 🔒 GATE
+        ref: §6
+      TC-P08-011:
+        intention: Retrait d'ArmingPermit (ex. fin de cycle benne) pendant un geste
+          armé désarme immédiatement, sans attendre le neutre
+        preuve: DeadmanArmed=FALSE dès ArmingPermit=FALSE, même bouton relâché
+        type: 💻 AUTO
+        ref: §4
+      TC-P08-012:
+        intention: Maintien d'ArmingPermit=TRUE (ex. exception CLOSING Extraction)
+          conserve l'armement même bouton relâché
+        preuve: DeadmanArmed reste TRUE tant que ArmingPermit=TRUE
+        type: 💻 AUTO
+        ref: §4
+      TC-P08-013:
+        intention: 'ArmingPermitDenied (sortie diagnostic) : TRUE pendant tout appui
+          bouton alors que ArmingPermit=FALSE, FALSE sinon'
+        preuve: ArmingPermitDenied = RawButton AND NOT ArmingPermit
+        type: ⬜ GAP
+        ref: §4
+      TC-P08-014:
+        intention: Mise à l'échelle proportionnelle sur valeurs intermédiaires (RawX=9000→80%,
+          RawY=300→-94%), pas seulement correcte aux bornes 0/10000/neutre
+        preuve: SpeedRef exact ±0.01%, Direction cohérent
+        type: 💻 AUTO
+        ref: §1, §2
+  AF-09:
+    file: AF_Partie-09_Fonction_Encoder_v2.1.md
+    functions: {}
+    validation_points:
+      TC-P09-001:
+        intention: Preset PresetTriggerCmd=2 sous tolérance 10 pts et timeout 2s
+        type: ⚡ AUTO_PLC
+      TC-P09-002:
+        intention: RawPos gelé si EncoderAvailable=FALSE (perte bus EtherCAT)
+        type: ⚡ AUTO_PLC
+      TC-P09-003:
+        intention: Homing nominal refusé sans capteur haut (hors bypass) ➔ Bit4
+        type: ⚡ AUTO_PLC
+      TC-P09-004:
+        intention: Homing refusé si arrêt non confirmé (contacteurs+frein) ➔ Bit2
+        type: ⚡ AUTO_PLC
+      TC-P09-005:
+        intention: Homing unitaire refusé hors MAINT_N2 ou treuil erroné ➔ Bit0/Bit1
+        type: 💻 AUTO
+      TC-P09-006:
+        intention: Cible hors [-99;+99] m rejetée sans écriture preset
+        type: 💻 AUTO
+      TC-P09-007:
+        intention: HomingRefRaw conforme ; CablePosM = cible post-Done
+        type: ⚡ AUTO_PLC
+      TC-P09-008:
+        intention: Écart au reboot ➔ HomingSuspect, Homed masqué
+        type: ⚡ AUTO_PLC
+      TC-P09-009:
+        intention: BtnConfirmCoherence lève le doute sans réécrire ref
+        type: ⚡ AUTO_PLC
+      TC-P09-010:
+        intention: Bornage [-99;+99] m dépassé ➔ EncoderIncoherent = TRUE + CablePosMSafe
+          suit la mesure réelle (non figée)
+        type: 💻 AUTO
+      TC-P09-011:
+        intention: EncoderFaultPresent = TRUE interdit la bascule en mode SEMI_AUTO
+        type: ⚡ AUTO_PLC
+      TC-P09-012:
+        intention: Méca D (Capteur haut sans arrêt) ➔ SafeStop + PowerCutOff après
+          3s
+        type: 🟢 SITE
+      TC-P09-013:
+        intention: Conversion linéaire exacte PointsPerRev ➔ mètres câble selon ratio
+          tambour
+        type: 💻 AUTO
+      TC-P09-014:
+        intention: Calcul vitesse m/s sur fenêtre fixe 50 ms sans filtre passe-bas
+          PT1 parasite
+        type: 💻 AUTO
+      TC-P09-015:
+        intention: Détection de variation de vitesse brusque > seuil paramétrable
+          avec tempo de confirmation
+        type: 💻 AUTO
+  AF-10:
+    file: AF_Partie-10_Fonction_Winch_v2.0.md
+    functions: {}
+    validation_points:
+      TC-P10-023:
+        intention: Fermeture seulement si MotionDirection=1 ET MotionRequestActive
+        type: 💻 AUTO
+      TC-P10-024:
+        intention: Ouverture seulement si MotionDirection=-1 ET MotionRequestActive
+        type: 💻 AUTO
+      TC-P10-025:
+        intention: Demande refusée si M1_Busy OR M2_Busy à l'entrée
+        type: 💻 AUTO
+      TC-P10-026:
+        intention: Glissement M1>1.0m pendant BUSY ➔ bit4 + M1SlipDetected + coupe
+          M2
+        type: 💻 AUTO
+      TC-P10-027:
+        intention: M1SlipDetected force SafeStop sur M1 côté Treuils
+        type: 💻 AUTO
+      TC-P10-028:
+        intention: 'Couche 2 (Méca C) : dérive M1>2.0m ➔ PowerCutOff'
+        type: 💻 AUTO
+      TC-P10-029:
+        intention: Recul (sens inverse) borné à la position de départ, jamais au-delà
+        type: 💻 AUTO
+      TC-P10-030:
+        intention: 'ConfirmOpen/ClosePosition : effet seulement MAINT_N1/N2 arrêtés'
+        type: 💻 AUTO
+      TC-P10-031:
+        intention: Codeur(s) non référencé(s) ➔ bit3 permanent, indépendant de Reset
+        type: 💻 AUTO
+      TC-P10-032:
+        intention: FB_ExtractionSequence.Busy préserve l'armement joystick en fin
+          benne
+        type: 💻 AUTO
+      TC-P10-033:
+        intention: Butée haute M2 décalée de OffsetCloseM si fermé/en fermeture
+        type: 💻 AUTO
+      TC-P10-034:
+        intention: 'Terrain : cinématique réelle en charge, amplitude offset validée'
+        type: 🟢 SITE
+      TC-P10-001:
+        intention: 'Méca A (bit7) : dérive>2m ou v>0.02m/s arrêt ➔ SafeStop+PowerCutOff'
+        type: 💻 AUTO
+      TC-P10-002:
+        intention: 'Méca B (bit8) : non-confirmation arrêt 3s ➔ SafeStop+PowerCutOff'
+        type: 💻 AUTO
+      TC-P10-003:
+        intention: 'Méca C (bit9) : dérive M1>2m en maintien M1 ➔ SafeStop+PowerCutOff'
+        type: 💻 AUTO
+      TC-P10-004:
+        intention: 'Méca D (bit11) : capteur haut sans arrêt 3s ➔ SafeStop+PowerCutOff'
+        type: 💻 AUTO
+      TC-P10-005:
+        intention: 'Méca E bit12 : écart>2m ➔ SafeStop seul (pas PowerCutOff)'
+        type: 💻 AUTO
+      TC-P10-006:
+        intention: 'Méca E bit13 : bit12 non confirmé 3s ➔ escalade PowerCutOff'
+        type: 💻 AUTO
+      TC-P10-007:
+        intention: 'Méca F (bit14) : sens mesuré opposé au sens commandé 500ms ➔ SafeStop'
+        type: 💻 AUTO
+      TC-P10-008:
+        intention: 'Méca G (bit15) : vitesse nulle malgré commande 3s ➔ SafeStop seul'
+        type: 💻 AUTO
+      TC-P10-009:
+        intention: PowerCutOff = exactement bits 2,7,8,9,10,11,13 (masque 16#2F84)
+        type: 💻 AUTO
+      TC-P10-010:
+        intention: SafeStop exclut bit3 (mou câble) si SyncEnable=FALSE
+        type: 💻 AUTO
+      TC-P10-011:
+        intention: Interlock sens & temporisations d'inversion / redémarrage 1s
+        type: 💻 AUTO
+      TC-P10-017:
+        intention: Config palier invalide (FB_SpeedStep) ➔ palier 0, sorties sûres
+        type: 💻 AUTO
+      TC-P10-018:
+        intention: 'StuckClosed : contacteurs off non confirmés 500ms ➔ bit1'
+        type: 💻 AUTO
+      TC-P10-019:
+        intention: 'Ordre MainTask : Safety ➔ WinchControl ➔ Outputs_LD'
+        type: ⚡ SITE+AUTO
+      TC-P10-012:
+        intention: Watchdog frein barrière 500ms sans confirmation ➔ FAULT + Inhibit
+        type: ⚡ AUTO_PLC
+      TC-P10-013:
+        intention: 'Anti-redémarrage : Cause + Reset + Neutre ➔ réautorisation'
+        type: ⚡ AUTO_PLC
+      TC-P10-020:
+        intention: Watchdog frein réel terrain (temps, contacteur/bobine)
+        type: 🟢 SITE
+      TC-P10-021:
+        intention: 'Temps mort même sens : 1s après arrêt ➔ nouvelle demande'
+        type: 💻 AUTO
+      TC-P10-022:
+        intention: 'Temps mort inversion : 1s après arrêt + inversion sens'
+        type: 💻 AUTO
+      TC-P10-014:
+        intention: Sync bit0 (écart > 0.10 m, instantané + latch, sans timer) ➔ SyncWarn
+          IHM seul
+        type: 💻 AUTO
+      TC-P10-015:
+        intention: Sync bit1 (incohérence commande, 500 ms) ➔ SafeStop fast
+        type: 💻 AUTO
+      TC-P10-016:
+        intention: 'Couplage croisé : SyncActive ➔ arrêt d''un treuil coupe l''autre'
+        type: 💻 AUTO
+  AF-11:
+    file: AF_Partie-11_Fonction_Translation_v2.2.md
+    functions: {}
+    validation_points:
+      TC-P11-002:
+        intention: Mot incohérent ➔ Incoherent=TRUE ➔ bit7 Safety ➔ SafeStop+PowerCutOff
+        type: ⚡ AUTO_PLC
+      TC-P11-010:
+        intention: 'Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff'
+        type: ⚡ AUTO_PLC
+      TC-P11-011:
+        intention: 'Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff'
+        type: ⚡ AUTO_PLC
+      TC-P11-014:
+        intention: BypassGlobal efface ErrorId, coupe TONs, Reset fonctionnel
+        type: ⚡ AUTO_PLC
+      TC-P11-001:
+        intention: 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ Incoherent
+        type: 💻 AUTO
+      TC-P11-003:
+        intention: Enable=FALSE coupe tout indépendamment de SafeStop/StartStop
+        type: ⚡ AUTO_PLC
+      TC-P11-004:
+        intention: Ralentissement PV actif si Direction=1 (Trémie) ET SlowdownSensor
+        type: ⚡ AUTO_PLC
+      TC-P11-005:
+        intention: 'Interlock sens : bascule directe si vitesse=0, sinon délai 200ms'
+        type: ⚡ AUTO_PLC
+      TC-P11-013:
+        intention: Boutons IHM en MAINT exigent DeadmanArmed=TRUE
+        type: ⚡ AUTO_PLC
+      TC-P11-006:
+        intention: Watchdog frein 500ms sans confirmation ➔ FAULT + Inhibit
+        type: ⚡ AUTO_PLC
+      TC-P11-007:
+        intention: 'Réautorisation post-timeout : Cause + Reset + Mot 0 + Nouvelle
+          demande'
+        type: ⚡ AUTO_PLC
+      TC-P11-008:
+        intention: 'Gate final : Mot/fréquence nuls sans confirmation frein simultanée'
+        type: ⚡ AUTO_PLC
+      TC-P11-009:
+        intention: Mot 7 (reset AC600) autorisé pendant RestartInhibit (sans levée
+          inhibition)
+        type: ⚡ AUTO_PLC
+  AF-12:
+    file: AF_Partie-12_Fonction_Diagnostic_v1.0.md
+    functions: {}
+    validation_points: {}
+  AF-13:
+    file: AF_Partie-13_Fonction_Simulation_v2.3.md
+    functions: {}
+    validation_points:
+      TC-P13-030:
+        intention: RelayFwd/RelayRev font compter RawPos de SpeedRefPct * 0.1 * SpeedScaleFactor
+          par scan
+        type: 💻 AUTO
+      TC-P13-031:
+        intention: PresetCmd=TRUE charge PresetValue directement (priorité sur Fwd/Rev)
+        type: 💻 AUTO
+      TC-P13-032:
+        intention: RawPos ne descend jamais sous 0 (borne explicite en soustraction)
+        type: 💻 AUTO
+      TC-P13-033:
+        intention: RawPos survit à un reset froid (via VAR_IN_OUT référençant GVL_PERSISTENT)
+        type: 👁️ MANUEL
+      TC-P13-050:
+        intention: Initialise au neutre (NeutralRaw) au premier cycle uniquement
+        type: 💻 AUTO
+      TC-P13-051:
+        intention: RawX/RawY/RawButton restent forçables librement en instance CODESYS
+          ensuite
+        type: 👁️ MANUEL
+      TC-P13-052:
+        intention: Le homme-mort réel de FB_Joystick reste actif — un RawButton non
+          forcé bloque toujours l'armement
+        type: ⚡ SITE+AUTO
+      TC-P13-020:
+        intention: SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop
+          — un seul canal FALSE ouvre la boucle
+        type: 💻 AUTO
+      TC-P13-021:
+        intention: SimContactorOk s'auto-maintient (latch) sur EmergencyArming, retombe
+          immédiatement si SimChainOk repasse FALSE
+        type: 💻 AUTO
+      TC-P13-022:
+        intention: Enable=FALSE neutralise tout (SimChainOk/SimContactorOk/ContactorLatch
+          à FALSE)
+        type: 💻 AUTO
+      TC-P13-023:
+        intention: 🆕 Un défaut AU réel latché (RedundancyTestFailedCause/EmergencyArmingFailedCause
+          dans FB_Safety_EmergencyManagementLogic) survit à un cycle Reset/Restart
+          de ce modèle simulé — voir §4
+        type: 👁️ MANUEL
+      TC-P13-040:
+        intention: Ne publie que les 6 mots thermomètre valides de FB_Translation_PositionDecoder
+          (11111→00000)
+        type: 💻 AUTO
+      TC-P13-041:
+        intention: Direction=+1 progresse vers Trémie, -1 vers Maintenance, 0 maintient
+          la position
+        type: 💻 AUTO
+      TC-P13-042:
+        intention: Position bornée [Trémie, Maintenance] — jamais de dépassement
+        type: 💻 AUTO
+      TC-P13-043:
+        intention: Enable=FALSE réinitialise sur la Trémie (0 m) — état de départ
+          propre (REX 2026-08-21, était P2)
+        type: 💻 AUTO
+      TC-P13-010:
+        intention: Enable=FALSE neutralise tout le banc en un seul RETURN (aucun sous-modèle
+          actif)
+        type: 💻 AUTO
+      TC-P13-011:
+        intention: 0 lecture de GVL_* en interne — toutes les entrées passées en paramètres
+          par l'appelant (PRG_02_Acquisition)
+        type: 👁️ MANUEL
+      TC-P13-012:
+        intention: M1_BrakeIsOpen_DI := M1_BrakeCmd (jamais de NOT) — polarité maintien
+          (P1 Lot L6)
+        type: 💻 AUTO
+      TC-P13-013:
+        intention: 🆕 M3_StatusWordSim bit0 retombe à l'arrêt (Direction=0) — ne déclenche
+          plus FB_Safety_Translation Méca B en continu
+        type: 💻 AUTO
+  AF-14:
+    file: AF_Partie-14_Fonction_Troubleshooting_v1.2.md
+    functions: {}
+    validation_points: {}

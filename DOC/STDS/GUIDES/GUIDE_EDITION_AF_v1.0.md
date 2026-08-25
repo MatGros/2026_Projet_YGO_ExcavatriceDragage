@@ -5,14 +5,24 @@
 
 ---
 
-## 🎯 1. Raison d'être & Responsabilité Unique (En-tête obligatoire)
+## 📑 0. Sommaire (obligatoire)
+
+Toute fiche AF **commence** par un sommaire (liens vers les `##`/`###` du document). Il est
+**obligatoire** dès que la fiche dépasse 2 sections, et doit être **maintenu à jour** à chaque
+ajout/retrait de section — un sommaire périmé est pire que pas de sommaire. Les titres de
+paragraphe nomment la fonction traitée en clair (ex. `## 4. Homme-mort`, pas `## 4. Section
+technique`) : le lecteur doit retrouver une fonction depuis le sommaire sans ouvrir le corps.
+
+---
+
+## 🎯 1. Rôle et périmètre (en-tête obligatoire)
 
 Toute fiche AF doit commencer par un paragraphe **court, clair et synthétique (3-4 lignes max)** qui explique pourquoi ce document existe :
 
 ```markdown
 # AF_Partie-XX : [Nom du Domaine / Fonction]
 
-## 🎯 Raison d'être & Responsabilité Unique
+## 🎯 Rôle et périmètre
 - **Problème résolu** : [Expliquer le besoin physique/opérateur résolu par la fonction]
 - **Périmètre strict** : [Ce que la fonction fait / Ce qu'elle ne fait absolument pas]
 - **Type de composant** : [Producteur d'intention / Brique E/S / Commande Mouvement / Safety]
@@ -22,16 +32,62 @@ Toute fiche AF doit commencer par un paragraphe **court, clair et synthétique (
 
 ## 🛡️ 2. Philosophie des Modes & Sécurités Machine (ISO 13849)
 
-### Règle d'or du Mode `MAINT_N2` (Maintenance Étendue) :
-- **Pas de déverrouillage automatique** : Le simple basculement en mode `MAINT_N2` **ne désactive aucune sécurité par défaut**.
-- En `MAINT_N2`, l'automate se comporte exactement comme en `MAINT_N1` (toutes les sécurités, fins de course et anti-télescopages restent **100% actifs**).
-- **Dérogation consciente & individuelle** : Le bypass d'une sécurité spécifique (ex: dépassement FDC, désynchronisation M1/M2) nécessite **deux conditions cumulees** :
-  1. Être en mode `MAINT_N2`.
+> ⚠️ **Rester générique ici** : ce guide est un standard de rédaction, pas une spec projet. Ne pas
+> y figer un nom de mode/variable propre à un projet donné (ex. un identifiant `MAINT_Nx` précis) —
+> le nommage réel varie d'un projet à l'autre et vit dans le `NAMING_CONVENTION.md`/`AGENTS.md` du
+> projet concerné. Ce guide décrit le **principe**, chaque AF instancie avec les noms réels.
+
+### Règle d'or d'un mode de maintenance étendue (dérogation supervisée) :
+- **Pas de déverrouillage automatique** : le simple basculement dans ce mode **ne désactive aucune sécurité par défaut**.
+- Dans ce mode, l'automate se comporte comme en maintenance standard (toutes les sécurités, fins de course et anti-télescopages restent **100% actifs**).
+- **Dérogation consciente & individuelle** : le bypass d'une sécurité spécifique (ex: dépassement FDC, désynchronisation d'axes) nécessite **deux conditions cumulées** :
+  1. Être dans le mode de maintenance étendue du projet.
   2. Une **action volontaire IHM spécifique** (appui bouton dédié/maintien), journalisée et affichée à l'écran.
 
 ---
 
-## 🧪 3. Points de Validation (`TC-Pxx-nnn`)
+## 🎯 2bis. Table des fonctions (avant les Points de Validation)
+
+> 📌 Catalogue **exhaustif** des fonctions du domaine, **placé avant** la section Table des
+> Points de Validation (§3) : on liste d'abord ce que la machine doit faire, ensuite ce qui le prouve.
+> Convention détaillée : voir le document `DESIGN_TABLE_FONCTIONS_AF` (actuellement archivé sous
+> `DOC/WFLOW/AUDITS/PRG02_20260824/`, à terme dans les templates du workflow — dossier temporaire,
+> ne pas figer de lien versionné dessus). Outillage d'extraction : script
+> `extract_functions_matrix.py` (`TOOLS/AGENT_WORKFLOW/scripts/`) → matrice consolidée
+> `af_traceability_matrix.yaml` (`TOOLS/AGENT_WORKFLOW/config/`).
+
+| Colonne | Contenu |
+|---|---|
+| `ID` | `F<NN>.<seq>` — `NN` = numéro de Partie AF, `seq` = compteur plat `01`, `02`… |
+| `Fonction` | Nom court, verbe d'action |
+| `Description` | 1-3 phrases complètes (toutes les conditions pertinentes citées) |
+| `Réalisée par` | `FB` / `PRG` (câblage de collage) / `gate` (script de vérification) |
+| `Criticité` | `C0`-`C4`, au cas par cas — **jamais héritée mécaniquement** du FB porteur (voir échelle ci-dessous) |
+| `TC couvrants` | `TC-Pxx-nnn` associés — un TC n'apparaît que sur une seule fonction sauf note explicite |
+| `Statut` | ✅/⚠️/❌ — manuel tant que l'outillage d'extraction n'est pas exécuté, sinon dérivé |
+
+### 🎨 Échelle de criticité (identifier vite le risque machine/humain)
+
+Même échelle et mêmes couleurs que `TASKS.yaml` / `TASK_VIEWER.html`, pour repérer d'un coup
+d'œil les fonctions basiques des fonctions critiques ou de sécurité :
+
+| Criticité | Sens | Repère couleur |
+|---|---|---|
+| 🔴 `C4` | Sécurité critique — AU, `PowerCutOff`, redondance, risque machine/humain direct | rouge |
+| 🟠 `C3` | Majeur — mouvement, interlock, anti-collision | orange |
+| 🔵 `C2` | Nominal métier — logique de commande sans risque direct | cyan |
+| ⚪ `C1` | Standards / doc non-safety | gris |
+| ⚪ `C0` | Format, typo | gris |
+
+> Une fonction héritée d'un FB `C4` n'est pas automatiquement `C4` : une fonction de lecture pure
+> (ex. acquisition brute) reste `C2` même portée par un FB par ailleurs safety — la criticité
+> qualifie **l'effet de la fonction**, pas son porteur.
+
+Exemple de référence : document `AF_Partie-08_Fonction_Joystick` §1 (8 fonctions, version active courante).
+
+---
+
+## 🧪 3. Table des points de validation (Cas de Test — TC)
 
 ### Règle des Identifiants (Immuabilité & Synthèse) :
 1. **Numérotation Immuable** : `TC-P<Partie>-<Numéro>` (ex: `TC-P11-010`, `TC-P11-020`).
@@ -116,5 +172,23 @@ Pour assurer la lisibilité visuelle et supprimer tout risque de dérive entre l
 
 ## 🧱 4. Structure d'un Dossier AF
 
-- **Chapô principal (`AF_Partie-XX_*.md`)** : Porte le résumé machine, l'intégration programme et le **Catalogue Synthétique des TC Macro**.
-- **Fiches FB sous-dossier (`AF_Partie-XX_*/FB_*.md`)** : Si un détail technique est nécessaire, il décline sous forme d'étapes `TC-Pxx-010.1`, `TC-Pxx-010.2` sans inventer de nouveaux identifiants racine.
+### Trame canonique d'une fiche `AF_Partie-XX_*.md`
+
+Ordre attendu (adapter le libellé au domaine, garder l'ordre) :
+
+1. `📑 Sommaire` (§0)
+2. `🎯 Rôle et périmètre` (§1, inclut la `Table des fonctions` §2bis)
+3. `🧪 Table des points de validation (Cas de Test — TC)` (§3)
+4. `Pipeline et composition` — schéma/diagramme du flux de données et des FB traversés (§3bis)
+5. `Interface publique` — **table des entrées** et **table des sorties** (nom, type, unité, rôle)
+6. Paragraphes de détail par fonction — libre, un paragraphe par comportement notable (homme-mort, calibration, défauts, intégration programme, IHM, alertes...)
+7. `Documents liés` — table des documents référencés ou référençant cette fiche. **Obligatoire même vide** : garder le paragraphe et écrire « aucun » plutôt que de le supprimer.
+
+### Répartition chapô / sous-fiches (anti-duplication)
+
+- **Chapô principal (`AF_Partie-XX_*.md`)** : porte le résumé machine, l'intégration programme et le **Catalogue Synthétique des TC Macro**.
+- **Fiches FB sous-dossier (`AF_Partie-XX_*/FB_*.md`)** : si un détail technique est nécessaire, il décline sous forme d'étapes `TC-Pxx-010.1`, `TC-Pxx-010.2` sans inventer de nouveaux identifiants racine.
+- ⛔ **Jamais les deux à la fois** : soit le détail complet d'une fonction vit **uniquement** dans le
+  chapô (pas de sous-fiche FB pour ce domaine), soit le chapô ne garde qu'un **squelette** qui
+  renvoie vers la fiche FB détaillée. Dupliquer le détail des deux côtés rend les mises à jour
+  ingérables — une info corrigée d'un côté et oubliée de l'autre devient une source d'erreur.

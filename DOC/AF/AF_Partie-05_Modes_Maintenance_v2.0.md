@@ -16,7 +16,7 @@
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| <nobr><code>TC-P05-001</code></nobr> | Modes machine restreints (Manuel, N1, N2, SEMI_AUTO) | `SyncEnable`, Diving, Extraction hors `E_Mode` | `💻 AUTO` | <small>§1-2</small> |
+| <nobr><code>TC-P05-001</code></nobr> | Modes machine restreints (`DISABLE`, `MAINT_N1`, `MAINT_N2`, `SEMI_AUTO`) | `SyncEnable`, Diving, Extraction hors `E_Mode` | `💻 AUTO` | <small>§1-2</small> |
 | <nobr><code>TC-P05-002</code></nobr> | Mode nominal : joystick pilote M1+M2 conjointement | M1 et M2 reçoivent la même intention | `💻 AUTO` | <small>§3</small> |
 | <nobr><code>TC-P05-003</code></nobr> | Mode MAINT_N2 M1 seul : M2 bloqué, frein serré | Safety reste active sur M2 | `💻 AUTO` | <small>§3</small> |
 | <nobr><code>TC-P05-004</code></nobr> | Refus mode SEMI_AUTO si codeurs invalides | Bascule refusée + message IHM | `💻 AUTO` | <small>§5</small> |
@@ -27,12 +27,18 @@
 
 ## 🎚️ 1. Modes machine
 
+> ⚠️ **« Manuel » n'est pas une valeur `E_Mode`** : `E_Mode` (`CODE/F_MODES/E_Mode.st`) ne compte
+> que 4 valeurs — `DISABLE`, `MAINT_N1`, `MAINT_N2`, `SEMI_AUTO`. « Manuel » est un terme
+> descriptif du **pilotage direct** offert par `MAINT_N1`/`MAINT_N2` (voir commentaires du code
+> source : « Manuel Niveau 1 », « Manuel Niveau 2 »), pas un 5e mode distinct — corrigé le
+> 2026-08-25, la table listait auparavant « Manuel » comme une entrée séparée.
+
 | Mode | Role |
 |---|---|
-| 🕹️ Manuel | Pilotage direct sous securites actives. |
-| 🔧 MAINT_N1 | Maintenance encadree, securites conservees. |
-| 🛠️ MAINT_N2 | Maintenance etendue, degradations conscientes et visibles. |
-| 🔄 SEMI_AUTO | Cycle sequencer ; mouvements toujours conditionnes par l'operateur. |
+| ⛔ DISABLE | Désactivé / veille de sécurité, sorties bloquées. |
+| 🔧 MAINT_N1 | Manuel niveau 1 : pilotage unitaire, toutes sécurités actives. |
+| 🛠️ MAINT_N2 | Manuel niveau 2 : pilotage dégradé, droits étendus et bypasses conscients autorisés. |
+| 🔄 SEMI_AUTO | Cycle séquencé ; mouvements toujours conditionnés par l'opérateur. |
 
 `FB_Modes` / `PRG_MODES_CFC` (POU ST actuel ; cible `PRG_03_Modes_Cycle_CFC`, rang 03) arbitre :
 - le mode actif ;
