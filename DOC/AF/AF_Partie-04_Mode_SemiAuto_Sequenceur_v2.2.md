@@ -72,7 +72,7 @@ Ces briques ne **pas** des modes machine.
 ### 🌊 `FB_DiveSearch` — Diving / plongée Kobold
 
 - Descend avec intention opérateur maintenue.
-- **Sémantique et Séquence de détection Kobold (`M1_M2_KoboldContactFond_DI`)** :
+- **Sémantique et Séquence de détection Kobold (`M1_M2_KoboldBottomTouch_DI`)** :
   1. **Prêt à plonger (Hors de l'eau, ex. $\ge +1,0$ m)** : Capteur = `0`.
   2. **Immersion (Contact surface de l'eau, fenêtre $[-0,5\text{ m} ; +0,5\text{ m}]$)** : Front montant $\rightarrow$ Capteur passe à **`1`**.
   3. **Plongée dans l'eau libre** : Capteur retombe à **`0`**.
@@ -249,6 +249,7 @@ Le format exact des messages est porte par la Partie 07.
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.2 (fix) | 2026-08-26 | Revue de cohérence croisée AF-01→14 (sous-agent) : nom de signal `M1_M2_KoboldContactFond_DI` (périmé) corrigé en `M1_M2_KoboldBottomTouch_DI` (déjà corrigé côté AF-06 le même jour, pas répercuté ici) — §3 et TBD |
 | v2.2 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : correction du titre (indiquait à tort "v3.0", jamais de fichier v3.0 réel), Sommaire lié, section `🎯 Rôle et périmètre` explicite, Suivi historique ajouté, renumérotation complète (chapô + sous-sections `4.1`-`4.6` + réfs `§N` cascadées). Correctifs de fond (review sous-agent expert automatisme, vérifiés contre `FB_Cycle.st`/`FB_WinchSync.st`/`FB_SyncDeviation.st`/`FB_DiveSearch.st`) : §4.5 nomme désormais l'entrée réelle `CycleMotionPermit` ; §5 entièrement réécrite — l'ancienne « phase de rattrapage dédiée » n'existe pas dans le code (seulement détection de seuils), les 3 mécanismes réels (écart position continu, contrôle X7_CTRL_ASCENT, écart vitesse X7) et leurs seuils codés sont désormais nommés, le TBD restreint à ce qui est réellement ouvert (manœuvre de rattrapage, axe prioritaire) ; ajout TBD timeout Kobold (`FB_DiveSearch` n'a aucun timer, attente indéfinie si le front d'immersion n'arrive jamais) |
 | v2.1 | — | Version precedente (voir `ARCHIVES/Doc/`) — refonte séquenceur `GUIDE_SEQUENCEUR_v1.2.md` |
 
@@ -259,7 +260,7 @@ Le format exact des messages est porte par la Partie 07.
 - Seuils Kobold eau/fond et distances de contrôle.
 - Cibles de translation et paramètres d'approche.
 - **Timeout séquence Kobold** (revue 2026-08-26) : `FB_DiveSearch.st` ne porte aucun `TON`/timer —
-  si le front d'immersion (capteur `M1_M2_KoboldContactFond_DI`) n'arrive jamais, le FB attend
+  si le front d'immersion (capteur `M1_M2_KoboldBottomTouch_DI`) n'arrive jamais, le FB attend
   indéfiniment (défaut uniquement par violation de séquence, jamais par expiration de temps).
   À trancher : timeout explicite à ajouter, ou attente indéfinie réellement voulue (couvert par
   ailleurs par le tempo max d'étape générique §4.5 si `CycleMotionPermit=TRUE`) ?
