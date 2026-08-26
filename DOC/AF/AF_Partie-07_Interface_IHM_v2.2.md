@@ -97,7 +97,7 @@ Safety → diagnostics safety publies, si separes
 | 🎮 `Cmd` | Demandes operateur. |
 | 🚦 `State` | Etats, mesures, diagnostics produits par le domaine. |
 | 🔧 `Cfg` | Reglages. Bornage PLC obligatoire. |
-| 🛠️ `Bypass` | Degradations de maintenance visibles. |
+| 🛠️ `Bypass` | Dégradations de maintenance visibles (`Global`, `BusCanOpen`, `BusEthercat`, `InputModules`, `Joystick`, `EncoderM1/M2`, `VariateurM3`). |
 | 🧪 `Test` | Stimuli de banc, jamais en production. |
 
 Le mapping, la persistance et d'eventuels agregats restent **TBD**. Ils ne justifient pas automatiquement un programme CFC.

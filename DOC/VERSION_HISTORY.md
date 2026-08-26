@@ -4,6 +4,13 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `T163_ROOT_CAUSE_MASKING_ET_BYPASS_GRANULAIRE` — 2026-08-27 — qualification E/S, masquage cascade & bypass granulaires
+- **`FB_Hmi_BannerFormatter`** : Root Cause Masking (11 alarmes parentes prioritaires masquant les alarmes filles/process), filtrage anti-bagotement (TOF 1.5s), inhibition boot (TON 4s) et exposition instantanée `AlarmArray[0..49]`.
+- **`FB_Diag_CanOpen` & `FB_Diag_Ethercat`** : Épuration des sorties scalaires à plat, publication exclusive de `Ready : BOOL` et des structures typées `ST_Diag_Device`. Découplage strict des bypass bus maîtres vs équipements esclaves.
+- **`ST_BypassNetwork`** : Bypasses granulaires dédiés (`BusCanOpen`, `BusEthercat`, `InputModules`, `Joystick`, `EncoderM1`, `EncoderM2`, `VariateurM3`, `Global`).
+- **`GVL_IHM`** : Remplacement de `VAR_GLOBAL RETAIN` par `VAR_GLOBAL` volatile (résolution dépassement mémoire NVRAM 1.4 Ko).
+- **Validation banc** : Validé et testé avec succès sur banc CODESYS 3.5.
+
 ### `T144_ALARM_BANNER` — 2026-08-20 — bandeau d'alarme défilant (carrousel n/N)
 - **`ST_AlarmBanner`** (nouveau) + champ `ST_HmiBanner.AlarmBanner` : carrousel des défauts actifs machine entière (M1/M2/M3, benne, sync, dive/extraction, AU, cycle), 1 message à la fois, `AlarmHoldTime` paramétrable (défaut `T#1s`).
 - **`FB_Hmi_BannerFormatter` §5** : dictionnaire organe+raison vérifié bit à bit contre le code source réel — corrige les bits `FB_Bucket.ErrorId` du plan initial (bit0/1/3 inversés), ajoute le bit3 "Startup" manquant d'`EmergencyDiag`, construit le dictionnaire `FB_Cycle.ErrorId` (absent du plan).

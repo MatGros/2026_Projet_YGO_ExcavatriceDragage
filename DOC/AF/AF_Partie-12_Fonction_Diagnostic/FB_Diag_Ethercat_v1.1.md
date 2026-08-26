@@ -24,27 +24,31 @@ Distingue `READY` (bus réel online) de `SIMULATED` (bypass actif).
 
 ## 📥 Entrées
 
-| Port | Type | Producteur |
-|---|---|---|
-| `Enable` / `Reset` | BOOL / BOOL | `PRG_01` / IHM |
-| `DeviceVariateurStateRaw` | DEVICE_STATE | `AC600_ECAT_Drive.GetDeviceState()` |
-| `DeviceVariateurSimBypass` | BOOL | `PRG_01` |
-| `DeviceEncoderM1StateRaw` | DEVICE_STATE | `COD1_CODEUR.GetDeviceState()` |
-| `DeviceEncoderM1SimBypass` | BOOL | `PRG_01` |
-| `DeviceEncoderM2StateRaw` | DEVICE_STATE | `COD2_CODEUR.GetDeviceState()` |
-| `DeviceEncoderM2SimBypass` | BOOL | `PRG_01` |
-| `NetworkBypassActive` | BOOL | `GVL_IHM.Network.Bypass.Global` |
+| Port | Type | Producteur | Rôle |
+|---|---|---|---|
+| `Enable` | BOOL | `PRG_02` (TRUE fixe) | Activation logique |
+| `Reset` | BOOL | IHM (front acquittement) | Réarmement sur front montant |
+| `DeviceVariateurStateRaw` | DEVICE_STATE | `AC600_ECAT_Drive.GetDeviceState()` | État esclave variateur M3 |
+| `DeviceVariateurSimBypass` | BOOL | `GVL_Simulation` | Simulation active banc M3 |
+| `DeviceEncoderM1StateRaw` | DEVICE_STATE | `COD1_CODEUR.GetDeviceState()` | État esclave codeur M1 |
+| `DeviceEncoderM1SimBypass` | BOOL | `GVL_Simulation` | Simulation active banc M1 |
+| `DeviceEncoderM2StateRaw` | DEVICE_STATE | `COD2_CODEUR.GetDeviceState()` | État esclave codeur M2 |
+| `DeviceEncoderM2SimBypass` | BOOL | `GVL_Simulation` | Simulation active banc M2 |
+| `NetworkBypassActive` | BOOL | `GVL_IHM.Network.Bypass.Global` | Bypass réseau global |
+| `EcatBusBypassActive` | BOOL | `GVL_IHM.Network.Bypass.BusEthercat` | Bypass bus EtherCAT maître |
+| `VariateurBypassActive` | BOOL | `GVL_IHM.Network.Bypass.VariateurM3` | Bypass variateur seul |
+| `EncoderM1BypassActive` | BOOL | `GVL_IHM.Network.Bypass.EncoderM1` | Bypass codeur M1 seul |
+| `EncoderM2BypassActive` | BOOL | `GVL_IHM.Network.Bypass.EncoderM2` | Bypass codeur M2 seul |
 
 ## 📤 Sorties
 
-| Port | Type | Consommateur |
-|---|---|---|
-| `Error` / `ErrorId` | BOOL / WORD | IHM Network |
-| `State` / `StateAtError` | E_Diag_State | IHM |
-| `DeviceEthercatMaster` | ST_Diag_Device | IHM Network |
-| `DeviceVariateur` | ST_Diag_Device | FB_Safety_Translation (via PRG_03), IHM |
-| `DeviceEncoderM1` / `DeviceEncoderM2` | ST_Diag_Device | FB_Acquisition_Preflight, IHM |
-| `*StateRawOut` | miroirs bruts | Troubleshooting |
+| Port | Type | Consommateur | Rôle |
+|---|---|---|---|
+| `Ready` | BOOL | Standard | Logique active |
+| `DeviceEthercatMaster` | ST_Diag_Device | `GVL_IHM.Network.BusEthercat`, IHM | Diagnostics bus maître |
+| `DeviceVariateur` | ST_Diag_Device | FB_Safety_Translation, IHM | Diagnostics esclave AC600 |
+| `DeviceEncoderM1` | ST_Diag_Device | Treuils M1, IHM | Diagnostics esclave COD1 |
+| `DeviceEncoderM2` | ST_Diag_Device | Treuils M2, IHM | Diagnostics esclave COD2 |
 
 ## 🔒 Impact machine
 
