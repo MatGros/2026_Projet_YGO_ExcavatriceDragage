@@ -102,8 +102,13 @@ flowchart TD
 ## 5. 🛡️ Invariant opposable
 
 Le troubleshooting **n'écrit jamais** une commande, une configuration ou un interlock.
-`PRG_07_Supervision` est en **lecture seule stricte**. Cette règle est inchangée :
-elle est l'invariant fondamental du POU.
+⚠️ **Portée exacte** : cet invariant s'applique à l'**instance `FB_TroubleshootingView`**
+elle-même (§8 `Structure de GVL_Troubleshooting` et §3 Interface — appel en lecture seule
+stricte des entrées de tous les domaines). Il ne s'applique **pas** à l'intégralité du POU
+`PRG_07_Supervision`, qui porte par ailleurs d'autres sections écrivant légitimement des
+`Cmd`/`Cfg`/`Bypass` (projections IHM, bypass sécurité par domaine — hors périmètre de ce
+FB). Trouvé en revue 2026-08-26 : la formulation précédente généralisait à tort au POU entier
+une propriété qui n'appartient qu'au sous-composant observateur.
 
 ## 6. 🩺 Table de visu — dépannage de l'acquisition DI
 
@@ -163,7 +168,7 @@ fermée, contacteur relâché, puis état armable. Pour éviter tout masquage ou
 diagnostic, la structure sépare explicitement :
 
 1. **Les entrées directes `HwIn` (vérité terrain instantanée)** : `HwIn_EmergencyChainClosed_DI`,
-   `HwIn_PowerContactorEngaged_DI`, `HwIn_EmergencyBtnCut_IHM`.
+   `HwIn_PowerContactorEngaged_DI`, `HwIn_EmergencyBtnCut_HMI`.
 2. **Les étapes chronologiques de pré-conditions** : `Step1..5`. `Step3_EmergencyChainClosed` et
    `Step4_ContactorReleased` sont basés directement sur les entrées `HwIn` (non filtrées par
    l'automate de sécurité), tandis que `Step5_ArmingAllowed` reflète l'autorisation calculée du
@@ -179,7 +184,7 @@ une précondition d'armement. Après acquittement éventuel, l'opérateur doit g
 
 | Version | Date | Contenu |
 |---|---|---|
-| v1.3 | 2026-08-26 | Mise en conformité `GUIDE_EDITION_AF_v1.0` : Sommaire lié, Table des fonctions F14.01, macro-table TC-P14-TSV, §4 Mermaid, Suivi historique/TBD/Documents liés |
+| v1.3 | 2026-08-26 | Mise en conformité `GUIDE_EDITION_AF_v1.0` : Sommaire lié, Table des fonctions F14.01, macro-table TC-P14-TSV, §4 Mermaid, Suivi historique/TBD/Documents liés. Review sous-agent : §5 invariant reformulé (portée restreinte à l'instance `FB_TroubleshootingView`, pas au POU entier — `PRG_07_Supervision` écrit bien des Cmd/Bypass ailleurs) ; coquille `HwIn_EmergencyBtnCut_IHM`→`_HMI` corrigée en §7 |
 | v1.2 et antérieures | — | Contenu fonctionnel (table de visu §6, checklist AU §7) inchangé depuis, voir `ARCHIVES/Doc/` |
 
 ## 9. ❓ TBD

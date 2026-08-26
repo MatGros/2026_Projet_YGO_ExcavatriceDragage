@@ -22,7 +22,7 @@
 | AF-11 | ✅ Fait | `d757f6f1` | 1 tour, ⛔ catalogue TC inventé + anti-télescopage mal attribué (F_Safety_Translation au lieu de PRG_05 direct) |
 | AF-12 | ✅ Fait (chapô seul, 3 fiches FB non retouchées — Q11) | `adfcaf8a` | 1 tour, chemin source faux + zéro TC-P12 signalé + bug de code trouvé (ErrorId M2) |
 | AF-13 | ✅ Fait | `db056391` | 1 tour, PASS avec réserve mineure (style Mermaid), corrigée avant commit — aucun écart de substance |
-| AF-14 | ⬜ | — | — |
+| AF-14 | ✅ Fait | (à suivre) | 1 tour, PASS avec réserves — §5 invariant sur-généralisait au POU entier (corrigé, portée restreinte au FB), coquille `_IHM`→`_HMI` |
 
 ## Questions ouvertes (à trancher par l'humain)
 
