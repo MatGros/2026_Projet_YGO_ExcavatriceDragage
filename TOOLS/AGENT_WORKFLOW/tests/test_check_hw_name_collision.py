@@ -22,7 +22,8 @@ def test_csv_reel_contient_les_noms_connus_du_bug_frein_m3() -> None:
     # 20260806 = CSV en vigueur au moment du REX (archive 2026-08-17, cf.
     # ARCHIVES/Tools/AGENT_WORKFLOW/config/) ; les 3 noms restent presents dans le
     # CSV vivant courant, ce test suit donc l'actif plutot qu'un snapshot fige.
-    csv_path = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260814.csv"
+    # 20260826 = CSV courant (export IO 2026-08-26, T162 renommage TremieFull).
+    csv_path = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260826.csv"
     names = check_hw_name_collision.load_hw_names(csv_path)
     assert "M3_BrakeRelease_RQ" in names
     assert "M1_RelayFwd_Up_DQ" in names
