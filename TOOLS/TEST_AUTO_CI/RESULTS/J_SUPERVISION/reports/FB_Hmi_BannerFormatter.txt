@@ -1,0 +1,12 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-1mXo0d\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-1mXo0d\test_main.cpp:33:61: error: 'class strucpp::FB_HMI_BANNERFORMATTER' has no member named 'READY'
+   33 |         if (!ctx.assert_false(static_cast<bool>(s.FB_BANNER.READY), "FB_BANNER.READY", 15, "Enable=FALSE -> Ready=FALSE (neutralise)")) return false;
+      |                                                             ^~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-1mXo0d\test_main.cpp:43:60: error: 'class strucpp::FB_HMI_BANNERFORMATTER' has no member named 'READY'
+   43 |         if (!ctx.assert_true(static_cast<bool>(s.FB_BANNER.READY), "FB_BANNER.READY", 23, "Enable=TRUE -> Ready=TRUE (nominal)")) return false;
+      |                                                            ^~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-1mXo0d\test_main.cpp:53:61: error: 'class strucpp::FB_HMI_BANNERFORMATTER' has no member named 'READY'
+   53 |         if (!ctx.assert_false(static_cast<bool>(s.FB_BANNER.READY), "FB_BANNER.READY", 31, "Coupure -> Ready retombe a FALSE")) return false;
+      |                                                             ^~~~~
+

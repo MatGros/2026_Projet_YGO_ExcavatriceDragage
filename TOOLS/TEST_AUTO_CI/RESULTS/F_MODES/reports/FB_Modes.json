@@ -3,11 +3,11 @@
   "file": "test_fb_modes.st",
   "results": [
     {
-      "name": "Modes : Enable=FALSE desactive le FB",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "Modes : Nominal Maint N1",
+      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
       "passed": true
     }
   ],

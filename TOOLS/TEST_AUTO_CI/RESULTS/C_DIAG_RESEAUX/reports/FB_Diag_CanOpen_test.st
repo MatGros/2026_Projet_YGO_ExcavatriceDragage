@@ -4,15 +4,31 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'CanOpen : Enable=FALSE desactive le diagnostic'
+TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
+    (* Scan 0 : Enable=FALSE -> Diagnostic desactive *)
     FB(Enable := FALSE, CANbusStateRaw := 2, DeviceJoystickStateRaw := DEVICE_STATE.RUNNING);
-    ASSERT_FALSE(FB.Ready, 'Ready doit etre FALSE sans Enable');
+    ASSERT_FALSE(FB.Ready, 'Enable=FALSE -> Ready=FALSE (neutralise)');
     ASSERT_EQ(FB.State, E_Diag_State.DISABLED, 'State doit etre DISABLED sans Enable');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 1 : Enable=TRUE -> Diagnostic pret et actif *)
+    FB(Enable := TRUE, CANbusStateRaw := 2, DeviceJoystickStateRaw := DEVICE_STATE.RUNNING,
+       SimBypassActive := FALSE, NetworkBypassActive := FALSE);
+    ASSERT_TRUE(FB.Ready, 'Enable=TRUE -> Ready=TRUE (nominal)');
+    ASSERT_EQ(FB.State, E_Diag_State.READY, 'State doit etre READY');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
+    FB(Enable := FALSE, CANbusStateRaw := 2, DeviceJoystickStateRaw := DEVICE_STATE.RUNNING);
+    ASSERT_FALSE(FB.Ready, 'Enable=FALSE -> Ready retombe a FALSE');
+    ASSERT_EQ(FB.State, E_Diag_State.DISABLED, 'State retombe a DISABLED');
 END_TEST
 
-TEST 'CanOpen : Enable=TRUE et Bus OK -> Ready et State=READY'
-    FB(Enable := TRUE, CANbusStateRaw := 2, DeviceJoystickStateRaw := DEVICE_STATE.RUNNING, SimBypassActive := FALSE, NetworkBypassActive := FALSE);
-    ASSERT_TRUE(FB.Ready, 'Ready doit etre TRUE avec Enable');
-    ASSERT_EQ(FB.State, E_Diag_State.READY, 'State doit etre READY quand bus et esclave OK');
-    ASSERT_FALSE(FB.Error, 'Aucune erreur attendue');
+TEST 'TC-P12-001 CanOpen : surveillance bus et esclave'
+    FB(Enable := TRUE, CANbusStateRaw := 2, DeviceJoystickStateRaw := DEVICE_STATE.RUNNING,
+       SimBypassActive := FALSE, NetworkBypassActive := FALSE);
+    ASSERT_TRUE(FB.Ready, 'Bus et esclave sains');
+    ASSERT_FALSE(FB.Error, 'Aucune erreur');
 END_TEST

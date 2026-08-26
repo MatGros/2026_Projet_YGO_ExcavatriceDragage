@@ -72,12 +72,14 @@
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks { margin-top: 8px; }
-    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; }
-    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
-    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
+    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary:hover { color: var(--text); }
+    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
@@ -191,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 13:10:19</div>
+    <div class="exec-time">2026-08-26 15:06:42</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-0">PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-1">PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-2">PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-3">PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-4">PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -661,28 +663,98 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-03-modes-cycle-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+                <h3>PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires) </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>Auth.Mode: MAINT_N1 arbitre</li><li>Auth.SyncEnable vrai en N1 par defaut</li><li>Auth.InhibitM1 faux en N1</li><li>Auth.InhibitM2 faux en N1</li><li>Auth.JoystickWinchSelectArbitrated = 1 (M1) en N1</li><li>Auth.HomingApproachEnable faux en N1 (N2 only)</li><li>Auth.MaintenanceM3TargetEnable vrai (N1 + bit)</li></ul></details>
             
             
-            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>1</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>1</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-prg-03-modes-cycle-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+                <h3>PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance) </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>Auth.Mode MAINT_N2 arbitre</li><li>Auth.InhibitM1 actif en N2 (demande M1)</li><li>Auth.InhibitM2 inactif (exclusion mutuelle)</li><li>Auth.HomingApproachEnable vrai en N2</li><li>Auth.MaintenanceM3TargetEnable vrai en N2 + bit</li><li>Auth.JoystickWinchSelectArbitrated M2 en N2</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>2</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>2</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>2</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+        <article id="test-prg-03-modes-cycle-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives) </h3>
+            </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>Exactement une inhibition devenue active</li><li>Exclusion mutuelle : les 2 inhibitions jamais simultanees</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>2</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>2</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+        <article id="test-prg-03-modes-cycle-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1 </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Auth.Mode degrade MAINT_N1 (refus Semi-Auto sur defaut codeur)</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>3</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>1</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+        <article id="test-prg-03-modes-cycle-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale) </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Auth.Mode SEMI_AUTO arbitre</li><li>Sequenceur a l etape X0_PREPARATION</li><li>Sequenceur non Busy initialement</li><li>Sequenceur sans erreur</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>3</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>3</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>

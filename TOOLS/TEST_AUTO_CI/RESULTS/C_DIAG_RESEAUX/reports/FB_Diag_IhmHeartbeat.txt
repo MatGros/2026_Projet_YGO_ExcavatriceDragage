@@ -1,0 +1,10 @@
+Error in test file 'test_fb_diag_ihmheartbeat.st':
+
+test_fb_diag_ihmheartbeat.st:11:25: error: Undeclared variable 'E_DIAG_STATE'
+  11 |     ASSERT_EQ(FB.State, E_Diag_State.DISABLED, 'State=DISABLED');
+     |                         ^
+
+test_fb_diag_ihmheartbeat.st:24:25: error: Undeclared variable 'E_DIAG_STATE'
+  24 |     ASSERT_EQ(FB.State, E_Diag_State.DISABLED, 'State retombe a DISABLED');
+     |                         ^
+

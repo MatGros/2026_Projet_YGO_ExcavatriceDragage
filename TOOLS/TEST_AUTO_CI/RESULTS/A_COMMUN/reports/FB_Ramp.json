@@ -1,23 +1,27 @@
 {
   "version": 1,
-  "file": "test_fb_filter.st",
+  "file": "test_fb_ramp.st",
   "results": [
     {
-      "name": "Pass-through si TimeConst=0 (pas de lissage)",
+      "name": "Accel : consigne progresse par pas de AccelRate*CycleTimeS vers la cible",
       "passed": true
     },
     {
-      "name": "Pass-through si CycleTimeS=0 (temps de cycle invalide)",
+      "name": "Decel : retour vers zero utilise DecelRate (taux different d Accel)",
       "passed": true
     },
     {
-      "name": "Reponse PT1 : convergence progressive vers un echelon, pas instantanee",
+      "name": "Atteinte de la cible : la rampe s arrete pile dessus, pas de depassement",
+      "passed": true
+    },
+    {
+      "name": "Garde-fou : une valeur Current deja hors plage (etat corrompu) reste bornee a +/-100",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 4,
+    "passed": 4,
     "failed": 0
   }
 }

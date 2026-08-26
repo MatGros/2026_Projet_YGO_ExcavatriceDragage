@@ -3,11 +3,11 @@
   "file": "test_fb_simbench.st",
   "results": [
     {
-      "name": "SimBench : instanciation et neutralisation sans Enable",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "Sim_Safety : neutralisation sans Enable",
+      "name": "TC-P13-001 Sim_Safety : neutralisation sans Enable",
       "passed": true
     }
   ],

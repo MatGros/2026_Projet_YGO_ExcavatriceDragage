@@ -1,10 +1,3 @@
-(* Smoke test FB_Encoder -- PAS encore le catalogue AF-09 complet.
-   Objectif unique pour l'instant : verifier que la chaine de compilation +
-   le rapport HTML peuplent correctement les IN/OUT (structs ST_EncoderHw /
-   ST_Encoder_Calib / ST_EncoderMeasurement, VAR_IN_OUT Calib) avant d'ecrire
-   les vrais TC-P09. Ne pas ajouter de TC-P09 ici sans l'accord explicite --
-   ce fichier sera remplace par le catalogue reel. *)
-
 SETUP
 VAR
     fb    : FB_Encoder;
@@ -12,13 +5,31 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'Smoke : Enable=FALSE neutralise (population rapport, pas un TC-P09)'
+TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
+    (* Scan 0 : Enable=FALSE -> Neutralisation initiale *)
     fb(Enable := FALSE, Calib := calib);
-    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready=FALSE');
-    ASSERT_TRUE(fb.ENCODERFAULT, 'Enable=FALSE -> EncoderFault=TRUE (gate neutralisation)');
+    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready=FALSE (neutralise)');
+    ASSERT_TRUE(fb.ENCODERFAULT, 'Enable=FALSE -> EncoderFault=TRUE');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 1 : Enable=TRUE -> Prete en service *)
+    fb(Enable := TRUE, Calib := calib);
+    ASSERT_TRUE(fb.READY, 'Enable=TRUE -> Ready=TRUE (nominal)');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
+    fb(Enable := FALSE, Calib := calib);
+    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready retombe a FALSE');
+    ASSERT_TRUE(fb.ENCODERFAULT, 'Coupure -> EncoderFault=TRUE');
 END_TEST
 
-TEST 'Smoke : Enable=TRUE sans capteur (population rapport, pas un TC-P09)'
+TEST 'TC-P09-010 Acquisition codeur : mise en service nominale'
+    calib.PointsPerRev := 4096;
+    calib.CableM_PerRev := 0.5;
+    calib.PositionMinM := -50.0;
+    calib.PositionMaxM := 50.0;
     fb(Enable := TRUE, Calib := calib);
-    ASSERT_TRUE(fb.READY, 'Enable=TRUE -> Ready=TRUE');
+    ASSERT_TRUE(fb.READY, 'Codeur actif et pret');
 END_TEST

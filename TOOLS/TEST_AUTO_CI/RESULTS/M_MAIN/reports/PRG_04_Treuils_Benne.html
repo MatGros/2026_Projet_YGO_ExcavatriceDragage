@@ -72,12 +72,14 @@
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks { margin-top: 8px; }
-    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; }
-    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
-    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
+    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary:hover { color: var(--text); }
+    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
@@ -191,7 +193,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 13:10:20</div>
+    <div class="exec-time">2026-08-26 15:06:55</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
@@ -1624,9 +1626,28 @@
                 <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (4)</span><ul><li>ST_WinchInterPrg: Ordre RelayFwd genere vers PRG_06</li><li>ST_WinchInterPrg: Aucun SafeStop actif</li><li>ST_WinchInterPrg: consigne vitesse M1 non nulle en montee</li><li>ST_WinchInterPrg: WinchM1State.RelayFwd reflete la demande</li></ul></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>ST_WinchInterPrg: Ordre RelayFwd genere vers PRG_06</li><li>ST_WinchInterPrg: Aucun SafeStop actif</li><li>ST_WinchInterPrg: consigne vitesse M1 non nulle en montee</li><li>ST_WinchInterPrg: WinchM1State.RelayFwd reflete la demande</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 0 variables actives)</summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (19)</summary>
+        <table class="static-table"><tbody><tr><td><code>ACQDATA.CABLEPOSM1</code></td><td>2</td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>1</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETCLOSE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1UP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNWINCHM1DOWN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDCFG.MAXMEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>BUCKETCFG.OFFSETOPENM</code></td><td>0</td></tr><tr><td><code>M1STARTSTOP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1DIRECTION</code></td><td>1</td></tr><tr><td><code>M1SPEEDTGT</code></td><td>50</td></tr><tr><td><code>STEPTABLE.P1R1</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         <article id="test-prg-04-treuils-benne-1" class="test-card test-card-pass">
             <header>
@@ -1634,9 +1655,28 @@
                 <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (2)</span><ul><li>ST_WinchInterPrg: SafeStop declenche immediatement sur defaut codeur</li><li>Mouvement neutralise sur defaut codeur</li></ul></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>ST_WinchInterPrg: SafeStop declenche immediatement sur defaut codeur</li><li>Mouvement neutralise sur defaut codeur</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 0 variables actives)</summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (19)</summary>
+        <table class="static-table"><tbody><tr><td><code>ACQDATA.CABLEPOSM1</code></td><td>0</td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>0</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETCLOSE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1UP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1DOWN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDCFG.MAXMEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>BUCKETCFG.OFFSETOPENM</code></td><td>0</td></tr><tr><td><code>M1STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1DIRECTION</code></td><td>0</td></tr><tr><td><code>M1SPEEDTGT</code></td><td>0</td></tr><tr><td><code>STEPTABLE.P1R1</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         </div>
     </details>

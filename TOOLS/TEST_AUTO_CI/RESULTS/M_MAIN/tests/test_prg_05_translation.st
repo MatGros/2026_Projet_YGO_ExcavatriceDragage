@@ -56,7 +56,7 @@ TEST 'PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuil
     ASSERT_TRUE(harness.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest, 'Demande desserrage frein M3 generee');
     ASSERT_FALSE(harness.Data.TranslationSafety.SafeStop, 'Aucun SafeStop actif sur translation');
     ASSERT_EQ(harness.Data.TranslationState.ActiveDirection, 1, 'Sens translation avant arbitre');
-    ASSERT_GT(harness.Data.TranslationState.ActiveSpeedCmd_Pct, 0.0, 'Consigne vitesse M3 arbitree non nulle');
+    ASSERT_GT(harness.Data.TranslationState.SpeedCmd_Pct, 0.0, 'Consigne vitesse M3 arbitree non nulle');
     ASSERT_NEQ(harness.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord, 16#0000, 'ControlWord variateur active pendant la commande');
 END_TEST
 
