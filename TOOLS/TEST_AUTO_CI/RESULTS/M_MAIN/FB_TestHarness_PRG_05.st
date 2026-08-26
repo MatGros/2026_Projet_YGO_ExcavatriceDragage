@@ -29,6 +29,13 @@ VAR_INPUT
     BtnReset                : BOOL := FALSE;
     BtnTranslationFwd       : BOOL := FALSE;
     BtnTranslationRev       : BOOL := FALSE;
+
+    // === 🧩 Capteurs position M3 (décodage propriété PRG_05, AF-02 TBD §8 #5) ===
+    M3_PosTremie_DI         : BOOL := FALSE;
+    M3_PosPV_DI             : BOOL := FALSE;
+    M3_PosPVP2_DI           : BOOL := FALSE;
+    M3_PosP1_DI             : BOOL := FALSE;
+    M3_PosMaintenance_DI    : BOOL := FALSE;
 END_VAR
 
 VAR_OUTPUT
@@ -39,6 +46,7 @@ END_VAR
 VAR
     instTranslationM3       : FB_Translation;
     instSafetyTranslationM3 : FB_Safety_Translation;
+    instPosDecoderM3        : FB_Translation_PositionDecoder;
     
     m3StartStop             : BOOL;
     m3Direction             : INT;
@@ -47,6 +55,15 @@ VAR
 END_VAR
 
 {region "Corps d'exécution PRG_05 encapsulé"}
+// 0. Décodage position M3 (migré de PRG_02, AF-02 TBD §8 #5)
+instPosDecoderM3(
+    SensorTremie      := M3_PosTremie_DI,
+    SensorPV          := M3_PosPV_DI,
+    SensorP2          := M3_PosPVP2_DI,
+    SensorP1          := M3_PosP1_DI,
+    SensorMaintenance := M3_PosMaintenance_DI
+);
+
 // 1. Interlock Hauteur Treuils (Treuils doivent être au-dessus du seuil mini pour translater)
 m3HeightOk := (WinchM1CablePosM >= 2.0) AND (WinchM2CablePosM >= 2.0);
 
@@ -68,9 +85,9 @@ instSafetyTranslationM3(
     BrakeFeedback           := BrakeFeedbackOpen,
     BrakeCmd                := FALSE,
     Direction               := m3Direction,
-    LimitSwitchFwd          := AcqData.M3_LimitSwitchFwd,
-    LimitSwitchRev          := AcqData.M3_LimitSwitchRev,
-    SensorWordIncoherent    := AcqData.M3_SensorWordIncoherent
+    LimitSwitchFwd          := instPosDecoderM3.LimitSwitchFwd,
+    LimitSwitchRev          := instPosDecoderM3.LimitSwitchRev,
+    SensorWordIncoherent    := instPosDecoderM3.Incoherent
 );
 
 Data.TranslationSafety.SafeStop    := instSafetyTranslationM3.SafeStop;
@@ -105,11 +122,11 @@ instTranslationM3(
     Direction               := m3Direction,
     SpeedTgt_Pct            := m3SpeedTgt,
     PositionSensorTarget    := FALSE,
-    SlowdownSensorTremie    := AcqData.TranslationAtPV,
-    SlowdownSensorMaintenance := AcqData.TranslationAtP1,
-    SlowdownSensorP1        := AcqData.TranslationAtP2,
-    LimitSwitchFwd          := AcqData.M3_LimitSwitchFwd,
-    LimitSwitchRev          := AcqData.M3_LimitSwitchRev,
+    SlowdownSensorTremie    := instPosDecoderM3.TranslationAtPV,
+    SlowdownSensorMaintenance := instPosDecoderM3.TranslationAtP1,
+    SlowdownSensorP1        := instPosDecoderM3.TranslationAtP2,
+    LimitSwitchFwd          := instPosDecoderM3.LimitSwitchFwd,
+    LimitSwitchRev          := instPosDecoderM3.LimitSwitchRev,
     DriveStatusWord         := 16#0081,
     DriveActualFreqHz       := 0.0,
     BrakeFeedback           := BrakeFeedbackOpen,

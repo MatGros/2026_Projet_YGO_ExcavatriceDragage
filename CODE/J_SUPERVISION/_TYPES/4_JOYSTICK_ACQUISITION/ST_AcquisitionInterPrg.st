@@ -11,15 +11,14 @@
 
 TYPE ST_AcquisitionInterPrg :
 STRUCT
-    // === 🧲 Mesures câbles & vitesses treuils M1/M2 ===
-    CablePosM1              : REAL; // 📏 Position cable M1 calibree (metres)
-    CablePosM2              : REAL; // 📏 Position cable M2 calibree (metres)
-    M1_Speed_Mps            : REAL; // 📏 Vitesse absolue M1 (m/s)
-    M1_SignedSpeed_Mps      : REAL; // 📏 Vitesse signee M1 (+:Montee, -:Descente) (m/s)
-    M1_SpeedValid           : BOOL; // 🟢 Validite mesure vitesse M1
-    M2_Speed_Mps            : REAL; // 📏 Vitesse absolue M2 (m/s)
-    M2_SignedSpeed_Mps      : REAL; // 📏 Vitesse signee M2 (+:Montee, -:Descente) (m/s)
-    M2_SpeedValid           : BOOL; // 🟢 Validite mesure vitesse M2
+    // === 🧲 Mesures codeurs M1/M2 (struct frontiere AF-06 §3ter) ===
+    Encoders                : ST_EncoderMeasurements; // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
+
+    // === 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_EncoderMeasurement) ===
+    M1_EncoderFault          : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
+    M2_EncoderFault          : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
+    M1_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
+    M2_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
 
     // === 🕹️ États joystick qualifiés ===
     JoystickDeadmanArmed    : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
@@ -28,33 +27,11 @@ STRUCT
     JoystickSpeedPctX       : REAL; // 📈 Magnitude deviation axe X en % (0..100)
     JoystickXNeutral        : BOOL; // 🟢 Axe X joystick au neutre
 
-    // === 🎯 Positions translation M3 (zones cumulatives + points exacts) ===
-    TranslationPosTremie      : BOOL; // 📍 Zone Tremie (1=Present)
-    TranslationPosPV          : BOOL; // 📍 Zone pre-ralentissement PV (1=Present)
-    TranslationPosP2          : BOOL; // 📍 Zone P2 (1=Present)
-    TranslationPosP1          : BOOL; // 📍 Zone P1 (1=Present)
-    TranslationPosMaintenance : BOOL; // 📍 Zone Maintenance (1=Present)
-    TranslationAtTremie       : BOOL; // 🎯 Position exacte Tremie (1=Atteint)
-    TranslationAtPV           : BOOL; // 🎯 Position exacte PV (1=Atteint)
-    TranslationAtP2           : BOOL; // 🎯 Position exacte P2 (1=Atteint)
-    TranslationAtP1           : BOOL; // 🎯 Position exacte P1 (1=Atteint)
-    TranslationAtMaintenance  : BOOL; // 🎯 Position exacte Maintenance (1=Atteint)
-    M3_LimitSwitchFwd         : BOOL; // 🛡️ Fin de course avant M3 (1=Actionne)
-    M3_LimitSwitchRev         : BOOL; // 🛡️ Fin de course arriere M3 (1=Actionne)
-    M3_SensorWordIncoherent   : BOOL; // ❌ Incoherence detectee mot capteurs M3
-    M3_SensorsWord             : BYTE; // 📊 Mot d'etat capteurs M3
-
-    // === 🩺 Diagnostics modules DI & codeurs ===
+    // === 🩺 Diagnostics modules DI ===
     LocalDigitalIoOk         : BOOL; // 🟢 Module Local_Digital_IO OK
     Vh0800EndOk              : BOOL; // 🟢 Module VH_0800END OK
     Vh0808EtpOk              : BOOL; // 🟢 Module VH_0808ETP OK
     InputModuleFault         : BOOL; // ❌ Defaut sur au moins un module DI
-    M1_EncoderIncoherent     : BOOL; // ❌ Mesure codeur M1 incoherente
-    M2_EncoderIncoherent     : BOOL; // ❌ Mesure codeur M2 incoherente
-    M1_EncoderFault          : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
-    M2_EncoderFault          : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
-    M1_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
-    M2_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
 
     // === 🧪 Simulation & variateur M3 filtré ===
     WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)

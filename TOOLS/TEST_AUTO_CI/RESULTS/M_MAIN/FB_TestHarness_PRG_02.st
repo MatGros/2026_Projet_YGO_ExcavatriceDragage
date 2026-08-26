@@ -66,7 +66,6 @@ VAR
     instDiagEthercat      : FB_Diag_Ethercat;
     instEncoderM1         : FB_Encoder;
     instEncoderM2         : FB_Encoder;
-    instPosDecoderM3      : FB_Translation_PositionDecoder;
     
     diagCanDev            : ST_Diag_Device;
     diagEcatDev           : ST_Diag_Device;
@@ -150,13 +149,9 @@ instEncoderM1(
     BypassGlobal := FALSE,
     Calib := calibM1
 );
-Data.CablePosM1            := instEncoderM1.Measurement.CablePosM;
-Data.M1_Speed_Mps          := instEncoderM1.Measurement.Speed_Mps;
-Data.M1_SignedSpeed_Mps    := instEncoderM1.Measurement.SignedSpeed_Mps;
-Data.M1_SpeedValid         := instEncoderM1.Measurement.SpeedValid;
-Data.M1_EncoderIncoherent  := instEncoderM1.Measurement.EncoderIncoherent;
-Data.M1_EncoderFault       := instEncoderM1.EncoderFault;
-Data.M1_HomedAndReliable   := instEncoderM1.HomedAndReliable;
+Data.Encoders.M1            := instEncoderM1.Measurement;
+Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
+Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
 
 hwM2.RawPosIn := COD2_PosValue;
 hwM2.SlaveOperational := EcatOperational;
@@ -172,37 +167,11 @@ instEncoderM2(
     Calib := calibM2
 );
 
-Data.CablePosM2            := instEncoderM2.Measurement.CablePosM;
-Data.M2_Speed_Mps          := instEncoderM2.Measurement.Speed_Mps;
-Data.M2_SignedSpeed_Mps    := instEncoderM2.Measurement.SignedSpeed_Mps;
-Data.M2_SpeedValid         := instEncoderM2.Measurement.SpeedValid;
-Data.M2_EncoderIncoherent  := instEncoderM2.Measurement.EncoderIncoherent;
-Data.M2_EncoderFault       := instEncoderM2.EncoderFault;
-Data.M2_HomedAndReliable   := instEncoderM2.HomedAndReliable;
+Data.Encoders.M2            := instEncoderM2.Measurement;
+Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
+Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
 
-// 4. Décodage Position Translation M3
-instPosDecoderM3(
-    SensorTremie := M3_PosTremie_DI,
-    SensorPV := M3_PosPV_DI,
-    SensorP2 := M3_PosPVP2_DI,
-    SensorP1 := M3_PosP1_DI,
-    SensorMaintenance := M3_PosMaintenance_DI
-);
-Data.TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
-Data.TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
-Data.TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
-Data.TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
-Data.TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
-Data.TranslationAtTremie       := instPosDecoderM3.TranslationAtTremie;
-Data.TranslationAtPV           := instPosDecoderM3.TranslationAtPV;
-Data.TranslationAtP2           := instPosDecoderM3.TranslationAtP2;
-Data.TranslationAtP1           := instPosDecoderM3.TranslationAtP1;
-Data.TranslationAtMaintenance  := instPosDecoderM3.TranslationAtMaintenance;
-Data.M3_LimitSwitchFwd         := instPosDecoderM3.LimitSwitchFwd;
-Data.M3_LimitSwitchRev         := instPosDecoderM3.LimitSwitchRev;
-Data.M3_SensorWordIncoherent   := instPosDecoderM3.Incoherent;
-
-// Diagnostics Cartes DI
+// 4. Diagnostics Cartes DI
 Data.LocalDigitalIoOk := TRUE;
 Data.Vh0800EndOk      := TRUE;
 Data.Vh0808EtpOk      := TRUE;

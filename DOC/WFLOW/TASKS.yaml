@@ -698,9 +698,9 @@ tasks:
     domaine: "TRANSLATION"
     agent: "DSH-02"
     date: "2026-08-24T04:30:00"
-    titre: "Interlock Translation M3 si Trémie pleine (HopperFull_OR_GateR..."
-    contexte: "Intitulé complet : Interlock Translation M3 si Trémie pleine (HopperFull_OR_GateRaised_DI)"
-    description: "✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T108_INTERLOCK_TREMIE_v0.1.md`) : constat vérifié — HopperFull_OR_GateRaised_DI déclaré+qualifié (PRG_02:160) mais NON consommé. Interlock proposé : blocage directionnel M3 vers Trémie (Direction=+1) si trémie pleine/grille levée, sortie libre (Direction=-1). ⏳ **Implémentation en attente** : choix injection A/B, impact cycle semi-auto (SelTarget=1), câblage électrique réel, validation humaine."
+    titre: "Interlock Translation M3 si Trémie pleine (TremieFull_OR_GateR..."
+    contexte: "Intitulé complet : Interlock Translation M3 si Trémie pleine (TremieFull_OR_GateRaised_DI)"
+    description: "✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T108_INTERLOCK_TREMIE_v0.1.md`) : constat vérifié — TremieFull_OR_GateRaised_DI déclaré+qualifié (PRG_02:160) mais NON consommé. Interlock proposé : blocage directionnel M3 vers Trémie (Direction=+1) si trémie pleine/grille levée, sortie libre (Direction=-1). ⏳ **Implémentation en attente** : choix injection A/B, impact cycle semi-auto (SelTarget=1), câblage électrique réel, validation humaine. (Signal renommé HopperFull→TremieFull_OR_GateRaised par T162, 2026-08-26.)"
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -1648,5 +1648,63 @@ tasks:
       - "Écrire TC-P12-020 (test_fb_diag_ethercat.st) AVANT la correction : le cas M2 doit être rouge (16#0040 attendu, 16#0030 obtenu), preuve du bug"
       - "Corriger le code dans un commit séparé, TC-P12-020 doit passer au vert (M2 + les autres devices déjà couverts par le même TC)"
       - "Vérifier l'absence d'autre consommateur du bit brut DeviceEncoderM2.ErrorId avant correction (IHM, troubleshooting)"
+    bloque_par: []
+
+  - id: "T160"
+    parent_id: ""
+    statut: "⏳"
+    criticite: "C2"
+    domaine: "GÉNÉRAL"
+    agent: "DSH-02"
+    date: "2026-08-26T22:02:00"
+    titre: "Refactor ST_EncoderMeasurements dans PRG_02_Acquisition (conformité AF-06 v2.4 §3ter)"
+    contexte: "Intitulé complet : Mettre PRG_02_Acquisition en conformité avec AF_Partie-06 v2.4 §3ter : publier les mesures codeurs M1/M2 via la struct frontière ST_EncoderMeasurements (sous-DUT M1/M2) au lieu des champs plats de ST_AcquisitionInterPrg, et remapper les 4 PRG consommateurs (PRG_03/04/05/07)."
+    description: "Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T160_ST_ENCODER_MEASUREMENTS.yaml | Valid: check_task_contract PASS. ✅ **Implémenté 2026-08-26** : bus ST_AcquisitionInterPrg restructuré (Encoders : ST_EncoderMeasurements, gates plats M1/M2_EncoderFault + M1/M2_HomedAndReliable conservés — option A), PRG_02 publie Data.Encoders.M1/M2, 4 PRG consommateurs remappés (0 diff logique), M3_SensorsWord corrigé (alimenté depuis instPosDecoderM3). G200 PASS (0 erreur), gates palier C 15/16 (seul échec G390 = PermissionError temp sandbox, fraîcheur bundle vérifiée manuellement OK). ⏳ Validation CODESYS (banc) à faire."
+    contrat: "DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T160_ST_ENCODER_MEASUREMENTS.yaml"
+    objectifs:
+      - "PRG_02_Acquisition publie les mesures codeurs via Data.Encoders : ST_EncoderMeasurements (M1/M2) au lieu des champs plats codeur de ST_AcquisitionInterPrg"
+      - "Chaque champ ST_EncoderMeasurement alimenté depuis instEncoderM1/instEncoderM2.Measurement"
+      - "Remapper les 4 PRG consommateurs (PRG_03/04/05/07) sur Data.Encoders.M1/M2 sans changement de valeur ni de logique"
+      - "Alimenter Data.M3_SensorsWord depuis instPosDecoderM3 (mot capteurs M3 réel) au lieu de 0"
+      - "G200 PASS (0 erreur) + gates palier C PASS + bundle régénéré"
+    bloque_par: []
+
+  - id: "T161"
+    parent_id: ""
+    statut: "⏳"
+    criticite: "C3"
+    domaine: "TRANSLATION"
+    agent: "DSH-02"
+    date: "2026-08-26T22:10:00"
+    titre: "Migration décodeur M3 de PRG_02 vers PRG_05 (conformité AF-02 TBD §8 #5)"
+    contexte: "Intitulé complet : Déplacer le décodage de position M3 (FB_Translation_PositionDecoder) de PRG_02_Acquisition vers PRG_05_Translation, conformément à AF_Partie-02 v3.2 TBD §8 #5 et fiche PRG-02 v1.0 (le décodage des capteurs M3 est propriété cible de PRG_05)."
+    description: "Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T161_MIGRATION_DECODEUR_M3.yaml | Valid: check_task_contract PASS. ✅ **Implémenté 2026-08-26** : décodeur M3 migré de PRG_02 vers PRG_05 (instPosDecoderM3 en §0, publication des 14 faits M3 dans ST_TranslationInterPrg), PRG_02 §5 ne garde que les retours variateur, ST_AcquisitionInterPrg ne porte plus les champs M3, PRG_07 remappé sur PRG_05_Translation.Data. ✅ **Revue indépendante PASS** (code de production 9/9) + findings CI F1-F5 corrigés (harnesses PRG_02/PRG_05, tests, registry.yaml) + script CI aligné + allowlist lint purgée. G200 PASS (0 erreur), gates palier C 15/16 (seul échec G390 = PermissionError temp sandbox, fraîcheur bundle vérifiée manuellement OK). ⏳ Validation CODESYS (banc) à faire."
+    contrat: "DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T161_MIGRATION_DECODEUR_M3.yaml"
+    objectifs:
+      - "Déclarer et appeler instPosDecoderM3 (FB_Translation_PositionDecoder) dans PRG_05_Translation, plus dans PRG_02_Acquisition"
+      - "PRG_02 ne publie plus les faits TranslationPos*/TranslationAt*/M3_LimitSwitch*/M3_SensorWord* dans ST_AcquisitionInterPrg"
+      - "PRG_05 publie les mêmes faits depuis son instance décodeur, valeurs strictement identiques"
+      - "Remapper les consommateurs (PRG_03/05/07) sans changement de valeur ni de logique"
+      - "Alimenter M3_SensorsWord depuis le décodeur (mot capteurs M3 réel) au lieu de 0"
+      - "G200 PASS (0 erreur) + gates palier C PASS + bundle régénéré"
+    bloque_par: []
+
+  - id: "T162"
+    parent_id: ""
+    statut: "⏳"
+    criticite: "C2"
+    domaine: "GÉNÉRAL"
+    agent: "DSH-02"
+    date: "2026-08-26T22:05:00"
+    titre: "Renommage signal TremieFull_OR_GateRaised_DI (ex HopperFull_OR_GateRaised_DI)"
+    contexte: "Intitulé complet : Renommer le point d'entrée physique HopperFull_OR_GateRaised_DI en TremieFull_OR_GateRaised_DI (dérogation à l'anglais, décision utilisateur 2026-08-26, aligné sur l'export IO Device_IO_20260826.csv)."
+    description: "Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T162_RENOMMAGE_TREMIEFULL_DI.yaml | Valid: check_task_contract PASS. ✅ **Implémenté 2026-08-26** : renommage appliqué dans CODE (PRG_02_Acquisition, ST_HwMachine, FB_SimBench), stub linter (GVL_Device_IO.st) et script test CI (PRG_02_Acquisition.st) — 0 occurrence HopperFull dans CODE/TOOLS. Doc AF-06 §5 et T108 mises à jour. CSV Device_IO_20260826.csv déjà aligné (export humain). G200 PASS (0 erreur), gates palier C 15/16 (seul échec G390 = PermissionError temp sandbox, fraîcheur bundle vérifiée manuellement OK). ⏳ Validation CODESYS (banc) à faire."
+    contrat: "DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T162_RENOMMAGE_TREMIEFULL_DI.yaml"
+    objectifs:
+      - "Renommer le point physique TremieFull_OR_GateRaised_DI dans le code ST (PRG_02_Acquisition, ST_HwMachine, FB_SimBench, GVL_Troubleshooting) — 0 occurrence HopperFull_OR_GateRaised_DI dans CODE/"
+      - "Vérifier la cohérence avec le CSV source de vérité matérielle (Device_IO_20260826.csv:456, %IX224.5, VH_0808ETP, Bit5)"
+      - "Mettre à jour la doc AF-06 §5 et la tâche T108"
+      - "Aucun changement de valeur ni de comportement logique — G200 PASS + gates palier C PASS"
+      - "Device.export déjà régénéré par l'humain (export CODESYS manuel), cohérent avec le câblage réel"
     bloque_par: []
 

@@ -1,0 +1,94 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T161 C3 : Migration decodeur M3 de PRG_02 vers PRG_05
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T161_MIGRATION_DECODEUR_M3
+  criticality: C3            # safety-adjacent : decodage position M3, interlock translation
+  strategy: rebuild          # deplace l'instance et la publication du decodeur M3
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Deplacer le decodage de position M3 (FB_Translation_PositionDecoder) de PRG_02_Acquisition
+    vers PRG_05_Translation, conformement a AF_Partie-02 v3.2 TBD §8 #5 et fiche PRG-02 v1.0
+    (le decodage des capteurs M3 est propriete cible de PRG_05). PRG_02 cesse de produire les
+    faits TranslationPos*/TranslationAt*/M3_LimitSwitch*/M3_SensorWord* ; PRG_05 les produit
+    et les publie, sans aucun changement de valeur ni de comportement logique.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "L'instance instPosDecoderM3 (FB_Translation_PositionDecoder) est declaree et appelee dans PRG_05_Translation, plus dans PRG_02_Acquisition."
+      verified_by: "grep : 0 occurrence instPosDecoderM3 dans PRG_02_Acquisition ; >=1 dans PRG_05_Translation"
+    - id: AC2
+      statement: "PRG_02_Acquisition ne publie plus les faits TranslationPos*/TranslationAt*/M3_LimitSwitch*/M3_SensorWord* dans ST_AcquisitionInterPrg."
+      verified_by: "grep : 0 occurrence de ces champs dans PRG_02_Acquisition + ST_AcquisitionInterPrg"
+    - id: AC3
+      statement: "PRG_05_Translation publie les memes faits (positions, fronts, limites, incoherence, mot capteurs) depuis son instance decodeur, avec des valeurs strictement identiques."
+      verified_by: "lecture PRG_05_Translation + G200_check_linkage --report (0 erreur)"
+    - id: AC4
+      statement: "Les consommateurs (PRG_03_Modes_Cycle, PRG_07_Supervision, et PRG_05 lui-meme) lisent les memes valeurs via la nouvelle source, sans changement de valeur ni de logique."
+      verified_by: "grep consommateurs + G200_check_linkage --report (0 erreur)"
+    - id: AC5
+      statement: "Le champ M3_SensorsWord est alimente depuis le decodeur (mot capteurs M3 reel) au lieu de la valeur figee 0."
+      verified_by: "lecture PRG_05_Translation + G200_check_linkage"
+    - id: AC6
+      statement: "Le nom de fichier est egal au nom du POU pour PRG_05_Translation.st."
+      verified_by: "G310_check_code_structure"
+    - id: AC7
+      statement: "Le suffixe de langage est egal au langage genere dans le bundle pour PRG_05_Translation.st."
+      verified_by: "G310_check_code_structure"
+    - id: AC8
+      statement: "G200 PASS (0 erreur) et gates palier C PASS apres regeneration du bundle."
+      verified_by: "G200 --report + run_all_gates --palier C"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_02_Acquisition.st              # retirer instance + publication decodeur M3
+      - CODE/M_MAIN/PRG_05_Translation.st              # ajouter instance + publication decodeur M3
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st  # retirer champs M3 si migres
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st              # remapper consommateurs M3
+      - CODE/M_MAIN/PRG_07_Supervision.st              # remapper consommateurs M3
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st  # FB deja conforme, hors scope
+      - CODE/E_CODEURS/                                # hors scope (codeurs)
+
+  # ── 4. Contrat de conservation (rebuild) ─────────────────────────────────
+  conservation:
+    must_survive:
+      - "Les valeurs TranslationPos*/TranslationAt*/M3_LimitSwitch*/M3_SensorWordIncoherent/M3_SensorsWord strictement identiques (non-regression decodage)"
+      - "Le comportement logique des consommateurs (PRG_03/05/07) inchange (0 diff logique)"
+      - "L'ordre fonctionnel de PRG_02 (fiche PRG-02 v1.0) et de PRG_05 (fiche PRG-05) respecte"
+    dropped_on_purpose:
+      - "L'instance instPosDecoderM3 et la publication des faits M3 dans PRG_02_Acquisition (deplacees vers PRG_05_Translation)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Toute perte de valeur (positions/fronts/limites/incoherence/mot capteurs M3) ou de
+    comportement logique dans les consommateurs est remontee immediatement. Non-regression
+    du decodage M3 et de l'interlock translation est imperatif. Le champ M3_SensorsWord
+    (bug preexistant) est corrige dans ce lot car il appartient a la frontiere de decodage M3.
+
+status: PENDING
+
+execution:
+  executed_by: "deepseek-v4-flash (executeur)"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

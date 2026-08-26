@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.194013" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.194013">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T20:03:39.031628" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T20:03:39.031628">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -132,7 +132,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
               </documentation>
             </variable>
-            <variable name="HopperFull_OR_GateRaised_DI">
+            <variable name="TremieFull_OR_GateRaised_DI">
               <type>
                 <BOOL />
               </type>
@@ -1337,7 +1337,7 @@ Machine.PhaseRotationOk_DI             := TRUE;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
 Machine.HydraulicThermalOk_DI          := TRUE;
-Machine.HopperFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
+Machine.TremieFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 
 // ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
 Busy := FALSE;

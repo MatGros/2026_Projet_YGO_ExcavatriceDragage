@@ -339,7 +339,7 @@ Machine.PhaseRotationOk_DI             := TRUE;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
 Machine.HydraulicThermalOk_DI          := TRUE;
-Machine.HopperFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
+Machine.TremieFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 
 // ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
 Busy := FALSE;

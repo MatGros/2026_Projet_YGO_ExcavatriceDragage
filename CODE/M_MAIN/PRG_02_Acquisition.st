@@ -32,7 +32,6 @@ VAR
     instDiagEthercat         : FB_Diag_Ethercat;              // * [INST] Diagnostic reseau EtherCAT (codeurs/variateur) — rang 02
     instEncoderM1            : FB_Encoder;                    // * [INST] Facade codeur complet M1 (Abs+Homing+Scale+Safety+Rel+Speed)
     instEncoderM2            : FB_Encoder;                    // * [INST] Facade codeur complet M2
-    instPosDecoderM3         : FB_Translation_PositionDecoder;// * [INST] Decodage position translation M3
 
     // === 🎛️ VARIABLES LOCALES & DÉTECTEURS ===
     M2BucketRefOpenEdge      : R_TRIG; // . [LOC] Front demande reference benne ouverte
@@ -157,10 +156,11 @@ HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI  := M1_M2_M3_BrakeThermalOk_DI;
 HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
 HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
 HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
-HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // Déclaré, pas encore consommé
+HwReal.Machine.TremieFull_OR_GateRaised_DI := TremieFull_OR_GateRaised_DI; // 🚧 Déclaré, non consommé — interlock trémie à câbler
 {endregion}
 
 {region "§1bis Diagnostic modules DI"}
+// === 🩺 §1bis DIAGNOSTIC MODULES DI ===
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING => module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
@@ -177,6 +177,7 @@ Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Dat
 {endregion}
 
 {region "§1ter Diagnostic reseaux (CANopen + EtherCAT)"}
+// === 🔌 §1ter DIAGNOSTIC RÉSEAUX (CANopen + EtherCAT) ===
 // 🔌 Diagnostics reseau produits ICI (rang 02) car consommes par PRG_02 (joystick,
 // codeurs) et par les PRG 04/05 — producteur avant consommateur (AF02 §4).
 instDiagCanOpen(
@@ -354,13 +355,9 @@ instEncoderM1(
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     Calib                 := _CalibM1
 );
-Data.CablePosM1           := instEncoderM1.Measurement.CablePosM;
-Data.M1_EncoderIncoherent := instEncoderM1.Measurement.EncoderIncoherent;
-Data.M1_EncoderFault      := instEncoderM1.EncoderFault;
-Data.M1_HomedAndReliable  := instEncoderM1.HomedAndReliable;
-Data.M1_Speed_Mps         := instEncoderM1.Measurement.Speed_Mps;
-Data.M1_SignedSpeed_Mps   := instEncoderM1.Measurement.SignedSpeed_Mps;
-Data.M1_SpeedValid        := instEncoderM1.Measurement.SpeedValid;
+Data.Encoders.M1           := instEncoderM1.Measurement;
+Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
+Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
 COD1_PresettTrigCmd := instEncoderM1.HwOut.PresetTriggerCmd;
 COD1_CodeSeqTrigCmd := instEncoderM1.HwOut.CodeSeqTriggerCmd;
 COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
@@ -375,9 +372,9 @@ M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
     AND NOT PRG_04_Treuils_Benne.instWinchM1.Status.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Status.Busy;
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
-    M2BucketRefTargetM := Data.CablePosM1;
+    M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
-    M2BucketRefTargetM := Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM;
+    M2BucketRefTargetM := Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
 
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
@@ -404,44 +401,16 @@ instEncoderM2(
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global,
     Calib                 := _CalibM2
 );
-Data.CablePosM2           := instEncoderM2.Measurement.CablePosM;
-Data.M2_EncoderIncoherent := instEncoderM2.Measurement.EncoderIncoherent;
-Data.M2_EncoderFault      := instEncoderM2.EncoderFault;
-Data.M2_HomedAndReliable  := instEncoderM2.HomedAndReliable;
-Data.M2_Speed_Mps         := instEncoderM2.Measurement.Speed_Mps;
-Data.M2_SignedSpeed_Mps   := instEncoderM2.Measurement.SignedSpeed_Mps;
-Data.M2_SpeedValid        := instEncoderM2.Measurement.SpeedValid;
+Data.Encoders.M2           := instEncoderM2.Measurement;
+Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
+Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
 COD2_PresettTrigCmd := instEncoderM2.HwOut.PresetTriggerCmd;
 COD2_CodeSeqTrigCmd := instEncoderM2.HwOut.CodeSeqTriggerCmd;
 COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;
 {endregion}
 
-{region "§5 Acquisition Translation M3"}
-// === ↔️ §5 ACQUISITION TRANSLATION (M3) — position & retours variateur ===
-
-instPosDecoderM3(
-    SensorTremie      := HwIn.Translation.M3_PosTremie_DI,
-    SensorPV          := HwIn.Translation.M3_PosPV_DI,
-    SensorP2          := HwIn.Translation.M3_PosPVP2_DI,
-    SensorP1          := HwIn.Translation.M3_PosP1_DI,
-    SensorMaintenance := HwIn.Translation.M3_PosMaintenance_DI
-);
-
-Data.TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
-Data.TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
-Data.TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
-Data.TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
-Data.TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
-Data.TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
-Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
-Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
-Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
-Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
-Data.M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
-Data.M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
-Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
-// ⚠️ M3_SensorsWord jamais assigné (bug préexistant) — conservé à 0, à corriger en lot dédié.
-Data.M3_SensorsWord            := 0;
+{region "§5 Retours variateur M3"}
+// === ↔️ §5 RETOURS VARIATEUR M3 (décodage position migré vers PRG_05, AF-02 TBD §8 #5) ===
 
 // 📊 Retours variateur M3 conditionnés (HwIn arbitré en §2)
 Data.M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);

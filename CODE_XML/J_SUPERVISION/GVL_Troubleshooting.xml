@@ -3144,7 +3144,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
               </documentation>
             </variable>
-            <variable name="HopperFull_OR_GateRaised_DI">
+            <variable name="TremieFull_OR_GateRaised_DI">
               <type>
                 <BOOL />
               </type>
