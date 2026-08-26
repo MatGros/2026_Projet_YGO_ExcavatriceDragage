@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Surveillance toggle IHM, generation toggle PLC et diagnostic timeout
    🛡️ Protection : FB de diagnostic autonome (sans action directe sur AU)
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
    ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Diag_IhmHeartbeat
 VAR_INPUT

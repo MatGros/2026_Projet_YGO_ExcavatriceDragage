@@ -1632,3 +1632,20 @@ tasks:
       - "Vérifier l'absence d'impact sur TC-P06-* et sur les tests non-régression existants avant tout changement"
     bloque_par: []
 
+  - id: "T159"
+    parent_id: ""
+    statut: "⏸️"
+    criticite: "C2"
+    domaine: "DIAGNOSTIC"
+    agent: "—"
+    date: "2026-08-26T00:00:00"
+    titre: "Bug ErrorId DeviceEncoderM2 dans FB_Diag_Ethercat.st (bit4+5 au lieu de bit6)"
+    contexte: "Trouvé en revue indépendante (sous-agent expert automatisme) durant la mise en conformité AF_Partie-12_Fonction_Diagnostic_v1.1.md §6. CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st positionne DeviceEncoderM2.ErrorId sur 16#0030 (bits 4+5, masque effacement 16#FFCF) au lieu de 16#0040 (bit6 seul, masque 16#FFBF) documenté/attendu."
+    description: "N'affecte PAS les décisions safety (Error/Online/Operational, seuls champs consommés par FB_Safety_Winch, restent corrects). Impact limité à la lecture directe du champ DeviceEncoderM2.ErrorId par un technicien/IHM/troubleshooting, qui verrait un motif indiscernable d'un double défaut variateur+M1. La synthèse ErrorId globale par nibble (0x00F0/0x0F00/0xF000) n'est pas affectée (basée sur le booléen Error, pas la valeur brute du bit). Correction proposée : bit6 = 16#0040, masque effacement 16#FFBF. Couverture CI actuelle (test_fb_diag_ethercat.st) insuffisante pour détecter ce type de bug (aucune assertion bit-level, voir T ⛔ TBD AF12 §8) — un guard (assertion ErrorId par device) devrait accompagner le correctif, conformément à la règle fix:+guard: du projet."
+    contrat: ""
+    objectifs:
+      - "Décision humaine : corriger le bit dans FB_Diag_Ethercat.st (16#0030→16#0040, masque 16#FFCF→16#FFBF)"
+      - "Ajouter un guard : assertion CI sur la valeur ErrorId par device (test_fb_diag_ethercat.st), pas seulement Online/Operational/Error"
+      - "Vérifier l'absence d'autre consommateur du bit brut DeviceEncoderM2.ErrorId avant correction (IHM, troubleshooting)"
+    bloque_par: []
+

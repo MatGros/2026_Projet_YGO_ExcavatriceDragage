@@ -17,7 +17,8 @@
 | AF-06 | ✅ Fait | `18ba121b` | 1 tour, ⛔ P0 sécurité trouvé (EncoderIncoherent non consommé par Modes/Safety) |
 | AF-07 | ✅ Fait | `6a8cec2b` | 2 tours (1er a échoué sur limite API), section §6 manquante depuis toujours écrite from scratch |
 | AF-10 | ✅ Fait (chapô seul, 9 fiches FB non retouchées) | `951db663` | 1 tour, 4 liens morts + §5.1 fausse + refs tâches inexistantes |
-| AF-11 | ✅ Fait | (à suivre) | 1 tour, ⛔ catalogue TC inventé + anti-télescopage mal attribué (F_Safety_Translation au lieu de PRG_05 direct) |
+| AF-11 | ✅ Fait | `d757f6f1` | 1 tour, ⛔ catalogue TC inventé + anti-télescopage mal attribué (F_Safety_Translation au lieu de PRG_05 direct) |
+| AF-12 | ✅ Fait (chapô seul, 3 fiches FB non retouchées) | (à suivre) | 1 tour, chemin source faux + zéro TC-P12 signalé + bug de code trouvé (ErrorId M2) |
 | AF-07 | ⬜ | — | — |
 | AF-08 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
 | AF-09 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
@@ -124,6 +125,19 @@ C4 (risque collision benne/translation), câblage direct hors FB, zéro test for
 jour. **Décision requise** : créer un TC (root ID, propriétaire à désigner) et/ou une fiche
 dédiée, ou documenter explicitement pourquoi ce câblage reste hors périmètre de test formel.
 Documenté en TBD `AF_Partie-11_Fonction_Translation_v2.3.md §6`.
+
+### Q10 — Bug de code : `DeviceEncoderM2.ErrorId` faux dans `FB_Diag_Ethercat.st`
+Trouvé en review AF-12 (2026-08-26) : `CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st` positionne
+`DeviceEncoderM2.ErrorId` sur `16#0030` (bits 4+5) au lieu de `16#0040` (bit6) attendu/documenté.
+**Sans impact sur les décisions safety** (Error/Online/Operational corrects, synthèse ErrorId
+globale par nibble non affectée) — impact limité à la lecture directe du bit par un technicien/
+IHM. Task T159 créée (C2, DIAGNOSTIC). **Décision requise** : corriger le bit + ajouter un guard
+CI (assertion ErrorId par device, absente aujourd'hui — c'est ce qui a permis au bug de passer
+inaperçu). Documenté dans `AF_Partie-12_Fonction_Diagnostic_v1.1.md §6/§8`.
+
+### Q11 — AF-12 : 3 fiches FB non retouchées (scope réduit)
+Comme pour AF-10, seul le chapô a été mis en conformité — `FB_Diag_CanOpen_v1.0.md`,
+`FB_Diag_Ethercat_v1.0.md`, `FB_Diag_IhmHeartbeat_v1.0.md` restent en l'état.
 
 ---
 
