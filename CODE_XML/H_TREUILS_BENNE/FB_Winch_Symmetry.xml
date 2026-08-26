@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.365380" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.365380">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:09.806220" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:09.806220">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -115,7 +115,7 @@
    ⚖️ ST_Winch_SymmetryCfg — Configuration des seuils de symétrie M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -182,7 +182,7 @@
    📊 ST_Winch_SymmetryData — Données mesurées de symétrie M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure des résultats de mesures et d'écarts du diagnostic symétrie
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -540,7 +540,7 @@
    ⚖️ FB_Winch_Symmetry — Mesure passive M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Observateur de symétrie et de synchronisme des treuils M1/M2
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Observateur pur : Aucune ecriture de commande, securite ou mouvement
    =======================================================================</xhtml>
           </documentation>
@@ -665,7 +665,7 @@ PreviousQualified := Qualified;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
