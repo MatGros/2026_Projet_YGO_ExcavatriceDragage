@@ -227,7 +227,7 @@ avant validation finale.
 5. `SafetyStructureNotValidated` = `FALSE` (§9) — sinon rien ne sortira physiquement, c'est attendu
 6. **Mapping E/S CODESYS M3 fait et vérifié** (`M3_CommandWord`/`M3_SetpointFrequencyHz`, §8) —
    sinon le mot/la fréquence calculés n'atteignent jamais le variateur
-7. Observer `TranslationStateHMI.ActiveDirection`/`ActiveSpeedCmd_Pct` — reflète la demande AVANT
+7. Observer `TranslationStateHMI.ActiveDirection`/`SpeedCmd_Pct` — reflète la demande AVANT
    barrière finale
 8. Observer `instTranslationOutputInterlockM3.State`/`.Reason`/`.DriveControlWord`/`.DriveFreqCmdWord`
    — barrière finale, valeurs réellement autorisées (§8, §9)

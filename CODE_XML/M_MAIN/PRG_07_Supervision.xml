@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T22:46:09.055455" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T22:46:09.055455">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T09:29:20.194010" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T09:29:20.194010">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3906,14 +3906,6 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Positionneur : cible sélectionnée atteinte (non mémorisé)</xhtml>
               </documentation>
             </variable>
-            <variable name="JoystickDeflection_Pct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Axe X fonctionnel -100..+100 %, 0 = neutre ; animation IHM M3</xhtml>
-              </documentation>
-            </variable>
             <variable name="DriveActualFreq_Hz">
               <type>
                 <REAL />
@@ -3946,12 +3938,12 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveSpeedCmd_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande active après arbitrage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande active après arbitrage (0.0 à 100.0 %)</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockState">
@@ -6250,16 +6242,16 @@ END_IF;
 // ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
 // 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne), factorisé dans FB_MirrorBypassRetain
 // (CODE/A_COMMUN) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
-instMirrorBypassTranslation(Hmi := GVL_IHM.TranslationM3.Bypass.Global, Retain := BypassTranslationGlobal, Prev := PrevTranslationBypass);
-instMirrorBypassM1(Hmi := GVL_IHM.M1TreuilRetenue.Bypass.Global, Retain := BypassWinchM1Global, Prev := PrevM1Bypass);
-instMirrorBypassM2(Hmi := GVL_IHM.M2TreuilBenne.Bypass.Global, Retain := BypassWinchM2Global, Prev := PrevM2Bypass);
-instMirrorBypassSync(Hmi := GVL_IHM.M1M2Sync.Bypass.Global, Retain := BypassSyncGlobal, Prev := PrevSyncBypass);
-instMirrorBypassCommun(Hmi := GVL_IHM.Commun.Bypass.Global, Retain := BypassCommunGlobal, Prev := PrevCommunBypass);
-instMirrorBypassLimitLegal(Hmi := GVL_IHM.Commun.Bypass.LimitLegal, Retain := BypassLimitLegal, Prev := PrevLimitLegal);
-instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, Retain := BypassTopLimitSwitch, Prev := PrevTopLimitSwitch);
-instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, Retain := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
-instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, Retain := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
-instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, Retain := BypassSlackCable, Prev := PrevSlackCable);
+instMirrorBypassTranslation(Hmi := GVL_IHM.TranslationM3.Bypass.Global, RetainVal := BypassTranslationGlobal, Prev := PrevTranslationBypass);
+instMirrorBypassM1(Hmi := GVL_IHM.M1TreuilRetenue.Bypass.Global, RetainVal := BypassWinchM1Global, Prev := PrevM1Bypass);
+instMirrorBypassM2(Hmi := GVL_IHM.M2TreuilBenne.Bypass.Global, RetainVal := BypassWinchM2Global, Prev := PrevM2Bypass);
+instMirrorBypassSync(Hmi := GVL_IHM.M1M2Sync.Bypass.Global, RetainVal := BypassSyncGlobal, Prev := PrevSyncBypass);
+instMirrorBypassCommun(Hmi := GVL_IHM.Commun.Bypass.Global, RetainVal := BypassCommunGlobal, Prev := PrevCommunBypass);
+instMirrorBypassLimitLegal(Hmi := GVL_IHM.Commun.Bypass.LimitLegal, RetainVal := BypassLimitLegal, Prev := PrevLimitLegal);
+instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, RetainVal := BypassTopLimitSwitch, Prev := PrevTopLimitSwitch);
+instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, RetainVal := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
+instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, RetainVal := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
+instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, RetainVal := BypassSlackCable, Prev := PrevSlackCable);
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
@@ -8604,7 +8596,7 @@ END_IF;
 &lt;-&gt; [BUS] Valeur bypass côté IHM (GVL_IHM)</xhtml>
               </documentation>
             </variable>
-            <variable name="Retain">
+            <variable name="RetainVal">
               <type>
                 <BOOL />
               </type>
@@ -8640,9 +8632,9 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 IF Hmi &lt;&gt; Prev THEN
-    Retain := Hmi;
+    RetainVal := Hmi;
 ELSE
-    Hmi := Retain;
+    Hmi := RetainVal;
 END_IF;
 Prev := Hmi;
 </xhtml>
@@ -9432,14 +9424,14 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied := NOT Tran
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx109_DriveThermalOk := Translation.State.DriveThermalOk;
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA := HwIn.Operator.JoyXRaw_ANA1;
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := Translation.State.JoystickDeflection_Pct;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := GVL_IHM.JOY1Joystick.State.AxisCmdX.SpeedTgt;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnFwd := Translation.Cmd.BtnFwd;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnRev := Translation.Cmd.BtnRev;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition := Translation.Cmd.SelTarget;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition := CycleTargetPosition;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx207_ModeActive := Auth.Mode;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive := Translation.Bypass.Global;
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := Translation.State.ActiveSpeedCmd_Pct;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := Translation.State.SpeedCmd_Pct;
 
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx302_SafeStopActive := Translation.Safety.SafeStop;
@@ -9676,9 +9668,9 @@ GVL_Troubleshooting.MotionM3.Cmd_BrakeRelease         := Translation.State.Brake
 
 GVL_Troubleshooting.MotionM3.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
 GVL_Troubleshooting.MotionM3.Step3_NotBusyOtherTask   := TRUE; // Aucune tâche exclusive connue bloquant M3 (pas de homing translation)
-GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.ActiveSpeedCmd_Pct &gt; 0.0);
+GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.SpeedCmd_Pct &gt; 0.0);
 GVL_Troubleshooting.MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
-GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.ActiveSpeedCmd_Pct;
+GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.SpeedCmd_Pct;
 GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
 GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // Interlock hauteur M1/M2 (risque collision)
 GVL_Troubleshooting.MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;

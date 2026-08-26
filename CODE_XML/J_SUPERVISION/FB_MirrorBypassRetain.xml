@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T22:41:38.445930" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T22:41:38.445930">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T09:25:26.193400" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T09:25:26.193400">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -38,7 +38,7 @@
 &lt;-&gt; [BUS] Valeur bypass côté IHM (GVL_IHM)</xhtml>
               </documentation>
             </variable>
-            <variable name="Retain">
+            <variable name="RetainVal">
               <type>
                 <BOOL />
               </type>
@@ -74,9 +74,9 @@
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 IF Hmi &lt;&gt; Prev THEN
-    Retain := Hmi;
+    RetainVal := Hmi;
 ELSE
-    Hmi := Retain;
+    Hmi := RetainVal;
 END_IF;
 Prev := Hmi;
 </xhtml>
