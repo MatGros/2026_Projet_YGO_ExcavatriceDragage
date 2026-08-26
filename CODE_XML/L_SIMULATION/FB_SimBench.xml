@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:15:38.692494" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:15:38.692494">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T01:18:19.352286" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T01:18:19.352286">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1106,7 +1106,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
       - FB_Sim_Encoder (instM1, instM2)
@@ -1585,7 +1585,7 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -2037,7 +2037,7 @@ RawPosOut := RawPos;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
       (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
@@ -2320,7 +2320,7 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md</xhtml>
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -2569,8 +2569,8 @@ Distances NON-linéaires : 0→5 (PV), 5→15 (P2), 15→20 (P1), 20→30 (Maint
    🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
       aucune sortie réelle. Un override manuel valide est appliqué par
       FB_SimBench, pas par ce FB.
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
-             DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
+             DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -2730,7 +2730,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

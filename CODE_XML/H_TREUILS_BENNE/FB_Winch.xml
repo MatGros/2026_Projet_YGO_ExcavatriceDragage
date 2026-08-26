@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:14:54.392760" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:14:54.392760">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:09.487866" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:09.487866">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -122,7 +122,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
    📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md §2
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -437,7 +437,7 @@ Seuils de changement de palier (0..100%)</xhtml>
    🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1082,7 +1082,7 @@ Code erreur bitmask.</xhtml>
    🪝 FB_Winch — Directeur d'un treuil individuel (M1 / M2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage d'un treuil individuel (contacteurs de sens et de vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop)
    🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
    =======================================================================</xhtml>
@@ -1459,7 +1459,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -1753,7 +1753,7 @@ TimeLast := TimeCurrent;
    🪜 FB_SpeedStep — Décodeur palier vitesse vers contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Décodage consigne vitesse 0..100% en paliers et pilotage contacteurs
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Décodeur interne (compose FB_Winch)
    🔒 Sécurité : Validation configuration table et anti-battement hysteresis
    =======================================================================</xhtml>

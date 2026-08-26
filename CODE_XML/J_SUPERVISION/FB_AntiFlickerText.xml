@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.374424" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.374424">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:44:08.750454" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:44:08.750454">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -51,7 +51,7 @@
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée de maintien min avant changement (AF-07 §5.3)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -79,7 +79,7 @@
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧊 FB_AntiFlickerText — Lissage anti-clignotement d'un texte IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4.3
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5.3
    🎯 Responsabilité : maintient un texte warning/état un temps minimum
       avant de laisser le contenu changer, et laisse passer en direct
       (sans maintien) les messages critiques (défauts AU/puissance).

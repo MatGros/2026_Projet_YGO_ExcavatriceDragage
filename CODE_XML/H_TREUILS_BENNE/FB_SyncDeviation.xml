@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.361782" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.361782">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:09.408763" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:09.408763">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -222,7 +222,7 @@
    🧬 Responsabilite : n'interprete PAS l'etat benne. Il reçoit ActiveOffsetM
       deja resolu (calcul offset-selon-etat-benne = FB_Bucket/HoldOffset).
    🔒 Polarite : SyncDeviationWarn/Fault = TRUE si ecart hors seuil.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

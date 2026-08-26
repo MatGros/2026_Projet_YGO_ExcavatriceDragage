@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.351123" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.351123">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T22:22:17.876853" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T22:22:17.876853">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -234,7 +234,7 @@
    🪣 ST_BucketCmdDemand — Demande de commande benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne de mouvement benne (Ouverture, Fermeture, Kobold)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -269,7 +269,7 @@
    🎯 ST_TranslationCmdDemand — Demande de commande translation M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des consignes de mouvement translation M3
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -312,7 +312,7 @@
    🔌 ST_WinchCmdDemand — Structure de demande de commande treuil
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des consignes de mouvement treuil (StartStop, Direction, Vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -956,7 +956,7 @@
    🎯 Rôle : Automate de cycle automatique de dragage (X0 à X13 + STABILIZING)
    🔒 Sécurité : Gating par mode et homme-mort, repli STABILIZING sur défaut
    🔌 Interface : Demandes de mouvements (treuils, translation, benne)
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

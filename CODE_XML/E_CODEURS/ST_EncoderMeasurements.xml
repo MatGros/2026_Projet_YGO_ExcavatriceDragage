@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.345292" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.345292">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T22:33:17.277354" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T22:33:17.277354">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -56,7 +56,7 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure frontière regroupant les sous-DUTs de mesure des treuils M1 et M2
    🔌 Interface : Producteur unique PRG_02_Acquisition
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -168,7 +168,7 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
    🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>

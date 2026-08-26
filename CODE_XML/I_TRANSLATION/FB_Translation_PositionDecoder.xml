@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.371895" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.371895">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:58:43.607237" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:58:43.607237">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -280,7 +280,7 @@ anti-rebond de FB_Translation.
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧩 FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🧩 Brique technique (AF_Partie-03 §2) : contrat minimal, pas de
       StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
       Maintenance) en mot de progression, dérive les 2 limites extrêmes,

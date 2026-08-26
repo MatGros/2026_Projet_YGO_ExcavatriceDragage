@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:21:57.630977" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:21:57.630977">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:58:44.205120" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:58:44.205120">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -285,7 +285,7 @@
       et le diagnostic TranslationSafety publiés par PRG_05_Translation vers
       les consommateurs (PRG_03/06/07).
    📤 Producteur unique : PRG_05_Translation (VAR_OUTPUT Data : ST_TranslationInterPrg).
-   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -834,7 +834,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
    📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md §2
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1117,7 +1117,7 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 5 (après PRG_04_Treuils_Benne).
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
-   📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🛡️ Sécurité : instSafetyTranslationM3 (FB_Safety_Translation) câblée en parallèle
       de instTranslationM3 — SafeStop/PowerCutOff réels.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -1999,7 +1999,7 @@ ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM a
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    Rôle : Surveillance joystick, bus EtherCAT, rotation de phases,
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt),
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -2748,7 +2748,7 @@ DriveActualFreqHz.</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -3314,7 +3314,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §3
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
       la position estimée continue en mètres (0.0 m à la Trémie -&gt; +30.0 m à la Maintenance),
       avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.
@@ -3611,7 +3611,7 @@ ErrorId bit0: "incoherence retour contacteur".</xhtml>
    🎯 Rôle : Gestion temporisée ouverture/fermeture frein à manque de courant
    🔒 Polarité : Sécurité positive (BrakeCmd=FALSE = frein collé au repos)
    🔌 Interface : Double vérification retour contacteur (ST_ContactorCheck)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md §3
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -3794,7 +3794,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -3917,7 +3917,7 @@ TimeLast := TimeCurrent;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Limitation de variation anti-à-coups (%/s) sur signal analogique
    🔒 Polarité : Distingue l'éloignement de zéro (Accel) et le retour à zéro (Decel)
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §1 (TC-P11-040)
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §1 (TC-P11-040)
    =======================================================================</xhtml>
           </documentation>
         </interface>

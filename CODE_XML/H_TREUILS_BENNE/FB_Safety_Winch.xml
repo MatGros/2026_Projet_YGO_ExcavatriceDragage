@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.358654" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.358654">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:09.170655" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:09.170655">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1021,7 +1021,7 @@ bit11: "Méca D" ; bit12/13: "Méca E écart synchro" ; bit14: "Sens opposé" ; 
    🛡️ FB_Safety_Winch — Surveillance et sécurité d'un treuil (M1 / M2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Protection machine, surveillance codeurs, dérives et interlocks
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Sécurité : Gestion des autorisations SafeStop, PowerCutOff et permis
    =======================================================================</xhtml>
           </documentation>
@@ -1470,7 +1470,7 @@ Status.Done := FALSE;
    📐 FB_DriftGuard — Détection de dérive de position sous armement
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Capture position de référence et détection de dérive anormale
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Brique interne de sécurité (compose FB_Safety_Winch)
    🔒 Sécurité : Détection de mouvement non commandé et glissement
    =======================================================================</xhtml>

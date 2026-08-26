@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.313824" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.313824">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:08.495918" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:08.495918">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -71,7 +71,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
    📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md §2
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -454,7 +454,7 @@ ErrorId bit0: "incoherence retour contacteur".</xhtml>
    🎯 Rôle : Gestion temporisée ouverture/fermeture frein à manque de courant
    🔒 Polarité : Sécurité positive (BrakeCmd=FALSE = frein collé au repos)
    🔌 Interface : Double vérification retour contacteur (ST_ContactorCheck)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md §3
    =======================================================================</xhtml>
           </documentation>
         </interface>

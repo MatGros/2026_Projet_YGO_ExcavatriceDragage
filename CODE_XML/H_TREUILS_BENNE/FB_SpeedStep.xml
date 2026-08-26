@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:14:41.442769" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:14:41.442769">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:09.249560" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:09.249560">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -217,7 +217,7 @@ Seuils de changement de palier (0..100%)</xhtml>
    🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -467,7 +467,7 @@ Seuils de changement de palier (0..100%)</xhtml>
    🪜 FB_SpeedStep — Décodeur palier vitesse vers contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Décodage consigne vitesse 0..100% en paliers et pilotage contacteurs
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Décodeur interne (compose FB_Winch)
    🔒 Sécurité : Validation configuration table et anti-battement hysteresis
    =======================================================================</xhtml>

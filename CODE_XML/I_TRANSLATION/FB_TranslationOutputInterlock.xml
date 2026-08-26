@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:15:20.391891" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:15:20.391891">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:58:43.526076" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:58:43.526076">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -485,7 +485,7 @@ Echelle registre 0x3100 (WORD=5000 -&gt; 50,00 Hz)</xhtml>
    🛡️ FB_TranslationOutputInterlock — Barrière finale frein / AC600 M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Barrière de sécurité finale pour frein et variateur AC600 M3
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🔌 Interface : Interlock de sortie (entre FB_Translation et PRG_06_Outputs)
    🔒 Sécurité : Surveillance feedback frein et watchdog de desserrage
    =======================================================================</xhtml>

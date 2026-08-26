@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:13:08.218774" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:13:08.218774">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:10.456396" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:10.456396">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -143,7 +143,7 @@
       l'état benne publiés par PRG_04_Treuils_Benne vers les consommateurs
       (PRG_02/03/06/07).
    📤 Producteur unique : PRG_04_Treuils_Benne (VAR_OUTPUT Data : ST_WinchInterPrg).
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -1302,7 +1302,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1463,7 +1463,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
    📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md §2
    =======================================================================</xhtml>
         </documentation>
       </dataType>
