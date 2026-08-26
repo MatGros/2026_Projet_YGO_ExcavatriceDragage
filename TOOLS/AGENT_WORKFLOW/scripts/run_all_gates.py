@@ -111,13 +111,19 @@ PALIERS = {"A", "B", "C", "D"}
 FILE_SCOPED_GATES = {"100", "110", "200"}
 
 
-def select_plan(palier: str | None) -> list[tuple[str, str, str, list[str]]]:
+def select_plan(palier: str | None, with_pytest: bool = False) -> list[tuple[str, str, str, list[str]]]:
     if palier is None:
-        return [g for g in PLANS if g[0] != "D"]
-    palier = palier.upper()
-    if palier not in PALIERS:
-        raise SystemExit(f"ERROR: palier inconnu '{palier}' (attendu A/B/C/D)")
-    return [g for g in PLANS if g[0] == palier]
+        plan = [g for g in PLANS if g[0] != "D"]
+    else:
+        palier = palier.upper()
+        if palier not in PALIERS:
+            raise SystemExit(f"ERROR: palier inconnu '{palier}' (attendu A/B/C/D)")
+        plan = [g for g in PLANS if g[0] == palier]
+    
+    # Par défaut : G420 (PyTest infrastructure 530 tests) est opt-in via --pytest / --ci
+    if not with_pytest:
+        plan = [g for g in plan if g[1] != "420"]
+    return plan
 
 
 def main() -> int:
@@ -126,6 +132,7 @@ def main() -> int:
     parser.add_argument("--palier", choices=sorted(PALIERS), help="Palier à exécuter (menu par intention, GUIDE_GATES_ET_TESTS_v1.2.md §2)")
     parser.add_argument("--codesys-log", type=Path, help="Log de compilation CODESYS (palier D)")
     parser.add_argument("--files", nargs="+", type=Path, help="Cibler un/des fichier(s) .st : seuls les gates applicables à un bloc isolé s'exécutent (G100, G110, G200)")
+    parser.add_argument("--pytest", "--ci", dest="with_pytest", action="store_true", help="Inclure G420 PyTest (suite de 530 tests unitaires convertisseur + outillage)")
     parser.add_argument("--skip-codesys", action="store_true", help="Ne pas lancer G500 même si --codesys-log fourni")
     parser.add_argument("--strict", action="store_true", help="Fail on any warning")
     parser.add_argument("--fail-fast", action="store_true", help="S'arrêter au premier gate rouge")
@@ -140,7 +147,7 @@ def main() -> int:
             if not f.is_file():
                 print(f"ERROR: fichier introuvable : {f}", file=sys.stderr)
                 return 2
-        base_plan = select_plan(args.palier)
+        base_plan = select_plan(args.palier, with_pytest=args.with_pytest)
         plan = [g for g in base_plan if g[1] in FILE_SCOPED_GATES]
         skipped_global = [(g[1], g[2]) for g in base_plan if g[1] not in FILE_SCOPED_GATES]
         rebuilt: list[tuple[str, str, str, list[str]]] = []
@@ -158,7 +165,7 @@ def main() -> int:
                 rebuilt.append(("A", "410x", f"LD convertible + invariants ({f.name})", [sys.executable, f"{S}/check_ld_file.py", str(f)]))
         plan = rebuilt
     else:
-        plan = select_plan(args.palier)
+        plan = select_plan(args.palier, with_pytest=args.with_pytest)
 
     results: list[tuple[str, bool, float]] = []
 
