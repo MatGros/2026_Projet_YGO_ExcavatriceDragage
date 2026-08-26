@@ -2,9 +2,9 @@
    🎛️ GVL_IHM — Variables globales d'échange pour l'IHM
    ───────────────────────────────────────────────────────────────
    📄 Mise en service et calibration de la machine de dragage.
-   💾 Déclaré en RETAIN pour la persistance des configurations opérateur.
+   💬 Variables volatiles d'échange temps-réel (IHM <-> Automate).
    ═══════════════════════════════════════════════════════════════ *)
-VAR_GLOBAL RETAIN
+VAR_GLOBAL
     M1TreuilRetenue : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Retenue (M1) *)
     M2TreuilBenne : ST_WinchBenneHMI;  (* 🛞️ Variables d'échange IHM Treuil Benne (M2) — type dédié avec Bucket *)
     M1M2Sync : ST_SyncHMI;  (* ⚖️ Variables d'échange IHM Surveillance de synchro *)

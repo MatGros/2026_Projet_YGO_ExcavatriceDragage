@@ -27,11 +27,13 @@ STRUCT
     JoystickSpeedPctX       : REAL; // 📈 Magnitude deviation axe X en % (0..100)
     JoystickXNeutral        : BOOL; // 🟢 Axe X joystick au neutre
 
-    // === 🩺 Diagnostics modules DI ===
-    LocalDigitalIoOk         : BOOL; // 🟢 Module Local_Digital_IO OK
-    Vh0800EndOk              : BOOL; // 🟢 Module VH_0800END OK
-    Vh0808EtpOk              : BOOL; // 🟢 Module VH_0808ETP OK
-    InputModuleFault         : BOOL; // ❌ Defaut sur au moins un module DI
+    // === 🩺 Diagnostics modules E/S ===
+    LocalDigitalIoOk         : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
+    Vh0800EndOk              : BOOL; // 🟢 Module VH_0800END OK (DI8)
+    Vh0808EtpOk              : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
+    Vh0008ErOk               : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
+    Vh0008Er1Ok              : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
+    InputModuleFault         : BOOL; // ❌ Defaut sur au moins un module E/S
 
     // === 🧪 Simulation & variateur M3 filtré ===
     WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)

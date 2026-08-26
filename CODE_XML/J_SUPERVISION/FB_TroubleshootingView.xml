@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.173363" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.173363">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T22:31:41.735056" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T22:31:41.735056">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -575,7 +575,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Anomalie CANopen</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Voyant anomalie globale CANopen (IHM Visu)</xhtml>
               </documentation>
             </variable>
             <variable name="CanErrorId">
@@ -623,7 +623,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Anomalie EtherCAT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Voyant anomalie globale EtherCAT (IHM Visu)</xhtml>
               </documentation>
             </variable>
             <variable name="EcatErrorId">
@@ -639,7 +639,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_InputModuleDiagHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic carte des 3 modules DI TOR réelles</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic carte des 5 modules d'E/S physiques</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -2244,12 +2244,37 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
       <dataType name="ST_BypassNetwork">
         <baseType>
           <struct>
+            <variable name="BusCanOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 1. Bus maîtres &amp; Modules d'E/S
+📡 Bypass diagnostic bus CANopen maître</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BusEthercat">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Bypass diagnostic bus EtherCAT maître</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InputModules">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Bypass diagnostic des 5 modules d'E/S physiques</xhtml>
+              </documentation>
+            </variable>
             <variable name="Joystick">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 1. Communication &amp; Systèmes esclaves
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ 2. Équipements esclaves
 🕹️ Bypass diagnostic esclave CANopen Joystick</xhtml>
               </documentation>
             </variable>
@@ -2293,8 +2318,8 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 2. Hiérarchie &amp; Restauration
-🌐 Bypass Global : tous les esclaves réseau à la fois</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 3. Hiérarchie &amp; Restauration
+🌐 Bypass Global : tous les bus et esclaves réseau à la fois</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -2420,12 +2445,28 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0808ETP opérationnel (7 TOR positions M3/hydraulique/crible)</xhtml>
               </documentation>
             </variable>
+            <variable name="Vh0008ErOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0008ER opérationnel (8 DO Relais Freins/Kobold)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008Er1Ok">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0008ER_1 opérationnel (8 DO Relais AU/PowerKeepAlive)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Fault">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un des 3 modules DI hors service</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un des 5 modules E/S hors service</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -6100,7 +6141,7 @@ Ready := TRUE;
 // === 🌐 0. ContexteMachineGlobal : ST_ChainContextGlobal (fiche §5.1) ===
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive        := Auth.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled := SimulationModeActive;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk    := NOT Network.CanError;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk    := Network.Joystick.Operational;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected  := GVL_IHM.Modes.Cmd.TglJoystickMaster;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal := Network.Bypass.Global;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal := FALSE; // TBD non câblé - voir fiche §6 (agrégat multi-domaine à définir)
@@ -6496,7 +6537,7 @@ GVL_Troubleshooting.Safety.ArmingFailed         := EmergencyDiag.ArmFailed;
 
 {region "§8 Diagnostic CAN et joystick"}
 // === 🕹️ 8. Diagnostic Chronologique Bus CAN &amp; Joystick (Joystick) ===
-GVL_Troubleshooting.Joystick.Step1_CanBusActive        := NOT Network.CanError;
+GVL_Troubleshooting.Joystick.Step1_CanBusActive        := Network.BusCanOpen.Operational;
 GVL_Troubleshooting.Joystick.Step2_JoystickOperational := Network.Joystick.Operational;
 GVL_Troubleshooting.Joystick.HwIn_JoyBtnRaw_DI         := HwIn.Operator.JoyBtnRaw;
 GVL_Troubleshooting.Joystick.NeutralXAct               := (HwIn.Operator.JoyXRaw_ANA1 &gt;= 4800 AND HwIn.Operator.JoyXRaw_ANA1 &lt;= 5200);

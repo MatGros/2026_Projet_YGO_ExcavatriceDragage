@@ -108,7 +108,7 @@ Ready := TRUE;
 // === 🌐 0. ContexteMachineGlobal : ST_ChainContextGlobal (fiche §5.1) ===
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive        := Auth.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled := SimulationModeActive;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk    := NOT Network.CanError;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk    := Network.Joystick.Operational;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected  := GVL_IHM.Modes.Cmd.TglJoystickMaster;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal := Network.Bypass.Global;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal := FALSE; // TBD non câblé - voir fiche §6 (agrégat multi-domaine à définir)
@@ -504,7 +504,7 @@ GVL_Troubleshooting.Safety.ArmingFailed         := EmergencyDiag.ArmFailed;
 
 {region "§8 Diagnostic CAN et joystick"}
 // === 🕹️ 8. Diagnostic Chronologique Bus CAN & Joystick (Joystick) ===
-GVL_Troubleshooting.Joystick.Step1_CanBusActive        := NOT Network.CanError;
+GVL_Troubleshooting.Joystick.Step1_CanBusActive        := Network.BusCanOpen.Operational;
 GVL_Troubleshooting.Joystick.Step2_JoystickOperational := Network.Joystick.Operational;
 GVL_Troubleshooting.Joystick.HwIn_JoyBtnRaw_DI         := HwIn.Operator.JoyBtnRaw;
 GVL_Troubleshooting.Joystick.NeutralXAct               := (HwIn.Operator.JoyXRaw_ANA1 >= 4800 AND HwIn.Operator.JoyXRaw_ANA1 <= 5200);

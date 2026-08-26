@@ -12,6 +12,8 @@ STRUCT
     LocalDigitalIoOk : BOOL; (* TRUE = module Local_Digital_IO opérationnel (8 TOR Winch/Machine) *)
     Vh0800EndOk      : BOOL; (* TRUE = module VH_0800END opérationnel (7 TOR freins/thermiques/AU) *)
     Vh0808EtpOk      : BOOL; (* TRUE = module VH_0808ETP opérationnel (7 TOR positions M3/hydraulique/crible) *)
-    Fault            : BOOL; (* TRUE = au moins un des 3 modules DI hors service *)
+    Vh0008ErOk       : BOOL; (* TRUE = module VH_0008ER opérationnel (8 DO Relais Freins/Kobold) *)
+    Vh0008Er1Ok      : BOOL; (* TRUE = module VH_0008ER_1 opérationnel (8 DO Relais AU/PowerKeepAlive) *)
+    Fault            : BOOL; (* TRUE = au moins un des 5 modules E/S hors service *)
 END_STRUCT
 END_TYPE

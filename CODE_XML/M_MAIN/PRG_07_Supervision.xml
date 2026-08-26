@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T20:08:24.495059" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T20:08:24.495059">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T22:32:53.940899" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T22:32:53.940899">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -935,6 +935,120 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_NetworkDiagHMI">
+        <baseType>
+          <struct>
+            <variable name="BusCanOpen">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Diagnostics bus CANopen</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Diagnostics esclave Joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CanError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Voyant anomalie globale CANopen (IHM Visu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CanErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code anomalie CANopen</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BusEthercat">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Diagnostics bus EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostics esclave COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostics esclave COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="VariateurM3">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Diagnostics esclave AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EcatError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Voyant anomalie globale EtherCAT (IHM Visu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EcatErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code anomalie EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InputModules">
+              <type>
+                <derived name="ST_InputModuleDiagHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic carte des 5 modules d'E/S physiques</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Bypass">
+              <type>
+                <derived name="ST_BypassNetwork" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass réseau global</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>db0961ed-689c-5868-863e-85a1d463708f</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📡 ST_NetworkDiagHMI — Données d'échange IHM pour les diagnostics réseau
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à l'affichage des diagnostics CANopen et EtherCAT.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_SafetyTranslation">
         <baseType>
           <struct>
@@ -1731,120 +1845,6 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_NetworkDiagHMI">
-        <baseType>
-          <struct>
-            <variable name="BusCanOpen">
-              <type>
-                <derived name="ST_Diag_Device" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Diagnostics bus CANopen</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Joystick">
-              <type>
-                <derived name="ST_Diag_Device" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Diagnostics esclave Joystick</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CanError">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Anomalie CANopen</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CanErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code anomalie CANopen</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BusEthercat">
-              <type>
-                <derived name="ST_Diag_Device" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Diagnostics bus EtherCAT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderM1">
-              <type>
-                <derived name="ST_Diag_Device" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostics esclave COD1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderM2">
-              <type>
-                <derived name="ST_Diag_Device" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostics esclave COD2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="VariateurM3">
-              <type>
-                <derived name="ST_Diag_Device" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Diagnostics esclave AC600</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EcatError">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Anomalie EtherCAT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EcatErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code anomalie EtherCAT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InputModules">
-              <type>
-                <derived name="ST_InputModuleDiagHMI" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic carte des 3 modules DI TOR réelles</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Bypass">
-              <type>
-                <derived name="ST_BypassNetwork" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass réseau global</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>db0961ed-689c-5868-863e-85a1d463708f</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 ST_NetworkDiagHMI — Données d'échange IHM pour les diagnostics réseau
-   ───────────────────────────────────────────────────────────────
-   🎨 Destiné à l'affichage des diagnostics CANopen et EtherCAT.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_Safety_Emergency_Diag">
         <baseType>
           <struct>
@@ -2292,6 +2292,19 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre total de messages actifs</xhtml>
               </documentation>
             </variable>
+            <variable name="AlarmArray">
+              <type>
+                <array>
+                  <dimension lower="0" upper="49" />
+                  <baseType>
+                    <string length="120" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📋 Liste complete instantanee de tous les defauts actifs</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2306,6 +2319,253 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    🎯 Role : liste les defauts/warnings actifs de toute la machine,
       affiches un a la fois en rotation (FB_Hmi_BannerFormatter S5)
    📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md S6
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_BypassNetwork">
+        <baseType>
+          <struct>
+            <variable name="BusCanOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 1. Bus maîtres &amp; Modules d'E/S
+📡 Bypass diagnostic bus CANopen maître</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BusEthercat">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Bypass diagnostic bus EtherCAT maître</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InputModules">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Bypass diagnostic des 5 modules d'E/S physiques</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ 2. Équipements esclaves
+🕹️ Bypass diagnostic esclave CANopen Joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Bypass diagnostic esclave EtherCAT COD1 (M1 codeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Bypass diagnostic esclave EtherCAT COD2 (M2 codeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="VariateurM3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Bypass diagnostic esclave EtherCAT AC600 (M3 drive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IhmHeartbeat">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Bypass du bit de vie IHM (défaut TRUE = sécurisé si pas d'IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Global">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 3. Hiérarchie &amp; Restauration
+🌐 Bypass Global : tous les bus et esclaves réseau à la fois</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
+🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b983f7fc-8c50-586b-bda1-7708d152c981</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🌐 ST_BypassNetwork — Bypass général du diagnostic réseau
+   ───────────────────────────────────────────────────────────────
+   🔒 Permet de forcer les esclaves réseau (CAN, EtherCAT) à "online"
+      pour le diagnostic, sans devoir toucher à chaque bit individuel.
+      Jamais actif en production.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Diag_Device">
+        <baseType>
+          <struct>
+            <variable name="Online">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Esclave visible sur le bus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Operational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Esclave en mode OP (opérationnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal de défaut actif pour cet esclave</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut détaillé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_Diag_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du cycle de diagnostic</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_Diag_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instantané de la phase lors de l'anomalie</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_InputModuleDiagHMI">
+        <baseType>
+          <struct>
+            <variable name="LocalDigitalIoOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module Local_Digital_IO opérationnel (8 TOR Winch/Machine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0800END opérationnel (7 TOR freins/thermiques/AU)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808EtpOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0808ETP opérationnel (7 TOR positions M3/hydraulique/crible)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008ErOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0008ER opérationnel (8 DO Relais Freins/Kobold)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008Er1Ok">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0008ER_1 opérationnel (8 DO Relais AU/PowerKeepAlive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un des 5 modules E/S hors service</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>305fe275-43ac-5096-abc4-7a46cf78f5f9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3bis
+   🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
+      pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
+      TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
+   🔗 Producteur : PRG_02_Acquisition (3 appels GetDeviceState()).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3239,212 +3499,6 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🚦 ST_JoystickState — États et diagnostics IHM du Joystick
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_BypassNetwork">
-        <baseType>
-          <struct>
-            <variable name="Joystick">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 1. Communication &amp; Systèmes esclaves
-🕹️ Bypass diagnostic esclave CANopen Joystick</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderM1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Bypass diagnostic esclave EtherCAT COD1 (M1 codeur)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Bypass diagnostic esclave EtherCAT COD2 (M2 codeur)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="VariateurM3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Bypass diagnostic esclave EtherCAT AC600 (M3 drive)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IhmHeartbeat">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Bypass du bit de vie IHM (défaut TRUE = sécurisé si pas d'IHM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Global">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 2. Hiérarchie &amp; Restauration
-🌐 Bypass Global : tous les esclaves réseau à la fois</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
-🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b983f7fc-8c50-586b-bda1-7708d152c981</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌐 ST_BypassNetwork — Bypass général du diagnostic réseau
-   ───────────────────────────────────────────────────────────────
-   🔒 Permet de forcer les esclaves réseau (CAN, EtherCAT) à "online"
-      pour le diagnostic, sans devoir toucher à chaque bit individuel.
-      Jamais actif en production.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_Diag_Device">
-        <baseType>
-          <struct>
-            <variable name="Online">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Esclave visible sur le bus</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Operational">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Esclave en mode OP (opérationnel)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal de défaut actif pour cet esclave</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut détaillé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_Diag_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du cycle de diagnostic</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_Diag_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instantané de la phase lors de l'anomalie</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_InputModuleDiagHMI">
-        <baseType>
-          <struct>
-            <variable name="LocalDigitalIoOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module Local_Digital_IO opérationnel (8 TOR Winch/Machine)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Vh0800EndOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0800END opérationnel (7 TOR freins/thermiques/AU)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Vh0808EtpOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0808ETP opérationnel (7 TOR positions M3/hydraulique/crible)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Fault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un des 3 modules DI hors service</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>305fe275-43ac-5096-abc4-7a46cf78f5f9</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3bis
-   🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
-      pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
-      TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
-   🔗 Producteur : PRG_02_Acquisition (3 appels GetDeviceState()).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4830,6 +4884,71 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_Diag_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="READY" value="1" />
+              <value name="INIT" value="2" />
+              <value name="MONITORING" value="3" />
+              <value name="ERROR" value="4" />
+              <value name="SIMULATED" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désactivé (surveillance non active)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Opérationnel réel, pas de défaut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisation / Recherche de réseau</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MONITORING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Surveillance active (états transitoires)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Anomalie de communication</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SIMULATED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation ou bypass réseau IHM — pas le bus réel</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e56e22b9-6e46-55bd-973d-b226ca7d1e70</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="ST_Joystick_AxisCmd">
         <baseType>
           <struct>
@@ -4898,71 +5017,6 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    =======================================================================</xhtml>
         </documentation>
-      </dataType>
-      <dataType name="E_Diag_State">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="READY" value="1" />
-              <value name="INIT" value="2" />
-              <value name="MONITORING" value="3" />
-              <value name="ERROR" value="4" />
-              <value name="SIMULATED" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désactivé (surveillance non active)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Opérationnel réel, pas de défaut</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisation / Recherche de réseau</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MONITORING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Surveillance active (états transitoires)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>ERROR</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Anomalie de communication</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SIMULATED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation ou bypass réseau IHM — pas le bus réel</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e56e22b9-6e46-55bd-973d-b226ca7d1e70</ObjectId>
-          </data>
-        </addData>
       </dataType>
       <dataType name="E_State">
         <baseType>
@@ -6381,21 +6435,26 @@ GVL_IHM.JOY1Joystick.State.Operational := PRG_02_Acquisition.instDiagCanOpen.Dev
 GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Error;
 GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instJoystick.ErrorId;
 
-GVL_IHM.Network.CanError    := PRG_02_Acquisition.instDiagCanOpen.Error;
-GVL_IHM.Network.CanErrorId  := PRG_02_Acquisition.instDiagCanOpen.ErrorId;
+GVL_IHM.Network.BusCanOpen  := PRG_02_Acquisition.instDiagCanOpen.DeviceCanOpenMaster;
 GVL_IHM.Network.Joystick    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick;
+GVL_IHM.Network.CanError    := GVL_IHM.Network.BusCanOpen.Error OR GVL_IHM.Network.Joystick.Error;
+GVL_IHM.Network.CanErrorId  := GVL_IHM.Network.BusCanOpen.ErrorId OR GVL_IHM.Network.Joystick.ErrorId;
+
 GVL_IHM.Network.BusEthercat := PRG_02_Acquisition.instDiagEthercat.DeviceEthercatMaster;
 GVL_IHM.Network.EncoderM1   := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1;
 GVL_IHM.Network.EncoderM2   := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2;
 GVL_IHM.Network.VariateurM3 := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur;
-GVL_IHM.Network.EcatError   := PRG_02_Acquisition.instDiagEthercat.Error;
-GVL_IHM.Network.EcatErrorId := PRG_02_Acquisition.instDiagEthercat.ErrorId;
+GVL_IHM.Network.EcatError   := GVL_IHM.Network.BusEthercat.Error OR GVL_IHM.Network.EncoderM1.Error OR GVL_IHM.Network.EncoderM2.Error OR GVL_IHM.Network.VariateurM3.Error;
+GVL_IHM.Network.EcatErrorId := GVL_IHM.Network.BusEthercat.ErrorId OR GVL_IHM.Network.EncoderM1.ErrorId OR GVL_IHM.Network.EncoderM2.ErrorId OR GVL_IHM.Network.VariateurM3.ErrorId;
 
-// 🩺 Diagnostic carte des 3 modules DI TOR réelles (AF06 §3bis) — lecture seule, calculé
+// 🩺 Diagnostic carte des 5 modules d'E/S physiques (AF06 §3bis) — lecture seule, calculé
 // dans PRG_02_Acquisition, simple recopie ici pour l'IHM (même patron que Network.*).
 GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.Data.LocalDigitalIoOk;
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Data.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Data.Vh0808EtpOk;
+GVL_IHM.Network.InputModules.Vh0008ErOk       := PRG_02_Acquisition.Data.Vh0008ErOk;
+GVL_IHM.Network.InputModules.Vh0008Er1Ok      := PRG_02_Acquisition.Data.Vh0008Er1Ok;
+GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputModuleFault;
 
 // ---------- §3g. État cycle semi-auto &amp; bandeau ----------
 GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready;
@@ -6472,7 +6531,8 @@ instHmiBannerFormatter(
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
     RedundancyTestFailed         := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed,
     EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
-    AlarmHoldTime               := T#1s
+    AlarmHoldTime               := T#1s,
+    Network                     := GVL_IHM.Network
 );
 GVL_IHM.Banner := instHmiBannerFormatter.Banner;
 
@@ -7880,6 +7940,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée d'affichage par message du carrousel</xhtml>
               </documentation>
             </variable>
+            <variable name="Network">
+              <type>
+                <derived name="ST_NetworkDiagHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Diagnostic réseau, bus et modules E/S</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Banner">
@@ -7948,6 +8016,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Défaut chaîne AU ou contacteur puissance absent</xhtml>
               </documentation>
             </variable>
+            <variable name="HardwareModuleOrBusFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Défaut matériel module E/S ou bus actif</xhtml>
+              </documentation>
+            </variable>
             <variable name="CriticalActionActive">
               <type>
                 <BOOL />
@@ -8007,7 +8083,7 @@ END_IF;
             <variable name="AlarmArray">
               <type>
                 <array>
-                  <dimension lower="0" upper="31" />
+                  <dimension lower="0" upper="49" />
                   <baseType>
                     <string length="120" />
                   </baseType>
@@ -8033,6 +8109,198 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Index courant du carrousel (0-based)</xhtml>
               </documentation>
             </variable>
+            <variable name="i">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de boucle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonBootInhibit">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde au démarrage (inhibition fausses alarmes réseau 4s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultLocalIo">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement Local_Digital_IO (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultVh0800">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement VH_0800END (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultVh0808">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement VH_0808ETP (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultVh0008Er">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement VH_0008ER (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultVh0008Er1">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement VH_0008ER_1 (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultCanBus">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement bus CANopen (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultJoy1">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement Joystick JOY1 (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultEcatBus">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement bus EtherCAT (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultEncM1">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement EtherCAT Encoder M1 (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultEncM2">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement EtherCAT Encoder M2 (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TofFaultVarM3">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-bagotement EtherCAT Variateur M3 (1.5s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LocalIoValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée Local_Digital_IO (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée VH_0800END (DI8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée VH_0808ETP (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008ErValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée VH_0008ER (DO8 Relais Freins/Kobold)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008Er1Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée VH_0008ER_1 (DO8 Relais AU/PowerKeepAlive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CanBusValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée Bus CANopen</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joy1Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée Joystick JOY1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EcatBusValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée Bus EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncM1Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée Encoder M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncM2Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée Encoder M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="VarM3Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée Variateur M3</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BannerHoldTime">
               <type>
                 <TIME />
@@ -8049,7 +8317,7 @@ END_IF;
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="32" />
+                <simpleValue value="50" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Taille du carrousel d'alarmes (AF-07 §6)</xhtml>
@@ -8082,9 +8350,52 @@ IF NOT Enable THEN
     Banner.AlarmBanner.Text      := '';
     Banner.AlarmBanner.Index     := 0;
     Banner.AlarmBanner.Count     := 0;
+    FOR i := 0 TO 49 DO
+        Banner.AlarmBanner.AlarmArray[i] := '';
+    END_FOR;
     TonAlarmBanner(IN := FALSE);
+    TonBootInhibit(IN := FALSE);
+    TofFaultLocalIo(IN := FALSE);
+    TofFaultVh0800(IN := FALSE);
+    TofFaultVh0808(IN := FALSE);
+    TofFaultVh0008Er(IN := FALSE);
+    TofFaultVh0008Er1(IN := FALSE);
+    TofFaultCanBus(IN := FALSE);
+    TofFaultJoy1(IN := FALSE);
+    TofFaultEcatBus(IN := FALSE);
+    TofFaultEncM1(IN := FALSE);
+    TofFaultEncM2(IN := FALSE);
+    TofFaultVarM3(IN := FALSE);
     RETURN;
 END_IF;
+
+// ⏱️ Garde au démarrage (inhibition 4s pendant init des bus et équipements)
+TonBootInhibit(IN := Enable, PT := T#4s);
+
+// 🌊 Filtrage anti-bagotement (TOF 1.5s sur perte de validité)
+TofFaultLocalIo(IN := (NOT Network.InputModules.LocalDigitalIoOk) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultVh0800(IN := (NOT Network.InputModules.Vh0800EndOk) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultVh0808(IN := (NOT Network.InputModules.Vh0808EtpOk) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultVh0008Er(IN := (NOT Network.InputModules.Vh0008ErOk) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultVh0008Er1(IN := (NOT Network.InputModules.Vh0008Er1Ok) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultCanBus(IN := (NOT Network.BusCanOpen.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultJoy1(IN := (NOT Network.Joystick.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultEcatBus(IN := (NOT Network.BusEthercat.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultEncM1(IN := (NOT Network.EncoderM1.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultEncM2(IN := (NOT Network.EncoderM2.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultVarM3(IN := (NOT Network.VariateurM3.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
+
+LocalIoValid   := NOT TofFaultLocalIo.Q;
+Vh0800Valid    := NOT TofFaultVh0800.Q;
+Vh0808Valid    := NOT TofFaultVh0808.Q;
+Vh0008ErValid  := NOT TofFaultVh0008Er.Q;
+Vh0008Er1Valid := NOT TofFaultVh0008Er1.Q;
+CanBusValid    := NOT TofFaultCanBus.Q;
+Joy1Valid      := NOT TofFaultJoy1.Q;
+EcatBusValid   := NOT TofFaultEcatBus.Q;
+EncM1Valid     := NOT TofFaultEncM1.Q;
+EncM2Valid     := NOT TofFaultEncM2.Q;
+VarM3Valid     := NOT TofFaultVarM3.Q;
 
 {region "§1 Contexte global"}
 // ═══════════════════════════════════════════════════════════════
@@ -8231,6 +8542,18 @@ ELSIF EmergencyArmingFailed THEN
     OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
 ELSIF NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
+ELSIF NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid THEN
+    OperatorActionCandidate := '[IO] Défaut module E/S - vérifier alimentation/coupleur';
+ELSIF NOT CanBusValid THEN
+    OperatorActionCandidate := '[CAN] Défaut bus CANopen - vérifier câblage';
+ELSIF NOT Joy1Valid THEN
+    OperatorActionCandidate := '[CAN] Joystick non détecté - vérifier liaison';
+ELSIF NOT EcatBusValid THEN
+    OperatorActionCandidate := '[ECAT] Défaut bus EtherCAT - vérifier liaison';
+ELSIF NOT EncM1Valid OR NOT EncM2Valid THEN
+    OperatorActionCandidate := '[ECAT] Codeurs non détectés - vérifier liaison';
+ELSIF NOT VarM3Valid THEN
+    OperatorActionCandidate := '[ECAT] Variateur non détecté - vérifier liaison';
 ELSIF SafeStopActive THEN
     OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
 ELSIF DirectionBlocked THEN
@@ -8318,7 +8641,8 @@ END_IF;
 // Interlock = mouvement demandé mais permit absent : c'est une cause
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
 PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
-CriticalActionActive := (PowerOrChainFault OR SafeStopActive OR DirectionBlocked);
+HardwareModuleOrBusFault := (NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid OR NOT CanBusValid OR NOT Joy1Valid OR NOT EcatBusValid OR NOT EncM1Valid OR NOT EncM2Valid OR NOT VarM3Valid);
+CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -8334,123 +8658,158 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
 // ═══════════════════════════════════════════════════════════════
 AlarmCount := 0;
 
+// 5.0 Collecte — Défauts matériels parents (priorité absolue carrousel)
+IF NOT LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[IO] Defaut module Local IO (DI8/DO8)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF NOT Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[IO] Defaut module VH0800END (DI8)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF NOT Vh0808Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[IO] Defaut module VH0808ETP (DI8/DO8)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF NOT Vh0008ErValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[IO] Defaut module VH0008ER (DO8 Relais)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF NOT Vh0008Er1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[IO] Defaut module VH0008ER_1 (DO8 Relais)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF NOT CanBusValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CAN] Defaut bus CANopen'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF CanBusValid AND NOT Joy1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CAN] Joystick JOY1 non detecte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF NOT EcatBusValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[ECAT] Defaut bus EtherCAT'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF EcatBusValid AND NOT EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] Codeur absolu COD1 non detecte (ECAT)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF EcatBusValid AND NOT EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] Codeur absolu COD2 non detecte (ECAT)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF EcatBusValid AND NOT VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] Variateur AC600 non detecte (ECAT)'; AlarmCount := AlarmCount + 1;
+END_IF;
+
 // 5a. Collecte — treuil M1 (ST_SafetyWinch, bits ErrorId décodés)
-IF WinchM1Safety.ErrorOperatorComm AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorEncoder AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorEncoder AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] perte codeur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ThermalFault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ThermalFault AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] surchauffe moteur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.SlackCable AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.SlackCable AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] mou de cable'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorPhaseRotation AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.CableLimitDescent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.CableLimitDescent AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] limite basse cable'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.CableLimitAscent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.CableLimitAscent AND LocalIoValid AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] butee haute'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorBrakeThermal AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorBrakeThermal AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] surchauffe frein'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorMecaA AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorMecaA AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorMecaB AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorMecaB AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorMecaC AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorMecaD AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorMecaD AND LocalIoValid AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorMecaE AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorMecaE AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorOppositeDir AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorOppositeDir AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorNoMovement AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorNoMovement AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] absence mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5b. Collecte — treuil M2 (mêmes bits que M1)
-IF WinchM2Safety.ErrorOperatorComm AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorEncoder AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorEncoder AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] perte codeur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ThermalFault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ThermalFault AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] surchauffe moteur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.SlackCable AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.SlackCable AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] mou de cable'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorPhaseRotation AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.CableLimitDescent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.CableLimitDescent AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] limite basse cable'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.CableLimitAscent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.CableLimitAscent AND LocalIoValid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] butee haute'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorBrakeThermal AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorBrakeThermal AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] surchauffe frein'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorMecaA AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorMecaA AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorMecaB AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorMecaB AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorMecaC AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorMecaD AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorMecaD AND LocalIoValid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorMecaE AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorMecaE AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorOppositeDir AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorOppositeDir AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorNoMovement AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorNoMovement AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] absence mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5c. Collecte — translation M3 (ST_SafetyTranslation)
-IF TranslationSafety.ErrorOperatorComm AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF TranslationSafety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF TranslationSafety.ErrorDriveComm AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF TranslationSafety.ErrorDriveComm AND VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] perte EtherCAT'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF TranslationSafety.ErrorPhaseRotation AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF TranslationSafety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF TranslationSafety.ErrorBrakeThermal AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF TranslationSafety.ErrorBrakeThermal AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] surchauffe frein'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF TranslationSafety.ErrorMecaB AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF TranslationSafety.ErrorMecaB AND VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF TranslationSafety.ErrorMecaA AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF TranslationSafety.ErrorMecaA AND VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] MecaA - deplacement sans commande'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF TranslationSafety.ErrorLimitSwitch AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF TranslationSafety.ErrorLimitSwitch AND Vh0808Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] butee extreme'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF TranslationSafety.ErrorSensorIncoherent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF TranslationSafety.ErrorSensorIncoherent AND Vh0808Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
@@ -8459,20 +8818,23 @@ IF ((BucketErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMax
     AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] incoherence etat'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] inversion commandes'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF ((BucketErrorId AND 16#0004) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] limites depassees'; AlarmCount := AlarmCount + 1;
+IF ((BucketErrorId AND 16#0004) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] ecart position M1/M2'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] codeurs non references'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] defaut configuration'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] glissement M1'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] capteur fond defectueux'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((BucketErrorId AND 16#0020) &lt;&gt; 16#0000) AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] derive cable M2 pendant maintien'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5e. Collecte — synchro M1/M2 (FB_WinchSync.ErrorId)
-IF ((SyncErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF ((SyncErrorId AND 16#0001) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[SYNC] ecart M1/M2'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((SyncErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
@@ -8481,15 +8843,27 @@ END_IF;
 
 // 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionSequence)
 IF ((DiveErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] preconditions'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[DIVE] timeout immersion'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((DiveErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] sequence'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[DIVE] timeout fond'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF ((DiveErrorId AND 16#0004) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] config'; AlarmCount := AlarmCount + 1;
+IF ((DiveErrorId AND 16#0004) &lt;&gt; 16#0000) AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[DIVE] limite basse atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF ((ExtractionErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF ((DiveErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[DIVE] contact fond perdu'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((DiveErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[DIVE] perte tension cable'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((DiveErrorId AND 16#0020) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[DIVE] anomalie vitesse'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((DiveErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[DIVE] config invalide'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((ExtractionErrorId AND 16#0001) &lt;&gt; 16#0000) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[EXTRACTION] fond'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((ExtractionErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
@@ -8514,16 +8888,16 @@ IF ((EmergencyErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_Nb
 END_IF;
 
 // 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId)
-IF ((CycleErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF ((CycleErrorId AND 16#0001) &lt;&gt; 16#0000) AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] limite legale atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF ((CycleErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF ((CycleErrorId AND 16#0002) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] defaut synchro treuils'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF ((CycleErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF ((CycleErrorId AND 16#0008) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ecart codeurs remontee'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF ((CycleErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF ((CycleErrorId AND 16#0010) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ecart vitesse confirme'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((CycleErrorId AND 16#0020) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
@@ -8534,6 +8908,12 @@ IF ((CycleErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxA
 END_IF;
 
 // 5i. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
+// Publication du tableau complet instantane dans le DUT IHM
+FOR i := AlarmCount TO (CST_NbMaxAlarmes - 1) DO
+    AlarmArray[i] := '';
+END_FOR;
+Banner.AlarmBanner.AlarmArray := AlarmArray;
+
 IF AlarmCount = 0 THEN
     AlarmIndex := 0;
     Banner.AlarmBanner.HasAlarm := FALSE;
@@ -9150,7 +9530,7 @@ Ready := TRUE;
 // === 🌐 0. ContexteMachineGlobal : ST_ChainContextGlobal (fiche §5.1) ===
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive        := Auth.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled := SimulationModeActive;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk    := NOT Network.CanError;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk    := Network.Joystick.Operational;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected  := GVL_IHM.Modes.Cmd.TglJoystickMaster;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal := Network.Bypass.Global;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal := FALSE; // TBD non câblé - voir fiche §6 (agrégat multi-domaine à définir)
@@ -9546,7 +9926,7 @@ GVL_Troubleshooting.Safety.ArmingFailed         := EmergencyDiag.ArmFailed;
 
 {region "§8 Diagnostic CAN et joystick"}
 // === 🕹️ 8. Diagnostic Chronologique Bus CAN &amp; Joystick (Joystick) ===
-GVL_Troubleshooting.Joystick.Step1_CanBusActive        := NOT Network.CanError;
+GVL_Troubleshooting.Joystick.Step1_CanBusActive        := Network.BusCanOpen.Operational;
 GVL_Troubleshooting.Joystick.Step2_JoystickOperational := Network.Joystick.Operational;
 GVL_Troubleshooting.Joystick.HwIn_JoyBtnRaw_DI         := HwIn.Operator.JoyBtnRaw;
 GVL_Troubleshooting.Joystick.NeutralXAct               := (HwIn.Operator.JoyXRaw_ANA1 &gt;= 4800 AND HwIn.Operator.JoyXRaw_ANA1 &lt;= 5200);
@@ -9868,8 +10248,8 @@ END_IF;
               <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
               <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
               <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
-              <Object Name="ST_BypassCommun" ObjectId="2553c0a8-2717-5217-9345-551661085587" />
               <Object Name="ST_BypassNetwork" ObjectId="b983f7fc-8c50-586b-bda1-7708d152c981" />
+              <Object Name="ST_BypassCommun" ObjectId="2553c0a8-2717-5217-9345-551661085587" />
               <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
               <Object Name="ST_SyncCmd" ObjectId="c4516adb-d5c4-5442-aed3-fe5c7a9333fa" />
               <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
@@ -9898,6 +10278,10 @@ END_IF;
               <Object Name="ST_AlarmBanner" ObjectId="51a442bb-120a-5a1f-856e-eba247651394" />
               <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
             </Folder>
+            <Folder Name="6_DIAG_ET_CHAINES">
+              <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
+              <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
+            </Folder>
             <Folder Name="4_JOYSTICK_ACQUISITION">
               <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
               <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
@@ -9906,10 +10290,6 @@ END_IF;
               <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
               <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />
               <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
-            </Folder>
-            <Folder Name="6_DIAG_ET_CHAINES">
-              <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
-              <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
             </Folder>
           </Folder>
         </Folder>

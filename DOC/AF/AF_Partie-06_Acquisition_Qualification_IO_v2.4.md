@@ -323,21 +323,28 @@ Les consommateurs decident ensuite :
 separee : c'est ce qui supprime le cycle prouve `Acquisition ↔ Diagnostics` et la duplication de
 `instJoystick`. Les FB et leurs seuils sont inchanges (Partie 12).
 
-### 🩺 4bis · Diagnostic carte des modules DI (22 TOR reelles)
+### 🩺 4bis · Diagnostic carte des 5 modules d'E/S physiques
 
-> ✅ Tranche 2026-08-04 (utilisateur, confirme sur les 3 modules) : les 22 TOR d'entree (§5) sont
-> portees par 3 supports materiels distincts, chacun exposant `GetDeviceState()` :
+> ✅ Tranche 2026-08-04 et complété 2026-08-26 (support matériel complet) : l'automate supervise l'état de santé
+> de ses 5 cartes d'E/S physiques via `GetDeviceState() = DEVICE_STATE.RUNNING` :
 
-| Module | TOR portees (§5) | Domaine |
-|---|---|---|
-| `Local_Digital_IO` | #8-15 (8 TOR) | Winch, Machine (Kobold) |
-| `VH_0800END` | #1-7 (7 TOR) | Machine (AU, phases, thermiques), freins M1/M2/M3 |
-| `VH_0808ETP` | #16-22 (7 TOR) | Translation (positions M3), Machine (hydraulique, crible) |
+| Module | Type | E/S portées | Fonctions critiques supportées |
+|---|---|---|---|
+| `Local_Digital_IO` | DI8 / DO8 | 8 DI + 8 DO | Winch (mou câble, sécurité), Machine (Kobold) |
+| `VH_0800END` | DI8 | 7 DI | Machine (AU, phases, thermiques), retours freins M1/M2/M3 |
+| `VH_0808ETP` | DI8 / DO8 | 7 DI + 8 DO | Translation (positions M3), résistances contacteurs M1/M2 |
+| `VH_0008ER` | DO8 Relais | 8 DO relais | Bobines freins treuils M1/M2/M3 & Moteur Kobold |
+| `VH_0008ER_1` | DO8 Relais | 8 DO relais | Réarmement AU (`EmergencyArming_RQ`) & Coupure puissance (`PowerKeepAlive_A/B_RQ`) |
 
-**Granularite MODULE, pas canal.** `GetDeviceState()` renseigne la sante d'une carte, pas d'une
-voie individuelle : un module en defaut ne dit pas *quelle* TOR ment, seulement qu'aucune de ses
-TOR n'est fiable. `FB_Input.ChannelOk` (§9 TBD) n'a donc **pas** de source par canal disponible
-aujourd'hui — limitation materielle assumee, pas un oubli.
+**Granularite MODULE, pas canal.** `GetDeviceState()` renseigne la santé d'une carte, pas d'une
+voie individuelle : un module en défaut ne dit pas *quelle* voie ment, seulement qu'aucune de ses
+E/S n'est fiable. `FB_Input.ChannelOk` n'a donc **pas** de source par canal disponible
+aujourd'hui — limitation matérielle assumée, pas un oubli.
+
+**Publication** :
+- `Data.LocalDigitalIoOk`, `Data.Vh0800EndOk`, `Data.Vh0808EtpOk`, `Data.Vh0008ErOk`, `Data.Vh0008Er1Ok` dans `ST_AcquisitionInterPrg`.
+- `Data.InputModuleFault` := `NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk AND Vh0008ErOk AND Vh0008Er1Ok)`.
+- Recopie directe vers `GVL_IHM.Network.InputModules` (consommé par `FB_Hmi_BannerFormatter` pour le Root Cause Masking).
 
 **Producteur** : `PRG_02_Acquisition` (3 appels `GetDeviceState()`, publies `LocalDigitalIoOk`,
 `Vh0800EndOk`, `Vh0808EtpOk`, `InputModuleFault` agrege OR).

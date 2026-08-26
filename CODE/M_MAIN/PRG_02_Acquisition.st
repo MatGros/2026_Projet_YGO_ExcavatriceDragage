@@ -159,21 +159,25 @@ HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
 HwReal.Machine.TremieFull_OR_GateRaised_DI := TremieFull_OR_GateRaised_DI; // 🚧 Déclaré, non consommé — interlock trémie à câbler
 {endregion}
 
-{region "§1bis Diagnostic modules DI"}
-// === 🩺 §1bis DIAGNOSTIC MODULES DI ===
-// 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
+{region "§1bis Diagnostic modules E/S"}
+// === 🩺 §1bis DIAGNOSTIC MODULES E/S ===
+// 🩺 Diagnostic carte des 5 modules d'E/S physiques (AF06 §3bis).
 // GetDeviceState() = RUNNING => module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
-IF MachineInputSourceSimulated THEN
+IF MachineInputSourceSimulated OR GVL_IHM.Network.Bypass.Global OR GVL_IHM.Network.Bypass.InputModules THEN
     Data.LocalDigitalIoOk := TRUE;
     Data.Vh0800EndOk      := TRUE;
     Data.Vh0808EtpOk      := TRUE;
+    Data.Vh0008ErOk       := TRUE;
+    Data.Vh0008Er1Ok      := TRUE;
 ELSE
     Data.LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
     Data.Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
     Data.Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.Vh0008ErOk       := (VH_0008ER.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.Vh0008Er1Ok      := (VH_0008ER_1.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
-Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Data.Vh0808EtpOk);
+Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Data.Vh0808EtpOk AND Data.Vh0008ErOk AND Data.Vh0008Er1Ok);
 {endregion}
 
 {region "§1ter Diagnostic reseaux (CANopen + EtherCAT)"}
@@ -186,7 +190,9 @@ instDiagCanOpen(
     CANbusStateRaw         := HwReal.Operator.CanBusState,
     DeviceJoystickStateRaw := HwReal.Operator.JOY1_DeviceState,
     SimBypassActive        := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive,
-    NetworkBypassActive    := GVL_IHM.Network.Bypass.Global
+    NetworkBypassActive    := GVL_IHM.Network.Bypass.Global,
+    CanBusBypassActive     := GVL_IHM.Network.Bypass.BusCanOpen,
+    JoystickBypassActive   := GVL_IHM.Network.Bypass.Joystick
 );
 instDiagEthercat(
     Enable                   := TRUE,
@@ -197,7 +203,11 @@ instDiagEthercat(
     DeviceEncoderM1SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
     DeviceEncoderM2StateRaw  := HwReal.Winch.COD2_DeviceState,
     DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
-    NetworkBypassActive      := GVL_IHM.Network.Bypass.Global
+    NetworkBypassActive      := GVL_IHM.Network.Bypass.Global,
+    EcatBusBypassActive      := GVL_IHM.Network.Bypass.BusEthercat,
+    VariateurBypassActive    := GVL_IHM.Network.Bypass.VariateurM3,
+    EncoderM1BypassActive    := GVL_IHM.Network.Bypass.EncoderM1,
+    EncoderM2BypassActive    := GVL_IHM.Network.Bypass.EncoderM2
 );
 {endregion}
 

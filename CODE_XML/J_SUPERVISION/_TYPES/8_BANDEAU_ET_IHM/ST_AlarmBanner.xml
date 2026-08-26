@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.191502" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.191502">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T21:52:06.137721" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T21:52:06.137721">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -56,6 +56,19 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre total de messages actifs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AlarmArray">
+              <type>
+                <array>
+                  <dimension lower="0" upper="49" />
+                  <baseType>
+                    <string length="120" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📋 Liste complete instantanee de tous les defauts actifs</xhtml>
               </documentation>
             </variable>
           </struct>

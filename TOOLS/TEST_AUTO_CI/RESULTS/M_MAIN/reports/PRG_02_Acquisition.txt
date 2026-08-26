@@ -1,0 +1,6 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_65pr5uez\strucpp-test-lUvxpZ\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_65pr5uez\strucpp-test-lUvxpZ\test_main.cpp:42:55: error: 'struct strucpp::ST_ENCODERMEASUREMENT' has no member named 'POSITION_M'
+   42 |         if (!ctx.assert_eq(s.HARNESS.DATA.ENCODERS.M1.POSITION_M, 2.0, "HARNESS.DATA.ENCODERS.M1.POSITION_M", "2.0", 23, "Structure Data: Position cable M1 = 2.0m")) return false;
+      |                                                       ^~~~~~~~~~
+

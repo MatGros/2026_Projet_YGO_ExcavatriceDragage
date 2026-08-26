@@ -193,7 +193,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 18:43:16</div>
+    <div class="exec-time">2026-08-26 23:38:22</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (5 tests)</summary>
@@ -600,8 +600,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Acquisition_Preflight</code></td>
                 <td>21</td><td>4</td>
-                <td>0</td><td>3</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>2</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -675,6 +675,14 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>Auth.Mode: MAINT_N1 arbitre</li><li>Auth.SyncEnable vrai en N1 par defaut</li><li>Auth.InhibitM1 faux en N1</li><li>Auth.InhibitM2 faux en N1</li><li>Auth.JoystickWinchSelectArbitrated = 1 (M1) en N1</li><li>Auth.HomingApproachEnable faux en N1 (N2 only)</li><li>Auth.MaintenanceM3TargetEnable vrai (N1 + bit)</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>1</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>1</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-prg-03-modes-cycle-1" class="test-card test-card-pass">
             <header>
@@ -685,6 +693,14 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>Auth.Mode MAINT_N2 arbitre</li><li>Auth.InhibitM1 actif en N2 (demande M1)</li><li>Auth.InhibitM2 inactif (exclusion mutuelle)</li><li>Auth.HomingApproachEnable vrai en N2</li><li>Auth.MaintenanceM3TargetEnable vrai en N2 + bit</li><li>Auth.JoystickWinchSelectArbitrated M2 en N2</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>2</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>2</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>2</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-prg-03-modes-cycle-2" class="test-card test-card-pass">
             <header>
@@ -695,6 +711,14 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>Exactement une inhibition devenue active</li><li>Exclusion mutuelle : les 2 inhibitions jamais simultanees</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>2</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>2</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-prg-03-modes-cycle-3" class="test-card test-card-pass">
             <header>
@@ -705,6 +729,14 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Auth.Mode degrade MAINT_N1 (refus Semi-Auto sur defaut codeur)</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>3</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>1</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-prg-03-modes-cycle-4" class="test-card test-card-pass">
             <header>
@@ -715,6 +747,14 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Auth.Mode SEMI_AUTO arbitre</li><li>Sequenceur a l etape X0_PREPARATION</li><li>Sequenceur non Busy initialement</li><li>Sequenceur sans erreur</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (31)</summary>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>3</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>3</td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>
@@ -726,7 +766,7 @@
         <summary>Code source ST original (23)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
                 <pre>(* =======================================================================
    📊 Type CODESYS système pour tests STruCpp
    ======================================================================= *)
@@ -748,7 +788,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -770,7 +810,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -806,7 +846,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
    ───────────────────────────────────────────────────────────────
@@ -830,7 +870,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
@@ -850,7 +890,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_CycleTime.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_CycleTime.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
@@ -911,7 +951,7 @@ TimeLast := TimeCurrent;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Ramp.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Ramp.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Ramp — Rampe d&#x27;accélération et décélération asymétrique
    ───────────────────────────────────────────────────────────────
@@ -964,7 +1004,7 @@ Current := LIMIT(-100.0, Current, 100.0);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Acquisition_Preflight.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Acquisition_Preflight.st</code></summary>
                 <pre>(* =======================================================================
    📊 FB_Acquisition_Preflight — Verdict passif machine arrêtée
    ───────────────────────────────────────────────────────────────
@@ -1015,13 +1055,12 @@ END_VAR
 VAR
     // === TRIGGERS &amp; ETATS INTERNES ===
     ExecuteEdge             : R_TRIG;       // . [LOC] Trigger front montant Execute
-    BootPending             : BOOL := TRUE; // . [LOC] Demande preflight initiale au demarrage
     RequestPending          : BOOL;         // . [LOC] Demande de verdict en attente
 END_VAR
 
 {region &quot;§1 Gate et demande&quot;}
 ExecuteEdge(CLK := Execute);
-RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
+RequestPending := RequestPending OR ExecuteEdge.Q;
 PreflightBusy := RequestPending AND NOT MachineIsStill;
 IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
 IF NOT RequestPending THEN RETURN; END_IF;
@@ -1052,12 +1091,12 @@ IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightError
 {endregion}
 
 {region &quot;§3 Sortie&quot;}
-PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
+PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; RequestPending := FALSE;
 {endregion}
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -1198,7 +1237,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Filter.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Filter.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Filter — Filtre passe-bas premier ordre (PT1 numérique)
    ───────────────────────────────────────────────────────────────
@@ -1235,7 +1274,7 @@ END_IF;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\F_MODES\E_Mode.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
@@ -1253,7 +1292,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\F_MODES\FB_Modes.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\FB_Modes.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
@@ -1448,7 +1487,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_CycleStep.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_CycleStep.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_CycleStep — Étapes de la machine d&#x27;état du cycle automatique
    ───────────────────────────────────────────────────────────────
@@ -1477,7 +1516,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_DiveSearchState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_DiveSearchState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_DiveSearchState — Phases internes de recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
@@ -1498,7 +1537,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
    ───────────────────────────────────────────────────────────────
@@ -1519,7 +1558,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\ST_WinchCmdDemand.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\ST_WinchCmdDemand.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_WinchCmdDemand — Structure de demande de commande treuil
    ───────────────────────────────────────────────────────────────
@@ -1535,7 +1574,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\H_TREUILS_BENNE\BENNE\ST_BucketCmdDemand.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketCmdDemand.st</code></summary>
                 <pre>(* =======================================================================
    🪣 ST_BucketCmdDemand — Demande de commande benne
    ───────────────────────────────────────────────────────────────
@@ -1551,7 +1590,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\I_TRANSLATION\ST_TranslationCmdDemand.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\ST_TranslationCmdDemand.st</code></summary>
                 <pre>(* =======================================================================
    🎯 ST_TranslationCmdDemand — Demande de commande translation M3
    ───────────────────────────────────────────────────────────────
@@ -1567,7 +1606,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\FB_DiveSearch.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_DiveSearch.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_DiveSearch — Assistance plongée et recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
@@ -1746,7 +1785,7 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\FB_ExtractionSequence.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_ExtractionSequence.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_ExtractionSequence — Fermeture benne et remontée assistée
    ───────────────────────────────────────────────────────────────
@@ -1921,7 +1960,7 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\G_CYCLE\FB_Cycle.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_Cycle.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Cycle — Séquenceur du cycle automatique (Grafcet de dragage)
    ───────────────────────────────────────────────────────────────
@@ -2439,7 +2478,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_Modes_Autorisations.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_Modes_Autorisations.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎚️ ST_Modes_Autorisations — Bus d&#x27;autorisations du mode machine
    ───────────────────────────────────────────────────────────────
@@ -2463,7 +2502,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_TestHarness_PRG_03.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_TestHarness_PRG_03.st</code></summary>
                 <pre>(* =======================================================================
    🧱 FB_TestHarness_PRG_03 : Banc d&#x27;essai unitaire pour PRG_03_Modes_Cycle
    ───────────────────────────────────────────────────────────────

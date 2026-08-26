@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.130490" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.130490">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T22:46:00.220395" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T22:46:00.220395">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,71 +23,6 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="E_Diag_State">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="READY" value="1" />
-              <value name="INIT" value="2" />
-              <value name="MONITORING" value="3" />
-              <value name="ERROR" value="4" />
-              <value name="SIMULATED" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désactivé (surveillance non active)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Opérationnel réel, pas de défaut</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisation / Recherche de réseau</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MONITORING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Surveillance active (états transitoires)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>ERROR</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Anomalie de communication</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SIMULATED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation ou bypass réseau IHM — pas le bus réel</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e56e22b9-6e46-55bd-973d-b226ca7d1e70</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="ST_Diag_Device">
         <baseType>
           <struct>
@@ -154,6 +89,71 @@
    📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    =======================================================================</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="E_Diag_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="READY" value="1" />
+              <value name="INIT" value="2" />
+              <value name="MONITORING" value="3" />
+              <value name="ERROR" value="4" />
+              <value name="SIMULATED" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désactivé (surveillance non active)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Opérationnel réel, pas de défaut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisation / Recherche de réseau</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MONITORING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Surveillance active (états transitoires)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Anomalie de communication</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SIMULATED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation ou bypass réseau IHM — pas le bus réel</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e56e22b9-6e46-55bd-973d-b226ca7d1e70</ObjectId>
+          </data>
+        </addData>
       </dataType>
     </dataTypes>
     <pous>
@@ -233,8 +233,40 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASS RESEAU IHM ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASS RESEAU IHM &amp; GRANULAIRES ===
 --&gt; [TST] TRUE = bypass reseau global IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EcatBusBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = bypass specifique bus EtherCAT maître</xhtml>
+              </documentation>
+            </variable>
+            <variable name="VariateurBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = bypass specifique esclave variateur M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1BypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = bypass specifique esclave codeur M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2BypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = bypass specifique esclave codeur M2</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -244,57 +276,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; CONFORMITE ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT DU BLOC ===
 &lt;-- [STAT] Logique de surveillance active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Busy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise (conformite interface)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_Diag_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase courante du diagnostic global</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS &amp; ALARMES ===
-&lt;-- [DIAG] Resume anomalie de communication bus</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut global resume</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_Diag_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Phase figee a l'apparition de l'erreur</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEthercatMaster">
@@ -302,7 +285,8 @@
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics bus EtherCAT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS STRUCTURES PAR EQUIPEMENT ===
+&lt;-- [DIAG] Diagnostics bus EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateur">
@@ -327,31 +311,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics esclave COD2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeviceVariateurStateRawOut">
-              <type>
-                <derived name="DEVICE_STATE" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MIROIRS BRUTS MATERIEL ===
-&lt;-- [DIAG] Miroir brut status variateur M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeviceEncoderM1StateRawOut">
-              <type>
-                <derived name="DEVICE_STATE" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Miroir brut status encodeur M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeviceEncoderM2StateRawOut">
-              <type>
-                <derived name="DEVICE_STATE" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Miroir brut status encodeur M2</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -457,7 +416,6 @@
 // 🛑 1. GATE : Désactivation si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
-    State := E_Diag_State.DISABLED;
     DeviceVariateur.State := E_Diag_State.DISABLED;
     DeviceEncoderM1.State := E_Diag_State.DISABLED;
     DeviceEncoderM2.State := E_Diag_State.DISABLED;
@@ -470,14 +428,11 @@ IF NOT Enable THEN
     DeviceVariateur.Error := FALSE;
     DeviceEncoderM1.Error := FALSE;
     DeviceEncoderM2.Error := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
     DeviceEthercatMaster.State := E_Diag_State.DISABLED;
     DeviceEthercatMaster.Online := FALSE;
     DeviceEthercatMaster.Operational := FALSE;
-    DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
-    DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
-    DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
+    DeviceEthercatMaster.Error := FALSE;
+    DeviceEthercatMaster.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -491,9 +446,9 @@ VariateurOnlineReal := (DeviceVariateurStateRaw = DEVICE_STATE.RUNNING);
 EncoderM1OnlineReal := (DeviceEncoderM1StateRaw = DEVICE_STATE.RUNNING);
 EncoderM2OnlineReal := (DeviceEncoderM2StateRaw = DEVICE_STATE.RUNNING);
 
-VariateurBypass := DeviceVariateurSimBypass OR NetworkBypassActive;
-EncoderM1Bypass := DeviceEncoderM1SimBypass OR NetworkBypassActive;
-EncoderM2Bypass := DeviceEncoderM2SimBypass OR NetworkBypassActive;
+VariateurBypass := DeviceVariateurSimBypass OR NetworkBypassActive OR VariateurBypassActive;
+EncoderM1Bypass := DeviceEncoderM1SimBypass OR NetworkBypassActive OR EncoderM1BypassActive;
+EncoderM2Bypass := DeviceEncoderM2SimBypass OR NetworkBypassActive OR EncoderM2BypassActive;
 
 VariateurOnlineEff := VariateurOnlineReal OR VariateurBypass;
 EncoderM1OnlineEff := EncoderM1OnlineReal OR EncoderM1Bypass;
@@ -569,13 +524,6 @@ ELSE
     DeviceEncoderM2.State := E_Diag_State.READY;
 END_IF;
 
-// Fige la phase du diagnostic global sur le premier défaut
-IF (DeviceVariateur.ErrorId &lt;&gt; 0 OR DeviceEncoderM1.ErrorId &lt;&gt; 0 OR DeviceEncoderM2.ErrorId &lt;&gt; 0) THEN
-    IF StateAtError = E_Diag_State.DISABLED THEN
-        StateAtError := State;
-    END_IF;
-END_IF;
-
 {endregion}
 
 {region "§5 Synthese EtherCAT et sorties"}
@@ -584,40 +532,20 @@ DeviceVariateur.Error := (DeviceVariateur.ErrorId &lt;&gt; 0);
 DeviceEncoderM1.Error := (DeviceEncoderM1.ErrorId &lt;&gt; 0);
 DeviceEncoderM2.Error := (DeviceEncoderM2.ErrorId &lt;&gt; 0);
 
-Error := (DeviceVariateur.Error OR DeviceEncoderM1.Error OR DeviceEncoderM2.Error);
-
-ErrorId := 16#0000;
-IF DeviceVariateur.Error THEN
-    ErrorId := ErrorId OR 16#00F0;
-END_IF;
-IF DeviceEncoderM1.Error THEN
-    ErrorId := ErrorId OR 16#0F00;
-END_IF;
-IF DeviceEncoderM2.Error THEN
-    ErrorId := ErrorId OR 16#F000;
-END_IF;
-
-IF Error THEN
-    State := E_Diag_State.ERROR;
-ELSIF NOT (VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff) THEN
-    State := E_Diag_State.INIT;
-ELSIF (VariateurBypass OR EncoderM1Bypass OR EncoderM2Bypass)
-      AND NOT (VariateurOnlineReal AND EncoderM1OnlineReal AND EncoderM2OnlineReal) THEN
-    State := E_Diag_State.SIMULATED;
-ELSE
-    State := E_Diag_State.READY;
-END_IF;
-
-DeviceEthercatMaster.Online := VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff;
+DeviceEthercatMaster.Online := (VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff) OR NetworkBypassActive OR EcatBusBypassActive;
 DeviceEthercatMaster.Operational := DeviceEthercatMaster.Online;
+DeviceEthercatMaster.Error := NOT DeviceEthercatMaster.Operational;
 
-DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
-DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
-DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
-
-Busy := FALSE;
-Done := FALSE;
-
+IF DeviceEthercatMaster.Error THEN
+    DeviceEthercatMaster.ErrorId := 16#0001;
+    DeviceEthercatMaster.State := E_Diag_State.ERROR;
+ELSIF (VariateurBypass OR EncoderM1Bypass OR EncoderM2Bypass OR EcatBusBypassActive) THEN
+    DeviceEthercatMaster.ErrorId := 16#0000;
+    DeviceEthercatMaster.State := E_Diag_State.SIMULATED;
+ELSE
+    DeviceEthercatMaster.ErrorId := 16#0000;
+    DeviceEthercatMaster.State := E_Diag_State.READY;
+END_IF;
 {endregion}
 </xhtml>
           </ST>
@@ -638,8 +566,8 @@ Done := FALSE;
       <ProjectStructure>
         <Folder Name="C_DIAG_RESEAUX">
           <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
-          <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
           <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
+          <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
         </Folder>
       </ProjectStructure>
     </data>

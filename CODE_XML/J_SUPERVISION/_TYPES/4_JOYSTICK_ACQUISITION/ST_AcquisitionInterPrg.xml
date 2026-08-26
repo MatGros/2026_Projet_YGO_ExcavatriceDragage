@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T20:08:17.589724" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T20:08:17.589724">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T21:56:13.395763" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T21:56:13.395763">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -114,8 +114,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 Diagnostics modules DI ===
-🟢 Module Local_Digital_IO OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 Diagnostics modules E/S ===
+🟢 Module Local_Digital_IO OK (DI8/DO8)</xhtml>
               </documentation>
             </variable>
             <variable name="Vh0800EndOk">
@@ -123,7 +123,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0800END OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0800END OK (DI8)</xhtml>
               </documentation>
             </variable>
             <variable name="Vh0808EtpOk">
@@ -131,7 +131,23 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0808ETP OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0808ETP OK (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008ErOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008Er1Ok">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)</xhtml>
               </documentation>
             </variable>
             <variable name="InputModuleFault">
@@ -139,7 +155,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur au moins un module DI</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur au moins un module E/S</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceChanged">
