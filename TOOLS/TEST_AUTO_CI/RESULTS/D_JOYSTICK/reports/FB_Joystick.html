@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 14:33:10</div>
+    <div class="exec-time">2026-08-26 14:39:48</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (10 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-joystick-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-1">TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-2">TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-3">TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-4">TC-P08-005 Changement de mode desarme le geste, nouvel appui exige</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-5">TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-6">TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-7">TC-P08-011 Fin de cycle benne desarme le geste par defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-8">TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-9">TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes</a></li></ul>
+        <summary>📋 Sommaire (11 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-joystick-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-1">TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-2">TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-3">TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-4">TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-5">TC-P08-005 Changement de mode desarme le geste, nouvel appui exige</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-6">TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-7">TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-8">TC-P08-011 Fin de cycle benne desarme le geste par defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-9">TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-10">TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            10/10 vérifications validées
+            11/11 vérifications validées
         </div>
     </div>
     
@@ -696,7 +696,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 9 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 10 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-joystick-1" class="test-card test-card-pass">
@@ -764,6 +764,35 @@
         <article id="test-fb-joystick-3" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle </h3>
+            </header>
+            <div class="comments"><p class='comment'>Arme le geste avec le manche au neutre</p><p class='comment'>Test dans la zone morte superieure : RawX = 5150 (neutre 5000 + 150 &lt; 300)</p><p class='comment'>Test dans la zone morte inferieure : RawY = 4850 (neutre 5000 - 150 &gt; -300)</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>Geste arme au neutre</li><li>RawX=5150 dans deadband (300) : consigne X strictement 0.0</li><li>RawX dans deadband : DirectionX=0</li><li>Signal dans deadband : considere au neutre</li><li>RawY=4850 dans deadband (300) : consigne Y strictement 0.0</li><li>RawY dans deadband : DirectionY=0</li><li>Signal dans deadband : considere au neutre</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (4 scans, 6 variables actives)</summary>
+            <div class="wf-scroll"><svg width="444" height="332" viewBox="0 0 444 332" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="314" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="326" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="314" class="wf-grid"/><text x="284.0" y="52" class="wf-time">110ms</text><text x="284.0" y="326" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="314" class="wf-grid"/><text x="340.0" y="52" class="wf-time">120ms</text><text x="340.0" y="326" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="314" class="wf-grid"/><text x="396.0" y="52" class="wf-time">130ms</text><text x="396.0" y="326" class="wf-scan">#3</text><text x="182" y="86.0" class="wf-label">RAWX</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="214.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5000</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><text x="284.0" y="76.0" class="wf-num">5000</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="326.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">5150</text><line x1="368" y1="82.0" x2="424" y2="82.0" class="wf-num-line"/><rect x="382.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="77.0" class="wf-num-changed">5000</text><text x="182" y="126.0" class="wf-label">RAWY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="214.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">5000</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">5000</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><text x="340.0" y="116.0" class="wf-num">5000</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><rect x="382.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="396.0" y="117.0" class="wf-num-changed">4850</text><text x="182" y="166.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L312,148L312,148L312,174L368,174L424,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">BUTTON</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,188L256,188L312,188L312,188L312,214L368,214L424,214" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,254L256,254L256,254L256,228L312,228L368,228L424,228" class="wf-line" stroke="#0d9488"/><text x="182" y="286.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><path d="M200,268L256,268L256,268L256,294L312,294L368,294L424,294" class="wf-line" stroke="#1d4ed8"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (4 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RAWX</th><th>RAWY</th><th>RAWBUTTON</th><th>BUTTON</th><th>DEADMANARMED</th><th>DEADMANARMPENDING</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>5000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>110 ms</td><td>5000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>120 ms</td><td class='changed'>5150</td><td>5000</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>130 ms</td><td class='changed'>5000</td><td class='changed'>4850</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (33)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADBANDRAW</code></td><td>300</td></tr><tr><td><code>NEUTRALHOLDTIME</code></td><td>100000000</td></tr><tr><td><code>DEADMANARMHOLDTIME</code></td><td>100000000</td></tr><tr><td><code>DEADMANARMGRACETIME</code></td><td>3000000000</td></tr><tr><td><code>RAWOUTOFRANGEMARGIN</code></td><td>500</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AXISCMDX.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AXISCMDY.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALYACT</code></td><td>5000</td></tr><tr><td><code>SPEEDTGTX_PCT</code></td><td>0</td></tr><tr><td><code>DIRECTIONX</code></td><td>0</td></tr><tr><td><code>SPEEDTGTY_PCT</code></td><td>0</td></tr><tr><td><code>DIRECTIONY</code></td><td>0</td></tr><tr><td><code>ATNEUTRAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>NEUTRALXMEM</code></td><td>5000</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>5000</td></tr><tr><td><code>CMDXVAL</code></td><td>0</td></tr><tr><td><code>CMDYVAL</code></td><td>0</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-joystick-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace </h3>
             </header>
             <div class="comments"><p class='comment'>nx/ny fixes explicitement a 5000 avant CHAQUE appel : STruCpp ne re-copie PAS la sortie
@@ -794,7 +823,7 @@
     </details>
     </div>
         </article>
-        <article id="test-fb-joystick-4" class="test-card test-card-pass">
+        <article id="test-fb-joystick-5" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-005 Changement de mode desarme le geste, nouvel appui exige </h3>
@@ -823,7 +852,7 @@
     </details>
     </div>
         </article>
-        <article id="test-fb-joystick-5" class="test-card test-card-pass">
+        <article id="test-fb-joystick-6" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu </h3>
@@ -852,7 +881,7 @@
     </details>
     </div>
         </article>
-        <article id="test-fb-joystick-6" class="test-card test-card-pass">
+        <article id="test-fb-joystick-7" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur) </h3>
@@ -885,7 +914,7 @@
     </details>
     </div>
         </article>
-        <article id="test-fb-joystick-7" class="test-card test-card-pass">
+        <article id="test-fb-joystick-8" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-011 Fin de cycle benne desarme le geste par defaut </h3>
@@ -914,7 +943,7 @@
     </details>
     </div>
         </article>
-        <article id="test-fb-joystick-8" class="test-card test-card-pass">
+        <article id="test-fb-joystick-9" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE </h3>
@@ -943,7 +972,7 @@
     </details>
     </div>
         </article>
-        <article id="test-fb-joystick-9" class="test-card test-card-pass">
+        <article id="test-fb-joystick-10" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes </h3>
@@ -1594,6 +1623,7 @@ test_fb_joystick.st
   [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
   [PASS] TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)
   [PASS] TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant
+  [PASS] TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle
   [PASS] TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace
   [PASS] TC-P08-005 Changement de mode desarme le geste, nouvel appui exige
   [PASS] TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu
@@ -1603,7 +1633,7 @@ test_fb_joystick.st
   [PASS] TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes
 
 -----------------------------------------
-10 tests, 10 passed, 0 failed
+11 tests, 11 passed, 0 failed
 </pre>
     </details>
 </div>
