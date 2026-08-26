@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 16:23:52</div>
+    <div class="exec-time">2026-08-26 18:18:15</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-brake-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-1">TC-P05-010 Modes : selection et autorisation mode Maintenance N1</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-brake-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-1">Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms)</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-2">Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable)</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-3">Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture</a></li><li class="toc-item toc-pass"><a href="#test-fb-brake-4">Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -403,6 +403,60 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 14 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>BRAKECMD</code> jamais câblé en production</li><li>Pin <code>BRAKECOMMANDOPENCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>CONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>CONTACTORFEEDBACK</code> jamais câblé en production</li><li>Pin <code>DELAYCONTACTCLOSE</code> jamais câblé en production</li><li>Pin <code>DELAYMAGNETISE</code> jamais câblé en production</li><li>Pin <code>DELAYMOTORDECEL</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FEEDBACKTIMEOUT</code> jamais câblé en production</li><li>Pin <code>MOVEMENTREQUESTED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MOVEMENTREQUESTED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CONTACTORFEEDBACK <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSCONTACTORCHECK <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DELAYCONTACTCLOSE <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DELAYMAGNETISE <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DELAYMOTORDECEL <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">FEEDBACKTIMEOUT <span class="pin-type">IEC_TIME</span></div>
+        </div></div>
+            <div class="pin-block">FB_Brake</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">STATUS <span class="pin-type">ST_FBSTATUS</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BRAKECOMMANDOPENCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTORCHECK <span class="pin-type">ST_CONTACTORCHECK</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -492,23 +546,152 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE : FB non pret (neutralise)</li><li>Enable=TRUE : FB pret</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 3 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="212" viewBox="0 0 388 212" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="194" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="206" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="194" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="206" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="194" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="206" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">MOVEMENTREQUESTED</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,108L256,108L256,108L256,134L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">READY</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148L312,148L312,174L368,174" class="wf-line" stroke="#0891b2"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>MOVEMENTREQUESTED</th><th>READY</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (11)</summary>
+        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTACTORFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSCONTACTORCHECK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DELAYCONTACTCLOSE</code></td><td>100000000</td></tr><tr><td><code>DELAYMAGNETISE</code></td><td>300000000</td></tr><tr><td><code>DELAYMOTORDECEL</code></td><td>500000000</td></tr><tr><td><code>FEEDBACKTIMEOUT</code></td><td>1000000000</td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKECOMMANDOPENCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTACTORCHECK.COMMAND</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-brake-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P05-010 Modes : selection et autorisation mode Maintenance N1 </h3>
+                <h3>Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms) </h3>
             </header>
+            <div class="comments"><p class='comment'>Bypass du controle contacteur : ce test se concentre sur le seul timing de magnetisation</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>t=0 : magnetisation demarre, frein encore colle</li><li>sequence en cours -&gt; BUSY</li><li>t=399ms &lt; 400ms requis : toujours colle</li><li>t=401ms &gt;= 400ms : magnetisation acquise, frein relache</li><li>sequence terminee -&gt; DONE</li><li>bypass actif : confirmation = image de BrakeCmd</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 4 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="252" viewBox="0 0 388 252" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="234" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="246" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="234" class="wf-grid"/><text x="284.0" y="52" class="wf-time">399ms</text><text x="284.0" y="246" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="234" class="wf-grid"/><text x="340.0" y="52" class="wf-time">409ms</text><text x="340.0" y="246" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">STATUS.BUSY</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">BRAKECMD</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L312,134L312,134L312,108L368,108" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">BRAKECOMMANDOPENCONFIRMED</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L312,174L312,174L312,148L368,148" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">CONTACTORCHECK.COMMAND</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L312,214L312,214L312,188L368,188" class="wf-line" stroke="#65a30d"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>STATUS.BUSY</th><th>BRAKECMD</th><th>BRAKECOMMANDOPENCONFIRMED</th><th>CONTACTORCHECK.COMMAND</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>399 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>409 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (10)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOVEMENTREQUESTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CONTACTORFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSCONTACTORCHECK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DELAYCONTACTCLOSE</code></td><td>100000000</td></tr><tr><td><code>DELAYMAGNETISE</code></td><td>300000000</td></tr><tr><td><code>DELAYMOTORDECEL</code></td><td>500000000</td></tr><tr><td><code>FEEDBACKTIMEOUT</code></td><td>1000000000</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-brake-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable) </h3>
+            </header>
+            <div class="comments"><p class='comment'>A VERIFIER intentionnellement : DelayMotorDecel/TonDecel sont declares et documentes
+       (&quot;Delai deceleration avant collage frein&quot;) mais TonDecel.IN est TOUJOURS force a FALSE
+       dans FB_Brake.st (§1/§3) -- aucune temporisation n est reellement appliquee avant que le
+       frein ne colle. Ce test documente le comportement REEL actuel (immediat), pas une exigence
+       validee -- a confirmer avec l utilisateur si une temporisation etait pourtant voulue.</p><p class='comment'>mouvement arrete : meme scan, frein colle instantanement -- DelayMotorDecel (500ms) ignore</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>precondition : frein ouvert</li><li>MovementRequested retombe : frein colle DES CE SCAN, aucun delai observe</li><li>retour a READY immediat</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 5 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="292" viewBox="0 0 388 292" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="274" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="286" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="274" class="wf-grid"/><text x="284.0" y="52" class="wf-time">401ms</text><text x="284.0" y="286" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="274" class="wf-grid"/><text x="340.0" y="52" class="wf-time">411ms</text><text x="340.0" y="286" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">MOVEMENTREQUESTED</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">STATUS.BUSY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,108L256,108L256,108L256,134L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">BRAKECMD</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148L312,148L312,174L368,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">BRAKECOMMANDOPENCONFIRMED</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L256,214L256,188L312,188L312,188L312,214L368,214" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">CONTACTORCHECK.COMMAND</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,254L256,254L256,254L256,228L312,228L312,228L312,254L368,254" class="wf-line" stroke="#0d9488"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>MOVEMENTREQUESTED</th><th>STATUS.BUSY</th><th>BRAKECMD</th><th>BRAKECOMMANDOPENCONFIRMED</th><th>CONTACTORCHECK.COMMAND</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>401 ms</td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>411 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (9)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTACTORFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSCONTACTORCHECK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DELAYCONTACTCLOSE</code></td><td>100000000</td></tr><tr><td><code>DELAYMAGNETISE</code></td><td>300000000</td></tr><tr><td><code>DELAYMOTORDECEL</code></td><td>500000000</td></tr><tr><td><code>FEEDBACKTIMEOUT</code></td><td>1000000000</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-brake-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture </h3>
+            </header>
+            <div class="comments"><p class='comment'>1s de plus (FeedbackTimeout) : le retour n a jamais confirme -&gt; defaut</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary><ul class="checks-list"><li>magnetisation acquise : commande ouverture emise (ContactorFeedback ne confirme pas encore)</li><li>commande ouverture emise mais jamais confirmee -&gt; StuckClosed</li><li>defaut visible sur Status.Error</li><li>bit0 : incoherence retour contacteur</li><li>sortie sure sur defaut : BrakeCmd force a FALSE malgre la sequence terminee</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 3 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="212" viewBox="0 0 388 212" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="194" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="206" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="194" class="wf-grid"/><text x="284.0" y="52" class="wf-time">401ms</text><text x="284.0" y="206" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="194" class="wf-grid"/><text x="340.0" y="52" class="wf-time">1401ms</text><text x="340.0" y="206" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">STATUS.BUSY</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">BRAKECMD</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">CONTACTORCHECK.COMMAND</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148L368,148" class="wf-line" stroke="#0891b2"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>STATUS.BUSY</th><th>BRAKECMD</th><th>CONTACTORCHECK.COMMAND</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>401 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>1401 ms</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (11)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOVEMENTREQUESTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CONTACTORFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSCONTACTORCHECK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DELAYCONTACTCLOSE</code></td><td>100000000</td></tr><tr><td><code>DELAYMAGNETISE</code></td><td>300000000</td></tr><tr><td><code>DELAYMOTORDECEL</code></td><td>500000000</td></tr><tr><td><code>FEEDBACKTIMEOUT</code></td><td>1000000000</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKECOMMANDOPENCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-brake-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu </h3>
+            </header>
+            <div class="comments"><p class='comment'>la cause disparait (le retour confirme enfin), mais SANS Reset : le defaut reste affiche</p><p class='comment'>front Reset, cause deja disparue : acquitte</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>precondition : defaut StuckClosed actif</li><li>cause disparue mais pas acquittee : le defaut reste affiche (pas d auto-effacement)</li><li>Reset avec cause disparue (retour coherent) : defaut acquitte</li><li>plus de defaut : frein a nouveau relache (mouvement toujours demande)</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (5 scans, 6 variables actives)</summary>
+            <div class="wf-scroll"><svg width="500" height="332" viewBox="0 0 500 332" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="314" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="326" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="314" class="wf-grid"/><text x="284.0" y="52" class="wf-time">401ms</text><text x="284.0" y="326" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="314" class="wf-grid"/><text x="340.0" y="52" class="wf-time">1401ms</text><text x="340.0" y="326" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="314" class="wf-grid"/><text x="396.0" y="52" class="wf-time">1411ms</text><text x="396.0" y="326" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="314" class="wf-grid"/><text x="452.0" y="52" class="wf-time">1421ms</text><text x="452.0" y="326" class="wf-scan">#4</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L368,94L424,94L424,94L424,68L480,68" class="wf-line" stroke="#111827"/><text x="182" y="126.0" class="wf-label">CONTACTORFEEDBACK</text><circle cx="192" cy="122.0" r="4" fill="#2563eb"/><path d="M200,134L256,134L312,134L368,134L368,134L368,108L424,108L480,108" class="wf-line" stroke="#2563eb"/><text x="182" y="166.0" class="wf-label">STATUS.BUSY</text><circle cx="192" cy="162.0" r="4" fill="#059669"/><path d="M200,148L256,148L256,148L256,174L312,174L368,174L424,174L480,174" class="wf-line" stroke="#059669"/><text x="182" y="206.0" class="wf-label">BRAKECMD</text><circle cx="192" cy="202.0" r="4" fill="#0891b2"/><path d="M200,214L256,214L256,214L256,188L312,188L312,188L312,214L368,214L424,214L424,214L424,188L480,188" class="wf-line" stroke="#0891b2"/><text x="182" y="246.0" class="wf-label">BRAKECOMMANDOPENCONFIRMED</text><circle cx="192" cy="242.0" r="4" fill="#65a30d"/><path d="M200,254L256,254L312,254L368,254L368,254L368,228L424,228L480,228" class="wf-line" stroke="#65a30d"/><text x="182" y="286.0" class="wf-label">CONTACTORCHECK.COMMAND</text><circle cx="192" cy="282.0" r="4" fill="#0d9488"/><path d="M200,294L256,294L256,294L256,268L312,268L368,268L424,268L480,268" class="wf-line" stroke="#0d9488"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (5 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th><th>CONTACTORFEEDBACK</th><th>STATUS.BUSY</th><th>BRAKECMD</th><th>BRAKECOMMANDOPENCONFIRMED</th><th>CONTACTORCHECK.COMMAND</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>401 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>1401 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>1411 ms</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>1421 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (8)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MOVEMENTREQUESTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BYPASSCONTACTORCHECK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DELAYCONTACTCLOSE</code></td><td>100000000</td></tr><tr><td><code>DELAYMAGNETISE</code></td><td>300000000</td></tr><tr><td><code>DELAYMOTORDECEL</code></td><td>500000000</td></tr><tr><td><code>FEEDBACKTIMEOUT</code></td><td>1000000000</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         </div>
     </details>

@@ -1,19 +1,33 @@
 {
   "version": 1,
-  "file": "test_prg_02_acquisition.st",
+  "file": "test_fb_extractionsequence.st",
   "results": [
     {
-      "name": "PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)",
-      "passed": true
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.READY expected TRUE, got FALSE",
+        "file": "test_fb_extractionsequence.st",
+        "line": 16,
+        "message": "Enable=TRUE -> Ready=TRUE (nominal)"
+      }
     },
     {
-      "name": "PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position",
-      "passed": true
+      "name": "TC-P04-020 Extraction : mise en service sequence extraction",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.READY expected TRUE, got FALSE",
+        "file": "test_fb_extractionsequence.st",
+        "line": 27,
+        "message": "Sequence Extraction prete"
+      }
     }
   ],
   "summary": {
     "total": 2,
-    "passed": 2,
-    "failed": 0
+    "passed": 0,
+    "failed": 2
   }
 }

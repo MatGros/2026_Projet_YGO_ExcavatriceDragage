@@ -1,9 +1,0 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-rLw0cW\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-rLw0cW\test_main.cpp:79:16: error: 'class strucpp::FB_TRANSLATION' has no member named 'TARGETSPEED_PCT'
-   79 |         s.FB_T.TARGETSPEED_PCT = 50.0;
-      |                ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-rLw0cW\test_main.cpp:80:16: error: 'class strucpp::FB_TRANSLATION' has no member named 'DIRECTIONPOSITIVE'
-   80 |         s.FB_T.DIRECTIONPOSITIVE = true;
-      |                ^~~~~~~~~~~~~~~~~
-

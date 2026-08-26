@@ -1,23 +1,33 @@
 {
   "version": 1,
-  "file": "test_fb_translation.st",
+  "file": "test_fb_divesearch.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.READY expected TRUE, got FALSE",
+        "file": "test_fb_divesearch.st",
+        "line": 16,
+        "message": "Enable=TRUE -> Ready=TRUE (nominal)"
+      }
     },
     {
-      "name": "TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations",
-      "passed": true
-    },
-    {
-      "name": "TC-P11-010 Translation : commande variateur nominale",
-      "passed": true
+      "name": "TC-P04-010 DiveSearch : mise en service recherche de couche",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.READY expected TRUE, got FALSE",
+        "file": "test_fb_divesearch.st",
+        "line": 27,
+        "message": "Module DiveSearch pret"
+      }
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
-    "failed": 0
+    "total": 2,
+    "passed": 0,
+    "failed": 2
   }
 }
