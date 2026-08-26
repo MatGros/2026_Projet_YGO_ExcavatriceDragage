@@ -15,6 +15,10 @@
       "passed": true
     },
     {
+      "name": "TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle",
+      "passed": true
+    },
+    {
       "name": "TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace",
       "passed": true
     },
@@ -44,8 +48,8 @@
     }
   ],
   "summary": {
-    "total": 10,
-    "passed": 10,
+    "total": 11,
+    "passed": 11,
     "failed": 0
   }
 }

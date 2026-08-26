@@ -232,6 +232,54 @@ TEST 'TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si rel
     ASSERT_TRUE(fb.DEADMANARMED, '110ms >= DeadmanArmHoldTime (100ms) : geste arme');
 END_TEST
 
+TEST 'TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* Arme le geste avec le manche au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'Geste arme au neutre');
+
+    (* Test dans la zone morte superieure : RawX = 5150 (neutre 5000 + 150 < 300) *)
+    ADVANCE_TIME(10000000);
+    nx := 5000; ny := 5000;
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5150, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX=5150 dans deadband (300) : consigne X strictement 0.0');
+    ASSERT_EQ(fb.DIRECTIONX, 0, 'RawX dans deadband : DirectionX=0');
+    ASSERT_TRUE(fb.ATNEUTRAL, 'Signal dans deadband : considere au neutre');
+
+    (* Test dans la zone morte inferieure : RawY = 4850 (neutre 5000 - 150 > -300) *)
+    ADVANCE_TIME(10000000);
+    nx := 5000; ny := 5000;
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 4850, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'RawY=4850 dans deadband (300) : consigne Y strictement 0.0');
+    ASSERT_EQ(fb.DIRECTIONY, 0, 'RawY dans deadband : DirectionY=0');
+    ASSERT_TRUE(fb.ATNEUTRAL, 'Signal dans deadband : considere au neutre');
+END_TEST
+
 TEST 'TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace'
     diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
     diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
