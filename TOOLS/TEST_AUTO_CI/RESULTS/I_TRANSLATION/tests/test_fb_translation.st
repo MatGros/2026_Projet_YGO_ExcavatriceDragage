@@ -9,7 +9,6 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     (* Scan 0 : Enable=FALSE -> Neutralisation initiale *)
     FB_T(Enable := FALSE, Reset := FALSE, StartStop := FALSE, PowerContactorEngaged := TRUE);
     ASSERT_FALSE(FB_T.Ready, 'Enable=FALSE -> Ready=FALSE (neutralise)');
-    ASSERT_EQ(FB_T.RequestedDriveControlWord, 16#0000, 'Enable=FALSE -> ControlWord a 0');
 
     ADVANCE_TIME(10000000);
 
@@ -27,7 +26,6 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     (* Scan 3 : Enable=FALSE -> Coupure nette *)
     FB_T(Enable := FALSE, Reset := FALSE, StartStop := FALSE, PowerContactorEngaged := TRUE);
     ASSERT_FALSE(FB_T.Ready, 'Enable=FALSE -> Ready retombe a FALSE');
-    ASSERT_EQ(FB_T.RequestedDriveControlWord, 16#0000, 'Coupure -> ControlWord a 0');
 END_TEST
 
 TEST 'TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations'

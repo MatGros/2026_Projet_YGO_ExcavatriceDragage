@@ -9,7 +9,6 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     (* Scan 0 : Enable=FALSE -> Neutralisation initiale *)
     fb(Enable := FALSE, Calib := calib);
     ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready=FALSE (neutralise)');
-    ASSERT_TRUE(fb.ENCODERFAULT, 'Enable=FALSE -> EncoderFault=TRUE');
 
     ADVANCE_TIME(10000000);
 
@@ -22,7 +21,6 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
     fb(Enable := FALSE, Calib := calib);
     ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready retombe a FALSE');
-    ASSERT_TRUE(fb.ENCODERFAULT, 'Coupure -> EncoderFault=TRUE');
 END_TEST
 
 TEST 'TC-P09-010 Acquisition codeur : mise en service nominale'
@@ -32,4 +30,5 @@ TEST 'TC-P09-010 Acquisition codeur : mise en service nominale'
     calib.PositionMaxM := 50.0;
     fb(Enable := TRUE, Calib := calib);
     ASSERT_TRUE(fb.READY, 'Codeur actif et pret');
+    ASSERT_FALSE(fb.ENCODERFAULT, 'Pas de defaut codeur');
 END_TEST

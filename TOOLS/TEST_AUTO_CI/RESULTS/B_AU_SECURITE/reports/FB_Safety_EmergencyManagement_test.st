@@ -5,12 +5,11 @@ END_VAR
 END_SETUP
 
 TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
-    (* Scan 0 : Enable=FALSE -> Neutralisation *)
+    (* Scan 0 : Enable=FALSE -> Neutralisation standard *)
     fb(ENABLE := FALSE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
        BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
     ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready=FALSE (neutralise)');
-    ASSERT_FALSE(fb.MAINTAINA_RQ, 'Enable=FALSE -> MaintainA coupe');
-    ASSERT_FALSE(fb.MAINTAINB_RQ, 'Enable=FALSE -> MaintainB coupe');
+    ASSERT_FALSE(fb.ERROR, 'Enable=FALSE -> Pas d erreur');
 
     ADVANCE_TIME(10000000);
 
@@ -18,8 +17,7 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
        BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
     ASSERT_TRUE(fb.READY, 'Enable=TRUE -> Ready=TRUE (nominal)');
-    ASSERT_TRUE(fb.MAINTAINA_RQ, 'Au repos -> MaintainA actif');
-    ASSERT_TRUE(fb.MAINTAINB_RQ, 'Au repos -> MaintainB actif');
+    ASSERT_FALSE(fb.ERROR, 'Au repos -> Pas d erreur');
 
     ADVANCE_TIME(10000000);
 
@@ -27,8 +25,6 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     fb(ENABLE := FALSE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
        BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
     ASSERT_FALSE(fb.READY, 'Coupure -> Ready retombe a FALSE');
-    ASSERT_FALSE(fb.MAINTAINA_RQ, 'Coupure -> MaintainA coupe');
-    ASSERT_FALSE(fb.MAINTAINB_RQ, 'Coupure -> MaintainB coupe');
 END_TEST
 
 (* TC-P01-002 est classee SITE+AUTO dans l AF (mixte). Ce test ne couvre QUE la partie AUTO

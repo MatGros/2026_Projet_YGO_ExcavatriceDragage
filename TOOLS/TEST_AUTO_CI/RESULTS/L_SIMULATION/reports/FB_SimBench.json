@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_simbench.st",
+  "file": "test_prg_04_treuils_benne.st",
   "results": [
     {
-      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "name": "PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth",
       "passed": true
     },
     {
-      "name": "TC-P13-001 Sim_Safety : neutralisation sans Enable",
+      "name": "PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)",
       "passed": true
     }
   ],

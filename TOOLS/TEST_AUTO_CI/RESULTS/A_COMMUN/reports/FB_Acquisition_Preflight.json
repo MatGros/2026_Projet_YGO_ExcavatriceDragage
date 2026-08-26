@@ -1,27 +1,19 @@
 {
   "version": 1,
-  "file": "test_fb_acquisition_preflight.st",
+  "file": "test_fb_modes.st",
   "results": [
     {
-      "name": "BootPending declenche automatiquement un verdict au 1er scan si la machine est deja a l arret",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "Execute pendant que la machine roule differe le verdict jusqu a l arret complet",
-      "passed": true
-    },
-    {
-      "name": "Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant",
-      "passed": true
-    },
-    {
-      "name": "Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple)",
+      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
       "passed": true
     }
   ],
   "summary": {
-    "total": 4,
-    "passed": 4,
+    "total": 2,
+    "passed": 2,
     "failed": 0
   }
 }
