@@ -1,6 +1,6 @@
 # FB_Sim_Safety — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.3.md`](../AF_Partie-13_Fonction_Simulation_v2.3.md) §4.
+> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.4.md`](../AF_Partie-13_Fonction_Simulation_v2.4.md) §4.
 > Rôle de **ce** document : modèle simulé de la chaîne AU/contacteur — et **catalogue unique** des `TC-P13-020...`.
 > Source code : `CODE/L_SIMULATION/FB_Sim_Safety.st` · instance `FB_SimBench.instSimSafety`.
 > ⚠️ Ce FB ne simule **que** les entrées de `FB_Safety_EmergencyManagement` (Partie 01, propriétaire

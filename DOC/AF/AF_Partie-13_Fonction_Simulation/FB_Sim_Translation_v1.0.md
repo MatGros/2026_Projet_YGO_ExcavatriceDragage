@@ -1,6 +1,6 @@
 # FB_Sim_Translation — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.3.md`](../AF_Partie-13_Fonction_Simulation_v2.3.md) §4.
+> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.4.md`](../AF_Partie-13_Fonction_Simulation_v2.4.md) §4.
 > Rôle de **ce** document : modèle simulé des 5 capteurs de position M3 par progression continue —
 > et **catalogue unique** des `TC-P13-040...`.
 > Source code : `CODE/L_SIMULATION/FB_Sim_Translation.st` · instance `FB_SimBench.instSimTranslation`.

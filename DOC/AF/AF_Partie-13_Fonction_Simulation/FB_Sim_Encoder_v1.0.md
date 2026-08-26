@@ -1,6 +1,6 @@
 # FB_Sim_Encoder — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.3.md`](../AF_Partie-13_Fonction_Simulation_v2.3.md) §4.
+> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.4.md`](../AF_Partie-13_Fonction_Simulation_v2.4.md) §4.
 > Rôle de **ce** document : modèle simulé d'un codeur absolu de treuil — et **catalogue unique**
 > des `TC-P13-030...`.
 > Source code : `CODE/L_SIMULATION/FB_Sim_Encoder.st` · instances `FB_SimBench.instSimEncoderM1/M2`.

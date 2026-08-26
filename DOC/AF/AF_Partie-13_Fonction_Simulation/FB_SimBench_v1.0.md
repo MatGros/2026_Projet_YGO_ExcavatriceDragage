@@ -1,6 +1,6 @@
 # FB_SimBench — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.3.md`](../AF_Partie-13_Fonction_Simulation_v2.3.md) §2/§4.
+> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.4.md`](../AF_Partie-13_Fonction_Simulation_v2.4.md) §2/§4.
 > Rôle de **ce** document : enveloppe unique de simulation banc — composition, câblage des
 > décalages 1-scan, table des sous-modèles — et **catalogue unique** des `TC-P13-010...`.
 > Source code : `CODE/L_SIMULATION/FB_SimBench.st` · instance `PRG_02_Acquisition.instSimBench`.
