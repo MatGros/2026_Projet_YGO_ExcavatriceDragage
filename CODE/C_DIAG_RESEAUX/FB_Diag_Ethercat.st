@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Surveillance bus EtherCAT master, variateur M3 et codeurs M1/M2
    🔌 Architecture : Publication ST_Diag_Device par esclave & E_Diag_State
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
    ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Diag_Ethercat
 VAR_INPUT
