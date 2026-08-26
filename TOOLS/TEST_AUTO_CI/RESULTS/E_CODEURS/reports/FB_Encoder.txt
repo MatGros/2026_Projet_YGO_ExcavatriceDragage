@@ -1,15 +1,15 @@
 Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-OI7QRl\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-OI7QRl\test_main.cpp:53:17: error: 'struct strucpp::ST_ENCODER_CALIB' has no member named 'POINTSPERREV'
-   53 |         s.CALIB.POINTSPERREV = 4096;
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-FeGsis\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-FeGsis\test_main.cpp:51:17: error: 'struct strucpp::ST_ENCODER_CALIB' has no member named 'POINTSPERREV'
+   51 |         s.CALIB.POINTSPERREV = 4096;
       |                 ^~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-OI7QRl\test_main.cpp:54:17: error: 'struct strucpp::ST_ENCODER_CALIB' has no member named 'CABLEM_PERREV'
-   54 |         s.CALIB.CABLEM_PERREV = 0.5;
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-FeGsis\test_main.cpp:52:17: error: 'struct strucpp::ST_ENCODER_CALIB' has no member named 'CABLEM_PERREV'
+   52 |         s.CALIB.CABLEM_PERREV = 0.5;
       |                 ^~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-OI7QRl\test_main.cpp:55:17: error: 'struct strucpp::ST_ENCODER_CALIB' has no member named 'POSITIONMINM'
-   55 |         s.CALIB.POSITIONMINM = -50.0;
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-FeGsis\test_main.cpp:53:17: error: 'struct strucpp::ST_ENCODER_CALIB' has no member named 'POSITIONMINM'
+   53 |         s.CALIB.POSITIONMINM = -50.0;
       |                 ^~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-OI7QRl\test_main.cpp:56:17: error: 'struct strucpp::ST_ENCODER_CALIB' has no member named 'POSITIONMAXM'
-   56 |         s.CALIB.POSITIONMAXM = 50.0;
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-FeGsis\test_main.cpp:54:17: error: 'struct strucpp::ST_ENCODER_CALIB' has no member named 'POSITIONMAXM'
+   54 |         s.CALIB.POSITIONMAXM = 50.0;
       |                 ^~~~~~~~~~~~
 

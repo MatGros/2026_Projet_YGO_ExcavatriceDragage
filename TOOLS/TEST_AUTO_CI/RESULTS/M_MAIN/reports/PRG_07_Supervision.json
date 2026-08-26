@@ -1,23 +1,19 @@
 {
   "version": 1,
-  "file": "test_prg_07_supervision.st",
+  "file": "test_fb_encoder.st",
   "results": [
     {
-      "name": "PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil",
-      "passed": true
-    },
-    {
-      "name": "PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau",
+      "name": "TC-P09-010 Acquisition codeur : mise en service nominale",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 2,
+    "passed": 2,
     "failed": 0
   }
 }

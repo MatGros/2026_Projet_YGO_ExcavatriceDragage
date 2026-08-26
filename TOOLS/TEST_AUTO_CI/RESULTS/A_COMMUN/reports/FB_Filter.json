@@ -1,19 +1,59 @@
 {
   "version": 1,
-  "file": "test_fb_modes.st",
+  "file": "test_fb_fbstatus.st",
   "results": [
     {
-      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "name": "TC-P03-001 Enable=FALSE neutralise le statut (gate)",
       "passed": true
     },
     {
-      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
+      "name": "Nominal : Enable=TRUE sans cause -> Ready, aucun defaut ni warning",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-007 Warning auto-efface sans Reset des que la cause disparait",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute)",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage)",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-014 Reset MAINTENU + cause disparait pendant le maintien : PAS d acquittement silencieux (T148, verrou)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 12,
+    "passed": 12,
     "failed": 0
   }
 }
