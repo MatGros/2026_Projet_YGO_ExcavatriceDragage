@@ -17,18 +17,20 @@
 
 ## 🧪 Points de validation (`TC-P10-001` à `010` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P10-001</code></nobr> | Méca A (bit7) : dérive>2m ou v>0.02m/s arrêt ➔ SafeStop+PowerCutOff | `💻 AUTO` |
-| <nobr><code>TC-P10-002</code></nobr> | Méca B (bit8) : non-confirmation arrêt 3s ➔ SafeStop+PowerCutOff | `💻 AUTO` |
-| <nobr><code>TC-P10-003</code></nobr> | Méca C (bit9) : dérive M1>2m en maintien M1 ➔ SafeStop+PowerCutOff | `💻 AUTO` |
-| <nobr><code>TC-P10-004</code></nobr> | Méca D (bit11) : capteur haut sans arrêt 3s ➔ SafeStop+PowerCutOff | `💻 AUTO` |
-| <nobr><code>TC-P10-005</code></nobr> | Méca E bit12 : écart>2m ➔ SafeStop seul (pas PowerCutOff) | `💻 AUTO` |
-| <nobr><code>TC-P10-006</code></nobr> | Méca E bit13 : bit12 non confirmé 3s ➔ escalade PowerCutOff | `💻 AUTO` |
-| <nobr><code>TC-P10-007</code></nobr> | Méca F (bit14) : sens mesuré opposé au sens commandé 500ms ➔ SafeStop | `💻 AUTO` |
-| <nobr><code>TC-P10-008</code></nobr> | Méca G (bit15) : vitesse nulle malgré commande 3s ➔ SafeStop seul | `💻 AUTO` |
-| <nobr><code>TC-P10-009</code></nobr> | `PowerCutOff` = exactement bits 2,7,8,9,10,11,13 (masque 16#2F84) | `💻 AUTO` |
-| <nobr><code>TC-P10-010</code></nobr> | `SafeStop` exclut bit3 (mou câble) si `SyncEnable=FALSE` | `💻 AUTO` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P10-001</code></nobr> | Méca A (bit7) : dérive>2m ou v>0.02m/s arrêt ➔ SafeStop+PowerCutOff | `💻 AUTO` | `NV-I` |
+| <nobr><code>TC-P10-002</code></nobr> | Méca B (bit8) : non-confirmation arrêt 3s ➔ SafeStop+PowerCutOff | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-003</code></nobr> | Méca C (bit9) : dérive M1>2m en maintien M1 ➔ SafeStop+PowerCutOff | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-004</code></nobr> | Méca D (bit11) : capteur haut sans arrêt 3s ➔ SafeStop+PowerCutOff | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-005</code></nobr> | Méca E bit12 : écart>2m ➔ SafeStop seul (pas PowerCutOff) | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-006</code></nobr> | Méca E bit13 : bit12 non confirmé 3s ➔ escalade PowerCutOff | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-007</code></nobr> | Méca F (bit14) : sens mesuré opposé au sens commandé 500ms ➔ SafeStop | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-008</code></nobr> | Méca G (bit15) : vitesse nulle malgré commande 3s ➔ SafeStop seul | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-009</code></nobr> | `PowerCutOff` = exactement bits 2,7,8,9,10,11,13 (masque 16#2F84) | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-010</code></nobr> | `SafeStop` exclut bit3 (mou câble) si `SyncEnable=FALSE` | `💻 AUTO` | `NV` |
 
 ---
 

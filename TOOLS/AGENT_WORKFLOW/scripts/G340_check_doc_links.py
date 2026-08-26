@@ -298,10 +298,21 @@ def main() -> int:
                             role_pattern = re.compile(rf"{re.escape(pou_name)}[^\n]*\n[^\n]*🎯\s*Cartouche\s*ST[^\n]*:\s*`(?P<expected>[^`]+)`", re.MULTILINE)
                             m = role_pattern.search(doc_text)
                             if not m:
-                                table_pattern = re.compile(rf"\|\s*`?{re.escape(pou_name)}`?\s*\|[^\n]*\|\s*`(?P<expected>[^`]+)`\s*\|", re.MULTILINE)
+                                # Repli legacy : seulement une ligne dont le POU est la
+                                # première cellule. Une recherche non ancrée capturait un
+                                # POU cité dans une colonne Réf/TC et, avec la colonne Etat,
+                                # prenait `NV` pour le rôle attendu.
+                                table_pattern = re.compile(
+                                    rf"^\|\s*`?{re.escape(pou_name)}`?\s*\|[^\n]*\|\s*`(?P<expected>[^`]+)`\s*\|$",
+                                    re.MULTILINE,
+                                )
                                 m = table_pattern.search(doc_text)
                             if m:
                                 expected = m.group("expected").strip()
+                                # Les tables de suivi portent désormais un état final ;
+                                # celui-ci n'est jamais une cartouche de rôle ST.
+                                if expected in {"V", "V-I", "NV", "NV-I", "R", "NA"}:
+                                    continue
                                 if st_role != expected:
                                     errors.append(
                                         f"{rel}:1: le rôle ST '{st_role}' ne correspond pas à la spec AF '{expected}' dans {doc_rel}"

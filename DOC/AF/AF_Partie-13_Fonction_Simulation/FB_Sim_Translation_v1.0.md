@@ -14,12 +14,14 @@
 
 ## 🧪 Points de validation (`TC-P13-040...` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P13-040</code></nobr> | Ne publie que les 6 mots thermomètre valides de `FB_Translation_PositionDecoder` (`11111→00000`) | `💻 AUTO` |
-| <nobr><code>TC-P13-041</code></nobr> | `Direction=+1` progresse vers Trémie, `-1` vers Maintenance, `0` maintient la position | `💻 AUTO` |
-| <nobr><code>TC-P13-042</code></nobr> | Position bornée `[Trémie, Maintenance]` — jamais de dépassement | `💻 AUTO` |
-| <nobr><code>TC-P13-043</code></nobr> | `Enable=FALSE` réinitialise sur la Trémie (0 m) — état de départ propre (REX 2026-08-21, était P2) | `💻 AUTO` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P13-040</code></nobr> | Ne publie que les 6 mots thermomètre valides de `FB_Translation_PositionDecoder` (`11111→00000`) | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-041</code></nobr> | `Direction=+1` progresse vers Trémie, `-1` vers Maintenance, `0` maintient la position | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-042</code></nobr> | Position bornée `[Trémie, Maintenance]` — jamais de dépassement | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-043</code></nobr> | `Enable=FALSE` réinitialise sur la Trémie (0 m) — état de départ propre (REX 2026-08-21, était P2) | `💻 AUTO` | `NV` |
 
 ---
 

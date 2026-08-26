@@ -53,7 +53,9 @@ def parse_markdown_table(lines: list[str]) -> list[dict[str, str]]:
         if not stripped.startswith("|") or not stripped.endswith("|"):
             continue
         # Découpage des colonnes en ignorant le premier et dernier vide (autour des | extrêmes)
-        cols = [col.strip() for col in stripped[1:-1].split("|")]
+        # Un pipe échappé fait partie d'une formule Markdown (ex. `\|x\|`),
+        # ce n'est pas un séparateur de colonne.
+        cols = [col.strip() for col in re.split(r"(?<!\\)\|", stripped[1:-1])]
         # Ignorer les lignes de séparation |---|---|
         if all(re.match(r"^:?-+:?$", col) for col in cols if col):
             continue
@@ -73,6 +75,27 @@ def parse_markdown_table(lines: list[str]) -> list[dict[str, str]]:
     return result
 
 
+def parse_markdown_tables(lines: list[str]) -> list[list[dict[str, str]]]:
+    """Découpe les blocs de tableaux distincts d'une même section Markdown."""
+    tables: list[list[dict[str, str]]] = []
+    block: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("|") and stripped.endswith("|"):
+            block.append(line)
+        else:
+            if block:
+                parsed = parse_markdown_table(block)
+                if parsed:
+                    tables.append(parsed)
+                block = []
+    if block:
+        parsed = parse_markdown_table(block)
+        if parsed:
+            tables.append(parsed)
+    return tables
+
+
 def extract_sections(content: str) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
     """Extrait les tables des sections Fonctions et Points de validation d'un contenu markdown."""
     lines = content.splitlines()
@@ -80,19 +103,23 @@ def extract_sections(content: str) -> tuple[list[dict[str, str]], list[dict[str,
     validation_rows: list[dict[str, str]] = []
 
     current_section: str | None = None
+    current_section_level: int | None = None
     section_lines: list[str] = []
 
     def flush_section():
-        nonlocal current_section, section_lines, functions_rows, validation_rows
+        nonlocal current_section, current_section_level, section_lines, functions_rows, validation_rows
         if current_section == "functions":
-            parsed = parse_markdown_table(section_lines)
-            if parsed:
-                functions_rows.extend(parsed)
+            for parsed in parse_markdown_tables(section_lines):
+                if any("fonction" in header.lower() for header in parsed[0]):
+                    functions_rows.extend(parsed)
+                    break
         elif current_section == "validation":
-            parsed = parse_markdown_table(section_lines)
-            if parsed:
-                validation_rows.extend(parsed)
+            for parsed in parse_markdown_tables(section_lines):
+                if any(header.lower().startswith("id") for header in parsed[0]):
+                    validation_rows.extend(parsed)
+                    break
         current_section = None
+        current_section_level = None
         section_lines = []
 
     for line in lines:
@@ -100,15 +127,21 @@ def extract_sections(content: str) -> tuple[list[dict[str, str]], list[dict[str,
         if RE_FUNCTIONS_HEADING.match(stripped):
             flush_section()
             current_section = "functions"
+            current_section_level = len(stripped) - len(stripped.lstrip("#"))
             continue
         elif RE_VALIDATION_HEADING.match(stripped):
             flush_section()
             current_section = "validation"
+            current_section_level = len(stripped) - len(stripped.lstrip("#"))
             continue
         elif RE_ANY_HEADING.match(stripped) and current_section:
-            # Nouveau titre de section
-            flush_section()
-            continue
+            heading_level = len(stripped) - len(stripped.lstrip("#"))
+            # Les sous-titres (ex. « Types d'essai », puis « Catalogue »)
+            # appartiennent encore à la section courante. Seul un titre de
+            # même niveau ou supérieur la clôture.
+            if current_section_level is not None and heading_level <= current_section_level:
+                flush_section()
+                continue
 
         if current_section:
             section_lines.append(line)
@@ -139,6 +172,8 @@ def normalize_function_item(row: dict[str, str]) -> dict[str, Any]:
             item["tc_couvrants"] = tc_list if tc_list else ([v] if v and v != "—" else [])
         elif "statut" in k_lower:
             item["statut"] = v
+        elif "état" in k_lower or "etat" in k_lower:
+            item["etat"] = v
 
     item.setdefault("id", row.get("ID", ""))
     item.setdefault("fonction", row.get("Fonction", ""))
@@ -147,6 +182,7 @@ def normalize_function_item(row: dict[str, str]) -> dict[str, Any]:
     item.setdefault("criticite", row.get("Criticité", row.get("Criticite", "")))
     item.setdefault("tc_couvrants", [])
     item.setdefault("statut", row.get("Statut", ""))
+    item.setdefault("etat", row.get("État", row.get("Etat", "")))
     return item
 
 
@@ -166,10 +202,13 @@ def normalize_validation_item(row: dict[str, str]) -> dict[str, Any]:
             item["type"] = v
         elif "réf" in k_lower or "ref" in k_lower:
             item["ref"] = v
+        elif "état" in k_lower or "etat" in k_lower:
+            item["etat"] = v
 
     item.setdefault("id", row.get("ID", ""))
     item.setdefault("intention", row.get("Intention", row.get("Intention / Comportement attendu", "")))
     item.setdefault("type", row.get("Type", ""))
+    item.setdefault("etat", row.get("État", row.get("Etat", "")))
     return item
 
 

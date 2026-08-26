@@ -15,17 +15,19 @@
 
 ### Table des fonctions
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
-|---|---|---|---|---|---|---|
-| `F10.01` | Piloter le mouvement treuil par palier | 5 paliers vitesse, sens, tempo asymétrique montée/descente | `FB_Winch` | 🟠 C3 | <nobr><code>TC-P10-011</code></nobr>, 017-019 | ✅ |
-| `F10.02` | Protéger le treuil (défense en profondeur) | 7 mécanismes A-G (safety métier), masques, bypass | `FB_Safety_Winch` | 🔴 C4 | <nobr><code>TC-P10-001</code></nobr>-010 | ✅ |
-| `F10.03` | Synchroniser M1/M2 (3 zones) | Nominal / dégradé palier 1 / SafeStop selon écart | `FB_WinchSync` | 🔴 C4 | <nobr><code>TC-P10-014</code></nobr>-016 | ✅ |
-| `F10.04` | Barrière finale sorties + watchdog frein | Contacteurs + frein couplé direct, anti-redémarrage | `FB_WinchOutputInterlock` | 🔴 C4 | <nobr><code>TC-P10-012</code></nobr>, 013, 020-022 | ✅ |
-| `F10.05` | Piloter la benne (désynchro M1/M2) | Ouverture/fermeture, glissement, assistants Dive/Extraction | `FB_Bucket` | 🟠 C3 | <nobr><code>TC-P10-023</code></nobr>-034 | ✅ |
-| `F10.06` | Diagnostiquer la symétrie M1/M2 | Écarts démarrage/frein/arrêt/position, passif | `FB_Winch_Symmetry` | ⚪ C1 | — | ✅ |
-| `F10.07` | Décoder consigne % → contacteurs | Palier 1-5 + garde-fou vitesse mesurée | `FB_SpeedStep` | 🟠 C3 | — | ✅ |
-| `F10.08` | Estimer la charge 2D (palier × vitesse) | Diagnostic, pas d'action sécurité | `FB_WinchLoadEstimator` | ⚪ C1 | — | ✅ |
-| `F10.09` | Surveiller la dérive sous frein serré | Capture position, alerte si dérive | `FB_DriftGuard` | 🟠 C3 | — | ✅ |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
+|---|---|---|---|---|---|---|---|
+| `F10.01` | Piloter le mouvement treuil par palier | 5 paliers vitesse, sens, tempo asymétrique montée/descente | `FB_Winch` | 🟠 C3 | <nobr><code>TC-P10-011</code></nobr>, 017-019 | ✅ | `NV-I` |
+| `F10.02` | Protéger le treuil (défense en profondeur) | 7 mécanismes A-G (safety métier), masques, bypass | `FB_Safety_Winch` | 🔴 C4 | <nobr><code>TC-P10-001</code></nobr>-010 | ✅ | `NV-I` |
+| `F10.03` | Synchroniser M1/M2 (3 zones) | Nominal / dégradé palier 1 / SafeStop selon écart | `FB_WinchSync` | 🔴 C4 | <nobr><code>TC-P10-014</code></nobr>-016 | ✅ | `NV-I` |
+| `F10.04` | Barrière finale sorties + watchdog frein | Contacteurs + frein couplé direct, anti-redémarrage | `FB_WinchOutputInterlock` | 🔴 C4 | <nobr><code>TC-P10-012</code></nobr>, 013, 020-022 | ✅ | `NV-I` |
+| `F10.05` | Piloter la benne (désynchro M1/M2) | Ouverture/fermeture, glissement, assistants Dive/Extraction | `FB_Bucket` | 🟠 C3 | <nobr><code>TC-P10-023</code></nobr>-034 | ✅ | `NV-I` |
+| `F10.06` | Diagnostiquer la symétrie M1/M2 | Écarts démarrage/frein/arrêt/position, passif | `FB_Winch_Symmetry` | ⚪ C1 | — | ✅ | `NV-I` |
+| `F10.07` | Décoder consigne % → contacteurs | Palier 1-5 + garde-fou vitesse mesurée | `FB_SpeedStep` | 🟠 C3 | — | ✅ | `NV-I` |
+| `F10.08` | Estimer la charge 2D (palier × vitesse) | Diagnostic, pas d'action sécurité | `FB_WinchLoadEstimator` | ⚪ C1 | — | ✅ | `NV-I` |
+| `F10.09` | Surveiller la dérive sous frein serré | Capture position, alerte si dérive | `FB_DriftGuard` | 🟠 C3 | — | ✅ | `NV-I` |
 
 ## 📑 Sommaire
 
@@ -54,17 +56,19 @@
 Catalogue `TC-P10-*` **réparti dans les fiches FB** (propriétaire unique par fiche, pas
 dupliqué ici) :
 
-| Fiche | TC couverts |
-|---|---|
-| [`FB_Winch`](AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md) | <nobr><code>TC-P10-011</code></nobr>, 017, 018, 019 |
-| [`FB_Safety_Winch`](AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md) | <nobr><code>TC-P10-001</code></nobr> à 010 |
-| [`FB_WinchSync`](AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md) | <nobr><code>TC-P10-014</code></nobr>, 015, 016 |
-| [`FB_WinchOutputInterlock`](AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md) | <nobr><code>TC-P10-012</code></nobr>, 013, 020, 021, 022 |
-| [`FB_Bucket`](AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md) | <nobr><code>TC-P10-023</code></nobr> à 034 |
-| [`FB_Winch_Symmetry`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.1.md) | Diagnostic MES-008, symétrie |
-| [`FB_SpeedStep`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | Décodage paliers 1..5 & garde-fou |
-| [`FB_WinchLoadEstimator`](AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md) | Diagnostic charge 2D |
-| [`FB_DriftGuard`](AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md) | Dérive position sous frein |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| Fiche | TC couverts | Etat |
+|---|---|---|
+| [`FB_Winch`](AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md) | <nobr><code>TC-P10-011</code></nobr>, 017, 018, 019 | `NV-I` |
+| [`FB_Safety_Winch`](AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md) | <nobr><code>TC-P10-001</code></nobr> à 010 | `NV-I` |
+| [`FB_WinchSync`](AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md) | <nobr><code>TC-P10-014</code></nobr>, 015, 016 | `NV` |
+| [`FB_WinchOutputInterlock`](AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md) | <nobr><code>TC-P10-012</code></nobr>, 013, 020, 021, 022 | `NV` |
+| [`FB_Bucket`](AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md) | <nobr><code>TC-P10-023</code></nobr> à 034 | `NV-I` |
+| [`FB_Winch_Symmetry`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.1.md) | Diagnostic MES-008, symétrie | `NV` |
+| [`FB_SpeedStep`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | Décodage paliers 1..5 & garde-fou | `NV` |
+| [`FB_WinchLoadEstimator`](AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md) | Diagnostic charge 2D | `NV` |
+| [`FB_DriftGuard`](AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md) | Dérive position sous frein | `NV` |
 
 ---
 

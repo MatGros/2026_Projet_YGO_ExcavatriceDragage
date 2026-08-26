@@ -22,11 +22,13 @@ calcul arithmétique sans état. Convertisseur unitaire, aucune décision.
 
 Décline `TC-P09-030` (chapô) :
 
-| ID | Comportement attendu | Type | Réf |
-|---|---|---|---|
-| <nobr><code>TC-P09-030.1</code></nobr> | `RawPos=HomingRefRaw+4096` (soit ½ tour), `CableM_PerRev=2.0`, `PointsPerRev=8192` → `CablePosM=1.0` | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-030.2</code></nobr> | `RawPos<HomingRefRaw` → `CablePosM` négative (sous l'eau) | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-030.3</code></nobr> | `PointsPerRev=0` → `CablePosM=0.0` (garde division par zéro), pas de plantage | <nobr><code>💻 AUTO</code></nobr> | §4 |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Comportement attendu | Type | Réf | Etat |
+|---|---|---|---|---|
+| <nobr><code>TC-P09-030.1</code></nobr> | `RawPos=HomingRefRaw+4096` (soit ½ tour), `CableM_PerRev=2.0`, `PointsPerRev=8192` → `CablePosM=1.0` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-030.2</code></nobr> | `RawPos<HomingRefRaw` → `CablePosM` négative (sous l'eau) | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-030.3</code></nobr> | `PointsPerRev=0` → `CablePosM=0.0` (garde division par zéro), pas de plantage | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
 
 ## 3 · 🔌 Interface
 

@@ -14,9 +14,11 @@ et expose un diagnostic de communication opérateur. Ne produit ni SafeStop ni P
 
 > Propriétaire unique de <nobr><code>TC-P12-050</code></nobr> — pas dupliqué au chapô.
 
-| ID | Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P12-050</code></nobr> | Absence de front `TglHeartbeatIhm` pendant `IhmTimeout` ➔ `HeartbeatIhmTimeout=TRUE`/`HeartbeatIhmOk=FALSE` ; `TglHeartbeatPlc` bascule toutes les `PlcTogglePeriod` indépendamment de l'IHM ; nouveau front après timeout ➔ `HeartbeatIhmOk` restauré immédiatement | <nobr><code>💻 AUTO</code></nobr> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P12-050</code></nobr> | Absence de front `TglHeartbeatIhm` pendant `IhmTimeout` ➔ `HeartbeatIhmTimeout=TRUE`/`HeartbeatIhmOk=FALSE` ; `TglHeartbeatPlc` bascule toutes les `PlcTogglePeriod` indépendamment de l'IHM ; nouveau front après timeout ➔ `HeartbeatIhmOk` restauré immédiatement | <nobr><code>💻 AUTO</code></nobr> | `NV` |
 
 ## 📥 Entrées
 

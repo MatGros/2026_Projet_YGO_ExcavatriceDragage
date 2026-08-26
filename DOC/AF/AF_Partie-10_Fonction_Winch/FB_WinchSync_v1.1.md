@@ -20,11 +20,13 @@
 
 ## 🧪 Points de validation (`TC-P10-014/015/016` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P10-014</code></nobr> | Sync bit0 (écart > 0.10 m, **instantané + latch**, sans timer) ➔ SyncWarn IHM seul | `💻 AUTO` |
-| <nobr><code>TC-P10-015</code></nobr> | Sync bit1 (incohérence commande, 500 ms) ➔ SafeStop fast | `💻 AUTO` |
-| <nobr><code>TC-P10-016</code></nobr> | Couplage croisé : `SyncActive` ➔ arrêt d'un treuil coupe l'autre | `💻 AUTO` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P10-014</code></nobr> | Sync bit0 (écart > 0.10 m, **instantané + latch**, sans timer) ➔ SyncWarn IHM seul | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-015</code></nobr> | Sync bit1 (incohérence commande, 500 ms) ➔ SafeStop fast | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-016</code></nobr> | Couplage croisé : `SyncActive` ➔ arrêt d'un treuil coupe l'autre | `💻 AUTO` | `NV` |
 
 ---
 

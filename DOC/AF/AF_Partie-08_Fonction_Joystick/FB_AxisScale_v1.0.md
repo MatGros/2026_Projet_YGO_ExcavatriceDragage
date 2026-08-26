@@ -33,11 +33,13 @@ dont elle n'a pas l'usage.
 > Décline `TC-P08-010` (macro chapô, partagé `F08.01`+`F08.02`) en étapes numérotées — pas de
 > nouvel identifiant racine (`GUIDE_EDITION_AF_v1.0.md` §4, `FB_SPEC_TEMPLATE.md` §2).
 
-| ID | Comportement attendu | Type | Réf |
-|---|---|---|---|
-| <nobr><code>TC-P08-010.1</code></nobr> | Échelle proportionnelle asymétrique : `RawX=9000` (neutre 5000) → `80%` ; `RawY=300` (neutre 5000) → `-94%` — pas seulement aux bornes | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P08-010.2</code></nobr> | Deadband ADC centrée sur le neutre : `\|RawIn-Neutral\| <= DeadbandRaw` ⇒ `OutPct=0.0` | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P08-010.3</code></nobr> | Saturation stricte : toute sortie de plage `RawIn` (hors `[0;10000]`) ne produit jamais `\|OutPct\| > 100.0` | <nobr><code>💻 AUTO</code></nobr> | §4 |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Comportement attendu | Type | Réf | Etat |
+|---|---|---|---|---|
+| <nobr><code>TC-P08-010.1</code></nobr> | Échelle proportionnelle asymétrique : `RawX=9000` (neutre 5000) → `80%` ; `RawY=300` (neutre 5000) → `-94%` — pas seulement aux bornes | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P08-010.2</code></nobr> | Deadband ADC centrée sur le neutre : `\|RawIn-Neutral\| <= DeadbandRaw` ⇒ `OutPct=0.0` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P08-010.3</code></nobr> | Saturation stricte : toute sortie de plage `RawIn` (hors `[0;10000]`) ne produit jamais `\|OutPct\| > 100.0` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
 
 ## 3 · 🔌 Interface
 

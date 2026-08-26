@@ -40,9 +40,11 @@ machine, organisées par ordre de lecture haut→bas dans `GVL_Troubleshooting` 
 
 ### 🎯 Table des fonctions
 
-| F-code | Fonction | FB propriétaire | Fiche | TC associés |
-|---|---|---|---|---|
-| F14.01 | Recopie passive de l'état machine (5 fonctions ci-dessus) vers `GVL_Troubleshooting`, aucun calcul ni décision | `FB_TroubleshootingView` | [FB_TroubleshootingView_v1.2.md](AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md) | <nobr><code>TC-P14-TSV-01..05</code></nobr> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| F-code | Fonction | FB propriétaire | Fiche | TC associés | Etat |
+|---|---|---|---|---|---|
+| F14.01 | Recopie passive de l'état machine (5 fonctions ci-dessus) vers `GVL_Troubleshooting`, aucun calcul ni décision | `FB_TroubleshootingView` | [FB_TroubleshootingView_v1.2.md](AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md) | <nobr><code>TC-P14-TSV-01..05</code></nobr> | `NV` |
 
 ---
 
@@ -50,9 +52,11 @@ machine, organisées par ordre de lecture haut→bas dans `GVL_Troubleshooting` 
 
 > Catalogue détaillé et propriété unique dans `FB_TroubleshootingView_v1.2.md §8`. Macro-table :
 
-| Bloc | Plage TC | Points clés |
-|---|---|---|
-| `FB_TroubleshootingView` | <nobr><code>TC-P14-TSV-01..05</code></nobr> | Zéro `VAR_OUTPUT` de commande, chaque champ a un producteur réel documenté, aucun TBD affiché comme mesure réelle, instance unique dans `PRG_07_Supervision`, zéro régression gates |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| Bloc | Plage TC | Points clés | Etat |
+|---|---|---|---|
+| `FB_TroubleshootingView` | <nobr><code>TC-P14-TSV-01..05</code></nobr> | Zéro `VAR_OUTPUT` de commande, chaque champ a un producteur réel documenté, aucun TBD affiché comme mesure réelle, instance unique dans `PRG_07_Supervision`, zéro régression gates | `NV` |
 
 ---
 

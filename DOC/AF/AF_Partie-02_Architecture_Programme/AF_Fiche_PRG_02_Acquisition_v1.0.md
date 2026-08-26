@@ -43,10 +43,13 @@
 
 ## 🧪 Tests associés
 
-| ID | Vérifie | Preuve |
-|---|---|---|
-| <nobr><code>TC-P02-001</code></nobr> | Producteur unique d'images et données | Revue des contrats + gate de liaison |
-| <nobr><code>TC-P02-004</code></nobr> | Ordre `MainTask` et retards N‑1 explicités | Revue manuelle de l'ordre CODESYS |
+> **Etat** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+
+| ID | Vérifie | Preuve | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P02-001</code></nobr> | Producteur unique d'images et données | Revue des contrats + gate de liaison | `NV` |
+| <nobr><code>TC-P02-004</code></nobr> | Ordre `MainTask` et retards N‑1 explicités | Revue manuelle de l'ordre CODESYS | `NV` |
 
 ## 📚 Documents liés
 

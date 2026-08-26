@@ -27,15 +27,17 @@
 
 ## 🧪 1 · Points de validation
 
-| ID | Intention | Preuve | Type | Réf |
-|---|---|---|---|---|
-| <nobr><code>TC-P03-001</code></nobr> | Cycle de vie et neutralisation `Enable` | `Enable=FALSE` neutralise commandes et statut (gate) ; `Enable=TRUE` autorise l'état Ready | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P03-002</code></nobr> | Reset inconditionnel (Cause/Ack) | Front `Reset` efface l'affichage (interlock reste sur Cause) | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P03-003</code></nobr> | Pas de redémarrage auto après Ack | Retour READY, nouvel ordre explicite requis | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P03-004</code></nobr> | Pas de `SafeStop`/`StartStop` hors mouvement | Absents des briques E/S, joystick et diag | `💻 AUTO` | <small>§3</small> |
-| <nobr><code>TC-P03-005</code></nobr> | Encapsulation stricte | Échanges via interfaces/DUTs publics uniquement | `💻 AUTO` | <small>§2</small> |
-| <nobr><code>TC-P03-006</code></nobr> | Re-latch sur ré-apparition Cause | Nouveau front Cause ➔ `Ack=FALSE` | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P03-007</code></nobr> | Warning auto-effaçable vs Fault latché | Warning s'efface sans Reset, Fault exige Ack | `💻 AUTO` | <small>§4</small> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention | Preuve | Type | Réf | Etat |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P03-001</code></nobr> | Cycle de vie et neutralisation `Enable` | `Enable=FALSE` neutralise commandes et statut (gate) ; `Enable=TRUE` autorise l'état Ready | `💻 AUTO` | <small>§4</small> | `NV-I` |
+| <nobr><code>TC-P03-002</code></nobr> | Reset inconditionnel (Cause/Ack) | Front `Reset` efface l'affichage (interlock reste sur Cause) | `💻 AUTO` | <small>§4</small> | `NV-I` |
+| <nobr><code>TC-P03-003</code></nobr> | Pas de redémarrage auto après Ack | Retour READY, nouvel ordre explicite requis | `💻 AUTO` | <small>§4</small> | `NV-I` |
+| <nobr><code>TC-P03-004</code></nobr> | Pas de `SafeStop`/`StartStop` hors mouvement | Absents des briques E/S, joystick et diag | `💻 AUTO` | <small>§3</small> | `NV` |
+| <nobr><code>TC-P03-005</code></nobr> | Encapsulation stricte | Échanges via interfaces/DUTs publics uniquement | `💻 AUTO` | <small>§2</small> | `NV` |
+| <nobr><code>TC-P03-006</code></nobr> | Re-latch sur ré-apparition Cause | Nouveau front Cause ➔ `Ack=FALSE` | `💻 AUTO` | <small>§4</small> | `NV-I` |
+| <nobr><code>TC-P03-007</code></nobr> | Warning auto-effaçable vs Fault latché | Warning s'efface sans Reset, Fault exige Ack | `💻 AUTO` | <small>§4</small> | `NV-I` |
 
 > Catalogue `TC-P03-008` à `TC-P03-013` (détail `FB_FbStatus` — cumul de défauts, sélection texte
 > IHM, bornes de liste, faille T148...) **déplacé dans la fiche dédiée** depuis v2.3 — propriétaire

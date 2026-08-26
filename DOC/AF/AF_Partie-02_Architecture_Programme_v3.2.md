@@ -30,24 +30,28 @@
 
 ### 🎯 Table des fonctions
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
-|---|---|---|---|---|---|---|
-| `F02.01` | Ordonner le cycle applicatif | Exécute les six PRG dans l'ordre Acquisition → Modes/Cycle → Treuils/Benne → Translation → Outputs → Supervision. | `MainTask` + `PRG_02` à `PRG_07` | 🔵 C2 | <nobr><code>TC-P02-004</code></nobr> | ⚠️ revue MainTask manuelle |
-| `F02.02` | Encapsuler l'orchestration ST | Les PRG rendent visibles leurs instances, flux et arbitrages ; calculs et machines d'état résident dans les FB. | `PRG_02` à `PRG_07` | ⚪ C1 | <nobr><code>TC-P02-002</code></nobr> | ✅ |
-| `F02.03` | Garantir un producteur unique | Chaque image, bus, commande et état public a un propriétaire unique, identifié avant tout raccordement. | Contrats `ST_*` + PRG producteurs | 🟠 C3 | <nobr><code>TC-P02-001</code></nobr> | ⚠️ gate à fiabiliser (TBD §8) |
-| `F02.04` | Isoler la barrière de sortie | Seul `PRG_06_Outputs` applique les interlocks finaux et écrit les Q/PDO des actionneurs. | `PRG_06_Outputs` | 🔴 C4 | <nobr><code>TC-P02-003</code></nobr> | ✅ |
-| `F02.05` | Rendre explicites les retards de scan | Toute donnée consommée avant son producteur est interdite, sauf retard d'un scan nommé et justifié. | Ordonnancement `MainTask` | 🟠 C3 | <nobr><code>TC-P02-004</code></nobr> | ⚠️ revue MainTask manuelle |
-| `F02.06` | Séparer supervision et commande métier | La vue troubleshooting observe seulement ; `PRG_07` porte distinctement reset IHM, persistance et bypass autorisés. | `PRG_07_Supervision` + `FB_TroubleshootingView` | 🔵 C2 | <nobr><code>TC-P02-005</code></nobr> | ✅ |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
+|---|---|---|---|---|---|---|---|
+| `F02.01` | Ordonner le cycle applicatif | Exécute les six PRG dans l'ordre Acquisition → Modes/Cycle → Treuils/Benne → Translation → Outputs → Supervision. | `MainTask` + `PRG_02` à `PRG_07` | 🔵 C2 | <nobr><code>TC-P02-004</code></nobr> | ⚠️ revue MainTask manuelle | `NV` |
+| `F02.02` | Encapsuler l'orchestration ST | Les PRG rendent visibles leurs instances, flux et arbitrages ; calculs et machines d'état résident dans les FB. | `PRG_02` à `PRG_07` | ⚪ C1 | <nobr><code>TC-P02-002</code></nobr> | ✅ | `NV-I` |
+| `F02.03` | Garantir un producteur unique | Chaque image, bus, commande et état public a un propriétaire unique, identifié avant tout raccordement. | Contrats `ST_*` + PRG producteurs | 🟠 C3 | <nobr><code>TC-P02-001</code></nobr> | ⚠️ gate à fiabiliser (TBD §8) | `NV` |
+| `F02.04` | Isoler la barrière de sortie | Seul `PRG_06_Outputs` applique les interlocks finaux et écrit les Q/PDO des actionneurs. | `PRG_06_Outputs` | 🔴 C4 | <nobr><code>TC-P02-003</code></nobr> | ✅ | `NV-I` |
+| `F02.05` | Rendre explicites les retards de scan | Toute donnée consommée avant son producteur est interdite, sauf retard d'un scan nommé et justifié. | Ordonnancement `MainTask` | 🟠 C3 | <nobr><code>TC-P02-004</code></nobr> | ⚠️ revue MainTask manuelle | `NV` |
+| `F02.06` | Séparer supervision et commande métier | La vue troubleshooting observe seulement ; `PRG_07` porte distinctement reset IHM, persistance et bypass autorisés. | `PRG_07_Supervision` + `FB_TroubleshootingView` | 🔵 C2 | <nobr><code>TC-P02-005</code></nobr> | ✅ | `NV-I` |
 
 ## 🧪 1 · Points de validation
 
-| ID | Intention | Preuve | Type | Réf |
-|---|---|---|---|---|
-| <nobr><code>TC-P02-001</code></nobr> | Un seul producteur par donnée | Aucun écouteur/écrivain multiple sur un contrat *(⚠️ `G200_check_linkage.py` L10 remonte des faux positifs intra-POU — voir TBD §8)* | `💻 AUTO` | <small>§2</small> |
-| <nobr><code>TC-P02-002</code></nobr> | Programme d'orchestration ST sans logique métier cachée | Les calculs et machines d'état résident dans les FB ; le PRG rend ses arbitrages et flux explicitement lisibles | `💻 AUTO` | <small>§2</small> |
-| <nobr><code>TC-P02-003</code></nobr> | Sorties physiques via `PRG_06_Outputs` | Aucun autre POU n'écrit les Q/PDO finaux | `💻 AUTO` | <small>§3</small> |
-| <nobr><code>TC-P02-004</code></nobr> | Ordre d'exécution MainTask conforme | Tâche CODESYS + `G200_check_linkage.py` PASS *(⚠️ ne vérifie pas l'ordre inter-POU — revue manuelle à ce jour, voir TBD §8)* | `⚡ SITE+AUTO` | <small>§5</small> |
-| <nobr><code>TC-P02-005</code></nobr> | Vue troubleshooting en lecture seule | `FB_TroubleshootingView` ne produit aucune commande, configuration ni interlock | `💻 AUTO` | <small>§3</small> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention | Preuve | Type | Réf | Etat |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P02-001</code></nobr> | Un seul producteur par donnée | Aucun écouteur/écrivain multiple sur un contrat *(⚠️ `G200_check_linkage.py` L10 remonte des faux positifs intra-POU — voir TBD §8)* | `💻 AUTO` | <small>§2</small> | `NV` |
+| <nobr><code>TC-P02-002</code></nobr> | Programme d'orchestration ST sans logique métier cachée | Les calculs et machines d'état résident dans les FB ; le PRG rend ses arbitrages et flux explicitement lisibles | `💻 AUTO` | <small>§2</small> | `NV` |
+| <nobr><code>TC-P02-003</code></nobr> | Sorties physiques via `PRG_06_Outputs` | Aucun autre POU n'écrit les Q/PDO finaux | `💻 AUTO` | <small>§3</small> | `NV` |
+| <nobr><code>TC-P02-004</code></nobr> | Ordre d'exécution MainTask conforme | Tâche CODESYS + `G200_check_linkage.py` PASS *(⚠️ ne vérifie pas l'ordre inter-POU — revue manuelle à ce jour, voir TBD §8)* | `⚡ SITE+AUTO` | <small>§5</small> | `NV` |
+| <nobr><code>TC-P02-005</code></nobr> | Vue troubleshooting en lecture seule | `FB_TroubleshootingView` ne produit aucune commande, configuration ni interlock | `💻 AUTO` | <small>§3</small> | `NV` |
 
 ---
 

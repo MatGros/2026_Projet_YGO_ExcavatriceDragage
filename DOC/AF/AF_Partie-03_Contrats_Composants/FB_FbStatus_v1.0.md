@@ -38,14 +38,16 @@ se généraliser aux autres FB `standard` du projet.
 > `TC-P03-001` à `007` restent au chapô (règles générales du socle Cause/Ack, §4 AF03, pas
 > spécifiques à `FB_FbStatus`).
 
-| ID | Comportement attendu | Type | Réf |
-|---|---|---|---|
-| <nobr><code>TC-P03-008</code></nobr> | Cumul de plusieurs Fault latchés : 2 `Causes[i]` distincts apparus à des instants différents s'accumulent dans `ErrorId`, `Reset` les acquitte ensemble | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P03-009</code></nobr> | Fault + Warning simultanés : texte IHM = première cause active (index le plus bas) ; le warning reste dans `WarningIdTxt`, jamais dans `ErrorId` | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P03-010</code></nobr> | Bornes de la liste `Causes[0..15]` : `Causes[0]` et `Causes[15]` correctement gérés, pas d'off-by-one | <nobr><code>💻 AUTO</code></nobr> | §3 |
-| <nobr><code>TC-P03-011</code></nobr> | `Reset` sans historique de défaut : aucun effet parasite, `ResetRequested` reste `FALSE` | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P03-012</code></nobr> | `Reset` maintenu (niveau haut) pendant que la cause disparaît : acquittement silencieux, sans confirmation au moment réel — ⚠️ faille T148 prouvée, pas validée comme cible | <nobr><code>💻 AUTO</code></nobr> | §5 |
-| <nobr><code>TC-P03-013</code></nobr> | Texte IHM pour un bit actif sans texte configuré (`Texte=''`) : chaîne vide, pas de plantage ni de texte résiduel d'un autre bit | <nobr><code>💻 AUTO</code></nobr> | §4 |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Comportement attendu | Type | Réf | Etat |
+|---|---|---|---|---|
+| <nobr><code>TC-P03-008</code></nobr> | Cumul de plusieurs Fault latchés : 2 `Causes[i]` distincts apparus à des instants différents s'accumulent dans `ErrorId`, `Reset` les acquitte ensemble | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
+| <nobr><code>TC-P03-009</code></nobr> | Fault + Warning simultanés : texte IHM = première cause active (index le plus bas) ; le warning reste dans `WarningIdTxt`, jamais dans `ErrorId` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
+| <nobr><code>TC-P03-010</code></nobr> | Bornes de la liste `Causes[0..15]` : `Causes[0]` et `Causes[15]` correctement gérés, pas d'off-by-one | <nobr><code>💻 AUTO</code></nobr> | §3 | `NV-I` |
+| <nobr><code>TC-P03-011</code></nobr> | `Reset` sans historique de défaut : aucun effet parasite, `ResetRequested` reste `FALSE` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
+| <nobr><code>TC-P03-012</code></nobr> | `Reset` maintenu (niveau haut) pendant que la cause disparaît : acquittement silencieux, sans confirmation au moment réel — ⚠️ faille T148 prouvée, pas validée comme cible | <nobr><code>💻 AUTO</code></nobr> | §5 | `NV-I` |
+| <nobr><code>TC-P03-013</code></nobr> | Texte IHM pour un bit actif sans texte configuré (`Texte=''`) : chaîne vide, pas de plantage ni de texte résiduel d'un autre bit | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
 
 Exécution : `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st` — 11 scénarios
 multi-scans, causes injectées via `Causes[i].Active`/`IsWarning`/`Texte` (plus de source bitfield

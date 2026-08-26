@@ -27,15 +27,21 @@
 
 ### 🎯 Table des fonctions
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
-|---|---|---|---|---|---|---|
-| `F02.01` | [verbe d'action] | [fonction d'architecture testable] | `PRG_XX` / `MainTask` | `C0`-`C4` | <nobr><code>TC-P02-001</code></nobr> | ✅/⚠️/❌ |
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | État |
+|---|---|---|---|---|---|---|---|
+| `F02.01` | [verbe d'action] | [fonction d'architecture testable] | `PRG_XX` / `MainTask` | `C0`-`C4` | <nobr><code>TC-P02-001</code></nobr> | ✅/⚠️/❌ | `NV` |
 
 ## 🧪 Points de validation
 
-| ID | Intention | Preuve | Type | Réf |
-|---|---|---|---|---|
-| <nobr><code>TC-P02-001</code></nobr> | [intention] | [preuve] | `💻 AUTO` | <small>§N</small> |
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+
+| ID | Intention | Preuve | Type | Réf | État |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P02-001</code></nobr> | [intention] | [preuve] | `💻 AUTO` | <small>§N</small> | `NV` |
 
 ## 🧱 Principes d'architecture
 

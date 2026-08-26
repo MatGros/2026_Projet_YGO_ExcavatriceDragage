@@ -2,64 +2,44 @@
 
 from __future__ import annotations
 
-import subprocess
 import sys
 from pathlib import Path
 
-try:
-    import yaml
-except ImportError:
-    yaml = None  # type: ignore
-
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "extract_functions_matrix.py"
 REPO_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "scripts"))
+
+from extract_functions_matrix import build_matrix  # noqa: E402
 
 
-def test_extract_functions_matrix_af08(tmp_path: Path) -> None:
-    out_yaml = tmp_path / "output_matrix.yaml"
-    cmd = [sys.executable, str(SCRIPT), "--root", str(REPO_ROOT), "--output", str(out_yaml)]
-    res = subprocess.run(cmd, capture_output=True, text=True)
-    assert res.returncode == 0, f"Script failed with stderr: {res.stderr}"
-    assert out_yaml.is_file(), "Output YAML file was not created"
+def test_extract_functions_matrix_af08() -> None:
+    data = build_matrix(REPO_ROOT / "DOC" / "AF")
+    assert "AF-08" in data["domains"]
+    af08 = data["domains"]["AF-08"]
+    functions = af08["functions"]  # dict keyed par ID (filtrable directement par cle)
+    assert set(functions.keys()) == {
+        "F08.01", "F08.02", "F08.03", "F08.04",
+        "F08.05", "F08.06", "F08.07", "F08.08",
+    }
 
-    # Vérification du contenu
-    content = out_yaml.read_text(encoding="utf-8")
-    assert "domains:" in content
+    # Vérifier que les TC couvrants et l'état sont renseignés.
+    assert "TC-P08-010" in functions["F08.01"]["tc_couvrants"]
+    assert "TC-P08-010" in functions["F08.02"]["tc_couvrants"]
+    assert functions["F08.01"]["etat"] in {"NV", "NV-I"}
+    assert "TC-P08-020" in functions["F08.03"]["tc_couvrants"]
+    assert "TC-P08-020" in functions["F08.04"]["tc_couvrants"]
+    assert "TC-P08-030" in functions["F08.05"]["tc_couvrants"]
+    assert "TC-P08-040" in functions["F08.06"]["tc_couvrants"]
+    assert "TC-P08-050" in functions["F08.07"]["tc_couvrants"]
+    assert "TC-P08-060" in functions["F08.08"]["tc_couvrants"]
 
-    if yaml is not None:
-        data = yaml.safe_load(content)
-        assert "domains" in data
-        assert "AF-08" in data["domains"]
-        af08 = data["domains"]["AF-08"]
-        functions = af08["functions"]  # dict keyed par ID (filtrable directement par cle)
-        assert set(functions.keys()) == {
-            "F08.01",
-            "F08.02",
-            "F08.03",
-            "F08.04",
-            "F08.05",
-            "F08.06",
-            "F08.07",
-            "F08.08",
-        }
+    # validation_points également filtrable par ID
+    validation_points = af08["validation_points"]
+    assert "TC-P08-010" in validation_points
+    assert "TC-P08-020" in validation_points
+    assert validation_points["TC-P08-010"]["etat"] in {"NV", "NV-I"}
 
-        # Vérifier que les TC couvrants sont bien renseignés
-        assert "TC-P08-010" in functions["F08.01"]["tc_couvrants"]
-        assert "TC-P08-010" in functions["F08.02"]["tc_couvrants"]
-        assert "TC-P08-020" in functions["F08.03"]["tc_couvrants"]
-        assert "TC-P08-020" in functions["F08.04"]["tc_couvrants"]
-        assert "TC-P08-030" in functions["F08.05"]["tc_couvrants"]
-        assert "TC-P08-040" in functions["F08.06"]["tc_couvrants"]
-        assert "TC-P08-050" in functions["F08.07"]["tc_couvrants"]
-        assert "TC-P08-060" in functions["F08.08"]["tc_couvrants"]
-
-        # validation_points egalement filtrable par ID
-        validation_points = af08["validation_points"]
-        assert "TC-P08-010" in validation_points
-        assert "TC-P08-020" in validation_points
-    else:
-        # Fallback vérification textuelle
-        for i in range(1, 9):
-            assert f"F08.0{i}" in content
-        assert "TC-P08-010" in content
-        assert "TC-P08-002" in content
+    # AF01 contient une table de types d'essai avant son catalogue : seul le
+    # catalogue TC doit être extrait.
+    af01 = data["domains"]["AF-01"]
+    assert "TC-P01-001" in af01["validation_points"]
+    assert af01["validation_points"]["TC-P01-001"]["etat"] in {"NV", "NV-I"}

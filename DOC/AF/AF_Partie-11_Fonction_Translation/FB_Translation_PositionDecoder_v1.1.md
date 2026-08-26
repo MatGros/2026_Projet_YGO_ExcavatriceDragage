@@ -16,10 +16,12 @@
 
 ## 🧪 Points de validation (`TC-P11-001/002` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P11-001</code></nobr> | 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ `Incoherent` | `💻 AUTO` |
-| <nobr><code>TC-P11-002</code></nobr> | Mot incohérent ➔ `Incoherent=TRUE` ➔ bit7 Safety ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P11-001</code></nobr> | 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ `Incoherent` | `💻 AUTO` | `NV-I` |
+| <nobr><code>TC-P11-002</code></nobr> | Mot incohérent ➔ `Incoherent=TRUE` ➔ bit7 Safety ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` | `NV` |
 
 ---
 

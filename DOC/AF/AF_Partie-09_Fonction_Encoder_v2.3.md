@@ -36,15 +36,17 @@
 
 ### Table des fonctions
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
-|---|---|---|---|---|---|---|
-| `F09.01` | Acquérir position brute + gérer le preset SDO | Lit `RawPosIn`/`AlarmsIn`/`SlaveOperational` (EtherCAT), séquence l'écriture preset (déclenchement, tolérance, timeout) | `FB_Encoder_Abs` | 🟠 C3 | <nobr><code>TC-P09-010</code></nobr> | ✅ |
-| `F09.02` | Référencer l'axe (homing) | 3 modes : nominal (capteur haut, front), unitaire (cible libre `CfgHomingTargetM`), dynamique (cible calculée par l'appelant, ex. benne) | `FB_Encoder_Homing` | 🟠 C3 | <nobr><code>TC-P09-020</code></nobr> | ✅ |
-| `F09.03` | Détecter une incohérence codeur au redémarrage | Écart entre position au boot et dernière position connue (RETAIN) > tolérance → `HomingSuspect`, levé par `BtnConfirmCoherence` | `FB_Encoder_Homing` | 🟠 C3 | <nobr><code>TC-P09-020</code></nobr> | ✅ |
-| `F09.04` | Mettre à l'échelle points → mètres | `CablePosM := (RawPos - HomingRefRaw) × CableM_PerRev / PointsPerRev` | `FB_Encoder_Scale` | 🔵 C2 | <nobr><code>TC-P09-030</code></nobr> | ✅ |
-| `F09.05` | Borner physiquement + relayer l'incohérence | Hors `[PositionMinM;PositionMaxM]` (déf. ±99m) OU `HomingSuspect` → `EncoderIncoherent=TRUE` | `FB_Encoder_Safety` | 🟠 C3 | <nobr><code>TC-P09-030</code></nobr> | ✅ |
-| `F09.06` | Synthétiser les gates de fiabilité | `EncoderFault := NOT Available OR Incoherent` (sans Homed) ; `HomedAndReliable := Available AND Homed AND NOT Incoherent` (gate stricte M3) | `FB_EncoderReliability` | 🟠 C3 | <nobr><code>TC-P09-040</code></nobr> | ✅ |
-| `F09.07` | Mesurer la vitesse câble | Fenêtre glissante horodatée (6 échantillons, ≥50ms), signée (+ montée) | `FB_Encoder_SpeedMeasure` | 🔵 C2 | <nobr><code>TC-P09-050</code></nobr> | ✅ |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
+|---|---|---|---|---|---|---|---|
+| `F09.01` | Acquérir position brute + gérer le preset SDO | Lit `RawPosIn`/`AlarmsIn`/`SlaveOperational` (EtherCAT), séquence l'écriture preset (déclenchement, tolérance, timeout) | `FB_Encoder_Abs` | 🟠 C3 | <nobr><code>TC-P09-010</code></nobr> | ✅ | `NV-I` |
+| `F09.02` | Référencer l'axe (homing) | 3 modes : nominal (capteur haut, front), unitaire (cible libre `CfgHomingTargetM`), dynamique (cible calculée par l'appelant, ex. benne) | `FB_Encoder_Homing` | 🟠 C3 | <nobr><code>TC-P09-020</code></nobr> | ✅ | `NV-I` |
+| `F09.03` | Détecter une incohérence codeur au redémarrage | Écart entre position au boot et dernière position connue (RETAIN) > tolérance → `HomingSuspect`, levé par `BtnConfirmCoherence` | `FB_Encoder_Homing` | 🟠 C3 | <nobr><code>TC-P09-020</code></nobr> | ✅ | `NV-I` |
+| `F09.04` | Mettre à l'échelle points → mètres | `CablePosM := (RawPos - HomingRefRaw) × CableM_PerRev / PointsPerRev` | `FB_Encoder_Scale` | 🔵 C2 | <nobr><code>TC-P09-030</code></nobr> | ✅ | `NV-I` |
+| `F09.05` | Borner physiquement + relayer l'incohérence | Hors `[PositionMinM;PositionMaxM]` (déf. ±99m) OU `HomingSuspect` → `EncoderIncoherent=TRUE` | `FB_Encoder_Safety` | 🟠 C3 | <nobr><code>TC-P09-030</code></nobr> | ✅ | `NV-I` |
+| `F09.06` | Synthétiser les gates de fiabilité | `EncoderFault := NOT Available OR Incoherent` (sans Homed) ; `HomedAndReliable := Available AND Homed AND NOT Incoherent` (gate stricte M3) | `FB_EncoderReliability` | 🟠 C3 | <nobr><code>TC-P09-040</code></nobr> | ✅ | `NV-I` |
+| `F09.07` | Mesurer la vitesse câble | Fenêtre glissante horodatée (6 échantillons, ≥50ms), signée (+ montée) | `FB_Encoder_SpeedMeasure` | 🔵 C2 | <nobr><code>TC-P09-050</code></nobr> | ✅ | `NV-I` |
 
 > `F09.08` (détection de variation brusque, `FB_Encoder_SpeedMonitor`) **retiré** — legacy, jamais
 > instancié, fait doublon avec `F09.07` déjà en place ; voir §10 Suivi historique. ID non réattribué.
@@ -56,14 +58,16 @@
 
 ## 2 · 🧪 Table des points de validation
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> |
-|---|---|---|---|---|
-| <nobr><code>TC-P09-010</code></nobr> | **Acquisition & preset** | Bus/esclave KO → `EncoderAvailable=FALSE`, `RawPos` gelé ; preset hors tolérance après timeout → `PresetNak` + Fault | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Abs</code></small> |
-| <nobr><code>TC-P09-020</code></nobr> | **Homing & cohérence** | 3 modes homing bornent la cible `[-99;+99]m` avant écriture ; écart au boot > tolérance → `HomingSuspect`, levé par confirmation explicite | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Homing</code></small> |
-| <nobr><code>TC-P09-030</code></nobr> | **Échelle & bornage** | Conversion signée exacte ; hors bornes ou suspect → `EncoderIncoherent=TRUE` | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Scale</code><br><code>FB_Encoder_Safety</code></small> |
-| <nobr><code>TC-P09-040</code></nobr> | **Fiabilité** | `EncoderFault` ne dépend pas de `Homed` (non-référencé ≠ incohérent) ; `HomedAndReliable` exige les 3 conditions | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_EncoderReliability</code></small> |
-| <nobr><code>TC-P09-050</code></nobr> | **Vitesse** | `Valid=TRUE` seulement après 6 échantillons couvrant ≥50ms ; purge sur perte de validité amont | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_SpeedMeasure</code></small> |
-| <nobr><code>TC-P09-060</code></nobr> | ⛔ **RETIRÉ (v2.2)** — testait `FB_Encoder_SpeedMonitor`, FB legacy jamais instancié, retiré du code (voir §10). ID non réattribué (immutabilité `CODE_QUALITY_STANDARDS.md §0`). | — | — | — |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P09-010</code></nobr> | **Acquisition & preset** | Bus/esclave KO → `EncoderAvailable=FALSE`, `RawPos` gelé ; preset hors tolérance après timeout → `PresetNak` + Fault | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Abs</code></small> | `NV-I` |
+| <nobr><code>TC-P09-020</code></nobr> | **Homing & cohérence** | 3 modes homing bornent la cible `[-99;+99]m` avant écriture ; écart au boot > tolérance → `HomingSuspect`, levé par confirmation explicite | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Homing</code></small> | `NV` |
+| <nobr><code>TC-P09-030</code></nobr> | **Échelle & bornage** | Conversion signée exacte ; hors bornes ou suspect → `EncoderIncoherent=TRUE` | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Scale</code><br><code>FB_Encoder_Safety</code></small> | `NV` |
+| <nobr><code>TC-P09-040</code></nobr> | **Fiabilité** | `EncoderFault` ne dépend pas de `Homed` (non-référencé ≠ incohérent) ; `HomedAndReliable` exige les 3 conditions | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_EncoderReliability</code></small> | `NV` |
+| <nobr><code>TC-P09-050</code></nobr> | **Vitesse** | `Valid=TRUE` seulement après 6 échantillons couvrant ≥50ms ; purge sur perte de validité amont | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_SpeedMeasure</code></small> | `NV` |
+| <nobr><code>TC-P09-060</code></nobr> | ⛔ **RETIRÉ (v2.2)** — testait `FB_Encoder_SpeedMonitor`, FB legacy jamais instancié, retiré du code (voir §10). ID non réattribué (immutabilité `CODE_QUALITY_STANDARDS.md §0`). | — | — | — | `NV` |
 
 ---
 

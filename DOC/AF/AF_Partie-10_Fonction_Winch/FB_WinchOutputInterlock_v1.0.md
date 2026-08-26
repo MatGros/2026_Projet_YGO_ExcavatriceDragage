@@ -17,13 +17,15 @@
 
 ## 🧪 Points de validation (`TC-P10-012/013/020/021/022` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P10-012</code></nobr> | Watchdog frein barrière 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` |
-| <nobr><code>TC-P10-013</code></nobr> | Anti-redémarrage : Cause + Reset + Neutre ➔ réautorisation | `⚡ AUTO_PLC` |
-| <nobr><code>TC-P10-020</code></nobr> | Watchdog frein réel terrain (temps, contacteur/bobine) | `🟢 SITE` |
-| <nobr><code>TC-P10-021</code></nobr> | Temps mort même sens : 1s après arrêt ➔ nouvelle demande | `💻 AUTO` |
-| <nobr><code>TC-P10-022</code></nobr> | Temps mort inversion : 1s après arrêt + inversion sens | `💻 AUTO` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P10-012</code></nobr> | Watchdog frein barrière 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` | `NV` |
+| <nobr><code>TC-P10-013</code></nobr> | Anti-redémarrage : Cause + Reset + Neutre ➔ réautorisation | `⚡ AUTO_PLC` | `NV` |
+| <nobr><code>TC-P10-020</code></nobr> | Watchdog frein réel terrain (temps, contacteur/bobine) | `🟢 SITE` | `NV` |
+| <nobr><code>TC-P10-021</code></nobr> | Temps mort même sens : 1s après arrêt ➔ nouvelle demande | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-022</code></nobr> | Temps mort inversion : 1s après arrêt + inversion sens | `💻 AUTO` | `NV` |
 
 ---
 

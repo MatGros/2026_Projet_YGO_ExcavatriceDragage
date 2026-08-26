@@ -26,10 +26,12 @@ de disponibilité, exécute une séquence de preset sur demande (venant de `FB_E
 
 Décline `TC-P09-010` (chapô) :
 
-| ID | Comportement attendu | Type | Réf |
-|---|---|---|---|
-| <nobr><code>TC-P09-010.1</code></nobr> | `AlarmsIn≠0` OU `NOT SlaveOperational` → `EncoderAvailable=FALSE`, `RawPos`/`AngleRaw`/`TurnCount` gelés (dernière valeur) | <nobr><code>💻 AUTO</code></nobr> | §5 |
-| <nobr><code>TC-P09-010.2</code></nobr> | Preset : écart `abs(RawPos - PresetValueOut) ≤ PresetTolerancePts` → `PresetAck` après 500ms visuel ; sinon timeout `PresetTimeout` → `PresetNak` + `ErrorId` bit1 | <nobr><code>💻 AUTO</code></nobr> | §4 |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Comportement attendu | Type | Réf | Etat |
+|---|---|---|---|---|
+| <nobr><code>TC-P09-010.1</code></nobr> | `AlarmsIn≠0` OU `NOT SlaveOperational` → `EncoderAvailable=FALSE`, `RawPos`/`AngleRaw`/`TurnCount` gelés (dernière valeur) | <nobr><code>💻 AUTO</code></nobr> | §5 | `NV-I` |
+| <nobr><code>TC-P09-010.2</code></nobr> | Preset : écart `abs(RawPos - PresetValueOut) ≤ PresetTolerancePts` → `PresetAck` après 500ms visuel ; sinon timeout `PresetTimeout` → `PresetNak` + `ErrorId` bit1 | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
 
 ## 3 · 🔌 Interface
 

@@ -14,12 +14,14 @@
 
 ## 🧪 Points de validation (`TC-P13-030...` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P13-030</code></nobr> | `RelayFwd`/`RelayRev` font compter `RawPos` de `SpeedTgt_Pct * 0.1 * SpeedScaleFactor` par scan | `💻 AUTO` |
-| <nobr><code>TC-P13-031</code></nobr> | `PresetCmd=TRUE` charge `PresetValue` directement (priorité sur Fwd/Rev) | `💻 AUTO` |
-| <nobr><code>TC-P13-032</code></nobr> | `RawPos` ne descend jamais sous 0 (borne explicite en soustraction) | `💻 AUTO` |
-| <nobr><code>TC-P13-033</code></nobr> | `RawPos` survit à un reset froid (via `VAR_IN_OUT` référençant `GVL_PERSISTENT`) | `👁️ MANUEL` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P13-030</code></nobr> | `RelayFwd`/`RelayRev` font compter `RawPos` de `SpeedTgt_Pct * 0.1 * SpeedScaleFactor` par scan | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-031</code></nobr> | `PresetCmd=TRUE` charge `PresetValue` directement (priorité sur Fwd/Rev) | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-032</code></nobr> | `RawPos` ne descend jamais sous 0 (borne explicite en soustraction) | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-033</code></nobr> | `RawPos` survit à un reset froid (via `VAR_IN_OUT` référençant `GVL_PERSISTENT`) | `👁️ MANUEL` | `NV` |
 
 ---
 

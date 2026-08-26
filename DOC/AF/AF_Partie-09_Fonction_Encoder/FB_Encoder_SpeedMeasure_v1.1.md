@@ -24,12 +24,14 @@ l'indisponibilité, pas un `ErrorId`). Calcul pur sur position sûre déjà prod
 
 Décline `TC-P09-050` (chapô) :
 
-| ID | Comportement attendu | Type | Réf |
-|---|---|---|---|
-| <nobr><code>TC-P09-050.1</code></nobr> | `Valid=TRUE` seulement après 6 échantillons couvrant `WindowElapsed ≥ T#50ms` | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-050.2</code></nobr> | `PositionValid=FALSE` (amont) → purge complète immédiate (`CollectedSamples:=0`, `Valid:=FALSE`) | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-050.3</code></nobr> | Rebouclage `TIME()` détecté (`CurrentTimestamp < LastTimestamp`) → purge sans réutiliser le delta aberrant | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-050.4</code></nobr> | `SignedSpeed_Mps` signée (+ montée) ; `Speed_Mps = ABS(SignedSpeed_Mps)` | <nobr><code>💻 AUTO</code></nobr> | §4 |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Comportement attendu | Type | Réf | Etat |
+|---|---|---|---|---|
+| <nobr><code>TC-P09-050.1</code></nobr> | `Valid=TRUE` seulement après 6 échantillons couvrant `WindowElapsed ≥ T#50ms` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-050.2</code></nobr> | `PositionValid=FALSE` (amont) → purge complète immédiate (`CollectedSamples:=0`, `Valid:=FALSE`) | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-050.3</code></nobr> | Rebouclage `TIME()` détecté (`CurrentTimestamp < LastTimestamp`) → purge sans réutiliser le delta aberrant | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-050.4</code></nobr> | `SignedSpeed_Mps` signée (+ montée) ; `Speed_Mps = ABS(SignedSpeed_Mps)` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
 
 ## 3 · 🔌 Interface
 

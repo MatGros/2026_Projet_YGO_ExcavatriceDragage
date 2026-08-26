@@ -18,13 +18,15 @@
 > IDs `TC-P11-010`…`060` **inventés**, ne correspondant à aucun test réel des fiches FB (chacune
 > propriétaire unique de sa plage, voir §1). Table reconstruite à partir des catalogues réels.
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
-|---|---|---|---|---|---|---|
-| `F11.01` | Décoder la position M3 (5 capteurs) | Position qualifiée Travail/Trémie/Extrêmes ; incohérence → défaut immédiat | `FB_Translation_PositionDecoder` | 🟠 C3 | <nobr><code>TC-P11-001</code></nobr>, 002 | ⚠️ cible PRG‑05 ; code encore PRG‑02 |
-| `F11.02` | Protéger M3 (Méca A/B, incohérence, bypass) | Arrêt commandé mais mouvement résiduel / incohérence prolongée → SafeStop+PowerCutOff | `FB_Safety_Translation` | 🔴 C4 | <nobr><code>TC-P11-002</code></nobr>, 010, 011, 014 | ✅ |
-| `F11.03` | Piloter le mouvement M3 (rampe, ralentissement, interlock sens) | Joystick/SemiAuto → rampe → AC600 ; ralentissement PV ; boutons IHM MAINT exigent homme-mort | `FB_Translation` | 🟠 C3 | <nobr><code>TC-P11-003</code></nobr>-005, 013 | ✅ |
-| `F11.04` | Barrière finale sorties + watchdog frein | Watchdog frein 500ms, réautorisation post-timeout, gate mot/fréquence, reset AC600 sous inhibition | `FB_TranslationOutputInterlock` | 🔴 C4 | <nobr><code>TC-P11-006</code></nobr>-009 | ✅ |
-| `F11.05` | Anti-télescopage hauteur M1/M2 (collision benne/translation) | Bloque translation si câbles M1/M2 sous hauteur mini, sauf `Bypass.MinHeight` conscient (jamais via `BypassGlobal`) | `PRG_05_Translation` §0 (câblage direct, hors FB dédié) | 🔴 C4 | — | ⚠️ non testé (`TC-` manquant) |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
+|---|---|---|---|---|---|---|---|
+| `F11.01` | Décoder la position M3 (5 capteurs) | Position qualifiée Travail/Trémie/Extrêmes ; incohérence → défaut immédiat | `FB_Translation_PositionDecoder` | 🟠 C3 | <nobr><code>TC-P11-001</code></nobr>, 002 | ⚠️ cible PRG‑05 ; code encore PRG‑02 | `NV` |
+| `F11.02` | Protéger M3 (Méca A/B, incohérence, bypass) | Arrêt commandé mais mouvement résiduel / incohérence prolongée → SafeStop+PowerCutOff | `FB_Safety_Translation` | 🔴 C4 | <nobr><code>TC-P11-002</code></nobr>, 010, 011, 014 | ✅ | `NV-I` |
+| `F11.03` | Piloter le mouvement M3 (rampe, ralentissement, interlock sens) | Joystick/SemiAuto → rampe → AC600 ; ralentissement PV ; boutons IHM MAINT exigent homme-mort | `FB_Translation` | 🟠 C3 | <nobr><code>TC-P11-003</code></nobr>-005, 013 | ✅ | `NV-I` |
+| `F11.04` | Barrière finale sorties + watchdog frein | Watchdog frein 500ms, réautorisation post-timeout, gate mot/fréquence, reset AC600 sous inhibition | `FB_TranslationOutputInterlock` | 🔴 C4 | <nobr><code>TC-P11-006</code></nobr>-009 | ✅ | `NV-I` |
+| `F11.05` | Anti-télescopage hauteur M1/M2 (collision benne/translation) | Bloque translation si câbles M1/M2 sous hauteur mini, sauf `Bypass.MinHeight` conscient (jamais via `BypassGlobal`) | `PRG_05_Translation` §0 (câblage direct, hors FB dédié) | 🔴 C4 | — | ⚠️ non testé (`TC-` manquant) | `NV` |
 
 ## 📑 Sommaire
 
@@ -41,13 +43,15 @@
 > ⚠️ Corrigée 2026-08-26 — voir note dans la Table des fonctions ci-dessus. Chaque fiche FB reste
 > **propriétaire unique** de sa plage d'IDs ; ce chapô ne recopie que la synthèse.
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> |
-|---|---|---|---|---|
-| <nobr><code>TC-P11-001/002</code></nobr> | **Position & cohérence** | 5 capteurs ➔ mot valide ➔ position qualifiée. Mot incohérent ➔ `Incoherent=TRUE` ➔ Safety bit7 ➔ SafeStop+PowerCutOff | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Translation_PositionDecoder</code></small> |
-| <nobr><code>TC-P11-010/011/014</code></nobr> | **Sécurité M3 (Méca A/B, bypass)** | Arrêt commandé mais mouvement résiduel (Méca A) ou incohérence prolongée (Méca B) ➔ SafeStop+PowerCutOff. `BypassGlobal` efface `ErrorId` | <nobr><code>⚡ AUTO_PLC</code></nobr> | <small><code>FB_Safety_Translation</code></small> |
-| <nobr><code>TC-P11-003/004/005/013</code></nobr> | **Vitesse, rampes & interlock sens** | Joystick/SemiAuto ➔ Rampe ➔ AC600. Ralentissement PV si `Direction=1`+capteur. Interlock sens 200ms si vitesse≠0. Boutons IHM MAINT exigent homme-mort | <nobr><code>⚡ AUTO_PLC</code></nobr> | <small><code>FB_Translation</code></small> |
-| <nobr><code>TC-P11-006-009</code></nobr> | **Barrière sorties & watchdog frein** | Watchdog frein 500ms sans confirmation ➔ FAULT+Inhibit. Réautorisation = Cause+Reset+Mot 0+nouvelle demande. Zéro redémarrage auto | <nobr><code>⚡ AUTO_PLC</code></nobr> | <small><code>FB_TranslationOutputInterlock</code></small> |
-| — (aucun TC) | **Anti-télescopage hauteur M1/M2** | Translation bloquée si `CablePosM1` ou `CablePosM2` sous `_TranslationMinHeightM1M2_M`, sauf `Bypass.MinHeight` conscient. ⚠️ Câblé directement dans `PRG_05_Translation.st` §0, hors `FB_Safety_Translation` — pas de test dédié aujourd'hui | <nobr><code>⚠️ manquant</code></nobr> | <small><code>PRG_05_Translation</code></small> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P11-001/002</code></nobr> | **Position & cohérence** | 5 capteurs ➔ mot valide ➔ position qualifiée. Mot incohérent ➔ `Incoherent=TRUE` ➔ Safety bit7 ➔ SafeStop+PowerCutOff | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Translation_PositionDecoder</code></small> | `NV-I` |
+| <nobr><code>TC-P11-010/011/014</code></nobr> | **Sécurité M3 (Méca A/B, bypass)** | Arrêt commandé mais mouvement résiduel (Méca A) ou incohérence prolongée (Méca B) ➔ SafeStop+PowerCutOff. `BypassGlobal` efface `ErrorId` | <nobr><code>⚡ AUTO_PLC</code></nobr> | <small><code>FB_Safety_Translation</code></small> | `NV-I` |
+| <nobr><code>TC-P11-003/004/005/013</code></nobr> | **Vitesse, rampes & interlock sens** | Joystick/SemiAuto ➔ Rampe ➔ AC600. Ralentissement PV si `Direction=1`+capteur. Interlock sens 200ms si vitesse≠0. Boutons IHM MAINT exigent homme-mort | <nobr><code>⚡ AUTO_PLC</code></nobr> | <small><code>FB_Translation</code></small> | `NV` |
+| <nobr><code>TC-P11-006-009</code></nobr> | **Barrière sorties & watchdog frein** | Watchdog frein 500ms sans confirmation ➔ FAULT+Inhibit. Réautorisation = Cause+Reset+Mot 0+nouvelle demande. Zéro redémarrage auto | <nobr><code>⚡ AUTO_PLC</code></nobr> | <small><code>FB_TranslationOutputInterlock</code></small> | `NV` |
+| — (aucun TC) | **Anti-télescopage hauteur M1/M2** | Translation bloquée si `CablePosM1` ou `CablePosM2` sous `_TranslationMinHeightM1M2_M`, sauf `Bypass.MinHeight` conscient. ⚠️ Câblé directement dans `PRG_05_Translation.st` §0, hors `FB_Safety_Translation` — pas de test dédié aujourd'hui | <nobr><code>⚠️ manquant</code></nobr> | <small><code>PRG_05_Translation</code></small> | `NV` |
 
 ---
 

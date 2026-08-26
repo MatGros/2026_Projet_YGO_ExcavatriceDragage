@@ -33,16 +33,18 @@
 
 ### Table des fonctions
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
-|---|---|---|---|---|---|---|
-| `F08.01` | Acquérir axes + bouton | Lit `RawX`/`RawY`/`RawButton` (bus CANopen ou image simulée) | `FB_Joystick` | 🔵 C2 | <nobr><code>TC-P08-010</code></nobr> | ✅ |
-| `F08.02` | Mettre à l'échelle | Brut ADC → % signé ±100, deadband ADC sur neutre persistant, saturation stricte | `FB_AxisScale` | 🔵 C2 | <nobr><code>TC-P08-010</code></nobr> | ✅ |
-| `F08.03` | Armer homme-mort | Maintien bouton `DeadmanArmHoldTime` (100ms) **ET** `ArmingPermit=TRUE` | `FB_Joystick` | 🔴 C4 | <nobr><code>TC-P08-020</code></nobr> | ✅ |
-| `F08.04` | Désarmer homme-mort | `ArmingPermit=FALSE` (immédiat) **ou** neutre tenu `NeutralHoldTime` après grâce `DeadmanArmGraceTime` (3s) | `FB_Joystick` | 🔴 C4 | <nobr><code>TC-P08-020</code></nobr> | ✅ |
-| `F08.05` | Détecter défaut capteur | `RawX`/`RawY` hors `[0;10000]` ± marge 500 → `SpeedTgt=0` 2 axes + Warning | `FB_Joystick` | 🟠 C3 | <nobr><code>TC-P08-030</code></nobr> | ✅ |
-| `F08.06` | Calibrer neutre | Front `BtnCalibrate` en zone `[2000;8000]` → mémorise neutre persistant, sinon Fault | `FB_Joystick` | 🔵 C2 | <nobr><code>TC-P08-040</code></nobr> | ⚠️ SITE non exécuté |
-| `F08.07` | Interdire mouvement sans armement | Consommateur combine `AxisCmd*.StartStop AND DeadmanArmed` avant tout ordre translation ; **partiel** sur treuils (voir §Intégration) | `PRG_04`/`PRG_05` (câblage), vérifié par `gate` `G375` | 🔴 C4 | <nobr><code>TC-P08-050</code></nobr> | ⚠️ partiel (treuils) |
-| `F08.08` | Signaler armement refusé | `ArmingPermitDenied := RawButton AND NOT ArmingPermit` (warning IHM) | `FB_Joystick` | ⚪ C1 | <nobr><code>TC-P08-060</code></nobr> | ⚠️ non testé |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
+|---|---|---|---|---|---|---|---|
+| `F08.01` | Acquérir axes + bouton | Lit `RawX`/`RawY`/`RawButton` (bus CANopen ou image simulée) | `FB_Joystick` | 🔵 C2 | <nobr><code>TC-P08-010</code></nobr> | ✅ | `NV-I` |
+| `F08.02` | Mettre à l'échelle | Brut ADC → % signé ±100, deadband ADC sur neutre persistant, saturation stricte | `FB_AxisScale` | 🔵 C2 | <nobr><code>TC-P08-010</code></nobr> | ✅ | `NV-I` |
+| `F08.03` | Armer homme-mort | Maintien bouton `DeadmanArmHoldTime` (100ms) **ET** `ArmingPermit=TRUE` | `FB_Joystick` | 🔴 C4 | <nobr><code>TC-P08-020</code></nobr> | ✅ | `NV-I` |
+| `F08.04` | Désarmer homme-mort | `ArmingPermit=FALSE` (immédiat) **ou** neutre tenu `NeutralHoldTime` après grâce `DeadmanArmGraceTime` (3s) | `FB_Joystick` | 🔴 C4 | <nobr><code>TC-P08-020</code></nobr> | ✅ | `NV-I` |
+| `F08.05` | Détecter défaut capteur | `RawX`/`RawY` hors `[0;10000]` ± marge 500 → `SpeedTgt=0` 2 axes + Warning | `FB_Joystick` | 🟠 C3 | <nobr><code>TC-P08-030</code></nobr> | ✅ | `NV-I` |
+| `F08.06` | Calibrer neutre | Front `BtnCalibrate` en zone `[2000;8000]` → mémorise neutre persistant, sinon Fault | `FB_Joystick` | 🔵 C2 | <nobr><code>TC-P08-040</code></nobr> | ⚠️ SITE non exécuté | `NV` |
+| `F08.07` | Interdire mouvement sans armement | Consommateur combine `AxisCmd*.StartStop AND DeadmanArmed` avant tout ordre translation ; **partiel** sur treuils (voir §Intégration) | `PRG_04`/`PRG_05` (câblage), vérifié par `gate` `G375` | 🔴 C4 | <nobr><code>TC-P08-050</code></nobr> | ⚠️ partiel (treuils) | `NV` |
+| `F08.08` | Signaler armement refusé | `ArmingPermitDenied := RawButton AND NOT ArmingPermit` (warning IHM) | `FB_Joystick` | ⚪ C1 | <nobr><code>TC-P08-060</code></nobr> | ⚠️ non testé | `NV` |
 
 > `TC-P08-010` couvre `F08.01`+`F08.02` (même pipeline acquisition+échelle) ; `TC-P08-020` couvre
 > `F08.03`+`F08.04` (armement+désarmement, même TC macro) — partage volontaire (règle guide 3-6
@@ -52,14 +54,16 @@
 
 ## 2 · 🧪 Table des points de validation
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> |
-|---|---|---|---|---|
-| <nobr><code>TC-P08-010</code></nobr> | **Acquisition & échelle** | `RawX=9000→80%`, `RawY=300→-94%` proportionnel (pas seulement aux bornes) ; deadband ADC centrée neutre | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_AxisScale</code></small> |
-| <nobr><code>TC-P08-020</code></nobr> | **Homme-mort** | Armement maintien+permission ; relâché avant fin = annulé ; désarmement (décélération normale, pas coupure) sur `ArmingPermit=FALSE` ou neutre tenu après grâce 3s | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Joystick</code></small> |
-| <nobr><code>TC-P08-030</code></nobr> | **Défaut capteur** | Hors plage ±marge ➔ `SpeedTgt=0` 2 axes, `ErrorId` bit1 Warning auto-effacé | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Joystick</code></small> |
-| <nobr><code>TC-P08-040</code></nobr> | **Calibration** | Hors `[2000;8000]` ➔ Fault bit0 à acquitter ; neutre persiste après redémarrage PLC | <nobr><code>⚡ AUTO+SITE</code></nobr> | <small><code>FB_Joystick</code></small> |
-| <nobr><code>TC-P08-050</code></nobr> | **Gate consommateurs** | Translation refuse tout ordre sans `DeadmanArmed` (tous modes) ; Treuils **seulement** en mode Joystick Maître (asymétrie non tranchée, §7/Q2) | <nobr><code>🔒 GATE</code></nobr> | <small><code>G375_check_deadman_arming_gate.py</code></small> |
-| <nobr><code>TC-P08-060</code></nobr> | **Armement refusé** | `ArmingPermitDenied=TRUE` pendant tout appui bouton si `ArmingPermit=FALSE` | <nobr><code>⬜ GAP</code></nobr> | <small><code>FB_Joystick</code></small> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P08-010</code></nobr> | **Acquisition & échelle** | `RawX=9000→80%`, `RawY=300→-94%` proportionnel (pas seulement aux bornes) ; deadband ADC centrée neutre | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_AxisScale</code></small> | `NV` |
+| <nobr><code>TC-P08-020</code></nobr> | **Homme-mort** | Armement maintien+permission ; relâché avant fin = annulé ; désarmement (décélération normale, pas coupure) sur `ArmingPermit=FALSE` ou neutre tenu après grâce 3s | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Joystick</code></small> | `NV` |
+| <nobr><code>TC-P08-030</code></nobr> | **Défaut capteur** | Hors plage ±marge ➔ `SpeedTgt=0` 2 axes, `ErrorId` bit1 Warning auto-effacé | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Joystick</code></small> | `NV` |
+| <nobr><code>TC-P08-040</code></nobr> | **Calibration** | Hors `[2000;8000]` ➔ Fault bit0 à acquitter ; neutre persiste après redémarrage PLC | <nobr><code>⚡ AUTO+SITE</code></nobr> | <small><code>FB_Joystick</code></small> | `NV` |
+| <nobr><code>TC-P08-050</code></nobr> | **Gate consommateurs** | Translation refuse tout ordre sans `DeadmanArmed` (tous modes) ; Treuils **seulement** en mode Joystick Maître (asymétrie non tranchée, §7/Q2) | <nobr><code>🔒 GATE</code></nobr> | <small><code>G375_check_deadman_arming_gate.py</code></small> | `NV` |
+| <nobr><code>TC-P08-060</code></nobr> | **Armement refusé** | `ArmingPermitDenied=TRUE` pendant tout appui bouton si `ArmingPermit=FALSE` | <nobr><code>⬜ GAP</code></nobr> | <small><code>FB_Joystick</code></small> | `NV` |
 
 > ⚠️ **`TC-P08-050` n'est pas un test de FB** : le gate vit dans `PRG_04_Treuils_Benne.st` /
 > `PRG_05_Translation.st` (câblage de collage), pas dans `FB_Joystick` (qui ignore Winch/Translation)
