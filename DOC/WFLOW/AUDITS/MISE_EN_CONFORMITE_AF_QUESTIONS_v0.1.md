@@ -16,16 +16,12 @@
 | AF-05 | ✅ Fait | `98cf96ee` | 1 tour, nom de variable inexistant corrigé (`TglMaintenanceZoneAccess`→`SelMaintenanceZoneAccess`) |
 | AF-06 | ✅ Fait | `18ba121b` | 1 tour, ⛔ P0 sécurité trouvé (EncoderIncoherent non consommé par Modes/Safety) |
 | AF-07 | ✅ Fait | `6a8cec2b` | 2 tours (1er a échoué sur limite API), section §6 manquante depuis toujours écrite from scratch |
-| AF-10 | ✅ Fait (chapô seul, 9 fiches FB non retouchées) | `951db663` | 1 tour, 4 liens morts + §5.1 fausse + refs tâches inexistantes |
-| AF-11 | ✅ Fait | `d757f6f1` | 1 tour, ⛔ catalogue TC inventé + anti-télescopage mal attribué (F_Safety_Translation au lieu de PRG_05 direct) |
-| AF-12 | ✅ Fait (chapô seul, 3 fiches FB non retouchées) | (à suivre) | 1 tour, chemin source faux + zéro TC-P12 signalé + bug de code trouvé (ErrorId M2) |
-| AF-07 | ⬜ | — | — |
 | AF-08 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
 | AF-09 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
-| AF-10 | ⬜ | — | — |
-| AF-11 | ⬜ | — | — |
-| AF-12 | ⬜ | — | — |
-| AF-13 | ⬜ | — | — |
+| AF-10 | ✅ Fait (chapô seul, 9 fiches FB non retouchées — Q8) | `951db663` | 1 tour, 4 liens morts + §5.1 fausse + refs tâches inexistantes |
+| AF-11 | ✅ Fait | `d757f6f1` | 1 tour, ⛔ catalogue TC inventé + anti-télescopage mal attribué (F_Safety_Translation au lieu de PRG_05 direct) |
+| AF-12 | ✅ Fait (chapô seul, 3 fiches FB non retouchées — Q11) | `adfcaf8a` | 1 tour, chemin source faux + zéro TC-P12 signalé + bug de code trouvé (ErrorId M2) |
+| AF-13 | ✅ Fait | `db056391` | 1 tour, PASS avec réserve mineure (style Mermaid), corrigée avant commit — aucun écart de substance |
 | AF-14 | ⬜ | — | — |
 
 ## Questions ouvertes (à trancher par l'humain)
