@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T01:07:30.664952" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T01:07:30.664952">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T12:18:00.929402" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T12:18:00.929402">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -151,7 +151,7 @@
    📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -363,7 +363,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Surveillance bus CANopen master et esclave Joystick (Online/Op)
    🔌 Architecture : Publication ST_Diag_Device &amp; E_Diag_State
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

@@ -25,33 +25,54 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)'
+TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* Scan 0 : Enable=FALSE -> Neutralisation initiale absolue, Ready=FALSE, sorties neutralisees *)
     fb(ENABLE := FALSE, RESET := FALSE, ARMINGPERMIT := TRUE,
        BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
        RAWX := 8000, RAWY := 8000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready=FALSE');
+    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready=FALSE (neutralise)');
     ASSERT_FALSE(fb.STATUS.ERROR, 'Enable=FALSE -> Status.Error=FALSE (neutralise)');
     ASSERT_FALSE(fb.STATUS.WARNING, 'Enable=FALSE -> Status.Warning=FALSE');
-    ASSERT_FALSE(fb.DEADMANARMED, 'Enable=FALSE -> Geste desarme');
-    ASSERT_EQ(fb.AXISCMDX.SPEEDTGT, 0.0, 'Sortie X a 0');
-    ASSERT_EQ(fb.AXISCMDY.SPEEDTGT, 0.0, 'Sortie Y a 0');
-END_TEST
+    ASSERT_EQ(fb.AXISCMDX.SPEEDTGT, 0.0, 'Enable=FALSE -> Sortie X neutralisee a 0');
+    ASSERT_EQ(fb.AXISCMDY.SPEEDTGT, 0.0, 'Enable=FALSE -> Sortie Y neutralisee a 0');
 
-TEST 'Nominal : Enable=TRUE au neutre -> Ready, aucun defaut'
-    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
-    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    ADVANCE_TIME(10000000);
+    nx := 5000; ny := 5000;
+
+    (* Scan 1 : Front montant Enable=TRUE avec entrees au repos -> Transition nominale prete *)
     fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
        BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
        RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_TRUE(fb.READY, 'Enable=TRUE -> Ready=TRUE');
+    ASSERT_TRUE(fb.READY, 'Enable=TRUE au repos -> Ready=TRUE (nominal)');
     ASSERT_FALSE(fb.STATUS.ERROR, 'Au repos -> Pas d erreur');
     ASSERT_FALSE(fb.STATUS.WARNING, 'Au repos -> Pas de warning');
+    ASSERT_EQ(fb.AXISCMDX.SPEEDTGT, 0.0, 'Au repos -> Sortie X a 0');
+    ASSERT_EQ(fb.AXISCMDY.SPEEDTGT, 0.0, 'Au repos -> Sortie Y a 0');
+
+    ADVANCE_TIME(10000000);
+    nx := 5000; ny := 5000;
+
+    (* Scan 2 : Front descendant Enable=FALSE -> Coupure nette et re-neutralisation immediate *)
+    fb(ENABLE := FALSE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready retombe a FALSE');
+    ASSERT_FALSE(fb.STATUS.ERROR, 'Coupure -> Pas d erreur parasite');
+    ASSERT_EQ(fb.AXISCMDX.SPEEDTGT, 0.0, 'Coupure -> Sortie X maintenue a 0');
+    ASSERT_EQ(fb.AXISCMDY.SPEEDTGT, 0.0, 'Coupure -> Sortie Y maintenue a 0');
 END_TEST
 
 TEST 'TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)'

@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Surveillance bus CANopen master et esclave Joystick (Online/Op)
    🔌 Architecture : Publication ST_Diag_Device & E_Diag_State
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Diag_CanOpen
 VAR_INPUT

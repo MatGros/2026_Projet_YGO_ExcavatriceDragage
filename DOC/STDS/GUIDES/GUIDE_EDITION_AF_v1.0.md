@@ -156,7 +156,7 @@ flowchart TD
     linkStyle 2 stroke:#fbbf24,stroke-width:3px
 ```
 
-**Style obligatoire** (validé sur `AF_Partie-08_Fonction_Joystick_v2.3.md`) :
+**Style obligatoire** (validé sur `AF_Partie-08_Fonction_Joystick_v2.5.md`) :
 - `%%{init...}%%` en première ligne — thème `base`, sans quoi Mermaid applique son thème neutre
   terne par défaut (flèches grises fades).
 - **Trait plein épais (`==>`)** = flux de **donnée** transformée entre blocs métier. **Pointillé

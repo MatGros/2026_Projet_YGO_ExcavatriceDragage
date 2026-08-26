@@ -63,7 +63,7 @@ que de le noyer dans un paragraphe de logique.
 Si le mécanisme est une **séquence temporelle** (armement, palier, homing...), ajouter un
 chronogramme texte (`GUIDE_EDITION_AF_v1.0.md §3ter`) : table Instant × Signal, fronts notés
 `↑`/`↓` collés à la valeur (`TRUE ↑`), jamais de flèche textuelle ambiguë. Voir
-`AF_Partie-08_Fonction_Joystick_v2.3.md §5` pour un exemple appliqué (homme-mort).]
+`AF_Partie-08_Fonction_Joystick_v2.5.md §5` pour un exemple appliqué (homme-mort).]
 
 ## 5 · 💾 Réglages RETAIN / persistants
 

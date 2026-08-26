@@ -2,7 +2,7 @@
    📊 E_Diag_State — Enumération des états du cycle de diagnostic réseau
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Phases d'état de surveillance diagnostic d'un bus ou équipement
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    ======================================================================= *)
 TYPE E_Diag_State :
 (

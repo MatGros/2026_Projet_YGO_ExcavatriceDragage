@@ -72,4 +72,4 @@ END_IF;
 |---|---|
 | Tâche | T88 |
 | FB | `CODE/A_COMMUN/FB_CycleTime.st` |
-| Contrat FB | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md` |
+| Contrat FB | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md` |

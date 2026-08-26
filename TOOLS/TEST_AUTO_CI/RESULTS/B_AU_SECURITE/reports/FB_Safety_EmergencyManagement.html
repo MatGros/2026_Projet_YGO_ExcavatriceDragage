@@ -191,7 +191,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-25 16:46:03</div>
+    <div class="exec-time">2026-08-26 13:08:50</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (7 tests)</summary>
@@ -634,7 +634,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Transporte les ordres logiques entre le bloc de décision et de sortie AU
    🔒 Polarité : MaintainA/B_Cmd en maintien (TRUE = voie saine)
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 TYPE ST_Safety_Emergency_InternalCmd :
@@ -653,7 +653,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Bus d&#x27;état public de la chaîne d&#x27;arrêt d&#x27;urgence
    🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 TYPE ST_Safety_Emergency_State :
@@ -674,7 +674,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d&#x27;arrêt d&#x27;urgence
    🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 TYPE ST_Safety_Emergency_Diag :
@@ -695,7 +695,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Machine d&#x27;état, fronts Reset/Arm, calcul ErrorId &amp; consignes logiques
    🔒 Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementLogic
@@ -1028,7 +1028,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
    🎯 Rôle : Enable gate + copie consignes logiques vers sorties physiques
    🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
    🔌 Architecture : Projection physique fail-safe
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput
@@ -1113,7 +1113,7 @@ Diag.LockoutActive        := LockoutActive;
    🎯 Rôle : Façade publique, instance unique ; câblage interne Logic/Output &amp; exposition des bus d&#x27;état
    🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
    🔌 Architecture : Composition interne Logic/Output
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagement
