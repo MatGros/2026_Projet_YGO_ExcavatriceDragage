@@ -152,6 +152,7 @@ en entier avant un essai (voir aussi §10).
 | `PRG_06_Outputs.instTranslationOutputInterlockM3.Reason` | `NONE` | `RESTART_INHIBITED` | Séquence de réarmement pas encore complète — revoir §"Réarmement anti-redémarrage" ci-dessous |
 
 **Réarmement après timeout frein (chronologie exacte, ne pas sauter d'étape)** :
+
 1. Cause physique corrigée (frein confirme bien l'ouverture)
 2. Front `Reset` (IHM) — **pas un niveau maintenu**
 3. Demande neutre explicite : mot de commande `0` vu au moins un scan

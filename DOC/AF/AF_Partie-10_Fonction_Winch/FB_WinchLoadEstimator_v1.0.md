@@ -1,8 +1,8 @@
 # Fiche Composant : FB_WinchLoadEstimator (v1.0)
 
-> **Rôle** : Estimation empirique de la charge retenue/soulevée par un treuil.  
-> **Catégorie** : Brique de diagnostic & supervision informative (sans effet de commande).  
-> **Code Source** : `CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st`  
+> **Rôle** : Estimation empirique de la charge retenue/soulevée par un treuil.
+> **Catégorie** : Brique de diagnostic & supervision informative (sans effet de commande).
+> **Code Source** : `CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st`
 
 ---
 

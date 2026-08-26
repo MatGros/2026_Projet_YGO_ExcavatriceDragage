@@ -29,7 +29,7 @@ Décline `TC-P09-010` (chapô) :
 | ID | Comportement attendu | Type | Réf |
 |---|---|---|---|
 | <nobr><code>TC-P09-010.1</code></nobr> | `AlarmsIn≠0` OU `NOT SlaveOperational` → `EncoderAvailable=FALSE`, `RawPos`/`AngleRaw`/`TurnCount` gelés (dernière valeur) | <nobr><code>💻 AUTO</code></nobr> | §5 |
-| <nobr><code>TC-P09-010.2</code></nobr> | Preset : écart `\|RawPos - PresetValueOut\| ≤ PresetTolerancePts` → `PresetAck` après 500ms visuel ; sinon timeout `PresetTimeout` → `PresetNak` + `ErrorId` bit1 | <nobr><code>💻 AUTO</code></nobr> | §4 |
+| <nobr><code>TC-P09-010.2</code></nobr> | Preset : écart `abs(RawPos - PresetValueOut) ≤ PresetTolerancePts` → `PresetAck` après 500ms visuel ; sinon timeout `PresetTimeout` → `PresetNak` + `ErrorId` bit1 | <nobr><code>💻 AUTO</code></nobr> | §4 |
 
 ## 3 · 🔌 Interface
 

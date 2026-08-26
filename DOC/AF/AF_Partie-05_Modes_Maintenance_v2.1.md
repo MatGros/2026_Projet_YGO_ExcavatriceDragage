@@ -51,6 +51,7 @@
 | 🔄 SEMI_AUTO | Cycle séquencé ; mouvements toujours conditionnés par l'opérateur. |
 
 `FB_Modes` / `PRG_MODES_CFC` (POU ST actuel ; cible `PRG_03_Modes_Cycle_CFC`, rang 03) arbitre :
+
 - le mode actif ;
 - le bus d'autorisations `Auth : ST_Modes_Autorisations` (mode arbitré, SyncEnable, InhibitM1/2, sélection joystick, homing approach, cible maintenance).
 

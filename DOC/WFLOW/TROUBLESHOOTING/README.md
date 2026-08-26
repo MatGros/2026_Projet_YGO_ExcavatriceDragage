@@ -20,7 +20,8 @@ Toute nouvelle fiche de depannage doit etre creee a partir de [TEMPLATE_Troubles
 1. **Symptome & Contexte** (Comportement observe, variables CODESYS incriminees).
 2. **Chaine causale & Diagnostic racine** (Analyse de code ST / Safety).
 3. **Impacts & Decision Safety** (Respect ISO 13849 vs Confort de banc).
-4. **Action corrective & Garde-fous** (Regle ix: + guard:).
+4. **Action corrective & Garde-fous** (Regle
+ix: + guard:).
 
 ---
 

@@ -64,7 +64,7 @@
 | **Observateur** | Verdict passif ou mesure sans rétroaction machine | Non | IHM uniquement |
 
 > 📌 **Principe** : un FB diag ne pilote jamais SafeStop/PowerCutOff. Il publie des faits.
-> Les FB_Safety_<Domaine> consomment ces faits et décident seuls de l'action.
+> Les `FB_Safety_<Domaine>` consomment ces faits et décident seuls de l'action.
 
 ---
 

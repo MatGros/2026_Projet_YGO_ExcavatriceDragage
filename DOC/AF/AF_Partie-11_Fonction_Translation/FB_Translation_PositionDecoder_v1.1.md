@@ -78,6 +78,7 @@ Tout autre mot ⇒ `Incoherent=TRUE`. Butées extrêmes dérivées **seulement**
 
 **Historique du lot** (pour éviter de refaire les mêmes erreurs) : 3 conceptions testées en
 direct sur machine réelle avant validation :
+
 1. Mot EXACT (5 bits) — abandonné : un capteur décalé de quelques mm suffisait à sauter le mot
    cible (décalage came).
 2. Front du capteur **précédent** dans la chaîne thermomètre (ex : arrivée à P1 = front
