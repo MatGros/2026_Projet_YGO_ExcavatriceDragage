@@ -11,25 +11,24 @@ Distingue explicitement un bus réellement online (`READY`) d'un bypass masquant
 
 ## 📥 Entrées
 
-| Port | Type | Producteur |
-|---|---|---|
-| `Enable` | BOOL | `PRG_01` (TRUE fixe) |
-| `Reset` | BOOL | IHM (front acquittement) |
-| `CANbusStateRaw` | INT | `CANbus.GetBusState()` (2 = ACTIVE) |
-| `DeviceJoystickStateRaw` | DEVICE_STATE | `JOY1.GetDeviceState()` |
-| `SimBypassActive` | BOOL | `PRG_01` (simulation device) |
-| `NetworkBypassActive` | BOOL | `GVL_IHM.Network.Bypass.Global` |
+| Port | Type | Producteur | Rôle |
+|---|---|---|---|
+| `Enable` | BOOL | `PRG_02` (TRUE fixe) | Activation logique |
+| `Reset` | BOOL | IHM (front acquittement) | Réarmement sur front montant |
+| `CANbusStateRaw` | INT | `CANbus.GetBusState()` (2 = ACTIVE) | État driver CAN CODESYS |
+| `DeviceJoystickStateRaw` | DEVICE_STATE | `JOY1.GetDeviceState()` | État esclave joystick |
+| `SimBypassActive` | BOOL | `GVL_Simulation` | Simulation active banc |
+| `NetworkBypassActive` | BOOL | `GVL_IHM.Network.Bypass.Global` | Bypass réseau global |
+| `CanBusBypassActive` | BOOL | `GVL_IHM.Network.Bypass.BusCanOpen` | Bypass maître CAN seul |
+| `JoystickBypassActive` | BOOL | `GVL_IHM.Network.Bypass.Joystick` | Bypass joystick esclave seul |
 
 ## 📤 Sorties
 
-| Port | Type | Consommateur |
-|---|---|---|
-| `Ready` / `Busy` / `Done` | BOOL | Conformité standard |
-| `Error` / `ErrorId` | BOOL / WORD | IHM Network |
-| `State` / `StateAtError` | E_Diag_State | IHM, Modes |
-| `DeviceCanOpenMaster` | ST_Diag_Device | IHM Network, FB_Joystick (via PRG_01) |
-| `DeviceJoystick` | ST_Diag_Device | FB_Safety_Winch, FB_Safety_Translation (via PRG_03), IHM |
-| `CANbusStateRawOut` / `DeviceJoystickStateRawOut` | miroirs bruts | Troubleshooting |
+| Port | Type | Consommateur | Rôle |
+|---|---|---|---|
+| `Ready` | BOOL | Standard | Logique active |
+| `DeviceCanOpenMaster` | ST_Diag_Device | `GVL_IHM.Network.BusCanOpen`, IHM | Diagnostics bus maître |
+| `DeviceJoystick` | ST_Diag_Device | `GVL_IHM.Network.Joystick`, Safety Treuils/Translation | Diagnostics esclave Joystick |
 
 ## 🔒 Impact machine
 
