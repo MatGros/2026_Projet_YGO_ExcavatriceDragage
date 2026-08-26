@@ -63,21 +63,25 @@ Trait plein = composition/données transférées. `Logic` et `Output` sont des s
 ### 🧱 Fiches Composants & Cartouches ST (`CODE/AU/`)
 
 #### 🛡️ `FB_Safety_EmergencyManagement` *(Composite Façade)*
+
 - **Fichier Source** : [`FB_Safety_EmergencyManagement.st`](../../../../CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st)
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Façade publique, instance unique ; câblage interne Logic/Output & exposition des bus d'état`
 - **Responsabilité** : Point d'entrée unique de la boucle d'arrêt d'urgence, encapsule les sous-instances privées `Logic` et `Output`.
 
 #### 🧠 `FB_Safety_EmergencyManagementLogic` *(Décision & Machine d'État)*
+
 - **Fichier Source** : [`FB_Safety_EmergencyManagementLogic.st`](../../../../CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st)
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Machine d'état, fronts Reset/Arm, calcul ErrorId & consignes logiques`
 - **Responsabilité** : Gère les étapes d'auto-test, les fronts `Reset`/`ArmRequest`, et produit le bus interne `ST_Safety_Emergency_InternalCmd`.
 
 #### 🔒 `FB_Safety_EmergencyManagementOutput` *(Pilote Physique Fail-Safe)*
+
 - **Fichier Source** : [`FB_Safety_EmergencyManagementOutput.st`](../../../../CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st)
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Enable gate + copie consignes logiques vers sorties physiques`
 - **Responsabilité** : Barrière physique finale pour les signaux `MaintainA_RQ` et `MaintainB_RQ` (polarité maintien, `TRUE` = voie saine).
 
 #### 🧩 `ST_Safety_Emergency_InternalCmd` *(DUT Bus Interne)*
+
 - **Fichier Source** : [`ST_Safety_Emergency_InternalCmd.st`](../../../../CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st)
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Transporte les ordres logiques entre le bloc de décision et le bloc de sortie`
 - **Responsabilité** : Structure d'échange interne à 3 champs `BOOL` reliant `Logic` et `Output`.

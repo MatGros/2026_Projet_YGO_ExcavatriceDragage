@@ -80,16 +80,19 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 ## 🎮 4 · Sélection de commande
 
 ### Nominal
+
 - Le joystick pilote M1 et M2 ensemble.
 - Les demandes restent maintenues : bouton/joystick + homme-mort.
 
 ### MAINT_N2 — pilotage unitaire
+
 - Une selection explicite autorise M1 seul ou M2 seul.
 - Le treuil non selectionne reste **non commande**.
 - Frein serre, surveillances safety **actives**.
 - Ce n'est **pas** une inhibition complete du FB safety.
 
 ### Inhibition
+
 - L'inhibition d'un treuil est une action de maintenance distincte.
 - Elle neutralise le mouvement de l'axe concerne et impose les consequences de synchro.
 - Elle est pilotée via `Auth.InhibitM1/2` (bus `Auth : ST_Modes_Autorisations`).
