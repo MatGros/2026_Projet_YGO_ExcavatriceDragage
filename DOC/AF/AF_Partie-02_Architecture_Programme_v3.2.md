@@ -2,17 +2,6 @@
 
 > La tracabilite des versions programme/document est portee par `DOC/VERSION_HISTORY.md`.
 
-## 🎯 Rôle et périmètre
-
-- **Rôle** : définir l'architecture cible de l'automate — pages CFC, sortie Ladder, programme
-  Cycle ST, frontières de flux et règles de lisibilité maintenance.
-- **Périmètre** : découpage par procédé (7 POU), ordonnancement `MainTask`, contrats de flux
-  inter-domaine. Ne définit pas : le détail des contrats FB/DUT (Partie 03), le contenu métier
-  de chaque domaine (Parties 04-14).
-- **Type de composant** : Fondations méta — pas de FB unique, pas de contrat AF03.
-- ⚠️ L'architecture ST historique est archivée. Le code actuel reste une base de migration, pas
-  le modèle cible.
-
 ## 📑 Sommaire
 
 1. [🧪 Points de validation](#1--points-de-validation)
@@ -25,15 +14,40 @@
 8. [❓ TBD](#8--tbd)
 9. [📚 Documents liés](#9--documents-liés)
 
+---
+
+## 🎯 Rôle et périmètre
+
+- **Rôle** : définir l'architecture d'exécution ST de l'automate : ordonnancement des programmes,
+  frontières de flux, responsabilités exclusives et règles de lisibilité maintenance.
+- **Périmètre** : découpage par procédé (6 POU actifs), ordonnancement `MainTask`, contrats de flux
+  inter-domaine. Ne définit pas : le détail des contrats FB/DUT (Partie 03), le contenu métier
+  de chaque domaine (Parties 04-14).
+- **Type de composant** : Architecture d'intégration — pas de FB unique ; les contrats publics
+  sont les bus inter-PRG, détaillés en AF03.
+- Le code ST versionné est la référence de l'architecture active. Les POU CFC/Ladder historiques
+  sont uniquement des repères de migration archivés.
+
+### 🎯 Table des fonctions
+
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
+|---|---|---|---|---|---|---|
+| `F02.01` | Ordonner le cycle applicatif | Exécute les six PRG dans l'ordre Acquisition → Modes/Cycle → Treuils/Benne → Translation → Outputs → Supervision. | `MainTask` + `PRG_02` à `PRG_07` | 🔵 C2 | <nobr><code>TC-P02-004</code></nobr> | ⚠️ revue MainTask manuelle |
+| `F02.02` | Encapsuler l'orchestration ST | Les PRG rendent visibles leurs instances, flux et arbitrages ; calculs et machines d'état résident dans les FB. | `PRG_02` à `PRG_07` | ⚪ C1 | <nobr><code>TC-P02-002</code></nobr> | ✅ |
+| `F02.03` | Garantir un producteur unique | Chaque image, bus, commande et état public a un propriétaire unique, identifié avant tout raccordement. | Contrats `ST_*` + PRG producteurs | 🟠 C3 | <nobr><code>TC-P02-001</code></nobr> | ⚠️ gate à fiabiliser (TBD §8) |
+| `F02.04` | Isoler la barrière de sortie | Seul `PRG_06_Outputs` applique les interlocks finaux et écrit les Q/PDO des actionneurs. | `PRG_06_Outputs` | 🔴 C4 | <nobr><code>TC-P02-003</code></nobr> | ✅ |
+| `F02.05` | Rendre explicites les retards de scan | Toute donnée consommée avant son producteur est interdite, sauf retard d'un scan nommé et justifié. | Ordonnancement `MainTask` | 🟠 C3 | <nobr><code>TC-P02-004</code></nobr> | ⚠️ revue MainTask manuelle |
+| `F02.06` | Séparer supervision et commande métier | La vue troubleshooting observe seulement ; `PRG_07` porte distinctement reset IHM, persistance et bypass autorisés. | `PRG_07_Supervision` + `FB_TroubleshootingView` | 🔵 C2 | <nobr><code>TC-P02-005</code></nobr> | ✅ |
+
 ## 🧪 1 · Points de validation
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
 | <nobr><code>TC-P02-001</code></nobr> | Un seul producteur par donnée | Aucun écouteur/écrivain multiple sur un contrat *(⚠️ `G200_check_linkage.py` L10 remonte des faux positifs intra-POU — voir TBD §8)* | `💻 AUTO` | <small>§2</small> |
-| <nobr><code>TC-P02-002</code></nobr> | Page CFC sans logique métier | Zéro `IF`/calcul inline dans le CFC | `💻 AUTO` | <small>§2</small> |
+| <nobr><code>TC-P02-002</code></nobr> | Programme d'orchestration ST sans logique métier cachée | Les calculs et machines d'état résident dans les FB ; le PRG rend ses arbitrages et flux explicitement lisibles | `💻 AUTO` | <small>§2</small> |
 | <nobr><code>TC-P02-003</code></nobr> | Sorties physiques via `PRG_06_Outputs` | Aucun autre POU n'écrit les Q/PDO finaux | `💻 AUTO` | <small>§3</small> |
 | <nobr><code>TC-P02-004</code></nobr> | Ordre d'exécution MainTask conforme | Tâche CODESYS + `G200_check_linkage.py` PASS *(⚠️ ne vérifie pas l'ordre inter-POU — revue manuelle à ce jour, voir TBD §8)* | `⚡ SITE+AUTO` | <small>§5</small> |
-| <nobr><code>TC-P02-005</code></nobr> | Troubleshooting lecture seule | Aucune écriture commande/config/interlock | `💻 AUTO` | <small>§3</small> |
+| <nobr><code>TC-P02-005</code></nobr> | Vue troubleshooting en lecture seule | `FB_TroubleshootingView` ne produit aucune commande, configuration ni interlock | `💻 AUTO` | <small>§3</small> |
 
 ---
 
@@ -50,25 +64,263 @@
 | 🧪 Simulation | Le choix réel/simulé est réalisé une fois à la frontière acquisition, par domaine. |
 | 🖥️ IHM | Les structures `Cmd/State/Cfg/Bypass` restent le contrat PLC-IHM, distinct des flux internes. |
 
-Un programme d'orchestration ST contient des déclarations d'instances, des constantes nommées et le câblage des entrées/sorties de FB par structures DUT. Il ne contient ni `IF` complexe, ni calcul, ni fusion de commandes, ni écriture de sortie physique hors `PRG_06_Outputs`.
+Un programme d'orchestration ST contient des déclarations d'instances, des constantes nommées et le câblage des entrées/sorties de FB par structures DUT. Il ne contient ni `IF` complexe, ni calcul, ni fusion de commandes, ni écriture de sortie d'actionneur hors `PRG_06_Outputs`. Les commandes de protocole des codeurs nécessaires au homing restent une exception propriétaire de `PRG_02`.
 
 ---
 
 ## 🗺️ 3 · Organisation cible
 
 **Regle de decoupage : par ensemble mecanique, pas par couche transverse.**
-Chaque procede physique porte sa propre safety dans sa page CFC : le lien entre la surveillance
-safety et le bloc metier commande doit etre visible sur le meme schema, sans ouvrir une autre page.
+Chaque procede physique porte sa propre safety dans son programme ST : le lien entre la surveillance
+safety et le bloc metier commande doit etre visible dans le meme POU, sans ouvrir un domaine transverse.
 
 | N° | Programme | Langage | Responsabilite |
 |---|---|---|---|
-| 01 | 📥 `PRG_02_Acquisition` | ST pur (`.st`) | Producteur unique de `HwReal`, `HwSim`, `HwIn`, entrées normalisées, chaîne codeurs/joystick et diagnostics devices/bus. |
+| 01 | 📥 `PRG_02_Acquisition` | ST pur (`.st`) | **Frontière d'acquisition, qualification et substitution réel/simulé** : producteur unique de `HwReal`, `HwSim`, `HwIn`, chaîne codeurs/homing, gestes joystick et diagnostics devices/bus. |
 | — | ~~`PRG_01_Inputs_LD`~~ | ~~Ladder~~ | ✅ Retiré (2026-08-26, vérifié absent de `CODE/M_MAIN/`) — qualification absorbée par `PRG_02_Acquisition`. |
 | 03 | 🎚️ `PRG_03_Modes_Cycle` | ST pur (`.st`) | Modes, droits, autorisations, sélections de sources et **séquenceur de cycle** (`FB_Cycle`). Produit des demandes ; ne commande aucune sortie. |
 | 04 | 🪝 `PRG_04_Treuils_Benne` | ST pur (`.st`) | **Ensemble levage indissociable** : M1 (retenue) + M2 (benne) + synchronisation + benne + `FB_DiveSearch`/`FB_ExtractionSequence`, avec la safety M1/M2 appelée de manière explicite. |
-| 05 | ↔️ `PRG_05_Translation` | ST pur (`.st`) | Positionnement M3 et arbitrage final translation, avec la safety M3 appelée de manière explicite. |
-| 06 | ⚡ `PRG_06_Outputs` | Ladder | Barrières finales, commandes physiques, **agrégation finale des demandes `PowerCutOff`** et réarmement. |
-| 07 | 🔎 `PRG_07_Supervision` | ST pur (`.st`) | Agrégation IHM, troubleshooting et bypass. Lecture seule stricte : n'écrit ni commande, ni configuration, ni interlock. |
+| 05 | ↔️ `PRG_05_Translation` | ST pur (`.st`) | Décodage des capteurs M3, positionnement et arbitrage final translation, avec la safety M3 appelée de manière explicite. |
+| 06 | ⚡ `PRG_06_Outputs` | ST pur (`.st`) | Barrières finales, commandes physiques, **agrégation finale des demandes `PowerCutOff`** et réarmement. |
+| 07 | 🔎 `PRG_07_Supervision` | ST pur (`.st`) | Agrégation IHM, persistance de configuration, synchronisation des bypass autorisés, diagnostics et vue troubleshooting en lecture seule. |
+
+### 🔄 Pipeline d'exécution et flux inter-PRG
+
+Le diagramme porte les **frontières de bus et l'ordonnancement** ; il ne remplace pas les contrats
+de composants AF03 ni les exigences métier AF04 à AF14. Une flèche pleine représente une donnée
+publique produite puis consommée dans le cycle. Une flèche pointillée issue de la Supervision porte
+une commande ou configuration dont les PRG précédents ne voient l'effet qu'au scan suivant.
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px'}}}%%
+flowchart TD
+    Inputs["📡 Terrain / PDO / E/S / Réseau<br/>🧪 Simulation<br/>🖥️ Commandes GVL_IHM<br/>(lues dans les PRG concernés)"]
+    P02["📡 PRG_02_Acquisition<br/>lit Terrain + Simulation<br/>produit HwReal · HwSim · HwIn · Data"]
+    P03["⚙️ PRG_03_Modes_Cycle<br/>lit HwIn · Data · IHM<br/>produit Auth · demandes cycle"]
+    P04["⚙️ PRG_04_Treuils_Benne<br/>lit Acquisition · Auth · IHM<br/>produit états · safety · requêtes M1/M2"]
+    P05["⚙️ PRG_05_Translation<br/>lit Acquisition · Auth · M1/M2 · IHM<br/>produit état · safety · requête M3"]
+    P06["🔒 PRG_06_Outputs<br/>lit requêtes M1/M2/M3<br/>produit interlocks finaux · Q/PDO · PowerCutOff"]
+    P07["🖥️ PRG_07_Supervision<br/>lit états PRG_02 à PRG_06<br/>produit états/diagnostics IHM · persistance · bypass"]
+    Next["↻ Scan suivant<br/>Reset · Cfg · bypass consommés par PRG_03 à PRG_06"]
+
+    Inputs ==>|"terrain / simulation"| P02
+    P02 ==>|"HwIn · Data"| P03
+    P03 ==>|"Auth · demandes cycle"| P04
+    P04 ==>|"états treuils/benne · requêtes M1/M2"| P05
+    P05 ==>|"état M3 · requête M3"| P06
+    P06 ==>|"états sorties / AU"| P07
+    P07 -.->|"Reset · Cfg · bypass"| Next
+
+    classDef acq fill:#0c1e2e,stroke:#38bdf8,stroke-width:2px,color:#e2e8f0
+    classDef cmd fill:#2b230a,stroke:#fbbf24,stroke-width:2px,color:#e2e8f0
+    classDef outp fill:#0f2b17,stroke:#4ade80,stroke-width:2px,color:#e2e8f0
+    classDef sup fill:#182638,stroke:#94a3b8,stroke-width:2px,color:#e2e8f0
+    classDef ext fill:#182638,stroke:#94a3b8,stroke-width:2px,color:#e2e8f0
+    class Inputs,Next ext
+    class P02 acq
+    class P03,P04,P05 cmd
+    class P06 outp
+    class P07 sup
+
+    linkStyle 0 stroke:#94a3b8,stroke-width:3px
+    linkStyle 1 stroke:#38bdf8,stroke-width:3px
+    linkStyle 2 stroke:#fbbf24,stroke-width:3px
+    linkStyle 3 stroke:#fbbf24,stroke-width:3px
+    linkStyle 4 stroke:#4ade80,stroke-width:3px
+    linkStyle 5 stroke:#94a3b8,stroke-width:3px
+    linkStyle 6 stroke:#94a3b8,stroke-width:2px
+```
+
+### 🕸️ Topologie détaillée des liaisons
+
+Cette vue complète le pipeline vertical : elle est destinée à la revue de raccordement et au
+dépannage. Elle montre les liaisons qui ne suivent pas la chaîne principale, notamment simulation,
+IHM, persistance, retours d'état vers la Supervision et retards d'un scan.
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px'}, 'flowchart': {'useMaxWidth': false}}}%%
+flowchart TD
+    Field["📡 Terrain / PDO / E/S / Réseau"]
+    Sim["🧪 Simulation"]
+    Hmi["🖥️ GVL_IHM"]
+    Persist["💾 GVL_PERSISTENT"]
+
+    P02["📡 PRG_02_Acquisition<br/>HwReal · HwSim · HwIn · Data"]
+    P03["⚙️ PRG_03_Modes_Cycle<br/>Auth · demandes cycle"]
+    P04["⚙️ PRG_04_Treuils_Benne<br/>états · safety · requêtes M1/M2"]
+    P05["⚙️ PRG_05_Translation<br/>état · safety · requête M3"]
+    P06["🔒 PRG_06_Outputs<br/>interlocks finaux · PowerCutOff"]
+    P07["🖥️ PRG_07_Supervision<br/>IHM · persistance · bypass · diagnostic"]
+
+    Field ==> P02
+    Sim -.-> P02
+    Hmi -.-> P03
+    Hmi -.-> P04
+    Hmi -.-> P05
+    Hmi -.-> P07
+    Persist <--> P07
+
+    P02 ==>|"HwIn · Data"| P03
+    P02 ==>|"HwIn · Data"| P04
+    P02 ==>|"HwIn · Data"| P05
+    P03 ==>|"Auth · demandes cycle"| P04
+    P03 ==>|"Auth · demandes cycle"| P05
+    P04 ==>|"état benne / treuils"| P05
+    P04 ==>|"requêtes finales M1/M2"| P06
+    P05 ==>|"requête finale M3"| P06
+
+    P02 ==>|"diagnostics"| P07
+    P03 ==>|"modes / cycle"| P07
+    P04 ==>|"états / safety M1-M2"| P07
+    P05 ==>|"état / safety M3"| P07
+    P06 ==>|"états sorties / AU"| P07
+    P06 ==>|"Q / PDO finaux"| Field
+    P07 ==>|"états / diagnostics"| Hmi
+    P07 -.->|"Reset · Cfg · bypass<br/>(scan suivant)"| P03
+    P07 -.->|"Reset · Cfg · bypass<br/>(scan suivant)"| P04
+    P07 -.->|"Reset · Cfg · bypass<br/>(scan suivant)"| P05
+    P07 -.->|"Reset<br/>(scan suivant)"| P06
+
+    classDef acq fill:#0c1e2e,stroke:#38bdf8,stroke-width:2px,color:#e2e8f0
+    classDef cmd fill:#2b230a,stroke:#fbbf24,stroke-width:2px,color:#e2e8f0
+    classDef outp fill:#0f2b17,stroke:#4ade80,stroke-width:2px,color:#e2e8f0
+    classDef sup fill:#182638,stroke:#94a3b8,stroke-width:2px,color:#e2e8f0
+    classDef ext fill:#182638,stroke:#94a3b8,stroke-width:2px,color:#e2e8f0
+    class Field,Sim,Hmi,Persist ext
+    class P02 acq
+    class P03,P04,P05 cmd
+    class P06 outp
+    class P07 sup
+
+    linkStyle 0 stroke:#94a3b8,stroke-width:3px
+    linkStyle 1 stroke:#94a3b8,stroke-width:2px
+    linkStyle 2 stroke:#94a3b8,stroke-width:2px
+    linkStyle 3 stroke:#94a3b8,stroke-width:2px
+    linkStyle 4 stroke:#94a3b8,stroke-width:2px
+    linkStyle 5 stroke:#94a3b8,stroke-width:2px
+    linkStyle 6 stroke:#94a3b8,stroke-width:2px
+    linkStyle 7 stroke:#38bdf8,stroke-width:3px
+    linkStyle 8 stroke:#38bdf8,stroke-width:3px
+    linkStyle 9 stroke:#38bdf8,stroke-width:3px
+    linkStyle 10 stroke:#fbbf24,stroke-width:3px
+    linkStyle 11 stroke:#fbbf24,stroke-width:3px
+    linkStyle 12 stroke:#fbbf24,stroke-width:3px
+    linkStyle 13 stroke:#fbbf24,stroke-width:3px
+    linkStyle 14 stroke:#fbbf24,stroke-width:3px
+    linkStyle 15 stroke:#38bdf8,stroke-width:3px
+    linkStyle 16 stroke:#fbbf24,stroke-width:3px
+    linkStyle 17 stroke:#fbbf24,stroke-width:3px
+    linkStyle 18 stroke:#fbbf24,stroke-width:3px
+    linkStyle 19 stroke:#4ade80,stroke-width:3px
+    linkStyle 20 stroke:#4ade80,stroke-width:3px
+    linkStyle 21 stroke:#94a3b8,stroke-width:3px
+    linkStyle 22 stroke:#94a3b8,stroke-width:2px
+    linkStyle 23 stroke:#94a3b8,stroke-width:2px
+    linkStyle 24 stroke:#94a3b8,stroke-width:2px
+    linkStyle 25 stroke:#94a3b8,stroke-width:2px
+```
+
+### 🔌 Contrats d'intégration des programmes
+
+| PRG | Lit (producteurs) | Produit | Responsabilité exclusive | Ordonnancement / référence métier |
+|---|---|---|---|---|
+| `PRG_02_Acquisition` | Terrain/PDO, réseau, simulation | `HwReal`, `HwSim`, `HwIn`, `Data` acquisition | Frontière acquisition/qualification, sélection réel/simulé, diagnostics devices, joystick et codeurs/homing | Premier ; AF06, AF08, AF09, AF12, AF13 |
+| `PRG_03_Modes_Cycle` | `PRG_02`, IHM, retours procédés du scan précédent | `Auth`, demandes du cycle | Arbitrage des modes et séquenceur ; aucune sortie physique | Après acquisition ; AF04, AF05 |
+| `PRG_04_Treuils_Benne` | `PRG_02`, `PRG_03`, IHM | États, safety et requêtes finales M1/M2 | Arbitrage treuils/benne/synchronisation et safety M1/M2 | Après Modes ; AF10 et sous-fiches associées |
+| `PRG_05_Translation` | `PRG_02.HwIn.Translation`, `PRG_03`, `PRG_04`, IHM | Position logique, état, safety et requête finale M3 | Décodage M3, arbitrage translation et safety M3 ; interlock anti-collision M1/M2 | Après Treuils/Benne ; AF11 |
+| `PRG_06_Outputs` | `PRG_02`, `PRG_04`, `PRG_05`, reset publié par `PRG_07` au scan précédent | Q/PDO finaux, état AU et sorties publiques | Barrière finale matérielle, interlocks actionneurs et agrégation `PowerCutOff` | Après tous les procédés ; AF01, AF06, AF10, AF11 |
+| `PRG_07_Supervision` | États publics `PRG_02` à `PRG_06`, IHM, persistance | États/diagnostics IHM, persistance/bypass, reset global | Supervision ; seule la vue troubleshooting est lecture seule | Dernier ; ses commandes sont consommées au scan suivant ; AF07, AF12, AF14 |
+
+### ⏱️ Ordre fonctionnel intra-PRG
+
+Cette séquence est un **ordre chronologique obligatoire, à lire de haut en bas** : la phase 2 peut
+consommer les garanties de la phase 1, jamais l'inverse. Elle ne fige ni le nom d'une instance, ni
+l'ordre entre deux calculs indépendants au sein d'une même phase. Toute exception est un retard d'un
+scan explicitement documenté ; elle ne doit jamais être implicite.
+
+### 🚧 Registre des accès inter‑PRG hors contrat public
+
+Ces lectures sont adressables en CODESYS, mais percent l'interface documentée du POU source. Elles ne
+sont pas un idiome cible : toute nouvelle dépendance passe par `Data`/`Auth`. Chaque migration doit
+conserver la fraîcheur actuelle ; `N‑1` vaut un cycle MainTask, soit 10 ms typiques.
+
+| Lecteur | Lecture actuelle hors contrat | Fraîcheur | Cible de migration |
+|---|---|---|---|
+| `PRG_02` | `PRG_04.instWinchM1/M2.Status.Busy` | 🟡 N‑1 | `PRG_04.Data.WinchM1/2State.Busy` déjà public |
+| `PRG_03` | instances joystick/codeur PRG‑02 ; synchro/benne PRG‑04 ; mouvement M3 PRG‑05 | 🟡 N‑1 pour PRG‑04/05 | Champs publics à compléter |
+| `PRG_04` | instance cycle PRG‑03 et états locaux M3 PRG‑05 | 🟡 N‑1 pour PRG‑05 | Demandes cycle/état M3 publics |
+| `PRG_05` | diagnostics internes PRG‑02 et interlock M3 interne PRG‑06 | 🟡 N‑1 pour PRG‑06 | Diagnostics acquisition/interlock publics |
+| `PRG_07` | variables locales PRG‑04 et instance cycle PRG‑03 | 🟢 courant (PRG‑04) | Diagnostics publics dédiés |
+
+#### `PRG_02_Acquisition` — détail externalisé
+
+📄 Lire [Fiche PRG‑02 — Acquisition](AF_Partie-02_Architecture_Programme/AF_Fiche_PRG_02_Acquisition_v1.0.md) pour l'ordre intra‑PRG,
+les raccordements `GVL_Simulation` / `GVL_IHM` / `GVL_PERSISTENT`, l'aiguillage `HwReal/HwSim/HwIn`
+et les retards d'un scan. AF‑02 conserve ci‑dessous le résumé des autres PRG pendant leur migration.
+
+#### `PRG_03_Modes_Cycle`
+
+| Phase — lire ↓ | 🎯 But | 🕒 Fraîcheur lue | ❓ Pourquoi maintenant ? | ✅ Garantie avant phase suivante |
+|---|---|---|---|---|
+| 1. 🎚️ Arbitrer les modes | Calculer mode, permissions, inhibitions et autorisations depuis acquisition et IHM. | 🟢 `PRG_02` et IHM courants | Les droits précèdent toute demande de mouvement. | Résultat `instModes.Auth` courant disponible localement. |
+| 2. 🔄 Séquencer le cycle | Évaluer le cycle et ses retours procédés. | 🟡 `Auth` N-1 dans le code actuel ; 🟡 retours procédé N-1 admis | Le cycle doit être évalué après la décision de mode, mais son entrée `Auth` est aujourd'hui en retard. | Demandes de cycle cohérentes avec les entrées réellement lues. |
+| 3. 📤 Publier | Exposer `Auth` et demandes à `PRG_04`/`PRG_05`. | 🟢 `instModes.Auth` courant | Les procédés aval doivent lire les droits du scan courant. | `PRG_04`/`PRG_05` consomment `Auth` courant. |
+
+> ⚠️ **Écart observé à arbitrer** : le source appelle `instModes`, puis appelle le cycle avec
+> `Auth`, et n'affecte `Auth := instModes.Auth` qu'en fin de POU. Le cycle lit donc `Auth` du scan
+> précédent. Le présent ordre fonctionnel prescrit `Auth` courant avant le cycle ; soit le retard
+> doit être accepté et documenté, soit la publication doit précéder l'appel du cycle. Aucun code
+> n'est modifié par cette documentation.
+
+#### `PRG_04_Treuils_Benne`
+
+| Phase — lire ↓ | 🎯 But | 🕒 Fraîcheur lue | ❓ Pourquoi maintenant ? | ✅ Garantie avant phase suivante |
+|---|---|---|---|---|
+| 1. 🧭 Préparer l'intention | Qualifier demandes maintenance et assistants de conduite. | 🟢 acquisition, `Auth`, IHM courants | Une consigne doit être attribuée avant d'être fusionnée. | Intention opérateur/automatique non ambiguë. |
+| 2. 🪣 Commander la benne | Évaluer état, demande et séquences propres à la benne. | 🟢 mesures M1/M2 courantes ; 🟡 états mouvements précédemment publiés si requis | Les interdictions croisées exigent l'état benne. | État benne disponible. |
+| 3. 🪝 Arbitrer M1/M2 | Fusionner les sources admises en consignes candidates par treuil. | 🟢 modes, cycle publié, joystick, benne | Une seule demande doit survivre par mouvement. | Une consigne candidate par treuil. |
+| 4. 🛡️ Synchroniser/sécuriser | Évaluer synchronisme, couplages, limites, permis directionnels et safety M1/M2. | 🟢 mesures/candidates courantes | La safety décide avant l'ordre moteur. | Permis effectifs et SafeStop/PowerCutOff déterminés. |
+| 5. ⚙️ Exécuter | Appeler la commande M1/M2 avec permis effectifs. | 🟢 consignes et safety courantes | Les ordres doivent être bornés par la safety déjà calculée. | Demandes actionneurs brutes cohérentes. |
+| 6. 📤 Publier | Publier demandes finales, états et diagnostics publics. | 🟢 exécution du scan | Les PRG aval doivent voir un état unique. | `PRG_05`, `PRG_06` et Supervision ont un état unique. |
+
+#### `PRG_05_Translation`
+
+| Phase — lire ↓ | 🎯 But | 🕒 Fraîcheur lue | ❓ Pourquoi maintenant ? | ✅ Garantie avant phase suivante |
+|---|---|---|---|---|
+| 1. 📍 Décoder M3 | Traduire les cinq capteurs `HwIn.Translation` en position logique et cohérence capteurs. | 🟢 `HwIn.Translation` courant | La position qualifiée précède interlocks et consigne. | Position logique M3 disponible. |
+| 2. 🚧 Établir les interlocks amont | Évaluer hauteur M1/M2, limites physiques et verrous de position. | 🟢 acquisition et `Auth` courants ; 🟢 état M1/M2 publié par `PRG_04` | L'enveloppe M3 est un prérequis de la demande. | Enveloppe de déplacement M3 définie. |
+| 3. ↔️ Arbitrer M3 | Sélectionner cible, sens et vitesse manuelle/automatique. | 🟢 position, `Auth`, cycle publié, IHM et interlocks courants | Une seule demande est admise avant safety. | Consigne M3 candidate unique. |
+| 4. 🛡️ Safety M3 | Déterminer SafeStop, PowerCutOff et défauts translation. | 🟢 acquisition/consigne courantes<br>🟡 états locaux publiés plus bas N-1 si relus | La safety borne la commande. | État safety M3 établi. |
+| 5. ⚙️ Exécuter | Appliquer safety et interlocks à la commande M3. | 🟢 consigne du scan<br>🟡 toute information safety publiée après l'appel est N-1 | L'ordre final dépend des deux. | Demande finale M3 cohérente. |
+| 6. 📤 Publier | Publier position, demande finale, état et diagnostic M3. | 🟢 exécution du scan | `PRG_06` doit disposer de l'ordre final. | `PRG_06` et Supervision disposent d'un état unique. |
+
+#### `PRG_06_Outputs`
+
+| Phase — lire ↓ | 🎯 But | 🕒 Fraîcheur lue | ❓ Pourquoi maintenant ? | ✅ Garantie avant phase suivante |
+|---|---|---|---|---|
+| 1. 🔒 Barrières M1/M2/M3 | Appliquer les interlocks finaux aux demandes métier. | 🟢 demandes/safety `PRG_04` et `PRG_05` courantes | Toute écriture physique doit passer par cette barrière. | Ordres moteur/frein autorisés ou neutralisés. |
+| 2. ⚡ Écrire les actionneurs | Écrire les Q/PDO uniquement depuis les barrières finales. | 🟢 interlocks finalisés | La commande électrique suit la décision finale. | Sorties physiques cohérentes. |
+| 3. 🔧 Auxiliaires | Appliquer la commande Kobold du procédé propriétaire. | 🟢 demande procédé courante | Elle ne doit pas contourner la frontière sortie. | Sortie auxiliaire cohérente. |
+| 4. 🛑 AU/réarmement | Agréger `PowerCutOff`, évaluer chaîne AU/réarmement et commander maintiens puissance. | 🟢 safety procédé/acquisition/IHM courants ; 🟡 reset `PRG_07` N-1 | Le reset est volontairement publié après les procédés. | Maintiens/réarmement et diagnostic AU cohérents. |
+| 5. 📤 Publier | Exposer états finaux sorties et chaîne AU. | 🟢 sorties du scan | Simulation et supervision consomment l'état rendu. | États publics disponibles ; le banc les relira N-1. |
+
+#### `PRG_07_Supervision`
+
+| Phase — lire ↓ | 🎯 But | 🕒 Fraîcheur lue | ❓ Pourquoi maintenant ? | ✅ Garantie avant phase suivante |
+|---|---|---|---|---|
+| 1. 🧰 Services communs | Produire horloge, heartbeat IHM et reset global sur front. | 🟢 IHM/état cycle courants | Les services sont centralisés, mais consommés lors du prochain tour. | Services disponibles N+1. |
+| 2. 💾 Persistance/bypass | Restaurer/sauvegarder configurations et synchroniser bypass autorisés. | 🟢 IHM/persistance/simulation courants | La configuration doit être stable avant sa prochaine consommation métier. | Configuration et bypass disponibles N+1. |
+| 3. 🖥️ Projeter IHM | Construire états et diagnostics IHM depuis contrats publics. | 🟢 états `PRG_02` à `PRG_06` courants | L'IHM doit refléter le scan terminé. | Vue opérateur cohérente. |
+| 4. 🔎 Dépanner | Alimenter la vue troubleshooting sans commande métier. | 🟢 états publics courants | Le dépannage n'influence aucune décision. | Diagnostic passif traçable. |
+
+##### 🔩 Repères d'implémentation — `PRG_07` (obligatoires)
+
+| Phase | Lire concrètement | Faire | Écrire / garantir |
+|---|---|---|---|
+| 1. Services communs | `GVL_IHM.*.Cmd` et états publics cycle/machine. | Construire heartbeat et acquittement global **sur front**. | `FaultMachineReset_IHM` est la porte unique de reset ; elle sera visible des autres PRG au scan suivant. |
+| 2. 💾 Configuration | `GVL_IHM.<domaine>.Cfg` et les mémoires `GVL_PERSISTENT` correspondantes (`_WinchM1CfgPersist`, `_WinchM2CfgPersist`, `_SyncCfgPersist`, `_TranslationCfgPersist`, `_BucketCfgPersist`, `_CommunCfgPersist`, `_CycleCfgPersist`, `_DredgingAssistCfgPersist`). | Au boot : restaurer Persist → IHM. Ensuite : synchroniser IHM → Persist. `TranslationM3.Cmd.SetFreq_Hz` utilise son traitement explicite `_TranslationSetFreq_Hz`. | Une configuration restaurée est signalée à l'IHM ; aucune configuration métier n'est dupliquée dans un PRG procédé. |
+| 2. 🛡️ Bypass | `GVL_IHM.<domaine>.Bypass`, mémoires RETAIN de bypass et `GVL_Simulation.SimulationBypassActive`. | Restaurer au boot puis synchroniser le bypass autorisé via le pont dédié ; la simulation emprunte le chemin IHM. | Aucun procédé ne contourne directement une sécurité par un `OR` caché. |
+| 3. 🖥️ Projection | Contrats publics de `PRG_02` à `PRG_06`. | Copier/agréger uniquement vers `GVL_IHM.*.State`, diagnostics et checklist. | Vue opérateur cohérente, sans devenir un producteur de commande métier. |
 
 | Element transverse | Rattachement | Regle |
 |---|---|---|
@@ -78,16 +330,15 @@ safety et le bloc metier commande doit etre visible sur le meme schema, sans ouv
 | 🔀 Securites croisees | Procede qui **subit** l'interdiction | Une interdiction est portee par le domaine qui la subit (ex. interdire M3 selon un etat benne = dans `PRG_05_Translation`). Les Modes distribuent des **autorisations**, ils ne portent pas la responsabilite de l'interdiction metier. |
 
 `FB_Cycle` reste une machine d'etat ST encapsulee : sa logique est plus lisible et testable sous cette
-forme, mais elle est instanciee dans la page CFC Modes/Cycle. Les assistants de plongee/extraction
+forme, mais elle est instanciee dans `PRG_03_Modes_Cycle`. Les assistants de plongee/extraction
 restent dans le domaine Treuils car ils sont aussi utilises en maintenance.
 
-### Ce qui n'est pas une page CFC autonome
+### Ce qui n'est pas un POU autonome
 
 - Les sous-briques techniques restent privees dans leurs FB.
-- Les structures IHM ne sont pas des bus internes et ne justifient pas a elles seules un programme CFC.
+- Les structures IHM ne sont pas des bus internes et ne justifient pas a elles seules un programme dédié.
 - La gestion d'arret d'urgence est une fonction de la chaine sortie/safety, pas une page parallele
   non raccordee.
-- `PRG_GLOBAL_CFC` est un prototype historique ; il ne sert pas de reference cible.
 
 ---
 
@@ -133,8 +384,8 @@ MainTask 10 ms — ordre d'appel
   02. PRG_03_Modes_Cycle           (source .st en ST pur d'orchestration)
   03. PRG_04_Treuils_Benne         (source .st en ST pur — safety M1/M2 intégrée)
   04. PRG_05_Translation           (source .st en ST pur — safety M3 intégrée)
-  05. PRG_06_Outputs            (source .st convertie en Ladder)
-  06. PRG_07_Supervision           (source .st en ST pur — lecture seule)
+  05. PRG_06_Outputs               (source .st en ST pur — barrière finale)
+  06. PRG_07_Supervision            (source .st en ST pur — supervision, persistance et diagnostics)
 ```
 
 ✅ **Migration source terminée** (vérifié 2026-08-26) : `CODE/M_MAIN/` ne contient plus que ces
@@ -163,10 +414,10 @@ creait les cycles Safety <-> Treuils et Safety <-> Translation. Correspondance d
 | `PRG_MODES_CFC` + `PRG_05_Cycle` | `PRG_03_Modes_Cycle` | Autorisations et séquences de conduite au même endroit (ST pur). |
 | `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne` | M1 et M2 sont mécaniquement indissociables (benne suspendue) ; leur safety est appelée au même endroit (ST pur). |
 | `PRG_TRANSLATION_CFC` + partie M3 de `PRG_SAFETY_CFC` | `PRG_05_Translation` | Idem pour la translation (ST pur). |
-| `PRG_OUTPUTS_LD` | `PRG_06_Outputs` | Devient aussi l'agrégateur `PowerCutOff` (Ladder). |
-| `PRG_SUPERVISION_CFC` + `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision` | Observation et diagnostic, lecture seule stricte (ST pur). |
+| `PRG_OUTPUTS_LD` | `PRG_06_Outputs` | Devient aussi l'agrégateur `PowerCutOff` (ST pur). |
+| `PRG_SUPERVISION_CFC` + `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision` | Supervision, persistance, bypass autorisés, observation et diagnostic (ST pur). |
 
-📌 Décision d'architecture (7 POU par procédé) reportée dans `AF_Partie-02` §2/§4 ; historique de migration archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
+📌 Décision d'architecture historique (7 POU par procédé, avant absorption de l'ancien POU Inputs) reportée dans `AF_Partie-02` §2/§4 ; l'architecture active comporte 6 POU. Historique de migration archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 **Aucun renommage ni fusion ne demarre sans lot dedie** : chaque etape exige remappage complet des
 consommateurs, producteur unique et preuve de liaison.
 
@@ -181,7 +432,7 @@ autorisation de renommer prématurément les POU dans le code sans lot dédié.
 
 | Niveau | Regle | Mise en oeuvre |
 |---|---|---|
-| **INTRA-programme** | L'ordre d'execution a l'interieur d'une page CFC est automatique : il suit le flux de donnees entre instances et structures publiques. | CODESYS determine l'ordre topologique des blocs a partir des connexions. |
+| **INTRA-programme** | L'ordre d'execution dans un POU ST suit l'ordre textuel des sections et appels. | Les dépendances locales sont écrites dans l'ordre producteur → consommateur ; toute exception est documentée. |
 | **INTER-programmes** | L'ordre entre programmes est explicite et fige dans la `MainTask` par la numerotation `PRG_XX`. | Aucun programme ne doit lire une donnée produite par un programme execute plus tard dans le meme cycle, sauf retard d'un scan documente. |
 
 ⚠️ **Cette règle n'est pas vérifiée automatiquement aujourd'hui.** `G200_check_linkage.py` valide
@@ -195,8 +446,8 @@ Toute dependance lue avant son producteur doit etre supprimee ou documentee comm
 ## 🔧 6 · Règles de maintenance et migration
 
 - Un technicien doit pouvoir suivre un flux de gauche a droite : acquisition -> decision -> mouvement -> sortie -> etat public.
-- Un domaine peut etre diagnostique depuis sa page CFC sans ouvrir une page machine globale.
-- Le troubleshooting observe les contrats publics et ne peut jamais ecrire une commande, une configuration ou un interlock.
+- Un domaine peut etre diagnostique depuis son POU ST et ses contrats publics sans ouvrir une page machine globale.
+- La vue troubleshooting observe les contrats publics et ne peut jamais ecrire une commande, une configuration ou un interlock ; `PRG_07_Supervision` gère par ailleurs les actions IHM, la persistance et les bypass explicitement autorisés.
 - Un remplacement se fait avec contrat de conservation, remappage complet des consommateurs et preuve de lien ; jamais par deux producteurs actifs (`_old` et nouveau).
 - Les noms finaux des devices et E/S viennent du materiel/export CODESYS, puis se propagent dans les contrats.
 - La chaine AU, sa polarite fail-safe, son auto-test et son rearmement sont proprietaires de la Partie 01.
@@ -206,7 +457,8 @@ Toute dependance lue avant son producteur doit etre supprimee ou documentee comm
 
 | Version | Date | Changement |
 |---|---|---|
-| v3.2 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lie, section `🎯 Rôle et périmètre` explicite, ajout Suivi historique et TBD, renumerotation complete des sections. Correction §5/§6 : la migration source (7 POU) est **terminee** sur disque (verifie, plus de legacy `PRG_01_Inputs_LD`/`*_CFC`) — seul le statut de la tache CODESYS en ligne restait flou dans la formulation precedente. <nobr><code>TC-P02-001</code></nobr>/<nobr><code>TC-P02-004</code></nobr> annotes : `G200_check_linkage.py` ne couvre ni le vrai producteur-unique par-POU (faux positifs intra-POU, L10) ni l'ordre inter-programmes (revue humaine a ce jour) — voir TBD ci-dessous. Revue par sous-agent expert automatisme. |
+| v3.2 (amendement) | 2026-08-26 | Lot documentaire incrémental : ajout de la table des fonctions `F02.01` à `F02.06`, des pipelines Mermaid et des tables d'ordre fonctionnel `PRG_02` à `PRG_07`. Chaque phase indique but, fraîcheur (`courant`/`N-1`), causalité et garantie. Le détail codable de `PRG_02` (simulation, `HwReal/HwSim/HwIn`, codeurs/homing) est migré dans `AF_Fiche_PRG_02_Acquisition` ; AF‑02 reste la carte globale. `PRG_07` porte le repère IHM/persistance/bypass. Référence active normalisée sur les six POU ST. |
+| v3.2 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lie, section `🎯 Rôle et périmètre` explicite, ajout Suivi historique et TBD, renumerotation complete des sections. Correction §5/§6 : la migration source (6 POU actifs après absorption de `PRG_01_Inputs_LD`) est **terminee** sur disque (verifie, plus de legacy `PRG_01_Inputs_LD`/`*_CFC`) — seul le statut de la tache CODESYS en ligne restait flou dans la formulation precedente. <nobr><code>TC-P02-001</code></nobr>/<nobr><code>TC-P02-004</code></nobr> annotes : `G200_check_linkage.py` ne couvre ni le vrai producteur-unique par-POU (faux positifs intra-POU, L10) ni l'ordre inter-programmes (revue humaine a ce jour) — voir TBD ci-dessous. Revue par sous-agent expert automatisme. |
 | v3.1 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
 ## ❓ 8 · TBD
@@ -217,9 +469,18 @@ Toute dependance lue avant son producteur doit etre supprimee ou documentee comm
 | 2 | Frontiere IHM : mapping et persistance des DUT `Cmd/State/Cfg/Bypass` non tranches | Bloque la specification complete du contrat PLC-IHM (Partie 07) |
 | 3 | `G200_check_linkage.py` L10 (producteur unique) remonte des faux positifs : deux ecritures a la meme variable **dans le meme POU** (branchement normal) comptent comme "producteur multiple", indistinguable d'un vrai second POU ecrivain | <nobr><code>TC-P02-001</code></nobr> ne peut pas etre juge fiable sans correction du script (scoper par POU, pas par ligne) — 1019 WARN actuels, aucun distingue vrai/faux positif |
 | 4 | Aucun gate n'existe pour verifier l'ordre inter-programmes (§7 "regle d'ordonnancement" — aucun programme ne doit lire une donnee produite plus tard dans le meme cycle) | <nobr><code>TC-P02-004</code></nobr> repose sur la revue manuelle ; un futur ajout de POU ou reordonnancement `MainTask` pourrait introduire une regression silencieuse |
+| 5 | Décodage de position M3 encore exécuté dans `PRG_02_Acquisition`, alors que la responsabilité cible est `PRG_05_Translation` | Décision d'architecture actée ; migration code C3 à planifier sans double producteur et avec vérification IHM/safety — AF11 propriétaire du détail |
 
 ## 📚 9 · Documents liés
 
 - Partie 01 : machine et securite electrique.
-- Partie 03 : contrats composants, DUT et regles CFC.
+- Partie 03 : contrats composants, DUT et règles d'interfaces ST.
 - Parties 04 a 14 : exigences de chaque domaine, sans redefinir l'architecture cible.
+- `DOC/STDS/GUIDES/GUIDE_EDITION_AF_v1.0.md` : convention de diagramme Mermaid et structure documentaire.
+- `DOC/WFLOW/TEMPLATE/AF_ARCHITECTURE_PROGRAMME_TEMPLATE.md` : squelette normé AF-02.
+- [Fiche PRG‑02 — Acquisition](AF_Partie-02_Architecture_Programme/AF_Fiche_PRG_02_Acquisition_v1.0.md) : ordre interne et raccordements codables.
+- [Fiche PRG‑03 — Modes & Cycle](AF_Partie-02_Architecture_Programme/AF_Fiche_PRG_03_Modes_Cycle_v1.0.md)
+- [Fiche PRG‑04 — Treuils & Benne](AF_Partie-02_Architecture_Programme/AF_Fiche_PRG_04_Treuils_Benne_v1.0.md)
+- [Fiche PRG‑05 — Translation](AF_Partie-02_Architecture_Programme/AF_Fiche_PRG_05_Translation_v1.0.md)
+- [Fiche PRG‑06 — Outputs](AF_Partie-02_Architecture_Programme/AF_Fiche_PRG_06_Outputs_v1.0.md)
+- [Fiche PRG‑07 — Supervision](AF_Partie-02_Architecture_Programme/AF_Fiche_PRG_07_Supervision_v1.0.md)

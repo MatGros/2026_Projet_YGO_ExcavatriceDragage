@@ -1,8 +1,9 @@
 # Analyse Fonctionnelle — Partie NN : [Nom du Domaine / Fonction] (vX.Y)
 
 > 📌 **Squelette de fiche AF** — famille "Fonctions métier" (AF-08+, une AF = un domaine/FB).
-> Règles complètes : `DOC/STDS/GUIDES/GUIDE_EDITION_AF_v1.0.md`. Pour les familles Fondations
-> (01-03) / Transverses (04-07) : partir d'ici et retirer les sections marquées
+> Règles complètes : `DOC/STDS/GUIDES/GUIDE_EDITION_AF_v1.0.md`. Pour **AF-02 Architecture**,
+> utiliser `DOC/WFLOW/TEMPLATE/AF_ARCHITECTURE_PROGRAMME_TEMPLATE.md` ; AF-03 et les familles
+> Transverses (04-07) adaptent ce squelette en retirant les sections marquées
 > `[FONCTIONS MÉTIER SEULEMENT]` — voir `GUIDE_EDITION_AF_v1.0.md §5`. Supprimer ce bloc de note
 > avant de committer la fiche réelle.
 

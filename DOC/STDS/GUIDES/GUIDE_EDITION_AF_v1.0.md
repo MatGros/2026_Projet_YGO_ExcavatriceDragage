@@ -287,9 +287,9 @@ Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
 > 📌 Toutes les AF ne se ressemblent pas — inutile de forcer un moule unique. Quatre familles,
 > reprises du plan de numérotation (`AGENTS.md`) : **AF-01** (vue machine — équipements,
 > fonctions, sécurité électrique/réarmement : décrit un comportement réel, testable, porté par
-> `FB_Safety_EmergencyManagement`), **AF-02/03 Fondations méta** (architecture programme, contrats
-> composants — règles transverses **sans FB unique**, mais déjà couvertes par leurs propres TC
-> racine), **4-7 Transverses** (Cycle/Modes/E-S/IHM — domaine partagé par plusieurs FB), **8+
+> `FB_Safety_EmergencyManagement`), **AF-02 Architecture** (contrat d'intégration des PRG et
+> ordonnancement), **AF-03 Contrats** (interfaces de composants sans FB unique), **4-7 Transverses**
+> (Cycle/Modes/E-S/IHM — domaine partagé par plusieurs FB), **8+
 > Fonctions métier** (une AF = un domaine/FB, ex. AF-08 Joystick). Un seul guide, une applicabilité
 > par famille — pas trois documents qui divergent avec le temps (cf. leçon `CLAUDE.md`/`AGENTS.md`
 > de ce projet).
@@ -304,17 +304,38 @@ Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
 > (Fonctions métier/transverses) qui ne sont qu'un index vers d'autres AF et ne portent pas de
 > codes `F<NN>.<seq>`.
 
-| Section (§4) | 🎯 AF-01 (machine/sécurité) | 🏛️ AF-02/03 (méta) | 🔀 Transverses (04-07) | 🔧 Fonctions métier (08+) |
-|---|---|---|---|---|
-| Sommaire | ✅ | ✅ | ✅ | ✅ |
-| Rôle et périmètre | ✅ (périmètre machine) | ✅ (périmètre architecture/contrat) | ✅ | ✅ |
-| Table des fonctions | ✅ **obligatoire** — catalogue `F01.xx` de la chaîne AU/réarmement (§7), mappé aux `TC-P01-*` existants ; les tables §4 (index vers d'autres AF) ne comptent pas comme ce catalogue | ❌ (pas de découpage F<NN>.<seq> pertinent) | recommandé si la fiche décrit plusieurs comportements | ✅ obligatoire |
-| Table des points de validation (TC) | ✅ **obligatoire** — table macro chapô avec IDs racine réels (`TC-P01-*`), sous-fiche décline le détail | ✅ (déjà satisfait par `TC-P02-*`/`TC-P03-*` en chapô) | ✅ | ✅ |
-| Pipeline et composition | selon pertinence | selon pertinence | ✅ | ✅ |
-| Interface publique (Entrées/Sorties) | ❌ (pas de FB unique à interfacer) | ❌ (pas de FB unique à interfacer) | selon domaine | ✅ |
-| Suivi historique | ✅ | ✅ | ✅ | ✅ |
-| TBD | ✅ | ✅ | ✅ | ✅ |
-| Documents liés | ✅ | ✅ | ✅ | ✅ |
+| Section (§4) | 🎯 AF-01 (machine/sécurité) | 🏛️ AF-02 (architecture) | 🏛️ AF-03 (contrats) | 🔀 Transverses (04-07) | 🔧 Fonctions métier (08+) |
+|---|---|---|---|---|---|
+| Sommaire | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Rôle et périmètre | ✅ (périmètre machine) | ✅ (intégration et ordonnancement) | ✅ (contrats composants) | ✅ | ✅ |
+| Table des fonctions | ✅ **obligatoire** — catalogue `F01.xx` de la chaîne AU/réarmement (§7), mappé aux `TC-P01-*` existants ; les tables §4 (index vers d'autres AF) ne comptent pas comme ce catalogue | ✅ **obligatoire** — catalogue `F02.xx` des fonctions d'architecture, mappé aux `TC-P02-*` | ❌ (pas de comportement machine propre) | recommandé si la fiche décrit plusieurs comportements | ✅ obligatoire |
+| Table des points de validation (TC) | ✅ **obligatoire** — table macro chapô avec IDs racine réels (`TC-P01-*`), sous-fiche décline le détail | ✅ `TC-P02-*` | ✅ `TC-P03-*` | ✅ | ✅ |
+| Pipeline et composition | selon pertinence | ✅ diagramme Mermaid vertical des flux et ordonnancement | selon pertinence | ✅ | ✅ |
+| Interface publique (Entrées/Sorties) | ❌ (pas de FB unique à interfacer) | ✅ contrat compact par PRG : lit, produit, responsabilité, latence et AF propriétaire | ✅ contrats FB/DUT | selon domaine | ✅ |
+| Suivi historique | ✅ | ✅ | ✅ | ✅ | ✅ |
+| TBD | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Documents liés | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+### Exigence particulière AF-02 : ordre fonctionnel intra-PRG
+
+AF-02 porte, pour chaque PRG actif, une table d'**ordre fonctionnel intra-PRG**. Elle se lit de
+haut en bas et documente des phases par objectif (pas des noms d'instances). Chaque ligne indique
+le but, la fraîcheur (`scan courant` ou `N-1` justifié), la raison qui impose sa position et la
+garantie rendue à la phase suivante. Une phase indépendante est explicitement signalée : un ordre
+de lecture ST ne doit jamais être présenté comme une dépendance fonctionnelle inexistante.
+
+Chaque raccordement GVL, persistance, image E/S ou bus inter-PRG porte en complément un repère
+concret : **lire → faire → écrire/garantir**. Il nomme le propriétaire (`GVL_IHM`,
+`GVL_Simulation`, `GVL_PERSISTENT`, `HwReal/HwSim/HwIn`, contrat public), sans figer les instances
+FB locales.
+
+### Fiche PRG associée à AF-02
+
+Quand l'ordre intra‑PRG ou les raccordements concrets rendent AF‑02 difficile à lire, créer une
+`AF_Fiche_PRG_XX_<Nom>_vX.Y.md` depuis `DOC/WFLOW/TEMPLATE/AF_FICHE_PRG_TEMPLATE.md`.
+AF‑02 reste la source unique de l'ordre `MainTask` et de la topologie inter‑PRG ; la fiche porte le
+détail codable d'un POU. Migrer une fiche à la fois : remplacer le détail dans AF‑02 par un lien,
+jamais par une suppression non documentée.
 
 Squelette prêt à copier pour la famille **Fonctions métier** (la plus fréquente, pilotée par
 AF-08) : `DOC/WFLOW/TEMPLATE/AF_SPEC_TEMPLATE.md`. Pour AF-01/02/03/Transverses, partir du même
