@@ -2,7 +2,7 @@
    ⚙️ E_WinchFinalInterlockState — États machine barrière finale treuil
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des états opérationnels de l'interlock final
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 {attribute 'qualified_only'}
 TYPE E_WinchFinalInterlockState :

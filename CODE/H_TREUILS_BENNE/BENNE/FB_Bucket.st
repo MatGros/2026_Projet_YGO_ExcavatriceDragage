@@ -2,7 +2,7 @@
    🪣 FB_Bucket — Commande d'ouverture et de fermeture du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage synchrone et séquencement d'ouverture/fermeture benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : FB standard (Partie3 §1bis)
    🔒 Sécurité : Surveillance du glissement M1 et interlocks de mouvement
    ======================================================================= *)

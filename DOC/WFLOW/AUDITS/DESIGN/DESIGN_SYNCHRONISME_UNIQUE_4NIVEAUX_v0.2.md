@@ -136,6 +136,6 @@ Le doc v0.1 disait « couplage coupé » (Fault) ET « SyncActive indépendante 
 | Tâche | T55 |
 | FB_WinchSync | `CODE/H_TREUILS_BENNE/FB_WinchSync.st` |
 | Sous-blocs | `FB_SyncDeviation.st` · `FB_SyncContactor.st` |
-| Méca E (défense en profondeur) | `DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md` · `FB_Safety_Winch` |
+| Méca E (défense en profondeur) | `DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md` · `FB_Safety_Winch` |
 | Revue indépendante | revue T55 (2026-08-24) — 8 corrections intégrées |
 | Contrats FB / sévérité | `DOC/STDS/CODE_QUALITY_STANDARDS.md §2/2bis` |

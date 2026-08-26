@@ -2,7 +2,7 @@
    📐 FB_DriftGuard — Détection de dérive de position sous armement
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Capture position de référence et détection de dérive anormale
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Brique interne de sécurité (compose FB_Safety_Winch)
    🔒 Sécurité : Détection de mouvement non commandé et glissement
    ======================================================================= *)

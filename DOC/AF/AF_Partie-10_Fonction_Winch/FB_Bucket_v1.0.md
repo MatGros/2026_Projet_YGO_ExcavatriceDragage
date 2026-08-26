@@ -1,6 +1,6 @@
 # FB_Bucket — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §1.
+> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.1.md`](AF_Partie-10_Fonction_Winch_v2.1.md) §1.
 > Rôle de **ce** document : ouverture/fermeture benne par désynchronisation M1/M2, protection
 > glissement, assistants maintenance — et **catalogue unique** des `TC-P10-023` à `TC-P10-034`.
 > **Sous-fonction du domaine Treuils** (AF10) — aucune I/O ni programme propre.

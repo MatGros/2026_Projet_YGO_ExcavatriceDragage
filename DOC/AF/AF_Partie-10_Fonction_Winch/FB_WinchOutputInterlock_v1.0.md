@@ -1,6 +1,6 @@
 # FB_WinchOutputInterlock — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §6.
+> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.1.md`](AF_Partie-10_Fonction_Winch_v2.1.md) §6.
 > Rôle de **ce** document : barrière finale, watchdog frein, machine d'état, anti-redémarrage —
 > et **catalogue unique** des `TC-P10-012`, `013`, `020`.
 > Source code : `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st` · instances dans `PRG_06_Outputs`.

@@ -1,6 +1,6 @@
 # FB_Winch — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §2.
+> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.1.md`](AF_Partie-10_Fonction_Winch_v2.1.md) §2.
 > Rôle de **ce** document : directeur mouvement treuil (rampe, palier, sens, frein) — et
 > **catalogue unique** des `TC-P10-011`, `017`, `018`, `019`.
 > Compose `FB_SpeedStep` (§5), `FB_Brake` (§6), `FB_Ramp` (résumés ici, pas de fiche séparée).

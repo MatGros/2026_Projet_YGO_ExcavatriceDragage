@@ -60,4 +60,4 @@
 | Tâche | T91 |
 | FB | `CODE/A_COMMUN/FB_Brake.st` |
 | MES | MES-006 (réf terrain) |
-| Spec | `DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3` |
+| Spec | `DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md §3` |

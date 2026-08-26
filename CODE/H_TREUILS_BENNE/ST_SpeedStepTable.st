@@ -2,7 +2,7 @@
    🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 TYPE ST_SpeedStepTable :
 STRUCT
