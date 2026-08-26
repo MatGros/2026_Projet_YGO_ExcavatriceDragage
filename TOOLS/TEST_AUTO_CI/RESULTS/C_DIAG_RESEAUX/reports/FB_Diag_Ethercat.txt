@@ -1,72 +1,14 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:23:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'MASTERSTATERAW'
-   23 |         s.FB.MASTERSTATERAW = 8;
-      |              ^~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:24:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'VARIATEURSTATERAW'; did you mean 'DEVICEVARIATEURSTATERAW'?
-   24 |         s.FB.VARIATEURSTATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEVARIATEURSTATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:25:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'ENCODERM1STATERAW'; did you mean 'DEVICEENCODERM1STATERAW'?
-   25 |         s.FB.ENCODERM1STATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEENCODERM1STATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:26:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'ENCODERM2STATERAW'; did you mean 'DEVICEENCODERM2STATERAW'?
-   26 |         s.FB.ENCODERM2STATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEENCODERM2STATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:33:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'MASTERSTATERAW'
-   33 |         s.FB.MASTERSTATERAW = 8;
-      |              ^~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:34:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'VARIATEURSTATERAW'; did you mean 'DEVICEVARIATEURSTATERAW'?
-   34 |         s.FB.VARIATEURSTATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEVARIATEURSTATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:35:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'ENCODERM1STATERAW'; did you mean 'DEVICEENCODERM1STATERAW'?
-   35 |         s.FB.ENCODERM1STATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEENCODERM1STATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:36:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'ENCODERM2STATERAW'; did you mean 'DEVICEENCODERM2STATERAW'?
-   36 |         s.FB.ENCODERM2STATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEENCODERM2STATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:37:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'SIMBYPASSACTIVE'; did you mean 'NETWORKBYPASSACTIVE'?
-   37 |         s.FB.SIMBYPASSACTIVE = false;
-      |              ^~~~~~~~~~~~~~~
-      |              NETWORKBYPASSACTIVE
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:45:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'MASTERSTATERAW'
-   45 |         s.FB.MASTERSTATERAW = 8;
-      |              ^~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:46:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'VARIATEURSTATERAW'; did you mean 'DEVICEVARIATEURSTATERAW'?
-   46 |         s.FB.VARIATEURSTATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEVARIATEURSTATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:47:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'ENCODERM1STATERAW'; did you mean 'DEVICEENCODERM1STATERAW'?
-   47 |         s.FB.ENCODERM1STATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEENCODERM1STATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:48:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'ENCODERM2STATERAW'; did you mean 'DEVICEENCODERM2STATERAW'?
-   48 |         s.FB.ENCODERM2STATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEENCODERM2STATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:65:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'MASTERSTATERAW'
-   65 |         s.FB.MASTERSTATERAW = 8;
-      |              ^~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:66:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'VARIATEURSTATERAW'; did you mean 'DEVICEVARIATEURSTATERAW'?
-   66 |         s.FB.VARIATEURSTATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEVARIATEURSTATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:67:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'ENCODERM1STATERAW'; did you mean 'DEVICEENCODERM1STATERAW'?
-   67 |         s.FB.ENCODERM1STATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEENCODERM1STATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:68:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'ENCODERM2STATERAW'; did you mean 'DEVICEENCODERM2STATERAW'?
-   68 |         s.FB.ENCODERM2STATERAW = 8;
-      |              ^~~~~~~~~~~~~~~~~
-      |              DEVICEENCODERM2STATERAW
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Diag_Ethercat_7oa3871h\strucpp-test-oK7un8\test_main.cpp:69:14: error: 'class strucpp::FB_DIAG_ETHERCAT' has no member named 'SIMBYPASSACTIVE'; did you mean 'NETWORKBYPASSACTIVE'?
-   69 |         s.FB.SIMBYPASSACTIVE = false;
-      |              ^~~~~~~~~~~~~~~
-      |              NETWORKBYPASSACTIVE
+Error compiling source files:
+
+FB_Diag_Ethercat.st:169:8: error: Undeclared variable 'STATEATERROR'
+ 169 |     IF StateAtError = E_Diag_State.DISABLED THEN
+     |        ^
+
+FB_Diag_Ethercat.st:170:9: error: Undeclared variable 'STATEATERROR'
+ 170 |         StateAtError := State;
+     |         ^
+
+FB_Diag_Ethercat.st:170:25: error: Undeclared variable 'STATE'
+ 170 |         StateAtError := State;
+     |                         ^
 

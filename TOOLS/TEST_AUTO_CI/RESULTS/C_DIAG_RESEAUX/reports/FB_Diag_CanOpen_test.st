@@ -8,7 +8,7 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     (* Scan 0 : Enable=FALSE -> Diagnostic desactive *)
     FB(Enable := FALSE, CANbusStateRaw := 2, DeviceJoystickStateRaw := DEVICE_STATE.RUNNING);
     ASSERT_FALSE(FB.Ready, 'Enable=FALSE -> Ready=FALSE (neutralise)');
-    ASSERT_EQ(FB.State, E_Diag_State.DISABLED, 'State doit etre DISABLED sans Enable');
+    ASSERT_EQ(FB.DeviceCanOpenMaster.State, E_Diag_State.DISABLED, 'State doit etre DISABLED sans Enable');
 
     ADVANCE_TIME(10000000);
 
@@ -16,19 +16,20 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     FB(Enable := TRUE, CANbusStateRaw := 2, DeviceJoystickStateRaw := DEVICE_STATE.RUNNING,
        SimBypassActive := FALSE, NetworkBypassActive := FALSE);
     ASSERT_TRUE(FB.Ready, 'Enable=TRUE -> Ready=TRUE (nominal)');
-    ASSERT_EQ(FB.State, E_Diag_State.READY, 'State doit etre READY');
+    ASSERT_EQ(FB.DeviceCanOpenMaster.State, E_Diag_State.READY, 'State doit etre READY');
 
     ADVANCE_TIME(10000000);
 
     (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
     FB(Enable := FALSE, CANbusStateRaw := 2, DeviceJoystickStateRaw := DEVICE_STATE.RUNNING);
     ASSERT_FALSE(FB.Ready, 'Enable=FALSE -> Ready retombe a FALSE');
-    ASSERT_EQ(FB.State, E_Diag_State.DISABLED, 'State retombe a DISABLED');
+    ASSERT_EQ(FB.DeviceCanOpenMaster.State, E_Diag_State.DISABLED, 'State retombe a DISABLED');
 END_TEST
 
 TEST 'TC-P12-001 CanOpen : surveillance bus et esclave'
     FB(Enable := TRUE, CANbusStateRaw := 2, DeviceJoystickStateRaw := DEVICE_STATE.RUNNING,
        SimBypassActive := FALSE, NetworkBypassActive := FALSE);
     ASSERT_TRUE(FB.Ready, 'Bus et esclave sains');
-    ASSERT_FALSE(FB.Error, 'Aucune erreur');
+    ASSERT_FALSE(FB.DeviceCanOpenMaster.Error, 'Aucune erreur bus maitre');
+    ASSERT_FALSE(FB.DeviceJoystick.Error, 'Aucune erreur joystick');
 END_TEST

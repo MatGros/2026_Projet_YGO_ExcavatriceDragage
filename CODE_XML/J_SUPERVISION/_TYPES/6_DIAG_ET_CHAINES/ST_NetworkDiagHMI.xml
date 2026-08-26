@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:23.533750" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:23.533750">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T22:32:48.561213" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T22:32:48.561213">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Anomalie CANopen</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Voyant anomalie globale CANopen (IHM Visu)</xhtml>
               </documentation>
             </variable>
             <variable name="CanErrorId">
@@ -95,7 +95,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Anomalie EtherCAT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Voyant anomalie globale EtherCAT (IHM Visu)</xhtml>
               </documentation>
             </variable>
             <variable name="EcatErrorId">
@@ -111,7 +111,7 @@
                 <derived name="ST_InputModuleDiagHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic carte des 3 modules DI TOR réelles</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic carte des 5 modules d'E/S physiques</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -140,12 +140,37 @@
       <dataType name="ST_BypassNetwork">
         <baseType>
           <struct>
+            <variable name="BusCanOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 1. Bus maîtres &amp; Modules d'E/S
+📡 Bypass diagnostic bus CANopen maître</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BusEthercat">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Bypass diagnostic bus EtherCAT maître</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InputModules">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Bypass diagnostic des 5 modules d'E/S physiques</xhtml>
+              </documentation>
+            </variable>
             <variable name="Joystick">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 1. Communication &amp; Systèmes esclaves
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ 2. Équipements esclaves
 🕹️ Bypass diagnostic esclave CANopen Joystick</xhtml>
               </documentation>
             </variable>
@@ -189,8 +214,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 2. Hiérarchie &amp; Restauration
-🌐 Bypass Global : tous les esclaves réseau à la fois</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 3. Hiérarchie &amp; Restauration
+🌐 Bypass Global : tous les bus et esclaves réseau à la fois</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -316,12 +341,28 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0808ETP opérationnel (7 TOR positions M3/hydraulique/crible)</xhtml>
               </documentation>
             </variable>
+            <variable name="Vh0008ErOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0008ER opérationnel (8 DO Relais Freins/Kobold)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008Er1Ok">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0008ER_1 opérationnel (8 DO Relais AU/PowerKeepAlive)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Fault">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un des 3 modules DI hors service</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un des 5 modules E/S hors service</xhtml>
               </documentation>
             </variable>
           </struct>

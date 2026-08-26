@@ -374,21 +374,26 @@ GVL_IHM.JOY1Joystick.State.Operational := PRG_02_Acquisition.instDiagCanOpen.Dev
 GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Error;
 GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instJoystick.ErrorId;
 
-GVL_IHM.Network.CanError    := PRG_02_Acquisition.instDiagCanOpen.Error;
-GVL_IHM.Network.CanErrorId  := PRG_02_Acquisition.instDiagCanOpen.ErrorId;
+GVL_IHM.Network.BusCanOpen  := PRG_02_Acquisition.instDiagCanOpen.DeviceCanOpenMaster;
 GVL_IHM.Network.Joystick    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick;
+GVL_IHM.Network.CanError    := GVL_IHM.Network.BusCanOpen.Error OR GVL_IHM.Network.Joystick.Error;
+GVL_IHM.Network.CanErrorId  := GVL_IHM.Network.BusCanOpen.ErrorId OR GVL_IHM.Network.Joystick.ErrorId;
+
 GVL_IHM.Network.BusEthercat := PRG_02_Acquisition.instDiagEthercat.DeviceEthercatMaster;
 GVL_IHM.Network.EncoderM1   := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1;
 GVL_IHM.Network.EncoderM2   := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2;
 GVL_IHM.Network.VariateurM3 := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur;
-GVL_IHM.Network.EcatError   := PRG_02_Acquisition.instDiagEthercat.Error;
-GVL_IHM.Network.EcatErrorId := PRG_02_Acquisition.instDiagEthercat.ErrorId;
+GVL_IHM.Network.EcatError   := GVL_IHM.Network.BusEthercat.Error OR GVL_IHM.Network.EncoderM1.Error OR GVL_IHM.Network.EncoderM2.Error OR GVL_IHM.Network.VariateurM3.Error;
+GVL_IHM.Network.EcatErrorId := GVL_IHM.Network.BusEthercat.ErrorId OR GVL_IHM.Network.EncoderM1.ErrorId OR GVL_IHM.Network.EncoderM2.ErrorId OR GVL_IHM.Network.VariateurM3.ErrorId;
 
-// 🩺 Diagnostic carte des 3 modules DI TOR réelles (AF06 §3bis) — lecture seule, calculé
+// 🩺 Diagnostic carte des 5 modules d'E/S physiques (AF06 §3bis) — lecture seule, calculé
 // dans PRG_02_Acquisition, simple recopie ici pour l'IHM (même patron que Network.*).
 GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.Data.LocalDigitalIoOk;
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Data.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Data.Vh0808EtpOk;
+GVL_IHM.Network.InputModules.Vh0008ErOk       := PRG_02_Acquisition.Data.Vh0008ErOk;
+GVL_IHM.Network.InputModules.Vh0008Er1Ok      := PRG_02_Acquisition.Data.Vh0008Er1Ok;
+GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputModuleFault;
 
 // ---------- §3g. État cycle semi-auto & bandeau ----------
 GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready;
@@ -465,7 +470,8 @@ instHmiBannerFormatter(
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
     RedundancyTestFailed         := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed,
     EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
-    AlarmHoldTime               := T#1s
+    AlarmHoldTime               := T#1s,
+    Network                     := GVL_IHM.Network
 );
 GVL_IHM.Banner := instHmiBannerFormatter.Banner;
 

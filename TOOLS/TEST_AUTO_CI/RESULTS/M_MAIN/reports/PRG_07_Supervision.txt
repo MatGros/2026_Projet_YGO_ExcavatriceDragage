@@ -1,0 +1,30 @@
+Error compiling source files:
+
+ST_NetworkDiagHMI.st:8:27: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_NETWORKDIAGHMI'
+   8 |     BusCanOpen          : ST_Diag_Device;  (* 📡 Diagnostics bus CANopen *)
+     |                           ^
+
+ST_NetworkDiagHMI.st:9:27: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_NETWORKDIAGHMI'
+   9 |     Joystick            : ST_Diag_Device;  (* 🕹️ Diagnostics esclave Joystick *)
+     |                           ^
+
+ST_NetworkDiagHMI.st:13:27: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_NETWORKDIAGHMI'
+  13 |     BusEthercat         : ST_Diag_Device;  (* 📡 Diagnostics bus EtherCAT *)
+     |                           ^
+
+ST_NetworkDiagHMI.st:14:27: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_NETWORKDIAGHMI'
+  14 |     EncoderM1           : ST_Diag_Device;  (* 🧲 Diagnostics esclave COD1 *)
+     |                           ^
+
+ST_NetworkDiagHMI.st:15:27: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_NETWORKDIAGHMI'
+  15 |     EncoderM2           : ST_Diag_Device;  (* 🧲 Diagnostics esclave COD2 *)
+     |                           ^
+
+ST_NetworkDiagHMI.st:16:27: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_NETWORKDIAGHMI'
+  16 |     VariateurM3         : ST_Diag_Device;  (* ↔️ Diagnostics esclave AC600 *)
+     |                           ^
+
+ST_NetworkDiagHMI.st:23:27: error: Undefined type 'ST_BYPASSNETWORK' in STRUCT 'ST_NETWORKDIAGHMI'
+  23 |     Bypass              : ST_BypassNetwork;
+     |                           ^
+

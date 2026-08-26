@@ -20,7 +20,7 @@ TEST 'PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consign
     
     // Vérification de la structure Data (ST_AcquisitionInterPrg)
     ASSERT_TRUE(harness.Data.JoystickDeadmanArmed, 'Structure Data: Homme-mort arme avec succes');
-    ASSERT_EQ(harness.Data.CablePosM1, 2.0, 'Structure Data: Position cable M1 = 2.0m');
+    ASSERT_EQ(harness.Data.Encoders.M1.CablePosM, 2.0, 'Structure Data: Position cable M1 = 2.0m');
     ASSERT_TRUE(harness.Data.M1_HomedAndReliable, 'Structure Data: Codeur M1 fiabilise');
 
     // 2. Mouvement manche a droite (RawX = 8000)

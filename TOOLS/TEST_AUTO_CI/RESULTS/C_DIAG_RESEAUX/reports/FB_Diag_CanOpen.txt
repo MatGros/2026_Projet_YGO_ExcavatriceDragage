@@ -1,0 +1,6 @@
+Error compiling source files:
+
+FB_Diag_CanOpen.st:77:9: error: Undeclared variable 'STATEATERROR'
+  77 |         StateAtError := E_Diag_State.DISABLED;
+     |         ^
+

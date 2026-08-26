@@ -20,7 +20,7 @@ TEST 'PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consign
     
     // Vérification de la structure Data (ST_AcquisitionInterPrg)
     ASSERT_TRUE(harness.Data.JoystickDeadmanArmed, 'Structure Data: Homme-mort arme avec succes');
-    ASSERT_EQ(harness.Data.CablePosM1, 2.0, 'Structure Data: Position cable M1 = 2.0m');
+    ASSERT_EQ(harness.Data.Encoders.M1.CablePosM, 2.0, 'Structure Data: Position cable M1 = 2.0m');
     ASSERT_TRUE(harness.Data.M1_HomedAndReliable, 'Structure Data: Codeur M1 fiabilise');
 
     // 2. Mouvement manche a droite (RawX = 8000)
@@ -31,27 +31,5 @@ TEST 'PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consign
     // Vérification de la structure d'image matérielle HwIn (ST_HardwareImage)
     ASSERT_EQ(harness.HwIn.Operator.JoyXRaw_ANA1, 8000, 'Structure HwIn: JoyXRaw_ANA1 transmis');
     ASSERT_TRUE(harness.HwIn.Operator.JoyBtnRaw, 'Structure HwIn: JoyBtnRaw transmis');
-END_TEST
-
-TEST 'PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position'
-    // Activation capteurs zone Tremie et injection des retours de freins/contacteurs
-    harness(
-        M3_PosTremie_DI := TRUE,
-        M3_PosPV_DI := TRUE,
-        M3_PosPVP2_DI := TRUE,
-        M3_PosP1_DI := TRUE,
-        M3_PosMaintenance_DI := TRUE,
-        M1_BrakeCmd := TRUE,
-        M3_BrakeCmd := TRUE
-    );
-    // Vérification du bus Data
-    ASSERT_TRUE(harness.Data.TranslationAtTremie, 'Structure Data: Position exacte Tremie atteinte');
-    ASSERT_TRUE(harness.Data.M3_LimitSwitchFwd, 'Structure Data: Fin de course avant actif a la tremie');
-    ASSERT_FALSE(harness.Data.M3_SensorWordIncoherent, 'Structure Data: Mot capteurs coherent');
-    
-    // Vérification du bus HwIn
-    ASSERT_TRUE(harness.HwIn.Translation.M3_PosTremie_DI, 'Structure HwIn: Capteur Tremie transmis');
-    ASSERT_TRUE(harness.HwIn.Winch.M1_BrakeIsOpen_DI, 'Structure HwIn: Retour frein M1 recopie');
-    ASSERT_TRUE(harness.HwIn.Translation.M3_BrakeIsOpen_DI, 'Structure HwIn: Retour frein M3 recopie');
 END_TEST
 

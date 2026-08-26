@@ -72,12 +72,14 @@
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks { margin-top: 8px; }
-    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; }
-    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
-    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
+    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary:hover { color: var(--text); }
+    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
@@ -191,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 13:19:55</div>
+    <div class="exec-time">2026-08-27 00:46:41</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-0">Ethercat : Enable=FALSE desactive le diagnostic</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-1">Ethercat : Enable=TRUE et Esclaves OK -&gt; Ready et State=READY</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-1">TC-P12-010 EtherCAT : surveillance maitre et esclaves</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -250,14 +252,14 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Diag_Ethercat</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 15 flux entrants · 28 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Diag_Ethercat</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 19 flux entrants · 21 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceVariateurStateRaw <span class="pin-type" style="color:var(--muted);">DEVICE_STATE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceVariateurSimBypass <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceEncoderM1StateRaw <span class="pin-type" style="color:var(--muted);">DEVICE_STATE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceEncoderM1SimBypass <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceEncoderM2StateRaw <span class="pin-type" style="color:var(--muted);">DEVICE_STATE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceEncoderM2SimBypass <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">NetworkBypassActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceVariateurStateRaw <span class="pin-type" style="color:var(--muted);">DEVICE_STATE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceVariateurSimBypass <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceEncoderM1StateRaw <span class="pin-type" style="color:var(--muted);">DEVICE_STATE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceEncoderM1SimBypass <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceEncoderM2StateRaw <span class="pin-type" style="color:var(--muted);">DEVICE_STATE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DeviceEncoderM2SimBypass <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">NetworkBypassActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EcatBusBypassActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">VariateurBypassActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EncoderM1BypassActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EncoderM2BypassActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
@@ -299,15 +301,15 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">9</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">13</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">14</b></div>
-                    <div>• Champs Out : <b style="color:#ffffff;">18</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">5</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">20</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">15 IN</b> / <b style="color:#ffffff;">28 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">19 IN</b> / <b style="color:#ffffff;">21 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -323,38 +325,22 @@
                 <div class="pin-name"><b>Ready</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>Busy</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>Done</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>State</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">E_Diag_State</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>Error</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>ErrorId</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">WORD</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>StateAtError</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">E_Diag_State</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>DeviceEthercatMaster</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Diag_Device</span> <span style="font-size:11px;color:#a5b4fc;">(3 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>DeviceEthercatMaster</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Diag_Device</span> <span style="font-size:11px;color:#a5b4fc;">(5 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
                 <div style="margin-top:2px;">
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>DeviceEthercatMaster</b>.Error</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Diag_Device</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>DeviceEthercatMaster</b>.ErrorId</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Diag_Device</span></div>
+                </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>DeviceEthercatMaster</b>.Online</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Diag_Device</span></div>
@@ -454,27 +440,15 @@
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>DeviceEncoderM2</b>.State</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Diag_Device</span></div>
                 </div></div>
-            </details>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>DeviceVariateurStateRawOut</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">DEVICE_STATE</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>DeviceEncoderM1StateRawOut</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">DEVICE_STATE</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>DeviceEncoderM2StateRawOut</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">DEVICE_STATE</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div></div>
+            </details></div>
         </div>
     </details>
     
     <details class="pin-diagram-details">
         <summary>🔌 Interface & câblage production</summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 23 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BUSY</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1SIMBYPASS</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1STATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1STATERAWOUT</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2SIMBYPASS</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2STATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2STATERAWOUT</code> jamais câblé en production</li><li>Pin <code>DEVICEETHERCATMASTER</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEUR</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEURSIMBYPASS</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEURSTATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEURSTATERAWOUT</code> jamais câblé en production</li><li>Pin <code>DONE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>ERROR</code> jamais câblé en production</li><li>Pin <code>ERRORID</code> jamais câblé en production</li><li>Pin <code>NETWORKBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>STATE</code> jamais câblé en production</li><li>Pin <code>STATEATERROR</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 18 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>DEVICEENCODERM1</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1SIMBYPASS</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1STATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2SIMBYPASS</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2STATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICEETHERCATMASTER</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEUR</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEURSIMBYPASS</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEURSTATERAW</code> jamais câblé en production</li><li>Pin <code>ECATBUSBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>ENCODERM1BYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>ENCODERM2BYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>NETWORKBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>VARIATEURBYPASSACTIVE</code> jamais câblé en production</li></ul>
         </div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
@@ -504,28 +478,22 @@
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
             <div class="pin-name">NETWORKBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ECATBUSBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">VARIATEURBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENCODERM1BYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENCODERM2BYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div></div>
             <div class="pin-block">FB_Diag_Ethercat</div>
             <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BUSY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DONE <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STATE <span class="pin-type">IEC_E_DIAG_STATE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">ERROR <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">ERRORID <span class="pin-type">IEC_WORD</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STATEATERROR <span class="pin-type">IEC_E_DIAG_STATE</span></div>
             <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">DEVICEETHERCATMASTER <span class="pin-type">ST_DIAG_DEVICE</span></div>
@@ -538,15 +506,6 @@
             <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">DEVICEENCODERM2 <span class="pin-type">ST_DIAG_DEVICE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DEVICEVARIATEURSTATERAWOUT <span class="pin-type">IEC_DEVICE_STATE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DEVICEENCODERM1STATERAWOUT <span class="pin-type">IEC_DEVICE_STATE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DEVICEENCODERM2STATERAWOUT <span class="pin-type">IEC_DEVICE_STATE</span></div>
             <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div></div>
         </div>
@@ -620,7 +579,7 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Diag_Ethercat</code></td>
-                <td>9</td><td>14</td>
+                <td>13</td><td>5</td>
                 <td>0</td><td>10</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (10 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
@@ -628,52 +587,63 @@
     </details>
     
     <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-diag-ethercat-0" class="test-card test-card-pass test-card-contract">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>Ethercat : Enable=FALSE desactive le diagnostic <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
-            
-            <div class="checks"><span class="checks-label">Vérifié (2)</span><ul><li>Ready doit etre FALSE sans Enable</li><li>State doit etre DISABLED sans Enable</li></ul></div>
+            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Diagnostic desactive</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Diagnostic actif</p><p class='comment'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE</li><li>State=DISABLED</li><li>Enable=TRUE -&gt; Ready=TRUE</li><li>State=READY</li><li>Coupure -&gt; Ready retombe a FALSE</li><li>State retombe a DISABLED</li></ul></details>
             
             
     <div class="chronogram-group">
         
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (32)</summary>
-            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEVARIATEURSIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM1STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM2STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NETWORKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE</code></td><td>0</td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>STATEATERROR</code></td><td>0</td></tr><tr><td><code>DEVICEETHERCATMASTER.ONLINE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEUR.ONLINE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM1.ONLINE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM2.ONLINE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAWOUT</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1STATERAWOUT</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2STATERAWOUT</code></td><td>9</td></tr><tr><td><code>VARIATEURONLINEREAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1ONLINEREAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2ONLINEREAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURONLINEEFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1ONLINEEFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2ONLINEEFF</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 12 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="572" viewBox="0 0 388 572" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="554" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="566" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="554" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="566" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="554" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="566" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">READY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">DEVICEETHERCATMASTER.ONLINE</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148L312,148L312,174L368,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">DEVICEVARIATEUR.ONLINE</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L256,214L256,188L312,188L312,188L312,214L368,214" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">DEVICEENCODERM1.ONLINE</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,254L256,254L256,254L256,228L312,228L312,228L312,254L368,254" class="wf-line" stroke="#0d9488"/><text x="182" y="286.0" class="wf-label">DEVICEENCODERM2.ONLINE</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><path d="M200,294L256,294L256,294L256,268L312,268L312,268L312,294L368,294" class="wf-line" stroke="#1d4ed8"/><text x="182" y="326.0" class="wf-label">VARIATEURONLINEREAL</text><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><path d="M200,334L256,334L256,334L256,308L312,308L368,308" class="wf-line" stroke="#2563eb"/><text x="182" y="366.0" class="wf-label">ENCODERM1ONLINEREAL</text><circle cx="192" cy="362.0" r="4" fill="#059669"/><path d="M200,374L256,374L256,374L256,348L312,348L368,348" class="wf-line" stroke="#059669"/><text x="182" y="406.0" class="wf-label">ENCODERM2ONLINEREAL</text><circle cx="192" cy="402.0" r="4" fill="#0891b2"/><path d="M200,414L256,414L256,414L256,388L312,388L368,388" class="wf-line" stroke="#0891b2"/><text x="182" y="446.0" class="wf-label">VARIATEURONLINEEFF</text><circle cx="192" cy="442.0" r="4" fill="#65a30d"/><path d="M200,454L256,454L256,454L256,428L312,428L368,428" class="wf-line" stroke="#65a30d"/><text x="182" y="486.0" class="wf-label">ENCODERM1ONLINEEFF</text><circle cx="192" cy="482.0" r="4" fill="#0d9488"/><path d="M200,494L256,494L256,494L256,468L312,468L368,468" class="wf-line" stroke="#0d9488"/><text x="182" y="526.0" class="wf-label">ENCODERM2ONLINEEFF</text><circle cx="192" cy="522.0" r="4" fill="#1d4ed8"/><path d="M200,534L256,534L256,534L256,508L312,508L368,508" class="wf-line" stroke="#1d4ed8"/></svg></div>
         </details>
-    </div>
-        </article>
-        <article id="test-fb-diag-ethercat-1" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Ethercat : Enable=TRUE et Esclaves OK -&gt; Ready et State=READY <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            <div class="checks"><span class="checks-label">Vérifié (3)</span><ul><li>Ready doit etre TRUE avec Enable</li><li>State doit etre READY quand tout est OK</li><li>Aucune erreur attendue</li></ul></div>
-            
-            
-    <div class="chronogram-group">
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>READY</th><th>DEVICEETHERCATMASTER.ONLINE</th><th>DEVICEVARIATEUR.ONLINE</th><th>DEVICEENCODERM1.ONLINE</th><th>DEVICEENCODERM2.ONLINE</th><th>VARIATEURONLINEREAL</th><th>ENCODERM1ONLINEREAL</th><th>ENCODERM2ONLINEREAL</th><th>VARIATEURONLINEEFF</th><th>ENCODERM1ONLINEEFF</th><th>ENCODERM2ONLINEEFF</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
         
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (32)</summary>
-            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEVARIATEURSIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM1STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM2STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NETWORKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE</code></td><td>1</td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>STATEATERROR</code></td><td>0</td></tr><tr><td><code>DEVICEETHERCATMASTER.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEVARIATEUR.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEENCODERM1.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEENCODERM2.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAWOUT</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1STATERAWOUT</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2STATERAWOUT</code></td><td>9</td></tr><tr><td><code>VARIATEURONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM1ONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2ONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>VARIATEURBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM1ONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2ONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
-        </details>
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (15)</summary>
+        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEVARIATEURSIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM1STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM2STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NETWORKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ECATBUSBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1BYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2BYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
     </div>
         </article>
         </div>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test métier)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Composant technique / socle transverse : non rattaché à un catalogue de tests métier ou de procédé spécifique.
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-diag-ethercat-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P12-010 EtherCAT : surveillance maitre et esclaves </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>EtherCAT pret</li><li>Pas d erreur bus</li><li>Pas d erreur encoder M1</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (27)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEVARIATEURSIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM1STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM2STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NETWORKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ECATBUSBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1BYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2BYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEETHERCATMASTER.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEVARIATEUR.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEENCODERM1.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEENCODERM2.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>VARIATEURONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM1ONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2ONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>VARIATEURBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM1ONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2ONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
         </div>
     </details>
     <details>
@@ -684,7 +654,7 @@
         <summary>Code source ST original (4)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
                 <pre>(* =======================================================================
    📊 Type CODESYS système pour tests STruCpp
    ======================================================================= *)
@@ -706,12 +676,12 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
                 <pre>(* =======================================================================
    📊 E_Diag_State — Enumération des états du cycle de diagnostic réseau
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Phases d&#x27;état de surveillance diagnostic d&#x27;un bus ou équipement
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    ======================================================================= *)
 TYPE E_Diag_State :
 (
@@ -726,12 +696,12 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Diag_Device — Structure diagnostic d&#x27;un esclave ou bus
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de donnees d&#x27;état, diagnostic et alarme d&#x27;un equipement réseau
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    ======================================================================= *)
 TYPE ST_Diag_Device :
 STRUCT
@@ -746,13 +716,13 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\FB_Diag_Ethercat.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\FB_Diag_Ethercat.st</code></summary>
                 <pre>(* =======================================================================
    📊 FB_Diag_Ethercat — Diagnostic bus EtherCAT &amp; Esclaves (M3, COD1, COD2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Surveillance bus EtherCAT master, variateur M3 et codeurs M1/M2
    🔌 Architecture : Publication ST_Diag_Device par esclave &amp; E_Diag_State
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Diag_Ethercat
 VAR_INPUT
@@ -772,29 +742,22 @@ VAR_INPUT
     DeviceEncoderM2StateRaw     : DEVICE_STATE; // --&gt; [HW]  Valeur brute COD2_CODEUR.GetDeviceState()
     DeviceEncoderM2SimBypass    : BOOL;         // --&gt; [TST] TRUE = simulation active encodeur M2
 
-    // === BYPASS RESEAU IHM ===
+    // === BYPASS RESEAU IHM &amp; GRANULAIRES ===
     NetworkBypassActive         : BOOL;         // --&gt; [TST] TRUE = bypass reseau global IHM
+    EcatBusBypassActive         : BOOL;         // --&gt; [TST] TRUE = bypass specifique bus EtherCAT maître
+    VariateurBypassActive       : BOOL;         // --&gt; [TST] TRUE = bypass specifique esclave variateur M3
+    EncoderM1BypassActive       : BOOL;         // --&gt; [TST] TRUE = bypass specifique esclave codeur M1
+    EncoderM2BypassActive       : BOOL;         // --&gt; [TST] TRUE = bypass specifique esclave codeur M2
 END_VAR
 VAR_OUTPUT
-    // === ETATS IEC &amp; CONFORMITE ===
+    // === ETAT DU BLOC ===
     Ready                       : BOOL;         // &lt;-- [STAT] Logique de surveillance active
-    Busy                        : BOOL;         // &lt;-- [STAT] Non utilise (conformite interface)
-    Done                        : BOOL;         // &lt;-- [STAT] Non utilise
-    State                       : E_Diag_State; // &lt;-- [STAT] Phase courante du diagnostic global
 
-    // === DIAGNOSTICS &amp; ALARMES ===
-    Error                       : BOOL;         // &lt;-- [DIAG] Resume anomalie de communication bus
-    ErrorId                     : WORD;         // &lt;-- [DIAG] Code defaut global resume
-    StateAtError                : E_Diag_State; // &lt;-- [DIAG] Phase figee a l&#x27;apparition de l&#x27;erreur
+    // === DIAGNOSTICS STRUCTURES PAR EQUIPEMENT ===
     DeviceEthercatMaster        : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics bus EtherCAT
     DeviceVariateur             : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics esclave AC600
     DeviceEncoderM1             : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics esclave COD1
     DeviceEncoderM2             : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics esclave COD2
-
-    // === MIROIRS BRUTS MATERIEL ===
-    DeviceVariateurStateRawOut  : DEVICE_STATE; // &lt;-- [DIAG] Miroir brut status variateur M3
-    DeviceEncoderM1StateRawOut  : DEVICE_STATE; // &lt;-- [DIAG] Miroir brut status encodeur M1
-    DeviceEncoderM2StateRawOut  : DEVICE_STATE; // &lt;-- [DIAG] Miroir brut status encodeur M2
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
@@ -816,7 +779,6 @@ END_VAR
 // 🛑 1. GATE : Désactivation si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
-    State := E_Diag_State.DISABLED;
     DeviceVariateur.State := E_Diag_State.DISABLED;
     DeviceEncoderM1.State := E_Diag_State.DISABLED;
     DeviceEncoderM2.State := E_Diag_State.DISABLED;
@@ -829,14 +791,11 @@ IF NOT Enable THEN
     DeviceVariateur.Error := FALSE;
     DeviceEncoderM1.Error := FALSE;
     DeviceEncoderM2.Error := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
     DeviceEthercatMaster.State := E_Diag_State.DISABLED;
     DeviceEthercatMaster.Online := FALSE;
     DeviceEthercatMaster.Operational := FALSE;
-    DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
-    DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
-    DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
+    DeviceEthercatMaster.Error := FALSE;
+    DeviceEthercatMaster.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -850,9 +809,9 @@ VariateurOnlineReal := (DeviceVariateurStateRaw = DEVICE_STATE.RUNNING);
 EncoderM1OnlineReal := (DeviceEncoderM1StateRaw = DEVICE_STATE.RUNNING);
 EncoderM2OnlineReal := (DeviceEncoderM2StateRaw = DEVICE_STATE.RUNNING);
 
-VariateurBypass := DeviceVariateurSimBypass OR NetworkBypassActive;
-EncoderM1Bypass := DeviceEncoderM1SimBypass OR NetworkBypassActive;
-EncoderM2Bypass := DeviceEncoderM2SimBypass OR NetworkBypassActive;
+VariateurBypass := DeviceVariateurSimBypass OR NetworkBypassActive OR VariateurBypassActive;
+EncoderM1Bypass := DeviceEncoderM1SimBypass OR NetworkBypassActive OR EncoderM1BypassActive;
+EncoderM2Bypass := DeviceEncoderM2SimBypass OR NetworkBypassActive OR EncoderM2BypassActive;
 
 VariateurOnlineEff := VariateurOnlineReal OR VariateurBypass;
 EncoderM1OnlineEff := EncoderM1OnlineReal OR EncoderM1Bypass;
@@ -928,13 +887,6 @@ ELSE
     DeviceEncoderM2.State := E_Diag_State.READY;
 END_IF;
 
-// Fige la phase du diagnostic global sur le premier défaut
-IF (DeviceVariateur.ErrorId &lt;&gt; 0 OR DeviceEncoderM1.ErrorId &lt;&gt; 0 OR DeviceEncoderM2.ErrorId &lt;&gt; 0) THEN
-    IF StateAtError = E_Diag_State.DISABLED THEN
-        StateAtError := State;
-    END_IF;
-END_IF;
-
 {endregion}
 
 {region &quot;§5 Synthese EtherCAT et sorties&quot;}
@@ -943,40 +895,20 @@ DeviceVariateur.Error := (DeviceVariateur.ErrorId &lt;&gt; 0);
 DeviceEncoderM1.Error := (DeviceEncoderM1.ErrorId &lt;&gt; 0);
 DeviceEncoderM2.Error := (DeviceEncoderM2.ErrorId &lt;&gt; 0);
 
-Error := (DeviceVariateur.Error OR DeviceEncoderM1.Error OR DeviceEncoderM2.Error);
-
-ErrorId := 16#0000;
-IF DeviceVariateur.Error THEN
-    ErrorId := ErrorId OR 16#00F0;
-END_IF;
-IF DeviceEncoderM1.Error THEN
-    ErrorId := ErrorId OR 16#0F00;
-END_IF;
-IF DeviceEncoderM2.Error THEN
-    ErrorId := ErrorId OR 16#F000;
-END_IF;
-
-IF Error THEN
-    State := E_Diag_State.ERROR;
-ELSIF NOT (VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff) THEN
-    State := E_Diag_State.INIT;
-ELSIF (VariateurBypass OR EncoderM1Bypass OR EncoderM2Bypass)
-      AND NOT (VariateurOnlineReal AND EncoderM1OnlineReal AND EncoderM2OnlineReal) THEN
-    State := E_Diag_State.SIMULATED;
-ELSE
-    State := E_Diag_State.READY;
-END_IF;
-
-DeviceEthercatMaster.Online := VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff;
+DeviceEthercatMaster.Online := (VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff) OR NetworkBypassActive OR EcatBusBypassActive;
 DeviceEthercatMaster.Operational := DeviceEthercatMaster.Online;
+DeviceEthercatMaster.Error := NOT DeviceEthercatMaster.Operational;
 
-DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
-DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
-DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
-
-Busy := FALSE;
-Done := FALSE;
-
+IF DeviceEthercatMaster.Error THEN
+    DeviceEthercatMaster.ErrorId := 16#0001;
+    DeviceEthercatMaster.State := E_Diag_State.ERROR;
+ELSIF (VariateurBypass OR EncoderM1Bypass OR EncoderM2Bypass OR EcatBusBypassActive) THEN
+    DeviceEthercatMaster.ErrorId := 16#0000;
+    DeviceEthercatMaster.State := E_Diag_State.SIMULATED;
+ELSE
+    DeviceEthercatMaster.ErrorId := 16#0000;
+    DeviceEthercatMaster.State := E_Diag_State.READY;
+END_IF;
 {endregion}
 </pre>
             </details>
@@ -986,8 +918,8 @@ Done := FALSE;
         <pre>STruC++ Test Runner v1.0
 
 test_fb_diag_ethercat.st
-  [PASS] Ethercat : Enable=FALSE desactive le diagnostic
-  [PASS] Ethercat : Enable=TRUE et Esclaves OK -&gt; Ready et State=READY
+  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  [PASS] TC-P12-010 EtherCAT : surveillance maitre et esclaves
 
 -----------------------------------------
 2 tests, 2 passed, 0 failed

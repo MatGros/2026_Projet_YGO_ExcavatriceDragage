@@ -3,11 +3,11 @@
   "file": "test_fb_diag_ethercat.st",
   "results": [
     {
-      "name": "Ethercat : Enable=FALSE desactive le diagnostic",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "Ethercat : Enable=TRUE et Esclaves OK -> Ready et State=READY",
+      "name": "TC-P12-010 EtherCAT : surveillance maitre et esclaves",
       "passed": true
     }
   ],

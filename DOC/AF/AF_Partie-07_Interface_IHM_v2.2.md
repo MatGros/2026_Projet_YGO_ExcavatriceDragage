@@ -209,26 +209,33 @@ d'information (§5) qui ne porte que 4 messages fixes par responsabilité.
 | `Text` | `STRING(120)` | Message courant, préfixé `n/N` (ex. `1/2 [M1] perte codeur`) |
 | `Index` | `INT` | Position courante, 1-based, `0` si aucun défaut |
 | `Count` | `INT` | Nombre total de messages actifs |
+| `AlarmArray` | `ARRAY[0..49] OF STRING(120)` | 📋 Liste instantanée et exhaustive de tous les défauts actifs |
 
-**Rotation** : un message affiché `AlarmHoldTime` (déf. `T#1s`) avant de passer au suivant
-(`(AlarmIndex + 1) MOD AlarmCount`) ; capacité `CST_NbMaxAlarmes = 32` messages. Si le nombre de
-messages actifs diminue sous l'index courant entre deux scans, l'index est reborné à `0` plutôt
-que de rester hors plage.
+**Rotation & Affichage instantané** : un message affiché `AlarmHoldTime` (déf. `T#1s`) avant de passer au suivant
+(`(AlarmIndex + 1) MOD AlarmCount`) ; capacité `CST_NbMaxAlarmes = 50` messages. L'ensemble des messages actifs du scan est simultanément publié dans `AlarmArray[0..Count-1]`.
+
+**Qualification E/S & Masquage des fausses alarmes en cascade (Root Cause Masking)** :
+Lors de la perte d'un module d'E/S ou d'un bus de communication, l'alarme parente racine est affichée en tête absolue du carrousel et toutes les alarmes filles secondaires portées par l'équipement défaillant sont masquées pour éviter la panique opérateur.
+
+| # | Alarme parente racine | Variable surveillée (`Network.*`) | Condition de déclenchement | Organe / Rôle matériel |
+|---|---|---|---|---|
+| **P1** | `[IO] Defaut module Local IO (DI8/DO8)` | `InputModules.LocalDigitalIoOk` | `NOT LocalIoValid` | CPU intégrée (8 DI + 8 DO) |
+| **P2** | `[IO] Defaut module VH0800END (DI8)` | `InputModules.Vh0800EndOk` | `NOT Vh0800Valid` | Module DI sécurité/freins/AU |
+| **P3** | `[IO] Defaut module VH0808ETP (DI8/DO8)` | `InputModules.Vh0808EtpOk` | `NOT Vh0808Valid` | Module mixte DI inductifs / DO résistances |
+| **P4** | `[IO] Defaut module VH0008ER (DO8 Relais)` | `InputModules.Vh0008ErOk` | `NOT Vh0008ErValid` | Sorties relais freins M1/M2/M3 & Kobold |
+| **P5** | `[IO] Defaut module VH0008ER_1 (DO8 Relais)` | `InputModules.Vh0008Er1Ok` | `NOT Vh0008Er1Valid` | Sorties relais réarmement AU & PowerKeepAlive |
+| **P6** | `[CAN] Defaut bus CANopen` | `BusCanOpen.Operational` | `NOT CanBusValid` | Bus de communication CAN maître |
+| **P7** | `[CAN] Joystick JOY1 non detecte` | `Joystick.Operational` | `CanBusValid AND NOT Joy1Valid` | Pupitre / Manipulateur opérateur |
+| **P8** | `[ECAT] Defaut bus EtherCAT` | `BusEthercat.Operational` | `NOT EcatBusValid` | Bus de communication EtherCAT maître |
+| **P9** | `[M1] Codeur absolu COD1 non detecte (ECAT)` | `EncoderM1.Operational` | `EcatBusValid AND NOT EncM1Valid` | Codeur absolu levage M1 |
+| **P10** | `[M2] Codeur absolu COD2 non detecte (ECAT)` | `EncoderM2.Operational` | `EcatBusValid AND NOT EncM2Valid` | Codeur absolu benne M2 |
+| **P11** | `[M3] Variateur AC600 non detecte (ECAT)` | `VariateurM3.Operational` | `EcatBusValid AND NOT VarM3Valid` | Variateur translation M3 |
 
 **Producteur** : `FB_Hmi_BannerFormatter` (`PRG_07_Supervision`) — même formateur que le bandeau
 d'information (§5), sortie séparée (`Banner.AlarmBanner`, pas `Banner.GlobalContextText` etc.).
 
-**État vide** : `AlarmCount=0` ⇒ `HasAlarm=FALSE`, `Text=''`, `Index=0`, `Count=0` — jamais de
+**État vide** : `AlarmCount=0` ⇒ `HasAlarm=FALSE`, `Text=''`, `Index=0`, `Count=0`, `AlarmArray[:] = ''` — jamais de
 texte résiduel du dernier défaut acquitté.
-
-**Ajouter une nouvelle source d'alarme** (revue sous-agent 2026-08-26, gap identifié) : ce §6
-documente l'affichage/rotation, pas les sources. `FB_Hmi_BannerFormatter` collecte aujourd'hui
-9 domaines (`WinchM1/2Safety`, `TranslationSafety`, `BucketErrorId`, `SyncErrorId`, `DiveErrorId`,
-`ExtractionErrorId`, `EmergencyErrorId`, `CycleErrorId`) via une chaîne de tests `IF...AND
-(AlarmCount < CST_NbMaxAlarmes)` codée en dur dans le FB. Ajouter une source suppose 3 étapes :
-(1) nouveau `VAR_INPUT` sur `FB_Hmi_BannerFormatter`, (2) nouvelle ligne dans cette chaîne `IF`,
-(3) câblage de l'entrée dans `PRG_07_Supervision`. Pas de mécanisme générique d'enregistrement —
-à connaître avant d'ajouter un domaine.
 
 ---
 
@@ -252,7 +259,7 @@ plus un TBD (voir §9).
 
 | Version | Date | Changement |
 |---|---|---|
-| v2.2 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, Suivi historique ajouté, renumérotation complète + réfs `§N` cascadées. **Correctif de fond majeur** : §6 « Bandeau d'alarme défilant » écrite pour la première fois — <nobr><code>TC-P07-008</code></nobr>/<nobr><code>TC-P07-009</code></nobr> référençaient `§4bis` depuis leur création mais aucun contenu n'existait (Sommaire + tableau TC en parlaient, le corps ne l'a jamais eu) ; documenté à partir du code réel (`ST_AlarmBanner.st`, `FB_Hmi_BannerFormatter.st`), vérifié exact par review sous-agent. Ajout d'une note sur le câblage d'une nouvelle source d'alarme (gap identifié en review). Réfs `§4`/`§4.1-4.3` obsolètes dans les commentaires `FB_Hmi_BannerFormatter.st`/`FB_AntiFlickerText.st` corrigées en `§5`/`§5.1-5.3` (sans toucher la numérotation interne 1-5 des régions du FB, distincte). TBD « Organisation finale troubleshooting » marqué résolu (`FB_TroubleshootingView`, périmé depuis AF-14) |
+| v2.2 | 2026-08-26 | Intégration Root Cause Masking dans `ST_AlarmBanner` (`AlarmArray[0..49]`), 11 alarmes parentes E/S et bus (P1..P11), temporisation démarrage (4s) et debouncing TOF (1.5s). Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, Suivi historique ajouté. |
 | v2.1 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
 ## ❓ 9 · TBD

@@ -1,0 +1,37 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_04::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18190:43: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM1'
+18190 |     INSTSAFETYWINCHM1.CABLEPOSM = ACQDATA.CABLEPOSM1;
+      |                                           ^~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18193:50: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SPEED_MPS'
+18193 |     INSTSAFETYWINCHM1.MEASUREDSPEEDMPS = ACQDATA.M1_SPEED_MPS;
+      |                                                  ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18194:56: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SIGNEDSPEED_MPS'
+18194 |     INSTSAFETYWINCHM1.MEASUREDSPEEDSIGNEDMPS = ACQDATA.M1_SIGNEDSPEED_MPS;
+      |                                                        ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18195:52: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SPEEDVALID'
+18195 |     INSTSAFETYWINCHM1.MEASUREDSPEEDVALID = ACQDATA.M1_SPEEDVALID;
+      |                                                    ^~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18218:43: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM2'
+18218 |     INSTSAFETYWINCHM2.CABLEPOSM = ACQDATA.CABLEPOSM2;
+      |                                           ^~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18221:50: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M2_SPEED_MPS'
+18221 |     INSTSAFETYWINCHM2.MEASUREDSPEEDMPS = ACQDATA.M2_SPEED_MPS;
+      |                                                  ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18222:56: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M2_SIGNEDSPEED_MPS'
+18222 |     INSTSAFETYWINCHM2.MEASUREDSPEEDSIGNEDMPS = ACQDATA.M2_SIGNEDSPEED_MPS;
+      |                                                        ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18223:52: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M2_SPEEDVALID'
+18223 |     INSTSAFETYWINCHM2.MEASUREDSPEEDVALID = ACQDATA.M2_SPEEDVALID;
+      |                                                    ^~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18254:37: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM1'
+18254 |     INSTWINCHM1.CABLEPOSM = ACQDATA.CABLEPOSM1;
+      |                                     ^~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp: In member function 'void strucpp::FB_MAIN_ENDTOEND::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18326:37: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM1'
+18326 |     PRG05.WINCHM1CABLEPOSM = BUSACQ.CABLEPOSM1;
+      |                                     ^~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_vg4idfzr\strucpp-test-Dbw5Xv\generated.cpp:18327:37: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM2'
+18327 |     PRG05.WINCHM2CABLEPOSM = BUSACQ.CABLEPOSM2;
+      |                                     ^~~~~~~~~~
+
