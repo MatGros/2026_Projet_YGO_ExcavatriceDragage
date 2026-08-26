@@ -241,12 +241,17 @@ ST_EncoderMeasurements
 - Redémarrage incohérent (`HomingSuspect`) : `EncoderIncoherent=TRUE` → Modes refuse `SEMI_AUTO`.
 - Sans simulation : M1 reflète COD1, M2 reflète COD2 — jamais croisés.
 
-> ✅ **Point de vigilance ordonnancement — TRANCHÉ (décision 2026-08-03)** : `FB_Encoder_Scale`
-> (rang 02) consomme `HomingRefRaw` produit par `FB_Encoder_Homing` (**rang 04**, Treuils).
-> **Retard d'un scan bénin assumé** : `HomingRefRaw` est RETAIN quasi-statique, ne change que sur
-> référencement abouti (procédure terrain AF09 §5) suivi d'une confirmation visuelle — jamais de
-> conséquence sur une commande, un interlock ou une sortie. Pas de relais dédié, pas de déplacement
-> du homing (réintroduirait la violation grave Homing→Modes). Documenté AF09 §4.2 « Note A-01 bis ».
+> ✅ **Point de vigilance ordonnancement — TRANCHÉ, mis à jour 2026-08-26** : la décision initiale
+> du 2026-08-03 (`FB_Encoder_Scale` rang 02 consommant `HomingRefRaw` produit par
+> `FB_Encoder_Homing` déplacé rang 04/Treuils) a été **remplacée par l'architecture actée du
+> 2026-08-25** (`AF_Partie-09_Fonction_Encoder_v2.3.md §8`) : la chaîne codeur complète
+> (Abs→Homing→Scale→Safety→Reliability→Speed) est regroupée dans une **façade unique
+> `FB_Encoder`, entièrement instanciée dans `PRG_02_Acquisition`** — le déplacement du homing seul
+> vers `PRG_04_Treuils_Benne` n'a jamais été implémenté et n'est plus la cible. `HomingRefRaw` est
+> donc produit et consommé au même rang (`PRG_02_Acquisition`), aucun retard inter-programme sur
+> ce champ. Le seul retard résiduel documenté est celui de `HomingPermit` (lit `Auth.Mode` produit
+> au rang `PRG_03_Modes_Cycle`, retard d'un scan bénin assumé — AF09 §8). Voir AF09 §8 pour le
+> détail complet.
 
 ### 🔥 Flux perte codeur → Modes / Safety / Supervision / IHM (trou P0 AF09 §6 alert. 8)
 
@@ -465,6 +470,7 @@ Instance : `PRG_07_Supervision.instPreflight` (ST pur, en lecture seule stricte)
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.4 (fix) | 2026-08-26 | Revue de cohérence croisée AF-01→14 (sous-agent) : §3ter « point de vigilance ordonnancement » contredisait AF09 §8 sur l'emplacement de `FB_Encoder_Homing` (rang 04/Treuils vs façade unique `PRG_02_Acquisition`) — corrigé pour refléter l'architecture actée 2026-08-25 (AF09 §8), référence morte « AF09 §4.2 » retirée |
 | v2.4 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié (incluant désormais 3bis/3ter/4bis, absents), section `🎯 Rôle et périmètre` explicite, Suivi historique ajouté, renumérotation complète (chapô + réfs `§N` cascadées), lien mort corrigé vers `FB_Acquisition_Preflight_v1.2.md` (citait v1.0, inexistant), référence `FB_Input` ajoutée en Documents liés. **Correctifs de fond majeurs** (review sous-agent expert automatisme, vérifiés contre le code) : §3bis-nommé-§3ter « Corrigé par conception » **infirmé** — `PRG_03_Modes_Cycle.st:43` ne consomme pas `EncoderIncoherent` (câblé sur `DeviceState` seul), le bug P0 original reste possible côté Modes, marqué ⛔ non résolu (pas juste un souci doc) ; `FB_Safety_Winch` bit `ErrorId` corrigé bit2→bit1 et clarifié qu'il ne consomme pas non plus `EncoderIncoherent` ; §5 : nom fichier CSV corrigé (`20260806`→`20260814`), 3 noms de TOR corrigés (`BrakeThermalOk_DI`→`M1_M2_M3_BrakeThermalOk_DI`, `M1_M2_KoboldContactFond_DI`→`M1_M2_KoboldBottomTouch_DI`, `M3_ThermalFeedback_DI`→`M3_ThermalOK_DI` + domaine Winch→Translation), 23e champ `HopperFull_OR_GateRaised_DI` (non câblé) signalé absent de la liste ; réf stale `AF_Partie-11 §4` retirée de `FB_Acquisition_Preflight` (section inexistante) |
 | v2.3 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 

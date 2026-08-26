@@ -216,7 +216,7 @@ de leur **combinaison**. Une seule page les porte, avec leur safety.
 | Ce qui est porté par `PRG_04_Treuils_Benne` | Rôle |
 |---|---|
 | Arbitrages M1/M2, benne, synchro, assistants plongée/extraction | Conduite treuils |
-| `instSafetyWinchM1/M2`, `instSpeedMonitorM1/M2`, `instLoadEstimatorM1/M2` | Safety treuils & benne |
+| `instSafetyWinchM1/M2`, `instLoadEstimatorM1/M2` | Safety treuils & benne |
 
 ⚠️ **Aucune sémantique safety ne change** : les mécanismes Méca A→E, les bits `ErrorId` 14/15,
 `AscentPermit`/`DescendPermit` (logique positive fail-safe), les seuils et les polarités restent ceux décrits dans les fiches FB.
@@ -348,6 +348,7 @@ L'asservissement synchro est découpé en 3 zones d'action calibrées sur site :
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.1 (fix) | 2026-08-26 | Revue de cohérence croisée AF-01→14 (sous-agent) : §5.2 citait encore `instSpeedMonitorM1/M2` comme instance active — retiré (`FB_Encoder_SpeedMonitor` supprimé, TBD signalé par AF-09 §11 mais resté sans effet jusqu'ici) |
 | v2.1 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié (incluant 2bis/2ter et 7.1-7.6), section `🎯 Rôle et périmètre` explicite, Table des fonctions `F10.01`-`F10.09` ajoutée (obligatoire, famille Fonctions métier), diagramme composition HTML/SVG → Mermaid `flowchart TD` stylisé, Suivi historique + TBD ajoutés, renumérotation complète (dont fusion 7.5→7.4/7.6→7.5/7.7→7.6 pour combler le trou 7.4 jamais rempli). **Correctifs de fond** (review sous-agent expert automatisme) : 4 des 9 liens vers les fiches FB (`FB_Winch`, `FB_Safety_Winch`, `FB_WinchOutputInterlock`, `FB_Bucket`) étaient morts — pointaient vers `AF_Partie-10_FB_*_v1.0.md` (racine `DOC/AF/`) alors que les 9 fiches vivent dans `AF_Partie-10_Fonction_Winch/` — corrigés dans la table Composition et le tableau Points de validation ; phrase tronquée en tête de §7 complétée ; §5.1 (organisation de l'exécution `PRG_04_Treuils_Benne`) entièrement fausse — décrivait des régions (`instBucket` en premier, arbitrage M1/M2 séparés, etc.) ne correspondant plus aux 8 régions réelles du code (`§1`-`§8` vérifiées une à une) — corrigée ; références à des tâches inexistantes (T87/T93/T94/T95/T96, jamais créées dans `TASKS.yaml`) retirées de §7.2/§7.3/§9/§10, la seule étude T91 réelle citée à tort ici concerne en fait `FB_Brake` (périmètre distinct depuis le découplage frein §2bis). Code repointé (`CODE/H_TREUILS_BENNE/*` et 3 audits) |
 | v2.0 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 

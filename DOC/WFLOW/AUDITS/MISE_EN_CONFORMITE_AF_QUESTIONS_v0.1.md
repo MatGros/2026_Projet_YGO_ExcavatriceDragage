@@ -135,6 +135,53 @@ inaperçu). Documenté dans `AF_Partie-12_Fonction_Diagnostic_v1.1.md §6/§8`.
 Comme pour AF-10, seul le chapô a été mis en conformité — `FB_Diag_CanOpen_v1.0.md`,
 `FB_Diag_Ethercat_v1.0.md`, `FB_Diag_IhmHeartbeat_v1.0.md` restent en l'état.
 
+### Q12 — Revue de cohérence croisée finale AF-01→14 (2026-08-26) : 4 corrections appliquées, 4 questions restantes
+
+Revue sous-agent dédiée (demandée explicitement par l'utilisateur comme « très très importante »)
+portant sur la cohérence **entre** les 14 documents, pas chacun isolément. Verdict global : corpus
+sain, zéro collision d'ID, zéro référence à un fichier archivé — une contradiction d'architecture
+réelle trouvée et 3 références croisées non fermées malgré des TBD explicites déjà posés.
+
+**Corrigé en autonomie** (factuel, pas de choix de conception) :
+- ⛔ AF-06 §3ter contredisait AF-09 §8 sur l'emplacement de `FB_Encoder_Homing` (rang 04/Treuils
+  vs façade unique `PRG_02_Acquisition`) — AF-06 corrigée pour suivre l'architecture actée la plus
+  récente (2026-08-25, AF-09 §8). Référence croisée AF-09→AF-06 stale (`§2ter`→`§3ter`) réparée.
+- AF-04 : nom périmé `M1_M2_KoboldContactFond_DI` → `M1_M2_KoboldBottomTouch_DI` (AF-06 l'avait
+  déjà corrigé le même jour, pas répercuté).
+- AF-10 §5.2 : `instSpeedMonitorM1/M2` retiré (TBD posé par AF-09 §11, jamais clôturé malgré AF-10
+  marquée ✅ dans ce même journal — le mécanisme TBD inter-AF détecte mais ne garantit pas la
+  clôture).
+
+**Question ouverte — `FB_SyncDeviation.st`** : AF-04 cite ce fichier comme réel
+(`FB_Cycle.st`/`FB_WinchSync.st`/`FB_SyncDeviation.st`) mais AF-10 (propriétaire exhaustif de la
+composition Treuils/Benne, 9 fiches FB) ne le liste pas. **Décision requise** : FB réel non
+inventorié à ajouter à AF-10 §2, ou nom historique/doublon de `FB_WinchSync` à retirer d'AF-04 ?
+
+**Question ouverte — Table des fonctions incohérente sur la famille « Transverse »** : AF-01 a
+reçu sa Table des fonctions au nom de la testabilité (D1) ; AF-04/05/06/07 (même famille
+Transverse, toutes dotées d'un catalogue TC réel donc testables) n'en ont aucune, alors qu'AF-08→14
+(Fonctions métier) en ont toutes une. **Décision requise** : ajouter la Table des fonctions à
+AF-04/05/06/07 par cohérence, ou documenter explicitement dans `GUIDE_EDITION_AF_v1.0.md` pourquoi
+« Transverse » en est structurellement exempté.
+
+**Question ouverte — 3 formats de `TC-Pxx-*` coexistent** : séquentiel dense (`-001, -002...` :
+AF01-07, 10, 11), par blocs de 10 (`-010, -020...` : AF08, 09, 13), composant inséré
+(`TC-P14-TSV-01` : AF14 seule). Aucune collision, mais aucune règle explicite dans le guide ne
+justifie la coexistence. **Décision requise** : format unique à trancher, ou règle de coexistence
+à documenter.
+
+**Question ouverte (cosmétique)** — `AF_Partie-02...v3.2.md` §3 tableau POU : colonne `N°` vaut
+`01` pour `PRG_02_Acquisition` (nom porte pourtant le numéral 02) puis saute à `03`. Confusion
+potentielle avec le rang d'exécution (justement le point sensible du finding AF-06/AF-09
+ci-dessus). **Décision requise** : corriger `01`→`02`, ou clarifier que la colonne N° est un rang
+distinct du numéral de nom.
+
+**Note (non bloquante)** : chevauchement lexical « armer/armement » entre AF-01 (réarmement AU
+électrique, `BtnEmergencyArming`) et AF-08 (armement homme-mort joystick, `DeadmanArmed`) — deux
+mécanismes disjoints partageant le même champ lexical, aucun risque de fond mais risque de lecture
+en confondant les deux. Une note de désambiguïsation dans l'un des deux documents réglerait le
+point, non urgent.
+
 ---
 
 *Mis à jour à chaque AF traitée. Ne pas éditer les entrées passées — ajouter, jamais réécrire

@@ -224,7 +224,7 @@ sur `Reset`, perte `PositionValid`, ou rebouclage `TIME` détecté.
 ## 8 · 🔒 Intégration programme
 
 `instEncoderM1`/`instEncoderM2` (façade `FB_Encoder`, **homing inclus**) : `PRG_02_Acquisition`
-(rang 01), publiés dans `Data.*` puis `ST_EncoderMeasurements` (AF06 §2ter — agrégation
+(rang 01), publiés dans `Data.*` puis `ST_EncoderMeasurements` (AF06 §3ter — agrégation
 `EncoderFault`, consommateurs Modes/Safety/IHM, **détail non dupliqué ici**).
 
 **Architecture actée (2026-08-25)** : la chaîne codeur complète (Abs→Homing→Scale→Safety→
@@ -236,7 +236,7 @@ choix retenu (décision utilisateur).
 
 Conséquence acceptée : `HomingPermit` (calculé dans `PRG_02_Acquisition.st:341`) lit
 `PRG_03_Modes_Cycle.Auth.Mode`, produit au rang 03 — **retard d'un scan (10ms)**, même schéma que
-`HomingRefRaw` déjà accepté (AF06 §2ter, note A-01 bis) : sans conséquence, le homing est un acte
+`HomingRefRaw` déjà accepté (AF06 §3ter, note A-01 bis) : sans conséquence, le homing est un acte
 volontaire et rare (front bouton + arrêt confirmé), pas une commande temps réel.
 
 Consommateurs directs de la façade (hors AF06) :
@@ -271,6 +271,9 @@ dédiée (AF14) — pointeur, pas de duplication ici.
 
 ## 10 · 📜 Suivi historique
 
+- **v2.3 (fix) — 2026-08-26** : Revue de cohérence croisée AF-01→14 (sous-agent) : références
+  stales `AF06 §2ter` corrigées en `AF06 §3ter` (numérotation d'AF-06 décalée lors de sa propre
+  mise en conformité, jamais répercutée ici) — §8 et §8bis.
 - **v2.2 → v2.3 (2026-08-25)** : Pipeline §3 converti en Mermaid `flowchart TD` (vertical, flèches
   étiquetées, couleurs par domaine) — remplace le schéma texte muet, standard
   `GUIDE_EDITION_AF_v1.0.md §3bis`.
