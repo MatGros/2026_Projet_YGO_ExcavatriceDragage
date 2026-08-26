@@ -302,7 +302,7 @@ dédiée (AF14) — pointeur, pas de duplication ici.
 - Incohérence de suffixe d'unité : `CfgTopSensorPosM`/`CfgHomingTargetM`/`PositionMinM`/`PositionMaxM`
   (sans `_`) vs `Speed_Mps`/`SignedSpeed_Mps` (avec `_`, conforme `NAMING_CONVENTION.md`) — lot de
   renommage dédié à trancher séparément, ne pas migrer au fil de l'eau (casse IHM/bundle).
-- **AF10 à corriger** : `AF_Partie-10_Fonction_Winch_v2.0.md` §4.2 liste encore `instSpeedMonitorM1/M2`
+- **AF10 à corriger** : `AF_Partie-10_Fonction_Winch_v2.1.md` §4.2 liste encore `instSpeedMonitorM1/M2`
   comme faisant partie de l'architecture cible de `PRG_04_Treuils_Benne` — obsolète depuis le
   retrait de `FB_Encoder_SpeedMonitor` (ci-dessus). À corriger quand AF10 sera traitée.
 

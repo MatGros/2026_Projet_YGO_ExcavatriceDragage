@@ -15,7 +15,8 @@
 | AF-04 | ✅ Fait | `0e7e54f2` | 1 tour, bug version titre + réécriture §5 synchro (fausse phase de rattrapage) |
 | AF-05 | ✅ Fait | `98cf96ee` | 1 tour, nom de variable inexistant corrigé (`TglMaintenanceZoneAccess`→`SelMaintenanceZoneAccess`) |
 | AF-06 | ✅ Fait | `18ba121b` | 1 tour, ⛔ P0 sécurité trouvé (EncoderIncoherent non consommé par Modes/Safety) |
-| AF-07 | ✅ Fait | (à suivre) | 2 tours (1er a échoué sur limite API), section §6 manquante depuis toujours écrite from scratch |
+| AF-07 | ✅ Fait | `6a8cec2b` | 2 tours (1er a échoué sur limite API), section §6 manquante depuis toujours écrite from scratch |
+| AF-10 | ✅ Fait (chapô seul, 9 fiches FB non retouchées) | (à suivre) | 1 tour, 4 liens morts + §5.1 fausse + refs tâches inexistantes |
 | AF-07 | ⬜ | — | — |
 | AF-08 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
 | AF-09 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
@@ -102,6 +103,17 @@ déjà correcte dans `FB_EncoderReliability`, juste jamais consommée en aval), 
 explicitement pourquoi une incohérence seule ne doit pas bloquer `SEMI_AUTO`/déclencher `SafeStop`
 si c'est volontaire. **Criticité C4 proposée** (sécurité, comportement machine). Documenté en TBD
 `AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §9`.
+
+### Q8 — AF-10 : 9 fiches FB non retouchées cette session (scope réduit, décision assumée)
+Vu le volume (9 fiches FB dédiées, AF métier le plus dense traité jusqu'ici), seul le chapô
+`AF_Partie-10_Fonction_Winch_v2.1.md` a été mis en conformité cette session. Les 9 fiches
+(`FB_Winch`, `FB_Safety_Winch`, `FB_WinchSync`, `FB_WinchOutputInterlock`, `FB_Bucket`,
+`FB_Winch_Symmetry`, `FB_SpeedStep`, `FB_WinchLoadEstimator`, `FB_DriftGuard`) restent en l'état
+(pas de Sommaire lié, pas de bump de version, pas de vérification individuelle approfondie).
+`FB_Safety_Winch` a été spot-check en review (7 mécanismes A-G vérifiés exacts contre le code,
+aucun écart trouvé). **Question pour l'humain** : une passe dédiée sur les 9 fiches FB d'AF-10
+est-elle prioritaire, ou le rythme actuel (chapô uniquement pour les AF les plus denses) convient-il
+pour la suite (AF-11 à AF-14) ?
 
 ---
 

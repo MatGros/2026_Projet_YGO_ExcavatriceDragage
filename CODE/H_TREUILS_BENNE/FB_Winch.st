@@ -2,7 +2,7 @@
    🪝 FB_Winch — Directeur d'un treuil individuel (M1 / M2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage d'un treuil individuel (contacteurs de sens et de vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop)
    🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
    ======================================================================= *)

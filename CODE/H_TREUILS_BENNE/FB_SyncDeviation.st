@@ -8,7 +8,7 @@
    🧬 Responsabilite : n'interprete PAS l'etat benne. Il reçoit ActiveOffsetM
       deja resolu (calcul offset-selon-etat-benne = FB_Bucket/HoldOffset).
    🔒 Polarite : SyncDeviationWarn/Fault = TRUE si ecart hors seuil.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_SyncDeviation

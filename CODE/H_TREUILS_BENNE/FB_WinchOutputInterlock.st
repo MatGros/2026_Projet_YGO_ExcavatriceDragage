@@ -2,7 +2,7 @@
    🛡️ FB_WinchOutputInterlock — Barrière finale frein / puissance M1 ou M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Barrière de sécurité finale pour frein et contacteurs M1/M2
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs)
    🔒 Sécurité : Surveillance feedback frein et temporisation d'inversion
    ======================================================================= *)

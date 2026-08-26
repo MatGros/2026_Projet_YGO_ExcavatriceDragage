@@ -1,6 +1,6 @@
 # FB_WinchSync — Spec composant (v1.1)
 
-> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §4.
+> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.1.md`](AF_Partie-10_Fonction_Winch_v2.1.md) §4.
 > Rôle de **ce** document : synchro niveau 1 (warning), couplage croisé — et **catalogue unique**
 > des `TC-P10-014`, `015`, `016`.
 > Source code : `CODE/H_TREUILS_BENNE/FB_WinchSync.st` · instance unique dans `PRG_04_Treuils_Benne.st` (ST). 🚩 La conversion CFC natif est **abandonnée** (2026-08-16) : aucune page CFC native cible.

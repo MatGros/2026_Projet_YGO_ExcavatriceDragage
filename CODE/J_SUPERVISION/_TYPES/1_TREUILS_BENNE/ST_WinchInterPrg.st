@@ -6,7 +6,7 @@
       l'état benne publiés par PRG_04_Treuils_Benne vers les consommateurs
       (PRG_02/03/06/07).
    📤 Producteur unique : PRG_04_Treuils_Benne (VAR_OUTPUT Data : ST_WinchInterPrg).
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════ *)
 

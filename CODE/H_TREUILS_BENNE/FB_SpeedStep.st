@@ -2,7 +2,7 @@
    🪜 FB_SpeedStep — Décodeur palier vitesse vers contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Décodage consigne vitesse 0..100% en paliers et pilotage contacteurs
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Décodeur interne (compose FB_Winch)
    🔒 Sécurité : Validation configuration table et anti-battement hysteresis
    ======================================================================= *)
