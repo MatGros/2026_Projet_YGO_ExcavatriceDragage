@@ -5,7 +5,7 @@
 > §5 (`TranslationPontM3`) avec le détail spécifique M3 : chaque cause de blocage, dans l'ordre où
 > la rencontrer, avec la variable exacte à observer en Watch CODESYS.
 > 📄 Sources : `CODE/TRANSLATION/*.st`, `CODE/M_MAIN/PRG_02_Acquisition.st`, `PRG_05_Translation.st`,
-> `PRG_06_Outputs.st`. Spec métier : `DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md`.
+> `PRG_06_Outputs.st`. Spec métier : `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md`.
 > ⚠️ **Lecture seule stricte** — ce document n'est pas une procédure d'action machine, c'est une
 > aide à l'observation. Toute action reste sous la responsabilité de l'opérateur/automaticien.
 
@@ -261,7 +261,7 @@ avant validation finale.
 
 | Doc | Rôle |
 |---|---|
-| `DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md` | Spec métier M3, §5 alertes détaillées |
+| `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` | Spec métier M3, §5 alertes détaillées |
 | `DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.2.md` | Table générique transverse (acquisition DI) |
 | `DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md` | FB de recopie IHM (`GVL_Troubleshooting`) |
 | `CHECKLIST_MiseEnService_Translation` (PLAN_TASK T26) | Checklist de recette terrain — **référencée mais pas encore rédigée** dans `DOC/CHECKLISTS/`, exécution/verdict signé restants |

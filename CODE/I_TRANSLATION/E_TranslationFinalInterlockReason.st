@@ -2,7 +2,7 @@
    🛡️ E_TranslationFinalInterlockReason — Raisons d'interlock M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des raisons de blocage de la barrière finale M3
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ======================================================================= *)
 {attribute 'qualified_only'}
 TYPE E_TranslationFinalInterlockReason :
