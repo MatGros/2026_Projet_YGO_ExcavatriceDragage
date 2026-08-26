@@ -156,7 +156,7 @@ contact pointé sur la broche du bloc producteur.
 
 - Oracles CODESYS : `TOOLS/SAMPLES_XML_CODESYS/PRG_06_Outputs_LD.xml`, `PRG_Oracle_Nested.xml`
 - Tests dichotomiques : `CODE/CODE_Bundle_{6invar,2networks,3networks,nocoil180,minimal}.xml`
-- Spec PLCopenXML : `DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md`
+- Spec PLCopenXML : `DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md`
 
 ---
 

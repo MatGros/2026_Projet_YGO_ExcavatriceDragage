@@ -74,7 +74,14 @@ def doc_key(name: str) -> str | None:
 
 
 def latest_versions(doc_dir: Path) -> dict[str, tuple[tuple[int, int], str]]:
-    """clef -> ((major, minor), nom de fichier) de la version la plus recente."""
+    """clef -> ((major, minor), chemin relatif a DOC/) de la version la plus recente.
+
+    ⚠️ Stocker le chemin relatif complet (`AF/AF_Partie-03_..._v2.3.md`), pas seulement
+    `entry.name` (bare filename) : un doc versionne peut vivre dans un sous-dossier de DOC/
+    (ex. `DOC/AF/`). Stocker juste le nom perdait ce sous-dossier des que le lien etait
+    reconstruit ailleurs (`f"DOC/{newest}"` retombait a plat sous DOC/, lien casse malgre un
+    PASS rapporte — REX 2026-08-26).
+    """
     latest: dict[str, tuple[tuple[int, int], str]] = {}
     for entry in doc_dir.rglob("*.md"):
         match = VERSIONED.match(entry.name)
@@ -83,16 +90,18 @@ def latest_versions(doc_dir: Path) -> dict[str, tuple[tuple[int, int], str]]:
             continue
         version = (int(match.group("major")), int(match.group("minor")))
         if key not in latest or version > latest[key][0]:
-            latest[key] = (version, entry.name)
+            latest[key] = (version, entry.relative_to(doc_dir).as_posix())
     return latest
 
 
 def all_versions(doc_dir: Path) -> dict[str, list[str]]:
+    """clef -> chemins relatifs a DOC/ (meme convention que `latest_versions`, pour que le
+    filtre `f != best` du rapport D3 fonctionne — deux formats differents ne matchent jamais)."""
     versions: dict[str, list[str]] = {}
     for entry in sorted(doc_dir.rglob("*.md")):
         key = doc_key(entry.name)
         if key:
-            versions.setdefault(key, []).append(entry.name)
+            versions.setdefault(key, []).append(entry.relative_to(doc_dir).as_posix())
     return versions
 
 

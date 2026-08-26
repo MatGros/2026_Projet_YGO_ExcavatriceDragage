@@ -13,7 +13,7 @@
 | <nobr>Comment on **déclare, encapsule, relie**</nobr> | **ce document** |
 | <nobr>Comment on **édite une AF**</nobr> | **ce document §0** |
 | <nobr>Comment on **teste/vérifie**</nobr> | `DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md` |
-| <nobr>Contrats FB, DUT et CFC</nobr> | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.2.md` |
+| <nobr>Contrats FB, DUT et CFC</nobr> | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md` |
 | <nobr>Ce que fait la machine</nobr> | `DOC/` — voir `DOC/README.md` pour l'index complet |
 | <nobr>Comment on exécute une modif</nobr> | `AGENTS.md` (§ Workflow d'édition) |
 
@@ -68,7 +68,7 @@
        `G340_check_doc_links.py --fix` reconnaît et maintient à jour automatiquement (D1/D2).
        Si la Table des fonctions de l'AF existe, ajouter le(s) code(s) `F<NN>.<seq>` **en
        suffixe entre parenthèses**, jamais en remplacement du chemin :
-       `📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.3.md (F08.02)`. Un FB qui
+       `📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (F08.02)`. Un FB qui
        porte plusieurs fonctions liste plusieurs codes (`F08.01, F08.03-F08.07`).
      - `🛡️` = Bloc ou fonction de Sécurité Machine.
      - `🔒` = Polarité, invariant de sécurité ou verrouillage / interlock.

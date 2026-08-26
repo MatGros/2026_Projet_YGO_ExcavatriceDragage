@@ -1,0 +1,7 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-x3a4FT\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_05::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-x3a4FT\generated.cpp:17549:27: error: 'struct strucpp::ST_TRANSLATIONSTATE' has no member named 'ACTIVESPEEDCMD_PCT'; did you mean 'SPEEDCMD_PCT'?
+17549 |     DATA.TRANSLATIONSTATE.ACTIVESPEEDCMD_PCT = M3SPEEDTGT;
+      |                           ^~~~~~~~~~~~~~~~~~
+      |                           SPEEDCMD_PCT
+
