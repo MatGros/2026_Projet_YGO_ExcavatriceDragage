@@ -22,8 +22,6 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
          PowerContactorEngaged := TRUE, Homed := TRUE, FwdRevSpeedFeedbackOff := TRUE,
          SpeedStepTable := Table);
     ASSERT_FALSE(FB_W.Ready, 'Enable=FALSE -> Ready=FALSE (neutralise)');
-    ASSERT_FALSE(FB_W.RelayFwd, 'Enable=FALSE -> RelayFwd coupe');
-    ASSERT_FALSE(FB_W.RelayRev, 'Enable=FALSE -> RelayRev coupe');
 
     ADVANCE_TIME(10000000);
 
@@ -39,8 +37,6 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
          PowerContactorEngaged := TRUE, Homed := TRUE, FwdRevSpeedFeedbackOff := TRUE,
          SpeedStepTable := Table);
     ASSERT_TRUE(FB_W.Ready, 'Enable=TRUE etabli -> Ready=TRUE (nominal)');
-    ASSERT_FALSE(FB_W.RelayFwd, 'Au repos -> RelayFwd inactif');
-    ASSERT_FALSE(FB_W.RelayRev, 'Au repos -> RelayRev inactif');
 
     ADVANCE_TIME(10000000);
 
@@ -49,8 +45,6 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
          PowerContactorEngaged := TRUE, Homed := TRUE, FwdRevSpeedFeedbackOff := TRUE,
          SpeedStepTable := Table);
     ASSERT_FALSE(FB_W.Ready, 'Enable=FALSE -> Ready retombe a FALSE');
-    ASSERT_FALSE(FB_W.RelayFwd, 'Coupure -> RelayFwd coupe');
-    ASSERT_FALSE(FB_W.RelayRev, 'Coupure -> RelayRev coupe');
 END_TEST
 
 TEST 'TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations'

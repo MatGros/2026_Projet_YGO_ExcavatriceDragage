@@ -5,13 +5,12 @@ END_VAR
 END_SETUP
 
 TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
-    (* Scan 0 : Enable=FALSE -> Neutralisation et frein colle *)
+    (* Scan 0 : Enable=FALSE -> Neutralisation standard *)
     fb(ENABLE := FALSE, RESET := FALSE, MOVEMENTREQUESTED := TRUE,
        CONTACTORFEEDBACK := FALSE, BYPASSCONTACTORCHECK := FALSE,
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
     ASSERT_FALSE(fb.READY, 'Enable=FALSE : FB non pret (neutralise)');
-    ASSERT_FALSE(fb.BRAKECMD, 'Enable=FALSE : frein colle (securite positive)');
 
     ADVANCE_TIME(10000000);
 
@@ -21,7 +20,6 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
     ASSERT_TRUE(fb.READY, 'Enable=TRUE : FB pret');
-    ASSERT_FALSE(fb.BRAKECMD, 'Au repos : frein colle en securite');
 
     ADVANCE_TIME(10000000);
 

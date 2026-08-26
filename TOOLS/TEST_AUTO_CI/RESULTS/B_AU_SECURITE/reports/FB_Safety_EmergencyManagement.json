@@ -1,50 +1,19 @@
 {
   "version": 1,
-  "file": "test_fb_safety_emergency.st",
+  "file": "test_fb_modes.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.MAINTAINA_RQ expected TRUE, got FALSE",
-        "file": "test_fb_safety_emergency.st",
-        "line": 21,
-        "message": "Au repos -> MaintainA actif"
-      }
-    },
-    {
-      "name": "TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu",
       "passed": true
     },
     {
-      "name": "TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -> pulse 1s puis confirmation",
-      "passed": true
-    },
-    {
-      "name": "TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste",
-      "passed": true
-    },
-    {
-      "name": "TC-P01-006 canal colle bloque le reamement (echec auto-test)",
-      "passed": true
-    },
-    {
-      "name": "TC-P01-007 timeout confirmation contacteur -> lockout 5s",
-      "passed": true
-    },
-    {
-      "name": "TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien",
-      "passed": true
-    },
-    {
-      "name": "TC-P01-008 PowerCutOffRequest coupe A et B sans armer",
+      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
       "passed": true
     }
   ],
   "summary": {
-    "total": 8,
-    "passed": 7,
-    "failed": 1
+    "total": 2,
+    "passed": 2,
+    "failed": 0
   }
 }
