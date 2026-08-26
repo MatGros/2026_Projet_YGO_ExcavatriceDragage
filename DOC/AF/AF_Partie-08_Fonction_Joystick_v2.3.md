@@ -7,17 +7,17 @@
 
 ## 📑 Sommaire
 
-1. [🎯 Rôle et périmètre](#1--rôle-et-périmètre)
-2. [🧪 Table des points de validation](#2--table-des-points-de-validation)
-3. [🔄 Pipeline et composition (F08.01, F08.02)](#3--pipeline-et-composition-f0801-f0802)
-4. [🔌 Interface publique](#4--interface-publique)
-5. [🔫 Homme-mort (F08.03, F08.04)](#5--homme-mort-f0803-f0804)
-6. [📡 Calibration et défaut capteur (F08.05, F08.06)](#6--calibration-et-défaut-capteur-f0805-f0806)
-7. [🔒 Interlock consommateurs (F08.07, F08.08)](#7--interlock-consommateurs-f0807-f0808)
-8. [🖥️ IHM, Configuration & Dépannage](#8--ihm-configuration--dépannage)
-9. [📜 Suivi historique](#9--suivi-historique)
-10. [❓ TBD](#10--tbd)
-11. [📚 Documents liés](#11--documents-liés)
+1. [🎯 Rôle et périmètre](#1-rôle-et-périmètre)
+2. [🧪 Table des points de validation](#2-table-des-points-de-validation)
+3. [🔄 Pipeline et composition (F08.01, F08.02)](#3-pipeline-et-composition-f0801-f0802)
+4. [🔌 Interface publique](#4-interface-publique)
+5. [🔫 Homme-mort (F08.03, F08.04)](#5-homme-mort-f0803-f0804)
+6. [📡 Calibration et défaut capteur (F08.05, F08.06)](#6-calibration-et-défaut-capteur-f0805-f0806)
+7. [🔒 Interlock consommateurs (F08.07, F08.08)](#7-interlock-consommateurs-f0807-f0808)
+8. [🖥️ IHM, Configuration & Dépannage](#8-ihm-configuration--dépannage)
+9. [📜 Suivi historique](#9-suivi-historique)
+10. [❓ TBD](#10-tbd)
+11. [📚 Documents liés](#11-documents-liés)
 
 ---
 
