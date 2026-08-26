@@ -235,16 +235,16 @@ END_IF;
 // ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
 // 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne), factorisé dans FB_MirrorBypassRetain
 // (CODE/A_COMMUN) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
-instMirrorBypassTranslation(Hmi := GVL_IHM.TranslationM3.Bypass.Global, Retain := BypassTranslationGlobal, Prev := PrevTranslationBypass);
-instMirrorBypassM1(Hmi := GVL_IHM.M1TreuilRetenue.Bypass.Global, Retain := BypassWinchM1Global, Prev := PrevM1Bypass);
-instMirrorBypassM2(Hmi := GVL_IHM.M2TreuilBenne.Bypass.Global, Retain := BypassWinchM2Global, Prev := PrevM2Bypass);
-instMirrorBypassSync(Hmi := GVL_IHM.M1M2Sync.Bypass.Global, Retain := BypassSyncGlobal, Prev := PrevSyncBypass);
-instMirrorBypassCommun(Hmi := GVL_IHM.Commun.Bypass.Global, Retain := BypassCommunGlobal, Prev := PrevCommunBypass);
-instMirrorBypassLimitLegal(Hmi := GVL_IHM.Commun.Bypass.LimitLegal, Retain := BypassLimitLegal, Prev := PrevLimitLegal);
-instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, Retain := BypassTopLimitSwitch, Prev := PrevTopLimitSwitch);
-instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, Retain := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
-instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, Retain := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
-instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, Retain := BypassSlackCable, Prev := PrevSlackCable);
+instMirrorBypassTranslation(Hmi := GVL_IHM.TranslationM3.Bypass.Global, RetainVal := BypassTranslationGlobal, Prev := PrevTranslationBypass);
+instMirrorBypassM1(Hmi := GVL_IHM.M1TreuilRetenue.Bypass.Global, RetainVal := BypassWinchM1Global, Prev := PrevM1Bypass);
+instMirrorBypassM2(Hmi := GVL_IHM.M2TreuilBenne.Bypass.Global, RetainVal := BypassWinchM2Global, Prev := PrevM2Bypass);
+instMirrorBypassSync(Hmi := GVL_IHM.M1M2Sync.Bypass.Global, RetainVal := BypassSyncGlobal, Prev := PrevSyncBypass);
+instMirrorBypassCommun(Hmi := GVL_IHM.Commun.Bypass.Global, RetainVal := BypassCommunGlobal, Prev := PrevCommunBypass);
+instMirrorBypassLimitLegal(Hmi := GVL_IHM.Commun.Bypass.LimitLegal, RetainVal := BypassLimitLegal, Prev := PrevLimitLegal);
+instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, RetainVal := BypassTopLimitSwitch, Prev := PrevTopLimitSwitch);
+instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, RetainVal := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
+instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, RetainVal := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
+instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, RetainVal := BypassSlackCable, Prev := PrevSlackCable);
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)

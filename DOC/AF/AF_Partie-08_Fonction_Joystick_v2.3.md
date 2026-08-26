@@ -110,6 +110,19 @@ même dictionnaire que `GUIDE_EDITION_AF_v1.0.md §3quater`.
 Simulation (F08.01) : `FB_Sim_Joystick` ne simule que les entrées brutes (`RawX`/`RawY`/
 `RawButton`) ; le homme-mort réel de `FB_Joystick` reste actif (pas de bypass, AF13).
 
+### 🏛️ Architecture de Commande Unifiée : du Joystick aux Sorties Physiques (M1, M2, M3)
+
+L'intention de vitesse issue du manche (`SpeedTgt` 0.0 à 100.0 %) est unifiée à l'acquisition et se convertit selon la technologie physique de chaque axe :
+
+| Étage | M1 (Treuil Retenue) | M2 (Treuil Benne) | M3 (Translation Pont) |
+|:---|:---|:---|:---|
+| **1. Entrée Joystick (`PRG_02`)** | `instJoystick.AxisCmdY.SpeedTgt`<br>*(0..100 %, Axe Y)* | `instJoystick.AxisCmdY.SpeedTgt`<br>*(0..100 %, Axe Y)* | `instJoystick.AxisCmdX.SpeedTgt`<br>*(0..100 %, Axe X)* |
+| **2. Consigne Arbitrée (`PRG_04` / `PRG_05`)** | `SpeedCmd_Pct` *(0.0 à 100.0 %)* | `SpeedCmd_Pct` *(0.0 à 100.0 %)* | `SpeedCmd_Pct` *(0.0 à 100.0 %)* |
+| **3. Moteur de Conversion** | **`FB_SpeedStep`**<br>*(Quantification en 5 paliers)* | **`FB_SpeedStep`**<br>*(Quantification en 5 paliers)* | **`FB_Ramp` + Échelle Hz**<br>*(Conversion continue en Hz)* |
+| **4. Grandeur Physique Interne** | **`StepNumber` (0 à 5)** :<br>• Palier 0 = Arrêt<br>• Palier 1 = PV (≤ 20 %)<br>• Palier 2 = GV1 (≤ 40 %)<br>• Palier 3 = GV2 (≤ 60 %)<br>• Palier 4 = GV3 (≤ 80 %)<br>• Palier 5 = GV4 (100 %) | **`StepNumber` (0 à 5)** :<br>• Palier 0 = Arrêt<br>• Palier 1 = PV (≤ 20 %)<br>• Palier 2 = GV1 (≤ 40 %)<br>• Palier 3 = GV2 (≤ 60 %)<br>• Palier 4 = GV3 (≤ 80 %)<br>• Palier 5 = GV4 (100 %) | **`DriveFreqCmd_Hz` (0.0 à 50.0 Hz)** :<br>• `Freq_Hz = (SpeedCmd_Pct / 100) * SetFreq_Hz`<br>• Progression continue filtrée par rampe d'accélération (Hz/s) |
+| **5. Sorties Physiques Réelles (`PRG_06`)** | • Sens : `RelayFwd` / `RelayRev`<br>• Paliers : `Contactor1` à `4`<br>• Frein : `BrakeCmd` | • Sens : `RelayFwd` / `RelayRev`<br>• Paliers : `Contactor1` à `4`<br>• Frein : `BrakeCmd` | • Bus EtherCAT : `DriveControlWord`<br>• Mot Fréquence : `DriveTargetVelocity`<br>• Frein : `BrakeCmd` |
+| **6. Supervision IHM (`PRG_07` / `GVL_IHM`)** | **`GVL_IHM.M1TreuilRetenue.State.SpeedCmd_Pct`**<br>*(+ `StepNumber` 0..5)* | **`GVL_IHM.M2TreuilBenne.State.SpeedCmd_Pct`**<br>*(+ `StepNumber` 0..5)* | **`GVL_IHM.TranslationM3.State.SpeedCmd_Pct`**<br>*(+ `DriveFreqCmd_Hz`)* |
+
 ---
 
 ## 4 · 🔌 Interface publique

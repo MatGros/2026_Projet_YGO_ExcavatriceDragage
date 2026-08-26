@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T02:13:11.918225" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T02:13:11.918225">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T09:53:59.185559" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T09:53:59.185559">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -107,14 +107,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Positionneur : cible sélectionnée atteinte (non mémorisé)</xhtml>
               </documentation>
             </variable>
-            <variable name="JoystickDeflection_Pct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Axe X fonctionnel -100..+100 %, 0 = neutre ; animation IHM M3</xhtml>
-              </documentation>
-            </variable>
             <variable name="DriveActualFreq_Hz">
               <type>
                 <REAL />
@@ -147,12 +139,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveSpeedCmd_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande active après arbitrage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande active après arbitrage (0.0 à 100.0 %)</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockState">

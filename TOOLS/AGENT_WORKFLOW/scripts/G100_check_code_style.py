@@ -11,6 +11,20 @@ from pathlib import Path
 
 FORBIDDEN = ("CoupeEnable", "FB_Watchdog")
 DOC_REF = re.compile(r"DOC/[A-Za-z0-9_./-]+\.md")
+
+# Mots-clés réservés IEC 61131-3 / CODESYS interdits comme identifiants (variables, membres, paramètres)
+RESERVED_IEC_CODESYS_KEYWORDS = {
+    "RETAIN", "PERSISTENT", "CONSTANT", "PUBLIC", "PRIVATE", "PROTECTED", "INTERNAL",
+    "VAR", "VAR_INPUT", "VAR_OUTPUT", "VAR_IN_OUT", "VAR_GLOBAL", "VAR_TEMP", "VAR_STAT", "VAR_CONFIG", "VAR_ACCESS",
+    "END_VAR", "END_TYPE", "END_STRUCT", "END_PROGRAM", "END_FUNCTION", "END_FUNCTION_BLOCK",
+    "PROGRAM", "FUNCTION", "FUNCTION_BLOCK", "INTERFACE", "METHOD", "PROPERTY", "ACTION",
+    "TYPE", "STRUCT", "ARRAY", "OF", "POINTER", "REFERENCE", "REF_TO",
+    "WITH", "DO", "WHILE", "REPEAT", "UNTIL", "FOR", "IF", "THEN", "ELSE", "ELSIF", "END_IF", "CASE", "END_CASE",
+    "RETURN", "EXIT", "CONTINUE", "JMP",
+}
+DECL_VAR_RE = re.compile(r"^\s*([A-Za-z_]\w*)\s*:\s*[^;:=]+;", re.MULTILINE)
+PARAM_CALL_RE = re.compile(r"(?:[,\(]\s*)([A-Za-z_]\w*)\s*:=", re.MULTILINE)
+
 # Détecte instFB.VarOutput :=  (écriture sur VAR_OUTPUT d'une instance)
 VAR_OUTPUT_WRITE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\.(Ready|Busy|Done|Error|ErrorId|State|StateAtError)\s*:=")
 GVL_SIMULATION_REFERENCE = re.compile(r"\bGVL_Simulation\.")
@@ -147,6 +161,27 @@ def main() -> int:
         for token in FORBIDDEN:
             if token in text:
                 print(f"[ERROR] {path}: forbidden token {token}", file=sys.stderr)
+                errors += 1
+
+        # REX 2026-08-26 : Rejet des mots-clés réservés IEC 61131-3 / CODESYS en identifiants
+        for m in DECL_VAR_RE.finditer(executable_text):
+            var_name = m.group(1)
+            if var_name.upper() in RESERVED_IEC_CODESYS_KEYWORDS:
+                line = line_number(text, m.start())
+                print(
+                    f"[ERROR] {path}:{line}: illegal variable/member name '{var_name}' (reserved IEC 61131-3 / CODESYS keyword)",
+                    file=sys.stderr,
+                )
+                errors += 1
+
+        for m in PARAM_CALL_RE.finditer(executable_text):
+            param_name = m.group(1)
+            if param_name.upper() in RESERVED_IEC_CODESYS_KEYWORDS:
+                line = line_number(text, m.start())
+                print(
+                    f"[ERROR] {path}:{line}: illegal formal parameter name '{param_name}' (reserved IEC 61131-3 / CODESYS keyword)",
+                    file=sys.stderr,
+                )
                 errors += 1
 
         # VAR_OUTPUT write detection — only flag cross-file writes

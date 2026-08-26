@@ -13,14 +13,14 @@
 FUNCTION_BLOCK PUBLIC FB_MirrorBypassRetain
 VAR_IN_OUT
     // === MIROIR BIDIRECTIONNEL ===
-    Hmi    : BOOL; // <-> [BUS] Valeur bypass côté IHM (GVL_IHM)
-    Retain : BOOL; // <-> [BUS] Valeur bypass côté RETAIN (GVL_PERSISTENT)
-    Prev   : BOOL; // <-> [BUS] Mémoire du cycle précédent (détection front IHM)
+    Hmi       : BOOL; // <-> [BUS] Valeur bypass côté IHM (GVL_IHM)
+    RetainVal : BOOL; // <-> [BUS] Valeur bypass côté RETAIN (GVL_PERSISTENT)
+    Prev      : BOOL; // <-> [BUS] Mémoire du cycle précédent (détection front IHM)
 END_VAR
 
 IF Hmi <> Prev THEN
-    Retain := Hmi;
+    RetainVal := Hmi;
 ELSE
-    Hmi := Retain;
+    Hmi := RetainVal;
 END_IF;
 Prev := Hmi;
