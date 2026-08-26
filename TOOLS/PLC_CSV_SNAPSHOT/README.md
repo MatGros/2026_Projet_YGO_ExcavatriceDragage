@@ -15,6 +15,8 @@
 PLC_CSV_SNAPSHOT/
 ├── codesys_console/        scripts a executer DANS la console de scripting CODESYS
 │                           (Tools > Scripting > execfile(...)) — mode Simulation interne
+│   ├── config.json         configuration des Script Commands CODESYS (bouton toolbar / Ctrl+W)
+│   └── codesys_snapshot_*.py
 ├── external_python/        scripts a executer dans un terminal classique (python ...)
 │                           — mode Control Win / automate reel, via OPC UA
 ├── _poc/                   fichiers ayant servi a batir le POC, gardes pour reference
@@ -69,8 +71,13 @@ Référence API utilisée (stubs installés avec l'IDE, lues pour ce projet — 
 
 ### 🖱️ Confort — bouton de barre d'outils & raccourci clavier direct
 
-- **Bouton Toolbar** : Configuré via Script Commands (voir [`DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md §6`](../../DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md)).
+- **Fichier de configuration source** : [`TOOLS/PLC_CSV_SNAPSHOT/codesys_console/config.json`](codesys_console/config.json).
+- **Déploiement / Mise à jour dans CODESYS** :
+  Copier simplement ce fichier `config.json` vers le dossier Script Commands de CODESYS :
+  - Soit `C:\Program Files\CODESYS 3.5.19.10\CODESYS\Script Commands\config.json` (système, demande confirmation admin)
+  - Soit `%LocalAppData%\CODESYS\Script Commands\config.json` (utilisateur, sans droits admin)
 - **Raccourci clavier** : `Ctrl + W` configuré pour déclencher immédiatement `codesys_snapshot_troubleshooting.py` (export instantané de `GVL_Troubleshooting` vers `RESULTS/snapshot/`).
+- **Guide complet de configuration IDE** : voir [`DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md §6`](../../DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md).
 
 ## 🅱️ Mode B — scripts `external_python/`, pour plus tard (test sur site avec HW réel)
 
