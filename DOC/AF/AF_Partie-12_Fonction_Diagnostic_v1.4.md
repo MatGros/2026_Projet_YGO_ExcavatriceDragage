@@ -49,7 +49,7 @@
 | [`FB_Diag_IhmHeartbeat`](AF_Partie-12_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.0.md) | `FB_Diag_IhmHeartbeat` | Surveillance bidirectionnelle IHM↔PLC |
 
 > 📌 `FB_Acquisition_Preflight` (qualification E/S machine arrêtée) est documenté dans
-> [`AF_Partie-06`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.2.md).
+> [`AF_Partie-06`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.3.md).
 > `FB_Winch_Symmetry` (mesure M1/M2) est documenté dans
 > [`AF_Partie-10`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.1.md).
 
@@ -196,7 +196,7 @@ bit-level complet, synthèse par nibble et impact déplacés dans
 
 ### FB_Acquisition_Preflight (PreflightErrorId)
 
-> Documenté dans [`AF_Partie-06`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.2.md) — 16 bits de qualification E/S machine arrêtée.
+> Documenté dans [`AF_Partie-06`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.3.md) — 16 bits de qualification E/S machine arrêtée.
 
 ### FB_Winch_Symmetry
 

@@ -48,13 +48,12 @@ END_VAR
 VAR
     // === TRIGGERS & ETATS INTERNES ===
     ExecuteEdge             : R_TRIG;       // . [LOC] Trigger front montant Execute
-    BootPending             : BOOL := TRUE; // . [LOC] Demande preflight initiale au demarrage
     RequestPending          : BOOL;         // . [LOC] Demande de verdict en attente
 END_VAR
 
 {region "§1 Gate et demande"}
 ExecuteEdge(CLK := Execute);
-RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
+RequestPending := RequestPending OR ExecuteEdge.Q;
 PreflightBusy := RequestPending AND NOT MachineIsStill;
 IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
 IF NOT RequestPending THEN RETURN; END_IF;
@@ -85,5 +84,5 @@ IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightError
 {endregion}
 
 {region "§3 Sortie"}
-PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
+PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; RequestPending := FALSE;
 {endregion}

@@ -1,4 +1,4 @@
-# Fiche `FB_Acquisition_Preflight` — v1.2
+# Fiche `FB_Acquisition_Preflight` — v1.3
 
 ## 🎯 Rôle et périmètre
 
@@ -23,7 +23,7 @@
 
 | ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
 |---|---|---|---|---|---|---|---|
-| `F06.01` | Établir un verdict préflight passif | Au démarrage puis sur front `Execute`, attend l'immobilité machine, agrège 16 contrôles et publie `PreflightOk`, `PreflightDone`, `PreflightBusy`, `PreflightErrorId`. | `FB_Acquisition_Preflight` + `PRG_07_Supervision` | 🔵 C2 | <nobr><code>TC-P06-007</code></nobr> | ✅ code lu | `NV-I` |
+| `F06.01` | Établir un verdict préflight passif | Sur front `Execute` (demande IHM `GVL_IHM.Commun.Preflight.BtnRun`) uniquement, attend l'immobilité machine, agrège 16 contrôles et publie `PreflightOk`, `PreflightDone`, `PreflightBusy`, `PreflightErrorId`. Aucun verdict automatique au démarrage automate. | `FB_Acquisition_Preflight` + `PRG_07_Supervision` | 🔵 C2 | <nobr><code>TC-P06-007</code></nobr> | ✅ code lu | `NV-I` |
 
 ## 🧪 2 · Points de validation
 
@@ -31,7 +31,7 @@
 
 | <nobr>ID Unique</nobr> | Groupe | Comportement attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
 |---|---|---|---|---|---|
-| <nobr><code>TC-P06-007</code></nobr> | **Preflight passif** | Au boot ou front IHM, tant que la machine n'est pas immobile : `PreflightBusy=TRUE` et aucun verdict final. Une fois immobile, les 16 bits sont agrégés et `PreflightOk=(PreflightErrorId=0)`. | <nobr><code>💻 AUTO_PLC</code></nobr> | <small><code>FB_Acquisition_Preflight</code><br><code>PRG_07_Supervision</code></small> | `NV-I` |
+| <nobr><code>TC-P06-007</code></nobr> | **Preflight passif** | Sans front `Execute`, `PreflightDone` reste `FALSE` (aucun verdict au démarrage). Sur front `Execute`, tant que la machine n'est pas immobile : `PreflightBusy=TRUE` et aucun verdict final. Une fois immobile, les 16 bits sont agrégés et `PreflightOk=(PreflightErrorId=0)`. | <nobr><code>💻 AUTO_PLC</code></nobr> | <small><code>FB_Acquisition_Preflight</code><br><code>PRG_07_Supervision</code></small> | `NV-I` |
 
 ## 🔄 3 · Pipeline et intégration
 
@@ -80,7 +80,7 @@ flowchart TD
 
 ## ⚙️ 5 · Verdict et masque défaut
 
-Le boot génère une première demande. Chaque front montant `Execute` en génère une autre. Une demande reste mémorisée tant que `MachineIsStill=FALSE` ; le FB met alors `PreflightBusy=TRUE` et ne publie pas de nouveau verdict. Dès l'immobilité confirmée, il reconstruit `PreflightErrorId`, puis publie `PreflightOk`, `PreflightDone` et remet la demande à zéro.
+Chaque front montant `Execute` (déclenché par l'opérateur depuis l'IHM, `GVL_IHM.Commun.Preflight.BtnRun`) génère une demande de verdict. Sans front `Execute`, aucune demande n'est créée : `PreflightDone` reste `FALSE`. Une demande reste mémorisée tant que `MachineIsStill=FALSE` ; le FB met alors `PreflightBusy=TRUE` et ne publie pas de nouveau verdict. Dès l'immobilité confirmée, il reconstruit `PreflightErrorId`, puis publie `PreflightOk`, `PreflightDone` et remet la demande à zéro.
 
 | Bits | Contrôle |
 |---|---|
@@ -96,7 +96,8 @@ Le boot génère une première demande. Chaque front montant `Execute` en génè
 
 ## 📜 7 · Suivi historique
 
-- **v1.2 (2026-08-26)** : mise en conformité AF ; ajout F06.01, TC-P06-007, pipeline et état de décision/implémentation. Le verdict au boot est un contrôle normal de l'état initial ; le retour M3 existant mais non câblé au Preflight est tracé.
+- **v1.3 (2026-08-26)** : décision actée — le verdict préflight n'est plus déclenché automatiquement au démarrage automate (`BootPending` retiré du code) ; il ne se produit que sur demande explicite opérateur via l'IHM (front `Execute`, déjà câblé sur `GVL_IHM.Commun.Preflight.BtnRun` depuis `PRG_07_Supervision`, non modifié). Contrat : `TASK_CONTRACT_PREFLIGHT_DECLENCHEMENT_IHM.yaml`.
+- **v1.2 (2026-08-26)** : mise en conformité AF ; ajout F06.01, TC-P06-007, pipeline et état de décision/implémentation. Le retour M3 existant mais non câblé au Preflight est tracé.
 - **v1.1** : version précédente (voir `ARCHIVES/Doc/`).
 
 ## ❓ 8 · TBD

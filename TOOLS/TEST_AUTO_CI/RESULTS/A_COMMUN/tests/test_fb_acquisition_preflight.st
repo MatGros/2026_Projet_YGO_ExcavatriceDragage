@@ -4,7 +4,7 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'BootPending declenche automatiquement un verdict au 1er scan si la machine est deja a l arret'
+TEST 'Sans front Execute, aucun verdict n est produit au demarrage (BootPending retire)'
     fb(EXECUTE := FALSE, MACHINEISSTILL := TRUE,
        M1BRAKEAPPLIED := TRUE, M2BRAKEAPPLIED := TRUE, M3BRAKEAPPLIED := TRUE,
        M1CONTACTORSRELEASED := TRUE, M2CONTACTORSRELEASED := TRUE,
@@ -13,13 +13,36 @@ TEST 'BootPending declenche automatiquement un verdict au 1er scan si la machine
        EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE,
        ENCODERM1OPERATIONAL := TRUE, ENCODERM2OPERATIONAL := TRUE,
        HOMEDM1 := TRUE, HOMEDM2 := TRUE, M1POSITIONINBOUNDS := TRUE, M2POSITIONINBOUNDS := TRUE);
-    ASSERT_TRUE(fb.PREFLIGHTDONE, 'BootPending force un verdict des le 1er scan, sans attendre un front Execute');
+    ASSERT_FALSE(fb.PREFLIGHTDONE, 'aucun front Execute -> aucun verdict, meme machine immobile');
+    ASSERT_FALSE(fb.PREFLIGHTBUSY, 'aucune demande en attente sans front Execute');
+END_TEST
+
+TEST 'Un front Execute machine immobile produit le verdict au meme scan'
+    fb(EXECUTE := TRUE, MACHINEISSTILL := TRUE,
+       M1BRAKEAPPLIED := TRUE, M2BRAKEAPPLIED := TRUE, M3BRAKEAPPLIED := TRUE,
+       M1CONTACTORSRELEASED := TRUE, M2CONTACTORSRELEASED := TRUE,
+       M1THERMALOK := TRUE, M2THERMALOK := TRUE, BRAKETHERMALOK := TRUE, PHASEROTATIONOK := TRUE,
+       SLACKCABLETENSIONED := TRUE, M3SENSORWORDINCOHERENT := FALSE,
+       EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE,
+       ENCODERM1OPERATIONAL := TRUE, ENCODERM2OPERATIONAL := TRUE,
+       HOMEDM1 := TRUE, HOMEDM2 := TRUE, M1POSITIONINBOUNDS := TRUE, M2POSITIONINBOUNDS := TRUE);
+    ASSERT_TRUE(fb.PREFLIGHTDONE, 'front Execute + machine immobile -> verdict produit');
     ASSERT_TRUE(fb.PREFLIGHTOK, 'toutes les conditions saines -> verdict OK');
     ASSERT_EQ(fb.PREFLIGHTERRORID, 0, 'aucun defaut -> ErrorId a 0');
 END_TEST
 
 TEST 'Execute pendant que la machine roule differe le verdict jusqu a l arret complet'
-    (* scan 1 : verdict boot consomme (machine deja a l arret), etat propre pour la suite *)
+    (* scan 1 : front Execute demande un preflight, machine deja a l arret, etat propre pour la suite *)
+    fb(EXECUTE := TRUE, MACHINEISSTILL := TRUE,
+       M1BRAKEAPPLIED := TRUE, M2BRAKEAPPLIED := TRUE, M3BRAKEAPPLIED := TRUE,
+       M1CONTACTORSRELEASED := TRUE, M2CONTACTORSRELEASED := TRUE,
+       M1THERMALOK := TRUE, M2THERMALOK := TRUE, BRAKETHERMALOK := TRUE, PHASEROTATIONOK := TRUE,
+       SLACKCABLETENSIONED := TRUE, M3SENSORWORDINCOHERENT := FALSE,
+       EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE,
+       ENCODERM1OPERATIONAL := TRUE, ENCODERM2OPERATIONAL := TRUE,
+       HOMEDM1 := TRUE, HOMEDM2 := TRUE, M1POSITIONINBOUNDS := TRUE, M2POSITIONINBOUNDS := TRUE);
+
+    (* scan 1bis : Execute retombe, pour que le prochain front soit bien detecte *)
     fb(EXECUTE := FALSE, MACHINEISSTILL := TRUE,
        M1BRAKEAPPLIED := TRUE, M2BRAKEAPPLIED := TRUE, M3BRAKEAPPLIED := TRUE,
        M1CONTACTORSRELEASED := TRUE, M2CONTACTORSRELEASED := TRUE,
@@ -55,7 +78,7 @@ TEST 'Execute pendant que la machine roule differe le verdict jusqu a l arret co
 END_TEST
 
 TEST 'Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant'
-    fb(EXECUTE := FALSE, MACHINEISSTILL := TRUE,
+    fb(EXECUTE := TRUE, MACHINEISSTILL := TRUE,
        M1BRAKEAPPLIED := FALSE, M2BRAKEAPPLIED := TRUE, M3BRAKEAPPLIED := TRUE,
        M1CONTACTORSRELEASED := TRUE, M2CONTACTORSRELEASED := TRUE,
        M1THERMALOK := TRUE, M2THERMALOK := TRUE, BRAKETHERMALOK := TRUE, PHASEROTATIONOK := TRUE,
@@ -69,7 +92,7 @@ END_TEST
 
 TEST 'Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple)'
     (* seule condition du FB qui n est pas un simple "NOT X" -- verifie explicitement *)
-    fb(EXECUTE := FALSE, MACHINEISSTILL := TRUE,
+    fb(EXECUTE := TRUE, MACHINEISSTILL := TRUE,
        M1BRAKEAPPLIED := TRUE, M2BRAKEAPPLIED := TRUE, M3BRAKEAPPLIED := TRUE,
        M1CONTACTORSRELEASED := TRUE, M2CONTACTORSRELEASED := TRUE,
        M1THERMALOK := TRUE, M2THERMALOK := TRUE, BRAKETHERMALOK := TRUE, PHASEROTATIONOK := TRUE,

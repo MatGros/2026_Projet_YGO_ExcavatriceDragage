@@ -18,7 +18,7 @@ contract:
   scope:
     allowed:
       - CODE/A_COMMUN/FB_Acquisition_Preflight.st
-      - DOC/AF/AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.2.md
+      - DOC/AF/AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.3.md
       - DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
       - TOOLS/TEST_AUTO_CI/
       - CODE/CODE_Bundle.xml
@@ -40,13 +40,23 @@ contract:
     - "omni/cx/gpt-5.6-terra"
   alert_duty: >
     Tout écart de contrat, de liaison ou de sécurité constaté hors périmètre est signalé sans étendre le patch.
-status: IN_PROGRESS
+status: DONE
 execution:
-  executed_by: "Codex"
-  completed_at: ""
-  status: PENDING
-  summary: ""
-  evidence_submitted: []
+  executed_by: "Claude"
+  completed_at: "2026-08-26T00:00:00+02:00"
+  status: DONE
+  summary: >
+    BootPending retiré de FB_Acquisition_Preflight.st (le verdict n'est plus déclenché qu'au front
+    Execute, déjà câblé sur GVL_IHM.Commun.Preflight.BtnRun via PRG_07_Supervision, non modifié).
+    Fiche bumpée v1.2→v1.3 (renommage + 4 liens entrants corrigés dans AF-06 et AF-12). Chapô AF-06
+    TC-P06-007 mis à jour. Test unitaire test_fb_acquisition_preflight.st réécrit (2 tests remplacés,
+    3 tests ajustés pour piloter Execute explicitement) — 5/5 PASS. Bundle régénéré, G200 liaison
+    PASS (0 erreur), 16/16 gates palier C PASS.
+  evidence_submitted:
+    - "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . -> PASS (bundle frais)"
+    - "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report -> PASS (0 erreur)"
+    - "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C -> 16/16 PASS"
+    - "python -m pytest TOOLS/TEST_AUTO_CI/TEST_AUTO_CI_UNITARY/A_COMMUN/test_unitaires.py -k Preflight -> 5/5 PASS"
 validation:
   status: APPROVED
   validated_by: "Humain"

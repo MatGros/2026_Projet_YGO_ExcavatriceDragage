@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 18:43:03</div>
+    <div class="exec-time">2026-08-26 21:38:26</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (4 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-0">BootPending declenche automatiquement un verdict au 1er scan si la machine est deja a l arret</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-1">Execute pendant que la machine roule differe le verdict jusqu a l arret complet</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-2">Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-3">Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple)</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-0">Sans front Execute, aucun verdict n est produit au demarrage (BootPending retire)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-1">Un front Execute machine immobile produit le verdict au meme scan</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-2">Execute pendant que la machine roule differe le verdict jusqu a l arret complet</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-3">Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-4">Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            4/4 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -231,7 +231,7 @@
         <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Acquisition_Preflight</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 21 flux entrants · 4 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ExecuteEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BootPending <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ExecuteEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
@@ -440,8 +440,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Acquisition_Preflight</code></td>
                 <td>21</td><td>4</td>
-                <td>0</td><td>3</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>2</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -454,30 +454,40 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-acquisition-preflight-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>BootPending declenche automatiquement un verdict au 1er scan si la machine est deja a l arret </h3>
+                <h3>Sans front Execute, aucun verdict n est produit au demarrage (BootPending retire) </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>BootPending force un verdict des le 1er scan, sans attendre un front Execute</li><li>toutes les conditions saines -&gt; verdict OK</li><li>aucun defaut -&gt; ErrorId a 0</li></ul></details>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>aucun front Execute -&gt; aucun verdict, meme machine immobile</li><li>aucune demande en attente sans front Execute</li></ul></details>
             
             
         </article>
         <article id="test-fb-acquisition-preflight-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>Execute pendant que la machine roule differe le verdict jusqu a l arret complet </h3>
+                <h3>Un front Execute machine immobile produit le verdict au meme scan </h3>
             </header>
-            <div class="comments"><p class='comment'>scan 1 : verdict boot consomme (machine deja a l arret), etat propre pour la suite</p><p class='comment'>scan 2 : operateur demande un nouveau preflight (front Execute) PENDANT que la machine roule</p><p class='comment'>scan 3 : la machine s arrete, le verdict differe se calcule enfin</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>demande en attente tant que la machine roule</li><li>pas de verdict tant que la machine n est pas a l arret complet</li><li>machine arretee : le verdict differe se calcule</li><li>plus de demande en attente une fois le verdict rendu</li></ul></details>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>front Execute + machine immobile -&gt; verdict produit</li><li>toutes les conditions saines -&gt; verdict OK</li><li>aucun defaut -&gt; ErrorId a 0</li></ul></details>
             
             
         </article>
         <article id="test-fb-acquisition-preflight-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Execute pendant que la machine roule differe le verdict jusqu a l arret complet </h3>
+            </header>
+            <div class="comments"><p class='comment'>scan 1 : front Execute demande un preflight, machine deja a l arret, etat propre pour la suite</p><p class='comment'>scan 1bis : Execute retombe, pour que le prochain front soit bien detecte</p><p class='comment'>scan 2 : operateur demande un nouveau preflight (front Execute) PENDANT que la machine roule</p><p class='comment'>scan 3 : la machine s arrete, le verdict differe se calcule enfin</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>demande en attente tant que la machine roule</li><li>pas de verdict tant que la machine n est pas a l arret complet</li><li>machine arretee : le verdict differe se calcule</li><li>plus de demande en attente une fois le verdict rendu</li></ul></details>
+            
+            
+        </article>
+        <article id="test-fb-acquisition-preflight-3" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant </h3>
@@ -487,7 +497,7 @@
             
             
         </article>
-        <article id="test-fb-acquisition-preflight-3" class="test-card test-card-pass">
+        <article id="test-fb-acquisition-preflight-4" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple) </h3>
@@ -507,7 +517,7 @@
         <summary>Code source ST original (1)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Acquisition_Preflight.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Acquisition_Preflight.st</code></summary>
                 <pre>(* =======================================================================
    📊 FB_Acquisition_Preflight — Verdict passif machine arrêtée
    ───────────────────────────────────────────────────────────────
@@ -558,13 +568,12 @@ END_VAR
 VAR
     // === TRIGGERS &amp; ETATS INTERNES ===
     ExecuteEdge             : R_TRIG;       // . [LOC] Trigger front montant Execute
-    BootPending             : BOOL := TRUE; // . [LOC] Demande preflight initiale au demarrage
     RequestPending          : BOOL;         // . [LOC] Demande de verdict en attente
 END_VAR
 
 {region &quot;§1 Gate et demande&quot;}
 ExecuteEdge(CLK := Execute);
-RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
+RequestPending := RequestPending OR ExecuteEdge.Q;
 PreflightBusy := RequestPending AND NOT MachineIsStill;
 IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
 IF NOT RequestPending THEN RETURN; END_IF;
@@ -595,7 +604,7 @@ IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightError
 {endregion}
 
 {region &quot;§3 Sortie&quot;}
-PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
+PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; RequestPending := FALSE;
 {endregion}
 </pre>
             </details>
@@ -605,13 +614,14 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
         <pre>STruC++ Test Runner v1.0
 
 test_fb_acquisition_preflight.st
-  [PASS] BootPending declenche automatiquement un verdict au 1er scan si la machine est deja a l arret
+  [PASS] Sans front Execute, aucun verdict n est produit au demarrage (BootPending retire)
+  [PASS] Un front Execute machine immobile produit le verdict au meme scan
   [PASS] Execute pendant que la machine roule differe le verdict jusqu a l arret complet
   [PASS] Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant
   [PASS] Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple)
 
 -----------------------------------------
-4 tests, 4 passed, 0 failed
+5 tests, 5 passed, 0 failed
 </pre>
     </details>
 </div>

@@ -42,7 +42,7 @@
 | <nobr><code>TC-P06-004</code></nobr> | Diag CANopen/EtherCAT publié en ligne | Statuts dispos pour Modes/Safety/IHM | `💻 AUTO` | <small>§4</small> | `NV` |
 | <nobr><code>TC-P06-005</code></nobr> | Noms des signaux de puissance validés | `PowerKeepAlive_A/B_RQ`, `EmergencyChainClosed_DI` | `🟢 SITE` | <small>§5</small> | `NV` |
 | <nobr><code>TC-P06-006</code></nobr> | Écriture des sorties physiques centralisée | `PRG_06_Outputs` seul producteur final | `💻 AUTO` | <small>§6</small> | `NV` |
-| <nobr><code>TC-P06-007</code></nobr> | Preflight passif machine arrêtée | Au boot ou front IHM, verdict 16 bits uniquement après immobilité ; publication IHM sans action machine | `💻 AUTO_PLC` | <small>§7 / FB_Acquisition_Preflight</small> | `NV-I` |
+| <nobr><code>TC-P06-007</code></nobr> | Preflight passif machine arrêtée | Sur front `Execute` (demande IHM) uniquement — aucun verdict automatique au démarrage automate — verdict 16 bits après immobilité ; publication IHM sans action machine | `💻 AUTO_PLC` | <small>§7 / FB_Acquisition_Preflight</small> | `NV-I` |
 
 ---
 
@@ -446,7 +446,7 @@ Ces signaux sont directement projetés dans `GVL_IHM` via `ST_SafetyWinch` (`M1T
 
 | Fiche | FB | Contenu |
 |---|---|---|
-| [`FB_Acquisition_Preflight`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.2.md) | `FB_Acquisition_Preflight` | Verdict passif : 16 contrôles de cohérence E/S machine arrêtée |
+| [`FB_Acquisition_Preflight`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.3.md) | `FB_Acquisition_Preflight` | Verdict passif : 16 contrôles de cohérence E/S machine arrêtée |
 
 `FB_Acquisition_Preflight` vérifie 16 conditions mécaniques/électriques quand la machine est
 arrêtée. Observateur pur : aucune écriture de commande, sécurité ou mouvement.
@@ -475,7 +475,7 @@ Instance : `PRG_07_Supervision.instPreflight` (ST pur, en lecture seule stricte)
 | Version | Date | Changement |
 |---|---|---|
 | v2.4 (fix) | 2026-08-26 | Revue de cohérence croisée AF-01→14 (sous-agent) : §3ter « point de vigilance ordonnancement » contredisait AF09 §8 sur l'emplacement de `FB_Encoder_Homing` (rang 04/Treuils vs façade unique `PRG_02_Acquisition`) — corrigé pour refléter l'architecture actée 2026-08-25 (AF09 §8), référence morte « AF09 §4.2 » retirée |
-| v2.4 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié (incluant désormais 3bis/3ter/4bis, absents), section `🎯 Rôle et périmètre` explicite, Suivi historique ajouté, renumérotation complète (chapô + réfs `§N` cascadées), lien mort corrigé vers `FB_Acquisition_Preflight_v1.2.md` (citait v1.0, inexistant), référence `FB_Input` ajoutée en Documents liés. **Correctifs de fond majeurs** (review sous-agent expert automatisme, vérifiés contre le code) : §3bis-nommé-§3ter « Corrigé par conception » **infirmé** — `PRG_03_Modes_Cycle.st:43` ne consomme pas `EncoderIncoherent` (câblé sur `DeviceState` seul), le bug P0 original reste possible côté Modes, marqué ⛔ non résolu (pas juste un souci doc) ; `FB_Safety_Winch` bit `ErrorId` corrigé bit2→bit1 et clarifié qu'il ne consomme pas non plus `EncoderIncoherent` ; §5 : nom fichier CSV corrigé (`20260806`→`20260814`), 3 noms de TOR corrigés (`BrakeThermalOk_DI`→`M1_M2_M3_BrakeThermalOk_DI`, `M1_M2_KoboldContactFond_DI`→`M1_M2_KoboldBottomTouch_DI`, `M3_ThermalFeedback_DI`→`M3_ThermalOK_DI` + domaine Winch→Translation), 23e champ `HopperFull_OR_GateRaised_DI` (non câblé) signalé absent de la liste ; réf stale `AF_Partie-11 §4` retirée de `FB_Acquisition_Preflight` (section inexistante) |
+| v2.4 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié (incluant désormais 3bis/3ter/4bis, absents), section `🎯 Rôle et périmètre` explicite, Suivi historique ajouté, renumérotation complète (chapô + réfs `§N` cascadées), lien mort corrigé vers `FB_Acquisition_Preflight_v1.3.md` (citait v1.0, inexistant), référence `FB_Input` ajoutée en Documents liés. **Correctifs de fond majeurs** (review sous-agent expert automatisme, vérifiés contre le code) : §3bis-nommé-§3ter « Corrigé par conception » **infirmé** — `PRG_03_Modes_Cycle.st:43` ne consomme pas `EncoderIncoherent` (câblé sur `DeviceState` seul), le bug P0 original reste possible côté Modes, marqué ⛔ non résolu (pas juste un souci doc) ; `FB_Safety_Winch` bit `ErrorId` corrigé bit2→bit1 et clarifié qu'il ne consomme pas non plus `EncoderIncoherent` ; §5 : nom fichier CSV corrigé (`20260806`→`20260814`), 3 noms de TOR corrigés (`BrakeThermalOk_DI`→`M1_M2_M3_BrakeThermalOk_DI`, `M1_M2_KoboldContactFond_DI`→`M1_M2_KoboldBottomTouch_DI`, `M3_ThermalFeedback_DI`→`M3_ThermalOK_DI` + domaine Winch→Translation), 23e champ `HopperFull_OR_GateRaised_DI` (non câblé) signalé absent de la liste ; réf stale `AF_Partie-11 §4` retirée de `FB_Acquisition_Preflight` (section inexistante) |
 | v2.3 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
 ## ❓ 9 · TBD
@@ -499,7 +499,7 @@ Instance : `PRG_07_Supervision.instPreflight` (ST pur, en lecture seule stricte)
 - Partie 01 : AU, `PowerKeepAlive`, rearmement.
 - Partie 02 : architecture cible 7 POU — `PRG_02_Acquisition` et `PRG_06_Outputs`.
 - Partie 08 : traitement joystick.
-- Sous-fiche [`FB_Acquisition_Preflight_v1.2.md`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.2.md) : détail des 16 contrôles préflight.
+- Sous-fiche [`FB_Acquisition_Preflight_v1.3.md`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.3.md) : détail des 16 contrôles préflight.
 - Sous-fiche [`FB_Input_v1.2.md`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Input_v1.2.md) : statut de retrait contrôlé (déprécié, non supprimé).
 - Partie 09 : homing et vitesse codeur.
 - Partie 13 : simulation.
