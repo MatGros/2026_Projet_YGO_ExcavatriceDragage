@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
       - FB_Sim_Encoder (instM1, instM2)

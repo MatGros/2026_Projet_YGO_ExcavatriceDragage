@@ -11,7 +11,7 @@
    🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
       aucune sortie réelle. Un override manuel valide est appliqué par
       FB_SimBench, pas par ce FB.
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
              DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ═══════════════════════════════════════════════════════════════ *)
 
