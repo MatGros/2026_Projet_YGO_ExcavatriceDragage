@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
    🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    ======================================================================= *)
 
 TYPE ST_EncoderMeasurement :

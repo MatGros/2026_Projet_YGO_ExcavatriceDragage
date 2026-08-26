@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.860769" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.860769">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T20:37:25.420934" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T20:37:25.420934">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -473,7 +473,7 @@ ErrorId bit0: "Com", bit1: "Preset Timeout".</xhtml>
    🎯 Rôle : Accès bus EtherCAT, extraction positions brutes et séquence de Preset SDO
    🔒 Polarité : EncoderAvailable=TRUE si communication bus et esclave OK
    🔌 Architecture : Module d'acquisition codeur absolu
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===</xhtml>
           </documentation>

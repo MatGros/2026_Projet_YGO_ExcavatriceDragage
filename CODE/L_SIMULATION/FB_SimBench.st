@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
       - FB_Sim_Encoder (instM1, instM2)
@@ -32,7 +32,7 @@ VAR_INPUT
     M1_SpeedContactor_2        : BOOL;   (* --> [HW] Contacteur palier 2 M1 *)
     M1_SpeedContactor_3        : BOOL;   (* --> [HW] Contacteur palier 3 M1 *)
     M1_SpeedContactor_4        : BOOL;   (* --> [HW] Contacteur palier 4 M1 *)
-    M1_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M1 *)
+    M1_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M1 *)
     M1_StepNumber              : INT;    (* --> [CMD] Palier vitesse courant M1 (1..5) *)
     M1_PresetTriggerCmd        : WORD;   (* --> [CMD] Trigger preset M1 *)
     M1_PresetValueOut          : UDINT;   (* --> [CFG] Valeur preset M1 *)
@@ -44,14 +44,14 @@ VAR_INPUT
     M2_SpeedContactor_2        : BOOL;   (* --> [HW] Contacteur palier 2 M2 *)
     M2_SpeedContactor_3        : BOOL;   (* --> [HW] Contacteur palier 3 M2 *)
     M2_SpeedContactor_4        : BOOL;   (* --> [HW] Contacteur palier 4 M2 *)
-    M2_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M2 *)
+    M2_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M2 *)
     M2_StepNumber              : INT;    (* --> [CMD] Palier vitesse courant M2 (1..5) *)
     M2_PresetTriggerCmd        : WORD;   (* --> [CMD] Trigger preset M2 *)
     M2_PresetValueOut          : UDINT;   (* --> [CFG] Valeur preset M2 *)
     M2_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M2 *)
 
     M3_Direction               : INT;              (* --> [CMD] 1 = Avant, -1 = Arrière, 0 = Arrêt *)
-    M3_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M3 *)
+    M3_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M3 *)
     M3_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M3 *)
 
     PowerKeepAlive_A           : BOOL;             (* --> [SAFE] TRUE = relais A maintenu sagement par le PLC *)
@@ -233,7 +233,7 @@ M3_RelayRev := (M3_Direction = -1);
 instSimTranslation(
     Enable          := TRUE,
     Direction       := M3_Direction,
-    SpeedRefPct     := M3_SpeedRefPct,
+    SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS
 );
 
@@ -267,7 +267,7 @@ Translation.M3_ThermalOK_DI      := TRUE;
 // aucune régression de mouvement possible.
 IF (M3_Direction <> 0) THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
-    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedRefPct * 50.0); // 50.0 Hz à 100% (x100 -> 5000)
+    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedCmd_Pct * 50.0); // 50.0 Hz à 100% (x100 -> 5000)
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
     M3_ActualFreqHz  := 0;

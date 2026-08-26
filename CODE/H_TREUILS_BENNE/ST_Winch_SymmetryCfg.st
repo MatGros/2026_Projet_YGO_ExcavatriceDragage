@@ -2,7 +2,7 @@
    ⚖️ ST_Winch_SymmetryCfg — Configuration des seuils de symétrie M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 TYPE ST_Winch_SymmetryCfg :
 STRUCT

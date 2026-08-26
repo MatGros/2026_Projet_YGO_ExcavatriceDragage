@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.987605" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.987605">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T09:54:05.136692" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T09:54:05.136692">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -285,7 +285,7 @@
       et le diagnostic TranslationSafety publiés par PRG_05_Translation vers
       les consommateurs (PRG_03/06/07).
    📤 Producteur unique : PRG_05_Translation (VAR_OUTPUT Data : ST_TranslationInterPrg).
-   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -374,14 +374,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Positionneur : cible sélectionnée atteinte (non mémorisé)</xhtml>
               </documentation>
             </variable>
-            <variable name="JoystickDeflection_Pct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Axe X fonctionnel -100..+100 %, 0 = neutre ; animation IHM M3</xhtml>
-              </documentation>
-            </variable>
             <variable name="DriveActualFreq_Hz">
               <type>
                 <REAL />
@@ -398,12 +390,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Mot de commande AC600 réellement appliqué</xhtml>
               </documentation>
             </variable>
-            <variable name="DriveFreqRef_Hz">
+            <variable name="DriveFreqCmd_Hz">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence réellement appliquée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Commande fréquence réellement appliquée</xhtml>
               </documentation>
             </variable>
             <variable name="ActiveDirection">
@@ -414,12 +406,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveSpeedRef_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Consigne active après arbitrage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande active après arbitrage (0.0 à 100.0 %)</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockState">
@@ -427,7 +419,7 @@
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">
@@ -834,7 +826,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
    📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §2
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -992,7 +984,7 @@
                 <INT />
               </type>
             </variable>
-            <variable name="M3_SpeedRef_Active">
+            <variable name="M3_SpeedCmd_Active">
               <type>
                 <REAL />
               </type>
@@ -1117,7 +1109,7 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 5 (après PRG_04_Treuils_Benne).
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
-   📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🛡️ Sécurité : instSafetyTranslationM3 (FB_Safety_Translation) câblée en parallèle
       de instTranslationM3 — SafeStop/PowerCutOff réels.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -1215,7 +1207,7 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
     // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
     IF M3_StartStop_Active THEN
-        M3_SpeedRef_Active := 100.0;
+        M3_SpeedCmd_Active := 100.0;
         // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
         IF SelTarget = 1 THEN
             M3_Direction_Active := 1;
@@ -1223,7 +1215,7 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
             M3_Direction_Active := -1;
         END_IF;
     ELSE
-        M3_SpeedRef_Active := 0.0;
+        M3_SpeedCmd_Active := 0.0;
         M3_Direction_Active := 0;
     END_IF;
 ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
@@ -1255,7 +1247,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
                   100.0,
                   (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz &gt; 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
     // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
-    M3_SpeedRef_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
+    M3_SpeedCmd_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
                               FreqPct,
                               (PRG_02_Acquisition.Data.JoystickSpeedPctX / 100.0) * FreqPct);
 ELSE
@@ -1263,13 +1255,13 @@ ELSE
     SelTarget    := 0;
     M3_StartStop_Active  := FALSE;
     M3_Direction_Active  := 0;
-    M3_SpeedRef_Active   := 0.0;
+    M3_SpeedCmd_Active   := 0.0;
 END_IF;
 
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
 // de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
 
-M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
+M3_SpeedCmd_Active := LIMIT(0.0, ABS(M3_SpeedCmd_Active), 100.0);
 
 IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
     SelTarget := 0;
@@ -1366,7 +1358,7 @@ instTranslationM3(
     SafeStop                := M3_SafeStop_Aggregate,
     Direction               := M3_Direction_Active,
     InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
-    SpeedRefPct             := M3_SpeedRef_Active,
+    SpeedTgt_Pct            := M3_SpeedCmd_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.Data.TranslationPosPV,
     // Les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
@@ -1450,13 +1442,13 @@ TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
 TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationState.PositionReached := instTranslationM3.TargetReached;
 TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
-TranslationState.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
-// 🎯 Cohérence sim : ActiveDirection/ActiveSpeedRef_Pct n'affichent la
+TranslationState.DriveFreqCmd_Hz := instTranslationM3.RequestedDriveFreqHz;
+// 🎯 Cohérence sim : ActiveDirection/SpeedCmd_Pct n'affichent la
 // consigne QUE si la commande variateur est réellement émise (RequestedDriveControlWord &lt;&gt; 0).
 // Sinon, un interlock bloquant (hauteur, SafeStop…) laisserait l'IHM suggérer un mouvement
 // qui n'a pas lieu ("je bouge mais ça bouge pas"). Affiche 0 quand c'est bloqué.
 TranslationState.ActiveDirection := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_Direction_Active, 0);
-TranslationState.ActiveSpeedRef_Pct := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_SpeedRef_Active, 0.0);
+TranslationState.SpeedCmd_Pct := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_SpeedCmd_Active, 0.0);
 TranslationState.PositionTremie := PRG_02_Acquisition.Data.TranslationPosTremie;
 TranslationState.PositionPV := PRG_02_Acquisition.Data.TranslationPosPV;
 TranslationState.PositionP2 := PRG_02_Acquisition.Data.TranslationPosP2;
@@ -1477,7 +1469,6 @@ TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
-TranslationState.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
 TranslationState.FinalInterlockState := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.State;
 TranslationState.FinalInterlockReason := PRG_06_Outputs.instTranslationOutputInterlockM3.Reason;
 TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.Error;
@@ -1999,7 +1990,7 @@ ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM a
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    Rôle : Surveillance joystick, bus EtherCAT, rotation de phases,
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt),
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -2278,7 +2269,7 @@ Status.State := E_State.READY;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -2748,7 +2739,7 @@ DriveActualFreqHz.</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -2825,8 +2816,8 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     IF NOT BypassLimitSwitch AND ((Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev)) THEN
         RampTargetPct := 0.0;
     ELSE
-        RampTargetPct := ABS(SpeedRefPct);
-        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedRefPct &gt; 0.0), la consigne est au moins égale à 1.0 Hz
+        RampTargetPct := ABS(SpeedTgt_Pct);
+        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedTgt_Pct &gt; 0.0), la consigne est au moins égale à 1.0 Hz
         IF RampTargetPct &gt; 0.0 THEN
             RampTargetPct := MAX(RampTargetPct, (1.0 / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
         END_IF;
@@ -3314,7 +3305,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §3
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
       la position estimée continue en mètres (0.0 m à la Trémie -&gt; +30.0 m à la Maintenance),
       avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.
@@ -3611,7 +3602,7 @@ ErrorId bit0: "incoherence retour contacteur".</xhtml>
    🎯 Rôle : Gestion temporisée ouverture/fermeture frein à manque de courant
    🔒 Polarité : Sécurité positive (BrakeCmd=FALSE = frein collé au repos)
    🔌 Interface : Double vérification retour contacteur (ST_ContactorCheck)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md §3
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -3794,7 +3785,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -3917,7 +3908,7 @@ TimeLast := TimeCurrent;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Limitation de variation anti-à-coups (%/s) sur signal analogique
    🔒 Polarité : Distingue l'éloignement de zéro (Accel) et le retour à zéro (Decel)
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §1 (TC-P11-040)
    =======================================================================</xhtml>
           </documentation>
         </interface>

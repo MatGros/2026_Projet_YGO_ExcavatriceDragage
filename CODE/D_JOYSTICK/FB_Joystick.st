@@ -9,7 +9,7 @@
                   Désarmement sur neutre prolongé ; le changement de mode / fin de
                   cycle benne est géré par l'externe via ArmingPermit (vue joystick).
    📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (F08.01, F08.03-F08.07)
    ===================================================================== *)
 
 FUNCTION_BLOCK FB_Joystick
@@ -54,9 +54,9 @@ VAR_OUTPUT
     // === MESURES & MIROIRS MAINTENANCE ===
     NeutralXAct               : INT;        // <-- [STAT] Point neutre X actuel pour IHM/Test
     NeutralYAct               : INT;        // <-- [STAT] Point neutre Y actuel pour IHM/Test
-    SpeedXPct                 : REAL;       // <-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef
+    SpeedTgtX_Pct             : REAL;       // <-- [STAT] Vitesse cible axe X signee (-100..+100 %), miroir AxisCmdX.SpeedTgt
     DirectionX                : INT;        // <-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdX.DirectionPositive/Negative
-    SpeedYPct                 : REAL;       // <-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef
+    SpeedTgtY_Pct             : REAL;       // <-- [STAT] Vitesse cible axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedTgt
     DirectionY                : INT;        // <-- [STAT] Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdY.DirectionPositive/Negative
     DeadmanArmed              : BOOL;       // <-- [STAT] Geste arme (bouton appuye au neutre) - IHM/diagnostic
     AtNeutral                 : BOOL;       // <-- [STAT] TRUE si les 2 axes sont en zone morte (position centrale)
@@ -87,7 +87,7 @@ VAR
     instCauses                : ARRAY[0..15] OF ST_FbCause;   // . [LOC] Liste des causes pour le socle FB_FbStatus
 END_VAR
 
-{region "S0 CAUSES + SOCLE (appele AVANT le gate)"}
+{region "§1 CAUSES + SOCLE (appele AVANT le gate)"}
 // 🎯 CAUSES exprimées en CLAIR (liste ST_FbCause) — plus de bitfield WORD.
 //    - CalibFail : fault à acquitter (IsWarning=FALSE).
 //    - RawOutOfRange / BusLost : warning auto-effacés (décision utilisateur).
@@ -136,15 +136,15 @@ ErrorId := Status.ErrorId;    // miroir
 Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT Error;
 {endregion}
 
-{region "S1 Gate securite (neutralisation pipeline, n efface pas le statut)"}
+{region "§2 Gate securite (neutralisation pipeline, n efface pas le statut)"}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0;
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
-    SpeedXPct := 0.0; DirectionX := 0;
-    SpeedYPct := 0.0; DirectionY := 0;
+    SpeedTgtX_Pct := 0.0; DirectionX := 0;
+    SpeedTgtY_Pct := 0.0; DirectionY := 0;
     Button := FALSE;
     AtNeutral := TRUE;
     DeadmanArmed := FALSE;
@@ -159,7 +159,7 @@ IF NOT Enable OR BusLost THEN
 END_IF;
 {endregion}
 
-{region "S2 Acquisition bouton + mise a l echelle"}
+{region "§3 Acquisition bouton + mise a l echelle"}
 Button := RawButton;
 
 // Mise a l'echelle (deadband) - le neutre s'evalue sur les 2 axes
@@ -168,7 +168,7 @@ ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic - position centrale
 {endregion}
 
-{region "S5 Armement homme mort"}
+{region "§4 Armement homme mort"}
 // Bouton homme-mort : armement par MAINTIEN (DeadmanArmHoldTime), independant de la position.
 DeadmanEdge(CLK := RawButton);
 IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
@@ -197,39 +197,39 @@ NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q, PT
 IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 {endregion}
 
-{region "S6 Pipeline axe X"}
+{region "§5 Pipeline axe X"}
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdX.SpeedRef := CmdXVal;
+AxisCmdX.SpeedTgt := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) > 0.1);
 
 AxisCmdX.DirectionPositive := (CmdXVal > 0.1);
 AxisCmdX.DirectionNegative := (CmdXVal < -0.1);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
-IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedRef := 0.0; END_IF;
+IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedXPct := AxisCmdX.SpeedRef;
+SpeedTgtX_Pct := AxisCmdX.SpeedTgt;
 IF AxisCmdX.DirectionPositive THEN DirectionX := 1;
 ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
 ELSE DirectionX := 0; END_IF;
 {endregion}
 
-{region "S7 Pipeline axe Y et sorties"}
+{region "§6 Pipeline axe Y et sorties"}
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdY.SpeedRef := CmdYVal;
+AxisCmdY.SpeedTgt := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) > 0.1);
 
 AxisCmdY.DirectionPositive := (CmdYVal > 0.1);
 AxisCmdY.DirectionNegative := (CmdYVal < -0.1);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
-IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedRef := 0.0; END_IF;
+IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedYPct := AxisCmdY.SpeedRef;
+SpeedTgtY_Pct := AxisCmdY.SpeedTgt;
 IF AxisCmdY.DirectionPositive THEN DirectionY := 1;
 ELSIF AxisCmdY.DirectionNegative THEN DirectionY := -1;
 ELSE DirectionY := 0; END_IF;

@@ -1,12 +1,12 @@
 # Fiche `FB_TroubleshootingView` v1.2
 
 > 🎯 Brique unique de mise en forme du dépannage. Lecture seule stricte, aucune écriture de
-> commande, configuration ou interlock. Profil `👁️ Programme CFC` au sens `AF_Partie-03 §2`
+> commande, configuration ou interlock. Profil `👁️ Observateur passif` au sens `AF_Partie-03 §2`
 > allégé : ici un FB (pas une page), instancié une seule fois dans `PRG_07_Supervision`.
 > 📄 Source : `CODE/J_SUPERVISION/FB_TroubleshootingView.st`
 > 📄 GVL alimentée : `CODE/J_SUPERVISION/GVL_Troubleshooting.st`
 > 🔗 Producteur unique de `GVL_Troubleshooting.*` — appelé uniquement dans `PRG_07_Supervision`.
-> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2.
+> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md` §2.
 
 ---
 
@@ -130,7 +130,7 @@ cf. audit de session : `RelayFwd`, `Contactor1-4`, `BrakeCmd`, `FinalInterlockSt
 
 ⚠️ Deux champs bruts n'ont **pas d'équivalent public actuel** et sont hors périmètre sans
 nouveau producteur : `Idx101_EncoderRawPos` (points bruts codeur) et `Idx208/209_Arbitrated*`
-(consigne avant sécurité, aujourd'hui variable interne `PRG_04_Treuils_Benne.M1_SpeedRef_Active`,
+(consigne avant sécurité, aujourd'hui variable interne `PRG_04_Treuils_Benne.M1_SpeedTgt_Active`,
 non publiée en `VAR_OUTPUT`). Ce sont des `TBD` (§6), pas des valeurs à deviner.
 
 ### 5.4 `BenneOuvertureFermeture : ST_ChainBucket`
@@ -175,7 +175,7 @@ Ce FB ne doit pas être bloqué par ces 4 points : ils sont publiés à `0`/`FAL
 
 ## 9. Documents liés
 
-- `AF_Partie-02_Architecture_Programme_v3.1.md` §2/§5 — décision architecture, lecture seule.
-- `AF_Partie-03_Contrats_Composants_v2.1.md` §1bis/§4 — profil FB, fiche contrat obligatoire.
+- `AF_Partie-02_Architecture_Programme_v3.2.md` §2/§5 — décision architecture, lecture seule.
+- `AF_Partie-03_Contrats_Composants_v2.2.md` §1bis/§4 — profil FB, fiche contrat obligatoire.
 - `AF_Partie-07_Interface_IHM_v2.0.md` §5 — principe troubleshooting lecture seule.
 - `AF_Partie-14_Fonction_Troubleshooting_v1.1.md` — chapô, table de visu acquisition existante.

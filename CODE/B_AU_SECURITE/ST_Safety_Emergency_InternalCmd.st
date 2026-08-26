@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Transporte les ordres logiques entre le bloc de décision et de sortie AU
    🔒 Polarité : MaintainA/B_Cmd en maintien (TRUE = voie saine)
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 TYPE ST_Safety_Emergency_InternalCmd :

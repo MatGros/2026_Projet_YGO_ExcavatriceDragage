@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_hmi_bannerformatter.st",
+  "file": "test_fb_bucket.st",
   "results": [
     {
-      "name": "AntiFlickerText : affichage instantane force",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "BannerFormatter : formatage nominal",
+      "name": "TC-P10-023 Benne : mise en service et verrouillage securite",
       "passed": true
     }
   ],

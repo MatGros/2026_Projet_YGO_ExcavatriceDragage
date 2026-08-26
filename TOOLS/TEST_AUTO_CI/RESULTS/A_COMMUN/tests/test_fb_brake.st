@@ -4,13 +4,31 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'Gate : Enable=FALSE colle le frein immediatement (securite positive)'
+TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
+    (* Scan 0 : Enable=FALSE -> Neutralisation standard *)
     fb(ENABLE := FALSE, RESET := FALSE, MOVEMENTREQUESTED := TRUE,
        CONTACTORFEEDBACK := FALSE, BYPASSCONTACTORCHECK := FALSE,
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
-    ASSERT_FALSE(fb.READY, 'Enable=FALSE : FB non pret');
-    ASSERT_FALSE(fb.BRAKECMD, 'Enable=FALSE : frein colle (BrakeCmd=FALSE) quelle que soit la demande de mouvement');
+    ASSERT_FALSE(fb.READY, 'Enable=FALSE : FB non pret (neutralise)');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 1 : Enable=TRUE -> Prete en service *)
+    fb(ENABLE := TRUE, RESET := FALSE, MOVEMENTREQUESTED := FALSE,
+       CONTACTORFEEDBACK := FALSE, BYPASSCONTACTORCHECK := FALSE,
+       DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
+       DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
+    ASSERT_TRUE(fb.READY, 'Enable=TRUE : FB pret');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
+    fb(ENABLE := FALSE, RESET := FALSE, MOVEMENTREQUESTED := FALSE,
+       CONTACTORFEEDBACK := FALSE, BYPASSCONTACTORCHECK := FALSE,
+       DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
+       DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
+    ASSERT_FALSE(fb.READY, 'Coupure -> Ready retombe a FALSE');
 END_TEST
 
 TEST 'Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms)'

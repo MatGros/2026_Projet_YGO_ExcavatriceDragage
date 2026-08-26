@@ -1,7 +1,7 @@
 # 📛 Gabarit de bannière de déclenchement — Skills agents
 
 > Gabarit **unique** pour toutes les bannières de déclenchement d'une skill ou d'un workflow agent
-> (troubleshooting, task-planner, codesys-workflow, briefing session, ...). TDAH-friendly :
+> (troubleshooting, task-planner, briefing session, ...). TDAH-friendly :
 > un bandeau visuel immédiat + une ligne d'action, rien d'autre avant le contenu.
 
 ## Règle

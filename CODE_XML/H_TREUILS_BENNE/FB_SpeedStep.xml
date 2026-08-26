@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.879125" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.879125">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:09.249560" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:09.249560">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -217,7 +217,7 @@ Seuils de changement de palier (0..100%)</xhtml>
    🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -235,7 +235,7 @@ Seuils de changement de palier (0..100%)</xhtml>
 --&gt; [CMD] Pilotage actif (FALSE = palier 0 / arret)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -420,7 +420,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant erreur configuration</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefInt">
+            <variable name="SpeedTgtInt">
               <type>
                 <INT />
               </type>
@@ -467,7 +467,7 @@ Seuils de changement de palier (0..100%)</xhtml>
    🪜 FB_SpeedStep — Décodeur palier vitesse vers contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Décodage consigne vitesse 0..100% en paliers et pilotage contacteurs
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Décodeur interne (compose FB_Winch)
    🔒 Sécurité : Validation configuration table et anti-battement hysteresis
    =======================================================================</xhtml>
@@ -600,12 +600,12 @@ END_IF;
 //    IN &gt; HIGH (régime "haut" confirmé) ; maintien entre LOW et HIGH (anti-battement).
 //    =&gt; NOT Hyst_n.OUT = "on a franchi le seuil n vers le haut" (palier n+1 atteint).
 // ─────────────────────────────────────────────────────────────────────────
-SpeedRefInt := REAL_TO_INT(SpeedRefPct);
+SpeedTgtInt := REAL_TO_INT(SpeedTgt_Pct);
 
-Hyst1(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
-Hyst2(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[2] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[2] - HystMargin));
-Hyst3(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[3] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[3] - HystMargin));
-Hyst4(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[4] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[4] - HystMargin));
+Hyst1(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
+Hyst2(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[2] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[2] - HystMargin));
+Hyst3(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[3] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[3] - HystMargin));
+Hyst4(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[4] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[4] - HystMargin));
 
 StepNumber := 1;                          // Palier mini dès qu'Enable est actif
 IF NOT Hyst1.OUT THEN StepNumber := 2; END_IF;

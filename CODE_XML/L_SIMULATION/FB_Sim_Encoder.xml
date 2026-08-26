@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.980824" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.980824">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T01:18:19.432290" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T01:18:19.432290">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -256,7 +256,7 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.

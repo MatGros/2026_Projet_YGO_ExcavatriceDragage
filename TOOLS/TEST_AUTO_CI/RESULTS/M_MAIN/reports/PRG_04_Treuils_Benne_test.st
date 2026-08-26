@@ -37,8 +37,8 @@ TEST 'PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth'
     // 4. Verification des demandes produites sur le bus sortant ST_WinchInterPrg
     ASSERT_TRUE(harness.Data.WinchM1FinalInterlockRequest.RequestedRelayFwd, 'ST_WinchInterPrg: Ordre RelayFwd genere vers PRG_06');
     ASSERT_FALSE(harness.Data.WinchM1Safety.SafeStop, 'ST_WinchInterPrg: Aucun SafeStop actif');
-    // Consigne vitesse arbitree (ST_WinchInterPrg.M1LogicRequestSpeedRef_Pct)
-    ASSERT_GT(harness.Data.M1LogicRequestSpeedRef_Pct, 0.0, 'ST_WinchInterPrg: consigne vitesse M1 non nulle en montee');
+    // Consigne vitesse arbitree (ST_WinchInterPrg.M1LogicRequestSpeedCmd_Pct)
+    ASSERT_GT(harness.Data.M1LogicRequestSpeedCmd_Pct, 0.0, 'ST_WinchInterPrg: consigne vitesse M1 non nulle en montee');
     // Etat public treuil (ST_WinchInterPrg.WinchM1State)
     ASSERT_TRUE(harness.Data.WinchM1State.RelayFwd, 'ST_WinchInterPrg: WinchM1State.RelayFwd reflete la demande');
 END_TEST

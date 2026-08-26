@@ -5,7 +5,7 @@
       les positions M3 et les diagnostics DI publiés par PRG_02_Acquisition vers
       les consommateurs (PRG_03/04/05/07, FB_TroubleshootingView).
    📤 Producteur unique : PRG_02_Acquisition (VAR_OUTPUT Data : ST_AcquisitionInterPrg).
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════ *)
 

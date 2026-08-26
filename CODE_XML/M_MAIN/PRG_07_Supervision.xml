@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.990216" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.990216">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T09:29:20.194010" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T09:29:20.194010">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -360,7 +360,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md §3ter
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -929,7 +929,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §4, §4bis
    🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
       IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -1348,7 +1348,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalReached">
@@ -1364,7 +1364,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: défaut/perte thermique centrale hydraulique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Défaut/perte thermique centrale hydraulique</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopSensorBypassActive">
@@ -1457,7 +1457,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
 struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
-(doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
+(doctrine reset=front, PRG_07_Supervision.st §2bis). Vérifier les valeurs avant reprise cycle.
 ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier</xhtml>
               </documentation>
             </variable>
@@ -1516,7 +1516,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-: granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
+🔒 Granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1723,11 +1723,11 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎚️ ST_Modes_Autorisations — Bus d'autorisations du mode machine
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
-                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §2
-   🎯 Produit par FB_Modes (via PRG_MODES_CFC)
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
       Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_MODES_CFC)
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1901,7 +1901,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
    🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1961,7 +1961,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
    🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -2027,7 +2027,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — , manquait (contrairement à ST_WinchHMI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — champ Cfg manquait initialement (contrairement à ST_WinchHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -2059,7 +2059,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Structuration en Cmd / State / Safety / Bypass / Test —
-      doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+      doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -2253,7 +2253,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -2305,7 +2305,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Role : liste les defauts/warnings actifs de toute la machine,
       affiches un a la fois en rotation (FB_Hmi_BannerFormatter S5)
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md S4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md S6
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3390,7 +3390,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -3440,7 +3440,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3bis
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3bis
    🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
       pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
       TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
@@ -3774,7 +3774,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_06_Outputs</xhtml>
               </documentation>
             </variable>
             <variable name="InvertDirection">
@@ -3906,14 +3906,6 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Positionneur : cible sélectionnée atteinte (non mémorisé)</xhtml>
               </documentation>
             </variable>
-            <variable name="JoystickDeflection_Pct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Axe X fonctionnel -100..+100 %, 0 = neutre ; animation IHM M3</xhtml>
-              </documentation>
-            </variable>
             <variable name="DriveActualFreq_Hz">
               <type>
                 <REAL />
@@ -3930,12 +3922,12 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Mot de commande AC600 réellement appliqué</xhtml>
               </documentation>
             </variable>
-            <variable name="DriveFreqRef_Hz">
+            <variable name="DriveFreqCmd_Hz">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence réellement appliquée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Commande fréquence réellement appliquée</xhtml>
               </documentation>
             </variable>
             <variable name="ActiveDirection">
@@ -3946,12 +3938,12 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveSpeedRef_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Consigne active après arbitrage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande active après arbitrage (0.0 à 100.0 %)</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockState">
@@ -3959,7 +3951,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">
@@ -4538,12 +4530,12 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Palier limité par vitesse réelle</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne de vitesse finale après rampe (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Commande de vitesse finale après rampe (%)</xhtml>
               </documentation>
             </variable>
             <variable name="StepNumber">
@@ -4664,7 +4656,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <derived name="E_WinchFinalInterlockState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">
@@ -4858,12 +4850,12 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef">
+            <variable name="SpeedTgt">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionNegative">
@@ -4902,8 +4894,8 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedRef + direction en bits (DirectionPositive/Negative, AtNeutral).
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -5511,7 +5503,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
    📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §2
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -5749,7 +5741,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -5883,6 +5875,86 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Vue troubleshooting (diagnostic IHM)</xhtml>
               </documentation>
             </variable>
+            <variable name="instMirrorBypassTranslation">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass Translation IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassM1">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass M1 IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassM2">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass M2 IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassSync">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass Sync IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassCommun">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass Commun IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassLimitLegal">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass LimitLegal IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassTopLimitSwitch">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass TopLimitSwitch IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassTopLimitSoftware">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass TopLimitSoftware IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassCableLimitSwitch">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass CableLimitSwitch IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassSlackCable">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass SlackCable IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
             <variable name="PrevTranslationBypass">
               <type>
                 <BOOL />
@@ -5989,7 +6061,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Regroupe tout le mapping bidirectionnel GVL_IHM / GVL_PERSISTENT.
    ✅ Expose FaultMachineReset_IHM pour tous les programmes du domaine sécurité/métier.
-   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md
+   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -6168,76 +6240,18 @@ IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
 END_IF;
 
 // ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
-// 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
-IF GVL_IHM.TranslationM3.Bypass.Global &lt;&gt; PrevTranslationBypass THEN
-    BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
-ELSE
-    GVL_IHM.TranslationM3.Bypass.Global := BypassTranslationGlobal;
-END_IF;
-PrevTranslationBypass := GVL_IHM.TranslationM3.Bypass.Global;
-
-IF GVL_IHM.M1TreuilRetenue.Bypass.Global &lt;&gt; PrevM1Bypass THEN
-    BypassWinchM1Global := GVL_IHM.M1TreuilRetenue.Bypass.Global;
-ELSE
-    GVL_IHM.M1TreuilRetenue.Bypass.Global := BypassWinchM1Global;
-END_IF;
-PrevM1Bypass := GVL_IHM.M1TreuilRetenue.Bypass.Global;
-
-IF GVL_IHM.M2TreuilBenne.Bypass.Global &lt;&gt; PrevM2Bypass THEN
-    BypassWinchM2Global := GVL_IHM.M2TreuilBenne.Bypass.Global;
-ELSE
-    GVL_IHM.M2TreuilBenne.Bypass.Global := BypassWinchM2Global;
-END_IF;
-PrevM2Bypass := GVL_IHM.M2TreuilBenne.Bypass.Global;
-
-IF GVL_IHM.M1M2Sync.Bypass.Global &lt;&gt; PrevSyncBypass THEN
-    BypassSyncGlobal := GVL_IHM.M1M2Sync.Bypass.Global;
-ELSE
-    GVL_IHM.M1M2Sync.Bypass.Global := BypassSyncGlobal;
-END_IF;
-PrevSyncBypass := GVL_IHM.M1M2Sync.Bypass.Global;
-
-IF GVL_IHM.Commun.Bypass.Global &lt;&gt; PrevCommunBypass THEN
-    BypassCommunGlobal := GVL_IHM.Commun.Bypass.Global;
-ELSE
-    GVL_IHM.Commun.Bypass.Global := BypassCommunGlobal;
-END_IF;
-PrevCommunBypass := GVL_IHM.Commun.Bypass.Global;
-
-IF GVL_IHM.Commun.Bypass.LimitLegal &lt;&gt; PrevLimitLegal THEN
-    BypassLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
-ELSE
-    GVL_IHM.Commun.Bypass.LimitLegal := BypassLimitLegal;
-END_IF;
-PrevLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
-
-IF GVL_IHM.Commun.Bypass.TopLimitSwitch &lt;&gt; PrevTopLimitSwitch THEN
-    BypassTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
-ELSE
-    GVL_IHM.Commun.Bypass.TopLimitSwitch := BypassTopLimitSwitch;
-END_IF;
-PrevTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
-
-IF GVL_IHM.Commun.Bypass.TopLimitSoftware &lt;&gt; PrevTopLimitSoftware THEN
-    BypassTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
-ELSE
-    GVL_IHM.Commun.Bypass.TopLimitSoftware := BypassTopLimitSoftware;
-END_IF;
-PrevTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
-
-IF GVL_IHM.Commun.Bypass.CableLimitSwitch &lt;&gt; PrevCableLimitSwitch THEN
-    BypassCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
-ELSE
-    GVL_IHM.Commun.Bypass.CableLimitSwitch := BypassCableLimitSwitch;
-END_IF;
-PrevCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
-
-IF GVL_IHM.Commun.Bypass.SlackCable &lt;&gt; PrevSlackCable THEN
-    BypassSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
-ELSE
-    GVL_IHM.Commun.Bypass.SlackCable := BypassSlackCable;
-END_IF;
-PrevSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
+// 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne), factorisé dans FB_MirrorBypassRetain
+// (CODE/A_COMMUN) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
+instMirrorBypassTranslation(Hmi := GVL_IHM.TranslationM3.Bypass.Global, RetainVal := BypassTranslationGlobal, Prev := PrevTranslationBypass);
+instMirrorBypassM1(Hmi := GVL_IHM.M1TreuilRetenue.Bypass.Global, RetainVal := BypassWinchM1Global, Prev := PrevM1Bypass);
+instMirrorBypassM2(Hmi := GVL_IHM.M2TreuilBenne.Bypass.Global, RetainVal := BypassWinchM2Global, Prev := PrevM2Bypass);
+instMirrorBypassSync(Hmi := GVL_IHM.M1M2Sync.Bypass.Global, RetainVal := BypassSyncGlobal, Prev := PrevSyncBypass);
+instMirrorBypassCommun(Hmi := GVL_IHM.Commun.Bypass.Global, RetainVal := BypassCommunGlobal, Prev := PrevCommunBypass);
+instMirrorBypassLimitLegal(Hmi := GVL_IHM.Commun.Bypass.LimitLegal, RetainVal := BypassLimitLegal, Prev := PrevLimitLegal);
+instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, RetainVal := BypassTopLimitSwitch, Prev := PrevTopLimitSwitch);
+instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, RetainVal := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
+instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, RetainVal := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
+instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, RetainVal := BypassSlackCable, Prev := PrevSlackCable);
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
@@ -6476,15 +6490,15 @@ instTroubleshootingView(
     Vh0800EndOk          := PRG_02_Acquisition.Data.Vh0800EndOk,
     Vh0808EtpOk          := PRG_02_Acquisition.Data.Vh0808EtpOk,
     Auth                 := PRG_03_Modes_Cycle.Auth,
-    M1LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
+    M1LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct,
     M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
-    M2LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
+    M2LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedCmd_Pct,
     M2LogicRequestDirection := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
     CoupledUserRequestActive := PRG_04_Treuils_Benne.CoupledUserRequestActive,
     CycleAutoBusy := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy,
-    CycleM1SpeedRef_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct,
-    CycleM2SpeedRef_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct,
+    CycleM1SpeedTgt_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct,
+    CycleM2SpeedTgt_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct,
     CycleBucketOpen := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Open,
     CycleTargetPosition := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target,
     SimulationModeActive := GVL_Simulation.SimulationModeActive,
@@ -6785,7 +6799,7 @@ instTroubleshootingView(
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Verdict passif de qualification E/S machine arrêtée (16 contrôles)
    🔒 Polarité : Observateur pur (aucun SafeStop, PowerCutOff ou ordre machine)
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §6
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §6
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -6876,7 +6890,7 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -6940,7 +6954,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -7004,7 +7018,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -7068,7 +7082,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -7132,7 +7146,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -7196,7 +7210,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -7260,7 +7274,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -7413,7 +7427,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Surveillance toggle IHM, generation toggle PLC et diagnostic timeout
    🛡️ Protection : FB de diagnostic autonome (sans action directe sur AU)
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -7937,6 +7951,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Au moins un bypass actif</xhtml>
               </documentation>
             </variable>
+            <variable name="PowerOrChainFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Défaut chaîne AU ou contacteur puissance absent</xhtml>
+              </documentation>
+            </variable>
             <variable name="CriticalActionActive">
               <type>
                 <BOOL />
@@ -8030,7 +8052,7 @@ END_IF;
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-clignotement warnings/états (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-clignotement warnings/états (AF-07 §5.3)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_NbMaxAlarmes">
@@ -8041,7 +8063,7 @@ END_IF;
                 <simpleValue value="32" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Taille du carrousel d'alarmes (AF-07 §4bis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Taille du carrousel d'alarmes (AF-07 §6)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -8049,12 +8071,12 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧠 FB_Hmi_BannerFormatter — Formateur du bandeau d'information IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5, §6
    🎯 Responsabilité : assemble les 4 textes du bandeau + le carrousel
       d'alarmes, expose la cause observable du blocage courant, sans
       piloter la machine.
    🛡️ Sécurité : priorité AU/puissance, SafeStop, puis interlocks métier.
-      L'anti-clignotement est délégué à FB_AntiFlickerText (AF-07 §4.3).
+      L'anti-clignotement est délégué à FB_AntiFlickerText (AF-07 §5.3).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -8078,7 +8100,7 @@ END_IF;
 {region "§1 Contexte global"}
 // ═══════════════════════════════════════════════════════════════
 // 1. CONTEXTE GLOBAL — aucun numéro d'étape ici
-// Format (AF-07 §4.1) : [RÉEL/SIMU] [MODE] [COUPLAGE]
+// Format (AF-07 §5.1) : [RÉEL/SIMU] [MODE] [COUPLAGE]
 // ═══════════════════════════════════════════════════════════════
 IF SimulationModeActive THEN
     PrefixContext := '[SIMULATION] ';
@@ -8112,7 +8134,7 @@ Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 {region "§2 Progression"}
 // ═══════════════════════════════════════════════════════════════
 // 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
-// Format (AF-07 §4.1) : Macro: &lt;Cycle&gt; &gt; Sous-cycle: &lt;Étape&gt;
+// Format (AF-07 §5.1) : Macro: &lt;Cycle&gt; &gt; Sous-cycle: &lt;Étape&gt;
 // ═══════════════════════════════════════════════════════════════
 IF HomingActive THEN
     IF HomingStepM1 &gt; 0 THEN
@@ -8165,7 +8187,7 @@ END_IF;
 {region "§3 Condition spéciale"}
 // ═══════════════════════════════════════════════════════════════
 // 3. CONDITION SPÉCIALE — un seul indicateur bypass/dérogation
-// Format (AF-07 §4.1) : ATTENTION: &lt;Dérogation / Bridage / Alerte&gt;
+// Format (AF-07 §5.1) : ATTENTION: &lt;Dérogation / Bridage / Alerte&gt;
 // 🧊 Warning → maintenu min (anti-clignotement), jamais critique.
 // ⚠️ La simulation n'est PAS un bypass : elle n'apparaît que dans le
 //    contexte global (champ 1), jamais ici.
@@ -8192,7 +8214,7 @@ Banner.SpecialConditionText := AntiFlickSpecial.Text;
 {region "§4 Action opérateur"}
 // ═══════════════════════════════════════════════════════════════
 // 4. ACTION — cause fixe, sécurité d'abord, sans rotation
-// Format (AF-07 §4.1) : [ORGANE] &lt;Action physique&gt; &gt; &lt;Fin&gt;
+// Format (AF-07 §5.1) : [ORGANE] &lt;Action physique&gt; &gt; &lt;Fin&gt;
 // 🧊 Défauts (AU/puissance/SafeStop) + interlock DirectionBlocked
 //    → affichés immédiatement (ForceInstant=TRUE) ; les autres états
 //    → maintenus min (anti-clignotement).
@@ -8229,7 +8251,7 @@ ELSIF DirectionBlocked THEN
         OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
-    // Guidance par étape du cycle (AF-07 §4.1) — ne masque jamais un défaut
+    // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
     CASE CycleStep OF
         E_CycleStep.X0_PREPARATION:
@@ -8306,8 +8328,8 @@ END_IF;
 
 // Interlock = mouvement demandé mais permit absent : c'est une cause
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
-CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged
-                     OR PowerCutOffActiveAny OR SafeStopActive OR DirectionBlocked);
+PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
+CriticalActionActive := (PowerOrChainFault OR SafeStopActive OR DirectionBlocked);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -8316,9 +8338,9 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
 {region "§5 Bandeau alarme"}
 // ═══════════════════════════════════════════════════════════════
 // 5. BANDEAU D'ALARME — carrousel des défauts actifs (index n/N)
-// Format (AF-07 §4bis) : [ORGANE] raison_brève. Un défaut à la fois,
+// Format (AF-07 §6) : [ORGANE] raison_brève. Un défaut à la fois,
 // rotation 1→2→…→N→1, maintien AlarmHoldTime par message.
-// 🧊 Distinct des 4 champs ci-dessus (AF-07 §4.2) : ce carrousel est
+// 🧊 Distinct des 4 champs ci-dessus (AF-07 §5.2) : ce carrousel est
 //    le SEUL endroit du bandeau qui publie Error/ErrorId (alarmes).
 // ═══════════════════════════════════════════════════════════════
 AlarmCount := 0;
@@ -8443,8 +8465,7 @@ IF TranslationSafety.ErrorSensorIncoherent AND (AlarmCount &lt; CST_NbMaxAlarmes
     AlarmArray[AlarmCount] := '[M3] capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5d. Collecte — benne (FB_Bucket.ErrorId, bits vérifiés à la lecture du FB source :
-// diffèrent du brouillon initial du plan, corrigés ici bit à bit)
+// 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)
 IF ((BucketErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -8492,8 +8513,7 @@ IF ((ExtractionErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_N
     AlarmArray[AlarmCount] := '[EXTRACTION] config'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId, bit3
-// "Startup" absent du brouillon initial du plan, ajouté ici après lecture du FB source)
+// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId)
 IF ((EmergencyErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[AU] redondance contacteurs'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -8504,8 +8524,7 @@ IF ((EmergencyErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_Nb
     AlarmArray[AlarmCount] := '[AU] echec autotest demarrage'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId, dictionnaire absent du plan,
-// construit ici après lecture complète du FB source)
+// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId)
 IF ((CycleErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] limite legale atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -8560,6 +8579,70 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>84039c85-4845-567a-8eb6-932818f2daf4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_MirrorBypassRetain" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars />
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MIROIR BIDIRECTIONNEL ===
+&lt;-&gt; [BUS] Valeur bypass côté IHM (GVL_IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RetainVal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Valeur bypass côté RETAIN (GVL_PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Prev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Mémoire du cycle précédent (détection front IHM)</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔄 FB_MirrorBypassRetain — Miroir bidirectionnel IHM ↔ RETAIN (bypass)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Synchronise un bypass IHM (volatile) avec sa copie RETAIN
+             (survit à une coupure) — dernier-écrit-gagne : si l'IHM a
+             changé depuis le cycle précédent, le RETAIN suit ; sinon
+             l'IHM est réaligné sur le RETAIN (ex. redémarrage à chaud).
+   🔌 Architecture : Brique technique sans cycle de vie (pas de défaut à remonter)
+   📍 Domaine : CODE/J_SUPERVISION (seul consommateur actuel : PRG_07_Supervision §2c)
+   📄 Doc métier : DOC/STDS/CODE_QUALITY_STANDARDS.md §10
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF Hmi &lt;&gt; Prev THEN
+    RetainVal := Hmi;
+ELSE
+    Hmi := RetainVal;
+END_IF;
+Prev := Hmi;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6b38f222-bba1-53c3-99fb-b91a23d65b9a</ObjectId>
           </data>
         </addData>
       </pou>
@@ -8632,7 +8715,7 @@ END_IF;
 --&gt; [SAFE] Autorisations machine</xhtml>
               </documentation>
             </variable>
-            <variable name="M1LogicRequestSpeedRef_Pct">
+            <variable name="M1LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -8649,7 +8732,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens M1</xhtml>
               </documentation>
             </variable>
-            <variable name="M2LogicRequestSpeedRef_Pct">
+            <variable name="M2LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -8689,7 +8772,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle auto actif</xhtml>
               </documentation>
             </variable>
-            <variable name="CycleM1SpeedRef_Pct">
+            <variable name="CycleM1SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -8697,7 +8780,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne cycle M1</xhtml>
               </documentation>
             </variable>
-            <variable name="CycleM2SpeedRef_Pct">
+            <variable name="CycleM2SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -9120,13 +9203,13 @@ GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied := NOT HwIn.
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M1_ThermalOk_DI;
 
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedTgt;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM1.Cmd.BtnUp;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM1.Cmd.BtnDown;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM1SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM1SpeedTgt_Pct;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx206_ModeActive := Auth.Mode;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm := WinchM1.Bypass.OperatorComm;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := M1LogicRequestSpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := M1LogicRequestSpeedCmd_Pct;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := M1LogicRequestDirection;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx210_CoupledUserRequestDirection := CoupledUserRequestDirection;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx211_CoupledUserRequestActive := CoupledUserRequestActive;
@@ -9165,7 +9248,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx330_BypassGlobalCommun       
 
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx401_MotionAllowed := WinchM1.State.Ready;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated := WinchM1.State.StepNumber;
-GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx403_SpeedRamp_Pct := WinchM1.State.SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx403_SpeedRamp_Pct := WinchM1.State.SpeedCmd_Pct;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx404_BrakeReleaseAuthorized := WinchM1.State.BrakeCmd;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx405_FinalInterlockState := WinchM1.State.FinalInterlockState;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason := WinchM1.State.FinalInterlockReason;
@@ -9192,13 +9275,13 @@ GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied := NOT HwIn.
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M2_ThermalOk_DI;
 
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedTgt;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM2.Cmd.BtnUp;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM2.Cmd.BtnDown;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM2SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM2SpeedTgt_Pct;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx206_ModeActive := Auth.Mode;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm := WinchM2.Bypass.OperatorComm;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct := M2LogicRequestSpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct := M2LogicRequestSpeedCmd_Pct;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection := M2LogicRequestDirection;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx210_CoupledUserRequestDirection := CoupledUserRequestDirection;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx211_CoupledUserRequestActive := CoupledUserRequestActive;
@@ -9237,7 +9320,7 @@ GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx330_BypassGlobalCommun       
 
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx401_MotionAllowed := WinchM2.State.Ready;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated := WinchM2.State.StepNumber;
-GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx403_SpeedRamp_Pct := WinchM2.State.SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx403_SpeedRamp_Pct := WinchM2.State.SpeedCmd_Pct;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized := WinchM2.State.BrakeCmd;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx405_FinalInterlockState := WinchM2.State.FinalInterlockState;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason := WinchM2.State.FinalInterlockReason;
@@ -9341,14 +9424,14 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied := NOT Tran
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx109_DriveThermalOk := Translation.State.DriveThermalOk;
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA := HwIn.Operator.JoyXRaw_ANA1;
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := Translation.State.JoystickDeflection_Pct;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := GVL_IHM.JOY1Joystick.State.AxisCmdX.SpeedTgt;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnFwd := Translation.Cmd.BtnFwd;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnRev := Translation.Cmd.BtnRev;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition := Translation.Cmd.SelTarget;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition := CycleTargetPosition;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx207_ModeActive := Auth.Mode;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive := Translation.Bypass.Global;
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := Translation.State.ActiveSpeedRef_Pct;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := Translation.State.SpeedCmd_Pct;
 
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx302_SafeStopActive := Translation.Safety.SafeStop;
@@ -9368,7 +9451,7 @@ GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch  := Tra
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent := Translation.Safety.ErrorSensorIncoherent;
 
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
-GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqRef_Hz;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqCmd_Hz;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx403_DriveControlWord := Translation.State.DriveControlWord;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx404_FinalInterlockState := Translation.State.FinalInterlockState;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx405_FinalInterlockReason := Translation.State.FinalInterlockReason;
@@ -9376,7 +9459,7 @@ GVL_Troubleshooting.TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirm
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed := Translation.State.FinalBrakeTimeoutElapsed;
 
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord := Translation.State.DriveControlWord;
-GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqRef_Hz en REAL Hz existe)
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqCmd_Hz en REAL Hz existe)
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ := Translation.State.BrakeCmd;
 
 {endregion}
@@ -9491,8 +9574,8 @@ GVL_Troubleshooting.Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMa
 GVL_Troubleshooting.Joystick.SelJoystickWinch := GVL_IHM.Modes.Cmd.SelJoystickWinch;
 GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
-GVL_Troubleshooting.Joystick.DeflectionX_Pct  := JoystickHMI.State.AxisCmdX.SpeedRef;
-GVL_Troubleshooting.Joystick.DeflectionY_Pct  := JoystickHMI.State.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.Joystick.DeflectionX_Pct  := JoystickHMI.State.AxisCmdX.SpeedTgt;
+GVL_Troubleshooting.Joystick.DeflectionY_Pct  := JoystickHMI.State.AxisCmdY.SpeedTgt;
 // Direction exprimée en bits (ST_Joystick_AxisCmd) : conversion locale bits→INT (-1/0/+1),
 // car ici on lit le struct (JoystickHMI.State.AxisCmdX/Y), pas le miroir FB DirectionX/Y.
 IF JoystickHMI.State.AxisCmdX.DirectionPositive THEN
@@ -9521,9 +9604,9 @@ GVL_Troubleshooting.MotionM1.Cmd_BrakeRelease         := WinchM1.State.BrakeCmd;
 
 GVL_Troubleshooting.MotionM1.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
 GVL_Troubleshooting.MotionM1.Step3_NotBusyOtherTask   := NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM2.Bucket.State.FBState = E_State.BUSY);
-GVL_Troubleshooting.MotionM1.Step4_MotionRequested    := WinchM1.State.Busy OR (WinchM1.State.SpeedRef_Pct &gt; 0.0);
+GVL_Troubleshooting.MotionM1.Step4_MotionRequested    := WinchM1.State.Busy OR (WinchM1.State.SpeedCmd_Pct &gt; 0.0);
 GVL_Troubleshooting.MotionM1.RequestedDirection       := SEL(WinchM1.State.RelayFwd, SEL(WinchM1.State.RelayRev, 0, -1), 1);
-GVL_Troubleshooting.MotionM1.RequestedSpeedPct        := WinchM1.State.SpeedRef_Pct;
+GVL_Troubleshooting.MotionM1.RequestedSpeedPct        := WinchM1.State.SpeedCmd_Pct;
 GVL_Troubleshooting.MotionM1.Step5_NoSafetyFault      := NOT WinchM1.Safety.SafeStop AND NOT WinchM1.Safety.ThermalFault;
 GVL_Troubleshooting.MotionM1.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.MotionM1.RequestedDirection = 1, WinchM1.Safety.DescendPermit, WinchM1.Safety.AscentPermit);
 GVL_Troubleshooting.MotionM1.Step7_BrakeReleased      := WinchM1.State.BrakeCmd AND WinchM1.State.BrakeCommandOpenConfirmed;
@@ -9553,9 +9636,9 @@ GVL_Troubleshooting.MotionM2.Cmd_BrakeRelease         := WinchM2.State.BrakeCmd;
 
 GVL_Troubleshooting.MotionM2.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
 GVL_Troubleshooting.MotionM2.Step3_NotBusyOtherTask   := NOT WinchM2.State.Encoder.HomingBusy;
-GVL_Troubleshooting.MotionM2.Step4_MotionRequested    := WinchM2.State.Busy OR (WinchM2.State.SpeedRef_Pct &gt; 0.0);
+GVL_Troubleshooting.MotionM2.Step4_MotionRequested    := WinchM2.State.Busy OR (WinchM2.State.SpeedCmd_Pct &gt; 0.0);
 GVL_Troubleshooting.MotionM2.RequestedDirection       := SEL(WinchM2.State.RelayFwd, SEL(WinchM2.State.RelayRev, 0, -1), 1);
-GVL_Troubleshooting.MotionM2.RequestedSpeedPct        := WinchM2.State.SpeedRef_Pct;
+GVL_Troubleshooting.MotionM2.RequestedSpeedPct        := WinchM2.State.SpeedCmd_Pct;
 GVL_Troubleshooting.MotionM2.Step5_NoSafetyFault      := NOT WinchM2.Safety.SafeStop AND NOT WinchM2.Safety.ThermalFault AND NOT WinchM2.Safety.SlackCable;
 GVL_Troubleshooting.MotionM2.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.MotionM2.RequestedDirection = 1, WinchM2.Safety.DescendPermit, WinchM2.Safety.AscentPermit);
 GVL_Troubleshooting.MotionM2.Step7_BrakeReleased      := WinchM2.State.BrakeCmd AND WinchM2.State.BrakeCommandOpenConfirmed;
@@ -9585,9 +9668,9 @@ GVL_Troubleshooting.MotionM3.Cmd_BrakeRelease         := Translation.State.Brake
 
 GVL_Troubleshooting.MotionM3.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
 GVL_Troubleshooting.MotionM3.Step3_NotBusyOtherTask   := TRUE; // Aucune tâche exclusive connue bloquant M3 (pas de homing translation)
-GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.ActiveSpeedRef_Pct &gt; 0.0);
+GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.SpeedCmd_Pct &gt; 0.0);
 GVL_Troubleshooting.MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
-GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.ActiveSpeedRef_Pct;
+GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.SpeedCmd_Pct;
 GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
 GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // Interlock hauteur M1/M2 (risque collision)
 GVL_Troubleshooting.MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
@@ -9679,7 +9762,7 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée de maintien min avant changement (AF-07 §5.3)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -9707,7 +9790,7 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧊 FB_AntiFlickerText — Lissage anti-clignotement d'un texte IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4.3
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5.3
    🎯 Responsabilité : maintient un texte warning/état un temps minimum
       avant de laisser le contenu changer, et laisse passer en direct
       (sans maintien) les messages critiques (défauts AU/puissance).
@@ -9771,6 +9854,7 @@ END_IF;
             <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
           </Folder>
           <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
+          <Object Name="FB_MirrorBypassRetain" ObjectId="6b38f222-bba1-53c3-99fb-b91a23d65b9a" />
           <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
           <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
           <Folder Name="_TYPES">

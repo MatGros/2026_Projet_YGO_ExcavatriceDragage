@@ -18,8 +18,8 @@ Point d'entrée agents (guardrails, workflow, délégation) : **[AGENTS.md](AGEN
 |---|---|
 | Nommage (PascalCase, préfixes, unités, polarité) | [DOC/STDS/NAMING_CONVENTION.md](DOC/STDS/NAMING_CONVENTION.md) |
 | Déclaration, liaison, POO, non-régression | [DOC/STDS/CODE_QUALITY_STANDARDS.md](DOC/STDS/CODE_QUALITY_STANDARDS.md) |
-| Architecture programme (CFC, Ladder, tâches) | [ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md](ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md) |
-| Contrats FB, DUT et CFC | [ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md](ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md) |
+| Architecture programme (7 POU, tâches, flux) | [DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md](DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md) |
+| Contrats FB, DUT et composants | [DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md](DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md) |
 | Fonctions métier (une par FB, 08+) | Joystick · Encoder/Homing · Treuils (Benne incluse) · Translation · Simulation · Troubleshooting — voir [DOC/README.md](DOC/README.md) |
 | Pilotage projet (tâches, reliquats, TBD) | [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml) |
 
@@ -80,8 +80,8 @@ excavatrice-dragage/
 
 ## 🔄 Workflow Édition
 
-**⚠️ Important :** Voir [`AGENTS.md`](AGENTS.md) pour le workflow complet avec guardrails, règles
-DOC et skill `codesys-workflow`. L'utilisateur applique **tout manuellement** dans CODESYS 3.5
+**⚠️ Important :** Voir [`AGENTS.md`](AGENTS.md) pour le workflow complet avec guardrails et règles
+DOC. L'utilisateur applique **tout manuellement** dans CODESYS 3.5
 (copie du ST puis import PLCopenXML) — aucun outil ici n'écrit dans CODESYS.
 
 Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
@@ -124,7 +124,7 @@ restitution bloquante).
 | **Tâches** | EtherCAT 4 ms → CAN 20 ms → Main 10 ms ; surveillance périodicité = fonction système CODESYS (200 ms) |
 | **FB Standard** | Tous les FB métier respectent le contrat [AF_Partie-03](ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md) (profils selon catégorie, §1bis) |
 | **Sécurité** | `Enable` > `SafeStop` (par métier, rampe rapide) > `StartStop` (rampe normale) ; AU matériel = seul arrêt brutal + `PowerCutOff` ; `Reset` = front |
-| **Cycle** | Semi-auto : `E_CycleStep` ([AF_Partie-04](DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md)) |
+| **Cycle** | Semi-auto : `E_CycleStep` ([AF_Partie-04](DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md)) |
 
 ---
 
@@ -132,7 +132,7 @@ restitution bloquante).
 
 1. **Lire [NAMING_CONVENTION.md](DOC/STDS/NAMING_CONVENTION.md)** ← commence ici
 2. Consulter [DOC/README.md](DOC/README.md) pour l'index complet des spécifications actives
-3. Charger la skill [`codesys-workflow`](.claude/skills/codesys-workflow.md) avant toute modif `CODE/`
+3. Consulter [`AGENTS.md`](AGENTS.md) avant toute modif `CODE/` (guardrails & standards)
 4. Consulter [PLAN_TASK (v1.0)](DOC/WFLOW/TASKS.yaml) pour savoir ce qu'il reste à faire, trancher ou demander au client
 
 ---
@@ -141,6 +141,6 @@ restitution bloquante).
 
 - **Git** : branche `main`
 - **Langage** : CODESYS 3.5 (ST / Ladder / FBD)
-- **Outillage** : Skill `codesys-workflow` (`.claude/skills/codesys-workflow.md`) + `TOOLS/`
+- **Outillage** : [`AGENTS.md`](AGENTS.md) + `TOOLS/`
 - **Auteur** : Mathieu Gros
 - **Dernière mise à jour** : 2026-07-31

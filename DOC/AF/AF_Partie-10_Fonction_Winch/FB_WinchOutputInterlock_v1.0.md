@@ -1,9 +1,9 @@
 # FB_WinchOutputInterlock — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §6.
+> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.1.md`](AF_Partie-10_Fonction_Winch_v2.1.md) §6.
 > Rôle de **ce** document : barrière finale, watchdog frein, machine d'état, anti-redémarrage —
 > et **catalogue unique** des `TC-P10-012`, `013`, `020`.
-> Source code : `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st` · instances dans `Outputs (Ladder)`.
+> Source code : `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st` · instances dans `PRG_06_Outputs`.
 
 ## 🧭 Sommaire
 
@@ -31,7 +31,7 @@
 
 Profil **barrière finale** (Partie3 §2) : reçoit la demande sortie typée (`ST_WinchFinalInterlockRequest`),
 applique les interlocks ultimes, produit **seule** la commande physique autorisée (Q réelles).
-2 instances : `instWinchOutputInterlockM1_LD`, `instWinchOutputInterlockM2_LD`, dans `Outputs (Ladder)`.
+2 instances : `instWinchOutputInterlockM1`, `instWinchOutputInterlockM2`, dans `PRG_06_Outputs`.
 
 `FB_Winch`/`ST_SpeedStepTable` restent propriétaires du **mapping** palier→contacteurs ; cette
 barrière **autorise ou masque** la demande, ne la reconstruit jamais.
@@ -72,7 +72,7 @@ BrakeCommandOpenConfirmed AND NOT RestartInhibit`. Timeout ⇒ bit0 `ErrorId`, `
 
 ## 5. Anti-redémarrage et temps mort de redémarrage
 
-`RestartDelay` = **900ms** (paramétrable) après `FwdRevSpeedFeedbackOff` confirmé. 
+`RestartDelay` = **900ms** (paramétrable) après `FwdRevSpeedFeedbackOff` confirmé.
 
 **Nouveau : temps mort de redémarrage après arrêt** — distinct du redémarrage post-faute :
 - **Redémarrage même sens** : temps mort paramétrable `DeadTimeSameDir` (défaut **1s**) après `MotorRequest=FALSE` → nouvelle demande.

@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "file": "test_prg_07_supervision.st",
+  "file": "test_prg_05_translation.st",
   "results": [
     {
-      "name": "PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut",
+      "name": "PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuils OK)",
       "passed": true
     },
     {
-      "name": "PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil",
+      "name": "PRG_05_Translation : Commande Translation Rev (Joystick X negatif)",
       "passed": true
     },
     {
-      "name": "PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau",
+      "name": "PRG_05_Translation : Interdiction Mouvement Translation si Treuils en Bas",
       "passed": true
     }
   ],

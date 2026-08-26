@@ -19,38 +19,17 @@
       },
       {
         "file": "CODE/D_JOYSTICK/FB_Joystick.st",
-        "line": 73,
-        "name": "CycleTimeCalc",
-        "type": "FB_CycleTime",
-        "snippet": "CycleTimeCalc             : FB_CycleTime;        // * [INST] Calcul du temps de cycle reel"
-      },
-      {
-        "file": "CODE/D_JOYSTICK/FB_Joystick.st",
-        "line": 74,
+        "line": 71,
         "name": "ScaleX",
         "type": "FB_AxisScale",
         "snippet": "ScaleX                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe X"
       },
       {
         "file": "CODE/D_JOYSTICK/FB_Joystick.st",
-        "line": 75,
+        "line": 72,
         "name": "ScaleY",
         "type": "FB_AxisScale",
         "snippet": "ScaleY                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe Y"
-      },
-      {
-        "file": "CODE/D_JOYSTICK/FB_Joystick.st",
-        "line": 76,
-        "name": "FilterX",
-        "type": "FB_Filter_PT1",
-        "snippet": "FilterX                   : FB_Filter_PT1;       // * [INST] Filtre passe-bas PT1 axe X"
-      },
-      {
-        "file": "CODE/D_JOYSTICK/FB_Joystick.st",
-        "line": 77,
-        "name": "FilterY",
-        "type": "FB_Filter_PT1",
-        "snippet": "FilterY                   : FB_Filter_PT1;       // * [INST] Filtre passe-bas PT1 axe Y"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_Safety_Winch.st",
@@ -68,14 +47,14 @@
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_Winch.st",
-        "line": 85,
+        "line": 82,
         "name": "SpeedStep",
         "type": "FB_SpeedStep",
         "snippet": "SpeedStep                       : FB_SpeedStep;                   // * [INST] Decodage paliers vitesse"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_Winch.st",
-        "line": 86,
+        "line": 83,
         "name": "CycleTimeCalc",
         "type": "FB_CycleTime",
         "snippet": "CycleTimeCalc                   : FB_CycleTime;                   // * [INST] Calcul temps de cycle"
@@ -89,21 +68,21 @@
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation.st",
-        "line": 81,
+        "line": 78,
         "name": "Brake",
         "type": "FB_Brake",
         "snippet": "Brake                : FB_Brake;       // * [INST] Séquence frein"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation.st",
-        "line": 82,
+        "line": 79,
         "name": "CycleTimeCalc",
         "type": "FB_CycleTime",
         "snippet": "CycleTimeCalc        : FB_CycleTime;   // * [INST] Mesure temps de cycle"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation.st",
-        "line": 83,
+        "line": 80,
         "name": "SpeedRamp",
         "type": "FB_Ramp",
         "snippet": "SpeedRamp             : FB_Ramp;       // * [INST] Rampe de vitesse logicielle (PLC)"
@@ -117,14 +96,14 @@
       },
       {
         "file": "CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st",
-        "line": 70,
+        "line": 86,
         "name": "AntiFlickSpecial",
         "type": "FB_AntiFlickerText",
         "snippet": "AntiFlickSpecial     : FB_AntiFlickerText; // * [INST] §3 Condition spéciale (warning → maintenu)"
       },
       {
         "file": "CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st",
-        "line": 71,
+        "line": 87,
         "name": "AntiFlickOperator",
         "type": "FB_AntiFlickerText",
         "snippet": "AntiFlickOperator    : FB_AntiFlickerText; // * [INST] §4 Action opérateur (critique → direct, warning → maintenu)"
@@ -148,84 +127,126 @@
       },
       {
         "file": "CODE/D_JOYSTICK/FB_Joystick.st",
-        "line": 59,
+        "line": 57,
         "name": "SpeedXPct",
         "unit": "Pct",
-        "snippet": "SpeedXPct                 : REAL;       // <-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef"
+        "snippet": "SpeedXPct                 : REAL;       // <-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedTgt"
       },
       {
         "file": "CODE/D_JOYSTICK/FB_Joystick.st",
-        "line": 61,
+        "line": 59,
         "name": "SpeedYPct",
         "unit": "Pct",
-        "snippet": "SpeedYPct                 : REAL;       // <-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef"
+        "snippet": "SpeedYPct                 : REAL;       // <-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedTgt"
+      },
+      {
+        "file": "CODE/E_CODEURS/FB_Encoder.st",
+        "line": 24,
+        "name": "HomingAtTargetM",
+        "unit": "M",
+        "snippet": "HomingAtTargetM       : BOOL;        // --> [CMD] Demande homing vers cible (front montant)"
+      },
+      {
+        "file": "CODE/E_CODEURS/FB_Encoder.st",
+        "line": 27,
+        "name": "CfgHomingTargetM",
+        "unit": "M",
+        "snippet": "CfgHomingTargetM      : REAL;        // --> [CFG] Cible libre homing unitaire (m)"
+      },
+      {
+        "file": "CODE/E_CODEURS/FB_Encoder.st",
+        "line": 28,
+        "name": "CfgTopSensorPosM",
+        "unit": "M",
+        "snippet": "CfgTopSensorPosM      : REAL;        // --> [CFG] Cible homing nominal capteur haut (m)"
+      },
+      {
+        "file": "CODE/E_CODEURS/FB_Encoder.st",
+        "line": 30,
+        "name": "DynamicHomingTargetM",
+        "unit": "M",
+        "snippet": "DynamicHomingTargetM  : REAL;       // --> [CFG] Cible dynamique de referencement (m)"
+      },
+      {
+        "file": "CODE/E_CODEURS/FB_Encoder.st",
+        "line": 43,
+        "name": "PositionMinM",
+        "unit": "M",
+        "snippet": "PositionMinM          : REAL := -99.0; // --> [CFG] Plafond bornage physique bas (m)"
+      },
+      {
+        "file": "CODE/E_CODEURS/FB_Encoder.st",
+        "line": 44,
+        "name": "PositionMaxM",
+        "unit": "M",
+        "snippet": "PositionMaxM          : REAL := 99.0;  // --> [CFG] Plafond bornage physique haut (m)"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 27,
+        "line": 22,
         "name": "CfgHomingTargetM",
         "unit": "M",
         "snippet": "CfgHomingTargetM       : REAL;        // --> [CFG] Cible libre homing unitaire (m)"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 29,
+        "line": 24,
         "name": "DynamicHomingTargetM",
         "unit": "M",
         "snippet": "DynamicHomingTargetM   : REAL := 0.0; // --> [CFG] Cible dynamique de referencement (m)"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 30,
+        "line": 25,
         "name": "CfgTopSensorPosM",
         "unit": "M",
         "snippet": "CfgTopSensorPosM       : REAL := 8.5; // --> [CFG] Cible homing nominal capteur haut (m)"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 95,
+        "line": 86,
         "name": "TargetPositionM",
         "unit": "M",
         "snippet": "TargetPositionM        : REAL;        // . [LOC] Cible retenue en metres"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 187,
+        "line": 174,
         "name": "TargetPositionM",
         "unit": "M",
         "snippet": "TargetPositionM := DynamicHomingTargetM;"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 189,
-        "name": "TargetPositionM",
-        "unit": "M",
-        "snippet": "TargetPositionM := CfgHomingTargetM;"
-      },
-      {
-        "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 191,
+        "line": 176,
         "name": "TargetPositionM",
         "unit": "M",
         "snippet": "TargetPositionM := CfgTopSensorPosM;"
       },
       {
+        "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
+        "line": 178,
+        "name": "TargetPositionM",
+        "unit": "M",
+        "snippet": "TargetPositionM := CfgHomingTargetM;"
+      },
+      {
         "file": "CODE/E_CODEURS/FB_Encoder_Safety.st",
-        "line": 21,
+        "line": 17,
         "name": "CablePosM",
         "unit": "M",
         "snippet": "CablePosM             : REAL;        // --> [HW]  Position calculee (m, sortie FB_Encoder_Scale)"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Safety.st",
-        "line": 25,
+        "line": 21,
         "name": "PositionMinM",
         "unit": "M",
         "snippet": "PositionMinM          : REAL := -99.0; // --> [CFG] Plafond bornage physique bas (m)"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Safety.st",
-        "line": 26,
+        "line": 22,
         "name": "PositionMaxM",
         "unit": "M",
         "snippet": "PositionMaxM          : REAL := 99.0;  // --> [CFG] Plafond bornage physique haut (m)"
@@ -253,14 +274,14 @@
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_SpeedMonitor.st",
-        "line": 37,
+        "line": 34,
         "name": "SpeedDeltaMps",
         "unit": "Mps",
         "snippet": "SpeedDeltaMps          : REAL;        // <-- [DIAG] Ecart absolu entre deux mesures (m/s)"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_SpeedMonitor.st",
-        "line": 52,
+        "line": 49,
         "name": "PreviousSpeedMps",
         "unit": "Mps",
         "snippet": "PreviousSpeedMps       : REAL;        // . [LOC] Vitesse mesuree au cycle precedent (m/s)"
@@ -393,7 +414,7 @@
       },
       {
         "file": "CODE/GVL_PERSISTENT.st",
-        "line": 99,
+        "line": 100,
         "name": "_TranslationGainMetersPerHzSec",
         "unit": "Sec",
         "snippet": "_TranslationGainMetersPerHzSec  : REAL := 0.008333; // Ratio m/s par Hz (ex: 50 Hz = 0.416 m/s)"
@@ -421,101 +442,136 @@
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 61,
+        "line": 56,
         "name": "ActiveOffsetM",
         "unit": "M",
         "snippet": "ActiveOffsetM                   : REAL;                           // <-- [DIAG] Decalage cible pour FB_WinchSync"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 63,
+        "line": 58,
         "name": "RemainingTravelM",
         "unit": "M",
         "snippet": "RemainingTravelM                : REAL;                           // <-- [DIAG] Distance restante avant cible (m)"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 82,
+        "line": 77,
         "name": "M1RefPosM",
         "unit": "M",
         "snippet": "M1RefPosM                       : REAL;                           // . [LOC] Position M1 memorisee a l'entree Busy"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 83,
+        "line": 78,
         "name": "M2StartPosM",
         "unit": "M",
         "snippet": "M2StartPosM                     : REAL;                           // . [LOC] Position M2 memorisee a l'entree Busy"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 260,
+        "line": 82,
+        "name": "HoldOffsetM",
+        "unit": "M",
+        "snippet": "HoldOffsetM                     : REAL;                           // . [LOC] Ecart reel mémorise (gel en position intermediaire)"
+      },
+      {
+        "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
+        "line": 256,
         "name": "M1RefPosM",
         "unit": "M",
         "snippet": "M1RefPosM := CablePosM1;"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 261,
+        "line": 257,
         "name": "M2StartPosM",
         "unit": "M",
         "snippet": "M2StartPosM := CablePosM2;   // Borne le recul autorisé (voir §6 CASE BUSY)"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 326,
+        "line": 322,
         "name": "RemainingTravelM",
         "unit": "M",
         "snippet": "RemainingTravelM := 0.0; // Pas de mouvement en cours"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 360,
+        "line": 356,
         "name": "RemainingTravelM",
         "unit": "M",
         "snippet": "RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 362,
+        "line": 358,
         "name": "RemainingTravelM",
         "unit": "M",
         "snippet": "RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 364,
+        "line": 360,
         "name": "RemainingTravelM",
         "unit": "M",
         "snippet": "RemainingTravelM := 0.0;"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 484,
+        "line": 480,
         "name": "RemainingTravelM",
         "unit": "M",
         "snippet": "RemainingTravelM := 0.0; // Cible atteinte"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 511,
+        "line": 507,
         "name": "ActiveOffsetM",
         "unit": "M",
         "snippet": "ActiveOffsetM := CablePosM2 - CablePosM1;"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 513,
+        "line": 508,
+        "name": "HoldOffsetM",
+        "unit": "M",
+        "snippet": "HoldOffsetM := ActiveOffsetM;   // Mémorise l'écart réel pour le gel en position intermédiaire"
+      },
+      {
+        "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
+        "line": 510,
         "name": "ActiveOffsetM",
         "unit": "M",
         "snippet": "ActiveOffsetM := Config.OffsetCloseM;"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
-        "line": 516,
+        "line": 511,
+        "name": "HoldOffsetM",
+        "unit": "M",
+        "snippet": "HoldOffsetM := ActiveOffsetM;"
+      },
+      {
+        "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
+        "line": 513,
         "name": "ActiveOffsetM",
         "unit": "M",
         "snippet": "ActiveOffsetM := Config.OffsetOpenM;"
+      },
+      {
+        "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
+        "line": 514,
+        "name": "HoldOffsetM",
+        "unit": "M",
+        "snippet": "HoldOffsetM := ActiveOffsetM;"
+      },
+      {
+        "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
+        "line": 518,
+        "name": "ActiveOffsetM",
+        "unit": "M",
+        "snippet": "ActiveOffsetM := HoldOffsetM;"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/BENNE/ST_BucketConfig.st",
@@ -672,18 +728,39 @@
         "snippet": "MecaCDriftM                     : REAL;                           // <-- [DIAG] Derive mesuree Meca C (m)"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_SpeedStep.st",
-        "line": 19,
-        "name": "SpeedRefPct",
-        "unit": "Pct",
-        "snippet": "SpeedRefPct                     : REAL;                           // --> [CMD] Consigne vitesse 0..100%"
+        "file": "CODE/H_TREUILS_BENNE/FB_SyncDeviation.st",
+        "line": 28,
+        "name": "CfgSyncToleranceM",
+        "unit": "M",
+        "snippet": "CfgSyncToleranceM               : REAL := 0.10;                   // --> [CFG] Seuil 1 (Warn) — ecart max avant alerte (m)"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_Winch.st",
-        "line": 17,
-        "name": "SpeedRefPct",
-        "unit": "Pct",
-        "snippet": "SpeedRefPct                     : REAL;                           // --> [CMD] Consigne vitesse % (0.0 a 100.0)"
+        "file": "CODE/H_TREUILS_BENNE/FB_SyncDeviation.st",
+        "line": 29,
+        "name": "CfgSyncCriticalToleranceM",
+        "unit": "M",
+        "snippet": "CfgSyncCriticalToleranceM       : REAL := 0.50;                   // --> [CFG] Seuil 2 (Fault) — ecart critique (m)"
+      },
+      {
+        "file": "CODE/H_TREUILS_BENNE/FB_SyncDeviation.st",
+        "line": 30,
+        "name": "ActiveOffsetM",
+        "unit": "M",
+        "snippet": "ActiveOffsetM                   : REAL := 0.0;                    // --> [CFG] Offset cible RESOLU (ex: benne)"
+      },
+      {
+        "file": "CODE/H_TREUILS_BENNE/FB_SyncDeviation.st",
+        "line": 37,
+        "name": "DeltaPosM",
+        "unit": "M",
+        "snippet": "DeltaPosM                       : REAL;                           // <-- [DIAG] Ecart absolu position |M1 - M2| (m)"
+      },
+      {
+        "file": "CODE/H_TREUILS_BENNE/FB_SyncDeviation.st",
+        "line": 38,
+        "name": "SignedDeltaPosM",
+        "unit": "M",
+        "snippet": "SignedDeltaPosM                 : REAL;                           // <-- [DIAG] Ecart signe position (M1 - M2) (m)"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_Winch.st",
@@ -715,63 +792,70 @@
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_Winch.st",
-        "line": 99,
+        "line": 96,
         "name": "RampTargetPct",
         "unit": "Pct",
         "snippet": "RampTargetPct                   : REAL;                           // . [LOC] Consigne cible envoyee au SpeedStep"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st",
-        "line": 20,
+        "line": 21,
         "name": "MeasuredSpeedMps",
         "unit": "Mps",
         "snippet": "MeasuredSpeedMps                : REAL;                           // --> [HW] Vitesse cable absolue (m/s)"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st",
-        "line": 21,
+        "line": 22,
         "name": "MeasuredSpeedSignedMps",
         "unit": "Mps",
         "snippet": "MeasuredSpeedSignedMps          : REAL;                           // --> [HW] Vitesse signee (+: montee, -: descente) (m/s)"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st",
-        "line": 39,
+        "line": 37,
         "name": "EstimatedLoadPct",
         "unit": "Pct",
         "snippet": "EstimatedLoadPct                : REAL;                           // <-- [DIAG] Estimation de charge (0..100%)"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st",
-        "line": 51,
+        "line": 49,
         "name": "SelectedLoadPct",
         "unit": "Pct",
         "snippet": "SelectedLoadPct                 : REAL;                           // . [LOC] Valeur de charge extraite de la table"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_WinchSync.st",
-        "line": 28,
+        "line": 32,
         "name": "CfgSyncToleranceM",
         "unit": "M",
-        "snippet": "CfgSyncToleranceM               : REAL := 0.10;                   // --> [CFG] Ecart max tolere avant alerte (m)"
+        "snippet": "CfgSyncToleranceM               : REAL := 0.10;                   // --> [CFG] Seuil 1 (Warn) — ecart max avant alerte (m)"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_WinchSync.st",
-        "line": 29,
+        "line": 33,
+        "name": "CfgSyncCriticalToleranceM",
+        "unit": "M",
+        "snippet": "CfgSyncCriticalToleranceM       : REAL := 0.50;                   // --> [CFG] Seuil 2 (Fault) — ecart critique (m)"
+      },
+      {
+        "file": "CODE/H_TREUILS_BENNE/FB_WinchSync.st",
+        "line": 34,
         "name": "ActiveOffsetM",
         "unit": "M",
-        "snippet": "ActiveOffsetM                   : REAL := 0.0;                    // --> [CFG] Offset cible applique (ex: benne)"
+        "snippet": "ActiveOffsetM                   : REAL := 0.0;                    // --> [CFG] Offset cible RESOLU (ex: benne)"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_WinchSync.st",
-        "line": 59,
+        "line": 60,
         "name": "DeltaPosM",
         "unit": "M",
         "snippet": "DeltaPosM                       : REAL;                           // <-- [DIAG] Ecart absolu position |M1 - M2| (m)"
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_WinchSync.st",
-        "line": 60,
+        "line": 61,
         "name": "SignedDeltaPosM",
         "unit": "M",
         "snippet": "SignedDeltaPosM                 : REAL;                           // <-- [DIAG] Ecart signe position (M1 - M2) (m)"
@@ -813,13 +897,6 @@
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation.st",
-        "line": 23,
-        "name": "SpeedRefPct",
-        "unit": "Pct",
-        "snippet": "SpeedRefPct                 : REAL;        // --> [CMD] Magnitude de la consigne (de 0 à 100%)"
-      },
-      {
-        "file": "CODE/I_TRANSLATION/FB_Translation.st",
         "line": 35,
         "name": "DriveActualFreqHz",
         "unit": "Hz",
@@ -855,14 +932,14 @@
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation.st",
-        "line": 75,
+        "line": 72,
         "name": "RequestedDriveFreqHz",
         "unit": "Hz",
         "snippet": "RequestedDriveFreqHz      : REAL; // <-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation.st",
-        "line": 90,
+        "line": 87,
         "name": "RampTargetPct",
         "unit": "Pct",
         "snippet": "RampTargetPct        : REAL;   // . [LOC] Cible rampe en %"
@@ -879,35 +956,35 @@
         "line": 25,
         "name": "PosMaintenanceM",
         "unit": "M",
-        "snippet": "PosMaintenanceM      : REAL := 0.0;   (* --> [CFG] Position Maintenance *)"
+        "snippet": "PosMaintenanceM      : REAL := 30.0;   (* --> [CFG] Position Maintenance *)"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st",
         "line": 26,
         "name": "PosP1M",
         "unit": "M",
-        "snippet": "PosP1M               : REAL := 6.0;   (* --> [CFG] Position P1 *)"
+        "snippet": "PosP1M               : REAL := 20.0;   (* --> [CFG] Position P1 *)"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st",
         "line": 27,
         "name": "PosP2M",
         "unit": "M",
-        "snippet": "PosP2M               : REAL := 14.0;   (* --> [CFG] Position P2 *)"
+        "snippet": "PosP2M               : REAL := 15.0;   (* --> [CFG] Position P2 *)"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st",
         "line": 28,
         "name": "PosPVM",
         "unit": "M",
-        "snippet": "PosPVM               : REAL := 21.0;   (* --> [CFG] Position PV *)"
+        "snippet": "PosPVM               : REAL := 5.0;   (* --> [CFG] Position PV *)"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st",
         "line": 29,
         "name": "PosTremieM",
         "unit": "M",
-        "snippet": "PosTremieM           : REAL := 25.0;   (* --> [CFG] Position Trémie *)"
+        "snippet": "PosTremieM           : REAL := 0.0;   (* --> [CFG] Position Trémie *)"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st",
@@ -939,14 +1016,7 @@
       },
       {
         "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
-        "line": 37,
-        "name": "DriveFreqRefHz",
-        "unit": "Hz",
-        "snippet": "DriveFreqRefHz               : REAL;   // <-- [ACT] Frequence de consigne variateur valide (Hz)"
-      },
-      {
-        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
-        "line": 64,
+        "line": 61,
         "name": "DriveFreqWordMaxHz",
         "unit": "Hz",
         "snippet": "DriveFreqWordMaxHz            : REAL := 600.0;   // Borne haute anti-debordement WORD (Hz)"
@@ -957,6 +1027,20 @@
         "name": "Idx414_BottomLimitActiveM",
         "unit": "M",
         "snippet": "Idx414_BottomLimitActiveM    : REAL; // : Limite basse active (m) — câble physique OU légale, la plus restrictive"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st",
+        "line": 26,
+        "name": "Idx321_CfgTopLimitM",
+        "unit": "M",
+        "snippet": "Idx321_CfgTopLimitM               : REAL;  // 📐 Limite haute effective active (m) = CfgCableLimitAscent_M"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st",
+        "line": 27,
+        "name": "Idx322_CablePosM",
+        "unit": "M",
+        "snippet": "Idx322_CablePosM                  : REAL;  // 📐 Position câble courante (m)"
       },
       {
         "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinchSync.st",
@@ -1001,102 +1085,109 @@
         "snippet": "RequestedSpeedPct            : REAL; (* 0..100 % consigne demandée *)"
       },
       {
+        "file": "CODE/J_SUPERVISION/FB_TroubleshootingView.st",
+        "line": 94,
+        "name": "CfgTopLimitM",
+        "unit": "M",
+        "snippet": "CfgTopLimitM             : REAL;   (* --> [CFG] Limite haute active (m) = CfgCableLimitAscent_M *)"
+      },
+      {
         "file": "CODE/L_SIMULATION/FB_Sim_Encoder.st",
-        "line": 34,
-        "name": "SpeedRefPct",
-        "unit": "Pct",
-        "snippet": "SpeedRefPct      : REAL;   (* --> [CMD] Vitesse rampée courante (%) *)"
+        "line": 42,
+        "name": "MinSpeedMps",
+        "unit": "Mps",
+        "snippet": "MinSpeedMps      : REAL := 1.0;    (* --> [CFG] Vitesse palier 1 (m/s) *)"
+      },
+      {
+        "file": "CODE/L_SIMULATION/FB_Sim_Encoder.st",
+        "line": 43,
+        "name": "MaxSpeedMps",
+        "unit": "Mps",
+        "snippet": "MaxSpeedMps      : REAL := 2.0;    (* --> [CFG] Vitesse palier 5 (m/s) *)"
+      },
+      {
+        "file": "CODE/L_SIMULATION/FB_Sim_Encoder.st",
+        "line": 57,
+        "name": "SpeedMps",
+        "unit": "Mps",
+        "snippet": "SpeedMps       : REAL;              (* . [LOC] Vitesse simulée (m/s) *)"
+      },
+      {
+        "file": "CODE/L_SIMULATION/FB_Sim_Joystick.st",
+        "line": 48,
+        "name": "FallTimeMs",
+        "unit": "Ms",
+        "snippet": "FallTimeMs          : TIME := T#200MS;   (* --> [CFG] Temps de retombée 100%→0 *)"
       },
       {
         "file": "CODE/L_SIMULATION/FB_Sim_Translation.st",
-        "line": 19,
-        "name": "SpeedRefPct",
-        "unit": "Pct",
-        "snippet": "SpeedRefPct     : REAL;              (* --> [CMD] Magnitude commande 0..100 %, bornée avant calcul *)"
+        "line": 47,
+        "name": "CST_TotalDistanceM",
+        "unit": "M",
+        "snippet": "CST_TotalDistanceM         : REAL := 30.0; // Distance totale Trémie→Maintenance (m)"
       },
       {
         "file": "CODE/L_SIMULATION/FB_SimBench.st",
-        "line": 35,
-        "name": "M1_SpeedRefPct",
-        "unit": "Pct",
-        "snippet": "M1_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M1 *)"
-      },
-      {
-        "file": "CODE/L_SIMULATION/FB_SimBench.st",
-        "line": 46,
-        "name": "M2_SpeedRefPct",
-        "unit": "Pct",
-        "snippet": "M2_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M2 *)"
-      },
-      {
-        "file": "CODE/L_SIMULATION/FB_SimBench.st",
-        "line": 52,
-        "name": "M3_SpeedRefPct",
-        "unit": "Pct",
-        "snippet": "M3_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M3 *)"
-      },
-      {
-        "file": "CODE/L_SIMULATION/FB_SimBench.st",
-        "line": 125,
+        "line": 129,
         "name": "M3_ActualFreqHz",
         "unit": "Hz",
         "snippet": "M3_ActualFreqHz            : UINT;   (* . [LOC] Fréquence simulée M3 *)"
       },
       {
         "file": "CODE/M_MAIN/PRG_02_Acquisition.st",
-        "line": 73,
-        "name": "M3_ActualFrequencyHz",
-        "unit": "Hz",
-        "snippet": "M3_ActualFrequencyHz       : UINT;  (* Actual Frequency 0x3103 (%IW9, x100) *)"
-      },
-      {
-        "file": "CODE/M_MAIN/PRG_02_Acquisition.st",
-        "line": 93,
+        "line": 41,
         "name": "M2BucketRefTargetM",
         "unit": "M",
-        "snippet": "M2BucketRefTargetM       : REAL;"
+        "snippet": "M2BucketRefTargetM       : REAL;   // . [LOC] Cible metrique etalonnage M2"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 62,
+        "line": 68,
         "name": "ControlAscentStartM1PosM",
         "unit": "M",
         "snippet": "ControlAscentStartM1PosM       : REAL;"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 63,
+        "line": 69,
         "name": "ControlAscentStartM2PosM",
         "unit": "M",
         "snippet": "ControlAscentStartM2PosM       : REAL;"
       },
       {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 510,
+        "name": "ControlAscentStartM1PosM",
+        "unit": "M",
+        "snippet": "ControlAscentStartM1PosM := PRG_02_Acquisition.Data.CablePosM1;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 511,
+        "name": "ControlAscentStartM2PosM",
+        "unit": "M",
+        "snippet": "ControlAscentStartM2PosM := PRG_02_Acquisition.Data.CablePosM2;"
+      },
+      {
         "file": "CODE/M_MAIN/PRG_05_Translation.st",
-        "line": 31,
+        "line": 39,
         "name": "FreqPct",
         "unit": "Pct",
         "snippet": "FreqPct                 : REAL;"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
-        "line": 281,
-        "name": "M3_SetpointFrequencyHz",
-        "unit": "Hz",
-        "snippet": "M3_SetpointFrequencyHz := instTranslationOutputInterlockM3.DriveFreqRefWord;"
-      },
-      {
         "file": "CODE/M_MAIN/PRG_07_Supervision.st",
-        "line": 13,
+        "line": 18,
         "name": "FaultMachineReset_IHM",
         "unit": "M",
-        "snippet": "FaultMachineReset_IHM : BOOL;"
+        "snippet": "FaultMachineReset_IHM : BOOL; // <-- [CMD] Impulsion d'acquittement defaut globale machine"
       },
       {
         "file": "CODE/M_MAIN/PRG_07_Supervision.st",
-        "line": 17,
+        "line": 23,
         "name": "instBlink1Hz",
         "unit": "Hz",
-        "snippet": "instBlink1Hz : BLINK;"
+        "snippet": "instBlink1Hz            : BLINK;                          // * [INST] Clignoteur 1 Hz (heartbeat IHM)"
       }
     ],
     "NC-050": [
@@ -1105,6 +1196,12 @@
         "line": 14,
         "name": "MovementRequested",
         "snippet": "MovementRequested       : BOOL;               // --> [CMD]  Demande de mouvement (sens+palier actifs)"
+      },
+      {
+        "file": "CODE/A_COMMUN/ST_FbStatus.st",
+        "line": 30,
+        "name": "ResetRequested",
+        "snippet": "ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)"
       },
       {
         "file": "CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st",
@@ -1156,13 +1253,13 @@
       },
       {
         "file": "CODE/D_JOYSTICK/FB_Joystick.st",
-        "line": 53,
+        "line": 51,
         "name": "AxisCmdX",
         "snippet": "AxisCmdX                  : ST_Joystick_AxisCmd; // <-- [ACT]  Sortie normalisee axe X"
       },
       {
         "file": "CODE/D_JOYSTICK/FB_Joystick.st",
-        "line": 54,
+        "line": 52,
         "name": "AxisCmdY",
         "snippet": "AxisCmdY                  : ST_Joystick_AxisCmd; // <-- [ACT]  Sortie normalisee axe Y"
       },
@@ -1174,31 +1271,31 @@
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Abs.st",
-        "line": 62,
+        "line": 55,
         "name": "PresetReqEdge",
         "snippet": "PresetReqEdge       : R_TRIG;      // . [LOC] Detecteur front montant PresetRequest"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 62,
+        "line": 54,
         "name": "PresetRequest",
         "snippet": "PresetRequest          : BOOL;        // <-- [ACT]  Pulse demande d'ecriture preset SDO"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 106,
+        "line": 97,
         "name": "PresetRequest",
         "snippet": "PresetRequest := FALSE;"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 151,
+        "line": 142,
         "name": "PresetRequest",
         "snippet": "PresetRequest := FALSE;"
       },
       {
         "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
-        "line": 215,
+        "line": 202,
         "name": "PresetRequest",
         "snippet": "PresetRequest := TRUE;"
       },
@@ -1240,7 +1337,7 @@
       },
       {
         "file": "CODE/G_CYCLE/FB_ExtractionSequence.st",
-        "line": 45,
+        "line": 42,
         "name": "BucketCloseRequest",
         "snippet": "BucketCloseRequest          : BOOL;     // <-- [ACT] Demande de fermeture benne"
       },
@@ -1252,7 +1349,7 @@
       },
       {
         "file": "CODE/H_TREUILS_BENNE/FB_Safety_Winch.st",
-        "line": 115,
+        "line": 116,
         "name": "MecaB_NoOperatorCmd",
         "snippet": "MecaB_NoOperatorCmd             : BOOL;                           // . [LOC] Absence commande operateur"
       },
@@ -1306,13 +1403,13 @@
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation.st",
-        "line": 76,
+        "line": 73,
         "name": "BrakeReleaseRequest",
         "snippet": "BrakeReleaseRequest       : BOOL; // <-- [ACT] Demande métier desserrage, issue de FB_Brake"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation.st",
-        "line": 95,
+        "line": 92,
         "name": "MovementRequested",
         "snippet": "MovementRequested      : BOOL;         // . [LOC] Pilote FB_Brake"
       },
@@ -1324,19 +1421,31 @@
       },
       {
         "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
-        "line": 55,
+        "line": 34,
+        "name": "DriveFreqCmd_Hz",
+        "snippet": "DriveFreqCmd_Hz              : REAL;   // <-- [ACT] Frequence de consigne variateur valide (Hz)"
+      },
+      {
+        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
+        "line": 35,
+        "name": "DriveFreqCmdWord",
+        "snippet": "DriveFreqCmdWord             : WORD;   // <-- [ACT] Frequence mise a l'echelle registre PDO 0x3100"
+      },
+      {
+        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
+        "line": 52,
         "name": "MovementRequested",
         "snippet": "MovementRequested            : BOOL;   // . [LOC] Demande de mouvement active"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
-        "line": 56,
+        "line": 53,
         "name": "NeutralRequestSeen",
         "snippet": "NeutralRequestSeen           : BOOL;   // . [LOC] Demande neutre (mot 0) observee"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
-        "line": 57,
+        "line": 54,
         "name": "ResetRequired",
         "snippet": "ResetRequired                : BOOL;   // . [LOC] Front Reset obligatoire avant nouvelle marche"
       },
@@ -1401,6 +1510,60 @@
         "snippet": "Idx207_OpenReqActive         : BOOL; // : 1 = Ouverture mémorisée/en cours (instBucket.OpenReq -- idem)"
       },
       {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st",
+        "line": 36,
+        "name": "PowerKeepAliveACmd",
+        "snippet": "PowerKeepAliveACmd    : BOOL; // 🔒 Maintien puissance voie A (1=Maintenu)"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st",
+        "line": 37,
+        "name": "PowerKeepAliveBCmd",
+        "snippet": "PowerKeepAliveBCmd    : BOOL; // 🔒 Maintien puissance voie B (1=Maintenu)"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st",
+        "line": 38,
+        "name": "EmergencyArmingCmd",
+        "snippet": "EmergencyArmingCmd    : BOOL; // 🎯 Impulsion rearmement puissance AU"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st",
+        "line": 16,
+        "name": "WinchM1FinalInterlockRequest",
+        "snippet": "WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // 🪝 Demande finale et interlocks treuil M1"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st",
+        "line": 17,
+        "name": "WinchM2FinalInterlockRequest",
+        "snippet": "WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // 🪝 Demande finale et interlocks treuil M2"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st",
+        "line": 18,
+        "name": "M1LogicRequestSpeedCmd_Pct",
+        "snippet": "M1LogicRequestSpeedCmd_Pct   : REAL; // 📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st",
+        "line": 19,
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct   : REAL; // 📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st",
+        "line": 20,
+        "name": "KoboldContactorCmdArbitrated",
+        "snippet": "KoboldContactorCmdArbitrated : BOOL; // 🪝 Ordre contacteur capteur fond Kobold (consommé PRG_06)"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st",
+        "line": 20,
+        "name": "SpeedCmd_Pct",
+        "snippet": "SpeedCmd_Pct            : REAL;             (* 📈 Commande de vitesse finale après rampe (%) *)"
+      },
+      {
         "file": "CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Demandes.st",
         "line": 5,
         "name": "Idx203_HmiCmd_BtnFwd",
@@ -1429,6 +1592,24 @@
         "line": 21,
         "name": "BrakeReleaseRequest",
         "snippet": "BrakeReleaseRequest          : BOOL;"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st",
+        "line": 15,
+        "name": "TranslationFinalInterlockRequest",
+        "snippet": "TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // ↔️ Demande finale et interlocks translation M3"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st",
+        "line": 22,
+        "name": "DriveFreqCmd_Hz",
+        "snippet": "DriveFreqCmd_Hz         : REAL;    (* 🎯 Commande fréquence réellement appliquée *)"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st",
+        "line": 24,
+        "name": "ActiveSpeedCmd_Pct",
+        "snippet": "ActiveSpeedCmd_Pct      : REAL;    (* 📊 Commande active après arbitrage *)"
       },
       {
         "file": "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st",
@@ -1461,80 +1642,86 @@
         "snippet": "Step4_MotionRequested        : BOOL; (* TRUE = Demande active (Bouton IHM ou Joystick) ➔ Si IHM : TglJoystickMaster doit être à 0 ! *)"
       },
       {
+        "file": "CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st",
+        "line": 35,
+        "name": "PowerCutOffRequest",
+        "snippet": "PowerCutOffRequest           : BOOL; (* TRUE = demande de coupure AU (entrée instSafetyEmergencyManagement) *)"
+      },
+      {
         "file": "CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st",
-        "line": 48,
+        "line": 50,
         "name": "CoupledUserRequestDirection",
         "snippet": "CoupledUserRequestDirection : INT;   // --> [CMD] Direction demandée couplée"
       },
       {
         "file": "CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st",
-        "line": 49,
+        "line": 51,
         "name": "M1LogicRequestDirection",
         "snippet": "M1LogicRequestDirection     : INT;   // --> [CMD] Direction logique M1"
       },
       {
         "file": "CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st",
-        "line": 50,
+        "line": 52,
         "name": "M2LogicRequestDirection",
         "snippet": "M2LogicRequestDirection     : INT;   // --> [CMD] Direction logique M2"
       },
       {
         "file": "CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st",
-        "line": 51,
+        "line": 53,
         "name": "CycleRequestDirection",
         "snippet": "CycleRequestDirection      : INT;   // --> [CMD] Direction cycle"
       },
       {
-        "file": "CODE/K_DEPANNAGE/FB_TroubleshootingView.st",
+        "file": "CODE/J_SUPERVISION/FB_TroubleshootingView.st",
         "line": 36,
-        "name": "M1LogicRequestSpeedRef_Pct",
-        "snippet": "M1LogicRequestSpeedRef_Pct : REAL;   (* --> [CMD] Consigne vitesse M1 *)"
+        "name": "M1LogicRequestSpeedCmd_Pct",
+        "snippet": "M1LogicRequestSpeedCmd_Pct : REAL;   (* --> [CMD] Consigne vitesse M1 *)"
       },
       {
-        "file": "CODE/K_DEPANNAGE/FB_TroubleshootingView.st",
+        "file": "CODE/J_SUPERVISION/FB_TroubleshootingView.st",
         "line": 37,
         "name": "M1LogicRequestDirection",
         "snippet": "M1LogicRequestDirection    : INT;   (* --> [CMD] Sens M1 *)"
       },
       {
-        "file": "CODE/K_DEPANNAGE/FB_TroubleshootingView.st",
+        "file": "CODE/J_SUPERVISION/FB_TroubleshootingView.st",
         "line": 38,
-        "name": "M2LogicRequestSpeedRef_Pct",
-        "snippet": "M2LogicRequestSpeedRef_Pct : REAL;   (* --> [CMD] Consigne vitesse M2 *)"
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct : REAL;   (* --> [CMD] Consigne vitesse M2 *)"
       },
       {
-        "file": "CODE/K_DEPANNAGE/FB_TroubleshootingView.st",
+        "file": "CODE/J_SUPERVISION/FB_TroubleshootingView.st",
         "line": 39,
         "name": "M2LogicRequestDirection",
         "snippet": "M2LogicRequestDirection    : INT;   (* --> [CMD] Sens M2 *)"
       },
       {
-        "file": "CODE/K_DEPANNAGE/FB_TroubleshootingView.st",
+        "file": "CODE/J_SUPERVISION/FB_TroubleshootingView.st",
         "line": 40,
         "name": "CoupledUserRequestDirection",
         "snippet": "CoupledUserRequestDirection : INT;   (* --> [CMD] Direction couplée *)"
       },
       {
-        "file": "CODE/K_DEPANNAGE/FB_TroubleshootingView.st",
+        "file": "CODE/J_SUPERVISION/FB_TroubleshootingView.st",
         "line": 41,
         "name": "CoupledUserRequestActive",
         "snippet": "CoupledUserRequestActive    : BOOL;   (* --> [CMD] Demande couplée active *)"
       },
       {
-        "file": "CODE/K_DEPANNAGE/FB_TroubleshootingView.st",
+        "file": "CODE/J_SUPERVISION/FB_TroubleshootingView.st",
         "line": 81,
         "name": "CycleStartRequest",
         "snippet": "CycleStartRequest        : BOOL;   (* --> [CMD] Demande Start *)"
       },
       {
-        "file": "CODE/K_DEPANNAGE/FB_TroubleshootingView.st",
+        "file": "CODE/J_SUPERVISION/FB_TroubleshootingView.st",
         "line": 82,
         "name": "CycleAbortRequest",
         "snippet": "CycleAbortRequest        : BOOL;   (* --> [CMD] Demande Abort *)"
       },
       {
         "file": "CODE/L_SIMULATION/FB_Sim_Encoder.st",
-        "line": 35,
+        "line": 34,
         "name": "PresetCmd",
         "snippet": "PresetCmd        : BOOL;   (* --> [CMD] Applique un preset (homing) *)"
       },
@@ -1546,153 +1733,405 @@
       },
       {
         "file": "CODE/L_SIMULATION/FB_SimBench.st",
-        "line": 36,
+        "line": 35,
+        "name": "M1_SpeedCmd_Pct",
+        "snippet": "M1_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M1 *)"
+      },
+      {
+        "file": "CODE/L_SIMULATION/FB_SimBench.st",
+        "line": 37,
         "name": "M1_PresetTriggerCmd",
         "snippet": "M1_PresetTriggerCmd        : WORD;   (* --> [CMD] Trigger preset M1 *)"
       },
       {
         "file": "CODE/L_SIMULATION/FB_SimBench.st",
         "line": 47,
+        "name": "M2_SpeedCmd_Pct",
+        "snippet": "M2_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M2 *)"
+      },
+      {
+        "file": "CODE/L_SIMULATION/FB_SimBench.st",
+        "line": 49,
         "name": "M2_PresetTriggerCmd",
         "snippet": "M2_PresetTriggerCmd        : WORD;   (* --> [CMD] Trigger preset M2 *)"
       },
       {
         "file": "CODE/L_SIMULATION/FB_SimBench.st",
-        "line": 115,
+        "line": 54,
+        "name": "M3_SpeedCmd_Pct",
+        "snippet": "M3_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M3 *)"
+      },
+      {
+        "file": "CODE/L_SIMULATION/FB_SimBench.st",
+        "line": 119,
         "name": "M1_PresetCmd",
         "snippet": "M1_PresetCmd               : BOOL;   (* . [LOC] Trigger preset M1 *)"
       },
       {
         "file": "CODE/L_SIMULATION/FB_SimBench.st",
-        "line": 116,
+        "line": 120,
         "name": "M2_PresetCmd",
         "snippet": "M2_PresetCmd               : BOOL;   (* . [LOC] Trigger preset M2 *)"
       },
       {
         "file": "CODE/M_MAIN/PRG_02_Acquisition.st",
-        "line": 92,
+        "line": 40,
         "name": "M2BucketRefRequested",
-        "snippet": "M2BucketRefRequested     : BOOL;"
+        "snippet": "M2BucketRefRequested     : BOOL;   // . [LOC] Demande d'etalonnage M2 active"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 12,
+        "line": 31,
         "name": "WinchM1FinalInterlockRequest",
-        "snippet": "WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest;"
+        "snippet": "WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // . [LOC] Demande finale et interlocks treuil M1"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 13,
+        "line": 32,
         "name": "WinchM2FinalInterlockRequest",
-        "snippet": "WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest;"
+        "snippet": "WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // . [LOC] Demande finale et interlocks treuil M2"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 14,
+        "line": 33,
         "name": "KoboldContactorCmdArbitrated",
-        "snippet": "KoboldContactorCmdArbitrated : BOOL;"
+        "snippet": "KoboldContactorCmdArbitrated : BOOL;                         // . [LOC] Ordre contacteur capteur fond Kobold"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 36,
+        "line": 42,
         "name": "CoupledUserRequestActive",
         "snippet": "CoupledUserRequestActive : BOOL;"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 37,
+        "line": 43,
         "name": "CoupledUserRequestDirection",
         "snippet": "CoupledUserRequestDirection     : INT;"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 65,
+        "line": 71,
         "name": "M1LogicRequestStartStop",
         "snippet": "M1LogicRequestStartStop     : BOOL;"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 66,
+        "line": 72,
         "name": "M1LogicRequestDirection",
         "snippet": "M1LogicRequestDirection     : INT;"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 67,
-        "name": "M1LogicRequestSpeedRef_Pct",
-        "snippet": "M1LogicRequestSpeedRef_Pct      : REAL;"
+        "line": 73,
+        "name": "M1LogicRequestSpeedCmd_Pct",
+        "snippet": "M1LogicRequestSpeedCmd_Pct      : REAL;"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 69,
+        "line": 75,
         "name": "M2LogicRequestStartStop",
         "snippet": "M2LogicRequestStartStop     : BOOL;"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 70,
+        "line": 76,
         "name": "M2LogicRequestDirection",
         "snippet": "M2LogicRequestDirection     : INT;"
       },
       {
         "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
-        "line": 71,
-        "name": "M2LogicRequestSpeedRef_Pct",
-        "snippet": "M2LogicRequestSpeedRef_Pct      : REAL;"
+        "line": 77,
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct      : REAL;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 152,
+        "name": "CoupledUserRequestDirection",
+        "snippet": "CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 158,
+        "name": "CoupledUserRequestDirection",
+        "snippet": "CoupledUserRequestDirection := 1;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 160,
+        "name": "CoupledUserRequestDirection",
+        "snippet": "CoupledUserRequestDirection := -1;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 162,
+        "name": "CoupledUserRequestDirection",
+        "snippet": "CoupledUserRequestDirection := 0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 164,
+        "name": "CoupledUserRequestActive",
+        "snippet": "CoupledUserRequestActive := (CoupledUserRequestDirection <> 0);"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 319,
+        "name": "KoboldContactorCmdArbitrated",
+        "snippet": "KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 411,
+        "name": "M1LogicRequestDirection",
+        "snippet": "M1LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 412,
+        "name": "M1LogicRequestStartStop",
+        "snippet": "M1LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 413,
+        "name": "M1LogicRequestSpeedCmd_Pct",
+        "snippet": "M1LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 418,
+        "name": "M1LogicRequestDirection",
+        "snippet": "M1LogicRequestDirection := 1;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 419,
+        "name": "M1LogicRequestSpeedCmd_Pct",
+        "snippet": "M1LogicRequestSpeedCmd_Pct  := 100.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 421,
+        "name": "M1LogicRequestDirection",
+        "snippet": "M1LogicRequestDirection := -1;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 422,
+        "name": "M1LogicRequestSpeedCmd_Pct",
+        "snippet": "M1LogicRequestSpeedCmd_Pct  := 100.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 424,
+        "name": "M1LogicRequestDirection",
+        "snippet": "M1LogicRequestDirection := 0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 425,
+        "name": "M1LogicRequestSpeedCmd_Pct",
+        "snippet": "M1LogicRequestSpeedCmd_Pct  := 0.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 430,
+        "name": "M1LogicRequestDirection",
+        "snippet": "M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 431,
+        "name": "M1LogicRequestSpeedCmd_Pct",
+        "snippet": "M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 433,
+        "name": "M1LogicRequestDirection",
+        "snippet": "M1LogicRequestDirection := 0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 434,
+        "name": "M1LogicRequestSpeedCmd_Pct",
+        "snippet": "M1LogicRequestSpeedCmd_Pct  := 0.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 449,
+        "name": "M2LogicRequestStartStop",
+        "snippet": "M2LogicRequestStartStop := instBucket.M2_StartStop;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 450,
+        "name": "M2LogicRequestDirection",
+        "snippet": "M2LogicRequestDirection := instBucket.M2_Direction;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 451,
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct  := 15.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 455,
+        "name": "M2LogicRequestDirection",
+        "snippet": "M2LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 456,
+        "name": "M2LogicRequestStartStop",
+        "snippet": "M2LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 457,
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 462,
+        "name": "M2LogicRequestDirection",
+        "snippet": "M2LogicRequestDirection := 1;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 463,
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct  := 100.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 465,
+        "name": "M2LogicRequestDirection",
+        "snippet": "M2LogicRequestDirection := -1;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 466,
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct  := 100.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 468,
+        "name": "M2LogicRequestDirection",
+        "snippet": "M2LogicRequestDirection := 0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 469,
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct  := 0.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 474,
+        "name": "M2LogicRequestDirection",
+        "snippet": "M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 475,
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 477,
+        "name": "M2LogicRequestDirection",
+        "snippet": "M2LogicRequestDirection := 0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 478,
+        "name": "M2LogicRequestSpeedCmd_Pct",
+        "snippet": "M2LogicRequestSpeedCmd_Pct  := 0.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 496,
+        "name": "M1LogicRequestStartStop",
+        "snippet": "M1LogicRequestStartStop := FALSE;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+        "line": 497,
+        "name": "M2LogicRequestStartStop",
+        "snippet": "M2LogicRequestStartStop := FALSE;"
       },
       {
         "file": "CODE/M_MAIN/PRG_05_Translation.st",
-        "line": 14,
+        "line": 28,
         "name": "TranslationFinalInterlockRequest",
-        "snippet": "TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest;"
+        "snippet": "TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // . [LOC] Demande finale et interlocks translation M3"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_05_Translation.st",
+        "line": 34,
+        "name": "M3_SpeedCmd_Active",
+        "snippet": "M3_SpeedCmd_Active      : REAL;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_05_Translation.st",
+        "line": 153,
+        "name": "M3_SpeedCmd_Active",
+        "snippet": "M3_SpeedCmd_Active := 100.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_05_Translation.st",
+        "line": 161,
+        "name": "M3_SpeedCmd_Active",
+        "snippet": "M3_SpeedCmd_Active := 0.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_05_Translation.st",
+        "line": 201,
+        "name": "M3_SpeedCmd_Active",
+        "snippet": "M3_SpeedCmd_Active   := 0.0;"
+      },
+      {
+        "file": "CODE/M_MAIN/PRG_05_Translation.st",
+        "line": 207,
+        "name": "M3_SpeedCmd_Active",
+        "snippet": "M3_SpeedCmd_Active := LIMIT(0.0, ABS(M3_SpeedCmd_Active), 100.0);"
       },
       {
         "file": "CODE/M_MAIN/PRG_06_Outputs.st",
-        "line": 95,
-        "name": "PowerCutOffReq",
-        "snippet": "PowerCutOffReq      : BOOL;"
+        "line": 52,
+        "name": "M3_DriveFreqCmdWord",
+        "snippet": "M3_DriveFreqCmdWord          : WORD; // <-- [ACT] Consigne frequence M3 (0x3100, x100) — cible mapping E/S"
       },
       {
         "file": "CODE/M_MAIN/PRG_06_Outputs.st",
-        "line": 97,
+        "line": 79,
         "name": "PowerKeepAliveACmd",
-        "snippet": "PowerKeepAliveACmd  : BOOL; (* Maintien puissance voie A — cible du mapping E/S *)"
+        "snippet": "PowerKeepAliveACmd           : BOOL; // . [LOC] Maintien puissance voie A"
       },
       {
         "file": "CODE/M_MAIN/PRG_06_Outputs.st",
-        "line": 98,
+        "line": 80,
         "name": "PowerKeepAliveBCmd",
-        "snippet": "PowerKeepAliveBCmd  : BOOL; (* Maintien puissance voie B — cible du mapping E/S *)"
+        "snippet": "PowerKeepAliveBCmd           : BOOL; // . [LOC] Maintien puissance voie B"
       },
       {
         "file": "CODE/M_MAIN/PRG_06_Outputs.st",
-        "line": 99,
+        "line": 81,
         "name": "EmergencyArmingCmd",
-        "snippet": "EmergencyArmingCmd  : BOOL; (* Impulsion réarmement — cible du mapping E/S *)"
+        "snippet": "EmergencyArmingCmd           : BOOL; // . [LOC] Impulsion rearmement puissance AU"
       },
       {
         "file": "CODE/M_MAIN/PRG_06_Outputs.st",
-        "line": 339,
+        "line": 84,
         "name": "PowerCutOffReq",
-        "snippet": "PowerCutOffReq := PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;"
-      },
-      {
-        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
-        "line": 351,
-        "name": "PowerKeepAliveACmd",
-        "snippet": "PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;"
-      },
-      {
-        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
-        "line": 352,
-        "name": "PowerKeepAliveBCmd",
-        "snippet": "PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;"
-      },
-      {
-        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
-        "line": 353,
-        "name": "EmergencyArmingCmd",
-        "snippet": "EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;"
+        "snippet": "PowerCutOffReq                   : BOOL; // . [LOC] Demande agregative coupure puissance"
       }
     ],
     "NC-060": [
@@ -1758,8 +2197,16 @@
         "name": "PresetTriggerCmd",
         "type": "WORD",
         "snippet": "PresetTriggerCmd : WORD;  (* 🎯 Commande de preset active *)"
+      },
+      {
+        "file": "CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st",
+        "line": 27,
+        "name": "WinchInputSourceChanged",
+        "type": "BOOL",
+        "snippet": "WinchInputSourceChanged   : BOOL; (* 🔀 PLC→IHM : source Winch a basculé (réel/simu) ce cycle *)"
       }
     ],
-    "NC-070": []
+    "NC-070": [],
+    "NC-080": []
   }
 }

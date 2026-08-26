@@ -8,7 +8,7 @@
       par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
       de vitesse au meme scan. HomedAndReliable = gate strict interlock M3.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder
@@ -75,7 +75,7 @@ VAR_IN_OUT
     Calib                  : ST_Encoder_Calib; // <-> [BUS] Calibration RETAIN du treuil
 END_VAR
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 IF NOT Enable THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
     Status.State := E_State.DISABLED;
@@ -90,7 +90,7 @@ Ready := TRUE;
 Status.State := E_State.READY;
 {endregion}
 
-{region "Abs"}
+{region "§2 Abs"}
 instAbs(
     Enable              := Enable,
     Reset               := Reset,
@@ -104,7 +104,7 @@ instAbs(
 );
 {endregion}
 
-{region "Homing"}
+{region "§3 Homing"}
 instHoming(
     Enable               := Enable,
     Reset                := Reset,
@@ -128,7 +128,7 @@ instHoming(
 );
 {endregion}
 
-{region "Scale"}
+{region "§4 Scale"}
 instScale(
     RawPos       := instAbs.RawPos,
     HomingRefRaw := instHoming.HomingRefRaw,
@@ -137,7 +137,7 @@ instScale(
 );
 {endregion}
 
-{region "Safety"}
+{region "§5 Safety"}
 instSafety(
     Enable             := Enable,
     Reset              := Reset,
@@ -149,7 +149,7 @@ instSafety(
 );
 {endregion}
 
-{region "Reliability"}
+{region "§6 Reliability"}
 instRel(
     EncoderAvailable  := instAbs.EncoderAvailable,
     Homed             := instHoming.Homed,
@@ -157,7 +157,7 @@ instRel(
 );
 {endregion}
 
-{region "Speed"}
+{region "§7 Speed"}
 instSpeed(
     Enable        := Enable,
     Reset         := Reset,
@@ -166,7 +166,7 @@ instSpeed(
 );
 {endregion}
 
-{region "Remplissage struct et synthese"}
+{region "§8 Remplissage struct et synthese"}
 Measurement.RawPos            := instAbs.RawPos;
 Measurement.EncoderAvailable  := instAbs.EncoderAvailable;
 Measurement.CablePosM         := instSafety.CablePosMSafe;

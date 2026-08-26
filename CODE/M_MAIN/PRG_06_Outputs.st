@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📤 PRG_06_Outputs — Barrière finale des sorties physiques (ST pur)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §5
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §5
    ⚙️ Exécuté en position 6 (après PRG_05_Translation).
    🛡️ Interlocks finaux M1/M2/M3 + agrégation PowerCutOff + chaîne AU.
    🔒 SafetyStructureNotValidated reste TRUE : aucune sortie moteur/frein
@@ -49,7 +49,7 @@ VAR_OUTPUT
     // Les noms Device bruts (*_DQ / *_RQ) ne sont pas declares ici : les declarer
     // creerait une collision avec la globale homonyme du mapping E/S.
     M3_DriveControlWord          : WORD; // <-- [ACT] Mot commande variateur M3 (0x3101) — cible mapping E/S
-    M3_DriveFreqRefWord          : WORD; // <-- [ACT] Consigne frequence M3 (0x3100, x100) — cible mapping E/S
+    M3_DriveFreqCmdWord          : WORD; // <-- [ACT] Consigne frequence M3 (0x3100, x100) — cible mapping E/S
     KoboldContactorCmd           : BOOL; // <-- [ACT] Ordre alimentation contacteur capteur fond Kobold
 END_VAR
 
@@ -267,8 +267,8 @@ instTranslationOutputInterlockM3(
 );
 
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
-M3_CommandWord := instTranslationOutputInterlockM3.DriveControlWord;
-M3_SetpointFrequencyHz := instTranslationOutputInterlockM3.DriveFreqRefWord;
+M3_DriveControlWord := instTranslationOutputInterlockM3.DriveControlWord;
+M3_DriveFreqCmdWord := instTranslationOutputInterlockM3.DriveFreqCmdWord;
 
 // ── Sorties physiques M3 ──
 M3_BrakeRelease_RQ           := TranslationBrakeCmd;

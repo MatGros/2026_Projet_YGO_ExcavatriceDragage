@@ -8,12 +8,25 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'SimBench : instanciation et neutralisation sans Enable'
+TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
+    (* Scan 0 : Enable=FALSE -> Neutralisation *)
     FB_Bench(Enable := FALSE);
-    ASSERT_FALSE(FB_Bench.Ready, 'Ready doit etre FALSE sans Enable');
+    ASSERT_FALSE(FB_Bench.Ready, 'Enable=FALSE -> Ready=FALSE (neutralise)');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 1 : Enable=TRUE -> SimBench actif *)
+    FB_Bench(Enable := TRUE);
+    ASSERT_TRUE(FB_Bench.Ready, 'Enable=TRUE -> Ready=TRUE (nominal)');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
+    FB_Bench(Enable := FALSE);
+    ASSERT_FALSE(FB_Bench.Ready, 'Coupure -> Ready retombe a FALSE');
 END_TEST
 
-TEST 'Sim_Safety : neutralisation sans Enable'
+TEST 'TC-P13-001 Sim_Safety : neutralisation sans Enable'
     FB_SimSafe(Enable := FALSE);
     ASSERT_FALSE(FB_SimSafe.SimChainOk, 'AU non ferme');
     ASSERT_FALSE(FB_SimSafe.SimContactorOk, 'Contacteur coupe');

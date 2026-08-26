@@ -25,33 +25,54 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)'
+TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* Scan 0 : Enable=FALSE -> Neutralisation initiale absolue, Ready=FALSE, sorties neutralisees *)
     fb(ENABLE := FALSE, RESET := FALSE, ARMINGPERMIT := TRUE,
        BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
        RAWX := 8000, RAWY := 8000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready=FALSE');
+    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready=FALSE (neutralise)');
     ASSERT_FALSE(fb.STATUS.ERROR, 'Enable=FALSE -> Status.Error=FALSE (neutralise)');
     ASSERT_FALSE(fb.STATUS.WARNING, 'Enable=FALSE -> Status.Warning=FALSE');
-    ASSERT_FALSE(fb.DEADMANARMED, 'Enable=FALSE -> Geste desarme');
-    ASSERT_EQ(fb.AXISCMDX.SPEEDREF, 0.0, 'Sortie X a 0');
-    ASSERT_EQ(fb.AXISCMDY.SPEEDREF, 0.0, 'Sortie Y a 0');
-END_TEST
+    ASSERT_EQ(fb.AXISCMDX.SPEEDTGT, 0.0, 'Enable=FALSE -> Sortie X neutralisee a 0');
+    ASSERT_EQ(fb.AXISCMDY.SPEEDTGT, 0.0, 'Enable=FALSE -> Sortie Y neutralisee a 0');
 
-TEST 'Nominal : Enable=TRUE au neutre -> Ready, aucun defaut'
-    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
-    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    ADVANCE_TIME(10000000);
+    nx := 5000; ny := 5000;
+
+    (* Scan 1 : Front montant Enable=TRUE avec entrees au repos -> Transition nominale prete *)
     fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
        BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
        RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_TRUE(fb.READY, 'Enable=TRUE -> Ready=TRUE');
+    ASSERT_TRUE(fb.READY, 'Enable=TRUE au repos -> Ready=TRUE (nominal)');
     ASSERT_FALSE(fb.STATUS.ERROR, 'Au repos -> Pas d erreur');
     ASSERT_FALSE(fb.STATUS.WARNING, 'Au repos -> Pas de warning');
+    ASSERT_EQ(fb.AXISCMDX.SPEEDTGT, 0.0, 'Au repos -> Sortie X a 0');
+    ASSERT_EQ(fb.AXISCMDY.SPEEDTGT, 0.0, 'Au repos -> Sortie Y a 0');
+
+    ADVANCE_TIME(10000000);
+    nx := 5000; ny := 5000;
+
+    (* Scan 2 : Front descendant Enable=FALSE -> Coupure nette et re-neutralisation immediate *)
+    fb(ENABLE := FALSE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready retombe a FALSE');
+    ASSERT_FALSE(fb.STATUS.ERROR, 'Coupure -> Pas d erreur parasite');
+    ASSERT_EQ(fb.AXISCMDX.SPEEDTGT, 0.0, 'Coupure -> Sortie X maintenue a 0');
+    ASSERT_EQ(fb.AXISCMDY.SPEEDTGT, 0.0, 'Coupure -> Sortie Y maintenue a 0');
 END_TEST
 
 TEST 'TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)'
@@ -85,9 +106,9 @@ TEST 'TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et 
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 60.0, 0.01, 'mouvement actif : consigne non nulle (RawX=8000, Neutral=5000)');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 60.0, 0.01, 'mouvement actif : consigne non nulle (RawX=8000, Neutral=5000)');
     ASSERT_EQ(fb.DIRECTIONX, 1, 'sens avant pendant le mouvement');
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'RawY au neutre : axe Y reste a 0, aucun couplage entre les axes');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'RawY au neutre : axe Y reste a 0, aucun couplage entre les axes');
     ASSERT_EQ(fb.DIRECTIONY, 0, 'axe Y au neutre : DirectionY=0');
 
     (* perte du bus CAN EN PLEIN MOUVEMENT : neutralisation immediate + desarmement *)
@@ -103,9 +124,9 @@ TEST 'TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et 
     ASSERT_TRUE(fb.STATUS.WARNING, 'perte de comm doit lever un Warning (liste de causes)');
     ASSERT_EQ(fb.STATUS.WARNINGID, 16#0004, 'bit2 : HW/bus non operationnel porte par WarningId');
     ASSERT_FALSE(fb.AXISCMDX.ENABLE, 'sorties axe X neutralisees des la perte du bus, meme en plein mouvement');
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'consigne X coupee immediatement, pas de decel progressive');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'consigne X coupee immediatement, pas de decel progressive');
     ASSERT_FALSE(fb.AXISCMDY.ENABLE, 'sorties axe Y aussi neutralisees (gate global, pas seulement l axe en mouvement)');
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'consigne Y aussi coupee');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'consigne Y aussi coupee');
     ASSERT_FALSE(fb.DEADMANARMED, 'le geste est desarme par la perte du bus (AF08 TC-P08-001)');
 
     (* bus revient : pas de rearmement automatique, nouvel appui conscient exige *)
@@ -156,7 +177,7 @@ TEST 'TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si rel
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_FALSE(fb.DEADMANARMED, '50ms < DeadmanArmHoldTime (100ms) : pas encore arme');
     ASSERT_NEAR(fb.CMDXVAL, 0.0, 0.01, 'consigne interne X (CmdXVal) forcee a 0 : pas encore arme');
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'axe X seul pousse (RawX=8000, RawY neutre) mais pas encore arme : aucune commande ne part');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'axe X seul pousse (RawX=8000, RawY neutre) mais pas encore arme : aucune commande ne part');
 
     (* 20ms de plus (toujours < 100ms) : cette fois l axe Y seul est pousse (X revient au
        neutre) -- meme preuve, isolee sur l autre axe *)
@@ -169,7 +190,7 @@ TEST 'TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si rel
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_FALSE(fb.DEADMANARMED, '70ms < DeadmanArmHoldTime (100ms) : toujours pas arme');
     ASSERT_NEAR(fb.CMDYVAL, 0.0, 0.01, 'consigne interne Y (CmdYVal) forcee a 0 : pas encore arme');
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'axe Y seul pousse (RawY=2000, RawX neutre) mais pas encore arme : aucune commande ne part');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'axe Y seul pousse (RawY=2000, RawX neutre) mais pas encore arme : aucune commande ne part');
 
     (* relache a 50ms, avant la fin des 100ms de maintien : annule la tentative *)
     fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
@@ -191,7 +212,7 @@ TEST 'TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si rel
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_FALSE(fb.DEADMANARMED, 'pas d armement differe sur une tentative deja annulee, meme apres 1s (nouvel appui conscient exige)');
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'manche a fond depuis 1s mais jamais arme : toujours aucune commande de mouvement');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'manche a fond depuis 1s mais jamais arme : toujours aucune commande de mouvement');
 
     (* nouveau front + maintien complet (110ms) : l armement redevient possible normalement *)
     ADVANCE_TIME(10000000);
@@ -209,6 +230,54 @@ TEST 'TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si rel
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_TRUE(fb.DEADMANARMED, '110ms >= DeadmanArmHoldTime (100ms) : geste arme');
+END_TEST
+
+TEST 'TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* Arme le geste avec le manche au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'Geste arme au neutre');
+
+    (* Test dans la zone morte superieure : RawX = 5150 (neutre 5000 + 150 < 300) *)
+    ADVANCE_TIME(10000000);
+    nx := 5000; ny := 5000;
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5150, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX=5150 dans deadband (300) : consigne X strictement 0.0');
+    ASSERT_EQ(fb.DIRECTIONX, 0, 'RawX dans deadband : DirectionX=0');
+    ASSERT_TRUE(fb.ATNEUTRAL, 'Signal dans deadband : considere au neutre');
+
+    (* Test dans la zone morte inferieure : RawY = 4850 (neutre 5000 - 150 > -300) *)
+    ADVANCE_TIME(10000000);
+    nx := 5000; ny := 5000;
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 4850, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'RawY=4850 dans deadband (300) : consigne Y strictement 0.0');
+    ASSERT_EQ(fb.DIRECTIONY, 0, 'RawY dans deadband : DirectionY=0');
+    ASSERT_TRUE(fb.ATNEUTRAL, 'Signal dans deadband : considere au neutre');
 END_TEST
 
 TEST 'TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace'
@@ -389,8 +458,8 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 100.0, 0.01, 'RawX au max nominal (10000) : SpeedRef sature a +100');
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 100.0, 0.01, 'meme comportement sur l axe Y');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 100.0, 0.01, 'RawX au max nominal (10000) : SpeedRef sature a +100');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 100.0, 0.01, 'meme comportement sur l axe Y');
     ASSERT_EQ(fb.DIRECTIONX, 1, 'Direction coherente avec le signe de la consigne');
 
     (* RawX/RawY au minimum nominal (0) : saturation -100 *)
@@ -401,7 +470,7 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, -100.0, 0.01, 'RawX au min nominal (0) : SpeedRef sature a -100');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, -100.0, 0.01, 'RawX au min nominal (0) : SpeedRef sature a -100');
     ASSERT_EQ(fb.DIRECTIONX, -1, 'Direction coherente avec le signe de la consigne');
 
     (* Depassement franc au-dela de la plage ADC nominale + marge de tolerance (defaut
@@ -415,8 +484,8 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'RawX=20000 (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse');
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'meme garde-fou sur l axe Y');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX=20000 (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'meme garde-fou sur l axe Y');
     ASSERT_FALSE(fb.ERROR, 'capteur hors plage = Warning, PAS un defaut a acquitter (socle FB_FbStatus)');
     ASSERT_TRUE(fb.STATUS.WARNING, 'capteur hors plage pendant fonctionnement : leve un Warning (visible operateur)');
     ASSERT_EQ(fb.STATUS.WARNINGID, 16#0002, 'bit1 : capteur hors plage porte par WarningId');
@@ -431,8 +500,8 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'RawX negatif (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse');
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'meme garde-fou sur l axe Y');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX negatif (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'meme garde-fou sur l axe Y');
 
     (* Depassement leger (< marge de tolerance) : ne doit PAS declencher le defaut -- evite les
        faux positifs sur bruit ADC/overshoot mineur pres des bornes nominales *)
@@ -443,7 +512,7 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 100.0, 0.01, 'RawX=10200 : dans la marge de tolerance (+500), toujours saturation normale +100, pas de defaut');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 100.0, 0.01, 'RawX=10200 : dans la marge de tolerance (+500), toujours saturation normale +100, pas de defaut');
     ASSERT_FALSE(fb.STATUS.WARNING, 'leger depassement tolere : aucun warning leve');
     ASSERT_EQ(fb.STATUS.WARNINGID, 0, 'aucun bit warning actif');
 END_TEST
@@ -558,9 +627,9 @@ TEST 'TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs interme
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 80.0, 0.01, 'RawX=9000 : proportionnel, 80% -- pas seulement correct aux bornes 0/10000');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 80.0, 0.01, 'RawX=9000 : proportionnel, 80% -- pas seulement correct aux bornes 0/10000');
     ASSERT_EQ(fb.DIRECTIONX, 1, 'sens avant coherent');
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'RawY toujours au neutre : axe Y inchange');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'RawY toujours au neutre : axe Y inchange');
 
     (* RawY=300 (en-deca du neutre 5000, hors zone morte) : OutPct = (300-5000)/5000*100 = -94% *)
     ADVANCE_TIME(10000000);
@@ -570,7 +639,7 @@ TEST 'TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs interme
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, -94.0, 0.01, 'RawY=300 : proportionnel, -94% -- pas seulement correct aux bornes 0/10000');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, -94.0, 0.01, 'RawY=300 : proportionnel, -94% -- pas seulement correct aux bornes 0/10000');
     ASSERT_EQ(fb.DIRECTIONY, -1, 'sens arriere coherent');
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'RawX revenu au neutre : axe X inchange');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX revenu au neutre : axe X inchange');
 END_TEST

@@ -11,7 +11,7 @@
       FB_SyncContactor. Ce bloc NE calcule PAS l'ecart lui-meme.
    🔒 SyncActive : autorisation de couplage (anti-telescopage), independante
       de l'erreur — le probleme est porte par SyncDeviationWarn/Fault.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchSync

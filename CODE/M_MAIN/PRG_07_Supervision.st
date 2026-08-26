@@ -4,7 +4,7 @@
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Regroupe tout le mapping bidirectionnel GVL_IHM / GVL_PERSISTENT.
    ✅ Expose FaultMachineReset_IHM pour tous les programmes du domaine sécurité/métier.
-   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md
+   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_07_Supervision
@@ -34,6 +34,16 @@ VAR
     instPreflight          : FB_Acquisition_Preflight;        // * [INST] Preflight acquisition avant demarrage
     instHmiBannerFormatter : FB_Hmi_BannerFormatter;          // * [INST] Formatage bandeau IHM (alarmes/etats)
     instTroubleshootingView : FB_TroubleshootingView;         // * [INST] Vue troubleshooting (diagnostic IHM)
+    instMirrorBypassTranslation      : FB_MirrorBypassRetain; // * [INST] Miroir bypass Translation IHM<->RETAIN
+    instMirrorBypassM1               : FB_MirrorBypassRetain; // * [INST] Miroir bypass M1 IHM<->RETAIN
+    instMirrorBypassM2               : FB_MirrorBypassRetain; // * [INST] Miroir bypass M2 IHM<->RETAIN
+    instMirrorBypassSync             : FB_MirrorBypassRetain; // * [INST] Miroir bypass Sync IHM<->RETAIN
+    instMirrorBypassCommun           : FB_MirrorBypassRetain; // * [INST] Miroir bypass Commun IHM<->RETAIN
+    instMirrorBypassLimitLegal       : FB_MirrorBypassRetain; // * [INST] Miroir bypass LimitLegal IHM<->RETAIN
+    instMirrorBypassTopLimitSwitch   : FB_MirrorBypassRetain; // * [INST] Miroir bypass TopLimitSwitch IHM<->RETAIN
+    instMirrorBypassTopLimitSoftware : FB_MirrorBypassRetain; // * [INST] Miroir bypass TopLimitSoftware IHM<->RETAIN
+    instMirrorBypassCableLimitSwitch : FB_MirrorBypassRetain; // * [INST] Miroir bypass CableLimitSwitch IHM<->RETAIN
+    instMirrorBypassSlackCable       : FB_MirrorBypassRetain; // * [INST] Miroir bypass SlackCable IHM<->RETAIN
 
     // === 🚦 MÉMOIRE SYNC BYPASS BIDIRECTIONNEL (RETAIN ↔ IHM) ===
     PrevTranslationBypass   : BOOL; // . [LOC] Memoire bypass Translation (sync bidirectionnel)
@@ -223,76 +233,18 @@ IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
 END_IF;
 
 // ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
-// 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
-IF GVL_IHM.TranslationM3.Bypass.Global <> PrevTranslationBypass THEN
-    BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
-ELSE
-    GVL_IHM.TranslationM3.Bypass.Global := BypassTranslationGlobal;
-END_IF;
-PrevTranslationBypass := GVL_IHM.TranslationM3.Bypass.Global;
-
-IF GVL_IHM.M1TreuilRetenue.Bypass.Global <> PrevM1Bypass THEN
-    BypassWinchM1Global := GVL_IHM.M1TreuilRetenue.Bypass.Global;
-ELSE
-    GVL_IHM.M1TreuilRetenue.Bypass.Global := BypassWinchM1Global;
-END_IF;
-PrevM1Bypass := GVL_IHM.M1TreuilRetenue.Bypass.Global;
-
-IF GVL_IHM.M2TreuilBenne.Bypass.Global <> PrevM2Bypass THEN
-    BypassWinchM2Global := GVL_IHM.M2TreuilBenne.Bypass.Global;
-ELSE
-    GVL_IHM.M2TreuilBenne.Bypass.Global := BypassWinchM2Global;
-END_IF;
-PrevM2Bypass := GVL_IHM.M2TreuilBenne.Bypass.Global;
-
-IF GVL_IHM.M1M2Sync.Bypass.Global <> PrevSyncBypass THEN
-    BypassSyncGlobal := GVL_IHM.M1M2Sync.Bypass.Global;
-ELSE
-    GVL_IHM.M1M2Sync.Bypass.Global := BypassSyncGlobal;
-END_IF;
-PrevSyncBypass := GVL_IHM.M1M2Sync.Bypass.Global;
-
-IF GVL_IHM.Commun.Bypass.Global <> PrevCommunBypass THEN
-    BypassCommunGlobal := GVL_IHM.Commun.Bypass.Global;
-ELSE
-    GVL_IHM.Commun.Bypass.Global := BypassCommunGlobal;
-END_IF;
-PrevCommunBypass := GVL_IHM.Commun.Bypass.Global;
-
-IF GVL_IHM.Commun.Bypass.LimitLegal <> PrevLimitLegal THEN
-    BypassLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
-ELSE
-    GVL_IHM.Commun.Bypass.LimitLegal := BypassLimitLegal;
-END_IF;
-PrevLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
-
-IF GVL_IHM.Commun.Bypass.TopLimitSwitch <> PrevTopLimitSwitch THEN
-    BypassTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
-ELSE
-    GVL_IHM.Commun.Bypass.TopLimitSwitch := BypassTopLimitSwitch;
-END_IF;
-PrevTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
-
-IF GVL_IHM.Commun.Bypass.TopLimitSoftware <> PrevTopLimitSoftware THEN
-    BypassTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
-ELSE
-    GVL_IHM.Commun.Bypass.TopLimitSoftware := BypassTopLimitSoftware;
-END_IF;
-PrevTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
-
-IF GVL_IHM.Commun.Bypass.CableLimitSwitch <> PrevCableLimitSwitch THEN
-    BypassCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
-ELSE
-    GVL_IHM.Commun.Bypass.CableLimitSwitch := BypassCableLimitSwitch;
-END_IF;
-PrevCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
-
-IF GVL_IHM.Commun.Bypass.SlackCable <> PrevSlackCable THEN
-    BypassSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
-ELSE
-    GVL_IHM.Commun.Bypass.SlackCable := BypassSlackCable;
-END_IF;
-PrevSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
+// 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne), factorisé dans FB_MirrorBypassRetain
+// (CODE/A_COMMUN) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
+instMirrorBypassTranslation(Hmi := GVL_IHM.TranslationM3.Bypass.Global, RetainVal := BypassTranslationGlobal, Prev := PrevTranslationBypass);
+instMirrorBypassM1(Hmi := GVL_IHM.M1TreuilRetenue.Bypass.Global, RetainVal := BypassWinchM1Global, Prev := PrevM1Bypass);
+instMirrorBypassM2(Hmi := GVL_IHM.M2TreuilBenne.Bypass.Global, RetainVal := BypassWinchM2Global, Prev := PrevM2Bypass);
+instMirrorBypassSync(Hmi := GVL_IHM.M1M2Sync.Bypass.Global, RetainVal := BypassSyncGlobal, Prev := PrevSyncBypass);
+instMirrorBypassCommun(Hmi := GVL_IHM.Commun.Bypass.Global, RetainVal := BypassCommunGlobal, Prev := PrevCommunBypass);
+instMirrorBypassLimitLegal(Hmi := GVL_IHM.Commun.Bypass.LimitLegal, RetainVal := BypassLimitLegal, Prev := PrevLimitLegal);
+instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, RetainVal := BypassTopLimitSwitch, Prev := PrevTopLimitSwitch);
+instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, RetainVal := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
+instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, RetainVal := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
+instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, RetainVal := BypassSlackCable, Prev := PrevSlackCable);
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
@@ -531,15 +483,15 @@ instTroubleshootingView(
     Vh0800EndOk          := PRG_02_Acquisition.Data.Vh0800EndOk,
     Vh0808EtpOk          := PRG_02_Acquisition.Data.Vh0808EtpOk,
     Auth                 := PRG_03_Modes_Cycle.Auth,
-    M1LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
+    M1LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct,
     M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
-    M2LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
+    M2LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedCmd_Pct,
     M2LogicRequestDirection := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
     CoupledUserRequestActive := PRG_04_Treuils_Benne.CoupledUserRequestActive,
     CycleAutoBusy := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy,
-    CycleM1SpeedRef_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct,
-    CycleM2SpeedRef_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct,
+    CycleM1SpeedTgt_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct,
+    CycleM2SpeedTgt_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct,
     CycleBucketOpen := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Open,
     CycleTargetPosition := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target,
     SimulationModeActive := GVL_Simulation.SimulationModeActive,

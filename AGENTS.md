@@ -10,36 +10,58 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 ## 🎬 Démarrage de session — briefing obligatoire
 
-> Concerne **tout agent** (Claude Code, Codex, autre) et tout humain qui reprend le projet —
-> `AGENTS.md` est justement le point d'entrée commun, lu par tous les outils.
+> Concerne **tout agent** (Claude Code, Codex, Antigravity, autre) et tout humain qui reprend le projet —
+> `AGENTS.md` est la source unique commune à tous les outils.
 
 **Déclenchement** : automatique au 1er message de toute session sur ce repo. Rejouable à la
 demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) — même séquence.
 
-**Séquence :**
+**Séquence de Restitution Obligatoire :**
 0. **Afficher immédiatement la bannière de briefing** (format standard, gabarit
    `DOC/WFLOW/TEMPLATE/SKILL_BANNER_TEMPLATE.md`) :
    ```text
    ============================================================
-   🎬 BRIEFING SESSION / AGENTS.MD ACTIF
+   🎬 BRIEFING SESSION WORKFLOW PROJET / AGENTS.MD ACTIF
    ============================================================
    ```
    Puis 1 ligne : *« Briefing session <projet> — reprise par <agent> »*.
-1. Lire les points d'entrée : `README.md` (racine), `DOC/README.md`, `TOOLS/README.md`,
-   `TOOLS/AGENT_WORKFLOW/README.md` — pas tout le détail, juste repérer où chercher ensuite.
-2. Restituer un briefing court :
-   - Tableau des 4 skills projet (`codesys-workflow`, `task-planner`, `troubleshooting`,
-     `create-pr`) — rôle + déclencheur, voir [DOC/README.md](DOC/README.md) et `.claude/skills/`.
-   - Snapshot rapide de [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml) : combien de tâches
-     verrouillées 🔒 / en cours ⏳ / à faire ⬜.
-   - Rappel des guardrails essentiels : jamais de commit sans validation humaine, AU physique
-     + `PowerCutOff` séparés, jamais de redémarrage auto après défaut.
-3. **Niveau 1 (systématique)** : lister les documents lus à l'étape 1, chemin + 1 ligne sur leur
-   rôle réel — preuve de repérage, pas de lecture exhaustive.
-4. **Niveau 2 (si tâche C2+ ou ambiguë)** : répondre à une question précise liée à la tâche en
-   cours, avec du concret tiré des fichiers réels (pas une réponse générique apprise par cœur).
-   Signal d'alerte : si l'agent doit grep tout le repo pour répondre à une question simple/évidente
-   après le briefing → soit le briefing était insuffisant, soit l'agent a zappé l'étape 1.
+
+1. **Restituer le tableau des 2 skills actives du projet** :
+   - `task-planner` : Pilotage catalogue `TASKS.yaml` & contrats `CONTRACTS/` · Déclencheur : « planifie tâche », « état des tâches », « tasks ».
+   - `troubleshooting` : Diagnostic formel, arbre de causes & traçage inverse · Déclencheur : « cherche le blocage », « diagnostic », « panne ».
+
+2. **Snapshot rapide de [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml)** : nombre de tâches
+   verrouillées 🔒 / en cours ⏳ / à faire ⬜.
+
+3. **Preuve de repérage des 3 piliers projet (Niveau 1 — systématique)** :
+   - 📐 **Standards & Guides (`DOC/STDS/`)** : `CODE_QUALITY_STANDARDS.md` (POO, encapsulation), `NAMING_CONVENTION.md` (PascalCase, NC-010..080, zéro Ref pour consignes), guides (`GUIDE_GATES_ET_TESTS`, `GUIDE_SEQUENCEUR`, `GUIDE_IDE_CODESYS`).
+   - 🏗️ **Architecture & Specs (`DOC/AF/` & `CODE/`)** : Architecture 7 POU (`PRG_02_Acquisition` ➔ `PRG_07_Supervision`, tâches 4ms/20ms/10ms), Fondations (AF01-03), Transverses (AF04-06), Métiers (AF08-14).
+   - 🛠️ **Outillage CI/CD & Validation mécanique (`TOOLS/`)** : Bundle PLCopenXML (`generate_codesys_bundle.py`), Vérification liaison bloquante (`G200_check_linkage.py`), Suite de 21 Gates (`run_all_gates.py`), Tests unitaires CI (`TOOLS/TEST_AUTO_CI/`).
+
+4. **Diagramme du Workflow Standard d'Implémentation** :
+   ```text
+   1. Cadrage & Tâche (ID, criticité C0-C4, stratégie Patch / Rebuild)
+      ↓
+   2. Contrat de tâche (Objectifs testables, scope, critères d'acceptation — obligatoire dès C2)
+      ↓
+   3. Plan technique & Validation humaine (Arrêt obligatoire avant de toucher au code)
+      ↓
+   4. Implémentation ST (Respect AF_Partie-02/03 + NAMING_CONVENTION)
+      ↓
+   5. Gates mécaniques bloquants (G200 Liaison, G310 Structure, Bundle XML, 21 Gates)
+      ↓
+   6. Restitution (Bandeau de conformité + intégration CODESYS manuelle par tes soins)
+   ```
+
+5. **Cas pratique & Justification de conception (Niveau 2 — Anti-Récitation)** :
+   - L'agent ne doit jamais réciter des phrases génériques apprises par cœur.
+   - Sur toute question de nommage, d'architecture ou de variable, il doit **justifier son cheminement technique** : citer la règle exacte (`NC-xxx`), nommer la documentation source (`NAMING_CONVENTION.md`, `AF_Partie-xx`), et expliquer la sémantique de la chaîne (`Req` ➔ `Tgt` ➔ `Cmd` ➔ `Act`).
+
+6. **Proposer les options d'action réelles (Menu de démarrage)** :
+   - 🔹 **Option 1 : Tâche du catalogue (`task-planner`)** — Sélectionner et verrouiller une tâche existante de `TASKS.yaml`.
+   - 🔹 **Option 2 : Dépannage / Diagnostic (`troubleshooting`)** — Lancer une analyse causale structurée sur un blocage ou un comportement inattendu.
+   - 🔹 **Option 3 : Cadrer un nouveau besoin / refactor** — Qualifier la criticité (C1..C4), rédiger le contrat `TASK_CONTRACT_*.yaml` et planifier.
+   - 🔹 **Option 4 : Contrôle outillage & Gates** — Exécuter la suite complète des 21 gates (`run_all_gates.py`) ou un audit mécanique spécifique.
 
 ---
 
@@ -49,8 +71,8 @@ demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) 
 |---|---|---|
 | 1 | [CODE_QUALITY_STANDARDS](DOC/STDS/CODE_QUALITY_STANDARDS.md) | **Déclaration, liaison, POO, non-régression** — référentiel universel |
 | 2 | [NAMING_CONVENTION](DOC/STDS/NAMING_CONVENTION.md) | Nommage (PascalCase, préfixes, unités, polarité) |
-| 3 | [AF_Partie-03](DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md) | Contrats FB, DUT et CFC |
-| 4 | [AF_Partie-02](DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md) | Architecture CFC, tâches et flux |
+| 3 | [AF_Partie-03](DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md) | Contrats FB, DUT et CFC |
+| 4 | [AF_Partie-02](DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md) | Architecture CFC, tâches et flux |
 | 5 | La spec métier concernée | `AF_Partie-08` à `-14` (une par fonction) |
 
 🚫 `ARCHIVES/` n'est **jamais** une source active.
@@ -90,7 +112,7 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 
 ## 🔒 GUARDRAILS — avant toute modif `CODE/`, `FB_`, `PRG_` ou « codesys »
 
-1. ✅ Charger la skill [`codesys-workflow`](.claude/skills/codesys-workflow.md)
+1. ✅ Appliquer le workflow d'édition standard (§ Workflow d'édition ci-dessous)
 2. ✅ Lire les documents 1 à 5 ci-dessus (ajuster la spec métier : Joystick=P08, Encoder/Homing=P09,
    Treuils **Benne incluse**=P10, Translation=P11, Diagnostic=P12, Simulation=P13, Troubleshooting=P14
 3. ✅ Vérifier que la spec est complète → sinon **demander**, ne pas deviner
@@ -102,7 +124,7 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 
 - Spec manquante, incomplète ou ambiguë
 - Nommage ambigu ou non-PascalCase
-- Interface FB incomplète (profils `AF_Partie-03 §1bis`)
+- Interface FB incomplète (profils `AF_Partie-03 §3` — Profils de composants)
 - `Reset` pas sur front · redémarrage automatique après défaut
 - `SafeStop`/`StartStop` sur un FB qui **n'est pas** un FB de mouvement (ex. `FB_Joystick`, briques E/S, diag)
 - `CoupeEnable` réintroduit (vocabulaire abandonné — n'a jamais été une variable)
@@ -215,7 +237,7 @@ git config core.hooksPath TOOLS/AGENT_WORKFLOW/hooks
 
 ---
 
-## 🛠️ Workflow d'édition (détail : [`codesys-workflow`](.claude/skills/codesys-workflow.md))
+## 🛠️ Workflow d'édition
 
 `0.` règles → `1.` architecture → `2.` existant → `3.` plan **validé** → `4.` code ST + note
 d'application → `4bis.` vérification mécanique **bloquante** → `5.` REX versionné → `6.` nouvel export

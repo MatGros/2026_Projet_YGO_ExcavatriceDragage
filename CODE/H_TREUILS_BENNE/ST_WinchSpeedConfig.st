@@ -2,7 +2,7 @@
    ⚙️ ST_WinchSpeedConfig — Configuration des plages de vitesse linéaire
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 TYPE ST_WinchSpeedConfig :
 STRUCT

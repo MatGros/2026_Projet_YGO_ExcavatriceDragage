@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable > SafeStop > StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -20,7 +20,7 @@ VAR_INPUT
     StartStop                   : BOOL;        // --> [CMD] TRUE = rampe accélération, FALSE = rampe décélération NORMALE
     SafeStop                    : BOOL;        // --> [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
     Direction                   : INT;         // --> [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)
-    SpeedRefPct                 : REAL;        // --> [CMD] Magnitude de la consigne (de 0 à 100%)
+    SpeedTgt_Pct                : REAL;        // --> [CMD] Magnitude de la consigne (de 0 à 100%)
     PositionSensorTarget        : BOOL;        // --> [HW] Capteur position cible courante
     // 3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
     // (même principe que PV→Trémie, généralisé — voir §4bis dans le corps ST)
@@ -161,8 +161,8 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     IF NOT BypassLimitSwitch AND ((Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev)) THEN
         RampTargetPct := 0.0;
     ELSE
-        RampTargetPct := ABS(SpeedRefPct);
-        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedRefPct > 0.0), la consigne est au moins égale à 1.0 Hz
+        RampTargetPct := ABS(SpeedTgt_Pct);
+        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedTgt_Pct > 0.0), la consigne est au moins égale à 1.0 Hz
         IF RampTargetPct > 0.0 THEN
             RampTargetPct := MAX(RampTargetPct, (1.0 / SEL(DriveFreqScaleMaxHz > 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
         END_IF;

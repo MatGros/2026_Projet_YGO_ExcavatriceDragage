@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.890265" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.890265">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:58:43.694017" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:58:43.694017">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -304,7 +304,7 @@
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §3
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
       la position estimée continue en mètres (0.0 m à la Trémie -&gt; +30.0 m à la Maintenance),
       avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.
@@ -474,7 +474,7 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

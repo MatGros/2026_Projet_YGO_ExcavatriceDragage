@@ -2,7 +2,7 @@
    🪝 FB_Winch — Directeur d'un treuil individuel (M1 / M2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage d'un treuil individuel (contacteurs de sens et de vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop)
    🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
    ======================================================================= *)
@@ -14,7 +14,7 @@ VAR_INPUT
     Reset                           : BOOL;                           // --> [CMD] Acquittement defaut (front)
     StartStop                       : BOOL;                           // --> [CMD] Ordre de marche/arret mouvement
     Direction                       : INT;                            // --> [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)
-    SpeedRefPct                     : REAL;                           // --> [CMD] Consigne vitesse % (0.0 a 100.0)
+    SpeedTgt_Pct                    : REAL;                           // --> [CMD] Vitesse cible % (0.0 a 100.0)
     Mode                            : E_Mode;                         // --> [CMD] Mode d'exploitation actif
 
     // === SECOURS ET PERMIS DE SÉCURITÉ ===
@@ -103,7 +103,7 @@ END_VAR
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-    SpeedStep(Enable := FALSE, SpeedRefPct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
+    SpeedStep(Enable := FALSE, SpeedTgt_Pct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
     RequestedStep := SpeedStep.StepNumber;
     StepNumber := 0;
     BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
@@ -151,7 +151,7 @@ EffectiveSafeStop := SafeStop
 
 RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
-    RampTargetPct := ABS(SpeedRefPct);
+    RampTargetPct := ABS(SpeedTgt_Pct);
 END_IF;
 
 // RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect) — permet d'approcher
@@ -228,7 +228,7 @@ END_IF;
 {endregion}
 
 {region "§3 Selection et temporisation paliers"}
-SpeedStep(Enable := (RampTargetPct > 0.1), SpeedRefPct := RampTargetPct,
+SpeedStep(Enable := (RampTargetPct > 0.1), SpeedTgt_Pct := RampTargetPct,
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
           MaxStepNumber := ActiveMaxStep,
           MeasuredSpeedBand := MeasuredSpeedBand,

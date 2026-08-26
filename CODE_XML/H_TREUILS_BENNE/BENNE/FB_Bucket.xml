@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.873076" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.873076">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:08.585792" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:08.585792">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -135,7 +135,7 @@
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -218,7 +218,7 @@
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -835,7 +835,7 @@
    🪣 FB_Bucket — Commande d'ouverture et de fermeture du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage synchrone et séquencement d'ouverture/fermeture benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : FB standard (Partie3 §1bis)
    🔒 Sécurité : Surveillance du glissement M1 et interlocks de mouvement
    =======================================================================</xhtml>
@@ -1259,7 +1259,7 @@ END_IF;
 DeltaPosition_M := CablePosM2 - CablePosM1;
 
 // Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
-// (M2PositionCorrected, côté PRG_SUPERVISION_CFC).
+// (M2PositionCorrected, côté PRG_07_Supervision).
 // CloseReq/OpenReq sont pris en compte (pas seulement IsClosed/IsOpen, qui sont FALSE pendant
 // TOUT le trajet depuis l'état transitoire) pour que la position corrigée de M2 converge
 // progressivement vers M1 pendant l'enroulage.

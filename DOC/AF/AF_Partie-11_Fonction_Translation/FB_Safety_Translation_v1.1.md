@@ -1,6 +1,6 @@
 # FB_Safety_Translation — Spec composant (v1.1)
 
-> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.2.md`](../AF_Partie-11_Fonction_Translation_v2.2.md) §3.
+> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.3.md`](../AF_Partie-11_Fonction_Translation_v2.3.md) §3.
 > Rôle de **ce** document : safety métier M3 (8 bits ErrorId), Méca A/B, masques —
 > et **catalogue unique** des `TC-P11-002` à `TC-P11-011`, `TC-P11-014`.
 > Source code : `CODE/I_TRANSLATION/FB_Safety_Translation.st` · instance `Safety.instSafetyTranslationM3`.
@@ -74,10 +74,12 @@ Produit `SafeStop` et `PowerCutOff`. 1 instance (`instSafetyTranslationM3`), Ena
 ## 4. Méca A et Méca B (détail)
 
 ### Méca A (bit5) — mouvement non commandé
+
 **Condition** : `Direction=0 AND NOT BrakeCmd` puis `ABS(DriveActualFreqHz) > 0.5Hz` pendant >1.0s.
 **Variateur tourne sans commande** → SafeStop + PowerCutOff.
 
 ### Méca B (bit4) — incohérence arrêt persistant
+
 **Condition standard** : `Direction=0 AND NOT BrakeCmd` puis `DriveStatusWord.0 OR NOT BrakeFeedback`
 pendant >3.0s. **Contacteur/frein ne confirment pas l'arrêt** → SafeStop + PowerCutOff.
 

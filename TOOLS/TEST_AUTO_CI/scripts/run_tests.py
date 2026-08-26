@@ -32,8 +32,8 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-# Ajout du sous-dossier scripts au sys.path pour les modules internes
-SCRIPT_DIR = pathlib.Path(__file__).resolve().parent / "scripts"
+# Ajout du dossier scripts au sys.path pour les modules internes
+SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
@@ -45,7 +45,7 @@ from af_coverage import check_af_coverage, check_extra_tests
 from encapsulation_check import check_encapsulation_chain
 from html_report import render_group_report, render_html_report
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 TEST_AUTO_CI = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI"
 COMPILER_DIR = REPO_ROOT / "TOOLS" / "COMPILER_ST2C_STruCpp"
 CONVERTER = COMPILER_DIR / "convert_codesys_to_iec.py"

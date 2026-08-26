@@ -4,7 +4,7 @@
    🎯 Regroupe les entrées/sorties hardware d'un codeur absolu EtherCAT
       pour exposer l'interface physique de FB_Encoder de façon testable.
    🔌 Producteur/consommateur : PRG_02_Acquisition câble ce bus vers le device.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_EncoderHw :
 STRUCT

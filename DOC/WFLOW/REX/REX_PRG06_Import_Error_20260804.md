@@ -1,7 +1,7 @@
 # 🔬 REX — Bug import CODESYS PRG_06_Outputs (multi-causes)
 
-**Date** : 2026-08-04 (mis à jour 2026-08, LOT_STRUCTURE_INTERLOCKS_LD)  
-**Version** : v1.1  
+**Date** : 2026-08-04 (mis à jour 2026-08, LOT_STRUCTURE_INTERLOCKS_LD)
+**Version** : v1.1
 **Statut** : ✅ Résolu (import + ouverture + simulation OK)
 
 ---
@@ -156,10 +156,10 @@ contact pointé sur la broche du bloc producteur.
 
 - Oracles CODESYS : `TOOLS/SAMPLES_XML_CODESYS/PRG_06_Outputs_LD.xml`, `PRG_Oracle_Nested.xml`
 - Tests dichotomiques : `CODE/CODE_Bundle_{6invar,2networks,3networks,nocoil180,minimal}.xml`
-- Spec PLCopenXML : `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md`
+- Spec PLCopenXML : `DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md`
 
 ---
 
-**Rédigé par** : Agent orchestrateur  
-**Validé par** : Utilisateur (import + ouverture + simulation PRG_01/PRG_06 OK)  
+**Rédigé par** : Agent orchestrateur
+**Validé par** : Utilisateur (import + ouverture + simulation PRG_01/PRG_06 OK)
 **Date de validation** : 2026-08-04

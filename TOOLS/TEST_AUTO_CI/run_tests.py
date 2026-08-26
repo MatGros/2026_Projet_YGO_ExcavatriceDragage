@@ -202,7 +202,18 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
         converted_files = [str(converted_dir / s.name) for s in sources]
         out_cpp = converted_dir / f"{fb_name}.cpp"
-        tmp_root = pathlib.Path(tempfile.gettempdir())
+        # Dossier TEMP dedie a ce job : STruCpp cree son strucpp-test-XXXXXX DANS %TEMP%, jamais
+        # nettoye (cf chronogram.py). Sous execution parallele (-j > 1, defaut = CPU-4), plusieurs
+        # process STruCpp partagent le meme TEMP systeme -- le diff avant/apres de
+        # _find_strucpp_temp_dir peut alors recuperer le dossier d'un AUTRE FB en cours de
+        # compilation concurrente (contamination croisee : JSON manquant, chronogramme vide,
+        # ASSERT non-deterministes, WinError 32 constates le 2026-08-26). On isole donc chaque job
+        # dans son propre sous-dossier TEMP via l'env TEMP/TMP (respecte par STruCpp comme tout
+        # binaire Windows standard) : le diff avant/apres ne voit plus alors que SES propres
+        # sous-dossiers strucpp-test-*, quel que soit le nombre de jobs concurrents.
+        job_tmp_root = pathlib.Path(tempfile.mkdtemp(prefix=f"ci_job_{fb_name}_"))
+        job_env = dict(os.environ, TEMP=str(job_tmp_root), TMP=str(job_tmp_root))
+        tmp_root = job_tmp_root
         before = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}
 
         if debug:
@@ -211,7 +222,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "-O", "0", "--cxx-flags", "-O0 -pipe", "--test", str(test_file)]
         proc = subprocess.Popen(strucpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                  text=True, encoding="utf-8", cwd=str(converted_dir), bufsize=1,
-                                 creationflags=subproc_flags)
+                                 creationflags=subproc_flags, env=job_env)
         lines = list(proc.stdout)
         proc.wait()
         t_comp = _time.perf_counter() - t_comp_start

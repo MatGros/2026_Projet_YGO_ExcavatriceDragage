@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.986598" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.986598">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T22:33:17.296239" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T22:33:17.296239">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -366,7 +366,7 @@
       les positions M3 et les diagnostics DI publiés par PRG_02_Acquisition vers
       les consommateurs (PRG_03/04/05/07, FB_TroubleshootingView).
    📤 Producteur unique : PRG_02_Acquisition (VAR_OUTPUT Data : ST_AcquisitionInterPrg).
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -462,7 +462,7 @@ Ordre declenchement preset vers PDO Rx</xhtml>
    🎯 Regroupe les entrées/sorties hardware d'un codeur absolu EtherCAT
       pour exposer l'interface physique de FB_Encoder de façon testable.
    🔌 Producteur/consommateur : PRG_02_Acquisition câble ce bus vers le device.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -644,7 +644,7 @@ Ordre declenchement preset vers PDO Rx</xhtml>
    📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -756,7 +756,7 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
    🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -822,7 +822,7 @@ TRUE des qu'un referencement a reussi</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
    💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1012,12 +1012,12 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef">
+            <variable name="SpeedTgt">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionNegative">
@@ -1056,8 +1056,8 @@ TRUE des qu'un referencement a reussi</xhtml>
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedRef + direction en bits (DirectionPositive/Negative, AtNeutral).
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1762,7 +1762,7 @@ TRUE des qu'un referencement a reussi</xhtml>
    📡 PRG_02_Acquisition — Programme d'Acquisition et Conditionnement I/O
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 1 (premier POU du cycle).
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §2
    🎯 Rôle unique : Produire les images HwReal/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
       et publier les retours.
@@ -1923,7 +1923,7 @@ instSimBench(
     M1_SpeedContactor_2      := PRG_06_Outputs.Data.M1SpeedContactor2,
     M1_SpeedContactor_3      := PRG_06_Outputs.Data.M1SpeedContactor3,
     M1_SpeedContactor_4      := PRG_06_Outputs.Data.M1SpeedContactor4,
-    M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
+    M1_SpeedCmd_Pct          := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct,
     M1_StepNumber            := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
     M1_PresetTriggerCmd      := instEncoderM1.HwOut.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderM1.HwOut.PresetValueOut,
@@ -1934,7 +1934,7 @@ instSimBench(
     M2_SpeedContactor_2      := PRG_06_Outputs.Data.M2SpeedContactor2,
     M2_SpeedContactor_3      := PRG_06_Outputs.Data.M2SpeedContactor3,
     M2_SpeedContactor_4      := PRG_06_Outputs.Data.M2SpeedContactor4,
-    M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
+    M2_SpeedCmd_Pct          := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedCmd_Pct,
     M2_StepNumber            := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
     M2_PresetTriggerCmd      := instEncoderM2.HwOut.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderM2.HwOut.PresetValueOut,
@@ -1945,7 +1945,7 @@ instSimBench(
     // (alimentés par la sortie PRG_06). Gate direction + vitesse = demande réelle (rampe/arrêt).
     M3_Direction             := SEL(PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord &lt;&gt; 0,
                                     PRG_05_Translation.M3_Direction_Active, 0),
-    M3_SpeedRefPct           := LIMIT(0.0,
+    M3_SpeedCmd_Pct          := LIMIT(0.0,
                                       PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
@@ -2032,7 +2032,7 @@ instJoystick(
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
 Data.JoystickYNeutral     := (instJoystick.DirectionY = 0);
 Data.JoystickDirectionX   := instJoystick.DirectionX;
-Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedXPct);
+Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedTgtX_Pct);
 Data.JoystickXNeutral     := (instJoystick.DirectionX = 0);
 {endregion}
 
@@ -2374,7 +2374,7 @@ Data.M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Surveillance bus CANopen master et esclave Joystick (Online/Op)
    🔌 Architecture : Publication ST_Diag_Device &amp; E_Diag_State
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -2785,7 +2785,7 @@ Done := FALSE;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Surveillance bus EtherCAT master, variateur M3 et codeurs M1/M2
    🔌 Architecture : Publication ST_Diag_Device par esclave &amp; E_Diag_State
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -3273,7 +3273,7 @@ Done := FALSE;
       par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
       de vitesse au meme scan. HomedAndReliable = gate strict interlock M3.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -3281,7 +3281,7 @@ Done := FALSE;
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 IF NOT Enable THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
     Status.State := E_State.DISABLED;
@@ -3296,7 +3296,7 @@ Ready := TRUE;
 Status.State := E_State.READY;
 {endregion}
 
-{region "Abs"}
+{region "§2 Abs"}
 instAbs(
     Enable              := Enable,
     Reset               := Reset,
@@ -3310,7 +3310,7 @@ instAbs(
 );
 {endregion}
 
-{region "Homing"}
+{region "§3 Homing"}
 instHoming(
     Enable               := Enable,
     Reset                := Reset,
@@ -3334,7 +3334,7 @@ instHoming(
 );
 {endregion}
 
-{region "Scale"}
+{region "§4 Scale"}
 instScale(
     RawPos       := instAbs.RawPos,
     HomingRefRaw := instHoming.HomingRefRaw,
@@ -3343,7 +3343,7 @@ instScale(
 );
 {endregion}
 
-{region "Safety"}
+{region "§5 Safety"}
 instSafety(
     Enable             := Enable,
     Reset              := Reset,
@@ -3355,7 +3355,7 @@ instSafety(
 );
 {endregion}
 
-{region "Reliability"}
+{region "§6 Reliability"}
 instRel(
     EncoderAvailable  := instAbs.EncoderAvailable,
     Homed             := instHoming.Homed,
@@ -3363,7 +3363,7 @@ instRel(
 );
 {endregion}
 
-{region "Speed"}
+{region "§7 Speed"}
 instSpeed(
     Enable        := Enable,
     Reset         := Reset,
@@ -3372,7 +3372,7 @@ instSpeed(
 );
 {endregion}
 
-{region "Remplissage struct et synthese"}
+{region "§8 Remplissage struct et synthese"}
 Measurement.RawPos            := instAbs.RawPos;
 Measurement.EncoderAvailable  := instAbs.EncoderAvailable;
 Measurement.CablePosM         := instSafety.CablePosMSafe;
@@ -3631,12 +3631,12 @@ Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHom
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Point neutre Y actuel pour IHM/Test</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedXPct">
+            <variable name="SpeedTgtX_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse cible axe X signee (-100..+100 %), miroir AxisCmdX.SpeedTgt</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionX">
@@ -3647,12 +3647,12 @@ Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHom
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdX.DirectionPositive/Negative</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedYPct">
+            <variable name="SpeedTgtY_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse cible axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedTgt</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionY">
@@ -3840,7 +3840,7 @@ Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHom
                   Désarmement sur neutre prolongé ; le changement de mode / fin de
                   cycle benne est géré par l'externe via ArmingPermit (vue joystick).
    📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (F08.01, F08.03-F08.07)
    =====================================================================</xhtml>
           </documentation>
         </interface>
@@ -3848,7 +3848,7 @@ Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHom
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "S0 CAUSES + SOCLE (appele AVANT le gate)"}
+{region "§1 CAUSES + SOCLE (appele AVANT le gate)"}
 // 🎯 CAUSES exprimées en CLAIR (liste ST_FbCause) — plus de bitfield WORD.
 //    - CalibFail : fault à acquitter (IsWarning=FALSE).
 //    - RawOutOfRange / BusLost : warning auto-effacés (décision utilisateur).
@@ -3897,15 +3897,15 @@ ErrorId := Status.ErrorId;    // miroir
 Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT Error;
 {endregion}
 
-{region "S1 Gate securite (neutralisation pipeline, n efface pas le statut)"}
+{region "§2 Gate securite (neutralisation pipeline, n efface pas le statut)"}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0;
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
-    SpeedXPct := 0.0; DirectionX := 0;
-    SpeedYPct := 0.0; DirectionY := 0;
+    SpeedTgtX_Pct := 0.0; DirectionX := 0;
+    SpeedTgtY_Pct := 0.0; DirectionY := 0;
     Button := FALSE;
     AtNeutral := TRUE;
     DeadmanArmed := FALSE;
@@ -3920,7 +3920,7 @@ IF NOT Enable OR BusLost THEN
 END_IF;
 {endregion}
 
-{region "S2 Acquisition bouton + mise a l echelle"}
+{region "§3 Acquisition bouton + mise a l echelle"}
 Button := RawButton;
 
 // Mise a l'echelle (deadband) - le neutre s'evalue sur les 2 axes
@@ -3929,7 +3929,7 @@ ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic - position centrale
 {endregion}
 
-{region "S5 Armement homme mort"}
+{region "§4 Armement homme mort"}
 // Bouton homme-mort : armement par MAINTIEN (DeadmanArmHoldTime), independant de la position.
 DeadmanEdge(CLK := RawButton);
 IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
@@ -3958,39 +3958,39 @@ NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q, PT
 IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 {endregion}
 
-{region "S6 Pipeline axe X"}
+{region "§5 Pipeline axe X"}
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdX.SpeedRef := CmdXVal;
+AxisCmdX.SpeedTgt := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
 
 AxisCmdX.DirectionPositive := (CmdXVal &gt; 0.1);
 AxisCmdX.DirectionNegative := (CmdXVal &lt; -0.1);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
-IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedRef := 0.0; END_IF;
+IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedXPct := AxisCmdX.SpeedRef;
+SpeedTgtX_Pct := AxisCmdX.SpeedTgt;
 IF AxisCmdX.DirectionPositive THEN DirectionX := 1;
 ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
 ELSE DirectionX := 0; END_IF;
 {endregion}
 
-{region "S7 Pipeline axe Y et sorties"}
+{region "§6 Pipeline axe Y et sorties"}
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdY.SpeedRef := CmdYVal;
+AxisCmdY.SpeedTgt := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
 
 AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
 AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
-IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedRef := 0.0; END_IF;
+IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
 // Miroirs
-SpeedYPct := AxisCmdY.SpeedRef;
+SpeedTgtY_Pct := AxisCmdY.SpeedTgt;
 IF AxisCmdY.DirectionPositive THEN DirectionY := 1;
 ELSIF AxisCmdY.DirectionNegative THEN DirectionY := -1;
 ELSE DirectionY := 0; END_IF;
@@ -4071,7 +4071,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M1</xhtml>
               </documentation>
             </variable>
-            <variable name="M1_SpeedRefPct">
+            <variable name="M1_SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -4159,7 +4159,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_SpeedRefPct">
+            <variable name="M2_SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -4207,7 +4207,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] 1 = Avant, -1 = Arrière, 0 = Arrêt</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_SpeedRefPct">
+            <variable name="M3_SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -4655,7 +4655,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
       - FB_Sim_Encoder (instM1, instM2)
@@ -4780,7 +4780,7 @@ M3_RelayRev := (M3_Direction = -1);
 instSimTranslation(
     Enable          := TRUE,
     Direction       := M3_Direction,
-    SpeedRefPct     := M3_SpeedRefPct,
+    SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS
 );
 
@@ -4814,7 +4814,7 @@ Translation.M3_ThermalOK_DI      := TRUE;
 // aucune régression de mouvement possible.
 IF (M3_Direction &lt;&gt; 0) THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
-    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedRefPct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
+    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedCmd_Pct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
     M3_ActualFreqHz  := 0;
@@ -5158,7 +5158,7 @@ anti-rebond de FB_Translation.
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧩 FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🧩 Brique technique (AF_Partie-03 §2) : contrat minimal, pas de
       StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
       Maintenance) en mot de progression, dérive les 2 limites extrêmes,
@@ -5295,7 +5295,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
       HomedAndReliable = EncoderAvailable AND Homed AND NOT EncoderIncoherent (gate STRICT M3)
    🧩 Responsabilite scindee (D-A2bis) : Homing = referencement, Safety = coherence,
       ce FB = « le codeur est fiable ». Aucune recomposition chez les consommateurs.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -5585,7 +5585,7 @@ ErrorId bit0: "Com", bit1: "Preset Timeout".</xhtml>
    🎯 Rôle : Accès bus EtherCAT, extraction positions brutes et séquence de Preset SDO
    🔒 Polarité : EncoderAvailable=TRUE si communication bus et esclave OK
    🔌 Architecture : Module d'acquisition codeur absolu
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===</xhtml>
           </documentation>
@@ -6105,7 +6105,7 @@ ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5
    🎯 Rôle : Séquence de référencement nominal (capteur haut) ou unitaire (MAINT_N2)
    🔒 Polarité : Homed=TRUE dès qu'un référencement valide est enregistré
    🔌 Architecture : Expose ST_Encoder_Calib en VAR_IN_OUT
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Homing) ===</xhtml>
           </documentation>
@@ -6415,7 +6415,7 @@ ErrorId bit0: "Bornes", bit1: "Boot suspect".</xhtml>
    🎯 Rôle : Bornage physique absolu [-99; +99]m et relais d'incohérence redémarrage
    🔒 Polarité : EncoderIncoherent=TRUE en cas de hors bornes ou HomingSuspect
    🛡️ Sécurité : Verrouillage de la position câble sûre
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -6568,7 +6568,7 @@ Status.Done := FALSE;
    🎯 Rôle : Calcul de la position câble en mètres par conversion arithmétique signée
    🔒 Polarité : CablePosM signée (+ enroulé, - sous l'eau)
    🔌 Architecture : Convertisseur de mesure unitaire par treuil
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===</xhtml>
           </documentation>
@@ -6789,7 +6789,7 @@ Fenetre glissante de mesure</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul de la vitesse absolue et signée sur fenêtre glissante horodatée
    🔒 Polarité : Valid=TRUE après 6 échantillons couvrant au moins 50ms
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -6959,7 +6959,7 @@ END_IF;
    🎯 Rôle : Normalise une valeur brute (0..10000) selon le neutre calibré
              et applique une zone morte en unités brutes (compte ADC).
    🛡️ Garde-fou : Saturation stricte de la consigne à +/-100.0 %.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (F08.02)
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -7454,7 +7454,7 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -7906,7 +7906,7 @@ RawPosOut := RawPos;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
       (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
@@ -8189,7 +8189,7 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md</xhtml>
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -8251,7 +8251,7 @@ SimContactorOk := ContactorLatch;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -8438,8 +8438,8 @@ Distances NON-linéaires : 0→5 (PV), 5→15 (P2), 15→20 (P1), 20→30 (Maint
    🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
       aucune sortie réelle. Un override manuel valide est appliqué par
       FB_SimBench, pas par ce FB.
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
-             DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
+             DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -8472,7 +8472,7 @@ END_IF;
 
 {region "§3 Progression"}
 instCycleTime(DefaultValueS := 0.010);
-SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
+SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
 
 // Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
 // Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.
@@ -8599,7 +8599,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

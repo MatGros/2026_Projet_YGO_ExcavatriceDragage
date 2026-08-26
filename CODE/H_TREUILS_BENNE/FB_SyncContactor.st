@@ -6,7 +6,7 @@
       meme si les codeurs sont bypasses.
    🔌 Interface : Bloc de surveillance transverse (1 instance)
    🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_SyncContactor

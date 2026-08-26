@@ -72,12 +72,14 @@
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks { margin-top: 8px; }
-    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; }
-    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
-    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
+    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary:hover { color: var(--text); }
+    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
@@ -191,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:32:55</div>
+    <div class="exec-time">2026-08-26 18:18:21</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (11 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-0">TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-1">Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-2">TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-3">TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-4">TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-5">TC-P08-005 Changement de mode desarme le geste, nouvel appui exige</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-6">TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-7">TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-8">TC-P08-011 Fin de cycle benne desarme le geste par defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-9">TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-10">TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes</a></li></ul>
+        <summary>📋 Sommaire (4 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-0">BootPending declenche automatiquement un verdict au 1er scan si la machine est deja a l arret</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-1">Execute pendant que la machine roule differe le verdict jusqu a l arret complet</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-2">Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-3">Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            11/11 vérifications validées
+            4/4 vérifications validées
         </div>
     </div>
     
@@ -281,6 +283,93 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 25 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>BRAKETHERMALOK</code> jamais câblé en production</li><li>Pin <code>EMERGENCYCHAINCLOSED</code> jamais câblé en production</li><li>Pin <code>ENCODERM1OPERATIONAL</code> jamais câblé en production</li><li>Pin <code>ENCODERM2OPERATIONAL</code> jamais câblé en production</li><li>Pin <code>EXECUTE</code> jamais câblé en production</li><li>Pin <code>HOMEDM1</code> jamais câblé en production</li><li>Pin <code>HOMEDM2</code> jamais câblé en production</li><li>Pin <code>M1BRAKEAPPLIED</code> jamais câblé en production</li><li>Pin <code>M1CONTACTORSRELEASED</code> jamais câblé en production</li><li>Pin <code>M1POSITIONINBOUNDS</code> jamais câblé en production</li><li>Pin <code>M1THERMALOK</code> jamais câblé en production</li><li>Pin <code>M2BRAKEAPPLIED</code> jamais câblé en production</li><li>Pin <code>M2CONTACTORSRELEASED</code> jamais câblé en production</li><li>Pin <code>M2POSITIONINBOUNDS</code> jamais câblé en production</li><li>Pin <code>M2THERMALOK</code> jamais câblé en production</li><li>Pin <code>M3BRAKEAPPLIED</code> jamais câblé en production</li><li>Pin <code>M3SENSORWORDINCOHERENT</code> jamais câblé en production</li><li>Pin <code>MACHINEISSTILL</code> jamais câblé en production</li><li>Pin <code>PHASEROTATIONOK</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>PREFLIGHTBUSY</code> jamais câblé en production</li><li>Pin <code>PREFLIGHTDONE</code> jamais câblé en production</li><li>Pin <code>PREFLIGHTERRORID</code> jamais câblé en production</li><li>Pin <code>PREFLIGHTOK</code> jamais câblé en production</li><li>Pin <code>SLACKCABLETENSIONED</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">EXECUTE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MACHINEISSTILL <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1BRAKEAPPLIED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2BRAKEAPPLIED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M3BRAKEAPPLIED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1CONTACTORSRELEASED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2CONTACTORSRELEASED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1THERMALOK <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2THERMALOK <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BRAKETHERMALOK <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">PHASEROTATIONOK <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SLACKCABLETENSIONED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M3SENSORWORDINCOHERENT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">EMERGENCYCHAINCLOSED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENCODERM1OPERATIONAL <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENCODERM2OPERATIONAL <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMEDM1 <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMEDM2 <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1POSITIONINBOUNDS <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2POSITIONINBOUNDS <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Acquisition_Preflight</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">PREFLIGHTOK <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">PREFLIGHTDONE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">PREFLIGHTBUSY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">PREFLIGHTERRORID <span class="pin-type">IEC_WORD</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -357,126 +446,99 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-acquisition-preflight-0" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-1" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            
-            
-            
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 9 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
+        <article id="test-fb-acquisition-preflight-0" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>BootPending declenche automatiquement un verdict au 1er scan si la machine est deja a l arret </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>BootPending force un verdict des le 1er scan, sans attendre un front Execute</li><li>toutes les conditions saines -&gt; verdict OK</li><li>aucun defaut -&gt; ErrorId a 0</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (27)</summary>
+            <table class="static-table"><tbody><tr><td><code>EXECUTE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEISSTILL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SLACKCABLETENSIONED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1POSITIONINBOUNDS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2POSITIONINBOUNDS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PREFLIGHTOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PREFLIGHTDONE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PREFLIGHTBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PREFLIGHTERRORID</code></td><td>0</td></tr><tr><td><code>BOOTPENDING</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>REQUESTPENDING</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+        <article id="test-fb-acquisition-preflight-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Execute pendant que la machine roule differe le verdict jusqu a l arret complet </h3>
+            </header>
+            <div class="comments"><p class='comment'>scan 1 : verdict boot consomme (machine deja a l arret), etat propre pour la suite</p><p class='comment'>scan 2 : operateur demande un nouveau preflight (front Execute) PENDANT que la machine roule</p><p class='comment'>scan 3 : la machine s arrete, le verdict differe se calcule enfin</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>demande en attente tant que la machine roule</li><li>pas de verdict tant que la machine n est pas a l arret complet</li><li>machine arretee : le verdict differe se calcule</li><li>plus de demande en attente une fois le verdict rendu</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 5 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="292" viewBox="0 0 388 292" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="274" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="286" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="274" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="286" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="274" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="286" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">EXECUTE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">MACHINEISSTILL</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,108L256,108L256,108L256,134L312,134L312,134L312,108L368,108" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">PREFLIGHTDONE</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L256,148L256,174L312,174L312,174L312,148L368,148" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">PREFLIGHTBUSY</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L256,214L256,188L312,188L312,188L312,214L368,214" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">REQUESTPENDING</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,254L256,254L256,254L256,228L312,228L312,228L312,254L368,254" class="wf-line" stroke="#0d9488"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>EXECUTE</th><th>MACHINEISSTILL</th><th>PREFLIGHTDONE</th><th>PREFLIGHTBUSY</th><th>REQUESTPENDING</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (22)</summary>
+        <table class="static-table"><tbody><tr><td><code>M1BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SLACKCABLETENSIONED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1POSITIONINBOUNDS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2POSITIONINBOUNDS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PREFLIGHTOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PREFLIGHTERRORID</code></td><td>0</td></tr><tr><td><code>BOOTPENDING</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
         <article id="test-fb-acquisition-preflight-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour) </h3>
+                <h3>Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>frein M1 desserre a l arret -&gt; verdict NOK</li><li>bit0 (frein M1) seul leve, aucun autre bit parasite</li></ul></details>
             
             
-            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (27)</summary>
+            <table class="static-table"><tbody><tr><td><code>EXECUTE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEISSTILL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1BRAKEAPPLIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SLACKCABLETENSIONED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1POSITIONINBOUNDS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2POSITIONINBOUNDS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PREFLIGHTOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PREFLIGHTDONE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PREFLIGHTBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PREFLIGHTERRORID</code></td><td>1</td></tr><tr><td><code>BOOTPENDING</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>REQUESTPENDING</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-fb-acquisition-preflight-3" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant </h3>
+                <h3>Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple) </h3>
             </header>
+            <div class="comments"><p class='comment'>seule condition du FB qui n est pas un simple &quot;NOT X&quot; -- verifie explicitement</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>bit11 : contacteur engage alors que la chaine AU est ouverte -- anomalie</li></ul></details>
             
             
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-5" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-005 Changement de mode desarme le geste, nouvel appui exige </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-6" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-7" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur) </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-8" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-011 Fin de cycle benne desarme le geste par defaut </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-9" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-10" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes </h3>
-            </header>
-            
-            
-            
-            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (27)</summary>
+            <table class="static-table"><tbody><tr><td><code>EXECUTE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEISSTILL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SLACKCABLETENSIONED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM1OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1POSITIONINBOUNDS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2POSITIONINBOUNDS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PREFLIGHTOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PREFLIGHTDONE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PREFLIGHTBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PREFLIGHTERRORID</code></td><td>2048</td></tr><tr><td><code>BOOTPENDING</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>REQUESTPENDING</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>
@@ -488,13 +550,13 @@
         <summary>Code source ST original (1)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Acquisition_Preflight.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Acquisition_Preflight.st</code></summary>
                 <pre>(* =======================================================================
    📊 FB_Acquisition_Preflight — Verdict passif machine arrêtée
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Verdict passif de qualification E/S machine arrêtée (16 contrôles)
    🔒 Polarité : Observateur pur (aucun SafeStop, PowerCutOff ou ordre machine)
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §6
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §6
    ======================================================================= *)
 FUNCTION_BLOCK FB_Acquisition_Preflight
 VAR_INPUT

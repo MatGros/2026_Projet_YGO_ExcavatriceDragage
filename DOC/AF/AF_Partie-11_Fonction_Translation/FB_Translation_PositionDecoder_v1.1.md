@@ -1,6 +1,6 @@
 # FB_Translation_PositionDecoder — Spec composant (v1.1)
 
-> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.2.md`](../AF_Partie-11_Fonction_Translation_v2.2.md) §2.
+> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.3.md`](../AF_Partie-11_Fonction_Translation_v2.3.md) §2.
 > Rôle de **ce** document : décodage 5 capteurs TOR → mot de progression + butées extrêmes —
 > et **catalogue unique** des `TC-P11-001`, `TC-P11-002`.
 > Source code : `CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st` · instance `Acquisition.instPositionDecoder`.
@@ -78,6 +78,7 @@ Tout autre mot ⇒ `Incoherent=TRUE`. Butées extrêmes dérivées **seulement**
 
 **Historique du lot** (pour éviter de refaire les mêmes erreurs) : 3 conceptions testées en
 direct sur machine réelle avant validation :
+
 1. Mot EXACT (5 bits) — abandonné : un capteur décalé de quelques mm suffisait à sauter le mot
    cible (décalage came).
 2. Front du capteur **précédent** dans la chaîne thermomètre (ex : arrivée à P1 = front

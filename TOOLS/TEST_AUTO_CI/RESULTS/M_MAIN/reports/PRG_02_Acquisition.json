@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_prg_04_treuils_benne.st",
+  "file": "test_prg_02_acquisition.st",
   "results": [
     {
-      "name": "PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth",
+      "name": "PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)",
       "passed": true
     },
     {
-      "name": "PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)",
+      "name": "PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position",
       "passed": true
     }
   ],

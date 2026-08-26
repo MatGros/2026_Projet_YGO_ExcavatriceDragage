@@ -2,7 +2,7 @@
    🪣 FB_Bucket — Commande d'ouverture et de fermeture du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage synchrone et séquencement d'ouverture/fermeture benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : FB standard (Partie3 §1bis)
    🔒 Sécurité : Surveillance du glissement M1 et interlocks de mouvement
    ======================================================================= *)
@@ -496,7 +496,7 @@ END_IF;
 DeltaPosition_M := CablePosM2 - CablePosM1;
 
 // Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
-// (M2PositionCorrected, côté PRG_SUPERVISION_CFC).
+// (M2PositionCorrected, côté PRG_07_Supervision).
 // CloseReq/OpenReq sont pris en compte (pas seulement IsClosed/IsOpen, qui sont FALSE pendant
 // TOUT le trajet depuis l'état transitoire) pour que la position corrigée de M2 converge
 // progressivement vers M1 pendant l'enroulage.

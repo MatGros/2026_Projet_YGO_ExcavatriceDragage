@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.987605" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.987605">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:10.539088" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:10.539088">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -652,7 +652,7 @@ Seuils de changement de palier (0..100%)</xhtml>
    🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -832,8 +832,8 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪝 ST_WinchFinalInterlockRequest — Demande brute vers frontière Q M1/M2
    ───────────────────────────────────────────────────────────────
-   📤 Producteur unique : PRG_TREUILS_CFC (VAR_OUTPUT).
-   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock.
+   📤 Producteur unique : PRG_04_Treuils_Benne (VAR_OUTPUT).
+   📥 Consommateur unique : PRG_06_Outputs, avant FB_WinchOutputInterlock.
    🔒 Ne contient jamais une sortie Q autorisée : les C1..C4 restent les
       demandes exactes de FB_Winch / ST_SpeedStepTable.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -859,7 +859,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Demande finale et interlocks treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M1LogicRequestSpeedRef_Pct">
+            <variable name="M1LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -867,7 +867,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)</xhtml>
               </documentation>
             </variable>
-            <variable name="M2LogicRequestSpeedRef_Pct">
+            <variable name="M2LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -959,7 +959,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
       l'état benne publiés par PRG_04_Treuils_Benne vers les consommateurs
       (PRG_02/03/06/07).
    📤 Producteur unique : PRG_04_Treuils_Benne (VAR_OUTPUT Data : ST_WinchInterPrg).
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -1056,12 +1056,12 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Palier limité par vitesse réelle</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRef_Pct">
+            <variable name="SpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne de vitesse finale après rampe (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Commande de vitesse finale après rampe (%)</xhtml>
               </documentation>
             </variable>
             <variable name="StepNumber">
@@ -1182,7 +1182,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <derived name="E_WinchFinalInterlockState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">
@@ -1468,7 +1468,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1551,7 +1551,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1850,7 +1850,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
    📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §2
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -2458,7 +2458,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <INT />
               </type>
             </variable>
-            <variable name="M1LogicRequestSpeedRef_Pct">
+            <variable name="M1LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -2473,7 +2473,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <INT />
               </type>
             </variable>
-            <variable name="M2LogicRequestSpeedRef_Pct">
+            <variable name="M2LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
@@ -2751,7 +2751,7 @@ front descendant Kobold</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 4 (après PRG_03_Modes_Cycle).
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
-   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md ; DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md ; DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -3026,28 +3026,28 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M1LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
     M1LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
-    M1LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
+    M1LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
 ELSE
     IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Mode Boutons IHM
         IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
             M1LogicRequestDirection := 1;
-            M1LogicRequestSpeedRef_Pct  := 100.0;
+            M1LogicRequestSpeedCmd_Pct  := 100.0;
         ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
             M1LogicRequestDirection := -1;
-            M1LogicRequestSpeedRef_Pct  := 100.0;
+            M1LogicRequestSpeedCmd_Pct  := 100.0;
         ELSE
             M1LogicRequestDirection := 0;
-            M1LogicRequestSpeedRef_Pct  := 0.0;
+            M1LogicRequestSpeedCmd_Pct  := 0.0;
         END_IF;
     ELSE
         // Mode Joystick Maître
         IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
             M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
-            M1LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
+            M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
         ELSE
             M1LogicRequestDirection := 0;
-            M1LogicRequestSpeedRef_Pct  := 0.0;
+            M1LogicRequestSpeedCmd_Pct  := 0.0;
         END_IF;
     END_IF;
 
@@ -3064,34 +3064,34 @@ END_IF;
 IF instBucket.Status.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestStartStop := instBucket.M2_StartStop;
     M2LogicRequestDirection := instBucket.M2_Direction;
-    M2LogicRequestSpeedRef_Pct  := 15.0;
+    M2LogicRequestSpeedCmd_Pct  := 15.0;
 ELSE
     IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
         // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
         M2LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
         M2LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
-        M2LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+        M2LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
     ELSE
         IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
             // Mode Boutons IHM
             IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
                 M2LogicRequestDirection := 1;
-                M2LogicRequestSpeedRef_Pct  := 100.0;
+                M2LogicRequestSpeedCmd_Pct  := 100.0;
             ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
                 M2LogicRequestDirection := -1;
-                M2LogicRequestSpeedRef_Pct  := 100.0;
+                M2LogicRequestSpeedCmd_Pct  := 100.0;
             ELSE
                 M2LogicRequestDirection := 0;
-                M2LogicRequestSpeedRef_Pct  := 0.0;
+                M2LogicRequestSpeedCmd_Pct  := 0.0;
             END_IF;
         ELSE
             // Mode Joystick Maître
             IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
                 M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
-                M2LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
+                M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
             ELSE
                 M2LogicRequestDirection := 0;
-                M2LogicRequestSpeedRef_Pct  := 0.0;
+                M2LogicRequestSpeedCmd_Pct  := 0.0;
             END_IF;
         END_IF;
 
@@ -3444,7 +3444,7 @@ instWinchM1(
     DescendPermit           := EffectivePermitM1_Descend,
     AscentPermit            := EffectivePermitM1_Ascent,
     Direction               := M1LogicRequestDirection,
-    SpeedRefPct             := M1LogicRequestSpeedRef_Pct,
+    SpeedTgt_Pct            := M1LogicRequestSpeedCmd_Pct,
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := SEL(instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
     // Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
@@ -3475,7 +3475,7 @@ instWinchM2(
     DescendPermit           := EffectivePermitM2_Descend,
     AscentPermit            := EffectivePermitM2_Ascent,
     Direction               := M2LogicRequestDirection,
-    SpeedRefPct             := M2LogicRequestSpeedRef_Pct,
+    SpeedTgt_Pct            := M2LogicRequestSpeedCmd_Pct,
     SpeedStepTable          := M2_SpeedStepTableActive,
     // instBucket.M2_ForceSlowSpeed
     // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) plafonne le palier
@@ -3553,7 +3553,7 @@ WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M1_Speed_Mps - M1_Prev
 M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
 
 WinchM1State.Position_M := PRG_02_Acquisition.Data.CablePosM1;
-WinchM1State.SpeedRef_Pct := M1LogicRequestSpeedRef_Pct;
+WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
 WinchM1State.FBState := instWinchM1.Status.State;
 WinchM1State.Ready := instWinchM1.Ready;
@@ -3610,7 +3610,7 @@ WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M2_Speed_Mps - M2_Prev
 M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
 
 WinchM2State.Position_M := PRG_02_Acquisition.Data.CablePosM2;
-WinchM2State.SpeedRef_Pct := M2LogicRequestSpeedRef_Pct;
+WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
 WinchM2State.FBState := instWinchM2.Status.State;
 WinchM2State.Ready := instWinchM2.Ready;
@@ -3767,8 +3767,8 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
 // Copie des structs internes vers le bus de sortie (producteur unique).
 Data.WinchM1FinalInterlockRequest := WinchM1FinalInterlockRequest;
 Data.WinchM2FinalInterlockRequest := WinchM2FinalInterlockRequest;
-Data.M1LogicRequestSpeedRef_Pct   := M1LogicRequestSpeedRef_Pct;
-Data.M2LogicRequestSpeedRef_Pct   := M2LogicRequestSpeedRef_Pct;
+Data.M1LogicRequestSpeedCmd_Pct   := M1LogicRequestSpeedCmd_Pct;
+Data.M2LogicRequestSpeedCmd_Pct   := M2LogicRequestSpeedCmd_Pct;
 Data.KoboldContactorCmdArbitrated := KoboldContactorCmdArbitrated;
 Data.WinchM1State                 := WinchM1State;
 Data.WinchM2State                 := WinchM2State;
@@ -4217,7 +4217,7 @@ Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
    🪣 FB_Bucket — Commande d'ouverture et de fermeture du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage synchrone et séquencement d'ouverture/fermeture benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : FB standard (Partie3 §1bis)
    🔒 Sécurité : Surveillance du glissement M1 et interlocks de mouvement
    =======================================================================</xhtml>
@@ -4641,7 +4641,7 @@ END_IF;
 DeltaPosition_M := CablePosM2 - CablePosM1;
 
 // Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
-// (M2PositionCorrected, côté PRG_SUPERVISION_CFC).
+// (M2PositionCorrected, côté PRG_07_Supervision).
 // CloseReq/OpenReq sont pris en compte (pas seulement IsClosed/IsOpen, qui sont FALSE pendant
 // TOUT le trajet depuis l'état transitoire) pour que la position corrigée de M2 converge
 // progressivement vers M1 pendant l'enroulage.
@@ -4924,7 +4924,7 @@ END_IF;
    🎯 Rôle : Qualification du capteur Kobold et autorisation de descente
    🛡️ Sécurité : Verrouillage si séquence d'immersion 0-&gt;1-&gt;0 invalide
    🔌 Interface : Intention de descente et mesures vers permis de descente
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -5323,7 +5323,7 @@ ErrorId bit0:fond ; bit1:ferme ; bit2:ctrl ; bit3:cfg.
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Séquence d'extraction (fermeture benne, remontée de contrôle, remontée nominale)
    🛡️ Sécurité : Aucune remontée assistée sans fond confirmé, contrôle palier 1
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -6212,7 +6212,7 @@ bit11: "Méca D" ; bit12/13: "Méca E écart synchro" ; bit14: "Sens opposé" ; 
    🛡️ FB_Safety_Winch — Surveillance et sécurité d'un treuil (M1 / M2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Protection machine, surveillance codeurs, dérives et interlocks
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Sécurité : Gestion des autorisations SafeStop, PowerCutOff et permis
    =======================================================================</xhtml>
           </documentation>
@@ -6625,12 +6625,12 @@ Status.Done := FALSE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse % (0.0 a 100.0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible % (0.0 a 100.0)</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -7163,7 +7163,7 @@ Code erreur bitmask.</xhtml>
    🪝 FB_Winch — Directeur d'un treuil individuel (M1 / M2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage d'un treuil individuel (contacteurs de sens et de vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop)
    🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
    =======================================================================</xhtml>
@@ -7177,7 +7177,7 @@ Code erreur bitmask.</xhtml>
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-    SpeedStep(Enable := FALSE, SpeedRefPct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
+    SpeedStep(Enable := FALSE, SpeedTgt_Pct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
     RequestedStep := SpeedStep.StepNumber;
     StepNumber := 0;
     BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
@@ -7225,7 +7225,7 @@ EffectiveSafeStop := SafeStop
 
 RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
-    RampTargetPct := ABS(SpeedRefPct);
+    RampTargetPct := ABS(SpeedTgt_Pct);
 END_IF;
 
 // RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect) — permet d'approcher
@@ -7302,7 +7302,7 @@ END_IF;
 {endregion}
 
 {region "§3 Selection et temporisation paliers"}
-SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedRefPct := RampTargetPct,
+SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedTgt_Pct := RampTargetPct,
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
           MaxStepNumber := ActiveMaxStep,
           MeasuredSpeedBand := MeasuredSpeedBand,
@@ -7804,7 +7804,7 @@ END_IF;
       FB_SyncContactor. Ce bloc NE calcule PAS l'ecart lui-meme.
    🔒 SyncActive : autorisation de couplage (anti-telescopage), independante
       de l'erreur — le probleme est porte par SyncDeviationWarn/Fault.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -8003,7 +8003,7 @@ Status.Done := FALSE;
    📐 FB_DriftGuard — Détection de dérive de position sous armement
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Capture position de référence et détection de dérive anormale
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Brique interne de sécurité (compose FB_Safety_Winch)
    🔒 Sécurité : Détection de mouvement non commandé et glissement
    =======================================================================</xhtml>
@@ -8104,7 +8104,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -8166,7 +8166,7 @@ TimeLast := TimeCurrent;
 --&gt; [CMD] Pilotage actif (FALSE = palier 0 / arret)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
@@ -8351,7 +8351,7 @@ TimeLast := TimeCurrent;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant erreur configuration</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefInt">
+            <variable name="SpeedTgtInt">
               <type>
                 <INT />
               </type>
@@ -8398,7 +8398,7 @@ TimeLast := TimeCurrent;
    🪜 FB_SpeedStep — Décodeur palier vitesse vers contacteurs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Décodage consigne vitesse 0..100% en paliers et pilotage contacteurs
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Décodeur interne (compose FB_Winch)
    🔒 Sécurité : Validation configuration table et anti-battement hysteresis
    =======================================================================</xhtml>
@@ -8531,12 +8531,12 @@ END_IF;
 //    IN &gt; HIGH (régime "haut" confirmé) ; maintien entre LOW et HIGH (anti-battement).
 //    =&gt; NOT Hyst_n.OUT = "on a franchi le seuil n vers le haut" (palier n+1 atteint).
 // ─────────────────────────────────────────────────────────────────────────
-SpeedRefInt := REAL_TO_INT(SpeedRefPct);
+SpeedTgtInt := REAL_TO_INT(SpeedTgt_Pct);
 
-Hyst1(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
-Hyst2(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[2] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[2] - HystMargin));
-Hyst3(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[3] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[3] - HystMargin));
-Hyst4(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[4] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[4] - HystMargin));
+Hyst1(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
+Hyst2(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[2] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[2] - HystMargin));
+Hyst3(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[3] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[3] - HystMargin));
+Hyst4(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[4] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[4] - HystMargin));
 
 StepNumber := 1;                          // Palier mini dès qu'Enable est actif
 IF NOT Hyst1.OUT THEN StepNumber := 2; END_IF;
@@ -8791,7 +8791,7 @@ END_CASE;
       meme si les codeurs sont bypasses.
    🔌 Interface : Bloc de surveillance transverse (1 instance)
    🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -9037,7 +9037,7 @@ END_IF;
    🧬 Responsabilite : n'interprete PAS l'etat benne. Il reçoit ActiveOffsetM
       deja resolu (calcul offset-selon-etat-benne = FB_Bucket/HoldOffset).
    🔒 Polarite : SyncDeviationWarn/Fault = TRUE si ecart hors seuil.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

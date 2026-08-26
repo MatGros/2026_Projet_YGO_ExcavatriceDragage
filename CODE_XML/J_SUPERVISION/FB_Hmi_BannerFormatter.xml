@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.891265" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.891265">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:44:43.693671" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:44:43.693671">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -379,7 +379,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §4, §4bis
    🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
       IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -822,7 +822,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Role : liste les defauts/warnings actifs de toute la machine,
       affiches un a la fois en rotation (FB_Hmi_BannerFormatter S5)
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md S4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md S6
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1293,6 +1293,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Au moins un bypass actif</xhtml>
               </documentation>
             </variable>
+            <variable name="PowerOrChainFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Défaut chaîne AU ou contacteur puissance absent</xhtml>
+              </documentation>
+            </variable>
             <variable name="CriticalActionActive">
               <type>
                 <BOOL />
@@ -1386,7 +1394,7 @@
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-clignotement warnings/états (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-clignotement warnings/états (AF-07 §5.3)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_NbMaxAlarmes">
@@ -1397,7 +1405,7 @@
                 <simpleValue value="32" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Taille du carrousel d'alarmes (AF-07 §4bis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Taille du carrousel d'alarmes (AF-07 §6)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -1405,12 +1413,12 @@
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧠 FB_Hmi_BannerFormatter — Formateur du bandeau d'information IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5, §6
    🎯 Responsabilité : assemble les 4 textes du bandeau + le carrousel
       d'alarmes, expose la cause observable du blocage courant, sans
       piloter la machine.
    🛡️ Sécurité : priorité AU/puissance, SafeStop, puis interlocks métier.
-      L'anti-clignotement est délégué à FB_AntiFlickerText (AF-07 §4.3).
+      L'anti-clignotement est délégué à FB_AntiFlickerText (AF-07 §5.3).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -1434,7 +1442,7 @@ END_IF;
 {region "§1 Contexte global"}
 // ═══════════════════════════════════════════════════════════════
 // 1. CONTEXTE GLOBAL — aucun numéro d'étape ici
-// Format (AF-07 §4.1) : [RÉEL/SIMU] [MODE] [COUPLAGE]
+// Format (AF-07 §5.1) : [RÉEL/SIMU] [MODE] [COUPLAGE]
 // ═══════════════════════════════════════════════════════════════
 IF SimulationModeActive THEN
     PrefixContext := '[SIMULATION] ';
@@ -1468,7 +1476,7 @@ Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 {region "§2 Progression"}
 // ═══════════════════════════════════════════════════════════════
 // 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
-// Format (AF-07 §4.1) : Macro: &lt;Cycle&gt; &gt; Sous-cycle: &lt;Étape&gt;
+// Format (AF-07 §5.1) : Macro: &lt;Cycle&gt; &gt; Sous-cycle: &lt;Étape&gt;
 // ═══════════════════════════════════════════════════════════════
 IF HomingActive THEN
     IF HomingStepM1 &gt; 0 THEN
@@ -1521,7 +1529,7 @@ END_IF;
 {region "§3 Condition spéciale"}
 // ═══════════════════════════════════════════════════════════════
 // 3. CONDITION SPÉCIALE — un seul indicateur bypass/dérogation
-// Format (AF-07 §4.1) : ATTENTION: &lt;Dérogation / Bridage / Alerte&gt;
+// Format (AF-07 §5.1) : ATTENTION: &lt;Dérogation / Bridage / Alerte&gt;
 // 🧊 Warning → maintenu min (anti-clignotement), jamais critique.
 // ⚠️ La simulation n'est PAS un bypass : elle n'apparaît que dans le
 //    contexte global (champ 1), jamais ici.
@@ -1548,7 +1556,7 @@ Banner.SpecialConditionText := AntiFlickSpecial.Text;
 {region "§4 Action opérateur"}
 // ═══════════════════════════════════════════════════════════════
 // 4. ACTION — cause fixe, sécurité d'abord, sans rotation
-// Format (AF-07 §4.1) : [ORGANE] &lt;Action physique&gt; &gt; &lt;Fin&gt;
+// Format (AF-07 §5.1) : [ORGANE] &lt;Action physique&gt; &gt; &lt;Fin&gt;
 // 🧊 Défauts (AU/puissance/SafeStop) + interlock DirectionBlocked
 //    → affichés immédiatement (ForceInstant=TRUE) ; les autres états
 //    → maintenus min (anti-clignotement).
@@ -1585,7 +1593,7 @@ ELSIF DirectionBlocked THEN
         OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
-    // Guidance par étape du cycle (AF-07 §4.1) — ne masque jamais un défaut
+    // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
     CASE CycleStep OF
         E_CycleStep.X0_PREPARATION:
@@ -1662,8 +1670,8 @@ END_IF;
 
 // Interlock = mouvement demandé mais permit absent : c'est une cause
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
-CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged
-                     OR PowerCutOffActiveAny OR SafeStopActive OR DirectionBlocked);
+PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
+CriticalActionActive := (PowerOrChainFault OR SafeStopActive OR DirectionBlocked);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -1672,9 +1680,9 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
 {region "§5 Bandeau alarme"}
 // ═══════════════════════════════════════════════════════════════
 // 5. BANDEAU D'ALARME — carrousel des défauts actifs (index n/N)
-// Format (AF-07 §4bis) : [ORGANE] raison_brève. Un défaut à la fois,
+// Format (AF-07 §6) : [ORGANE] raison_brève. Un défaut à la fois,
 // rotation 1→2→…→N→1, maintien AlarmHoldTime par message.
-// 🧊 Distinct des 4 champs ci-dessus (AF-07 §4.2) : ce carrousel est
+// 🧊 Distinct des 4 champs ci-dessus (AF-07 §5.2) : ce carrousel est
 //    le SEUL endroit du bandeau qui publie Error/ErrorId (alarmes).
 // ═══════════════════════════════════════════════════════════════
 AlarmCount := 0;
@@ -1799,8 +1807,7 @@ IF TranslationSafety.ErrorSensorIncoherent AND (AlarmCount &lt; CST_NbMaxAlarmes
     AlarmArray[AlarmCount] := '[M3] capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5d. Collecte — benne (FB_Bucket.ErrorId, bits vérifiés à la lecture du FB source :
-// diffèrent du brouillon initial du plan, corrigés ici bit à bit)
+// 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)
 IF ((BucketErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -1848,8 +1855,7 @@ IF ((ExtractionErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_N
     AlarmArray[AlarmCount] := '[EXTRACTION] config'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId, bit3
-// "Startup" absent du brouillon initial du plan, ajouté ici après lecture du FB source)
+// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId)
 IF ((EmergencyErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[AU] redondance contacteurs'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -1860,8 +1866,7 @@ IF ((EmergencyErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_Nb
     AlarmArray[AlarmCount] := '[AU] echec autotest demarrage'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId, dictionnaire absent du plan,
-// construit ici après lecture complète du FB source)
+// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId)
 IF ((CycleErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] limite legale atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -1946,7 +1951,7 @@ END_IF;
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée de maintien min avant changement (AF-07 §5.3)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1974,7 +1979,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧊 FB_AntiFlickerText — Lissage anti-clignotement d'un texte IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4.3
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5.3
    🎯 Responsabilité : maintient un texte warning/état un temps minimum
       avant de laisser le contenu changer, et laisse passer en direct
       (sans maintien) les messages critiques (défauts AU/puissance).

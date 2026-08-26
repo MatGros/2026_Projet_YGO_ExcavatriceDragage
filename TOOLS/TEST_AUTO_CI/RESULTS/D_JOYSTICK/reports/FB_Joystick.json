@@ -3,11 +3,7 @@
   "file": "test_fb_joystick.st",
   "results": [
     {
-      "name": "TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)",
-      "passed": true
-    },
-    {
-      "name": "Nominal : Enable=TRUE au neutre -> Ready, aucun defaut",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
@@ -16,6 +12,10 @@
     },
     {
       "name": "TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle",
       "passed": true
     },
     {

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.881122" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.881122">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:09.568345" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:09.568345">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -232,7 +232,7 @@
    📊 ST_WinchLoadEstimateTable — Table empirique de charge estimée
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Matrice 5x5 d'estimation de charge (palier commandé x bande vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -280,7 +280,7 @@
    ⚙️ ST_WinchSpeedConfig — Configuration des plages de vitesse linéaire
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -532,7 +532,7 @@ ErrorId bit0: "entrée/table invalide".</xhtml>
    📊 FB_WinchLoadEstimator — Estimation empirique de charge treuil
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Estimation informative de la charge par croisement palier/vitesse
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Brique de diagnostic/mesure (1 instance par treuil)
    🔒 Sécurité : Aucune commande moteur ni action sur SafeStop (information IHM)
    =======================================================================</xhtml>

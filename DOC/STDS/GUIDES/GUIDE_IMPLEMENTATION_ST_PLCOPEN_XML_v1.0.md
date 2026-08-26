@@ -64,13 +64,13 @@ respecter la hiérarchie standard suivante :
          xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.plcopen.org/xml/tc6_0200 http://www.plcopen.org/xml/tc6_0200">
-  
+
   <!-- En-tête du fichier -->
-  <fileHeader companyName="MonEntreprise" 
-              productName="STGenerator" 
-              productVersion="1.0" 
+  <fileHeader companyName="MonEntreprise"
+              productName="STGenerator"
+              productVersion="1.0"
               creationDateTime="2026-08-12T14:00:00"/>
-  
+
   <!-- En-tête de contenu -->
   <contentHeader name="Projet_ST_Exhaustif"/>
 
@@ -370,15 +370,15 @@ CASE eEtatMachine OF
     ET_EtatMachine.INIT:
         bInitDone := FALSE;
         eEtatMachine := ET_EtatMachine.RUNNING;
-        
+
     ET_EtatMachine.RUNNING:
         IF bDefaut THEN
             eEtatMachine := ET_EtatMachine.ERROR;
         END_IF;
-        
+
     ET_EtatMachine.ERROR:
         bAlerte := TRUE;
-        
+
 ELSE
     eEtatMachine := ET_EtatMachine.INIT;
 END_CASE;
@@ -482,7 +482,7 @@ Fonctionnel** complet avec entrées/sorties et instructions conditionnelles en S
          xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.plcopen.org/xml/tc6_0200 http://www.plcopen.org/xml/tc6_0200">
-  
+
   <fileHeader companyName="AutomationStudio" productName="STGenerator" productVersion="1.0" creationDateTime="2026-08-12T15:00:00"/>
   <contentHeader name="Projet_ST_Complet"/>
 
@@ -535,7 +535,7 @@ END_IF;
 CASE eMode OF
     ET_ModeOperation.MANUEL:
         bPompeActive := bCmdStart;
-        
+
     ET_ModeOperation.AUTOMATIQUE:
         IF rPression < 2.0 AND bCmdStart THEN
             bPompeActive := TRUE;
@@ -543,7 +543,7 @@ CASE eMode OF
         ELSIF rPression >= 8.0 THEN
             bPompeActive := FALSE;
         END_IF;
-        
+
     ET_ModeOperation.SECOURU:
         bPompeActive := TRUE;
 END_CASE;
@@ -568,10 +568,10 @@ END_CASE;
             <xhtml:p><![CDATA[
 // Appel du bloc fonctionnel
 fbPompe1(
-    bCmdStart := bStartLocal, 
-    eMode := ET_ModeOperation.AUTOMATIQUE, 
-    rPression := rPressionLigne, 
-    bPompeActive => bStatePompe, 
+    bCmdStart := bStartLocal,
+    eMode := ET_ModeOperation.AUTOMATIQUE,
+    rPression := rPressionLigne,
+    bPompeActive => bStatePompe,
     bAlarmePression => bAlarme
 );
             ]]></xhtml:p>

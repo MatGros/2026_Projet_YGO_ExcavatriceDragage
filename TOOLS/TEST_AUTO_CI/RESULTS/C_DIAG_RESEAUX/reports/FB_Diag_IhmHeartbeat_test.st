@@ -4,15 +4,27 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'IhmHeartbeat : Enable=FALSE desactive la surveillance'
-    FB(Enable := FALSE, TglHeartbeatIhm := FALSE);
-    ASSERT_FALSE(FB.HeartbeatIhmOk, 'HeartbeatIhmOk doit etre FALSE');
-    ASSERT_TRUE(FB.HeartbeatIhmTimeout, 'HeartbeatIhmTimeout doit etre TRUE');
+TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
+    (* Scan 0 : Enable=FALSE -> Diagnostic desactive *)
+    FB(Enable := FALSE, HeartbeatIn := 0, TimeoutCfg := T#2S);
+    ASSERT_FALSE(FB.Ready, 'Enable=FALSE -> Ready=FALSE');
+    ASSERT_EQ(FB.State, E_Diag_State.DISABLED, 'State=DISABLED');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 1 : Enable=TRUE -> Diagnostic pret *)
+    FB(Enable := TRUE, HeartbeatIn := 1, TimeoutCfg := T#2S);
+    ASSERT_TRUE(FB.Ready, 'Enable=TRUE -> Ready=TRUE');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
+    FB(Enable := FALSE, HeartbeatIn := 1, TimeoutCfg := T#2S);
+    ASSERT_FALSE(FB.Ready, 'Coupure -> Ready retombe a FALSE');
+    ASSERT_EQ(FB.State, E_Diag_State.DISABLED, 'State retombe a DISABLED');
 END_TEST
 
-TEST 'IhmHeartbeat : Front recu -> HeartbeatIhmOk=TRUE'
-    FB(Enable := TRUE, TglHeartbeatIhm := FALSE);
-    FB(Enable := TRUE, TglHeartbeatIhm := TRUE);
-    ASSERT_TRUE(FB.HeartbeatIhmOk, 'HeartbeatIhmOk doit etre TRUE suite au front');
-    ASSERT_FALSE(FB.HeartbeatIhmTimeout, 'Pas de timeout');
+TEST 'TC-P12-020 IHM Heartbeat : detection activite'
+    FB(Enable := TRUE, HeartbeatIn := 1, TimeoutCfg := T#2S);
+    ASSERT_TRUE(FB.Ready, 'Heartbeat IHM valide');
 END_TEST

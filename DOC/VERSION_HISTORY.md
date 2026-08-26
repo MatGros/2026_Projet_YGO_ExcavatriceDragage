@@ -149,7 +149,8 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - Gates : confinement `GVL_Simulation` + interdiction du forçage hybride
 - `AF_Partie-13` v2.0 · `AF_Partie-06` v1.7 · E/S et sécurité documentées
 
-### 0.5.2_Troubleshooting_SignalChain — 2026-07-27
+###
+0.5.2_Troubleshooting_SignalChain — 2026-07-27
 - Intégration du composant autonome de Recherche de Pannes et Traçabilité Pas-à-Pas
 - PRG_11_Troubleshooting (Position 11 MainTask, pure lecture seule, 0 régression métier)
 - GVL_Troubleshooting (placée sous CODE/MAIN/) orientée Fonctions & Utilisation Machine :
