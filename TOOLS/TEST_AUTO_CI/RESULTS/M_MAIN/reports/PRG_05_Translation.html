@@ -72,12 +72,14 @@
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks { margin-top: 8px; }
-    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; }
-    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
-    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
+    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary:hover { color: var(--text); }
+    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
@@ -191,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-25 16:47:44</div>
+    <div class="exec-time">2026-08-26 15:09:57</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-05-translation-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-05-translation-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-05-translation-0">PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuils OK)</a></li><li class="toc-item toc-pass"><a href="#test-prg-05-translation-1">PRG_05_Translation : Commande Translation Rev (Joystick X negatif)</a></li><li class="toc-item toc-pass"><a href="#test-prg-05-translation-2">PRG_05_Translation : Interdiction Mouvement Translation si Treuils en Bas</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -434,7 +436,7 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_05_Translation</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 44 flux entrants · 5 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_05_Translation</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 43 flux entrants · 5 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instTranslationM3 <span style="color:var(--muted);font-weight:500;">(FB_Translation)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSafetyTranslationM3 <span style="color:var(--muted);font-weight:500;">(FB_Safety_Translation)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instPosEstimatorM3 <span style="color:var(--muted);font-weight:500;">(FB_Translation_PositionEstimator)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TranslationFinalInterlockRequest <span style="color:var(--muted);font-weight:500;">(ST_TranslationFinalInterlockRequest)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TranslationState <span style="color:var(--muted);font-weight:500;">(ST_TranslationState)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TranslationSafety <span style="color:var(--muted);font-weight:500;">(ST_SafetyTranslation)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonM3ConfirmedMoving <span style="color:var(--muted);font-weight:500;">(TON)</span></span></div>
@@ -504,7 +506,7 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_02_Acquisition</span> <span style="font-size:11px;color:#818cf8;">(21 retours ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_02_Acquisition</span> <span style="font-size:11px;color:#818cf8;">(20 retours ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
                 </div>
             </summary>
@@ -583,10 +585,6 @@
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
@@ -708,12 +706,12 @@
                     <div>• Entrées Formelles : <b style="color:#ffffff;">0</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">8</b></div>
-                    <div>• Retours PRG : <b style="color:#ffffff;">34</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">33</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">1</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">3</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">2</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">44 IN</b> / <b style="color:#ffffff;">5 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">43 IN</b> / <b style="color:#ffffff;">5 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -927,28 +925,84 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-05-translation-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+                <h3>PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuils OK) </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary><ul class="checks-list"><li>Demande desserrage frein M3 generee</li><li>Aucun SafeStop actif sur translation</li><li>Sens translation avant arbitre</li><li>Consigne vitesse M3 arbitree non nulle</li><li>ControlWord variateur active pendant la commande</li></ul></details>
             
             
-            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 0 variables actives)</summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (16)</summary>
+        <table class="static-table"><tbody><tr><td><code>ACQDATA.CABLEPOSM1</code></td><td>0</td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>1</td></tr><tr><td><code>WINCHM1CABLEPOSM</code></td><td>5</td></tr><tr><td><code>WINCHM2CABLEPOSM</code></td><td>5</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DRIVEONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DRIVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3STARTSTOP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3DIRECTION</code></td><td>1</td></tr><tr><td><code>M3SPEEDTGT</code></td><td>75</td></tr><tr><td><code>M3HEIGHTOK</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         <article id="test-prg-05-translation-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+                <h3>PRG_05_Translation : Commande Translation Rev (Joystick X negatif) </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Sens translation arriere arbitre</li><li>Frein M3 desserre en arriere</li><li>Aucun SafeStop en commande arriere nominale</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 0 variables actives)</summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (16)</summary>
+        <table class="static-table"><tbody><tr><td><code>ACQDATA.CABLEPOSM1</code></td><td>0</td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>1</td></tr><tr><td><code>WINCHM1CABLEPOSM</code></td><td>5</td></tr><tr><td><code>WINCHM2CABLEPOSM</code></td><td>5</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DRIVEONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DRIVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3STARTSTOP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3DIRECTION</code></td><td>-1</td></tr><tr><td><code>M3SPEEDTGT</code></td><td>-60</td></tr><tr><td><code>M3HEIGHTOK</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-prg-05-translation-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_05_Translation : Interdiction Mouvement Translation si Treuils en Bas </h3>
+            </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>Frein reste serre</li><li>Mouvement interdit</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (16)</summary>
+            <table class="static-table"><tbody><tr><td><code>ACQDATA.CABLEPOSM1</code></td><td>0</td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>0</td></tr><tr><td><code>WINCHM1CABLEPOSM</code></td><td>0.5</td></tr><tr><td><code>WINCHM2CABLEPOSM</code></td><td>5</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DRIVEONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DRIVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3DIRECTION</code></td><td>0</td></tr><tr><td><code>M3SPEEDTGT</code></td><td>0</td></tr><tr><td><code>M3HEIGHTOK</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>
@@ -988,7 +1042,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des phases opérationnelles d&#x27;un FB métier
    ⚙️ Machine d&#x27;état : Un seul état actif à la fois (orthogonal à Error)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
    ======================================================================= *)
 
 TYPE E_State :
@@ -1070,7 +1124,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
    📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §2
    ======================================================================= *)
 
 TYPE ST_ContactorCheck :
@@ -1090,7 +1144,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
    ======================================================================= *)
 FUNCTION_BLOCK FB_CycleTime
 VAR_INPUT
@@ -1151,7 +1205,7 @@ TimeLast := TimeCurrent;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Limitation de variation anti-à-coups (%/s) sur signal analogique
    🔒 Polarité : Distingue l&#x27;éloignement de zéro (Accel) et le retour à zéro (Decel)
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §1 (TC-P11-040)
    ======================================================================= *)
 FUNCTION_BLOCK FB_Ramp
 VAR_INPUT
@@ -1204,7 +1258,7 @@ Current := LIMIT(-100.0, Current, 100.0);
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Verdict passif de qualification E/S machine arrêtée (16 contrôles)
    🔒 Polarité : Observateur pur (aucun SafeStop, PowerCutOff ou ordre machine)
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §6
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §6
    ======================================================================= *)
 FUNCTION_BLOCK FB_Acquisition_Preflight
 VAR_INPUT
@@ -1476,7 +1530,7 @@ END_IF;
    🎯 Rôle : Gestion temporisée ouverture/fermeture frein à manque de courant
    🔒 Polarité : Sécurité positive (BrakeCmd=FALSE = frein collé au repos)
    🔌 Interface : Double vérification retour contacteur (ST_ContactorCheck)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md §3
    ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Brake
 VAR_INPUT
@@ -1626,7 +1680,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
    📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    ======================================================================= *)
 
 TYPE ST_Joystick_AxisCmd :
@@ -1649,7 +1703,7 @@ END_TYPE
    ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des modes d&#x27;exploitation et maintenance
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
    ======================================================================= *)
 TYPE E_Mode :
 ENUM
@@ -1667,7 +1721,7 @@ END_TYPE
    🛡️ E_TranslationFinalInterlockReason — Raisons d&#x27;interlock M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des raisons de blocage de la barrière finale M3
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ======================================================================= *)
 {attribute &#x27;qualified_only&#x27;}
 TYPE E_TranslationFinalInterlockReason :
@@ -1685,7 +1739,7 @@ END_TYPE
    🎯 ST_TranslationCmdDemand — Demande de commande translation M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des consignes de mouvement translation M3
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ======================================================================= *)
 TYPE ST_TranslationCmdDemand :
 STRUCT
@@ -1700,7 +1754,7 @@ END_TYPE
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧩 FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🧩 Brique technique (AF_Partie-03 §2) : contrat minimal, pas de
       StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
       Maintenance) en mot de progression, dérive les 2 limites extrêmes,
@@ -1822,7 +1876,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §3
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
       la position estimée continue en mètres (0.0 m à la Trémie -&gt; +30.0 m à la Maintenance),
       avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.
@@ -1967,7 +2021,7 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
    🛡️ FB_TranslationOutputInterlock — Barrière finale frein / AC600 M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Barrière de sécurité finale pour frein et variateur AC600 M3
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🔌 Interface : Interlock de sortie (entre FB_Translation et PRG_06_Outputs)
    🔒 Sécurité : Surveillance feedback frein et watchdog de desserrage
    ======================================================================= *)
@@ -2152,7 +2206,7 @@ DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz)
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    Rôle : Surveillance joystick, bus EtherCAT, rotation de phases,
       thermique frein commun, Méca A (vitesse non commandée à l&#x27;arrêt),
       Méca B (frein/variateur en mouvement à l&#x27;arrêt), et Fdc extrêmes.
@@ -2432,7 +2486,7 @@ Status.State := E_State.READY;
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation — Directeur de l&#x27;axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l&#x27;interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -2872,12 +2926,11 @@ STRUCT
     BrakeFeedback           : BOOL;    (* 🔌 Retour physique direct : TRUE = frein OUVERT (desserré) *)
     PositionSensorTarget    : BOOL;    (* 🎯 Capteur de détection de la position cible atteint *)
     PositionReached         : BOOL;    (* ✅ Positionneur : cible sélectionnée atteinte (non mémorisé) *)
-    JoystickDeflection_Pct  : REAL;    (* 🕹️ Axe X fonctionnel -100..+100 %, 0 = neutre ; animation IHM M3 *)
     DriveActualFreq_Hz      : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
     DriveControlWord        : WORD;    (* ⚙️ Mot de commande AC600 réellement appliqué *)
     DriveFreqCmd_Hz         : REAL;    (* 🎯 Commande fréquence réellement appliquée *)
     ActiveDirection         : INT;     (* ↔️ Sens arbitré : -1 / 0 / +1 *)
-    ActiveSpeedCmd_Pct      : REAL;    (* 📊 Commande active après arbitrage *)
+    SpeedCmd_Pct            : REAL;    (* 📊 Commande active après arbitrage (0.0 à 100.0 %) *)
     FinalInterlockState     : E_State; (* 🛡️ État final lecture seule *)
     FinalInterlockReason    : E_TranslationFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
     FinalInterlockError     : BOOL;    (* 🛡️ Défaut final mémorisé *)
@@ -2923,7 +2976,7 @@ END_TYPE
       et le diagnostic TranslationSafety publiés par PRG_05_Translation vers
       les consommateurs (PRG_03/06/07).
    📤 Producteur unique : PRG_05_Translation (VAR_OUTPUT Data : ST_TranslationInterPrg).
-   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════ *)
 
@@ -2946,8 +2999,8 @@ END_TYPE
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🎚️ ST_Modes_Autorisations — Bus d&#x27;autorisations du mode machine
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
-                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §2
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
    🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
       Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
    🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
@@ -2974,7 +3027,7 @@ END_TYPE</pre>
       les positions M3 et les diagnostics DI publiés par PRG_02_Acquisition vers
       les consommateurs (PRG_03/04/05/07, FB_TroubleshootingView).
    📤 Producteur unique : PRG_02_Acquisition (VAR_OUTPUT Data : ST_AcquisitionInterPrg).
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════ *)
 
@@ -3168,7 +3221,7 @@ Data.TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslati
 Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz      := instTranslationM3.RequestedDriveFreqHz;
 
 Data.TranslationState.ActiveDirection                          := m3Direction;
-Data.TranslationState.ActiveSpeedCmd_Pct                       := m3SpeedTgt;
+Data.TranslationState.SpeedCmd_Pct                             := m3SpeedTgt;
 Data.TranslationState.Busy                                     := instTranslationM3.Status.Busy;
 {endregion}
 END_FUNCTION_BLOCK

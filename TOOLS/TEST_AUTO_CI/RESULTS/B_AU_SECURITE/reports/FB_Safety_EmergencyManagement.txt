@@ -1,0 +1,17 @@
+STruC++ Test Runner v1.0
+
+test_fb_safety_emergency.st
+         ASSERT_TRUE failed: FB.MAINTAINA_RQ expected TRUE, got FALSE
+         at test_fb_safety_emergency.st:21
+         Message: Au repos -> MaintainA actif
+  [FAIL] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  [PASS] TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu
+  [PASS] TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -> pulse 1s puis confirmation
+  [PASS] TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste
+  [PASS] TC-P01-006 canal colle bloque le reamement (echec auto-test)
+  [PASS] TC-P01-007 timeout confirmation contacteur -> lockout 5s
+  [PASS] TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien
+  [PASS] TC-P01-008 PowerCutOffRequest coupe A et B sans armer
+
+-----------------------------------------
+8 tests, 7 passed, 1 failed

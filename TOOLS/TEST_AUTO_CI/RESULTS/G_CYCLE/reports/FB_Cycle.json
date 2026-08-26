@@ -3,6 +3,10 @@
   "file": "test_fb_cycle.st",
   "results": [
     {
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "passed": true
+    },
+    {
       "name": "TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape",
       "passed": true
     },
@@ -24,8 +28,8 @@
     }
   ],
   "summary": {
-    "total": 5,
-    "passed": 5,
+    "total": 6,
+    "passed": 6,
     "failed": 0
   }
 }

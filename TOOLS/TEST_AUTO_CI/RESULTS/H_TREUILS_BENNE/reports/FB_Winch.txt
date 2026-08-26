@@ -1,0 +1,23 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-5KQKgp\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-5KQKgp\test_main.cpp:97:17: error: 'struct strucpp::ST_SPEEDSTEPTABLE' has no member named 'STEP1_THRESHOLDPCT'; did you mean 'STEPTHRESHOLD_PCT'?
+   97 |         s.TABLE.STEP1_THRESHOLDPCT = 10.0;
+      |                 ^~~~~~~~~~~~~~~~~~
+      |                 STEPTHRESHOLD_PCT
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-5KQKgp\test_main.cpp:98:17: error: 'struct strucpp::ST_SPEEDSTEPTABLE' has no member named 'STEP2_THRESHOLDPCT'; did you mean 'STEPTHRESHOLD_PCT'?
+   98 |         s.TABLE.STEP2_THRESHOLDPCT = 30.0;
+      |                 ^~~~~~~~~~~~~~~~~~
+      |                 STEPTHRESHOLD_PCT
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-5KQKgp\test_main.cpp:99:17: error: 'struct strucpp::ST_SPEEDSTEPTABLE' has no member named 'STEP3_THRESHOLDPCT'; did you mean 'STEPTHRESHOLD_PCT'?
+   99 |         s.TABLE.STEP3_THRESHOLDPCT = 50.0;
+      |                 ^~~~~~~~~~~~~~~~~~
+      |                 STEPTHRESHOLD_PCT
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-5KQKgp\test_main.cpp:100:17: error: 'struct strucpp::ST_SPEEDSTEPTABLE' has no member named 'STEP4_THRESHOLDPCT'; did you mean 'STEPTHRESHOLD_PCT'?
+  100 |         s.TABLE.STEP4_THRESHOLDPCT = 70.0;
+      |                 ^~~~~~~~~~~~~~~~~~
+      |                 STEPTHRESHOLD_PCT
+C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-5KQKgp\test_main.cpp:101:17: error: 'struct strucpp::ST_SPEEDSTEPTABLE' has no member named 'STEP5_THRESHOLDPCT'; did you mean 'STEPTHRESHOLD_PCT'?
+  101 |         s.TABLE.STEP5_THRESHOLDPCT = 90.0;
+      |                 ^~~~~~~~~~~~~~~~~~
+      |                 STEPTHRESHOLD_PCT
+

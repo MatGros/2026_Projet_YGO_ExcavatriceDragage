@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_winch.st",
+  "file": "test_fb_bucket.st",
   "results": [
     {
-      "name": "Safety_Winch : Enable=FALSE neutralise les autorisations",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "Winch : Enable=FALSE neutralise les sorties",
+      "name": "TC-P10-023 Benne : mise en service et verrouillage securite",
       "passed": true
     }
   ],

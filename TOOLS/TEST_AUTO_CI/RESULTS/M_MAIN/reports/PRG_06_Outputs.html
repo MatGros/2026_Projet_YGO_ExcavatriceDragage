@@ -72,12 +72,14 @@
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks { margin-top: 8px; }
-    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; }
-    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
-    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
+    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary:hover { color: var(--text); }
+    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
@@ -191,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 13:10:18</div>
+    <div class="exec-time">2026-08-26 15:07:12</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -1110,28 +1112,62 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-06-outputs-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+                <h3>PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Contacteur montee M1 active</li><li>Palier 1 M1 active</li><li>Commande desserrage frein M1 active</li><li>Commande desserrage frein M3 active</li></ul></details>
             
             
-            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (5)</summary>
+            <table class="static-table"><tbody><tr><td><code>FAULTRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYFWD</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1INTERLOCKENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3INTERLOCKENABLE</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-prg-06-outputs-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+                <h3>PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Contacteur montee M2 active</li><li>Palier 1 M2 active</li><li>Commande desserrage frein M2 active</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (5)</summary>
+            <table class="static-table"><tbody><tr><td><code>FAULTRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2INTERLOCKENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+        <article id="test-prg-06-outputs-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
+            </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Relais montee M1 coupe</li><li>Contacteurs vitesse M1 coupes</li><li>Frein M1 retombe</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (5)</summary>
+            <table class="static-table"><tbody><tr><td><code>FAULTRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>

@@ -72,12 +72,14 @@
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks { margin-top: 8px; }
-    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; }
-    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
-    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
+    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary:hover { color: var(--text); }
+    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
@@ -191,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 13:09:47</div>
+    <div class="exec-time">2026-08-26 15:08:45</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-0">Safety_Translation : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-1">Translation : Enable=FALSE neutralise le variateur</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-1">TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-2">TC-P11-010 Translation : commande variateur nominale</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -695,36 +697,46 @@
     </details>
     
     <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-translation-0" class="test-card test-card-pass test-card-contract">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>Safety_Translation : Enable=FALSE neutralise les autorisations <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
-            
-            <div class="checks"><span class="checks-label">Vérifié (1)</span><ul><li>Ready doit etre FALSE sans Enable</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-translation-1" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Translation : Enable=FALSE neutralise le variateur <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            <div class="checks"><span class="checks-label">Vérifié (2)</span><ul><li>Ready doit etre FALSE sans Enable</li><li>ControlWord a 0</li></ul></div>
+            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation initiale</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Premier scan d initialisation</p><p class='comment'>Scan 2 : Regime nominal etabli -&gt; Ready=TRUE</p><p class='comment'>Scan 3 : Enable=FALSE -&gt; Coupure nette</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=FALSE -&gt; ControlWord a 0</li><li>Enable=TRUE au repos -&gt; Ready=TRUE (nominal)</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li><li>Coupure -&gt; ControlWord a 0</li></ul></details>
             
             
         </article>
         </div>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test métier)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Composant technique / socle transverse : non rattaché à un catalogue de tests métier ou de procédé spécifique.
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-translation-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Ready doit etre FALSE sans Enable</li></ul></details>
+            
+            
+        </article>
+        <article id="test-fb-translation-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P11-010 Translation : commande variateur nominale </h3>
+            </header>
+            <div class="comments"><p class='comment'>Scan 1 : initialisation</p><p class='comment'>Scan 2 : mise en service</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Translation active et prete</li></ul></details>
+            
+            
+        </article>
         </div>
     </details>
     <details>
@@ -1952,11 +1964,12 @@ END_IF;
         <pre>STruC++ Test Runner v1.0
 
 test_fb_translation.st
-  [PASS] Safety_Translation : Enable=FALSE neutralise les autorisations
-  [PASS] Translation : Enable=FALSE neutralise le variateur
+  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  [PASS] TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations
+  [PASS] TC-P11-010 Translation : commande variateur nominale
 
 -----------------------------------------
-2 tests, 2 passed, 0 failed
+3 tests, 3 passed, 0 failed
 </pre>
     </details>
 </div>
