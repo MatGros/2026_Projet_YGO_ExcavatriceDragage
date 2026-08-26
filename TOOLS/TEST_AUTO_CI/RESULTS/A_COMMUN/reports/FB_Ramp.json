@@ -1,59 +1,27 @@
 {
   "version": 1,
-  "file": "test_fb_fbstatus.st",
+  "file": "test_fb_ramp.st",
   "results": [
     {
-      "name": "TC-P03-001 Enable=FALSE neutralise le statut (gate)",
+      "name": "Accel : consigne progresse par pas de AccelRate*CycleTimeS vers la cible",
       "passed": true
     },
     {
-      "name": "Nominal : Enable=TRUE sans cause -> Ready, aucun defaut ni warning",
+      "name": "Decel : retour vers zero utilise DecelRate (taux different d Accel)",
       "passed": true
     },
     {
-      "name": "TC-P03-007 Warning auto-efface sans Reset des que la cause disparait",
+      "name": "Atteinte de la cible : la rampe s arrete pile dessus, pas de depassement",
       "passed": true
     },
     {
-      "name": "TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset",
-      "passed": true
-    },
-    {
-      "name": "TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute)",
-      "passed": true
-    },
-    {
-      "name": "TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche",
-      "passed": true
-    },
-    {
-      "name": "TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe",
-      "passed": true
-    },
-    {
-      "name": "TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees",
-      "passed": true
-    },
-    {
-      "name": "TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite",
-      "passed": true
-    },
-    {
-      "name": "TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste",
-      "passed": true
-    },
-    {
-      "name": "TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage)",
-      "passed": true
-    },
-    {
-      "name": "TC-P03-014 Reset MAINTENU + cause disparait pendant le maintien : PAS d acquittement silencieux (T148, verrou)",
+      "name": "Garde-fou : une valeur Current deja hors plage (etat corrompu) reste bornee a +/-100",
       "passed": true
     }
   ],
   "summary": {
-    "total": 12,
-    "passed": 12,
+    "total": 4,
+    "passed": 4,
     "failed": 0
   }
 }

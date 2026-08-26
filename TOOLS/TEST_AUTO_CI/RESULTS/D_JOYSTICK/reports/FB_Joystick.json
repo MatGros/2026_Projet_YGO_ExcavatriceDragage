@@ -1,19 +1,55 @@
 {
   "version": 1,
-  "file": "test_fb_modes.st",
+  "file": "test_fb_joystick.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
+      "name": "TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-005 Changement de mode desarme le geste, nouvel appui exige",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-011 Fin de cycle benne desarme le geste par defaut",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE",
+      "passed": true
+    },
+    {
+      "name": "TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 11,
+    "passed": 11,
     "failed": 0
   }
 }

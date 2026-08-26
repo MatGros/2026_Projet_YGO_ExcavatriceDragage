@@ -1,19 +1,31 @@
 {
   "version": 1,
-  "file": "test_fb_modes.st",
+  "file": "test_fb_brake.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
+      "name": "Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms)",
+      "passed": true
+    },
+    {
+      "name": "Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable)",
+      "passed": true
+    },
+    {
+      "name": "Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture",
+      "passed": true
+    },
+    {
+      "name": "Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 5,
+    "passed": 5,
     "failed": 0
   }
 }

@@ -10,7 +10,7 @@ RUN_TESTS_PY = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI" / "run_tests.py"
 
 
 def _run_domain_test(domain_name: str, workers: int = 4):
-    cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", domain_name, "-j", str(workers)]
+    cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", domain_name, "-j", str(workers), "--fast"]
     proc = subprocess.run(
         cmd,
         capture_output=True,
