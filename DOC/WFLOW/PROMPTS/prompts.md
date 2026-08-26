@@ -1,6 +1,6 @@
 # 🗃️ Base Personnelle de Prompts (Usage Humain Exclusif)
 
-> ⛔ **AVERTISSEMENT AGENT / LLM (STRICT) :**  
+> ⛔ **AVERTISSEMENT AGENT / LLM (STRICT) :**
 > Ce document est un carnet personnel réservé exclusivement à l'utilisateur. Les agents **NE DOIVENT EN AUCUN CAS** modifier, ajouter ou supprimer de prompt sans demande explicite.
 
 ---

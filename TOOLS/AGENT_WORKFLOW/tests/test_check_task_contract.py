@@ -282,10 +282,23 @@ def test_raw_scope_allowed_empty_refuse(tmp_path: Path) -> None:
 
 
 def test_campaign_raw_fallback(tmp_path: Path) -> None:
-    """Les contrats avec champs YAML replies (> et |) restent valides sans PyYAML."""
-    folded = VALID.replace(
-        'statement: "BrakeCmd reste FALSE tant que BrakeCommandOpenConfirmed est FALSE."',
-        'statement: >\n        BrakeCmd reste FALSE\n        tant que BrakeCommandOpenConfirmed est FALSE.',
+    """Les contrats du projet restent valides sans PyYAML.
+
+    Ils emploient des champs YAML replies (``statement: >`` / ``verified_by:``)
+    et protegeaient donc le defaut de decalage statements/preuves du repli.
+    """
+    root = Path(__file__).resolve().parents[3]
+    names = (
+        "TASK_CONTRACT_T130.yaml",
+        "TASK_CONTRACT_T137.yaml",
+        "TASK_CONTRACT_T151_NETTOYAGE_PI_CODING.yaml",
+        "TASK_CONTRACT_T152A_BANNERFORMATTER_STYLE.yaml",
+        "TASK_CONTRACT_T152B_REGIONS_PREFIXE.yaml",
+        "TASK_CONTRACT_T152C_VOCABULAIRE_ABANDONNE.yaml",
     )
-    result = run(write(tmp_path, folded), disable_pyyaml=True)
-    assert result.returncode == 0, f"{result.stdout}{result.stderr}"
+    for name in names:
+        result = run(
+            root / "DOC" / "WFLOW" / "CONTRACTS" / name,
+            disable_pyyaml=True,
+        )
+        assert result.returncode == 0, f"{name}: {result.stdout}{result.stderr}"

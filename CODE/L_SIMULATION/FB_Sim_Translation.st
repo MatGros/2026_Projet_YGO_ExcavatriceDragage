@@ -11,15 +11,15 @@
    🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
       aucune sortie réelle. Un override manuel valide est appliqué par
       FB_SimBench, pas par ce FB.
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
-             DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
+             DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Sim_Translation
 VAR_INPUT
     Enable          : BOOL;              (* --> [CMD] TRUE = modèle actif *)
     Direction       : INT;               (* --> [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position *)
-    SpeedRefPct     : REAL;              (* --> [CMD] Magnitude commande 0..100 %, bornée avant calcul *)
+    SpeedTgt_Pct    : REAL;              (* --> [CMD] Magnitude commande 0..100 %, bornée avant calcul *)
     FullTravelTimeS : REAL := 8.0;       (* --> [CFG] Temps complet Trémie→Maintenance à 100 %, simulation seulement *)
 END_VAR
 VAR_OUTPUT
@@ -73,7 +73,7 @@ END_IF;
 
 {region "§3 Progression"}
 instCycleTime(DefaultValueS := 0.010);
-SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
+SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
 
 // Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
 // Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.

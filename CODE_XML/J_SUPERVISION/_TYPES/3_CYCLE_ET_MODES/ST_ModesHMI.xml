@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.957976" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.957976">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.414538" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.414538">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -87,7 +87,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">— Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §5)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">— Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5)
 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique</xhtml>
               </documentation>
             </variable>
@@ -120,7 +120,7 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">— bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
-SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
+SpeedTgt_Pct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
 sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
 🔀 Switch machine unique — pilote aussi Translation M3.
 🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>

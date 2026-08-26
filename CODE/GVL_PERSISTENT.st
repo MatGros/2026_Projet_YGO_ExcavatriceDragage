@@ -3,7 +3,7 @@
    ⚠️ Survivent aux coupures, Reset Warm/Cold et Downloads.
    🔒 Données critiques de calibration et mise en service.
    ═══════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
+    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md
 *)
 
 // {attribute 'qualified_only'} — Force l'accès via GVL_PERSISTENT.Variable (évite les conflits)

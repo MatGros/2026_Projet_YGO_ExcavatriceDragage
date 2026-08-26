@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Machine d'état, fronts Reset/Arm, calcul ErrorId & consignes logiques
    🔒 Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementLogic

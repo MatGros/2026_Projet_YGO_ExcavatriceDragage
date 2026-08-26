@@ -47,7 +47,7 @@ VAR
     bucketCfg               : ST_BucketConfig;
     m1StartStop             : BOOL;
     m1Direction             : INT;
-    m1SpeedRef              : REAL;
+    m1SpeedTgt              : REAL;
     stepTable               : ST_SpeedStepTable;
 END_VAR
 
@@ -140,17 +140,17 @@ m1StartStop := (AcqData.JoystickDeadmanArmed AND (AcqData.JoystickDirectionX = 0
 
 IF BtnWinchM1Up THEN
     m1Direction := 1;
-    m1SpeedRef  := 50.0;
+    m1SpeedTgt  := 50.0;
 ELSIF BtnWinchM1Down THEN
     m1Direction := -1;
-    m1SpeedRef  := 50.0;
+    m1SpeedTgt  := 50.0;
 ELSIF AcqData.JoystickDeadmanArmed AND NOT AcqData.JoystickYNeutral THEN
     m1Direction := 1; // Commande de montée treuil M1
-    m1SpeedRef  := 60.0;
+    m1SpeedTgt  := 60.0;
 
 ELSE
     m1Direction := 0;
-    m1SpeedRef  := 0.0;
+    m1SpeedTgt  := 0.0;
 END_IF;
 
 instWinchM1(
@@ -160,7 +160,7 @@ instWinchM1(
     SafeStop                := Data.WinchM1Safety.SafeStop,
     StartStop               := m1StartStop,
     Direction               := m1Direction,
-    SpeedRefPct             := m1SpeedRef,
+    SpeedTgt_Pct            := m1SpeedTgt,
     Mode                    := ModesAuth.Mode,
     DescendPermit           := Data.WinchM1Safety.DescendPermit,
     AscentPermit            := Data.WinchM1Safety.AscentPermit,
@@ -187,7 +187,7 @@ Data.WinchM1FinalInterlockRequest.RequestedStep              := instWinchM1.Step
 Data.WinchM1FinalInterlockRequest.PowerCutOff               := Data.WinchM1Safety.PowerCutOff;
 Data.WinchM1FinalInterlockRequest.SafeStop                  := Data.WinchM1Safety.SafeStop;
 
-Data.M1LogicRequestSpeedRef_Pct                             := m1SpeedRef;
+Data.M1LogicRequestSpeedCmd_Pct                             := m1SpeedTgt;
 Data.WinchM1State.StepNumber                                := instWinchM1.StepNumber;
 Data.WinchM1State.RelayFwd                                  := instWinchM1.RelayFwd;
 Data.WinchM1State.RelayRev                                  := instWinchM1.RelayRev;

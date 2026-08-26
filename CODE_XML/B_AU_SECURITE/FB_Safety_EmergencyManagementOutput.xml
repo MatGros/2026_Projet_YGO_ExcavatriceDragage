@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.852371" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.852371">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T21:04:32.984478" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T21:04:32.984478">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -79,7 +79,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
    🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -123,7 +123,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Transporte les ordres logiques entre le bloc de décision et de sortie AU
    🔒 Polarité : MaintainA/B_Cmd en maintien (TRUE = voie saine)
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -183,7 +183,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
    🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -342,7 +342,7 @@
    🎯 Rôle : Enable gate + copie consignes logiques vers sorties physiques
    🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
    🔌 Architecture : Projection physique fail-safe
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

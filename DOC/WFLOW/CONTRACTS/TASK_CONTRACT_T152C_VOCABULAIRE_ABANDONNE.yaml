@@ -1,0 +1,92 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T152-C : Vocabulaire de POU abandonné en commentaire
+# + commentaire cassé ST_TranslationHMI — Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T152-C
+  parent_id: T152
+  criticality: C1            # commentaires uniquement, 0 risque fonctionnel
+  strategy: patch
+
+  # ── 1. Objectif ───────────────────────────────────────────────────────────
+  objective: >
+    Remplacer dans les commentaires les références à des POU abandonnés, y compris le résidu
+    abrégé _LD (vocabulaire interdit par NAMING_CONVENTION.md/AGENTS.md), par les noms cibles
+    réels de l'architecture 7 POU, et reformuler les commentaires syntaxiquement cassés (motif
+    "(* :" / "// :" orphelin) — aucune modification fonctionnelle. Périmètre élargi par le 3e
+    challenge indépendant (2026-08-25, exhaustif sur les 77 fichiers de _TYPES/).
+
+  # ── 2. Critères d'acceptation ─────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "ST_WinchFinalInterlockRequest.st:4-5 — PRG_TREUILS_CFC → PRG_04_Treuils_Benne, PRG_10_Outputs_LD → PRG_06_Outputs."
+      verified_by: "Relecture des lignes citées"
+    - id: AC2
+      statement: "ST_TranslationCmd.st:14 — PRG_10_Outputs_LD → PRG_06_Outputs."
+      verified_by: "Relecture de la ligne citée"
+    - id: AC3
+      statement: "ST_Modes_Autorisations.st:6,8 — PRG_MODES_CFC (×2) → PRG_03_Modes_Cycle."
+      verified_by: "Relecture des lignes citées"
+    - id: AC4
+      statement: "ST_CommunHMI.st:22,42 — PRG_AUXILIARY_CFC → PRG_02_Acquisition, PRG_SUPERVISION_CFC → PRG_07_Supervision."
+      verified_by: "Relecture des lignes citées"
+    - id: AC5
+      statement: "ST_TranslationHMI.st:16 — commentaire cassé reformulé, sens clair et correct."
+      verified_by: "Relecture de la ligne citée"
+    - id: AC6
+      statement: "0 occurrence residuelle des motifs PRG_TREUILS_CFC / PRG_10_Outputs_LD / PRG_MODES_CFC / PRG_AUXILIARY_CFC / PRG_SUPERVISION_CFC / _LD (limite de mot) dans CODE/J_SUPERVISION/_TYPES/, y compris ST_Chain_Winch_Control.st:7, ST_WinchState.st:37, ST_Chain_Translation_Control.st:6, ST_TranslationState.st:25."
+      verified_by: "grep -riE sur CODE/J_SUPERVISION/_TYPES/ avec le motif '_LD\\b' inclus, pas seulement les 5 noms complets"
+    - id: AC7
+      statement: "Les 6 commentaires cassés (motif deux-points orphelin en tête, ex. \"(* : texte\") sont reformules avec un sens clair : ST_TranslationHMI.st:16, ST_CommunHMI.st:18, ST_CommunHMI.st:21, ST_CommunHMI.st:57, ST_Chain_Winch_Control.st:14, ST_Chain_Winch_Control.st:15."
+      verified_by: "Relecture des 6 lignes citees post-edition"
+    - id: AC8
+      statement: "Gates Palier A/C 100% PASS (0 changement fonctionnel attendu)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+
+  # ── 3. Périmètre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st
+    forbidden:
+      - Toute modification de déclaration de champ, de type ou de logique — commentaires uniquement
+
+  # ── 4. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - grep_report
+    - run_all_gates
+
+  # ── 5. Modèles autorisés ───────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout problème constaté en cours de route est remonté IMMÉDIATEMENT à l'orchestrateur,
+    pas à la fin et jamais silencieusement. Signaler n'est pas élargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

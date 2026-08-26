@@ -13,9 +13,9 @@
 | <nobr>Comment on **déclare, encapsule, relie**</nobr> | **ce document** |
 | <nobr>Comment on **édite une AF**</nobr> | **ce document §0** |
 | <nobr>Comment on **teste/vérifie**</nobr> | `DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md` |
-| <nobr>Contrats FB, DUT et CFC</nobr> | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` |
+| <nobr>Contrats FB, DUT et CFC</nobr> | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md` |
 | <nobr>Ce que fait la machine</nobr> | `DOC/` — voir `DOC/README.md` pour l'index complet |
-| <nobr>Comment on exécute une modif</nobr> | `.claude/skills/codesys-workflow.md` |
+| <nobr>Comment on exécute une modif</nobr> | `AGENTS.md` (§ Workflow d'édition) |
 
 ---
 
@@ -25,8 +25,11 @@
    - Toute spécification vit sous `DOC/AF/`.
    - Une modification d'exigence métier impose une nouvelle version (`_vX.Y.md`). L'ancienne version est déplacée dans `ARCHIVES/Doc/`.
 2. **Structure d'une AF** :
-   - 📌 Sommaire & Rôle Machine
-   - 🧪 **Points de Validation (`TC-Pxx-nnn`)** (juste après le sommaire, obligatoire)
+   - 📌 Sommaire
+   - 🎯 **§1 Rôle et périmètre + Table des fonctions** (`F<NN>.<seq>`) — catalogue des fonctions
+     du domaine, **avant** la Table des points de validation (convention `GUIDE_EDITION_AF.md §2bis`,
+     document `DESIGN_TABLE_FONCTIONS_AF`)
+   - 🧪 **Table des points de validation — Cas de Test (`TC-Pxx-nnn`)** (juste après §1, obligatoire)
    - 🧱 Interfaces & DUTs
    - ⚙️ Chronogrammes & Logique métier
 3. **Règle des Identifiants de Validation (`TC-Pxx-nnn`)** :
@@ -55,12 +58,18 @@
         🎯 Rôle : Anti-télescopage Benne/Translation et verrous de sécurité M3
         🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
         🔌 Architecture : Composition interne Logic/Output
-        📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+        📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
         ======================================================================= *)
      ```
    - **Guide des Émojis Blanchis Autorisés (whitelist CODESYS projet)** :
      - `🎯` = Rôle principal du composant (recopié de l'AF).
-     - `📄` = Référence exacte à la spec métier active dans `DOC/AF/`.
+     - `📄` = Référence exacte à la spec métier active dans `DOC/AF/` — **chemin complet
+       versionné obligatoire** (`DOC/AF/AF_Partie-NN_..._vX.Y.md`), c'est le seul format que
+       `G340_check_doc_links.py --fix` reconnaît et maintient à jour automatiquement (D1/D2).
+       Si la Table des fonctions de l'AF existe, ajouter le(s) code(s) `F<NN>.<seq>` **en
+       suffixe entre parenthèses**, jamais en remplacement du chemin :
+       `📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (F08.02)`. Un FB qui
+       porte plusieurs fonctions liste plusieurs codes (`F08.01, F08.03-F08.07`).
      - `🛡️` = Bloc ou fonction de Sécurité Machine.
      - `🔒` = Polarité, invariant de sécurité ou verrouillage / interlock.
      - `🔌` = Interface matérielle ou bus de données DUT.
@@ -840,7 +849,6 @@ fait plus partie des nouveaux contrats LD.
 ## 📖 Comment ce document vit
 
 - `AGENTS.md` (point d'entrée unique) y renvoie au même niveau que `NAMING_CONVENTION.md`.
-- `.claude/skills/codesys-workflow.md` **applique** ce référentiel, ne le recopie pas.
 - `TOOLS/AGENT_WORKFLOW/docs/CODE_WRITING_POLICY.md` renvoie ici pour §POO et §organisation.
 - Les prompts de sous-agents le citent via `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md`.
 - Toute règle ajoutée ici après un incident vient **avec son garde-fou** dans

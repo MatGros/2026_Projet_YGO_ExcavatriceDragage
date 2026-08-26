@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.871761" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.871761">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T22:22:17.899257" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T22:22:17.899257">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -588,7 +588,7 @@ ErrorId bit0:fond ; bit1:ferme ; bit2:ctrl ; bit3:cfg.
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Séquence d'extraction (fermeture benne, remontée de contrôle, remontée nominale)
    🛡️ Sécurité : Aucune remontée assistée sans fond confirmé, contrôle palier 1
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

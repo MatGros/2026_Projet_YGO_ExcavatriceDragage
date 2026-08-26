@@ -1,8 +1,8 @@
 # Fiche Composant : FB_SpeedStep (v1.0)
 
-> **Rôle** : Décodeur de consigne de vitesse analogique (0..100 %) vers les 4 contacteurs de palier discrets d'un treuil.  
-> **Catégorie** : Brique technique de commande mouvement (composée à l'intérieur de `FB_Winch`).  
-> **Code Source** : `CODE/H_TREUILS_BENNE/FB_SpeedStep.st`  
+> **Rôle** : Décodeur de consigne de vitesse analogique (0..100 %) vers les 4 contacteurs de palier discrets d'un treuil.
+> **Catégorie** : Brique technique de commande mouvement (composée à l'intérieur de `FB_Winch`).
+> **Code Source** : `CODE/H_TREUILS_BENNE/FB_SpeedStep.st`
 
 ---
 
@@ -25,7 +25,7 @@ Le bloc intègre :
 FUNCTION_BLOCK PUBLIC FB_SpeedStep
 VAR_INPUT
     Enable            : BOOL;               // FALSE = Treuil à l'arrêt (Palier 0, tous contacteurs FALSE)
-    SpeedRefPct       : REAL;                // Consigne vitesse 0..100 % rampée
+    SpeedTgt_Pct       : REAL;                // Consigne vitesse 0..100 % rampée
     Table             : ST_SpeedStepTable;   // Table de réglage des 5 paliers propre au treuil
     HystMargin        : REAL := 2.0;         // Marge anti-battement (% consigne)
     MaxStepNumber     : INT := 5;            // Plafond de palier autorisé (1..5)

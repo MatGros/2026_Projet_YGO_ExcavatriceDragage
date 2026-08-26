@@ -2,7 +2,7 @@
    ⚖️ FB_Winch_Symmetry — Mesure passive M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Observateur de symétrie et de synchronisme des treuils M1/M2
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Observateur pur : Aucune ecriture de commande, securite ou mouvement
    ======================================================================= *)
 

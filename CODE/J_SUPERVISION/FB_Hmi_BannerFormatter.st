@@ -1,12 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
    🧠 FB_Hmi_BannerFormatter — Formateur du bandeau d'information IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5, §6
    🎯 Responsabilité : assemble les 4 textes du bandeau + le carrousel
       d'alarmes, expose la cause observable du blocage courant, sans
       piloter la machine.
    🛡️ Sécurité : priorité AU/puissance, SafeStop, puis interlocks métier.
-      L'anti-clignotement est délégué à FB_AntiFlickerText (AF-07 §4.3).
+      L'anti-clignotement est délégué à FB_AntiFlickerText (AF-07 §5.3).
    ═══════════════════════════════════════════════════════════════ *)
 FUNCTION_BLOCK PUBLIC FB_Hmi_BannerFormatter
 VAR_INPUT
@@ -78,6 +78,7 @@ VAR
     CurrentDirection     : INT;   // . [LOC] Direction courante
     DirectionBlocked     : BOOL; // . [LOC] Interlock métier : mouvement demandé mais permit absent
     AnyBypassActive      : BOOL;   // . [LOC] Au moins un bypass actif
+    PowerOrChainFault    : BOOL; // . [LOC] Défaut chaîne AU ou contacteur puissance absent
     CriticalActionActive : BOOL; // . [LOC] Défaut/interlock critique : affiché immédiatement (sans maintien)
     SpecialConditionCandidate : STRING(120);   // . [LOC] Texte condition spéciale
     OperatorActionCandidate   : STRING(120);   // . [LOC] Texte action opérateur
@@ -90,8 +91,8 @@ VAR
     AlarmIndex           : INT; // . [LOC] §5 Index courant du carrousel (0-based)
 END_VAR
 VAR CONSTANT
-    CST_BannerHoldTime   : TIME := T#500ms; // . [LOC] Anti-clignotement warnings/états (AF-07 §4.3)
-    CST_NbMaxAlarmes     : INT := 32; // . [LOC] Taille du carrousel d'alarmes (AF-07 §4bis)
+    CST_BannerHoldTime   : TIME := T#500ms; // . [LOC] Anti-clignotement warnings/états (AF-07 §5.3)
+    CST_NbMaxAlarmes     : INT := 32; // . [LOC] Taille du carrousel d'alarmes (AF-07 §6)
 END_VAR
 
 IF NOT Enable THEN
@@ -110,7 +111,7 @@ END_IF;
 {region "§1 Contexte global"}
 // ═══════════════════════════════════════════════════════════════
 // 1. CONTEXTE GLOBAL — aucun numéro d'étape ici
-// Format (AF-07 §4.1) : [RÉEL/SIMU] [MODE] [COUPLAGE]
+// Format (AF-07 §5.1) : [RÉEL/SIMU] [MODE] [COUPLAGE]
 // ═══════════════════════════════════════════════════════════════
 IF SimulationModeActive THEN
     PrefixContext := '[SIMULATION] ';
@@ -144,7 +145,7 @@ Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 {region "§2 Progression"}
 // ═══════════════════════════════════════════════════════════════
 // 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
-// Format (AF-07 §4.1) : Macro: <Cycle> > Sous-cycle: <Étape>
+// Format (AF-07 §5.1) : Macro: <Cycle> > Sous-cycle: <Étape>
 // ═══════════════════════════════════════════════════════════════
 IF HomingActive THEN
     IF HomingStepM1 > 0 THEN
@@ -197,7 +198,7 @@ END_IF;
 {region "§3 Condition spéciale"}
 // ═══════════════════════════════════════════════════════════════
 // 3. CONDITION SPÉCIALE — un seul indicateur bypass/dérogation
-// Format (AF-07 §4.1) : ATTENTION: <Dérogation / Bridage / Alerte>
+// Format (AF-07 §5.1) : ATTENTION: <Dérogation / Bridage / Alerte>
 // 🧊 Warning → maintenu min (anti-clignotement), jamais critique.
 // ⚠️ La simulation n'est PAS un bypass : elle n'apparaît que dans le
 //    contexte global (champ 1), jamais ici.
@@ -224,7 +225,7 @@ Banner.SpecialConditionText := AntiFlickSpecial.Text;
 {region "§4 Action opérateur"}
 // ═══════════════════════════════════════════════════════════════
 // 4. ACTION — cause fixe, sécurité d'abord, sans rotation
-// Format (AF-07 §4.1) : [ORGANE] <Action physique> > <Fin>
+// Format (AF-07 §5.1) : [ORGANE] <Action physique> > <Fin>
 // 🧊 Défauts (AU/puissance/SafeStop) + interlock DirectionBlocked
 //    → affichés immédiatement (ForceInstant=TRUE) ; les autres états
 //    → maintenus min (anti-clignotement).
@@ -261,7 +262,7 @@ ELSIF DirectionBlocked THEN
         OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
-    // Guidance par étape du cycle (AF-07 §4.1) — ne masque jamais un défaut
+    // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
     CASE CycleStep OF
         E_CycleStep.X0_PREPARATION:
@@ -338,8 +339,8 @@ END_IF;
 
 // Interlock = mouvement demandé mais permit absent : c'est une cause
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
-CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged
-                     OR PowerCutOffActiveAny OR SafeStopActive OR DirectionBlocked);
+PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
+CriticalActionActive := (PowerOrChainFault OR SafeStopActive OR DirectionBlocked);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -348,9 +349,9 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
 {region "§5 Bandeau alarme"}
 // ═══════════════════════════════════════════════════════════════
 // 5. BANDEAU D'ALARME — carrousel des défauts actifs (index n/N)
-// Format (AF-07 §4bis) : [ORGANE] raison_brève. Un défaut à la fois,
+// Format (AF-07 §6) : [ORGANE] raison_brève. Un défaut à la fois,
 // rotation 1→2→…→N→1, maintien AlarmHoldTime par message.
-// 🧊 Distinct des 4 champs ci-dessus (AF-07 §4.2) : ce carrousel est
+// 🧊 Distinct des 4 champs ci-dessus (AF-07 §5.2) : ce carrousel est
 //    le SEUL endroit du bandeau qui publie Error/ErrorId (alarmes).
 // ═══════════════════════════════════════════════════════════════
 AlarmCount := 0;
@@ -475,8 +476,7 @@ IF TranslationSafety.ErrorSensorIncoherent AND (AlarmCount < CST_NbMaxAlarmes) T
     AlarmArray[AlarmCount] := '[M3] capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5d. Collecte — benne (FB_Bucket.ErrorId, bits vérifiés à la lecture du FB source :
-// diffèrent du brouillon initial du plan, corrigés ici bit à bit)
+// 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)
 IF ((BucketErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -524,8 +524,7 @@ IF ((ExtractionErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarm
     AlarmArray[AlarmCount] := '[EXTRACTION] config'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId, bit3
-// "Startup" absent du brouillon initial du plan, ajouté ici après lecture du FB source)
+// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId)
 IF ((EmergencyErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[AU] redondance contacteurs'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -536,8 +535,7 @@ IF ((EmergencyErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarme
     AlarmArray[AlarmCount] := '[AU] echec autotest demarrage'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId, dictionnaire absent du plan,
-// construit ici après lecture complète du FB source)
+// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId)
 IF ((CycleErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] limite legale atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;

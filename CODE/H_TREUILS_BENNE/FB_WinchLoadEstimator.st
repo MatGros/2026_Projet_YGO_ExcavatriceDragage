@@ -2,7 +2,7 @@
    📊 FB_WinchLoadEstimator — Estimation empirique de charge treuil
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Estimation informative de la charge par croisement palier/vitesse
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Brique de diagnostic/mesure (1 instance par treuil)
    🔒 Sécurité : Aucune commande moteur ni action sur SafeStop (information IHM)
    ======================================================================= *)

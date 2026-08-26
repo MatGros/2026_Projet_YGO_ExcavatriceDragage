@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:32:56</div>
+    <div class="exec-time">2026-08-26 13:19:55</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (11 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-0">TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-1">Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-2">TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-3">TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-4">TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-5">TC-P08-005 Changement de mode desarme le geste, nouvel appui exige</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-6">TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-7">TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-8">TC-P08-011 Fin de cycle benne desarme le geste par defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-9">TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-10">TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-0">Ethercat : Enable=FALSE desactive le diagnostic</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ethercat-1">Ethercat : Enable=TRUE et Esclaves OK -&gt; Ready et State=READY</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +204,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            11/11 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
@@ -470,6 +470,87 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 23 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>BUSY</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1SIMBYPASS</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1STATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM1STATERAWOUT</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2SIMBYPASS</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2STATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICEENCODERM2STATERAWOUT</code> jamais câblé en production</li><li>Pin <code>DEVICEETHERCATMASTER</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEUR</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEURSIMBYPASS</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEURSTATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICEVARIATEURSTATERAWOUT</code> jamais câblé en production</li><li>Pin <code>DONE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>ERROR</code> jamais câblé en production</li><li>Pin <code>ERRORID</code> jamais câblé en production</li><li>Pin <code>NETWORKBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>STATE</code> jamais câblé en production</li><li>Pin <code>STATEATERROR</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DEVICEVARIATEURSTATERAW <span class="pin-type">IEC_DEVICE_STATE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DEVICEVARIATEURSIMBYPASS <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DEVICEENCODERM1STATERAW <span class="pin-type">IEC_DEVICE_STATE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DEVICEENCODERM1SIMBYPASS <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DEVICEENCODERM2STATERAW <span class="pin-type">IEC_DEVICE_STATE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DEVICEENCODERM2SIMBYPASS <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">NETWORKBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Diag_Ethercat</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BUSY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DONE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">STATE <span class="pin-type">IEC_E_DIAG_STATE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">ERROR <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">ERRORID <span class="pin-type">IEC_WORD</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">STATEATERROR <span class="pin-type">IEC_E_DIAG_STATE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DEVICEETHERCATMASTER <span class="pin-type">ST_DIAG_DEVICE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DEVICEVARIATEUR <span class="pin-type">ST_DIAG_DEVICE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DEVICEENCODERM1 <span class="pin-type">ST_DIAG_DEVICE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DEVICEENCODERM2 <span class="pin-type">ST_DIAG_DEVICE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DEVICEVARIATEURSTATERAWOUT <span class="pin-type">IEC_DEVICE_STATE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DEVICEENCODERM1STATERAWOUT <span class="pin-type">IEC_DEVICE_STATE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DEVICEENCODERM2STATERAWOUT <span class="pin-type">IEC_DEVICE_STATE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -553,120 +634,46 @@
         <article id="test-fb-diag-ethercat-0" class="test-card test-card-pass test-card-contract">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3>Ethercat : Enable=FALSE desactive le diagnostic <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
             
+            <div class="checks"><span class="checks-label">Vérifié (2)</span><ul><li>Ready doit etre FALSE sans Enable</li><li>State doit etre DISABLED sans Enable</li></ul></div>
             
             
-            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (32)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEVARIATEURSIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM1STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM2STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NETWORKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE</code></td><td>0</td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>STATEATERROR</code></td><td>0</td></tr><tr><td><code>DEVICEETHERCATMASTER.ONLINE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEUR.ONLINE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM1.ONLINE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM2.ONLINE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAWOUT</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1STATERAWOUT</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2STATERAWOUT</code></td><td>9</td></tr><tr><td><code>VARIATEURONLINEREAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1ONLINEREAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2ONLINEREAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURONLINEEFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1ONLINEEFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2ONLINEEFF</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-fb-diag-ethercat-1" class="test-card test-card-pass test-card-contract">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3>Ethercat : Enable=TRUE et Esclaves OK -&gt; Ready et State=READY <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
             
+            <div class="checks"><span class="checks-label">Vérifié (3)</span><ul><li>Ready doit etre TRUE avec Enable</li><li>State doit etre READY quand tout est OK</li><li>Aucune erreur attendue</li></ul></div>
             
             
-            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (32)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEVARIATEURSIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM1STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEVICEENCODERM2STATERAW</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2SIMBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NETWORKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE</code></td><td>1</td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>STATEATERROR</code></td><td>0</td></tr><tr><td><code>DEVICEETHERCATMASTER.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEVARIATEUR.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEENCODERM1.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEENCODERM2.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEVARIATEURSTATERAWOUT</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM1STATERAWOUT</code></td><td>9</td></tr><tr><td><code>DEVICEENCODERM2STATERAWOUT</code></td><td>9</td></tr><tr><td><code>VARIATEURONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM1ONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2ONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>VARIATEURBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM1BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERM2BYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>VARIATEURONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM1ONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERM2ONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>
     
-    <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 9 scénario(s) métier & sécurité machine</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-diag-ethercat-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour) </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-diag-ethercat-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-diag-ethercat-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-diag-ethercat-5" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-005 Changement de mode desarme le geste, nouvel appui exige </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-diag-ethercat-6" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-diag-ethercat-7" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur) </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-diag-ethercat-8" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-011 Fin de cycle benne desarme le geste par defaut </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-diag-ethercat-9" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-diag-ethercat-10" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes </h3>
-            </header>
-            
-            
-            
-            
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test métier)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Composant technique / socle transverse : non rattaché à un catalogue de tests métier ou de procédé spécifique.
         </div>
     </details>
     <details>
@@ -677,7 +684,7 @@
         <summary>Code source ST original (4)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
                 <pre>(* =======================================================================
    📊 Type CODESYS système pour tests STruCpp
    ======================================================================= *)
@@ -699,12 +706,12 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
                 <pre>(* =======================================================================
    📊 E_Diag_State — Enumération des états du cycle de diagnostic réseau
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Phases d&#x27;état de surveillance diagnostic d&#x27;un bus ou équipement
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
    ======================================================================= *)
 TYPE E_Diag_State :
 (
@@ -719,12 +726,12 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Diag_Device — Structure diagnostic d&#x27;un esclave ou bus
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de donnees d&#x27;état, diagnostic et alarme d&#x27;un equipement réseau
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
    ======================================================================= *)
 TYPE ST_Diag_Device :
 STRUCT
@@ -739,13 +746,13 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\FB_Diag_Ethercat.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\FB_Diag_Ethercat.st</code></summary>
                 <pre>(* =======================================================================
    📊 FB_Diag_Ethercat — Diagnostic bus EtherCAT &amp; Esclaves (M3, COD1, COD2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Surveillance bus EtherCAT master, variateur M3 et codeurs M1/M2
    🔌 Architecture : Publication ST_Diag_Device par esclave &amp; E_Diag_State
-   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.1.md
    ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Diag_Ethercat
 VAR_INPUT

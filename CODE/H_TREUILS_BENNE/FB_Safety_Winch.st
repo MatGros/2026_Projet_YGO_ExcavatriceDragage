@@ -2,7 +2,7 @@
    🛡️ FB_Safety_Winch — Surveillance et sécurité d'un treuil (M1 / M2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Protection machine, surveillance codeurs, dérives et interlocks
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Sécurité : Gestion des autorisations SafeStop, PowerCutOff et permis
    ======================================================================= *)
 

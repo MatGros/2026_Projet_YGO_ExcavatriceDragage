@@ -22,15 +22,46 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 import time
 from pathlib import Path
 
+# Assurer l'encodage UTF-8 sous console Windows pour les emojis et caractères spéciaux
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
-def run(cmd: list[str], cwd: Path | None = None) -> tuple[int, str, str]:
-    r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace")
-    return r.returncode, r.stdout or "", r.stderr or ""
+
+def run_stream(cmd: list[str], cwd: Path | None = None) -> tuple[int, str, str]:
+    """Exécute une commande en streamant stdout/stderr en temps réel dans la console."""
+    env = dict(os.environ)
+    env["PYTHONUNBUFFERED"] = "1"
+    p = subprocess.Popen(
+        cmd,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        bufsize=1,
+        env=env,
+    )
+    lines: list[str] = []
+    if p.stdout:
+        for line in iter(p.stdout.readline, ""):
+            # Nettoyage d'affichage pour les terminaux Windows
+            sys.stdout.write(line)
+            sys.stdout.flush()
+            lines.append(line)
+        p.stdout.close()
+    code = p.wait()
+    return code, "".join(lines), ""
 
 
 # ── Paliers (GUIDE_GATES_ET_TESTS_v1.2.md §2) — tranche d'ID par palier ──────────
@@ -80,13 +111,19 @@ PALIERS = {"A", "B", "C", "D"}
 FILE_SCOPED_GATES = {"100", "110", "200"}
 
 
-def select_plan(palier: str | None) -> list[tuple[str, str, str, list[str]]]:
+def select_plan(palier: str | None, with_pytest: bool = False) -> list[tuple[str, str, str, list[str]]]:
     if palier is None:
-        return [g for g in PLANS if g[0] != "D"]
-    palier = palier.upper()
-    if palier not in PALIERS:
-        raise SystemExit(f"ERROR: palier inconnu '{palier}' (attendu A/B/C/D)")
-    return [g for g in PLANS if g[0] == palier]
+        plan = [g for g in PLANS if g[0] != "D"]
+    else:
+        palier = palier.upper()
+        if palier not in PALIERS:
+            raise SystemExit(f"ERROR: palier inconnu '{palier}' (attendu A/B/C/D)")
+        plan = [g for g in PLANS if g[0] == palier]
+    
+    # Par défaut : G420 (PyTest infrastructure 530 tests) est opt-in via --pytest / --ci
+    if not with_pytest:
+        plan = [g for g in plan if g[1] != "420"]
+    return plan
 
 
 def main() -> int:
@@ -95,6 +132,7 @@ def main() -> int:
     parser.add_argument("--palier", choices=sorted(PALIERS), help="Palier à exécuter (menu par intention, GUIDE_GATES_ET_TESTS_v1.2.md §2)")
     parser.add_argument("--codesys-log", type=Path, help="Log de compilation CODESYS (palier D)")
     parser.add_argument("--files", nargs="+", type=Path, help="Cibler un/des fichier(s) .st : seuls les gates applicables à un bloc isolé s'exécutent (G100, G110, G200)")
+    parser.add_argument("--pytest", "--ci", dest="with_pytest", action="store_true", help="Inclure G420 PyTest (suite de 530 tests unitaires convertisseur + outillage)")
     parser.add_argument("--skip-codesys", action="store_true", help="Ne pas lancer G500 même si --codesys-log fourni")
     parser.add_argument("--strict", action="store_true", help="Fail on any warning")
     parser.add_argument("--fail-fast", action="store_true", help="S'arrêter au premier gate rouge")
@@ -109,7 +147,7 @@ def main() -> int:
             if not f.is_file():
                 print(f"ERROR: fichier introuvable : {f}", file=sys.stderr)
                 return 2
-        base_plan = select_plan(args.palier)
+        base_plan = select_plan(args.palier, with_pytest=args.with_pytest)
         plan = [g for g in base_plan if g[1] in FILE_SCOPED_GATES]
         skipped_global = [(g[1], g[2]) for g in base_plan if g[1] not in FILE_SCOPED_GATES]
         rebuilt: list[tuple[str, str, str, list[str]]] = []
@@ -127,48 +165,47 @@ def main() -> int:
                 rebuilt.append(("A", "410x", f"LD convertible + invariants ({f.name})", [sys.executable, f"{S}/check_ld_file.py", str(f)]))
         plan = rebuilt
     else:
-        plan = select_plan(args.palier)
+        plan = select_plan(args.palier, with_pytest=args.with_pytest)
 
     results: list[tuple[str, bool, float]] = []
 
-    def gate(title: str, cmd: list[str]) -> bool:
-        print("\n" + "=" * 60)
-        print(title.encode("ascii", "replace").decode("ascii"))
-        print("=" * 60)
+    def gate(idx: int, total: int, title: str, cmd: list[str]) -> bool:
+        clean_title = title.encode("ascii", "replace").decode("ascii")
+        print("\n" + "=" * 60, flush=True)
+        print(f"⏳ [{idx}/{total}] {clean_title} ...", flush=True)
+        print("=" * 60, flush=True)
         t0 = time.perf_counter()
-        code, out, err = run(cmd, project_root)
+        code, _out, _err = run_stream(cmd, project_root)
         duration = time.perf_counter() - t0
-        if out.strip():
-            print(out.strip().encode("ascii", "replace").decode("ascii"))
-        if err.strip():
-            print(err.strip().encode("ascii", "replace").decode("ascii"), file=sys.stderr)
-        print(f"[TEMPS] Durée gate : {duration:.2f}s")
+        status_icon = "✅ PASS" if code == 0 else "❌ FAIL"
+        print(f"\n[{status_icon}] Durée gate : {duration:.2f}s", flush=True)
         results.append((title, code == 0, duration))
         return code == 0
 
     for gid, title in skipped_global:
-        print("\n" + "=" * 60)
-        print(title)
-        print("=" * 60)
-        print(f"[--] Gate {gid} global : non applicable en mode --files (bloc isolé). S'exécutera sur le bundle complet (palier C).")
+        print("\n" + "=" * 60, flush=True)
+        print(title, flush=True)
+        print("=" * 60, flush=True)
+        print(f"[--] Gate {gid} global : non applicable en mode --files (bloc isolé). S'exécutera sur le bundle complet (palier C).", flush=True)
         results.append((f"{title} [non applicable : gate global, bundle requis]", True, 0.0))
 
     d_plan = [g for g in plan if g[1] == "500"]
     if d_plan and not args.codesys_log and not args.skip_codesys:
-        print("\n" + "=" * 60)
-        print("G500 — Compilation CODESYS (log)")
-        print("=" * 60)
-        print("Palier D = validation sur demande : fournir --codesys-log <build.log> pour exécuter G500.")
+        print("\n" + "=" * 60, flush=True)
+        print("G500 — Compilation CODESYS (log)", flush=True)
+        print("=" * 60, flush=True)
+        print("Palier D = validation sur demande : fournir --codesys-log <build.log> pour exécuter G500.", flush=True)
         results.append(("G500 — Compilation CODESYS (log) [sauté : aucun log fourni]", True, 0.0))
         plan = [g for g in plan if g[1] != "500"]
 
-    for _, _id, title, cmd in plan:
-        ok = gate(title, cmd)
+    total_gates = len(plan)
+    for idx, (_, _id, title, cmd) in enumerate(plan, 1):
+        ok = gate(idx, total_gates, title, cmd)
         if not ok and args.fail_fast:
             break
 
     if not args.skip_codesys and args.codesys_log and not d_plan:
-        gate("G500 — GATE 6: Compilation CODESYS", [
+        gate(total_gates + 1, total_gates + 1, "G500 — GATE 6: Compilation CODESYS", [
             sys.executable, f"{S}/G500_check_codesys_compile.py",
             "--log", str(args.codesys_log),
             "--max-warnings", "0" if args.strict else "10",

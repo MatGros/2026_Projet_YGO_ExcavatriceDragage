@@ -1,11 +1,11 @@
 # FB_Bucket — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §1.
+> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.1.md`](AF_Partie-10_Fonction_Winch_v2.1.md) §1.
 > Rôle de **ce** document : ouverture/fermeture benne par désynchronisation M1/M2, protection
 > glissement, assistants maintenance — et **catalogue unique** des `TC-P10-023` à `TC-P10-034`.
 > **Sous-fonction du domaine Treuils** (AF10) — aucune I/O ni programme propre.
 > Source code : `CODE/TREUILS/BENNE/*.st`, `CODE/G_CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st`.
-> Instance unique `instBucket` dans `Treuils (CFC)` — fiche FB du domaine Treuils.
+> Instance unique `instBucket` dans `PRG_04_Treuils_Benne` — fiche FB du domaine Treuils.
 
 ## 🧭 Sommaire
 
@@ -100,13 +100,13 @@ Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY
 - `CLOSING_BUCKET` : produit `BucketCloseRequest` → `instBucket.CmdClose_IHM`. Transition vers `CONTROL_ASCENT` dès fermé.
 - `CONTROL_ASCENT` : force palier 1 (`ForceMinSpeedStep`) sur M1/M2, sort après distance parcourue confirmée sur les deux.
 
-**Lien homme-mort** : `PreserveArmingAfterBucket := instExtractionSequence.Busy` (câblé `Acquisition (CFC)`) — **seule** cette séquence préserve l'armement joystick en fin de fermeture pour enchaîner immédiatement palier 1, sous ses propres interlocks. `FB_DiveSearch` ne bénéficie pas de cette exception.
+**Lien homme-mort** : `PreserveArmingAfterBucket := instExtractionSequence.Busy` (câblé dans `PRG_02_Acquisition`) — **seule** cette séquence préserve l'armement joystick en fin de fermeture pour enchaîner immédiatement palier 1, sous ses propres interlocks. `FB_DiveSearch` ne bénéficie pas de cette exception.
 
 ---
 
 ## 6. Bus et intégration programme
 
-**Ordre `Treuils (CFC)`** (vérifié) :
+**Ordre dans `PRG_04_Treuils_Benne`** (vérifié) :
 1. §1 `instBucket` (**appelé en premier**, avant arbitrage M1/M2 — évite fenêtre de commande manuelle parasite)
 2. §2/§3 Arbitrage M1/M2 — **Benne prioritaire absolue sur M2** si `instBucket.Busy`
 3. §3bis Assistance maintenance (DiveSearch/ExtractionSequence, si benne non busy)
@@ -114,7 +114,7 @@ Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY
 5. Synchro suspendue pendant `instBucket.Busy`
 6. Butée haute M2 décalée de `OffsetCloseM` si fermé/en fermeture
 
-**Consommateurs `instBucket.Busy/Done`** : Treuils (arbitrage), Safety (CFC) (`BenneHoldStillActive`, Méca E), `FB_ExtractionSequence`, `FB_Joystick` (désarmement), Supervision (IHM).
+**Consommateurs `instBucket.Busy/Done`** : Treuils (arbitrage), Safety (`BenneHoldStillActive`, Méca E), `FB_ExtractionSequence`, `FB_Joystick` (désarmement), Supervision (IHM).
 
 **Homme-mort** : axe Y joystick, même axe que pilotage normal M1/M2 — pas d'axe dédié.
 
@@ -126,12 +126,12 @@ Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY
 |---|---|
 | Aucune I/O propre | Réutilise entièrement les Q de `FB_Winch` M2 |
 | Couplage bidirectionnel fort | `FB_Bucket` a besoin de position/Homed M1+M2 ; `FB_WinchSync`/`FB_Safety_Winch` ont besoin en retour de `Busy`/`ActiveOffsetM`/`M1SlipDetected` |
-| Organisation code déjà ainsi | `TREUILS/BENNE/`, appelé dans `Treuils (CFC)` — jamais remis en cause |
+| Organisation code déjà ainsi | `H_TREUILS_BENNE/BENNE/`, appelé dans `PRG_04_Treuils_Benne` — jamais remis en cause |
 | Contenu propre suffisant | Offsets, Méca C couche 1, cinématique inversée, DiveSearch/ExtractionSequence — mérite sa fiche FB |
 
 **Décision retenue** : FB_Bucket est une **fiche FB de la Partie 10** (Treuils), au même titre que
 `FB_WinchSync` — pas une Partie séparée. Contenu suffisant pour sa fiche, mais pas de
-programme/Safety propre (contrairement à Translation qui a son propre CFC + Safety dédié).
+programme/Safety propre (contrairement à Translation qui a son propre programme + Safety dédié).
 
 ---
 

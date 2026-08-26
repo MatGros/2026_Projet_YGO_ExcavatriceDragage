@@ -4,6 +4,29 @@ VAR
 END_VAR
 END_SETUP
 
+TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
+    (* Scan 0 : Enable=FALSE -> Neutralisation standard *)
+    fb(ENABLE := FALSE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_FALSE(fb.READY, 'Enable=FALSE -> Ready=FALSE (neutralise)');
+    ASSERT_FALSE(fb.ERROR, 'Enable=FALSE -> Pas d erreur');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 1 : Enable=TRUE -> Prete en service *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_TRUE(fb.READY, 'Enable=TRUE -> Ready=TRUE (nominal)');
+    ASSERT_FALSE(fb.ERROR, 'Au repos -> Pas d erreur');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
+    fb(ENABLE := FALSE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_FALSE(fb.READY, 'Coupure -> Ready retombe a FALSE');
+END_TEST
+
 (* TC-P01-002 est classee SITE+AUTO dans l AF (mixte). Ce test ne couvre QUE la partie AUTO
    (commande logicielle) : preuve qu un seul canal est coupe a la fois et que le FB interprete
    correctement le retour de boucle fourni en entree. Il ne peut PAS prouver que la coupure

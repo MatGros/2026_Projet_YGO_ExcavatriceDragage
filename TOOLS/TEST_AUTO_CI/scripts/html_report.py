@@ -339,8 +339,10 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
         comments_html = "".join(f"<p class='comment'>{_html.escape(c)}</p>" for c in info["comments"])
         chrono_html = _render_chronogram(name, trace_entries or [], cycle_time_ms, field_types, passed_r)
 
-        # Détection si c'est un test d'interface/socle standard (TC-P03-*, Nominal, Gate, Reset...)
-        is_contract_test = any(k in name.upper() for k in ("TC-P03-", "ENABLE=FALSE", "ENABLE=TRUE", "NOMINAL :", "GATE", "RESET A VIDE"))
+        # Détection si c'est un test d'interface/socle standard (TC-P03-*)
+        # Exception : pour FB_FbStatus, l'AF03 est son AF métier propre, ses TC-P03 vont donc dans la section principale.
+        is_p03_fb = (fb_name == "FB_FbStatus")
+        is_contract_test = not is_p03_fb and name.upper().startswith("TC-P03-")
         contract_tag = '<span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span>' if is_contract_test else ''
 
         anchor = f"test-{fb_slug}-{i}"
@@ -355,7 +357,7 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
                 <h3>{_html.escape(name)} {contract_tag}</h3>
             </header>
             {f'<div class="comments">{comments_html}</div>' if comments_html else ''}
-            {f'<div class="checks"><span class="checks-label">Vérifié ({len(info["checks"])})</span><ul>{checks_html}</ul></div>' if checks_html else ''}
+            {f'<details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié ({len(info["checks"])})</span></summary><ul class="checks-list">{checks_html}</ul></details>' if checks_html else ''}
             {_failure_block(r.get('failure'))}
             {chrono_html}
         </article>"""
@@ -754,12 +756,14 @@ _CSS = """
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks { margin-top: 8px; }
-    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; }
-    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
-    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
+    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary:hover { color: var(--text); }
+    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }

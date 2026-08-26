@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.882627" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.882627">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:48:09.726360" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:48:09.726360">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -590,7 +590,7 @@
       FB_SyncContactor. Ce bloc NE calcule PAS l'ecart lui-meme.
    🔒 SyncActive : autorisation de couplage (anti-telescopage), independante
       de l'erreur — le probleme est porte par SyncDeviationWarn/Fault.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -895,7 +895,7 @@ Status.Done := FALSE;
       meme si les codeurs sont bypasses.
    🔌 Interface : Bloc de surveillance transverse (1 instance)
    🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -1141,7 +1141,7 @@ END_IF;
    🧬 Responsabilite : n'interprete PAS l'etat benne. Il reçoit ActiveOffsetM
       deja resolu (calcul offset-selon-etat-benne = FB_Bucket/HoldOffset).
    🔒 Polarite : SyncDeviationWarn/Fault = TRUE si ecart hors seuil.
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

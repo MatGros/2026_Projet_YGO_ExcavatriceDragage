@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T16:19:47.887746" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T16:19:47.887746">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T00:58:43.362657" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T00:58:43.362657">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -733,7 +733,7 @@ ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM a
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    Rôle : Surveillance joystick, bus EtherCAT, rotation de phases,
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt),
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.

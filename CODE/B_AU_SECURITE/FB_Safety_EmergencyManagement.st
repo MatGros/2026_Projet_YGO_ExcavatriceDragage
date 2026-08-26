@@ -4,7 +4,7 @@
    🎯 Rôle : Façade publique, instance unique ; câblage interne Logic/Output & exposition des bus d'état
    🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
    🔌 Architecture : Composition interne Logic/Output
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagement

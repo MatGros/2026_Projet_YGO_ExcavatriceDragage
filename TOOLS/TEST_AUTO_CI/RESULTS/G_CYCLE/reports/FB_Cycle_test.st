@@ -5,6 +5,32 @@ VAR
 END_VAR
 END_SETUP
 
+TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
+    (* Scan 0 : Enable=FALSE -> Neutralisation *)
+    FB(Enable := FALSE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := FALSE, CycleMotionPermit := FALSE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.Ready, 'Enable=FALSE -> Ready=FALSE (neutralise)');
+    ASSERT_FALSE(FB.Busy, 'Enable=FALSE -> Busy=FALSE');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 1 : Enable=TRUE -> Prete en service *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := FALSE, CycleMotionPermit := FALSE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.Ready, 'Enable=TRUE -> Ready=TRUE (nominal)');
+    ASSERT_FALSE(FB.Busy, 'Au repos -> Pas de cycle actif');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
+    FB(Enable := FALSE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := FALSE, CycleMotionPermit := FALSE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.Ready, 'Coupure -> Ready retombe a FALSE');
+END_TEST
+
 TEST 'TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape'
     SampleCount := 5;
     // Initialisation et démarrage cycle

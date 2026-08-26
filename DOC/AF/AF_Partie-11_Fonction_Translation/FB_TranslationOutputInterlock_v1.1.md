@@ -1,9 +1,9 @@
 # FB_TranslationOutputInterlock — Spec composant (v1.1)
 
-> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.2.md`](../AF_Partie-11_Fonction_Translation_v2.2.md) §5.
+> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.3.md`](../AF_Partie-11_Fonction_Translation_v2.3.md) §5.
 > Rôle de **ce** document : barrière finale M3 (watchdog frein, gate double condition,
 > anti-redémarrage, mot AC600) — et **catalogue unique** des `TC-P11-006` à `TC-P11-009`.
-> Source code : `CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st` · instance `Outputs.instTranslationOutputInterlock_LD`.
+> Source code : `CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st` · instance `PRG_06_Outputs.instTranslationOutputInterlockM3`.
 
 ## 🧭 Sommaire
 
@@ -31,7 +31,7 @@
 
 ⚡ Profil **barrière finale** (Partie3 §2) : reçoit la demande sortie typée
 (`ST_TranslationFinalInterlockRequest`), applique les interlocks ultimes, produit **seule**
-la commande physique autorisée (mot AC600 + frein). 1 instance dans `Outputs (Ladder)`.
+la commande physique autorisée (mot AC600 + frein). 1 instance dans `PRG_06_Outputs`.
 
 `FB_Translation` reste propriétaire du **calcul** mot/fréquence ; cette barrière
 **autorise ou masque**, ne reconstruit jamais.
@@ -48,7 +48,7 @@ la commande physique autorisée (mot AC600 + frein). 1 instance dans `Outputs (L
 | `RequestedDriveControlWord` | Mot AC600 (0/1/2/7) |
 | `RequestedDriveFreqHz` | Fréquence demandée (Hz) |
 
-**Sorties** : `DriveControlWord` (WORD), `DriveFreqRefHz` (REAL), `BrakeCmd` (Q physiques),
+**Sorties** : `DriveControlWord` (WORD), `DriveFreqCmd_Hz` (REAL), `BrakeCmd` (Q physiques),
 `State`, `Reason` (`E_TranslationFinalInterlockReason`), `RestartInhibit`, `ErrorId`.
 
 ---
@@ -63,7 +63,7 @@ AND NOT RestartInhibit`. Timeout ⇒ bit0 `ErrorId`, `RestartInhibit:=TRUE`,
 
 ## 4. Gate final double condition obligatoire
 
-`DriveControlWord`+`DriveFreqRefHz` autorisés **seulement si** :
+`DriveControlWord`+`DriveFreqCmd_Hz` autorisés **seulement si** :
 `MovementRequested AND BrakeReleaseRequest AND BrakeCommandOpenConfirmed`
 
 Si une seule des deux conditions manque : `State=INIT` (attente confirmation), **sans** défaut
@@ -74,6 +74,7 @@ tant que < 500ms.
 ## 5. Anti-redémarrage
 
 Après timeout :
+
 1. `RestartInhibit:=TRUE` — frein coupé, mouvement interdit.
 2. Acquittement : `ResetEdge.Q AND BrakeCommandOpenConfirmed` → efface bit0.
 3. Réautorisation : `NOT Error AND NOT ResetRequired` + **mot 0 vu** (`NeutralRequestSeen`)

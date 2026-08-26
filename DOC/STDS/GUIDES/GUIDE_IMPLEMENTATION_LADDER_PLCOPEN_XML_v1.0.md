@@ -50,13 +50,13 @@ ainsi que les instances d'exécution.
          xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.plcopen.org/xml/tc6_0200 http://www.plcopen.org/xml/tc6_0200">
-  
+
   <!-- En-tête de fichier obligatoire -->
-  <fileHeader companyName="NomEntreprise" 
-              productName="ProductGen" 
-              productVersion="1.0" 
+  <fileHeader companyName="NomEntreprise"
+              productName="ProductGen"
+              productVersion="1.0"
               creationDateTime="2026-08-12T10:00:00"/>
-  
+
   <!-- En-tête de contenu et configuration graphique -->
   <contentHeader name="Projet_Ladder_Exhaustif">
     <coordinateInfo>
@@ -307,7 +307,7 @@ chaîne du flux logique RLO (Result of Logic Operation).
       </connectionPointIn>
     </variable>
   </inputVariables>
-  
+
   <inOutVariables/>
 
   <outputVariables>
@@ -530,9 +530,9 @@ Voici un exemple complet d'une POU en Ladder Diagram comprenant :
          xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.plcopen.org/xml/tc6_0200 http://www.plcopen.org/xml/tc6_0200">
-  
+
   <fileHeader companyName="AutomationStudio" productName="XMLGenerator" productVersion="1.0" creationDateTime="2026-08-12T12:00:00"/>
-  
+
   <contentHeader name="Projet_Demo">
     <coordinateInfo>
       <ld><scaling x="8" y="8"/></ld>
