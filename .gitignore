@@ -71,6 +71,7 @@ package-lock.json
 .clinerules/
 .vscode/*
 !.vscode/settings.json
+!.vscode/sessions.json
 .claude/
 .mgs-workspace.code-workspace
 node_modules/

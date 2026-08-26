@@ -1,0 +1,107 @@
+{
+    "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
+    "theme": "tribe",
+    "active": "AI",
+    "activateOnStartup": true,
+    "keepExistingTerminals": false,
+    "sessions": {
+        "AI": [
+            {
+                "name": "🚀 AGY Antigravity",
+                "autoExecuteCommands": true,
+                "icon": "rocket",
+                "color": "terminal.ansiBlue",
+                "commands": [
+                    "agy"
+                ]
+            },
+            {
+                "name": "🧠 Claude Code",
+                "autoExecuteCommands": true,
+                "icon": "code",
+                "color": "terminal.ansiRed",
+                "commands": [
+                    "claude"
+                ]
+            },
+            {
+                "name": "🔓 OpenCode",
+                "autoExecuteCommands": true,
+                "icon": "organization",
+                "color": "terminal.ansiBrightBlue",
+                "commands": [
+                    "opencode --agent orchestrateur"
+                ]
+            },
+            {
+                "name": "🌐 OmniRoute Server",
+                "autoExecuteCommands": true,
+                "icon": "server",
+                "color": "terminal.ansiBrightGreen",
+                "commands": [
+                    "omniroute"
+                ]
+            },
+            {
+                "name": "🤖 Codex (OpenAI)",
+                "autoExecuteCommands": true,
+                "icon": "symbol-class",
+                "color": "terminal.ansiBrightRed",
+                "commands": [
+                    "codex"
+                ]
+            },
+            {
+                "name": "🦙 DSH (Ollama deepseek-v4-flash)",
+                "autoExecuteCommands": true,
+                "icon": "terminal",
+                "color": "terminal.ansiBrightYellow",
+                "commands": [
+                    "ollama launch dsh --model deepseek-v4-flash:cloud"
+                ]
+            }
+        ],
+        "disabled_terminals": [
+            {
+                "name": "🦙 Claude Code (Ollama)",
+                "autoExecuteCommands": true,
+                "icon": "cpu",
+                "color": "terminal.ansiBrightMagenta",
+                "commands": [
+                    "ollama launch claude --model gemma4:e4b"
+                ]
+            },
+            {
+                "name": "🦙 OpenCode (Ollama)",
+                "autoExecuteCommands": true,
+                "icon": "cpu",
+                "color": "terminal.ansiBrightCyan",
+                "commands": [
+                    "ollama launch opencode --model gemma4:e4b"
+                ]
+            },
+            {
+                "name": "✅ Gates",
+                "autoExecuteCommands": true,
+                "icon": "check",
+                "color": "terminal.ansiGreen",
+                "commands": [
+                    "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys"
+                ]
+            },
+            {
+                "name": "🤠 Herdr",
+                "autoExecuteCommands": true,
+                "icon": "robot",
+                "color": "terminal.ansiYellow",
+                "commands": [
+                    "herdr start-agent claude"
+                ]
+            }
+        ]       
+
+        
+        
+
+    }
+}
