@@ -14,11 +14,7 @@ TEST 'PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuil
     acqData.JoystickDeadmanArmed := TRUE;
     acqData.JoystickDirectionX := 1;
     acqData.JoystickSpeedPctX := 75.0;
-    acqData.M3_LimitSwitchFwd := FALSE; // Non en butée
-    acqData.M3_LimitSwitchRev := FALSE;
-    acqData.TranslationAtPV := FALSE;
-    acqData.TranslationAtP1 := FALSE;
-    acqData.TranslationAtP2 := FALSE;
+    // Capteurs M3 par défaut à FALSE (non en butée) — décodage M3 propriété PRG_05 (AF-02 TBD §8 #5)
 
     
     // 3. Exécution PRG_05 (3 scans : 1=FirstScanDone, 2=CommandedDirection, 3=SpeedRamp/Brake)

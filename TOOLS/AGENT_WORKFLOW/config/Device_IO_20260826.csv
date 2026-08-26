@@ -1,0 +1,571 @@
+//CoDeSys Mapping Export V1.2
+//Mapped variable;//Parameter name @ counter in device;//Unit;//Description;//IEC address;//Device name
+//Important: change only first, third or fourth column in Excel or add variable name before first
+;Input;;Universal digital input;%IB0;Local_Digital_IO
+M1_ContactorsReleased_DI;Bit0;;Retour état contacteur sens avant arrière speed relachés;%IX0.0;Local_Digital_IO
+M1_ThermalOk_DI;Bit1;;Retour état disjoncteur thermique;%IX0.1;Local_Digital_IO
+M2_ContactorsReleased_DI;Bit2;;Retour état contacteur sens avant arrière speed relachés;%IX0.2;Local_Digital_IO
+M2_ThermalOk_DI;Bit3;;Retour état disjoncteur thermique;%IX0.3;Local_Digital_IO
+M2_TensionedCable_DI;Bit4;;Capteur détection mou de câble - câble hors gorges enrouleur;%IX0.4;Local_Digital_IO
+M1_M2_KoboldBottomTouch_DI;Bit5;;Font détecté si retour info = 0 et benne immergée.;%IX0.5;Local_Digital_IO
+M3_ThermalOK_DI;Bit6;;Retour état disjoncteur thermique;%IX0.6;Local_Digital_IO
+M1M2_TopPositionFree_DI;Bit7;;Capteur de position exreme haut - référencement codeurs - déclenchement AU;%IX0.7;Local_Digital_IO
+;Output;;Universal digital output;%QB0;Local_Digital_IO
+M1_RelayFwd_Up_DQ;Bit0@1;;+1 Sens ENROULAGE MONTEE EXTRACTION;%QX0.0;Local_Digital_IO
+M1_RelayRev_Down_DQ;Bit1@1;;-1 Sens DEROULAGE DESCENTE PLONGEE;%QX0.1;Local_Digital_IO
+M2_RelayFwd_Up_Close_DQ;Bit2@1;;+1 Sens ENROULAGE MONTEE EXTRACTION - FERMETURE GRAPPIN;%QX0.2;Local_Digital_IO
+M2_RelayRev_Down_Open_DQ;Bit3@1;;-1 Sens DEROULAGE DESCENTE PLONGEE - OUVERTURE GRAPPIN;%QX0.3;Local_Digital_IO
+;Bit4@1;;;%QX0.4;Local_Digital_IO
+;Bit5@1;;;%QX0.5;Local_Digital_IO
+;Bit6@1;;;%QX0.6;Local_Digital_IO
+;Bit7@1;;;%QX0.7;Local_Digital_IO
+COD1_PresettTrigCmd;Preset Trigger Command;;Preset Trigger Command;%QW2;COD1_CODEUR
+;Bit0;;Preset Trigger Command;%QX4.0;COD1_CODEUR
+;Bit1;;Preset Trigger Command;%QX4.1;COD1_CODEUR
+;Bit2;;Preset Trigger Command;%QX4.2;COD1_CODEUR
+;Bit3;;Preset Trigger Command;%QX4.3;COD1_CODEUR
+;Bit4;;Preset Trigger Command;%QX4.4;COD1_CODEUR
+;Bit5;;Preset Trigger Command;%QX4.5;COD1_CODEUR
+;Bit6;;Preset Trigger Command;%QX4.6;COD1_CODEUR
+;Bit7;;Preset Trigger Command;%QX4.7;COD1_CODEUR
+;Bit8;;Preset Trigger Command;%QX5.0;COD1_CODEUR
+;Bit9;;Preset Trigger Command;%QX5.1;COD1_CODEUR
+;Bit10;;Preset Trigger Command;%QX5.2;COD1_CODEUR
+;Bit11;;Preset Trigger Command;%QX5.3;COD1_CODEUR
+;Bit12;;Preset Trigger Command;%QX5.4;COD1_CODEUR
+;Bit13;;Preset Trigger Command;%QX5.5;COD1_CODEUR
+;Bit14;;Preset Trigger Command;%QX5.6;COD1_CODEUR
+;Bit15;;Preset Trigger Command;%QX5.7;COD1_CODEUR
+COD1_CodeSeqTrigCmd;Code Sequence Trigger Command;;Code Sequence Trigger Command;%QW3;COD1_CODEUR
+;Bit0@1;;Code Sequence Trigger Command;%QX6.0;COD1_CODEUR
+;Bit1@1;;Code Sequence Trigger Command;%QX6.1;COD1_CODEUR
+;Bit2@1;;Code Sequence Trigger Command;%QX6.2;COD1_CODEUR
+;Bit3@1;;Code Sequence Trigger Command;%QX6.3;COD1_CODEUR
+;Bit4@1;;Code Sequence Trigger Command;%QX6.4;COD1_CODEUR
+;Bit5@1;;Code Sequence Trigger Command;%QX6.5;COD1_CODEUR
+;Bit6@1;;Code Sequence Trigger Command;%QX6.6;COD1_CODEUR
+;Bit7@1;;Code Sequence Trigger Command;%QX6.7;COD1_CODEUR
+;Bit8@1;;Code Sequence Trigger Command;%QX7.0;COD1_CODEUR
+;Bit9@1;;Code Sequence Trigger Command;%QX7.1;COD1_CODEUR
+;Bit10@1;;Code Sequence Trigger Command;%QX7.2;COD1_CODEUR
+;Bit11@1;;Code Sequence Trigger Command;%QX7.3;COD1_CODEUR
+;Bit12@1;;Code Sequence Trigger Command;%QX7.4;COD1_CODEUR
+;Bit13@1;;Code Sequence Trigger Command;%QX7.5;COD1_CODEUR
+;Bit14@1;;Code Sequence Trigger Command;%QX7.6;COD1_CODEUR
+;Bit15@1;;Code Sequence Trigger Command;%QX7.7;COD1_CODEUR
+COD1_PresetValue;Preset Value;;Preset Value;%QD2;COD1_CODEUR
+;Bit0@2;;Preset Value;%QX8.0;COD1_CODEUR
+;Bit1@2;;Preset Value;%QX8.1;COD1_CODEUR
+;Bit2@2;;Preset Value;%QX8.2;COD1_CODEUR
+;Bit3@2;;Preset Value;%QX8.3;COD1_CODEUR
+;Bit4@2;;Preset Value;%QX8.4;COD1_CODEUR
+;Bit5@2;;Preset Value;%QX8.5;COD1_CODEUR
+;Bit6@2;;Preset Value;%QX8.6;COD1_CODEUR
+;Bit7@2;;Preset Value;%QX8.7;COD1_CODEUR
+;Bit8@2;;Preset Value;%QX9.0;COD1_CODEUR
+;Bit9@2;;Preset Value;%QX9.1;COD1_CODEUR
+;Bit10@2;;Preset Value;%QX9.2;COD1_CODEUR
+;Bit11@2;;Preset Value;%QX9.3;COD1_CODEUR
+;Bit12@2;;Preset Value;%QX9.4;COD1_CODEUR
+;Bit13@2;;Preset Value;%QX9.5;COD1_CODEUR
+;Bit14@2;;Preset Value;%QX9.6;COD1_CODEUR
+;Bit15@2;;Preset Value;%QX9.7;COD1_CODEUR
+;Bit16;;Preset Value;%QX10.0;COD1_CODEUR
+;Bit17;;Preset Value;%QX10.1;COD1_CODEUR
+;Bit18;;Preset Value;%QX10.2;COD1_CODEUR
+;Bit19;;Preset Value;%QX10.3;COD1_CODEUR
+;Bit20;;Preset Value;%QX10.4;COD1_CODEUR
+;Bit21;;Preset Value;%QX10.5;COD1_CODEUR
+;Bit22;;Preset Value;%QX10.6;COD1_CODEUR
+;Bit23;;Preset Value;%QX10.7;COD1_CODEUR
+;Bit24;;Preset Value;%QX11.0;COD1_CODEUR
+;Bit25;;Preset Value;%QX11.1;COD1_CODEUR
+;Bit26;;Preset Value;%QX11.2;COD1_CODEUR
+;Bit27;;Preset Value;%QX11.3;COD1_CODEUR
+;Bit28;;Preset Value;%QX11.4;COD1_CODEUR
+;Bit29;;Preset Value;%QX11.5;COD1_CODEUR
+;Bit30;;Preset Value;%QX11.6;COD1_CODEUR
+;Bit31;;Preset Value;%QX11.7;COD1_CODEUR
+COD1_Alarms;Alarms;;Alarms;%IW2;COD1_CODEUR
+;Bit0@3;;Alarms;%IX4.0;COD1_CODEUR
+;Bit1@3;;Alarms;%IX4.1;COD1_CODEUR
+;Bit2@3;;Alarms;%IX4.2;COD1_CODEUR
+;Bit3@3;;Alarms;%IX4.3;COD1_CODEUR
+;Bit4@3;;Alarms;%IX4.4;COD1_CODEUR
+;Bit5@3;;Alarms;%IX4.5;COD1_CODEUR
+;Bit6@3;;Alarms;%IX4.6;COD1_CODEUR
+;Bit7@3;;Alarms;%IX4.7;COD1_CODEUR
+;Bit8@3;;Alarms;%IX5.0;COD1_CODEUR
+;Bit9@3;;Alarms;%IX5.1;COD1_CODEUR
+;Bit10@3;;Alarms;%IX5.2;COD1_CODEUR
+;Bit11@3;;Alarms;%IX5.3;COD1_CODEUR
+;Bit12@3;;Alarms;%IX5.4;COD1_CODEUR
+;Bit13@3;;Alarms;%IX5.5;COD1_CODEUR
+;Bit14@3;;Alarms;%IX5.6;COD1_CODEUR
+;Bit15@3;;Alarms;%IX5.7;COD1_CODEUR
+COD1_Warnings;Warnings;;Warnings;%IW3;COD1_CODEUR
+;Bit0@4;;Warnings;%IX6.0;COD1_CODEUR
+;Bit1@4;;Warnings;%IX6.1;COD1_CODEUR
+;Bit2@4;;Warnings;%IX6.2;COD1_CODEUR
+;Bit3@4;;Warnings;%IX6.3;COD1_CODEUR
+;Bit4@4;;Warnings;%IX6.4;COD1_CODEUR
+;Bit5@4;;Warnings;%IX6.5;COD1_CODEUR
+;Bit6@4;;Warnings;%IX6.6;COD1_CODEUR
+;Bit7@4;;Warnings;%IX6.7;COD1_CODEUR
+;Bit8@4;;Warnings;%IX7.0;COD1_CODEUR
+;Bit9@4;;Warnings;%IX7.1;COD1_CODEUR
+;Bit10@4;;Warnings;%IX7.2;COD1_CODEUR
+;Bit11@4;;Warnings;%IX7.3;COD1_CODEUR
+;Bit12@4;;Warnings;%IX7.4;COD1_CODEUR
+;Bit13@4;;Warnings;%IX7.5;COD1_CODEUR
+;Bit14@4;;Warnings;%IX7.6;COD1_CODEUR
+;Bit15@4;;Warnings;%IX7.7;COD1_CODEUR
+COD1_PosValue;Position value;;Position value;%ID2;COD1_CODEUR
+;Bit0@5;;Position value;%IX8.0;COD1_CODEUR
+;Bit1@5;;Position value;%IX8.1;COD1_CODEUR
+;Bit2@5;;Position value;%IX8.2;COD1_CODEUR
+;Bit3@5;;Position value;%IX8.3;COD1_CODEUR
+;Bit4@5;;Position value;%IX8.4;COD1_CODEUR
+;Bit5@5;;Position value;%IX8.5;COD1_CODEUR
+;Bit6@5;;Position value;%IX8.6;COD1_CODEUR
+;Bit7@5;;Position value;%IX8.7;COD1_CODEUR
+;Bit8@5;;Position value;%IX9.0;COD1_CODEUR
+;Bit9@5;;Position value;%IX9.1;COD1_CODEUR
+;Bit10@5;;Position value;%IX9.2;COD1_CODEUR
+;Bit11@5;;Position value;%IX9.3;COD1_CODEUR
+;Bit12@5;;Position value;%IX9.4;COD1_CODEUR
+;Bit13@5;;Position value;%IX9.5;COD1_CODEUR
+;Bit14@5;;Position value;%IX9.6;COD1_CODEUR
+;Bit15@5;;Position value;%IX9.7;COD1_CODEUR
+;Bit16@1;;Position value;%IX10.0;COD1_CODEUR
+;Bit17@1;;Position value;%IX10.1;COD1_CODEUR
+;Bit18@1;;Position value;%IX10.2;COD1_CODEUR
+;Bit19@1;;Position value;%IX10.3;COD1_CODEUR
+;Bit20@1;;Position value;%IX10.4;COD1_CODEUR
+;Bit21@1;;Position value;%IX10.5;COD1_CODEUR
+;Bit22@1;;Position value;%IX10.6;COD1_CODEUR
+;Bit23@1;;Position value;%IX10.7;COD1_CODEUR
+;Bit24@1;;Position value;%IX11.0;COD1_CODEUR
+;Bit25@1;;Position value;%IX11.1;COD1_CODEUR
+;Bit26@1;;Position value;%IX11.2;COD1_CODEUR
+;Bit27@1;;Position value;%IX11.3;COD1_CODEUR
+;Bit28@1;;Position value;%IX11.4;COD1_CODEUR
+;Bit29@1;;Position value;%IX11.5;COD1_CODEUR
+;Bit30@1;;Position value;%IX11.6;COD1_CODEUR
+;Bit31@1;;Position value;%IX11.7;COD1_CODEUR
+COD1_SpdValue;Speed value channel 1;;Speed value channel 1;%IW6;COD1_CODEUR
+;Bit0@6;;Speed value channel 1;%IX12.0;COD1_CODEUR
+;Bit1@6;;Speed value channel 1;%IX12.1;COD1_CODEUR
+;Bit2@6;;Speed value channel 1;%IX12.2;COD1_CODEUR
+;Bit3@6;;Speed value channel 1;%IX12.3;COD1_CODEUR
+;Bit4@6;;Speed value channel 1;%IX12.4;COD1_CODEUR
+;Bit5@6;;Speed value channel 1;%IX12.5;COD1_CODEUR
+;Bit6@6;;Speed value channel 1;%IX12.6;COD1_CODEUR
+;Bit7@6;;Speed value channel 1;%IX12.7;COD1_CODEUR
+;Bit8@6;;Speed value channel 1;%IX13.0;COD1_CODEUR
+;Bit9@6;;Speed value channel 1;%IX13.1;COD1_CODEUR
+;Bit10@6;;Speed value channel 1;%IX13.2;COD1_CODEUR
+;Bit11@6;;Speed value channel 1;%IX13.3;COD1_CODEUR
+;Bit12@6;;Speed value channel 1;%IX13.4;COD1_CODEUR
+;Bit13@6;;Speed value channel 1;%IX13.5;COD1_CODEUR
+;Bit14@6;;Speed value channel 1;%IX13.6;COD1_CODEUR
+;Bit15@6;;Speed value channel 1;%IX13.7;COD1_CODEUR
+COD1_AccValue;Acceleration value channel 1;;Acceleration value channel 1;%IW7;COD1_CODEUR
+;Bit0@7;;Acceleration value channel 1;%IX14.0;COD1_CODEUR
+;Bit1@7;;Acceleration value channel 1;%IX14.1;COD1_CODEUR
+;Bit2@7;;Acceleration value channel 1;%IX14.2;COD1_CODEUR
+;Bit3@7;;Acceleration value channel 1;%IX14.3;COD1_CODEUR
+;Bit4@7;;Acceleration value channel 1;%IX14.4;COD1_CODEUR
+;Bit5@7;;Acceleration value channel 1;%IX14.5;COD1_CODEUR
+;Bit6@7;;Acceleration value channel 1;%IX14.6;COD1_CODEUR
+;Bit7@7;;Acceleration value channel 1;%IX14.7;COD1_CODEUR
+;Bit8@7;;Acceleration value channel 1;%IX15.0;COD1_CODEUR
+;Bit9@7;;Acceleration value channel 1;%IX15.1;COD1_CODEUR
+;Bit10@7;;Acceleration value channel 1;%IX15.2;COD1_CODEUR
+;Bit11@7;;Acceleration value channel 1;%IX15.3;COD1_CODEUR
+;Bit12@7;;Acceleration value channel 1;%IX15.4;COD1_CODEUR
+;Bit13@7;;Acceleration value channel 1;%IX15.5;COD1_CODEUR
+;Bit14@7;;Acceleration value channel 1;%IX15.6;COD1_CODEUR
+;Bit15@7;;Acceleration value channel 1;%IX15.7;COD1_CODEUR
+M3_CommandWord;0x3101 Command;;0x3101 Command;%QW6;AC600_ECAT_Drive
+;Bit0;;0x3101 Command;%QX12.0;AC600_ECAT_Drive
+;Bit1;;0x3101 Command;%QX12.1;AC600_ECAT_Drive
+;Bit2;;0x3101 Command;%QX12.2;AC600_ECAT_Drive
+;Bit3;;0x3101 Command;%QX12.3;AC600_ECAT_Drive
+;Bit4;;0x3101 Command;%QX12.4;AC600_ECAT_Drive
+;Bit5;;0x3101 Command;%QX12.5;AC600_ECAT_Drive
+;Bit6;;0x3101 Command;%QX12.6;AC600_ECAT_Drive
+;Bit7;;0x3101 Command;%QX12.7;AC600_ECAT_Drive
+;Bit8;;0x3101 Command;%QX13.0;AC600_ECAT_Drive
+;Bit9;;0x3101 Command;%QX13.1;AC600_ECAT_Drive
+;Bit10;;0x3101 Command;%QX13.2;AC600_ECAT_Drive
+;Bit11;;0x3101 Command;%QX13.3;AC600_ECAT_Drive
+;Bit12;;0x3101 Command;%QX13.4;AC600_ECAT_Drive
+;Bit13;;0x3101 Command;%QX13.5;AC600_ECAT_Drive
+;Bit14;;0x3101 Command;%QX13.6;AC600_ECAT_Drive
+;Bit15;;0x3101 Command;%QX13.7;AC600_ECAT_Drive
+M3_SetpointFrequencyHz;0x3100 Frequency;;0x3100 Frequency;%QW7;AC600_ECAT_Drive
+;Bit0@1;;0x3100 Frequency;%QX14.0;AC600_ECAT_Drive
+;Bit1@1;;0x3100 Frequency;%QX14.1;AC600_ECAT_Drive
+;Bit2@1;;0x3100 Frequency;%QX14.2;AC600_ECAT_Drive
+;Bit3@1;;0x3100 Frequency;%QX14.3;AC600_ECAT_Drive
+;Bit4@1;;0x3100 Frequency;%QX14.4;AC600_ECAT_Drive
+;Bit5@1;;0x3100 Frequency;%QX14.5;AC600_ECAT_Drive
+;Bit6@1;;0x3100 Frequency;%QX14.6;AC600_ECAT_Drive
+;Bit7@1;;0x3100 Frequency;%QX14.7;AC600_ECAT_Drive
+;Bit8@1;;0x3100 Frequency;%QX15.0;AC600_ECAT_Drive
+;Bit9@1;;0x3100 Frequency;%QX15.1;AC600_ECAT_Drive
+;Bit10@1;;0x3100 Frequency;%QX15.2;AC600_ECAT_Drive
+;Bit11@1;;0x3100 Frequency;%QX15.3;AC600_ECAT_Drive
+;Bit12@1;;0x3100 Frequency;%QX15.4;AC600_ECAT_Drive
+;Bit13@1;;0x3100 Frequency;%QX15.5;AC600_ECAT_Drive
+;Bit14@1;;0x3100 Frequency;%QX15.6;AC600_ECAT_Drive
+;Bit15@1;;0x3100 Frequency;%QX15.7;AC600_ECAT_Drive
+M3_StatusWord;0x3102 Drive Status;;0x3102 Drive Status;%IW8;AC600_ECAT_Drive
+;Bit0@2;;0x3102 Drive Status;%IX16.0;AC600_ECAT_Drive
+;Bit1@2;;0x3102 Drive Status;%IX16.1;AC600_ECAT_Drive
+;Bit2@2;;0x3102 Drive Status;%IX16.2;AC600_ECAT_Drive
+;Bit3@2;;0x3102 Drive Status;%IX16.3;AC600_ECAT_Drive
+;Bit4@2;;0x3102 Drive Status;%IX16.4;AC600_ECAT_Drive
+;Bit5@2;;0x3102 Drive Status;%IX16.5;AC600_ECAT_Drive
+;Bit6@2;;0x3102 Drive Status;%IX16.6;AC600_ECAT_Drive
+;Bit7@2;;0x3102 Drive Status;%IX16.7;AC600_ECAT_Drive
+;Bit8@2;;0x3102 Drive Status;%IX17.0;AC600_ECAT_Drive
+;Bit9@2;;0x3102 Drive Status;%IX17.1;AC600_ECAT_Drive
+;Bit10@2;;0x3102 Drive Status;%IX17.2;AC600_ECAT_Drive
+;Bit11@2;;0x3102 Drive Status;%IX17.3;AC600_ECAT_Drive
+;Bit12@2;;0x3102 Drive Status;%IX17.4;AC600_ECAT_Drive
+;Bit13@2;;0x3102 Drive Status;%IX17.5;AC600_ECAT_Drive
+;Bit14@2;;0x3102 Drive Status;%IX17.6;AC600_ECAT_Drive
+;Bit15@2;;0x3102 Drive Status;%IX17.7;AC600_ECAT_Drive
+M3_ActualFrequencyHz;C00.01 Output Frequency;;C00.01 Output Frequency;%IW9;AC600_ECAT_Drive
+;Bit0@3;;C00.01 Output Frequency;%IX18.0;AC600_ECAT_Drive
+;Bit1@3;;C00.01 Output Frequency;%IX18.1;AC600_ECAT_Drive
+;Bit2@3;;C00.01 Output Frequency;%IX18.2;AC600_ECAT_Drive
+;Bit3@3;;C00.01 Output Frequency;%IX18.3;AC600_ECAT_Drive
+;Bit4@3;;C00.01 Output Frequency;%IX18.4;AC600_ECAT_Drive
+;Bit5@3;;C00.01 Output Frequency;%IX18.5;AC600_ECAT_Drive
+;Bit6@3;;C00.01 Output Frequency;%IX18.6;AC600_ECAT_Drive
+;Bit7@3;;C00.01 Output Frequency;%IX18.7;AC600_ECAT_Drive
+;Bit8@3;;C00.01 Output Frequency;%IX19.0;AC600_ECAT_Drive
+;Bit9@3;;C00.01 Output Frequency;%IX19.1;AC600_ECAT_Drive
+;Bit10@3;;C00.01 Output Frequency;%IX19.2;AC600_ECAT_Drive
+;Bit11@3;;C00.01 Output Frequency;%IX19.3;AC600_ECAT_Drive
+;Bit12@3;;C00.01 Output Frequency;%IX19.4;AC600_ECAT_Drive
+;Bit13@3;;C00.01 Output Frequency;%IX19.5;AC600_ECAT_Drive
+;Bit14@3;;C00.01 Output Frequency;%IX19.6;AC600_ECAT_Drive
+;Bit15@3;;C00.01 Output Frequency;%IX19.7;AC600_ECAT_Drive
+COD2_PresettTrigCmd;Preset Trigger Command;;Preset Trigger Command;%QW8;COD2_CODEUR
+;Bit0;;Preset Trigger Command;%QX16.0;COD2_CODEUR
+;Bit1;;Preset Trigger Command;%QX16.1;COD2_CODEUR
+;Bit2;;Preset Trigger Command;%QX16.2;COD2_CODEUR
+;Bit3;;Preset Trigger Command;%QX16.3;COD2_CODEUR
+;Bit4;;Preset Trigger Command;%QX16.4;COD2_CODEUR
+;Bit5;;Preset Trigger Command;%QX16.5;COD2_CODEUR
+;Bit6;;Preset Trigger Command;%QX16.6;COD2_CODEUR
+;Bit7;;Preset Trigger Command;%QX16.7;COD2_CODEUR
+;Bit8;;Preset Trigger Command;%QX17.0;COD2_CODEUR
+;Bit9;;Preset Trigger Command;%QX17.1;COD2_CODEUR
+;Bit10;;Preset Trigger Command;%QX17.2;COD2_CODEUR
+;Bit11;;Preset Trigger Command;%QX17.3;COD2_CODEUR
+;Bit12;;Preset Trigger Command;%QX17.4;COD2_CODEUR
+;Bit13;;Preset Trigger Command;%QX17.5;COD2_CODEUR
+;Bit14;;Preset Trigger Command;%QX17.6;COD2_CODEUR
+;Bit15;;Preset Trigger Command;%QX17.7;COD2_CODEUR
+COD2_CodeSeqTrigCmd;Code Sequence Trigger Command;;Code Sequence Trigger Command;%QW9;COD2_CODEUR
+;Bit0@1;;Code Sequence Trigger Command;%QX18.0;COD2_CODEUR
+;Bit1@1;;Code Sequence Trigger Command;%QX18.1;COD2_CODEUR
+;Bit2@1;;Code Sequence Trigger Command;%QX18.2;COD2_CODEUR
+;Bit3@1;;Code Sequence Trigger Command;%QX18.3;COD2_CODEUR
+;Bit4@1;;Code Sequence Trigger Command;%QX18.4;COD2_CODEUR
+;Bit5@1;;Code Sequence Trigger Command;%QX18.5;COD2_CODEUR
+;Bit6@1;;Code Sequence Trigger Command;%QX18.6;COD2_CODEUR
+;Bit7@1;;Code Sequence Trigger Command;%QX18.7;COD2_CODEUR
+;Bit8@1;;Code Sequence Trigger Command;%QX19.0;COD2_CODEUR
+;Bit9@1;;Code Sequence Trigger Command;%QX19.1;COD2_CODEUR
+;Bit10@1;;Code Sequence Trigger Command;%QX19.2;COD2_CODEUR
+;Bit11@1;;Code Sequence Trigger Command;%QX19.3;COD2_CODEUR
+;Bit12@1;;Code Sequence Trigger Command;%QX19.4;COD2_CODEUR
+;Bit13@1;;Code Sequence Trigger Command;%QX19.5;COD2_CODEUR
+;Bit14@1;;Code Sequence Trigger Command;%QX19.6;COD2_CODEUR
+;Bit15@1;;Code Sequence Trigger Command;%QX19.7;COD2_CODEUR
+COD2_PresetValue;Preset Value;;Preset Value;%QD5;COD2_CODEUR
+;Bit0@2;;Preset Value;%QX20.0;COD2_CODEUR
+;Bit1@2;;Preset Value;%QX20.1;COD2_CODEUR
+;Bit2@2;;Preset Value;%QX20.2;COD2_CODEUR
+;Bit3@2;;Preset Value;%QX20.3;COD2_CODEUR
+;Bit4@2;;Preset Value;%QX20.4;COD2_CODEUR
+;Bit5@2;;Preset Value;%QX20.5;COD2_CODEUR
+;Bit6@2;;Preset Value;%QX20.6;COD2_CODEUR
+;Bit7@2;;Preset Value;%QX20.7;COD2_CODEUR
+;Bit8@2;;Preset Value;%QX21.0;COD2_CODEUR
+;Bit9@2;;Preset Value;%QX21.1;COD2_CODEUR
+;Bit10@2;;Preset Value;%QX21.2;COD2_CODEUR
+;Bit11@2;;Preset Value;%QX21.3;COD2_CODEUR
+;Bit12@2;;Preset Value;%QX21.4;COD2_CODEUR
+;Bit13@2;;Preset Value;%QX21.5;COD2_CODEUR
+;Bit14@2;;Preset Value;%QX21.6;COD2_CODEUR
+;Bit15@2;;Preset Value;%QX21.7;COD2_CODEUR
+;Bit16;;Preset Value;%QX22.0;COD2_CODEUR
+;Bit17;;Preset Value;%QX22.1;COD2_CODEUR
+;Bit18;;Preset Value;%QX22.2;COD2_CODEUR
+;Bit19;;Preset Value;%QX22.3;COD2_CODEUR
+;Bit20;;Preset Value;%QX22.4;COD2_CODEUR
+;Bit21;;Preset Value;%QX22.5;COD2_CODEUR
+;Bit22;;Preset Value;%QX22.6;COD2_CODEUR
+;Bit23;;Preset Value;%QX22.7;COD2_CODEUR
+;Bit24;;Preset Value;%QX23.0;COD2_CODEUR
+;Bit25;;Preset Value;%QX23.1;COD2_CODEUR
+;Bit26;;Preset Value;%QX23.2;COD2_CODEUR
+;Bit27;;Preset Value;%QX23.3;COD2_CODEUR
+;Bit28;;Preset Value;%QX23.4;COD2_CODEUR
+;Bit29;;Preset Value;%QX23.5;COD2_CODEUR
+;Bit30;;Preset Value;%QX23.6;COD2_CODEUR
+;Bit31;;Preset Value;%QX23.7;COD2_CODEUR
+COD2_Alarms;Alarms;;Alarms;%IW10;COD2_CODEUR
+;Bit0@3;;Alarms;%IX20.0;COD2_CODEUR
+;Bit1@3;;Alarms;%IX20.1;COD2_CODEUR
+;Bit2@3;;Alarms;%IX20.2;COD2_CODEUR
+;Bit3@3;;Alarms;%IX20.3;COD2_CODEUR
+;Bit4@3;;Alarms;%IX20.4;COD2_CODEUR
+;Bit5@3;;Alarms;%IX20.5;COD2_CODEUR
+;Bit6@3;;Alarms;%IX20.6;COD2_CODEUR
+;Bit7@3;;Alarms;%IX20.7;COD2_CODEUR
+;Bit8@3;;Alarms;%IX21.0;COD2_CODEUR
+;Bit9@3;;Alarms;%IX21.1;COD2_CODEUR
+;Bit10@3;;Alarms;%IX21.2;COD2_CODEUR
+;Bit11@3;;Alarms;%IX21.3;COD2_CODEUR
+;Bit12@3;;Alarms;%IX21.4;COD2_CODEUR
+;Bit13@3;;Alarms;%IX21.5;COD2_CODEUR
+;Bit14@3;;Alarms;%IX21.6;COD2_CODEUR
+;Bit15@3;;Alarms;%IX21.7;COD2_CODEUR
+COD2_Warnings;Warnings;;Warnings;%IW11;COD2_CODEUR
+;Bit0@4;;Warnings;%IX22.0;COD2_CODEUR
+;Bit1@4;;Warnings;%IX22.1;COD2_CODEUR
+;Bit2@4;;Warnings;%IX22.2;COD2_CODEUR
+;Bit3@4;;Warnings;%IX22.3;COD2_CODEUR
+;Bit4@4;;Warnings;%IX22.4;COD2_CODEUR
+;Bit5@4;;Warnings;%IX22.5;COD2_CODEUR
+;Bit6@4;;Warnings;%IX22.6;COD2_CODEUR
+;Bit7@4;;Warnings;%IX22.7;COD2_CODEUR
+;Bit8@4;;Warnings;%IX23.0;COD2_CODEUR
+;Bit9@4;;Warnings;%IX23.1;COD2_CODEUR
+;Bit10@4;;Warnings;%IX23.2;COD2_CODEUR
+;Bit11@4;;Warnings;%IX23.3;COD2_CODEUR
+;Bit12@4;;Warnings;%IX23.4;COD2_CODEUR
+;Bit13@4;;Warnings;%IX23.5;COD2_CODEUR
+;Bit14@4;;Warnings;%IX23.6;COD2_CODEUR
+;Bit15@4;;Warnings;%IX23.7;COD2_CODEUR
+COD2_PosValue;Position value;;Position value;%ID50;COD2_CODEUR
+;Bit0@5;;Position value;%IX200.0;COD2_CODEUR
+;Bit1@5;;Position value;%IX200.1;COD2_CODEUR
+;Bit2@5;;Position value;%IX200.2;COD2_CODEUR
+;Bit3@5;;Position value;%IX200.3;COD2_CODEUR
+;Bit4@5;;Position value;%IX200.4;COD2_CODEUR
+;Bit5@5;;Position value;%IX200.5;COD2_CODEUR
+;Bit6@5;;Position value;%IX200.6;COD2_CODEUR
+;Bit7@5;;Position value;%IX200.7;COD2_CODEUR
+;Bit8@5;;Position value;%IX201.0;COD2_CODEUR
+;Bit9@5;;Position value;%IX201.1;COD2_CODEUR
+;Bit10@5;;Position value;%IX201.2;COD2_CODEUR
+;Bit11@5;;Position value;%IX201.3;COD2_CODEUR
+;Bit12@5;;Position value;%IX201.4;COD2_CODEUR
+;Bit13@5;;Position value;%IX201.5;COD2_CODEUR
+;Bit14@5;;Position value;%IX201.6;COD2_CODEUR
+;Bit15@5;;Position value;%IX201.7;COD2_CODEUR
+;Bit16@1;;Position value;%IX202.0;COD2_CODEUR
+;Bit17@1;;Position value;%IX202.1;COD2_CODEUR
+;Bit18@1;;Position value;%IX202.2;COD2_CODEUR
+;Bit19@1;;Position value;%IX202.3;COD2_CODEUR
+;Bit20@1;;Position value;%IX202.4;COD2_CODEUR
+;Bit21@1;;Position value;%IX202.5;COD2_CODEUR
+;Bit22@1;;Position value;%IX202.6;COD2_CODEUR
+;Bit23@1;;Position value;%IX202.7;COD2_CODEUR
+;Bit24@1;;Position value;%IX203.0;COD2_CODEUR
+;Bit25@1;;Position value;%IX203.1;COD2_CODEUR
+;Bit26@1;;Position value;%IX203.2;COD2_CODEUR
+;Bit27@1;;Position value;%IX203.3;COD2_CODEUR
+;Bit28@1;;Position value;%IX203.4;COD2_CODEUR
+;Bit29@1;;Position value;%IX203.5;COD2_CODEUR
+;Bit30@1;;Position value;%IX203.6;COD2_CODEUR
+;Bit31@1;;Position value;%IX203.7;COD2_CODEUR
+COD2_SpdValue;Speed value channel 1;;Speed value channel 1;%IW102;COD2_CODEUR
+;Bit0@6;;Speed value channel 1;%IX204.0;COD2_CODEUR
+;Bit1@6;;Speed value channel 1;%IX204.1;COD2_CODEUR
+;Bit2@6;;Speed value channel 1;%IX204.2;COD2_CODEUR
+;Bit3@6;;Speed value channel 1;%IX204.3;COD2_CODEUR
+;Bit4@6;;Speed value channel 1;%IX204.4;COD2_CODEUR
+;Bit5@6;;Speed value channel 1;%IX204.5;COD2_CODEUR
+;Bit6@6;;Speed value channel 1;%IX204.6;COD2_CODEUR
+;Bit7@6;;Speed value channel 1;%IX204.7;COD2_CODEUR
+;Bit8@6;;Speed value channel 1;%IX205.0;COD2_CODEUR
+;Bit9@6;;Speed value channel 1;%IX205.1;COD2_CODEUR
+;Bit10@6;;Speed value channel 1;%IX205.2;COD2_CODEUR
+;Bit11@6;;Speed value channel 1;%IX205.3;COD2_CODEUR
+;Bit12@6;;Speed value channel 1;%IX205.4;COD2_CODEUR
+;Bit13@6;;Speed value channel 1;%IX205.5;COD2_CODEUR
+;Bit14@6;;Speed value channel 1;%IX205.6;COD2_CODEUR
+;Bit15@6;;Speed value channel 1;%IX205.7;COD2_CODEUR
+COD2_AccValue;Acceleration value channel 1;;Acceleration value channel 1;%IW103;COD2_CODEUR
+;Bit0@7;;Acceleration value channel 1;%IX206.0;COD2_CODEUR
+;Bit1@7;;Acceleration value channel 1;%IX206.1;COD2_CODEUR
+;Bit2@7;;Acceleration value channel 1;%IX206.2;COD2_CODEUR
+;Bit3@7;;Acceleration value channel 1;%IX206.3;COD2_CODEUR
+;Bit4@7;;Acceleration value channel 1;%IX206.4;COD2_CODEUR
+;Bit5@7;;Acceleration value channel 1;%IX206.5;COD2_CODEUR
+;Bit6@7;;Acceleration value channel 1;%IX206.6;COD2_CODEUR
+;Bit7@7;;Acceleration value channel 1;%IX206.7;COD2_CODEUR
+;Bit8@7;;Acceleration value channel 1;%IX207.0;COD2_CODEUR
+;Bit9@7;;Acceleration value channel 1;%IX207.1;COD2_CODEUR
+;Bit10@7;;Acceleration value channel 1;%IX207.2;COD2_CODEUR
+;Bit11@7;;Acceleration value channel 1;%IX207.3;COD2_CODEUR
+;Bit12@7;;Acceleration value channel 1;%IX207.4;COD2_CODEUR
+;Bit13@7;;Acceleration value channel 1;%IX207.5;COD2_CODEUR
+;Bit14@7;;Acceleration value channel 1;%IX207.6;COD2_CODEUR
+;Bit15@7;;Acceleration value channel 1;%IX207.7;COD2_CODEUR
+;VbusRunStatus;;VBus running status(0:init,1:scan,2:config,3:running);%IB208;VH_ExtensionDevice
+;VbusErrorStop;;VBus Error Stop Sign(VbusRunErrorCounter>100);%IB209;VH_ExtensionDevice
+;SlaveNumber;;Slave Number;%IB210;VH_ExtensionDevice
+;VbusErrorStatus;;VBus error status(0x20:error counter,0x4x:Write Param Error,0x6x:Read Param Error,0x8x:Read ID Error,0xax:poll parameter error);%IB211;VH_ExtensionDevice
+;VbusErrorSlaveNum;;VBus error number(bit0~3:slot number,bit8:breaking,bit9:overrun,bit10:overflow,bit11:overtemperature,bit12:power,bit13:AD error);%IW106;VH_ExtensionDevice
+;Bit0;;Slot Number(bit0);%IX212.0;VH_ExtensionDevice
+;Bit1;;Slot Number(bit1);%IX212.1;VH_ExtensionDevice
+;Bit2;;Slot Number(bit2);%IX212.2;VH_ExtensionDevice
+;Bit3;;Slot Number(bit3);%IX212.3;VH_ExtensionDevice
+;Bit4;;;%IX212.4;VH_ExtensionDevice
+;Bit5;;;%IX212.5;VH_ExtensionDevice
+;Bit6;;;%IX212.6;VH_ExtensionDevice
+;Bit7;;;%IX212.7;VH_ExtensionDevice
+;Bit8;;Breaking;%IX213.0;VH_ExtensionDevice
+;Bit9;;Overrun;%IX213.1;VH_ExtensionDevice
+;Bit10;;Overflow;%IX213.2;VH_ExtensionDevice
+;Bit11;;Over temperature;%IX213.3;VH_ExtensionDevice
+;Bit12;;Power;%IX213.4;VH_ExtensionDevice
+;Bit13;;AD error;%IX213.5;VH_ExtensionDevice
+;Bit14;;;%IX213.6;VH_ExtensionDevice
+;Bit15;;;%IX213.7;VH_ExtensionDevice
+;VbusRunErrorCounter;;VBus error Counter(Consecutive errors);%ID54;VH_ExtensionDevice
+;InternalSurveillance;;Internal surveillance;%ID55;VH_ExtensionDevice
+;VBUS_Control;;Vbus control(0x5450:VBUS automatically reconnects from new after incorrect shutdown,0x5445:VBUS remains reset);%QW12;VH_ExtensionDevice
+;in0;;Digital input00~07;%IB224;VH_0808ETP
+M3_PosTremie_DI;Bit0;;Capteur d'info position chariot;%IX224.0;VH_0808ETP
+M3_PosPV_DI;Bit1;;Capteur d'info position chariot;%IX224.1;VH_0808ETP
+M3_PosPVP2_DI;Bit2;;Capteur d'info position chariot;%IX224.2;VH_0808ETP
+M3_PosP1_DI;Bit3;;Capteur d'info position chariot;%IX224.3;VH_0808ETP
+M3_PosMaintenance_DI;Bit4;;Capteur d'info position;%IX224.4;VH_0808ETP
+TremieFull_OR_GateRaised_DI;Bit5;;Trémie pleine ou grille levée permet d'interdire la translation M3 vers trémie;%IX224.5;VH_0808ETP
+HydraulicThermalOk_DI;Bit6;;Disjoncteur thermique moteur hydraulique;%IX224.6;VH_0808ETP
+ConveyorInfeedReady_DI;Bit7;;Autorisation démarrage crible - dépose gravats sur crible;%IX224.7;VH_0808ETP
+;out0;;Digital output00~07;%QB26;VH_0808ETP
+M1_SpeedContactor_1_DQ;Bit0@1;;Contacteur de commande resistances moteur;%QX26.0;VH_0808ETP
+M1_SpeedContactor_2_DQ;Bit1@1;;Contacteur de commande resistances moteur;%QX26.1;VH_0808ETP
+M1_SpeedContactor_3_DQ;Bit2@1;;Contacteur de commande resistances moteur;%QX26.2;VH_0808ETP
+M1_SpeedContactor_4_DQ;Bit3@1;;Contacteur de commande resistances moteur;%QX26.3;VH_0808ETP
+M2_SpeedContactor_1_DQ;Bit4@1;;Contacteur de commande resistances moteur;%QX26.4;VH_0808ETP
+M2_SpeedContactor_2_DQ;Bit5@1;;Contacteur de commande resistances moteur;%QX26.5;VH_0808ETP
+M2_SpeedContactor_3_DQ;Bit6@1;;Contacteur de commande resistances moteur;%QX26.6;VH_0808ETP
+M2_SpeedContactor_4_DQ;Bit7@1;;Contacteur de commande resistances moteur;%QX26.7;VH_0808ETP
+;in0;;Digital input00~07;%IB225;VH_0800END
+M1_BrakeIsOpen_DI;Bit0;;Retour etat contacteur de puissance frein;%IX225.0;VH_0800END
+M2_BrakeIsOpen_DI;Bit1;;Retour etat contacteur de puissance frein;%IX225.1;VH_0800END
+M3_BrakeIsOpen_DI;Bit2;;Retour etat contacteur de puissance frein;%IX225.2;VH_0800END
+M1_M2_M3_BrakeThermalOk_DI;Bit3;;Retour état disjoncteur thermique  (commun M1/M2/M3);%IX225.3;VH_0800END
+PhaseRotationOk_DI;Bit4;;Controle rotation phase  (commun M1/M2/M3);%IX225.4;VH_0800END
+;Bit5;;;%IX225.5;VH_0800END
+PowerContactorEngaged_DI;Bit6;;Retour etat contacteur de puissance géré par arrêt d'urgence;%IX225.6;VH_0800END
+EmergencyChainClosed_DI;Bit7;;Retour etat boucle d'arrêt d'urgence coup de point et contact PLC;%IX225.7;VH_0800END
+;out0;;Digital output00~07;%QB27;VH_0008ER
+M1_BrakeRelease_RQ;Bit0;;Commande bobine frein;%QX27.0;VH_0008ER
+M2_BrakeRelease_RQ;Bit1;;Commande bobine frein;%QX27.1;VH_0008ER
+M3_BrakeRelease_RQ;Bit2;;Commande bobine frein;%QX27.2;VH_0008ER
+M1_M2_KoboldMeasureEnable_DQ;Bit3;;Commande moteur Kobol obligatoire pour détecter le fond;%QX27.3;VH_0008ER
+;Bit4;;;%QX27.4;VH_0008ER
+;Bit5;;;%QX27.5;VH_0008ER
+;Bit6;;;%QX27.6;VH_0008ER
+;Bit7;;;%QX27.7;VH_0008ER
+;out0;;Digital output00~07;%QB28;VH_0008ER_1
+EmergencyArming_RQ;Bit0;;Impulsion de 1s toutes les 5s minimum pour demander un réarmement de la puissance;%QX28.0;VH_0008ER_1
+;Bit1;;;%QX28.1;VH_0008ER_1
+;Bit2;;;%QX28.2;VH_0008ER_1
+;Bit3;;;%QX28.3;VH_0008ER_1
+;Bit4;;;%QX28.4;VH_0008ER_1
+;Bit5;;;%QX28.5;VH_0008ER_1
+PowerKeepAlive_A_RQ;Bit6;;NC Coupure puissance générale voie A;%QX28.6;VH_0008ER_1
+PowerKeepAlive_B_RQ;Bit7;;NC Coupure puissance générale voie B;%QX28.7;VH_0008ER_1
+;Input 7-0;;;%IB226;JOY1_JOYSTICK_MCB560_CO4201A
+JoyBtnRaw;Bit0;;;%IX226.0;JOY1_JOYSTICK_MCB560_CO4201A
+;Bit1;;;%IX226.1;JOY1_JOYSTICK_MCB560_CO4201A
+;Bit2;;;%IX226.2;JOY1_JOYSTICK_MCB560_CO4201A
+;Bit3;;;%IX226.3;JOY1_JOYSTICK_MCB560_CO4201A
+;Bit4;;;%IX226.4;JOY1_JOYSTICK_MCB560_CO4201A
+;Bit5;;;%IX226.5;JOY1_JOYSTICK_MCB560_CO4201A
+;Bit6;;;%IX226.6;JOY1_JOYSTICK_MCB560_CO4201A
+;Bit7;;;%IX226.7;JOY1_JOYSTICK_MCB560_CO4201A
+JoyXRaw_ANA1;Analog 1;;;%IW114;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@1;;;%IX228.0;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@2;;;%IX228.1;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@3;;;%IX228.2;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@4;;;%IX228.3;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@5;;;%IX228.4;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@6;;;%IX228.5;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@7;;;%IX228.6;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@8;;;%IX228.7;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@9;;;%IX229.0;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@10;;;%IX229.1;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@11;;;%IX229.2;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@12;;;%IX229.3;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@13;;;%IX229.4;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@14;;;%IX229.5;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@15;;;%IX229.6;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 1@16;;;%IX229.7;JOY1_JOYSTICK_MCB560_CO4201A
+JoyYRaw_ANA2;Analog 2;;;%IW115;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@1;;;%IX230.0;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@2;;;%IX230.1;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@3;;;%IX230.2;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@4;;;%IX230.3;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@5;;;%IX230.4;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@6;;;%IX230.5;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@7;;;%IX230.6;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@8;;;%IX230.7;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@9;;;%IX231.0;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@10;;;%IX231.1;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@11;;;%IX231.2;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@12;;;%IX231.3;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@13;;;%IX231.4;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@14;;;%IX231.5;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@15;;;%IX231.6;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 2@16;;;%IX231.7;JOY1_JOYSTICK_MCB560_CO4201A
+joyANA3;Analog 3;;;%IW116;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@1;;;%IX232.0;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@2;;;%IX232.1;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@3;;;%IX232.2;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@4;;;%IX232.3;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@5;;;%IX232.4;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@6;;;%IX232.5;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@7;;;%IX232.6;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@8;;;%IX232.7;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@9;;;%IX233.0;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@10;;;%IX233.1;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@11;;;%IX233.2;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@12;;;%IX233.3;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@13;;;%IX233.4;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@14;;;%IX233.5;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@15;;;%IX233.6;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 3@16;;;%IX233.7;JOY1_JOYSTICK_MCB560_CO4201A
+joyANA4;Analog 4;;;%IW117;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@1;;;%IX234.0;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@2;;;%IX234.1;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@3;;;%IX234.2;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@4;;;%IX234.3;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@5;;;%IX234.4;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@6;;;%IX234.5;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@7;;;%IX234.6;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@8;;;%IX234.7;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@9;;;%IX235.0;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@10;;;%IX235.1;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@11;;;%IX235.2;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@12;;;%IX235.3;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@13;;;%IX235.4;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@14;;;%IX235.5;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@15;;;%IX235.6;JOY1_JOYSTICK_MCB560_CO4201A
+;Analog 4@16;;;%IX235.7;JOY1_JOYSTICK_MCB560_CO4201A

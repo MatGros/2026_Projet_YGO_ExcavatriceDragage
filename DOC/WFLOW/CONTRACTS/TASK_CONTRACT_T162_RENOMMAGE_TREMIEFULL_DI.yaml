@@ -1,0 +1,94 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T162 C2 : Renommage signal TremieFull_DI (ex HopperFull_OR_GateRaised_DI)
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T162_RENOMMAGE_TREMIEFULL_DI
+  criticality: C2            # point materiel reel (_DI) : coherence cablage + code + doc
+  strategy: rebuild          # renommage d'un point I/O physique sur toute la chaine
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Renommer le point d'entree physique HopperFull_OR_GateRaised_DI en TremieFull_OR_GateRaised_DI
+    (derogation a l'anglais, decision utilisateur 2026-08-26 : nom francais plus lisible, aligne
+    sur l'export IO Device_IO_20260826.csv). Le renommage est applique de facon coherente sur
+    toute la chaine : code ST, struct ST_HwMachine, simulation, troubleshooting, CSV source de
+    verite materielle et documentation AF-06, sans aucun changement de valeur ni de comportement
+    logique.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Le point physique est renomme TremieFull_OR_GateRaised_DI dans le code ST (PRG_02_Acquisition, ST_HwMachine, FB_SimBench, GVL_Troubleshooting) et plus aucune occurrence de HopperFull_OR_GateRaised_DI n'existe dans CODE/."
+      verified_by: "grep : 0 occurrence HopperFull_OR_GateRaised_DI dans CODE/ ; >=1 TremieFull_OR_GateRaised_DI"
+    - id: AC2
+      statement: "Le CSV source de verite materielle (Device_IO_20260826.csv) porte le nouveau nom TremieFull_OR_GateRaised_DI avec le meme mapping (%IX224.5, VH_0808ETP, Bit5)."
+      verified_by: "lecture Device_IO_20260826.csv ligne 456"
+    - id: AC3
+      statement: "Le Device.export (export CODESYS) est regenere avec le nouveau nom, coherent avec le cablage reel."
+      verified_by: "grep TremieFull_OR_GateRaised_DI dans Device.export + validation humaine du cablage"
+    - id: AC4
+      statement: "La documentation AF-06 §5 et la tache T108 referencent le nouveau nom TremieFull_OR_GateRaised_DI."
+      verified_by: "grep TremieFull_OR_GateRaised_DI dans DOC/AF/AF_Partie-06 + DOC/WFLOW/TASKS.yaml T108"
+    - id: AC5
+      statement: "Aucun changement de valeur ni de comportement logique : le signal conserve sa polarite et sa signification physique."
+      verified_by: "G200_check_linkage --report (0 erreur) + run_all_gates --palier C"
+    - id: AC6
+      statement: "Le nom de fichier est egal au nom du POU pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+    - id: AC7
+      statement: "Le suffixe de langage est egal au langage genere dans le bundle pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_02_Acquisition.st              # renommer le point physique
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st  # renommer le champ struct
+      - CODE/L_SIMULATION/FB_SimBench.st              # renommer la simulation
+      - CODE/J_SUPERVISION/GVL_Troubleshooting.st      # renommer le snapshot troubleshooting
+      - TOOLS/AGENT_WORKFLOW/config/Device_IO_20260814.csv  # source de verite materielle
+      - DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md  # doc §5
+      - DOC/WFLOW/TASKS.yaml                           # tache T108 reference
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export  # regenere par l'humain (export CODESYS manuel)
+      - CODE/E_CODEURS/                                # hors scope (codeurs)
+
+  # ── 4. Contrat de conservation (rebuild) ─────────────────────────────────
+  conservation:
+    must_survive:
+      - "Le mapping physique (%IX224.5, VH_0808ETP, Bit5) strictement identique"
+      - "La polarite et la signification du signal (TRUE = trémie pleine / grille levée) inchangees"
+      - "Le comportement logique de tous les consommateurs inchange (0 diff logique)"
+    dropped_on_purpose:
+      - "Le nom HopperFull_OR_GateRaised_DI remplace par TremieFull_OR_GateRaised_DI (derogation a l'anglais, decision utilisateur, aligne sur l'export IO 20260826)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Le renommage d'un point _DI doit rester coherent avec le cablage electrique reel.
+    Si le cablage physique est 'trémie pleine OU grille levee' (deux conditions), le nom
+    TremieFull_DI ne reflete plus la condition complete — a confirmer avec l'humain avant
+    tout chargement. Le Device.export est regenere par l'humain (export CODESYS manuel),
+    jamais par l'agent.
+
+status: PENDING
+
+execution:
+  executed_by: "deepseek-v4-flash (executeur)"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

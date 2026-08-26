@@ -19,5 +19,21 @@ STRUCT
 
     // === 🛡️ Sécurité translation ===
     TranslationSafety                : ST_SafetyTranslation; // 🛡️ Diagnostic et securites translation M3
+
+    // === 🎯 Faits decodeur position M3 (produits par PRG_05, AF-02 TBD §8 #5) ===
+    TranslationPosTremie      : BOOL; // 📍 Zone Tremie (1=Present)
+    TranslationPosPV          : BOOL; // 📍 Zone pre-ralentissement PV (1=Present)
+    TranslationPosP2          : BOOL; // 📍 Zone P2 (1=Present)
+    TranslationPosP1          : BOOL; // 📍 Zone P1 (1=Present)
+    TranslationPosMaintenance : BOOL; // 📍 Zone Maintenance (1=Present)
+    TranslationAtTremie       : BOOL; // 🎯 Position exacte Tremie (1=Atteint)
+    TranslationAtPV           : BOOL; // 🎯 Position exacte PV (1=Atteint)
+    TranslationAtP2           : BOOL; // 🎯 Position exacte P2 (1=Atteint)
+    TranslationAtP1           : BOOL; // 🎯 Position exacte P1 (1=Atteint)
+    TranslationAtMaintenance  : BOOL; // 🎯 Position exacte Maintenance (1=Atteint)
+    M3_LimitSwitchFwd         : BOOL; // 🛡️ Fin de course avant M3 (1=Actionne)
+    M3_LimitSwitchRev         : BOOL; // 🛡️ Fin de course arriere M3 (1=Actionne)
+    M3_SensorWordIncoherent   : BOOL; // ❌ Incoherence detectee mot capteurs M3
+    M3_SensorsWord             : BYTE; // 📊 Mot d'etat capteurs M3
 END_STRUCT
 END_TYPE

@@ -23,6 +23,7 @@ VAR
     instTranslationM3           : FB_Translation;
     instSafetyTranslationM3     : FB_Safety_Translation;
     instPosEstimatorM3          : FB_Translation_PositionEstimator;
+    instPosDecoderM3            : FB_Translation_PositionDecoder; // 🧩 Decodage position M3 (migre de PRG_02, AF-02 TBD §8 #5)
 
     // === 📊 STRUCTS INTERNES (publiés via Data) ===
     TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // . [LOC] Demande finale et interlocks translation M3
@@ -62,6 +63,35 @@ VAR
     M3_ConfirmedMoving   : BOOL;
 END_VAR
 
+{region "§0 Decodage position M3"}
+// === 🧩 §0 DÉCODAGE POSITION M3 (migré de PRG_02, AF-02 TBD §8 #5) ===
+// PRG_02_Acquisition s'exécute avant ce POU (rang 01 < 05) : HwIn.Translation est
+// disponible au même scan. Le décodage des capteurs M3 est propriété de PRG_05.
+instPosDecoderM3(
+    SensorTremie      := PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI,
+    SensorPV          := PRG_02_Acquisition.HwIn.Translation.M3_PosPV_DI,
+    SensorP2          := PRG_02_Acquisition.HwIn.Translation.M3_PosPVP2_DI,
+    SensorP1          := PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI,
+    SensorMaintenance := PRG_02_Acquisition.HwIn.Translation.M3_PosMaintenance_DI
+);
+
+// 📤 Publication des faits M3 dans le bus PRG_05 (consommés par PRG_07)
+Data.TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
+Data.TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
+Data.TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
+Data.TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
+Data.TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
+Data.TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
+Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
+Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
+Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
+Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
+Data.M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
+Data.M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
+Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
+Data.M3_SensorsWord            := instPosDecoderM3.SensorsWord;
+{endregion}
+
 {region "§0 Interlock hauteur M1/M2"}
 // === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (risque collision translation) ===
 // PRG_02_Acquisition s'exécute avant ce POU dans la MainTask (rang 01 < 05) : lecture
@@ -75,8 +105,8 @@ END_VAR
 M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
                         OR (PRG_02_Acquisition.Data.M1_HomedAndReliable
                             AND PRG_02_Acquisition.Data.M2_HomedAndReliable
-                            AND (PRG_02_Acquisition.Data.CablePosM1 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
-                            AND (PRG_02_Acquisition.Data.CablePosM2 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
+                            AND (PRG_02_Acquisition.Data.Encoders.M1.CablePosM >= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
+                            AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM >= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 {endregion}
@@ -91,13 +121,13 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 // la vraie extrémité Maintenance (00000) — backup si le verrou souple a déjà échoué à arrêter
 // avant P1, garde la machine hors de la zone interdite plutôt que d'attendre le vrai fond.
 M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
-                                   NOT PRG_02_Acquisition.Data.TranslationPosP1 AND PRG_02_Acquisition.Data.TranslationPosMaintenance,
-                                   PRG_02_Acquisition.Data.M3_LimitSwitchRev);
+                                   NOT instPosDecoderM3.TranslationPosP1 AND instPosDecoderM3.TranslationPosMaintenance,
+                                   instPosDecoderM3.LimitSwitchRev);
 
 // 🔒 §0ter STABILISATION BISTABLE FINS DE COURSE EXTRÊMES (Trémie & Maintenance/P1)
 // Maintient la détection stable à 1 même si le capteur physique vibre ou saute brièvement.
 // Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
-IF PRG_02_Acquisition.Data.M3_LimitSwitchFwd THEN
+IF instPosDecoderM3.LimitSwitchFwd THEN
     M3_LimitSwitchFwdStable := TRUE;
 ELSIF M3_Direction_Active = -1 THEN
     M3_LimitSwitchFwdStable := FALSE;
@@ -105,7 +135,7 @@ END_IF;
 
 IF M3_LimitSwitchRevEffective THEN
     M3_LimitSwitchRevStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT PRG_02_Acquisition.Data.M3_LimitSwitchRev) THEN
+ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchRev) THEN
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
@@ -120,15 +150,15 @@ END_IF;
 M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0) > 0.5;
 TonM3ConfirmedMoving(IN := M3_ConfirmedMoving, PT := T#1s500ms);
 
-IF PRG_02_Acquisition.Data.TranslationAtTremie THEN
+IF instPosDecoderM3.TranslationAtTremie THEN
     M3_AtTremieStable := TRUE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.Data.TranslationAtPV THEN
+ELSIF instPosDecoderM3.TranslationAtPV THEN
     M3_AtPVStable := TRUE; M3_AtTremieStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.Data.TranslationAtP2 THEN
+ELSIF instPosDecoderM3.TranslationAtP2 THEN
     M3_AtP2Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.Data.TranslationAtP1 THEN
+ELSIF instPosDecoderM3.TranslationAtP1 THEN
     M3_AtP1Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.Data.TranslationAtMaintenance THEN
+ELSIF instPosDecoderM3.TranslationAtMaintenance THEN
     M3_AtMaintenanceStable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
 ELSIF TonM3ConfirmedMoving.Q THEN
     // Mouvement réel confirmé ≥1.5s sans nouveau front : on a vraiment quitté le dernier point.
@@ -269,7 +299,7 @@ instSafetyTranslationM3(
     Direction               := M3_Direction_Active,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
-    SensorWordIncoherent    := PRG_02_Acquisition.Data.M3_SensorWordIncoherent,
+    SensorWordIncoherent    := instPosDecoderM3.Incoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
     BypassDriveComm         := GVL_IHM.TranslationM3.Bypass.DriveComm,
@@ -303,17 +333,17 @@ instTranslationM3(
     InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
     SpeedTgt_Pct            := M3_SpeedCmd_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    SlowdownSensorTremie       := PRG_02_Acquisition.Data.TranslationPosPV,
+    SlowdownSensorTremie       := instPosDecoderM3.TranslationPosPV,
     // Les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
     // FB_Translation_PositionDecoder.st). Chaque zone est délimitée par "capteur PRÉCÉDENT retombé
     // à 0" ET "capteur de la zone encore à 1" — zone P2→P1 = NOT PosP2 AND PosP1 (mot 00011) ;
     // zone P1→Maintenance = NOT PosP1 AND PosMaintenance (mot 00001). Zones mutuellement exclusives,
     // chacune sa propre vitesse d'approche (CfgApproachSpeedP1_Hz / CfgApproachSpeedMaintenance_Hz).
-    SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.Data.TranslationPosP1) AND PRG_02_Acquisition.Data.TranslationPosMaintenance,
+    SlowdownSensorMaintenance  := (NOT instPosDecoderM3.TranslationPosP1) AND instPosDecoderM3.TranslationPosMaintenance,
     // Ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
     // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -> 100% vitesse jusqu'à
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
-    SlowdownSensorP1           := (NOT PRG_02_Acquisition.Data.TranslationPosP2) AND PRG_02_Acquisition.Data.TranslationPosP1
+    SlowdownSensorP1           := (NOT instPosDecoderM3.TranslationPosP2) AND instPosDecoderM3.TranslationPosP1
                                    AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
@@ -337,11 +367,11 @@ instPosEstimatorM3(
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
     DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     Direction            := M3_Direction_Active,
-    SensorMaintenance    := PRG_02_Acquisition.Data.TranslationPosMaintenance,
-    SensorP1             := PRG_02_Acquisition.Data.TranslationPosP1,
-    SensorP2             := PRG_02_Acquisition.Data.TranslationPosP2,
-    SensorPV             := PRG_02_Acquisition.Data.TranslationPosPV,
-    SensorTremie         := PRG_02_Acquisition.Data.TranslationPosTremie,
+    SensorMaintenance    := instPosDecoderM3.TranslationPosMaintenance,
+    SensorP1             := instPosDecoderM3.TranslationPosP1,
+    SensorP2             := instPosDecoderM3.TranslationPosP2,
+    SensorPV             := instPosDecoderM3.TranslationPosPV,
+    SensorTremie         := instPosDecoderM3.TranslationPosTremie,
     PosMaintenanceM      := GVL_PERSISTENT._TranslationPosMaintenance_M,
     PosP1M               := GVL_PERSISTENT._TranslationPosP1_M,
     PosP2M               := GVL_PERSISTENT._TranslationPosP2_M,
@@ -392,11 +422,11 @@ TranslationState.DriveFreqCmd_Hz := instTranslationM3.RequestedDriveFreqHz;
 // qui n'a pas lieu ("je bouge mais ça bouge pas"). Affiche 0 quand c'est bloqué.
 TranslationState.ActiveDirection := SEL(instTranslationM3.RequestedDriveControlWord <> 0, M3_Direction_Active, 0);
 TranslationState.SpeedCmd_Pct := SEL(instTranslationM3.RequestedDriveControlWord <> 0, M3_SpeedCmd_Active, 0.0);
-TranslationState.PositionTremie := PRG_02_Acquisition.Data.TranslationPosTremie;
-TranslationState.PositionPV := PRG_02_Acquisition.Data.TranslationPosPV;
-TranslationState.PositionP2 := PRG_02_Acquisition.Data.TranslationPosP2;
-TranslationState.PositionP1 := PRG_02_Acquisition.Data.TranslationPosP1;
-TranslationState.PositionMaintenance := PRG_02_Acquisition.Data.TranslationPosMaintenance;
+TranslationState.PositionTremie := instPosDecoderM3.TranslationPosTremie;
+TranslationState.PositionPV := instPosDecoderM3.TranslationPosPV;
+TranslationState.PositionP2 := instPosDecoderM3.TranslationPosP2;
+TranslationState.PositionP1 := instPosDecoderM3.TranslationPosP1;
+TranslationState.PositionMaintenance := instPosDecoderM3.TranslationPosMaintenance;
 // Affichage IHM = M3_AtXxxStable (§0quater) — armé sur front
 // (direction-dépendant), libéré sur mouvement réel confirmé ≥1.5s (pas juste un rebond capteur
 // ni un changement de sens instantané). Même signal que celui consommé par M3_PositionSensorTarget.
@@ -406,8 +436,8 @@ TranslationState.AtP2 := M3_AtP2Stable;
 TranslationState.AtP1 := M3_AtP1Stable;
 TranslationState.AtMaintenance := M3_AtMaintenanceStable;
 TranslationState.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
-TranslationState.SensorsWord := PRG_02_Acquisition.Data.M3_SensorsWord;
-TranslationState.SensorWordIncoherent := PRG_02_Acquisition.Data.M3_SensorWordIncoherent;
+TranslationState.SensorsWord := instPosDecoderM3.SensorsWord;
+TranslationState.SensorWordIncoherent := instPosDecoderM3.Incoherent;
 TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;

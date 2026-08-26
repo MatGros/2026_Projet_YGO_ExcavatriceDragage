@@ -71,10 +71,10 @@ instCycleSemiAuto(
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
     WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Status.Error,
     WinchSyncDeltaM         := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM,
-    M1_CablePosM            := PRG_02_Acquisition.Data.CablePosM1,
-    M2_CablePosM            := PRG_02_Acquisition.Data.CablePosM2,
-    M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M1_Speed_Mps,
-    M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M2_Speed_Mps,
+    M1_CablePosM            := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
+    M2_CablePosM            := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
+    M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
+    M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,

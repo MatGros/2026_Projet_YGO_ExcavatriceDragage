@@ -55,7 +55,7 @@ VAR_GLOBAL
     M1_M2_KoboldBottomTouch_DI   : BOOL;
     HydraulicThermalOk_DI        : BOOL;
     ConveyorInfeedReady_DI       : BOOL;
-    HopperFull_OR_GateRaised_DI  : BOOL;
+    TremieFull_OR_GateRaised_DI  : BOOL;
 
     // Modules d'E/S déportées
     Local_Digital_IO             : FB_DeviceStub;

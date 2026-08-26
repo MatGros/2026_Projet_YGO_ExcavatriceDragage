@@ -12,8 +12,8 @@ STRUCT
     M1_M2_KoboldBottomTouch_DI     : BOOL; (* Retour détecteur fond Kobold *)
     HydraulicThermalOk_DI          : BOOL; (* Thermique centrale hydraulique OK *)
     ConveyorInfeedReady_DI         : BOOL; (* Autorisation démarrage crible (dépôt gravats) *)
-    HopperFull_OR_GateRaised_DI    : BOOL; (* : Trémie pleine OU grille levée — pas encore câblé électriquement,
-                                               déclaré en avance (Device_IO_20260812). Aucun consommateur pour l'instant :
+    TremieFull_OR_GateRaised_DI    : BOOL; (* : Trémie pleine OU grille levée — pas encore câblé électriquement,
+                                               déclaré en avance (Device_IO_20260826). Aucun consommateur pour l'instant :
                                                l'interdiction translation M3→Trémie est une tâche à part, voir PLAN_TASK.md. *)
 END_STRUCT
 END_TYPE

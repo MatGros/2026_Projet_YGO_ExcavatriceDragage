@@ -283,8 +283,8 @@ END_IF;
 
 // ---------- §3a. Faits machine communs (lecture seule) ----------
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
-    AND ((PRG_02_Acquisition.Data.CablePosM1 <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
-      OR (PRG_02_Acquisition.Data.CablePosM2 <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
+    AND ((PRG_02_Acquisition.Data.Encoders.M1.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
+      OR (PRG_02_Acquisition.Data.Encoders.M2.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
 GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;
@@ -312,15 +312,15 @@ instPreflight(
     BrakeThermalOk            := PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     PhaseRotationOk           := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     SlackCableTensioned       := PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
-    M3SensorWordIncoherent    := PRG_02_Acquisition.Data.M3_SensorWordIncoherent,
+    M3SensorWordIncoherent    := PRG_05_Translation.Data.M3_SensorWordIncoherent,
     EmergencyChainClosed      := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     EncoderM1Operational      := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational,
     EncoderM2Operational      := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2.Operational,
     HomedM1                   := PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed,
     HomedM2                   := PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed,
-    M1PositionInBounds        := NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent,
-    M2PositionInBounds        := NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent
+    M1PositionInBounds        := NOT PRG_02_Acquisition.Data.Encoders.M1.EncoderIncoherent,
+    M2PositionInBounds        := NOT PRG_02_Acquisition.Data.Encoders.M2.EncoderIncoherent
 );
 GVL_IHM.Commun.Preflight.PreflightOk      := instPreflight.PreflightOk;
 GVL_IHM.Commun.Preflight.PreflightDone    := instPreflight.PreflightDone;
@@ -410,8 +410,8 @@ GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.instWinchSync
 GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchMps;
 GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive;
 GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchConfirmed;
-GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.CablePosM1;
-GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.CablePosM2;
+GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
+GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
 GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.instJoystick.AtNeutral;
 GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.instJoystick.AtNeutral;

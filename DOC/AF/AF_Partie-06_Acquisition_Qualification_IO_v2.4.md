@@ -366,7 +366,7 @@ un module DI absent en simulation banc reste un fait materiel reel, jamais un ch
 > `ST_InputsQualified` ou dans un POU `PRG_01` en retrait.
 >
 > ⚠️ **Table non exhaustive (trouvé 2026-08-26)** : `ST_HwMachine` porte un 23e champ,
-> `HopperFull_OR_GateRaised_DI` (`VH_0808ETP · 5`, CSV `Device_IO_20260814.csv:456`) — déclaré
+> `TremieFull_OR_GateRaised_DI` (`VH_0808ETP · 5`, CSV `Device_IO_20260826.csv:456`) — déclaré
 > dans le code, **pas encore câblé électriquement**, absent de la liste ci-dessous. À ajouter dès
 > câblage effectif.
 

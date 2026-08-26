@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.199485" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.199485">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T20:08:13.327673" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T20:08:13.327673">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,69 +26,46 @@
       <dataType name="ST_AcquisitionInterPrg">
         <baseType>
           <struct>
-            <variable name="CablePosM1">
+            <variable name="Encoders">
               <type>
-                <REAL />
+                <derived name="ST_EncoderMeasurements" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 Mesures câbles &amp; vitesses treuils M1/M2 ===
-📏 Position cable M1 calibree (metres)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 Mesures codeurs M1/M2 (struct frontiere AF-06 §3ter) ===
+📊 Mesures + statuts codeurs M1/M2 (sous-DUT)</xhtml>
               </documentation>
             </variable>
-            <variable name="CablePosM2">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Position cable M2 calibree (metres)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_Speed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse absolue M1 (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_SignedSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse signee M1 (+:Montee, -:Descente) (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_SpeedValid">
+            <variable name="M1_EncoderFault">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Validite mesure vitesse M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_EncoderMeasurement) ===
+❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_Speed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse absolue M2 (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_SignedSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse signee M2 (+:Montee, -:Descente) (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_SpeedValid">
+            <variable name="M2_EncoderFault">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Validite mesure vitesse M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickDeadmanArmed">
@@ -132,125 +109,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Axe X joystick au neutre</xhtml>
               </documentation>
             </variable>
-            <variable name="TranslationPosTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎯 Positions translation M3 (zones cumulatives + points exacts) ===
-📍 Zone Tremie (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone pre-ralentissement PV (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P2 (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P1 (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone Maintenance (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Tremie (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte PV (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P2 (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P1 (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Maintenance (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_LimitSwitchFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course avant M3 (1=Actionne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_LimitSwitchRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course arriere M3 (1=Actionne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_SensorWordIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Incoherence detectee mot capteurs M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_SensorsWord">
-              <type>
-                <BYTE />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat capteurs M3</xhtml>
-              </documentation>
-            </variable>
             <variable name="LocalDigitalIoOk">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 Diagnostics modules DI &amp; codeurs ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 Diagnostics modules DI ===
 🟢 Module Local_Digital_IO OK</xhtml>
               </documentation>
             </variable>
@@ -276,54 +140,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur au moins un module DI</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_EncoderIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Mesure codeur M1 incoherente</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_EncoderIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Mesure codeur M2 incoherente</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_EncoderFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_EncoderFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_HomedAndReliable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_HomedAndReliable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceChanged">
@@ -1120,7 +936,7 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
               </documentation>
             </variable>
-            <variable name="HopperFull_OR_GateRaised_DI">
+            <variable name="TremieFull_OR_GateRaised_DI">
               <type>
                 <BOOL />
               </type>
@@ -1445,6 +1261,43 @@ TRUE des qu'un referencement a reussi</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_EncoderMeasurements">
+        <baseType>
+          <struct>
+            <variable name="M1">
+              <type>
+                <derived name="ST_EncoderMeasurement" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAINES DE MESURE PAR TREUIL ===
+Chaine de mesure treuil M1 (COD1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2">
+              <type>
+                <derived name="ST_EncoderMeasurement" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaine de mesure treuil M2 (COD2)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>65c54961-1ede-5088-bb46-6d69104691fb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure frontière regroupant les sous-DUTs de mesure des treuils M1 et M2
+   🔌 Interface : Producteur unique PRG_02_Acquisition
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -1599,14 +1452,6 @@ TRUE des qu'un referencement a reussi</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Facade codeur complet M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instPosDecoderM3">
-              <type>
-                <derived name="FB_Translation_PositionDecoder" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Decodage position translation M3</xhtml>
               </documentation>
             </variable>
             <variable name="M2BucketRefOpenEdge">
@@ -1869,10 +1714,11 @@ HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI  := M1_M2_M3_BrakeThermalOk_DI;
 HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
 HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
 HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
-HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // Déclaré, pas encore consommé
+HwReal.Machine.TremieFull_OR_GateRaised_DI := TremieFull_OR_GateRaised_DI; // 🚧 Déclaré, non consommé — interlock trémie à câbler
 {endregion}
 
 {region "§1bis Diagnostic modules DI"}
+// === 🩺 §1bis DIAGNOSTIC MODULES DI ===
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING =&gt; module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
@@ -1889,6 +1735,7 @@ Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Dat
 {endregion}
 
 {region "§1ter Diagnostic reseaux (CANopen + EtherCAT)"}
+// === 🔌 §1ter DIAGNOSTIC RÉSEAUX (CANopen + EtherCAT) ===
 // 🔌 Diagnostics reseau produits ICI (rang 02) car consommes par PRG_02 (joystick,
 // codeurs) et par les PRG 04/05 — producteur avant consommateur (AF02 §4).
 instDiagCanOpen(
@@ -2066,13 +1913,9 @@ instEncoderM1(
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     Calib                 := _CalibM1
 );
-Data.CablePosM1           := instEncoderM1.Measurement.CablePosM;
-Data.M1_EncoderIncoherent := instEncoderM1.Measurement.EncoderIncoherent;
-Data.M1_EncoderFault      := instEncoderM1.EncoderFault;
-Data.M1_HomedAndReliable  := instEncoderM1.HomedAndReliable;
-Data.M1_Speed_Mps         := instEncoderM1.Measurement.Speed_Mps;
-Data.M1_SignedSpeed_Mps   := instEncoderM1.Measurement.SignedSpeed_Mps;
-Data.M1_SpeedValid        := instEncoderM1.Measurement.SpeedValid;
+Data.Encoders.M1           := instEncoderM1.Measurement;
+Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
+Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
 COD1_PresettTrigCmd := instEncoderM1.HwOut.PresetTriggerCmd;
 COD1_CodeSeqTrigCmd := instEncoderM1.HwOut.CodeSeqTriggerCmd;
 COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
@@ -2087,9 +1930,9 @@ M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
     AND NOT PRG_04_Treuils_Benne.instWinchM1.Status.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Status.Busy;
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
-    M2BucketRefTargetM := Data.CablePosM1;
+    M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
-    M2BucketRefTargetM := Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM;
+    M2BucketRefTargetM := Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
 
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
@@ -2116,44 +1959,16 @@ instEncoderM2(
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global,
     Calib                 := _CalibM2
 );
-Data.CablePosM2           := instEncoderM2.Measurement.CablePosM;
-Data.M2_EncoderIncoherent := instEncoderM2.Measurement.EncoderIncoherent;
-Data.M2_EncoderFault      := instEncoderM2.EncoderFault;
-Data.M2_HomedAndReliable  := instEncoderM2.HomedAndReliable;
-Data.M2_Speed_Mps         := instEncoderM2.Measurement.Speed_Mps;
-Data.M2_SignedSpeed_Mps   := instEncoderM2.Measurement.SignedSpeed_Mps;
-Data.M2_SpeedValid        := instEncoderM2.Measurement.SpeedValid;
+Data.Encoders.M2           := instEncoderM2.Measurement;
+Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
+Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
 COD2_PresettTrigCmd := instEncoderM2.HwOut.PresetTriggerCmd;
 COD2_CodeSeqTrigCmd := instEncoderM2.HwOut.CodeSeqTriggerCmd;
 COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;
 {endregion}
 
-{region "§5 Acquisition Translation M3"}
-// === ↔️ §5 ACQUISITION TRANSLATION (M3) — position &amp; retours variateur ===
-
-instPosDecoderM3(
-    SensorTremie      := HwIn.Translation.M3_PosTremie_DI,
-    SensorPV          := HwIn.Translation.M3_PosPV_DI,
-    SensorP2          := HwIn.Translation.M3_PosPVP2_DI,
-    SensorP1          := HwIn.Translation.M3_PosP1_DI,
-    SensorMaintenance := HwIn.Translation.M3_PosMaintenance_DI
-);
-
-Data.TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
-Data.TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
-Data.TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
-Data.TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
-Data.TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
-Data.TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
-Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
-Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
-Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
-Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
-Data.M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
-Data.M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
-Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
-// ⚠️ M3_SensorsWord jamais assigné (bug préexistant) — conservé à 0, à corriger en lot dédié.
-Data.M3_SensorsWord            := 0;
+{region "§5 Retours variateur M3"}
+// === ↔️ §5 RETOURS VARIATEUR M3 (décodage position migré vers PRG_05, AF-02 TBD §8 #5) ===
 
 // 📊 Retours variateur M3 conditionnés (HwIn arbitré en §2)
 Data.M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
@@ -4886,7 +4701,7 @@ Machine.PhaseRotationOk_DI             := TRUE;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
 Machine.HydraulicThermalOk_DI          := TRUE;
-Machine.HopperFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
+Machine.TremieFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 
 // ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
 Busy := FALSE;
@@ -4899,339 +4714,6 @@ Done := TRUE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Translation_PositionDecoder" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="SensorTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur extrême gauche (Trémie)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur pré-ralentissement avant Trémie (Point de Vitesse)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur zone de travail P2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur zone de travail P1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur extrême droite (Maintenance, accès MAINT_N2 uniquement)</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="LimitSwitchFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Trémie confirmé (mot = 11111)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LimitSwitchRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Maintenance confirmé (mot = 00000)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Incoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Mot hors des 6 combinaisons valides -&gt; défaut sécurité (SafeStop+PowerCutOff, voir FB_Safety_Translation)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorsWord">
-              <type>
-                <BYTE />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostic (bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Exposition des positions individuelles pour consommation par les programmes aval
-⚠️ CUMULATIF ("au-dessus de ce seuil") — pour le ralentissement d'approche (zone large,
-doit tenir toute la durée de l'approche, pas juste un instant). Ne PAS utiliser pour
-détecter une arrivée/cible (voir TranslationAtXxx ci-dessous, mot exact, avec front).
-&lt;-- [STAT] TRUE = capteur Trémie actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE = capteur PV actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE = capteur P2 actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE = capteur P1 actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE = capteur Maintenance actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détection d'arrivée/cible par FRONT DU CAPTEUR PROPRE à chaque position (montant OU
-descendant) : le franchissement d'un point Xi est marqué par SON PROPRE capteur qui bascule
-(front descendant en venant de Trémie = on vient de dépasser Xi ; front montant en venant de
-Maintenance = on vient d'atteindre Xi). Trémie et Maintenance (bouts de chaîne) n'ont qu'un
-seul sens d'arrivée valide chacun. ⚠️ Signal TRANSITOIRE (1 cycle) — distinct des
-TranslationPosXxx (niveau cumulatif, réservé au ralentissement). L'appelant
-(PRG_05_Translation §0quater) le mémorise en verrou bistable pour le débounce/verrou
-anti-rebond de FB_Translation.
-&lt;-- [STAT] TRUE 1 cycle : front montant SensorTremie (arrivée venant de Maintenance uniquement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE 1 cycle : front (montant ou descendant) SensorPV</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE 1 cycle : front (montant ou descendant) SensorP2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE 1 cycle : front (montant ou descendant) SensorP1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE 1 cycle : front descendant SensorMaintenance (arrivée venant de Trémie uniquement)</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="EdgeUpTremie">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Trémie</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EdgeDnTremie">
-              <type>
-                <derived name="F_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant Trémie</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EdgeUpPV">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant PV</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EdgeDnPV">
-              <type>
-                <derived name="F_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant PV</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EdgeUpP2">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant P2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EdgeDnP2">
-              <type>
-                <derived name="F_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant P2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EdgeUpP1">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant P1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EdgeDnP1">
-              <type>
-                <derived name="F_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant P1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EdgeUpMaintenance">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EdgeDnMaintenance">
-              <type>
-                <derived name="F_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant Maintenance</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧩 FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
-   ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
-   🧩 Brique technique (AF_Partie-03 §2) : contrat minimal, pas de
-      StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
-      Maintenance) en mot de progression, dérive les 2 limites extrêmes,
-      détecte toute combinaison incohérente (défense en profondeur M3) et
-      les fronts individuels par capteur (arrivée/cible, robuste décalage came).
-   🎯 Mot valide : progression monotone de 11111 (extrême Trémie) à 00000
-      (extrême Maintenance) : 11111→01111→00111→00011→00001→00000.
-      Tout autre mot = incohérence câblage/mécanique (capteur collé/HS).
-   ═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION ===
-
-{region "§1 Assemblage mot et cohérence"}
-// 🧾 Assemblage du mot (bit4=Trémie ... bit0=Maintenance, ordre doc AF_Partie-02 §3bis)
-SensorsWord := 0;
-IF SensorTremie      THEN SensorsWord := SensorsWord OR 16#10; END_IF;
-IF SensorPV          THEN SensorsWord := SensorsWord OR 16#08; END_IF;
-IF SensorP2          THEN SensorsWord := SensorsWord OR 16#04; END_IF;
-IF SensorP1          THEN SensorsWord := SensorsWord OR 16#02; END_IF;
-IF SensorMaintenance THEN SensorsWord := SensorsWord OR 16#01; END_IF;
-
-// 🎯 Les 6 combinaisons valides (progression monotone décroissante Trémie→Maintenance)
-CASE SensorsWord OF
-    2#11111, 2#01111, 2#00111, 2#00011, 2#00001, 2#00000:
-        Incoherent := FALSE;
-    ELSE
-        Incoherent := TRUE;
-END_CASE;
-
-// 🚧 Limites extrêmes — uniquement sur mot valide (évite un Fdc fantôme déclenché par une incohérence)
-LimitSwitchFwd := (NOT Incoherent) AND (SensorsWord = 2#11111);
-LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
-{endregion}
-
-{region "§2 Reprise capteurs"}
-// Reprise des capteurs de position pour les consommateurs aval (passthrough, identique à l'entrée filtrée)
-// ⚠️ CUMULATIF — voir avertissement en déclaration, réservé au ralentissement d'approche.
-TranslationPosTremie      := SensorTremie;
-TranslationPosPV          := SensorPV;
-TranslationPosP2          := SensorP2;
-TranslationPosP1          := SensorP1;
-TranslationPosMaintenance := SensorMaintenance;
-{endregion}
-
-{region "§3 Fronts individuels"}
-// Front individuel par capteur — voir avertissement en déclaration. Transitoire (1 cycle),
-// mémorisé par l'appelant.
-EdgeUpTremie(CLK := SensorTremie);           EdgeDnTremie(CLK := SensorTremie);
-EdgeUpPV(CLK := SensorPV);                   EdgeDnPV(CLK := SensorPV);
-EdgeUpP2(CLK := SensorP2);                   EdgeDnP2(CLK := SensorP2);
-EdgeUpP1(CLK := SensorP1);                   EdgeDnP1(CLK := SensorP1);
-EdgeUpMaintenance(CLK := SensorMaintenance); EdgeDnMaintenance(CLK := SensorMaintenance);
-
-// Front du capteur PROPRE à chaque position — voir modèle en déclaration.
-// Extrémités : un seul sens valide chacune. Points intermédiaires : les deux fronts de LEUR PROPRE
-// capteur (montant = atteint en venant de Maintenance, descendant = dépassé en venant de Trémie).
-TranslationAtTremie      := EdgeUpTremie.Q;
-TranslationAtPV          := EdgeUpPV.Q OR EdgeDnPV.Q;
-TranslationAtP2          := EdgeUpP2.Q OR EdgeDnP2.Q;
-TranslationAtP1          := EdgeUpP1.Q OR EdgeDnP1.Q;
-TranslationAtMaintenance := EdgeDnMaintenance.Q;
-{endregion}
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3</ObjectId>
           </data>
         </addData>
       </pou>
@@ -8677,6 +8159,7 @@ TimeLast := TimeCurrent;
           <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
           <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
           <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
+          <Object Name="ST_EncoderMeasurements" ObjectId="65c54961-1ede-5088-bb46-6d69104691fb" />
         </Folder>
         <Folder Name="D_JOYSTICK">
           <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
@@ -8689,9 +8172,6 @@ TimeLast := TimeCurrent;
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-        </Folder>
-        <Folder Name="I_TRANSLATION">
-          <Object Name="FB_Translation_PositionDecoder" ObjectId="2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3" />
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">

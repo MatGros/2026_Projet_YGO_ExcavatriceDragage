@@ -589,69 +589,46 @@
       <dataType name="ST_AcquisitionInterPrg">
         <baseType>
           <struct>
-            <variable name="CablePosM1">
+            <variable name="Encoders">
               <type>
-                <REAL />
+                <derived name="ST_EncoderMeasurements" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 Mesures câbles &amp; vitesses treuils M1/M2 ===
-📏 Position cable M1 calibree (metres)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 Mesures codeurs M1/M2 (struct frontiere AF-06 §3ter) ===
+📊 Mesures + statuts codeurs M1/M2 (sous-DUT)</xhtml>
               </documentation>
             </variable>
-            <variable name="CablePosM2">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Position cable M2 calibree (metres)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_Speed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse absolue M1 (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_SignedSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse signee M1 (+:Montee, -:Descente) (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_SpeedValid">
+            <variable name="M1_EncoderFault">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Validite mesure vitesse M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_EncoderMeasurement) ===
+❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_Speed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse absolue M2 (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_SignedSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse signee M2 (+:Montee, -:Descente) (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_SpeedValid">
+            <variable name="M2_EncoderFault">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Validite mesure vitesse M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickDeadmanArmed">
@@ -695,125 +672,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Axe X joystick au neutre</xhtml>
               </documentation>
             </variable>
-            <variable name="TranslationPosTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎯 Positions translation M3 (zones cumulatives + points exacts) ===
-📍 Zone Tremie (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone pre-ralentissement PV (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P2 (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P1 (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone Maintenance (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Tremie (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte PV (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P2 (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P1 (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Maintenance (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_LimitSwitchFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course avant M3 (1=Actionne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_LimitSwitchRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course arriere M3 (1=Actionne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_SensorWordIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Incoherence detectee mot capteurs M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_SensorsWord">
-              <type>
-                <BYTE />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat capteurs M3</xhtml>
-              </documentation>
-            </variable>
             <variable name="LocalDigitalIoOk">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 Diagnostics modules DI &amp; codeurs ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 Diagnostics modules DI ===
 🟢 Module Local_Digital_IO OK</xhtml>
               </documentation>
             </variable>
@@ -839,54 +703,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur au moins un module DI</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_EncoderIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Mesure codeur M1 incoherente</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_EncoderIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Mesure codeur M2 incoherente</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_EncoderFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_EncoderFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_HomedAndReliable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_HomedAndReliable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceChanged">
@@ -6179,7 +5995,7 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
               </documentation>
             </variable>
-            <variable name="HopperFull_OR_GateRaised_DI">
+            <variable name="TremieFull_OR_GateRaised_DI">
               <type>
                 <BOOL />
               </type>
@@ -9247,6 +9063,119 @@ Seuils de changement de palier (0..100%)</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Sécurité translation ===
 🛡️ Diagnostic et securites translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎯 Faits decodeur position M3 (produits par PRG_05, AF-02 TBD §8 #5) ===
+📍 Zone Tremie (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosPV">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone pre-ralentissement PV (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P2 (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P1 (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone Maintenance (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Tremie (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtPV">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte PV (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P2 (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P1 (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Maintenance (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_LimitSwitchFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course avant M3 (1=Actionne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_LimitSwitchRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course arriere M3 (1=Actionne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_SensorWordIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Incoherence detectee mot capteurs M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_SensorsWord">
+              <type>
+                <BYTE />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat capteurs M3</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -24507,7 +24436,7 @@ Machine.PhaseRotationOk_DI             := TRUE;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
 Machine.HydraulicThermalOk_DI          := TRUE;
-Machine.HopperFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
+Machine.TremieFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 
 // ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
 Busy := FALSE;
@@ -32529,14 +32458,6 @@ PreviousQualified := Qualified;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Facade codeur complet M2</xhtml>
               </documentation>
             </variable>
-            <variable name="instPosDecoderM3">
-              <type>
-                <derived name="FB_Translation_PositionDecoder" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Decodage position translation M3</xhtml>
-              </documentation>
-            </variable>
             <variable name="M2BucketRefOpenEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -32797,10 +32718,11 @@ HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI  := M1_M2_M3_BrakeThermalOk_DI;
 HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
 HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
 HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
-HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // Déclaré, pas encore consommé
+HwReal.Machine.TremieFull_OR_GateRaised_DI := TremieFull_OR_GateRaised_DI; // 🚧 Déclaré, non consommé — interlock trémie à câbler
 {endregion}
 
 {region "§1bis Diagnostic modules DI"}
+// === 🩺 §1bis DIAGNOSTIC MODULES DI ===
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING =&gt; module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
@@ -32817,6 +32739,7 @@ Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Dat
 {endregion}
 
 {region "§1ter Diagnostic reseaux (CANopen + EtherCAT)"}
+// === 🔌 §1ter DIAGNOSTIC RÉSEAUX (CANopen + EtherCAT) ===
 // 🔌 Diagnostics reseau produits ICI (rang 02) car consommes par PRG_02 (joystick,
 // codeurs) et par les PRG 04/05 — producteur avant consommateur (AF02 §4).
 instDiagCanOpen(
@@ -32994,13 +32917,9 @@ instEncoderM1(
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     Calib                 := _CalibM1
 );
-Data.CablePosM1           := instEncoderM1.Measurement.CablePosM;
-Data.M1_EncoderIncoherent := instEncoderM1.Measurement.EncoderIncoherent;
-Data.M1_EncoderFault      := instEncoderM1.EncoderFault;
-Data.M1_HomedAndReliable  := instEncoderM1.HomedAndReliable;
-Data.M1_Speed_Mps         := instEncoderM1.Measurement.Speed_Mps;
-Data.M1_SignedSpeed_Mps   := instEncoderM1.Measurement.SignedSpeed_Mps;
-Data.M1_SpeedValid        := instEncoderM1.Measurement.SpeedValid;
+Data.Encoders.M1           := instEncoderM1.Measurement;
+Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
+Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
 COD1_PresettTrigCmd := instEncoderM1.HwOut.PresetTriggerCmd;
 COD1_CodeSeqTrigCmd := instEncoderM1.HwOut.CodeSeqTriggerCmd;
 COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
@@ -33015,9 +32934,9 @@ M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
     AND NOT PRG_04_Treuils_Benne.instWinchM1.Status.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Status.Busy;
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
-    M2BucketRefTargetM := Data.CablePosM1;
+    M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
-    M2BucketRefTargetM := Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM;
+    M2BucketRefTargetM := Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
 
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
@@ -33044,44 +32963,16 @@ instEncoderM2(
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global,
     Calib                 := _CalibM2
 );
-Data.CablePosM2           := instEncoderM2.Measurement.CablePosM;
-Data.M2_EncoderIncoherent := instEncoderM2.Measurement.EncoderIncoherent;
-Data.M2_EncoderFault      := instEncoderM2.EncoderFault;
-Data.M2_HomedAndReliable  := instEncoderM2.HomedAndReliable;
-Data.M2_Speed_Mps         := instEncoderM2.Measurement.Speed_Mps;
-Data.M2_SignedSpeed_Mps   := instEncoderM2.Measurement.SignedSpeed_Mps;
-Data.M2_SpeedValid        := instEncoderM2.Measurement.SpeedValid;
+Data.Encoders.M2           := instEncoderM2.Measurement;
+Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
+Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
 COD2_PresettTrigCmd := instEncoderM2.HwOut.PresetTriggerCmd;
 COD2_CodeSeqTrigCmd := instEncoderM2.HwOut.CodeSeqTriggerCmd;
 COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;
 {endregion}
 
-{region "§5 Acquisition Translation M3"}
-// === ↔️ §5 ACQUISITION TRANSLATION (M3) — position &amp; retours variateur ===
-
-instPosDecoderM3(
-    SensorTremie      := HwIn.Translation.M3_PosTremie_DI,
-    SensorPV          := HwIn.Translation.M3_PosPV_DI,
-    SensorP2          := HwIn.Translation.M3_PosPVP2_DI,
-    SensorP1          := HwIn.Translation.M3_PosP1_DI,
-    SensorMaintenance := HwIn.Translation.M3_PosMaintenance_DI
-);
-
-Data.TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
-Data.TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
-Data.TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
-Data.TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
-Data.TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
-Data.TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
-Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
-Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
-Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
-Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
-Data.M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
-Data.M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
-Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
-// ⚠️ M3_SensorsWord jamais assigné (bug préexistant) — conservé à 0, à corriger en lot dédié.
-Data.M3_SensorsWord            := 0;
+{region "§5 Retours variateur M3"}
+// === ↔️ §5 RETOURS VARIATEUR M3 (décodage position migré vers PRG_05, AF-02 TBD §8 #5) ===
 
 // 📊 Retours variateur M3 conditionnés (HwIn arbitré en §2)
 Data.M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
@@ -33191,10 +33082,10 @@ instCycleSemiAuto(
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
     WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Status.Error,
     WinchSyncDeltaM         := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM,
-    M1_CablePosM            := PRG_02_Acquisition.Data.CablePosM1,
-    M2_CablePosM            := PRG_02_Acquisition.Data.CablePosM2,
-    M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M1_Speed_Mps,
-    M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M2_Speed_Mps,
+    M1_CablePosM            := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
+    M2_CablePosM            := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
+    M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
+    M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
@@ -33867,8 +33758,8 @@ instDiveSearch(
     MotionDirection := CoupledUserRequestDirection,
     BucketIsOpen := _BucketState.IsOpen,
     KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
-    M1Position_M := PRG_02_Acquisition.Data.CablePosM1,
-    M2Position_M := PRG_02_Acquisition.Data.CablePosM2,
+    M1Position_M := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
+    M2Position_M := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
                        AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
@@ -33903,10 +33794,10 @@ instExtractionSequence(
     BucketBusy := instBucket.Status.Busy,
     BucketError := instBucket.Status.Error,
     WinchSyncError := instWinchSync.Status.Error,
-    M1Position_M := PRG_02_Acquisition.Data.CablePosM1,
-    M2Position_M := PRG_02_Acquisition.Data.CablePosM2,
-    M1MeasuredSpeedValid := PRG_02_Acquisition.Data.M1_SpeedValid,
-    M2MeasuredSpeedValid := PRG_02_Acquisition.Data.M2_SpeedValid,
+    M1Position_M := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
+    M2Position_M := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
+    M1MeasuredSpeedValid := PRG_02_Acquisition.Data.Encoders.M1.SpeedValid,
+    M2MeasuredSpeedValid := PRG_02_Acquisition.Data.Encoders.M2.SpeedValid,
     PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
                        AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
     ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M
@@ -34006,8 +33897,8 @@ instBucket(
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection     := CoupledUserRequestDirection,
-    CablePosM1          := PRG_02_Acquisition.Data.CablePosM1,
-    CablePosM2          := PRG_02_Acquisition.Data.CablePosM2,
+    CablePosM1          := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
+    CablePosM2          := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     HomedM1             := PRG_02_Acquisition.instEncoderM1.Homed,
     HomedM2             := PRG_02_Acquisition.instEncoderM2.Homed,
     M1_Busy             := instWinchM1.Status.Busy,
@@ -34166,12 +34057,12 @@ IF BucketBusyRiseEdge.Q THEN
 END_IF;
 IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
     ControlAscentActive := TRUE;
-    ControlAscentStartM1PosM := PRG_02_Acquisition.Data.CablePosM1;
-    ControlAscentStartM2PosM := PRG_02_Acquisition.Data.CablePosM2;
+    ControlAscentStartM1PosM := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
+    ControlAscentStartM2PosM := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
 END_IF;
 IF ControlAscentActive THEN
-    IF (ABS(PRG_02_Acquisition.Data.CablePosM1 - ControlAscentStartM1PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
-       AND (ABS(PRG_02_Acquisition.Data.CablePosM2 - ControlAscentStartM2PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
+    IF (ABS(PRG_02_Acquisition.Data.Encoders.M1.CablePosM - ControlAscentStartM1PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
+       AND (ABS(PRG_02_Acquisition.Data.Encoders.M2.CablePosM - ControlAscentStartM2PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
         ControlAscentActive := FALSE;             // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)) THEN
         ControlAscentActive := FALSE;             // Montée relâchée/interrompue : annule la phase
@@ -34189,8 +34080,8 @@ instWinchSync(
                         AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     Mode            := PRG_03_Modes_Cycle.Auth.Mode,
-    CablePosM1      := PRG_02_Acquisition.Data.CablePosM1,
-    CablePosM2      := PRG_02_Acquisition.Data.CablePosM2,
+    CablePosM1      := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
+    CablePosM2      := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     HomedAndReliableM1 := PRG_02_Acquisition.Data.M1_HomedAndReliable,
     HomedAndReliableM2 := PRG_02_Acquisition.Data.M2_HomedAndReliable,
     SyncEnable      := PRG_03_Modes_Cycle.Auth.SyncEnable,
@@ -34285,10 +34176,10 @@ IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
    AND (CoupledUserRequestDirection = -1)
    AND _BucketState.IsOpen
    AND KoboldAutoStopRiseEdge.Q THEN
-    IF (PRG_02_Acquisition.Data.CablePosM1 &lt;= _DredgingAssistCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.Data.CablePosM1 &gt;= _DredgingAssistCfgPersist.ImmersionLower_M)
-       AND (PRG_02_Acquisition.Data.CablePosM2 &lt;= _DredgingAssistCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= _DredgingAssistCfgPersist.ImmersionLower_M) THEN
+    IF (PRG_02_Acquisition.Data.Encoders.M1.CablePosM &lt;= _DredgingAssistCfgPersist.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.Encoders.M1.CablePosM &gt;= _DredgingAssistCfgPersist.ImmersionLower_M)
+       AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &lt;= _DredgingAssistCfgPersist.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &gt;= _DredgingAssistCfgPersist.ImmersionLower_M) THEN
         KoboldImmersionConfirmed := TRUE;
     END_IF;
 END_IF;
@@ -34318,11 +34209,11 @@ ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTo
 // unitaire M2, hors instBucket) applique l'anticipation d'inertie OpenAnticipationM/CloseAnticipationM
 // (mêmes que FB_Bucket) pour couvrir aussi le jog unitaire.
 ProcessPermitM2_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
-    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.CablePosM2 &lt;= (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &lt;= (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
-                      (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
+                      (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _CommunCfgPersist.CfgCableLimitAscent_M);
 
 // FB_Safety_Winch M1/M2.
@@ -34345,7 +34236,7 @@ instSafetyWinchM1(
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Busy,
-    CablePosM              := PRG_02_Acquisition.Data.CablePosM1,
+    CablePosM              := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M1LogicRequestDirection,
@@ -34357,12 +34248,12 @@ instSafetyWinchM1(
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
     BenneHoldStillActive   := instBucket.Status.Busy,
-    ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.CablePosM2 - instBucket.ActiveOffsetM,
+    ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.Encoders.M2.CablePosM - instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Status.Busy,
     OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM2,
-    MeasuredSpeedMps       := PRG_02_Acquisition.Data.M1_Speed_Mps,
-    MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.M1_SignedSpeed_Mps,
-    MeasuredSpeedValid     := PRG_02_Acquisition.Data.M1_SpeedValid,
+    MeasuredSpeedMps       := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.Encoders.M1.SignedSpeed_Mps,
+    MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M1.SpeedValid,
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
     BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
@@ -34401,7 +34292,7 @@ instSafetyWinchM2(
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Busy,
-    CablePosM              := PRG_02_Acquisition.Data.CablePosM2,
+    CablePosM              := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M2LogicRequestDirection,
@@ -34413,12 +34304,12 @@ instSafetyWinchM2(
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
     BenneHoldStillActive   := FALSE,
-    ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.CablePosM1 + instBucket.ActiveOffsetM,
+    ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.Encoders.M1.CablePosM + instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Status.Busy,
     OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM1,
-    MeasuredSpeedMps       := PRG_02_Acquisition.Data.M2_Speed_Mps,
-    MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.M2_SignedSpeed_Mps,
-    MeasuredSpeedValid     := PRG_02_Acquisition.Data.M2_SpeedValid,
+    MeasuredSpeedMps       := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.Encoders.M2.SignedSpeed_Mps,
+    MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M2.SpeedValid,
     BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
     BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
@@ -34461,7 +34352,7 @@ END_IF;
 ProcessAndSafetyPermitM1_Ascent := SafetyPermitM1_Ascent;
 ProcessAndSafetyPermitM2_Ascent := SafetyPermitM2_Ascent
     // Même anticipation que ProcessPermitM2_Descend ci-dessus.
-    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &gt;= (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
 SafeStopM1_Active := SafeStopM1_Raw OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active := SafeStopM2_Raw OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -34500,7 +34391,7 @@ instWinchM1(
     BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback,
     Homed                   := PRG_02_Acquisition.instEncoderM1.Homed,
     HomingSuspect           := PRG_02_Acquisition.instEncoderM1.HomingSuspect,
-    CablePosM               := PRG_02_Acquisition.Data.CablePosM1,
+    CablePosM               := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
@@ -34536,7 +34427,7 @@ instWinchM2(
     BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback,
     Homed                   := PRG_02_Acquisition.instEncoderM2.Homed,
     HomingSuspect           := PRG_02_Acquisition.instEncoderM2.HomingSuspect,
-    CablePosM               := PRG_02_Acquisition.Data.CablePosM2,
+    CablePosM               := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
@@ -34591,11 +34482,11 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 // SpeedDelta_Mps = variation de vitesse ENTRE DEUX SCANS (ST_WinchState.st),
 // pas un écart M1/M2 (qui existe via SyncStateHMI.DeltaPos_M/instWinchSync).
 // Delta temporel via mémoire scan précédent.
-WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
-WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M1_Speed_Mps - M1_PrevSpeed_Mps;
-M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
+WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps;
+WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps - M1_PrevSpeed_Mps;
+M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps;
 
-WinchM1State.Position_M := PRG_02_Acquisition.Data.CablePosM1;
+WinchM1State.Position_M := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
 WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
 WinchM1State.FBState := instWinchM1.Status.State;
@@ -34648,11 +34539,11 @@ WinchM1State.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElap
 WinchM1State.DirectionChangePending := instWinchM1.DirectionChangePending;
 
 // Voir bandeau M1 ci-dessus.
-WinchM2State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
-WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M2_Speed_Mps - M2_PrevSpeed_Mps;
-M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
+WinchM2State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps;
+WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps - M2_PrevSpeed_Mps;
+M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps;
 
-WinchM2State.Position_M := PRG_02_Acquisition.Data.CablePosM2;
+WinchM2State.Position_M := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
 WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
 WinchM2State.FBState := instWinchM2.Status.State;
@@ -34709,14 +34600,14 @@ WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
 CableLimitAscentM1Reached := PRG_02_Acquisition.instEncoderM1.Homed
     AND NOT PRG_02_Acquisition.instEncoderM1.HomingSuspect
     AND NOT PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Busy
-    AND (PRG_02_Acquisition.Data.CablePosM1 &gt;= _CommunCfgPersist.CfgCableLimitAscent_M);
+    AND (PRG_02_Acquisition.Data.Encoders.M1.CablePosM &gt;= _CommunCfgPersist.CfgCableLimitAscent_M);
 CableLimitAscentM2Reached := PRG_02_Acquisition.instEncoderM2.Homed
     AND NOT PRG_02_Acquisition.instEncoderM2.HomingSuspect
     AND NOT PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Busy
-    AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= (_CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift));
+    AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &gt;= (_CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift));
 
 WinchM1Safety.CableLimitAscent := CableLimitAscentM1Reached;
-WinchM1Safety.CableLimitDescent := (PRG_02_Acquisition.Data.CablePosM1 &lt;= _WinchM1CfgPersist.CfgCableLimitDescent_M);
+WinchM1Safety.CableLimitDescent := (PRG_02_Acquisition.Data.Encoders.M1.CablePosM &lt;= _WinchM1CfgPersist.CfgCableLimitDescent_M);
 WinchM1Safety.SafeStop := SafeStopM1_Active;
 WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent;
 WinchM1Safety.DescendPermit := EffectivePermitM1_Descend;
@@ -34740,7 +34631,7 @@ WinchM1Safety.SafeStopSafety     := PRG_06_Outputs.M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := PRG_06_Outputs.M1BlockedBySafetyInfo;
 
 WinchM2Safety.CableLimitAscent := CableLimitAscentM2Reached;
-WinchM2Safety.CableLimitDescent := (PRG_02_Acquisition.Data.CablePosM2 &lt;= _WinchM2CfgPersist.CfgCableLimitDescent_M);
+WinchM2Safety.CableLimitDescent := (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &lt;= _WinchM2CfgPersist.CfgCableLimitDescent_M);
 WinchM2Safety.SafeStop := SafeStopM2_Active;
 WinchM2Safety.AscentPermit := EffectivePermitM2_Ascent;
 WinchM2Safety.DescendPermit := EffectivePermitM2_Descend;
@@ -34779,7 +34670,7 @@ BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
 BucketState.M2StartStop := instBucket.M2_StartStop;
 BucketState.M2Direction := instBucket.M2_Direction;
 BucketState.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
-BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.CablePosM2 - instBucket.ActiveOffsetM;
+BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.Encoders.M2.CablePosM - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Status.Busy;
 BucketState.Done := instBucket.Status.Done;
@@ -34860,6 +34751,14 @@ Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
               <type>
                 <derived name="FB_Translation_PositionEstimator" />
               </type>
+            </variable>
+            <variable name="instPosDecoderM3">
+              <type>
+                <derived name="FB_Translation_PositionDecoder" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Decodage position M3 (migre de PRG_02, AF-02 TBD §8 #5)</xhtml>
+              </documentation>
             </variable>
             <variable name="TranslationFinalInterlockRequest">
               <type>
@@ -35031,6 +34930,35 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§0 Decodage position M3"}
+// === 🧩 §0 DÉCODAGE POSITION M3 (migré de PRG_02, AF-02 TBD §8 #5) ===
+// PRG_02_Acquisition s'exécute avant ce POU (rang 01 &lt; 05) : HwIn.Translation est
+// disponible au même scan. Le décodage des capteurs M3 est propriété de PRG_05.
+instPosDecoderM3(
+    SensorTremie      := PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI,
+    SensorPV          := PRG_02_Acquisition.HwIn.Translation.M3_PosPV_DI,
+    SensorP2          := PRG_02_Acquisition.HwIn.Translation.M3_PosPVP2_DI,
+    SensorP1          := PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI,
+    SensorMaintenance := PRG_02_Acquisition.HwIn.Translation.M3_PosMaintenance_DI
+);
+
+// 📤 Publication des faits M3 dans le bus PRG_05 (consommés par PRG_07)
+Data.TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
+Data.TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
+Data.TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
+Data.TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
+Data.TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
+Data.TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
+Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
+Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
+Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
+Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
+Data.M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
+Data.M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
+Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
+Data.M3_SensorsWord            := instPosDecoderM3.SensorsWord;
+{endregion}
+
 {region "§0 Interlock hauteur M1/M2"}
 // === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (risque collision translation) ===
 // PRG_02_Acquisition s'exécute avant ce POU dans la MainTask (rang 01 &lt; 05) : lecture
@@ -35044,8 +34972,8 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
 M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
                         OR (PRG_02_Acquisition.Data.M1_HomedAndReliable
                             AND PRG_02_Acquisition.Data.M2_HomedAndReliable
-                            AND (PRG_02_Acquisition.Data.CablePosM1 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
-                            AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
+                            AND (PRG_02_Acquisition.Data.Encoders.M1.CablePosM &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
+                            AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 {endregion}
@@ -35060,13 +34988,13 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 // la vraie extrémité Maintenance (00000) — backup si le verrou souple a déjà échoué à arrêter
 // avant P1, garde la machine hors de la zone interdite plutôt que d'attendre le vrai fond.
 M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
-                                   NOT PRG_02_Acquisition.Data.TranslationPosP1 AND PRG_02_Acquisition.Data.TranslationPosMaintenance,
-                                   PRG_02_Acquisition.Data.M3_LimitSwitchRev);
+                                   NOT instPosDecoderM3.TranslationPosP1 AND instPosDecoderM3.TranslationPosMaintenance,
+                                   instPosDecoderM3.LimitSwitchRev);
 
 // 🔒 §0ter STABILISATION BISTABLE FINS DE COURSE EXTRÊMES (Trémie &amp; Maintenance/P1)
 // Maintient la détection stable à 1 même si le capteur physique vibre ou saute brièvement.
 // Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
-IF PRG_02_Acquisition.Data.M3_LimitSwitchFwd THEN
+IF instPosDecoderM3.LimitSwitchFwd THEN
     M3_LimitSwitchFwdStable := TRUE;
 ELSIF M3_Direction_Active = -1 THEN
     M3_LimitSwitchFwdStable := FALSE;
@@ -35074,7 +35002,7 @@ END_IF;
 
 IF M3_LimitSwitchRevEffective THEN
     M3_LimitSwitchRevStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT PRG_02_Acquisition.Data.M3_LimitSwitchRev) THEN
+ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchRev) THEN
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
@@ -35089,15 +35017,15 @@ END_IF;
 M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0) &gt; 0.5;
 TonM3ConfirmedMoving(IN := M3_ConfirmedMoving, PT := T#1s500ms);
 
-IF PRG_02_Acquisition.Data.TranslationAtTremie THEN
+IF instPosDecoderM3.TranslationAtTremie THEN
     M3_AtTremieStable := TRUE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.Data.TranslationAtPV THEN
+ELSIF instPosDecoderM3.TranslationAtPV THEN
     M3_AtPVStable := TRUE; M3_AtTremieStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.Data.TranslationAtP2 THEN
+ELSIF instPosDecoderM3.TranslationAtP2 THEN
     M3_AtP2Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.Data.TranslationAtP1 THEN
+ELSIF instPosDecoderM3.TranslationAtP1 THEN
     M3_AtP1Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.Data.TranslationAtMaintenance THEN
+ELSIF instPosDecoderM3.TranslationAtMaintenance THEN
     M3_AtMaintenanceStable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
 ELSIF TonM3ConfirmedMoving.Q THEN
     // Mouvement réel confirmé ≥1.5s sans nouveau front : on a vraiment quitté le dernier point.
@@ -35238,7 +35166,7 @@ instSafetyTranslationM3(
     Direction               := M3_Direction_Active,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
-    SensorWordIncoherent    := PRG_02_Acquisition.Data.M3_SensorWordIncoherent,
+    SensorWordIncoherent    := instPosDecoderM3.Incoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
     BypassDriveComm         := GVL_IHM.TranslationM3.Bypass.DriveComm,
@@ -35272,17 +35200,17 @@ instTranslationM3(
     InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
     SpeedTgt_Pct            := M3_SpeedCmd_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    SlowdownSensorTremie       := PRG_02_Acquisition.Data.TranslationPosPV,
+    SlowdownSensorTremie       := instPosDecoderM3.TranslationPosPV,
     // Les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
     // FB_Translation_PositionDecoder.st). Chaque zone est délimitée par "capteur PRÉCÉDENT retombé
     // à 0" ET "capteur de la zone encore à 1" — zone P2→P1 = NOT PosP2 AND PosP1 (mot 00011) ;
     // zone P1→Maintenance = NOT PosP1 AND PosMaintenance (mot 00001). Zones mutuellement exclusives,
     // chacune sa propre vitesse d'approche (CfgApproachSpeedP1_Hz / CfgApproachSpeedMaintenance_Hz).
-    SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.Data.TranslationPosP1) AND PRG_02_Acquisition.Data.TranslationPosMaintenance,
+    SlowdownSensorMaintenance  := (NOT instPosDecoderM3.TranslationPosP1) AND instPosDecoderM3.TranslationPosMaintenance,
     // Ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
     // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -&gt; 100% vitesse jusqu'à
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
-    SlowdownSensorP1           := (NOT PRG_02_Acquisition.Data.TranslationPosP2) AND PRG_02_Acquisition.Data.TranslationPosP1
+    SlowdownSensorP1           := (NOT instPosDecoderM3.TranslationPosP2) AND instPosDecoderM3.TranslationPosP1
                                    AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
@@ -35306,11 +35234,11 @@ instPosEstimatorM3(
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
     DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     Direction            := M3_Direction_Active,
-    SensorMaintenance    := PRG_02_Acquisition.Data.TranslationPosMaintenance,
-    SensorP1             := PRG_02_Acquisition.Data.TranslationPosP1,
-    SensorP2             := PRG_02_Acquisition.Data.TranslationPosP2,
-    SensorPV             := PRG_02_Acquisition.Data.TranslationPosPV,
-    SensorTremie         := PRG_02_Acquisition.Data.TranslationPosTremie,
+    SensorMaintenance    := instPosDecoderM3.TranslationPosMaintenance,
+    SensorP1             := instPosDecoderM3.TranslationPosP1,
+    SensorP2             := instPosDecoderM3.TranslationPosP2,
+    SensorPV             := instPosDecoderM3.TranslationPosPV,
+    SensorTremie         := instPosDecoderM3.TranslationPosTremie,
     PosMaintenanceM      := GVL_PERSISTENT._TranslationPosMaintenance_M,
     PosP1M               := GVL_PERSISTENT._TranslationPosP1_M,
     PosP2M               := GVL_PERSISTENT._TranslationPosP2_M,
@@ -35361,11 +35289,11 @@ TranslationState.DriveFreqCmd_Hz := instTranslationM3.RequestedDriveFreqHz;
 // qui n'a pas lieu ("je bouge mais ça bouge pas"). Affiche 0 quand c'est bloqué.
 TranslationState.ActiveDirection := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_Direction_Active, 0);
 TranslationState.SpeedCmd_Pct := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_SpeedCmd_Active, 0.0);
-TranslationState.PositionTremie := PRG_02_Acquisition.Data.TranslationPosTremie;
-TranslationState.PositionPV := PRG_02_Acquisition.Data.TranslationPosPV;
-TranslationState.PositionP2 := PRG_02_Acquisition.Data.TranslationPosP2;
-TranslationState.PositionP1 := PRG_02_Acquisition.Data.TranslationPosP1;
-TranslationState.PositionMaintenance := PRG_02_Acquisition.Data.TranslationPosMaintenance;
+TranslationState.PositionTremie := instPosDecoderM3.TranslationPosTremie;
+TranslationState.PositionPV := instPosDecoderM3.TranslationPosPV;
+TranslationState.PositionP2 := instPosDecoderM3.TranslationPosP2;
+TranslationState.PositionP1 := instPosDecoderM3.TranslationPosP1;
+TranslationState.PositionMaintenance := instPosDecoderM3.TranslationPosMaintenance;
 // Affichage IHM = M3_AtXxxStable (§0quater) — armé sur front
 // (direction-dépendant), libéré sur mouvement réel confirmé ≥1.5s (pas juste un rebond capteur
 // ni un changement de sens instantané). Même signal que celui consommé par M3_PositionSensorTarget.
@@ -35375,8 +35303,8 @@ TranslationState.AtP2 := M3_AtP2Stable;
 TranslationState.AtP1 := M3_AtP1Stable;
 TranslationState.AtMaintenance := M3_AtMaintenanceStable;
 TranslationState.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
-TranslationState.SensorsWord := PRG_02_Acquisition.Data.M3_SensorsWord;
-TranslationState.SensorWordIncoherent := PRG_02_Acquisition.Data.M3_SensorWordIncoherent;
+TranslationState.SensorsWord := instPosDecoderM3.SensorsWord;
+TranslationState.SensorWordIncoherent := instPosDecoderM3.Incoherent;
 TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
@@ -36645,8 +36573,8 @@ END_IF;
 
 // ---------- §3a. Faits machine communs (lecture seule) ----------
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
-    AND ((PRG_02_Acquisition.Data.CablePosM1 &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
-      OR (PRG_02_Acquisition.Data.CablePosM2 &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
+    AND ((PRG_02_Acquisition.Data.Encoders.M1.CablePosM &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
+      OR (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
 GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;
@@ -36674,15 +36602,15 @@ instPreflight(
     BrakeThermalOk            := PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     PhaseRotationOk           := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     SlackCableTensioned       := PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
-    M3SensorWordIncoherent    := PRG_02_Acquisition.Data.M3_SensorWordIncoherent,
+    M3SensorWordIncoherent    := PRG_05_Translation.Data.M3_SensorWordIncoherent,
     EmergencyChainClosed      := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     EncoderM1Operational      := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational,
     EncoderM2Operational      := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2.Operational,
     HomedM1                   := PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed,
     HomedM2                   := PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed,
-    M1PositionInBounds        := NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent,
-    M2PositionInBounds        := NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent
+    M1PositionInBounds        := NOT PRG_02_Acquisition.Data.Encoders.M1.EncoderIncoherent,
+    M2PositionInBounds        := NOT PRG_02_Acquisition.Data.Encoders.M2.EncoderIncoherent
 );
 GVL_IHM.Commun.Preflight.PreflightOk      := instPreflight.PreflightOk;
 GVL_IHM.Commun.Preflight.PreflightDone    := instPreflight.PreflightDone;
@@ -36772,8 +36700,8 @@ GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.instWinchSync
 GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchMps;
 GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive;
 GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchConfirmed;
-GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.CablePosM1;
-GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.CablePosM2;
+GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
+GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
 GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.instJoystick.AtNeutral;
 GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.instJoystick.AtNeutral;
