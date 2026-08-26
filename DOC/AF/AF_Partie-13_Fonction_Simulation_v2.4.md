@@ -240,6 +240,6 @@ Les gates Python interdisent désormais :
 - [AF_Partie-02](AF_Partie-02_Architecture_Programme_v3.2.md) — architecture CFC, `PRG_02_Acquisition`
 - [AF_Partie-03](AF_Partie-03_Contrats_Composants_v2.2.md) — contrats FB/DUT
 - [AF_Partie-11](AF_Partie-11_Fonction_Translation_v2.3.md) — `FB_Sim_Translation` miroir M3
-- [AF_Partie-14](AF_Partie-14_Fonction_Troubleshooting_v1.2.md) — réflexe `RedundancyTestFailed`/`ArmingFailed`
+- [AF_Partie-14](AF_Partie-14_Fonction_Troubleshooting_v1.3.md) — réflexe `RedundancyTestFailed`/`ArmingFailed`
 - Fiches FB dédiées : voir §3
 - `DOC/WFLOW/TASKS.yaml` — suivi organisationnel (T110)
