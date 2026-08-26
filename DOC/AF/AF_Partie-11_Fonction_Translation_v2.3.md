@@ -20,7 +20,7 @@
 
 | ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
 |---|---|---|---|---|---|---|
-| `F11.01` | Décoder la position M3 (5 capteurs) | Position qualifiée Travail/Trémie/Extrêmes ; incohérence → défaut immédiat | `FB_Translation_PositionDecoder` | 🟠 C3 | <nobr><code>TC-P11-001</code></nobr>, 002 | ✅ |
+| `F11.01` | Décoder la position M3 (5 capteurs) | Position qualifiée Travail/Trémie/Extrêmes ; incohérence → défaut immédiat | `FB_Translation_PositionDecoder` | 🟠 C3 | <nobr><code>TC-P11-001</code></nobr>, 002 | ⚠️ cible PRG‑05 ; code encore PRG‑02 |
 | `F11.02` | Protéger M3 (Méca A/B, incohérence, bypass) | Arrêt commandé mais mouvement résiduel / incohérence prolongée → SafeStop+PowerCutOff | `FB_Safety_Translation` | 🔴 C4 | <nobr><code>TC-P11-002</code></nobr>, 010, 011, 014 | ✅ |
 | `F11.03` | Piloter le mouvement M3 (rampe, ralentissement, interlock sens) | Joystick/SemiAuto → rampe → AC600 ; ralentissement PV ; boutons IHM MAINT exigent homme-mort | `FB_Translation` | 🟠 C3 | <nobr><code>TC-P11-003</code></nobr>-005, 013 | ✅ |
 | `F11.04` | Barrière finale sorties + watchdog frein | Watchdog frein 500ms, réautorisation post-timeout, gate mot/fréquence, reset AC600 sous inhibition | `FB_TranslationOutputInterlock` | 🔴 C4 | <nobr><code>TC-P11-006</code></nobr>-009 | ✅ |
@@ -110,7 +110,8 @@ même dictionnaire que `GUIDE_EDITION_AF_v1.0.md §3quater`.
 
 ## ⚙️ 3 · Intégration programme & Architecture
 
-- **POU cible unique** : `PRG_05_Translation` (ST pur).
+- **POU cible unique** : `PRG_05_Translation` (ST pur). ⚠️ Le code actuel instancie encore le
+  décodeur dans `PRG_02_Acquisition` ; migration C3 à planifier sans double producteur.
 - **Source des autorisations** : `ST_Modes_Autorisations` distribué par `PRG_03_Modes_Cycle`.
 - **Image des sorties** : Transmise à `PRG_06_Outputs` pour la barrière finale matérielle.
 
