@@ -4,7 +4,7 @@
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Regroupe tout le mapping bidirectionnel GVL_IHM / GVL_PERSISTENT.
    ✅ Expose FaultMachineReset_IHM pour tous les programmes du domaine sécurité/métier.
-   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md
+   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_07_Supervision

@@ -14,7 +14,8 @@
 | AF-03 | ✅ Fait | `3ed051bd` | 1 tour, 5 gaps ingénierie corrigés |
 | AF-04 | ✅ Fait | `0e7e54f2` | 1 tour, bug version titre + réécriture §5 synchro (fausse phase de rattrapage) |
 | AF-05 | ✅ Fait | `98cf96ee` | 1 tour, nom de variable inexistant corrigé (`TglMaintenanceZoneAccess`→`SelMaintenanceZoneAccess`) |
-| AF-06 | ✅ Fait | (à suivre) | 1 tour, ⛔ P0 sécurité trouvé (EncoderIncoherent non consommé par Modes/Safety) |
+| AF-06 | ✅ Fait | `18ba121b` | 1 tour, ⛔ P0 sécurité trouvé (EncoderIncoherent non consommé par Modes/Safety) |
+| AF-07 | ✅ Fait | (à suivre) | 2 tours (1er a échoué sur limite API), section §6 manquante depuis toujours écrite from scratch |
 | AF-07 | ⬜ | — | — |
 | AF-08 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
 | AF-09 | ✅ Déjà fait (session précédente) | `a045b40c` | — |

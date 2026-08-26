@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧊 FB_AntiFlickerText — Lissage anti-clignotement d'un texte IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4.3
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5.3
    🎯 Responsabilité : maintient un texte warning/état un temps minimum
       avant de laisser le contenu changer, et laisse passer en direct
       (sans maintien) les messages critiques (défauts AU/puissance).
@@ -13,7 +13,7 @@ FUNCTION_BLOCK PUBLIC FB_AntiFlickerText
 VAR_INPUT
     NewText      : STRING(120);  (* --> [CMD] Texte candidat à afficher *)
     ForceInstant : BOOL;         (* --> [CMD] TRUE = afficher immédiatement (défaut critique), sans maintien *)
-    HoldTime     : TIME := T#500ms; (* --> [CFG] Durée de maintien min avant changement (AF-07 §4.3) *)
+    HoldTime     : TIME := T#500ms; (* --> [CFG] Durée de maintien min avant changement (AF-07 §5.3) *)
 END_VAR
 VAR_OUTPUT
     Text         : STRING(120);  (* <-- [STAT] Texte stabilisé exposé à l'IHM *)
