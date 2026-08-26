@@ -104,6 +104,9 @@ Couverture CI **existante mais superficielle** (pas un substitut au catalogue ci
 | DUT | Champs clés | Producteur | Consommateur |
 |---|---|---|---|
 | `ST_Diag_Device` | `Online`, `Operational`, `Error`, `ErrorId`, `State` (E_Diag_State), `StateAtError` | `FB_Diag_CanOpen`, `FB_Diag_Ethercat` | Safety, Modes, IHM, Troubleshooting |
+| `ST_BypassNetwork` | Bypasses granulaires (`Global`, `BusCanOpen`, `BusEthercat`, `InputModules`, `Joystick`, `EncoderM1/M2`, `VariateurM3`, `IhmHeartbeat`) | IHM / Banc | `PRG_02_Acquisition`, `instDiagCanOpen`, `instDiagEthercat` |
+| `ST_NetworkDiagHMI` | `BusCanOpen`, `Joystick`, `CanError`, `CanErrorId`, `BusEthercat`, `EncoderM1/M2`, `VariateurM3`, `EcatError`, `EcatErrorId`, `InputModules`, `Bypass` | `PRG_07_Supervision` | IHM (Visu, Bandeau, Diagnostics) |
+| `ST_InputModuleDiagHMI` | `LocalDigitalIoOk`, `Vh0800EndOk`, `Vh0808EtpOk`, `Vh0008ErOk`, `Vh0008Er1Ok`, `Fault` | `PRG_02` / `PRG_07` | `FB_Hmi_BannerFormatter`, IHM |
 | `E_Diag_State` | `DISABLED`, `READY`, `INIT`, `MONITORING`, `ERROR`, `SIMULATED` | FB diag | IHM, Modes |
 | `ST_Winch_SymmetryCfg` | Seuils (`DeltaStartDelay_Ms`, etc.) | GVL_PERSISTENT | `FB_Winch_Symmetry` |
 | `ST_Winch_SymmetryData` | Mesures (`DeltaStartDelay_Ms`, `MaxSyncDeviation_M`, etc.) | `FB_Winch_Symmetry` | IHM, GVL_PERSISTENT |

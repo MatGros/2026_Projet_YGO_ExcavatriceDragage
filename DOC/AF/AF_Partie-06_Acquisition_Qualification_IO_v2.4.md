@@ -56,8 +56,8 @@ L'acquisition publie des **faits qualifiés** :
 - E/S TOR, PDO et mesures réelles brutes dans `HwReal` ;
 - image simulée dans `HwSim` ;
 - image effectivement consommée dans `HwIn` ;
-- disponibilité des devices, dont les trois modules DI (`Local_Digital_IO`, `VH_0800END`,
-  `VH_0808ETP`) ;
+- disponibilité des devices, dont les cinq modules physiques d'E/S (`Local_Digital_IO`,
+  `VH_0800END`, `VH_0808ETP`, `VH_0008ER`, `VH_0008ER_1`) ;
 - mesures codeurs, joystick et position M3 traitées par leurs FB dédiés.
 
 Le nom métier des entrées porte la polarité attendue (`EmergencyChainClosed_DI = TRUE` signifie
@@ -346,8 +346,8 @@ aujourd'hui — limitation matérielle assumée, pas un oubli.
 - `Data.InputModuleFault` := `NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk AND Vh0008ErOk AND Vh0008Er1Ok)`.
 - Recopie directe vers `GVL_IHM.Network.InputModules` (consommé par `FB_Hmi_BannerFormatter` pour le Root Cause Masking).
 
-**Producteur** : `PRG_02_Acquisition` (3 appels `GetDeviceState()`, publies `LocalDigitalIoOk`,
-`Vh0800EndOk`, `Vh0808EtpOk`, `InputModuleFault` agrege OR).
+**Producteur** : `PRG_02_Acquisition` (5 appels `GetDeviceState()`, publies `LocalDigitalIoOk`,
+`Vh0800EndOk`, `Vh0808EtpOk`, `Vh0008ErOk`, `Vh0008Er1Ok`, `InputModuleFault` agrege OR).
 
 **Consommateurs** :
 - `PRG_04_Treuils_Benne` : `InputModuleFault` force `SafeStop` M1 **et** M2 (VH_0800END et
@@ -359,8 +359,7 @@ aujourd'hui — limitation matérielle assumée, pas un oubli.
   `GVL_IHM.Network.Bus*`/`*Error`.
 
 **Choix explicite** : `SafeStop` (rampe rapide, `Enable` maintenu), pas coupure seche — coherent
-avec le traitement `EncoderFault` deja en place (§3ter). Aucun bypass simulation sur ce diagnostic :
-un module DI absent en simulation banc reste un fait materiel reel, jamais un choix modelise.
+avec le traitement `EncoderFault` deja en place (§3ter). En simulation ou lors de tests banc sans cartes physiques, le bypass banc (`MachineInputSourceSimulated OR GVL_IHM.Network.Bypass.Global OR GVL_IHM.Network.Bypass.InputModules`) force la validité des cartes pour permettre les essais.
 
 ---
 

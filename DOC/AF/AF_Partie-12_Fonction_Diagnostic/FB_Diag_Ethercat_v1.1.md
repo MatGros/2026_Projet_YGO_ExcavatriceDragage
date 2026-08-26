@@ -3,7 +3,7 @@
 > Diagnostic bus EtherCAT (3 esclaves : variateur M3 + codeurs M1/M2).
 > Profil AF03 : brique métier non-mouvement.
 > Source : `CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st` · instance : `PRG_02_Acquisition.instDiagEthercat`.
-> Chapô : [`AF_Partie-12_Fonction_Diagnostic_v1.3.md`](../AF_Partie-12_Fonction_Diagnostic_v1.3.md) §2/§7.
+> Chapô : [`AF_Partie-12_Fonction_Diagnostic_v1.4.md`](../AF_Partie-12_Fonction_Diagnostic_v1.4.md) §2/§7.
 
 ## 🎯 Rôle
 
@@ -14,7 +14,7 @@ Distingue `READY` (bus réel online) de `SIMULATED` (bypass actif).
 
 > Propriétaire unique de <nobr><code>TC-P12-030</code></nobr> (synthèse `ErrorId` globale par
 > nibble — spécifique à ce FB) — pas dupliqué au chapô. `TC-P12-010`/`020`/`040` restent au chapô
-> (partagés avec `FB_Diag_CanOpen`, voir `AF_Partie-12_Fonction_Diagnostic_v1.3.md` §2).
+> (partagés avec `FB_Diag_CanOpen`, voir `AF_Partie-12_Fonction_Diagnostic_v1.4.md` §2).
 
 > **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
 
@@ -73,4 +73,4 @@ Distingue `READY` (bus réel online) de `SIMULATED` (bypass actif).
 
 ## 📄 Docs liées
 
-- [`AF_Partie-12` (chapô)](../AF_Partie-12_Fonction_Diagnostic_v1.3.md) §2/§7 · `AF_Partie-11` §4 (flux) · `AF_Partie-06` §3 (diagnostics bus)
+- [`AF_Partie-12` (chapô)](../AF_Partie-12_Fonction_Diagnostic_v1.4.md) §2/§7 · `AF_Partie-11` §4 (flux) · `AF_Partie-06` §3 (diagnostics bus)
