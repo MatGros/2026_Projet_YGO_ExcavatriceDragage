@@ -23,12 +23,14 @@
 
 ## 🧪 Points de validation (`TC-P11-003/004/005/013` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P11-003</code></nobr> | `Enable=FALSE` coupe tout indépendamment de `SafeStop`/`StartStop` | `⚡ AUTO_PLC` |
-| <nobr><code>TC-P11-004</code></nobr> | Ralentissement PV actif si `Direction=1` (Trémie) ET `SlowdownSensor` | `⚡ AUTO_PLC` |
-| <nobr><code>TC-P11-005</code></nobr> | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | `⚡ AUTO_PLC` |
-| <nobr><code>TC-P11-013</code></nobr> | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` | `⚡ AUTO_PLC` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P11-003</code></nobr> | `Enable=FALSE` coupe tout indépendamment de `SafeStop`/`StartStop` | `⚡ AUTO_PLC` | `NV` |
+| <nobr><code>TC-P11-004</code></nobr> | Ralentissement PV actif si `Direction=1` (Trémie) ET `SlowdownSensor` | `⚡ AUTO_PLC` | `NV` |
+| <nobr><code>TC-P11-005</code></nobr> | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | `⚡ AUTO_PLC` | `NV` |
+| <nobr><code>TC-P11-013</code></nobr> | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` | `⚡ AUTO_PLC` | `NV` |
 
 ---
 

@@ -20,6 +20,8 @@ _CELL_RE = re.compile(r"`([^`]*)`")
 _TYPE_TOKEN_RE = re.compile(r"^(SITE|AUTO_PLC|AUTO)(\+(SITE|AUTO_PLC|AUTO))*$")
 _TEST_TITLE_RE = re.compile(r"TEST\s+'([^']*)'")
 _TEST_ID_RE = re.compile(r"TC-P(\d+)-(\d+(?:/\d+)*)")
+_ETAT_VALUES = {"V", "V-I", "NV", "NV-I", "R", "NA"}
+_COVERAGE_REQUIRED_STATES = {"V", "V-I"}
 
 
 def parse_af_catalog(af_text: str) -> list:
@@ -40,7 +42,8 @@ def parse_af_catalog(af_text: str) -> list:
                 break
         cells = [c.strip(" `") for c in line.split("|")]
         intention = cells[2] if len(cells) > 2 else ""
-        rows.append((tc_id, type_str, intention))
+        etat = next((cell for cell in reversed(cells) if cell in _ETAT_VALUES), "")
+        rows.append((tc_id, type_str, intention, etat))
     return rows
 
 
@@ -76,7 +79,10 @@ def check_af_coverage(af_doc_path, test_st_path, ignore=None) -> list:
     tested_ids = extract_test_ids(test_text)
 
     missing = []
-    for tc_id, type_str, intention in catalog:
+    for tc_id, type_str, intention, etat in catalog:
+        # Absence de colonne Etat : comportement historique conservé.
+        if etat and etat not in _COVERAGE_REQUIRED_STATES:
+            continue
         if "AUTO" in type_str and tc_id not in tested_ids and tc_id not in ignore:
             missing.append((tc_id, intention))
     return missing
@@ -93,7 +99,7 @@ def check_extra_tests(af_doc_path, test_st_path) -> list:
     except OSError:
         return []
 
-    catalog_ids = {tc_id for tc_id, _type, _intent in parse_af_catalog(af_text)}
+    catalog_ids = {tc_id for tc_id, _type, _intent, _etat in parse_af_catalog(af_text)}
     tested_ids = extract_test_ids(test_text)
 
     # Les tests transverses de contrat AF03 (TC-P03-*) sont universels et légitimes sur tout composant

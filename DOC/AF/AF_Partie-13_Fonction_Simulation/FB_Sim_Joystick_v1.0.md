@@ -14,11 +14,13 @@
 
 ## 🧪 Points de validation (`TC-P13-050...` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P13-050</code></nobr> | Initialise au neutre (`NeutralRaw`) au premier cycle uniquement | `💻 AUTO` |
-| <nobr><code>TC-P13-051</code></nobr> | `RawX`/`RawY`/`RawButton` restent forçables librement en instance CODESYS ensuite | `👁️ MANUEL` |
-| <nobr><code>TC-P13-052</code></nobr> | Le homme-mort réel de `FB_Joystick` reste actif — un `RawButton` non forcé bloque toujours l'armement | `⚡ SITE+AUTO` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P13-050</code></nobr> | Initialise au neutre (`NeutralRaw`) au premier cycle uniquement | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-051</code></nobr> | `RawX`/`RawY`/`RawButton` restent forçables librement en instance CODESYS ensuite | `👁️ MANUEL` | `NV` |
+| <nobr><code>TC-P13-052</code></nobr> | Le homme-mort réel de `FB_Joystick` reste actif — un `RawButton` non forcé bloque toujours l'armement | `⚡ SITE+AUTO` | `NV` |
 
 ---
 

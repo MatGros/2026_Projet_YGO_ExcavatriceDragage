@@ -46,13 +46,15 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 
 ### 🎯 Table des fonctions
 
-| F-code | Fonction | FB propriétaire | Fiche | TC associés |
-|---|---|---|---|---|
-| F13.01 | Enveloppe unique de simulation — composition des 4 sous-modèles, décalage 1 scan | `FB_SimBench` | [FB_SimBench_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_SimBench_v1.0.md) | <nobr><code>TC-P13-010..013</code></nobr> |
-| F13.02 | Chaîne AU/contacteur simulée | `FB_Sim_Safety` | [FB_Sim_Safety_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_Sim_Safety_v1.0.md) | <nobr><code>TC-P13-020..023</code></nobr> |
-| F13.03 | Position codeurs M1/M2 simulée, persistance reset froid | `FB_Sim_Encoder` | [FB_Sim_Encoder_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.0.md) | <nobr><code>TC-P13-030..033</code></nobr> |
-| F13.04 | 5 capteurs M3 simulés par progression continue | `FB_Sim_Translation` | [FB_Sim_Translation_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md) | <nobr><code>TC-P13-040..043</code></nobr> |
-| F13.05 | Entrées joystick brutes, homme-mort jamais contourné | `FB_Sim_Joystick` | [FB_Sim_Joystick_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_Sim_Joystick_v1.0.md) | <nobr><code>TC-P13-050..052</code></nobr> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| F-code | Fonction | FB propriétaire | Fiche | TC associés | Etat |
+|---|---|---|---|---|---|
+| F13.01 | Enveloppe unique de simulation — composition des 4 sous-modèles, décalage 1 scan | `FB_SimBench` | [FB_SimBench_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_SimBench_v1.0.md) | <nobr><code>TC-P13-010..013</code></nobr> | `NV` |
+| F13.02 | Chaîne AU/contacteur simulée | `FB_Sim_Safety` | [FB_Sim_Safety_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_Sim_Safety_v1.0.md) | <nobr><code>TC-P13-020..023</code></nobr> | `NV` |
+| F13.03 | Position codeurs M1/M2 simulée, persistance reset froid | `FB_Sim_Encoder` | [FB_Sim_Encoder_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.0.md) | <nobr><code>TC-P13-030..033</code></nobr> | `NV` |
+| F13.04 | 5 capteurs M3 simulés par progression continue | `FB_Sim_Translation` | [FB_Sim_Translation_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md) | <nobr><code>TC-P13-040..043</code></nobr> | `NV` |
+| F13.05 | Entrées joystick brutes, homme-mort jamais contourné | `FB_Sim_Joystick` | [FB_Sim_Joystick_v1.0.md](AF_Partie-13_Fonction_Simulation/FB_Sim_Joystick_v1.0.md) | <nobr><code>TC-P13-050..052</code></nobr> | `NV` |
 
 ---
 
@@ -61,13 +63,15 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 > Catalogue détaillé et propriété unique dans chaque fiche FB (§3). Cette macro-table condense
 > les points clés — **ne pas dupliquer les libellés exacts** ici, se référer à la fiche pour le TC complet.
 
-| Bloc | Plage TC | Points clés |
-|---|---|---|
-| `FB_SimBench` | <nobr><code>TC-P13-010..013</code></nobr> | Enveloppe unique, décalage 1 scan, REX StatusWord AC600 corrigé |
-| `FB_Sim_Safety` | <nobr><code>TC-P13-020..023</code></nobr> | Chaîne AU simulée, latch contacteur, 🆕 <nobr><code>TC-P13-023</code></nobr> : défaut réel latché **survit** au cycle Reset du modèle simulé (§4) |
-| `FB_Sim_Encoder` | <nobr><code>TC-P13-030..033</code></nobr> | Position codeur simulée, persistance reset froid |
-| `FB_Sim_Translation` | <nobr><code>TC-P13-040..043</code></nobr> | 6 mots thermomètre valides, bornage position, reset Trémie sur `Enable=FALSE` |
-| `FB_Sim_Joystick` | <nobr><code>TC-P13-050..052</code></nobr> | Entrées brutes joystick, homme-mort jamais contourné |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| Bloc | Plage TC | Points clés | Etat |
+|---|---|---|---|
+| `FB_SimBench` | <nobr><code>TC-P13-010..013</code></nobr> | Enveloppe unique, décalage 1 scan, REX StatusWord AC600 corrigé | `NV` |
+| `FB_Sim_Safety` | <nobr><code>TC-P13-020..023</code></nobr> | Chaîne AU simulée, latch contacteur, 🆕 <nobr><code>TC-P13-023</code></nobr> : défaut réel latché **survit** au cycle Reset du modèle simulé (§4) | `NV` |
+| `FB_Sim_Encoder` | <nobr><code>TC-P13-030..033</code></nobr> | Position codeur simulée, persistance reset froid | `NV` |
+| `FB_Sim_Translation` | <nobr><code>TC-P13-040..043</code></nobr> | 6 mots thermomètre valides, bornage position, reset Trémie sur `Enable=FALSE` | `NV` |
+| `FB_Sim_Joystick` | <nobr><code>TC-P13-050..052</code></nobr> | Entrées brutes joystick, homme-mort jamais contourné | `NV` |
 
 ---
 

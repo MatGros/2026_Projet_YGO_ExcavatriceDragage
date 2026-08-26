@@ -16,12 +16,14 @@
 
 ## 🧪 Points de validation (`TC-P13-020...` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P13-020</code></nobr> | `SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop` — un seul canal FALSE ouvre la boucle | `💻 AUTO` |
-| <nobr><code>TC-P13-021</code></nobr> | `SimContactorOk` s'auto-maintient (latch) sur `EmergencyArming`, retombe immédiatement si `SimChainOk` repasse FALSE | `💻 AUTO` |
-| <nobr><code>TC-P13-022</code></nobr> | `Enable=FALSE` neutralise tout (`SimChainOk`/`SimContactorOk`/`ContactorLatch` à FALSE) | `💻 AUTO` |
-| <nobr><code>TC-P13-023</code></nobr> | 🆕 Un défaut AU réel latché (`RedundancyTestFailedCause`/`EmergencyArmingFailedCause` dans `FB_Safety_EmergencyManagementLogic`) **survit** à un cycle Reset/Restart de ce modèle simulé — voir §4 | `👁️ MANUEL` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P13-020</code></nobr> | `SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop` — un seul canal FALSE ouvre la boucle | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-021</code></nobr> | `SimContactorOk` s'auto-maintient (latch) sur `EmergencyArming`, retombe immédiatement si `SimChainOk` repasse FALSE | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-022</code></nobr> | `Enable=FALSE` neutralise tout (`SimChainOk`/`SimContactorOk`/`ContactorLatch` à FALSE) | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-023</code></nobr> | 🆕 Un défaut AU réel latché (`RedundancyTestFailedCause`/`EmergencyArmingFailedCause` dans `FB_Safety_EmergencyManagementLogic`) **survit** à un cycle Reset/Restart de ce modèle simulé — voir §4 | `👁️ MANUEL` | `NV` |
 
 ---
 

@@ -27,13 +27,15 @@ consomme `HomingRefRaw` produit ici).
 
 Décline `TC-P09-020` (chapô) :
 
-| ID | Comportement attendu | Type | Réf |
-|---|---|---|---|
-| <nobr><code>TC-P09-020.1</code></nobr> | Nominal : front `Home` + front `TopPositionSensor` (dans les 2 ordres) → `HomingRefRaw` calculé pour `CablePosM = CfgTopSensorPosM` | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-020.2</code></nobr> | Unitaire : front `Home` seul → cible `CfgHomingTargetM` | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-020.3</code></nobr> | Dynamique : front `UseDynamicTarget` (ou combiné `Home`) → cible `DynamicHomingTargetM` (ex. auto-référencement benne M2) | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-020.4</code></nobr> | Toute cible hors `[-99;+99]m` → homing refusé, `ErrorId` bit4, pas d'écriture RETAIN | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-020.5</code></nobr> | Écart `RawPos`/`Calib.LastKnownRawPos` au boot > tolérance → `HomingSuspect=TRUE`, `Homed=FALSE` ; levé uniquement par front `BtnConfirmCoherence` **ET** `HomingPermit=TRUE` | <nobr><code>💻 AUTO</code></nobr> | §5 |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Comportement attendu | Type | Réf | Etat |
+|---|---|---|---|---|
+| <nobr><code>TC-P09-020.1</code></nobr> | Nominal : front `Home` + front `TopPositionSensor` (dans les 2 ordres) → `HomingRefRaw` calculé pour `CablePosM = CfgTopSensorPosM` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-020.2</code></nobr> | Unitaire : front `Home` seul → cible `CfgHomingTargetM` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-020.3</code></nobr> | Dynamique : front `UseDynamicTarget` (ou combiné `Home`) → cible `DynamicHomingTargetM` (ex. auto-référencement benne M2) | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-020.4</code></nobr> | Toute cible hors `[-99;+99]m` → homing refusé, `ErrorId` bit4, pas d'écriture RETAIN | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-020.5</code></nobr> | Écart `RawPos`/`Calib.LastKnownRawPos` au boot > tolérance → `HomingSuspect=TRUE`, `Homed=FALSE` ; levé uniquement par front `BtnConfirmCoherence` **ET** `HomingPermit=TRUE` | <nobr><code>💻 AUTO</code></nobr> | §5 | `NV` |
 
 ## 3 · 🔌 Interface
 

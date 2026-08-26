@@ -19,12 +19,14 @@
 
 ## 🧪 Points de validation (`TC-P10-011/017/018/019` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P10-011</code></nobr> | Interlock sens & temporisations d'inversion / redémarrage 1s | `💻 AUTO` |
-| <nobr><code>TC-P10-017</code></nobr> | Config palier invalide (`FB_SpeedStep`) ➔ palier 0, sorties sûres | `💻 AUTO` |
-| <nobr><code>TC-P10-018</code></nobr> | `StuckClosed` : contacteurs off non confirmés 500ms ➔ bit1 | `💻 AUTO` |
-| <nobr><code>TC-P10-019</code></nobr> | Ordre MainTask : Safety ➔ WinchControl ➔ PRG_06_Outputs | `⚡ SITE+AUTO` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P10-011</code></nobr> | Interlock sens & temporisations d'inversion / redémarrage 1s | `💻 AUTO` | `NV-I` |
+| <nobr><code>TC-P10-017</code></nobr> | Config palier invalide (`FB_SpeedStep`) ➔ palier 0, sorties sûres | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-018</code></nobr> | `StuckClosed` : contacteurs off non confirmés 500ms ➔ bit1 | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P10-019</code></nobr> | Ordre MainTask : Safety ➔ WinchControl ➔ PRG_06_Outputs | `⚡ SITE+AUTO` | `NV` |
 
 ---
 

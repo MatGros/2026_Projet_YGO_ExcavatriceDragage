@@ -30,11 +30,13 @@ ces deux passages ne sont pas réconciliés dans AF03 lui-même. Voir §5.
 
 Décline `TC-P09-040` (chapô) :
 
-| ID | Comportement attendu | Type | Réf |
-|---|---|---|---|
-| <nobr><code>TC-P09-040.1</code></nobr> | `EncoderAvailable=TRUE`, `Homed=FALSE`, `EncoderIncoherent=FALSE` → `EncoderFault=FALSE` (non-référencé ≠ incohérent) | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-040.2</code></nobr> | Même cas → `HomedAndReliable=FALSE` (gate stricte exige `Homed`) | <nobr><code>💻 AUTO</code></nobr> | §4 |
-| <nobr><code>TC-P09-040.3</code></nobr> | `EncoderAvailable=FALSE` → `EncoderFault=TRUE` quel que soit `Homed`/`EncoderIncoherent` | <nobr><code>💻 AUTO</code></nobr> | §4 |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Comportement attendu | Type | Réf | Etat |
+|---|---|---|---|---|
+| <nobr><code>TC-P09-040.1</code></nobr> | `EncoderAvailable=TRUE`, `Homed=FALSE`, `EncoderIncoherent=FALSE` → `EncoderFault=FALSE` (non-référencé ≠ incohérent) | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-040.2</code></nobr> | Même cas → `HomedAndReliable=FALSE` (gate stricte exige `Homed`) | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+| <nobr><code>TC-P09-040.3</code></nobr> | `EncoderAvailable=FALSE` → `EncoderFault=TRUE` quel que soit `Homed`/`EncoderIncoherent` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
 
 ## 3 · 🔌 Interface
 

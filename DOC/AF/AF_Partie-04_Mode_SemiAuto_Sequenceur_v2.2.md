@@ -30,20 +30,22 @@
 
 ## 🧪 1 · Points de validation
 
-| ID | Intention | Preuve | Type | Réf |
-|---|---|---|---|---|
-| <nobr><code>TC-P04-001</code></nobr> | Relâchement manche (retour centre) stoppe sans perte d'étape | `StartStop=FALSE`, étape inchangée | `💻 AUTO` | <small>§2</small> |
-| <nobr><code>TC-P04-002</code></nobr> | Cycle produit des demandes, zéro sortie physique | Aucune Q/PDO écrite par `FB_Cycle` | `💻 AUTO` | <small>§2</small> |
-| <nobr><code>TC-P04-003</code></nobr> | `STABILIZING` fige l'étape (hold sur) | Étape figée, pas de reprise auto | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P04-004</code></nobr> | Reprise après `STABILIZING` : Cause + Reset + nouvel ordre | 3 conditions nécessaires | `💻 AUTO` | <small>§2</small> |
-| <nobr><code>TC-P04-005</code></nobr> | Intention maintenue sur Diving/Extraction | Descente/montée bloquées sans manche défléchi | `⚡ SITE+AUTO` | <small>§3</small> |
-| <nobr><code>TC-P04-006</code></nobr> | Pas d'asservissement continu de vitesse en synchro | Même commande M1/M2, pas de boucle fermée | `💻 AUTO` | <small>§5</small> |
-| <nobr><code>TC-P04-007</code></nobr> | Seuil synchro 1 ➔ arrêt mouvement principal | M1/M2 stoppés, rattrapage dédié | `⚡ SITE+AUTO` | <small>§5</small> |
-| <nobr><code>TC-P04-008</code></nobr> | Écart persistant ➔ escalade safety | `SafeStop`/`PowerCutOff` selon contrat | `💻 AUTO` | <small>§5</small> |
-| <nobr><code>TC-P04-009</code></nobr> | Tempo max d'étape : défaut seulement si pilotage joystick actif | Pas de défaut au repos (manche centre) | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P04-010</code></nobr> | `CycleStepAtError` mémorise l'étape spécifique au défaut | Étape affichée IHM, pas `E_State` générique | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P04-011</code></nobr> | Deux instances (MAINT + SEMI_AUTO) sans impact croisé | Gating sorties par mode, non-régression MAINT | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P04-012</code></nobr> | Compteur de prélèvements RETAIN, reset MAINT only | Survit à la coupure ; reset utilisateur en MAINT | `💻 AUTO` | <small>§4</small> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention | Preuve | Type | Réf | Etat |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P04-001</code></nobr> | Relâchement manche (retour centre) stoppe sans perte d'étape | `StartStop=FALSE`, étape inchangée | `💻 AUTO` | <small>§2</small> | `NV-I` |
+| <nobr><code>TC-P04-002</code></nobr> | Cycle produit des demandes, zéro sortie physique | Aucune Q/PDO écrite par `FB_Cycle` | `💻 AUTO` | <small>§2</small> | `NV-I` |
+| <nobr><code>TC-P04-003</code></nobr> | `STABILIZING` fige l'étape (hold sur) | Étape figée, pas de reprise auto | `💻 AUTO` | <small>§4</small> | `NV-I` |
+| <nobr><code>TC-P04-004</code></nobr> | Reprise après `STABILIZING` : Cause + Reset + nouvel ordre | 3 conditions nécessaires | `💻 AUTO` | <small>§2</small> | `NV-I` |
+| <nobr><code>TC-P04-005</code></nobr> | Intention maintenue sur Diving/Extraction | Descente/montée bloquées sans manche défléchi | `⚡ SITE+AUTO` | <small>§3</small> | `NV` |
+| <nobr><code>TC-P04-006</code></nobr> | Pas d'asservissement continu de vitesse en synchro | Même commande M1/M2, pas de boucle fermée | `💻 AUTO` | <small>§5</small> | `NV` |
+| <nobr><code>TC-P04-007</code></nobr> | Seuil synchro 1 ➔ arrêt mouvement principal | M1/M2 stoppés, rattrapage dédié | `⚡ SITE+AUTO` | <small>§5</small> | `NV` |
+| <nobr><code>TC-P04-008</code></nobr> | Écart persistant ➔ escalade safety | `SafeStop`/`PowerCutOff` selon contrat | `💻 AUTO` | <small>§5</small> | `NV` |
+| <nobr><code>TC-P04-009</code></nobr> | Tempo max d'étape : défaut seulement si pilotage joystick actif | Pas de défaut au repos (manche centre) | `💻 AUTO` | <small>§4</small> | `NV` |
+| <nobr><code>TC-P04-010</code></nobr> | `CycleStepAtError` mémorise l'étape spécifique au défaut | Étape affichée IHM, pas `E_State` générique | `💻 AUTO` | <small>§4</small> | `NV-I` |
+| <nobr><code>TC-P04-011</code></nobr> | Deux instances (MAINT + SEMI_AUTO) sans impact croisé | Gating sorties par mode, non-régression MAINT | `💻 AUTO` | <small>§4</small> | `NV` |
+| <nobr><code>TC-P04-012</code></nobr> | Compteur de prélèvements RETAIN, reset MAINT only | Survit à la coupure ; reset utilisateur en MAINT | `💻 AUTO` | <small>§4</small> | `NV-I` |
 
 ---
 

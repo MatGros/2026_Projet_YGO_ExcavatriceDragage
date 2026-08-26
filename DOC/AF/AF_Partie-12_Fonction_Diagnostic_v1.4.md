@@ -17,11 +17,13 @@
 
 ### Table des fonctions
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
-|---|---|---|---|---|---|---|
-| `F12.01` | Diagnostiquer le bus CANopen (joystick) | Perte liaison / non-opérationnel → `ErrorId` bit0/1 | `FB_Diag_CanOpen` | 🟠 C3 | <nobr><code>TC-P12-010</code></nobr>, 020, 040 | ⚠️ conçu, non implémenté |
-| `F12.02` | Diagnostiquer le bus EtherCAT (variateur M3, codeurs M1/M2) | Perte liaison par device → `ErrorId` bit4/5/6 (nibbles) | `FB_Diag_Ethercat` | 🟠 C3 | <nobr><code>TC-P12-010</code></nobr>, 020, 030, 040 | ⚠️ conçu, non implémenté |
-| `F12.03` | Surveiller le heartbeat IHM↔PLC | Toggle bidirectionnel, détecte timeout communication | `FB_Diag_IhmHeartbeat` | 🟠 C3 | <nobr><code>TC-P12-050</code></nobr> | ⚠️ conçu, non implémenté |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
+|---|---|---|---|---|---|---|---|
+| `F12.01` | Diagnostiquer le bus CANopen (joystick) | Perte liaison / non-opérationnel → `ErrorId` bit0/1 | `FB_Diag_CanOpen` | 🟠 C3 | <nobr><code>TC-P12-010</code></nobr>, 020, 040 | ⚠️ conçu, non implémenté | `NV` |
+| `F12.02` | Diagnostiquer le bus EtherCAT (variateur M3, codeurs M1/M2) | Perte liaison par device → `ErrorId` bit4/5/6 (nibbles) | `FB_Diag_Ethercat` | 🟠 C3 | <nobr><code>TC-P12-010</code></nobr>, 020, 030, 040 | ⚠️ conçu, non implémenté | `NV` |
+| `F12.03` | Surveiller le heartbeat IHM↔PLC | Toggle bidirectionnel, détecte timeout communication | `FB_Diag_IhmHeartbeat` | 🟠 C3 | <nobr><code>TC-P12-050</code></nobr> | ⚠️ conçu, non implémenté | `NV` |
 
 ## 📑 Sommaire
 
@@ -66,13 +68,15 @@
 > (`FB_Diag_IhmHeartbeat` seul) sont détaillés dans leur fiche dédiée (propriétaire unique, pas
 > dupliqué ici — `GUIDE_EDITION_AF_v1.0.md` §4).
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> |
-|---|---|---|---|---|
-| <nobr><code>TC-P12-010</code></nobr> | **Perte liaison par device** | Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur M2) : `StateRaw≠RUNNING/ACTIVE` ➔ `Online=FALSE`, `Operational=FALSE`, `State=INIT`, sans effet sur les autres devices | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small> |
-| <nobr><code>TC-P12-020</code></nobr> | **ErrorId bit-level par device** | Défaut isolé sur un seul device ➔ `ErrorId` de ce device porte **exactement** son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices (Joystick bit0/1, Variateur bit4, M1 bit5, **M2 bit6**) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small> |
-| <nobr><code>TC-P12-030</code></nobr> | **Synthèse ErrorId globale** | Détail complet dans la fiche dédiée : [`FB_Diag_Ethercat_v1.1.md` §Points de validation](AF_Partie-12_Fonction_Diagnostic/FB_Diag_Ethercat_v1.1.md) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_Ethercat</code></small> |
-| <nobr><code>TC-P12-040</code></nobr> | **Bypass sim/réseau vs état réel** | `SimBypass`/`NetworkBypassActive` sans device réel `RUNNING` ➔ `SIMULATED` ; réel `RUNNING` sans bypass ➔ `READY` ; ni l'un ni l'autre ➔ `INIT` ; `Enable=FALSE` prioritaire ➔ `DISABLED` | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small> |
-| <nobr><code>TC-P12-050</code></nobr> | **Heartbeat IHM** | Détail complet dans la fiche dédiée : [`FB_Diag_IhmHeartbeat_v1.1.md` §Points de validation](AF_Partie-12_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.1.md) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_IhmHeartbeat</code></small> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P12-010</code></nobr> | **Perte liaison par device** | Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur M2) : `StateRaw≠RUNNING/ACTIVE` ➔ `Online=FALSE`, `Operational=FALSE`, `State=INIT`, sans effet sur les autres devices | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small> | `NV-I` |
+| <nobr><code>TC-P12-020</code></nobr> | **ErrorId bit-level par device** | Défaut isolé sur un seul device ➔ `ErrorId` de ce device porte **exactement** son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices (Joystick bit0/1, Variateur bit4, M1 bit5, **M2 bit6**) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small> | `NV-I` |
+| <nobr><code>TC-P12-030</code></nobr> | **Synthèse ErrorId globale** | Détail complet dans la fiche dédiée : [`FB_Diag_Ethercat_v1.1.md` §Points de validation](AF_Partie-12_Fonction_Diagnostic/FB_Diag_Ethercat_v1.1.md) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_Ethercat</code></small> | `NV` |
+| <nobr><code>TC-P12-040</code></nobr> | **Bypass sim/réseau vs état réel** | `SimBypass`/`NetworkBypassActive` sans device réel `RUNNING` ➔ `SIMULATED` ; réel `RUNNING` sans bypass ➔ `READY` ; ni l'un ni l'autre ➔ `INIT` ; `Enable=FALSE` prioritaire ➔ `DISABLED` | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small> | `NV` |
+| <nobr><code>TC-P12-050</code></nobr> | **Heartbeat IHM** | Détail complet dans la fiche dédiée : [`FB_Diag_IhmHeartbeat_v1.1.md` §Points de validation](AF_Partie-12_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.1.md) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_IhmHeartbeat</code></small> | `NV` |
 
 Couverture CI **existante mais superficielle** (pas un substitut au catalogue ci-dessus) :
 `TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_ethercat.st` — 2 cas seulement

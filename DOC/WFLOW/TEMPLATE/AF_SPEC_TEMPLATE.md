@@ -37,17 +37,23 @@ historique. État actuel uniquement, 3-4 lignes max.
 
 ### 🎯 Table des fonctions
 
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+
 <!-- [FONCTIONS MÉTIER SEULEMENT] — obligatoire pour cette famille -->
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
-|---|---|---|---|---|---|---|
-| `FNN.01` | [Nom court, verbe d'action] | [1-3 phrases, toutes les conditions pertinentes] | `FB_XXX` | `C0`-`C4` | <nobr><code>TC-PNN-001</code></nobr> | ❌ |
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | État |
+|---|---|---|---|---|---|---|---|
+| `FNN.01` | [Nom court, verbe d'action] | [1-3 phrases, toutes les conditions pertinentes] | `FB_XXX` | `C0`-`C4` | <nobr><code>TC-PNN-001</code></nobr> | ❌ | `NV` |
 
 ## 🧪 2. Table des points de validation (Cas de Test — TC)
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf</nobr> |
-|---|---|---|---|---|
-| <nobr><code>TC-PNN-001</code></nobr> | **[Nom Groupe]** | [Comportement physique et logique, 1-2 phrases] | <nobr><code>💻 AUTO</code></nobr> | <small>§N</small> |
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+
+| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf</nobr> | État |
+|---|---|---|---|---|---|
+| <nobr><code>TC-PNN-001</code></nobr> | **[Nom Groupe]** | [Comportement physique et logique, 1-2 phrases] | <nobr><code>💻 AUTO</code></nobr> | <small>§N</small> | `NV` |
 
 ## 🔄 3. Pipeline et composition
 

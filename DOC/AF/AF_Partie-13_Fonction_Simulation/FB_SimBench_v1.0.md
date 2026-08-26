@@ -16,12 +16,14 @@
 
 ## 🧪 Points de validation (`TC-P13-010...` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P13-010</code></nobr> | `Enable=FALSE` neutralise tout le banc en un seul `RETURN` (aucun sous-modèle actif) | `💻 AUTO` |
-| <nobr><code>TC-P13-011</code></nobr> | 0 lecture de `GVL_*` en interne — toutes les entrées passées en paramètres par l'appelant (`PRG_02_Acquisition`) | `👁️ MANUEL` |
-| <nobr><code>TC-P13-012</code></nobr> | `M1_BrakeIsOpen_DI := M1_BrakeCmd` (jamais de `NOT`) — polarité maintien (`P1 Lot L6`) | `💻 AUTO` |
-| <nobr><code>TC-P13-013</code></nobr> | 🆕 `M3_StatusWordSim` bit0 retombe à l'arrêt (`Direction=0`) — ne déclenche plus `FB_Safety_Translation` Méca B en continu | `💻 AUTO` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P13-010</code></nobr> | `Enable=FALSE` neutralise tout le banc en un seul `RETURN` (aucun sous-modèle actif) | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-011</code></nobr> | 0 lecture de `GVL_*` en interne — toutes les entrées passées en paramètres par l'appelant (`PRG_02_Acquisition`) | `👁️ MANUEL` | `NV` |
+| <nobr><code>TC-P13-012</code></nobr> | `M1_BrakeIsOpen_DI := M1_BrakeCmd` (jamais de `NOT`) — polarité maintien (`P1 Lot L6`) | `💻 AUTO` | `NV` |
+| <nobr><code>TC-P13-013</code></nobr> | 🆕 `M3_StatusWordSim` bit0 retombe à l'arrêt (`Direction=0`) — ne déclenche plus `FB_Safety_Translation` Méca B en continu | `💻 AUTO` | `NV` |
 
 ---
 

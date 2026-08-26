@@ -16,9 +16,11 @@ Distingue `READY` (bus réel online) de `SIMULATED` (bypass actif).
 > nibble — spécifique à ce FB) — pas dupliqué au chapô. `TC-P12-010`/`020`/`040` restent au chapô
 > (partagés avec `FB_Diag_CanOpen`, voir `AF_Partie-12_Fonction_Diagnostic_v1.3.md` §2).
 
-| ID | Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P12-030</code></nobr> | `Error` global et synthèse `ErrorId` par nibble (`0x00F0` variateur / `0x0F00` M1 / `0xF000` M2) reflètent l'état `Error` booléen de chaque device, indépendamment du détail bit-level | <nobr><code>💻 AUTO</code></nobr> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P12-030</code></nobr> | `Error` global et synthèse `ErrorId` par nibble (`0x00F0` variateur / `0x0F00` M1 / `0xF000` M2) reflètent l'état `Error` booléen de chaque device, indépendamment du détail bit-level | <nobr><code>💻 AUTO</code></nobr> | `NV` |
 
 ## 📥 Entrées
 

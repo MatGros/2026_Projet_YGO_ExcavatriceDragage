@@ -13,16 +13,18 @@
 > Catalogue propre à la chaîne AU/réarmement (§7) — les tables §4 (Fonctions métier/transverses)
 > sont un **index** vers d'autres AF, pas un catalogue `F<NN>.<seq>` de cette partie.
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut |
-|---|---|---|---|---|---|---|
-| `F01.01` | Couper la puissance (AU) | Boucle AU physique ouverte ➔ coupure matérielle des moteurs/actionneurs, indépendante du PLC | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-001</code></nobr> | ✅ |
-| `F01.02` | Maintenir 2 canaux fail-safe | Perte de maintien A **ou** B ➔ ouvre la boucle AU | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-002</code></nobr> | ✅ |
-| `F01.03` | Réarmer sur demande explicite | Front `ArmRequest` + boucle saine ➔ séquence de réarmement ; jamais automatique | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-003</code></nobr>, <nobr><code>TC-P01-005</code></nobr> | ✅ |
-| `F01.04` | Acquitter sans lever l'interlock | `Reset` efface l'affichage (pattern Cause/Ack) sans jamais ouvrir l'interlock de sécurité | `FB_Safety_EmergencyManagement` | 🟠 C3 | <nobr><code>TC-P01-004</code></nobr>, <nobr><code>TC-P01-009</code></nobr> | ✅ |
-| `F01.05` | Auto-tester la redondance A/B | Test croisé des 2 canaux à chaque réarmement (preuve runtime, pas de procédure manuelle séparée) | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-006</code></nobr> | ✅ |
-| `F01.06` | Verrouiller après échec | Non-confirmation contacteur après pulse ➔ lockout 5s avant nouvel essai | `FB_Safety_EmergencyManagement` | 🟠 C3 | <nobr><code>TC-P01-007</code></nobr> | ✅ |
-| `F01.07` | Couper sur demande safety métier | `PowerCutOffRequest` (agrégat M1/M2/M3) ➔ coupe A et B sans déclencher d'armement | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-008</code></nobr> | ✅ |
-| `F01.08` | Cohérence coupure IHM / réarmement | `BtnEmergencyCutOff` pendant le pulse de réarmement | `FB_Safety_EmergencyManagement` | 🟠 C3 | <nobr><code>TC-P01-010</code></nobr> | ⚠️ écart relevé, non corrigé (audit 2026-08-22) |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
+|---|---|---|---|---|---|---|---|
+| `F01.01` | Couper la puissance (AU) | Boucle AU physique ouverte ➔ coupure matérielle des moteurs/actionneurs, indépendante du PLC | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-001</code></nobr> | ✅ | `NV-I` |
+| `F01.02` | Maintenir 2 canaux fail-safe | Perte de maintien A **ou** B ➔ ouvre la boucle AU | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-002</code></nobr> | ✅ | `NV-I` |
+| `F01.03` | Réarmer sur demande explicite | Front `ArmRequest` + boucle saine ➔ séquence de réarmement ; jamais automatique | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-003</code></nobr>, <nobr><code>TC-P01-005</code></nobr> | ✅ | `NV-I` |
+| `F01.04` | Acquitter sans lever l'interlock | `Reset` efface l'affichage (pattern Cause/Ack) sans jamais ouvrir l'interlock de sécurité | `FB_Safety_EmergencyManagement` | 🟠 C3 | <nobr><code>TC-P01-004</code></nobr>, <nobr><code>TC-P01-009</code></nobr> | ✅ | `NV-I` |
+| `F01.05` | Auto-tester la redondance A/B | Test croisé des 2 canaux à chaque réarmement (preuve runtime, pas de procédure manuelle séparée) | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-006</code></nobr> | ✅ | `NV-I` |
+| `F01.06` | Verrouiller après échec | Non-confirmation contacteur après pulse ➔ lockout 5s avant nouvel essai | `FB_Safety_EmergencyManagement` | 🟠 C3 | <nobr><code>TC-P01-007</code></nobr> | ✅ | `NV-I` |
+| `F01.07` | Couper sur demande safety métier | `PowerCutOffRequest` (agrégat M1/M2/M3) ➔ coupe A et B sans déclencher d'armement | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-008</code></nobr> | ✅ | `NV-I` |
+| `F01.08` | Cohérence coupure IHM / réarmement | `BtnEmergencyCutOff` pendant le pulse de réarmement | `FB_Safety_EmergencyManagement` | 🟠 C3 | <nobr><code>TC-P01-010</code></nobr> | ⚠️ écart relevé, non corrigé (audit 2026-08-22) | `NV` |
 
 ## 📑 Sommaire
 
@@ -45,13 +47,15 @@
 > intention, au même niveau de synthèse que la Table des fonctions ci-dessus :
 > [`FB_Safety_EmergencyManagement_v1.2.md §2`](AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.2.md).
 
-| Groupe | IDs couverts | Comportement Attendu (synthèse) | <nobr>Type</nobr> | <nobr>Réf FB</nobr> |
-|---|---|---|---|---|
-| Coupure de puissance | <nobr><code>TC-P01-001</code></nobr>, <nobr><code>TC-P01-008</code></nobr> | AU physique et demande safety métier agrégée coupent A+B, sans passer par une séquence d'armement | <nobr><code>🟢 SITE+AUTO</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> |
-| Redondance A/B | <nobr><code>TC-P01-002</code></nobr>, <nobr><code>TC-P01-006</code></nobr> | Perte d'un canal ouvre la boucle ; auto-test croisé des 2 canaux prouvé à chaque réarmement | <nobr><code>⚡ SITE+AUTO_PLC</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> |
-| Réarmement | <nobr><code>TC-P01-003</code></nobr>, <nobr><code>TC-P01-005</code></nobr>, <nobr><code>TC-P01-007</code></nobr> | Front explicite requis, jamais automatique ; acquittement et réarmement = 2 actions distinctes ; échec de confirmation ➔ lockout 5s | <nobr><code>⚡ AUTO_PLC</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> |
-| Acquittement (Cause/Ack) | <nobr><code>TC-P01-004</code></nobr>, <nobr><code>TC-P01-009</code></nobr> | `Reset` efface l'affichage sans jamais lever l'interlock de sécurité ; re-latch si nouvel échec | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> |
-| Cohérence coupure IHM | <nobr><code>TC-P01-010</code></nobr> | Coupure IHM maintenue pendant le pulse de réarmement — écart connu, non corrigé (audit 2026-08-22) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| Groupe | IDs couverts | Comportement Attendu (synthèse) | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
+|---|---|---|---|---|---|
+| Coupure de puissance | <nobr><code>TC-P01-001</code></nobr>, <nobr><code>TC-P01-008</code></nobr> | AU physique et demande safety métier agrégée coupent A+B, sans passer par une séquence d'armement | <nobr><code>🟢 SITE+AUTO</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV` |
+| Redondance A/B | <nobr><code>TC-P01-002</code></nobr>, <nobr><code>TC-P01-006</code></nobr> | Perte d'un canal ouvre la boucle ; auto-test croisé des 2 canaux prouvé à chaque réarmement | <nobr><code>⚡ SITE+AUTO_PLC</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV-I` |
+| Réarmement | <nobr><code>TC-P01-003</code></nobr>, <nobr><code>TC-P01-005</code></nobr>, <nobr><code>TC-P01-007</code></nobr> | Front explicite requis, jamais automatique ; acquittement et réarmement = 2 actions distinctes ; échec de confirmation ➔ lockout 5s | <nobr><code>⚡ AUTO_PLC</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV-I` |
+| Acquittement (Cause/Ack) | <nobr><code>TC-P01-004</code></nobr>, <nobr><code>TC-P01-009</code></nobr> | `Reset` efface l'affichage sans jamais lever l'interlock de sécurité ; re-latch si nouvel échec | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV-I` |
+| Cohérence coupure IHM | <nobr><code>TC-P01-010</code></nobr> | Coupure IHM maintenue pendant le pulse de réarmement — écart connu, non corrigé (audit 2026-08-22) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV-I` |
 
 ## 🔄 2 · Architecture & Flux Général Machine
 

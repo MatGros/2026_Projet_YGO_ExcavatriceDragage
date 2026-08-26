@@ -24,14 +24,16 @@
 
 ## 🧪 1 · Points de validation
 
-| ID | Intention | Preuve | Type | Réf |
-|---|---|---|---|---|
-| <nobr><code>TC-P05-001</code></nobr> | Modes machine restreints (`DISABLE`, `MAINT_N1`, `MAINT_N2`, `SEMI_AUTO`) | `SyncEnable`, Diving, Extraction hors `E_Mode` | `💻 AUTO` | <small>§2-3</small> |
-| <nobr><code>TC-P05-002</code></nobr> | Mode nominal : joystick pilote M1+M2 conjointement | M1 et M2 reçoivent la même intention | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P05-003</code></nobr> | Mode MAINT_N2 M1 seul : M2 bloqué, frein serré | Safety reste active sur M2 | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P05-004</code></nobr> | Refus mode SEMI_AUTO si codeurs invalides | Bascule refusée + message IHM | `💻 AUTO` | <small>§7</small> |
-| <nobr><code>TC-P05-005</code></nobr> | Limite légale = blocage exploitation, pas safety | Pas de `PowerCutOff` sur simple limite légale | `💻 AUTO` | <small>§6</small> |
-| <nobr><code>TC-P05-006</code></nobr> | Pas de redémarrage automatique après défaut | `Reset` + nouvel ordre explicite requis | `💻 AUTO` | <small>§7</small> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention | Preuve | Type | Réf | Etat |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P05-001</code></nobr> | Modes machine restreints (`DISABLE`, `MAINT_N1`, `MAINT_N2`, `SEMI_AUTO`) | `SyncEnable`, Diving, Extraction hors `E_Mode` | `💻 AUTO` | <small>§2-3</small> | `NV` |
+| <nobr><code>TC-P05-002</code></nobr> | Mode nominal : joystick pilote M1+M2 conjointement | M1 et M2 reçoivent la même intention | `💻 AUTO` | <small>§4</small> | `NV` |
+| <nobr><code>TC-P05-003</code></nobr> | Mode MAINT_N2 M1 seul : M2 bloqué, frein serré | Safety reste active sur M2 | `💻 AUTO` | <small>§4</small> | `NV` |
+| <nobr><code>TC-P05-004</code></nobr> | Refus mode SEMI_AUTO si codeurs invalides | Bascule refusée + message IHM | `💻 AUTO` | <small>§7</small> | `NV` |
+| <nobr><code>TC-P05-005</code></nobr> | Limite légale = blocage exploitation, pas safety | Pas de `PowerCutOff` sur simple limite légale | `💻 AUTO` | <small>§6</small> | `NV` |
+| <nobr><code>TC-P05-006</code></nobr> | Pas de redémarrage automatique après défaut | `Reset` + nouvel ordre explicite requis | `💻 AUTO` | <small>§7</small> | `NV` |
 
 ---
 

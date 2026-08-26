@@ -71,6 +71,18 @@ Toute fiche AF doit commencer par un paragraphe **court, clair et synthétique (
 | `TC couvrants` | `TC-Pxx-nnn` associés — un TC n'apparaît que sur une seule fonction sauf note explicite |
 | `Statut` | ✅/⚠️/❌ — manuel tant que l'outillage d'extraction n'est pas exécuté, sinon dérivé |
 
+### 🏷️ État de décision et d'implémentation
+
+Chaque table de **fonctions** et de **points de validation (TC)** porte une dernière colonne étroite
+`État`, précédée de cette légende :
+
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+
+Cette colonne est distincte du `Statut` technique. Sans validation humaine explicite, ne jamais
+inférer `V` : initialiser `NV` ou `NV-I` après preuve du code. Un élément `NV`/`NV-I` ne génère pas
+d'exigence de code ni de test d'acceptation bloquant.
+
 ### 🎨 Échelle de criticité (identifier vite le risque machine/humain)
 
 Même échelle et mêmes couleurs que `TASKS.yaml` / `TASK_VIEWER.html`, pour repérer d'un coup

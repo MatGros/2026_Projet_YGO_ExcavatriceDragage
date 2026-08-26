@@ -18,12 +18,14 @@
 
 ## 🧪 Points de validation (`TC-P11-006` à `009` — propriétaire unique)
 
-| ID | Intention / Comportement attendu | Type |
-|---|---|---|
-| <nobr><code>TC-P11-006</code></nobr> | Watchdog frein 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` |
-| <nobr><code>TC-P11-007</code></nobr> | Réautorisation post-timeout : Cause + Reset + Mot 0 + Nouvelle demande | `⚡ AUTO_PLC` |
-| <nobr><code>TC-P11-008</code></nobr> | Gate final : Mot/fréquence nuls sans confirmation frein simultanée | `⚡ AUTO_PLC` |
-| <nobr><code>TC-P11-009</code></nobr> | Mot 7 (reset AC600) autorisé pendant `RestartInhibit` (sans levée inhibition) | `⚡ AUTO_PLC` |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention / Comportement attendu | Type | Etat |
+|---|---|---|---|
+| <nobr><code>TC-P11-006</code></nobr> | Watchdog frein 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` | `NV` |
+| <nobr><code>TC-P11-007</code></nobr> | Réautorisation post-timeout : Cause + Reset + Mot 0 + Nouvelle demande | `⚡ AUTO_PLC` | `NV` |
+| <nobr><code>TC-P11-008</code></nobr> | Gate final : Mot/fréquence nuls sans confirmation frein simultanée | `⚡ AUTO_PLC` | `NV` |
+| <nobr><code>TC-P11-009</code></nobr> | Mot 7 (reset AC600) autorisé pendant `RestartInhibit` (sans levée inhibition) | `⚡ AUTO_PLC` | `NV` |
 
 ---
 

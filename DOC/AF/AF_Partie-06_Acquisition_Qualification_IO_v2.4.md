@@ -32,14 +32,17 @@
 
 ## 🧪 1 · Points de validation
 
-| ID | Intention | Preuve | Type | Réf |
-|---|---|---|---|---|
-| <nobr><code>TC-P06-001</code></nobr> | Aucune lecture d'E/S brute dans les FB métier | Consommateurs lisent des faits qualifiés | `💻 AUTO` | <small>§3</small> |
-| <nobr><code>TC-P06-002</code></nobr> | Polarité normalisée une seule fois à l'acquisition | Zéro ré-inversion dans les FB métier | `💻 AUTO` | <small>§3</small> |
-| <nobr><code>TC-P06-003</code></nobr> | Bascule réel/simulation centralisée | `HwIn` source unique par domaine | `💻 AUTO` | <small>§3</small> |
-| <nobr><code>TC-P06-004</code></nobr> | Diag CANopen/EtherCAT publié en ligne | Statuts dispos pour Modes/Safety/IHM | `💻 AUTO` | <small>§4</small> |
-| <nobr><code>TC-P06-005</code></nobr> | Noms des signaux de puissance validés | `PowerKeepAlive_A/B_RQ`, `EmergencyChainClosed_DI` | `🟢 SITE` | <small>§5</small> |
-| <nobr><code>TC-P06-006</code></nobr> | Écriture des sorties physiques centralisée | `PRG_06_Outputs` seul producteur final | `💻 AUTO` | <small>§6</small> |
+> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+
+| ID | Intention | Preuve | Type | Réf | Etat |
+|---|---|---|---|---|---|
+| <nobr><code>TC-P06-001</code></nobr> | Aucune lecture d'E/S brute dans les FB métier | Consommateurs lisent des faits qualifiés | `💻 AUTO` | <small>§3</small> | `NV` |
+| <nobr><code>TC-P06-002</code></nobr> | Polarité normalisée une seule fois à l'acquisition | Zéro ré-inversion dans les FB métier | `💻 AUTO` | <small>§3</small> | `NV` |
+| <nobr><code>TC-P06-003</code></nobr> | Bascule réel/simulation centralisée | `HwIn` source unique par domaine | `💻 AUTO` | <small>§3</small> | `NV` |
+| <nobr><code>TC-P06-004</code></nobr> | Diag CANopen/EtherCAT publié en ligne | Statuts dispos pour Modes/Safety/IHM | `💻 AUTO` | <small>§4</small> | `NV` |
+| <nobr><code>TC-P06-005</code></nobr> | Noms des signaux de puissance validés | `PowerKeepAlive_A/B_RQ`, `EmergencyChainClosed_DI` | `🟢 SITE` | <small>§5</small> | `NV` |
+| <nobr><code>TC-P06-006</code></nobr> | Écriture des sorties physiques centralisée | `PRG_06_Outputs` seul producteur final | `💻 AUTO` | <small>§6</small> | `NV` |
+| <nobr><code>TC-P06-007</code></nobr> | Preflight passif machine arrêtée | Au boot ou front IHM, verdict 16 bits uniquement après immobilité ; publication IHM sans action machine | `💻 AUTO_PLC` | <small>§7 / FB_Acquisition_Preflight</small> | `NV-I` |
 
 ---
 
