@@ -206,6 +206,7 @@ l'eau). Conversion `DINT` **avant** soustraction (jamais l'inverse, évite un d�
 | `BypassGlobal` | Neutralise les 2 causes ci-dessus | Mise en service uniquement |
 
 `FB_EncoderReliability` (calcul combinatoire pur, sans mémoire) synthétise 2 gates distincts :
+
 - `EncoderFault := NOT EncoderAvailable OR EncoderIncoherent` — **sans** `Homed` (non-référencé
   ≠ incohérent) : sert la fiabilité de mesure (vitesse, mouvements).
 - `HomedAndReliable := EncoderAvailable AND Homed AND NOT EncoderIncoherent` — gate **stricte**,
@@ -240,6 +241,7 @@ Conséquence acceptée : `HomingPermit` (calculé dans `PRG_02_Acquisition.st:34
 volontaire et rare (front bouton + arrêt confirmé), pas une commande temps réel.
 
 Consommateurs directs de la façade (hors AF06) :
+
 - `PRG_04_Treuils_Benne` : `Homed`, `HomingSuspect`, `Measurement.HomingStatus.Busy` (affichage
   checklist maintenance), `Speed_Mps`/`SignedSpeed_Mps` (entrée `FB_Safety_Winch`, détection
   mouvement non commandé — Méca A).

@@ -72,7 +72,7 @@ BrakeCommandOpenConfirmed AND NOT RestartInhibit`. Timeout ⇒ bit0 `ErrorId`, `
 
 ## 5. Anti-redémarrage et temps mort de redémarrage
 
-`RestartDelay` = **900ms** (paramétrable) après `FwdRevSpeedFeedbackOff` confirmé. 
+`RestartDelay` = **900ms** (paramétrable) après `FwdRevSpeedFeedbackOff` confirmé.
 
 **Nouveau : temps mort de redémarrage après arrêt** — distinct du redémarrage post-faute :
 - **Redémarrage même sens** : temps mort paramétrable `DeadTimeSameDir` (défaut **1s**) après `MotorRequest=FALSE` → nouvelle demande.

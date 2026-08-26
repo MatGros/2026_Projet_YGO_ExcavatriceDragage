@@ -128,7 +128,7 @@ Le nom doit permettre de comprendre ce que représente la donnée **sans connaî
 | <nobr><code>NC-100</code></nobr> | Polarité positive des arbitrages `*Permit`/`*Allowed` : `TRUE` = autorisé, `FALSE` = bloqué | Tout signal d'arbitrage répond à « que signifie `TRUE` ? » = autorisation positive ; jamais d'`OR` d'autorisations | 👁️ MANUEL | §Polarité positive des arbitrages (T109) |
 
 ---
- 
+
 ## Préfixes structurels (classification, non typage)
 | Préfixe | Usage | Exemple |
 |---------|-------|---------|
@@ -254,9 +254,9 @@ Le nommage des instances privilégie la **sémantique métier** et la lisibilit�
 4. **Singletons au niveau `PROGRAM` (`PRG_02` à `PRG_07`)** :
    - ✅ Préfixe **`inst`** + rôle PascalCase pour isoler la portée et éviter toute collision de nom avec les GVL/DUT : `instJoystick : FB_Joystick;`, `instModes : FB_Modes;`, `instCycleSemiAuto : FB_Cycle;`, `instTranslationM3 : FB_Translation;`.
    - ❌ Pas `FB_Joystick_0`, pas le nom du type seul, pas de suffixe `_0` d'export.
-  
+
 ---
- 
+
 ## Abréviations autorisées
 
 ⚠️ Liste vérifiée sur `CODE/` (2026-07-15, grep exhaustif) — certaines abréviations
@@ -323,9 +323,9 @@ IHM) — deux familles à deux niveaux d'architecture différents : `_DI`/`_DQ`/
 physique/matériel, `ReqX`/`CmdX` = logique métier/IHM.
 
 ---
- 
+
 ## Nommage par catégorie
- 
+
 ### Entrées de commande
 ```
 Enable, Reset
@@ -448,24 +448,24 @@ CablePosTgt, PositionTgt    → position cible
 PressureSP                  → consigne pression
 TemperatureSP               → consigne température
 ```
- 
+
 ### Mesures physiques réelles (Actual)
 ```
 SpeedAct, DrumSpeedAct      → vitesse mesurée réelle
 CablePosAct, PositionAct    → position réelle mesurée
 DrumTorqueAct               → couple réel mesuré
 ```
- 
+
 ### Sorties d'état / feedback
 ```
 Ready, Done, Busy, Moving
 Error, ErrorId    → ErrorId = bitfield WORD (bit n = défaut n)
-                   Règle documentation ErrorId : 
+                   Règle documentation ErrorId :
                    - Chaque bit doit être documenté dans la déclaration du FB.
                    - Format : `bitN: "MESSAGE IHM" - Description technique`
                    - Le texte entre guillemets est le message exact attendu sur l'IHM (à copier-coller).
 ```
- 
+
 ### Sorties physiques / actionneurs
 ```
 RelayFwd, RelayRev           → contacteurs direction
@@ -701,7 +701,7 @@ GVL_IHM . TranslationM3 . BtnFwd
 ```
 
 ---
- 
+
 ## Structures : exemple CODESYS
 ```codesys
 (* Consigne joystick *)
@@ -714,7 +714,7 @@ STRUCT
     PowerContactorEngaged : BOOL;   (* Chaine AU réarmée / contacteur puissance OK *)
 END_STRUCT
 END_TYPE
- 
+
 (* Status treuil *)
 TYPE ST_WinchIO :
 STRUCT
@@ -730,9 +730,9 @@ STRUCT
 END_STRUCT
 END_TYPE
 ```
- 
+
 ---
- 
+
 ## En Ladder : lisibilité flux
 ```
 [FB_Joystick]     →  (.Done)  →  [FB_Treuil.Enable]
@@ -740,9 +740,9 @@ END_TYPE
 [FB_Encodeur]     ←  (.CablePosAct)
 ```
 → Chaînes d'instance, flux d'info immédiatement visible pour maintenance. ✅
- 
+
 ---
- 
+
 ## Résumé règles
 1. ❌ Pas de `bFlag`, `iCounter`, `rValue` (Zéro notation hongroise).
 2. ✅ `Enable`, `Ready`, `CablePos_M`, `Speed_Pct`.
@@ -754,4 +754,4 @@ END_TYPE
 8. Instance = `<Mécanisme>[<Repère>]` (repère seulement si plusieurs instances du même mécanisme).
 9. Seuil logiciel = 4 maillons : Paramètre (`_M`) → Mesure → `XxxReached` (fait) → `XxxActive` (conséquence).
 10. Structures + Enums = organisation, pas typage du nom.
- 
+

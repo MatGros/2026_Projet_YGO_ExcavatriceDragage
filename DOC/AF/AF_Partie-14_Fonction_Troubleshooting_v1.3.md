@@ -115,7 +115,7 @@ une propriété qui n'appartient qu'au sous-composant observateur.
 > La source d'observation cible est `PRG_02_Acquisition`. Les références historiques à
 > `PRG_01_Inputs_LD` et `FB_Input` ne doivent plus être ajoutées ; elles sont conservées
 > uniquement dans les audits de migration jusqu'à la suppression effective du code.
-
+>
 > **Proposition de support IHM / Watch CODESYS.** Cette table est en lecture seule : elle observe
 > l'acquisition et ses conséquences, mais n'écrit ni commande, ni Reset, ni bypass.
 > Les valeurs doivent être comparées dans l'ordre **module → agrégat → procédé → entrée**.

@@ -74,6 +74,7 @@ tant que < 500ms.
 ## 5. Anti-redémarrage
 
 Après timeout :
+
 1. `RestartInhibit:=TRUE` — frein coupé, mouvement interdit.
 2. Acquittement : `ResetEdge.Q AND BrakeCommandOpenConfirmed` → efface bit0.
 3. Réautorisation : `NOT Error AND NOT ResetRequired` + **mot 0 vu** (`NeutralRequestSeen`)

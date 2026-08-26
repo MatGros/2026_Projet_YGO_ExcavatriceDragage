@@ -234,7 +234,7 @@ Succès étape 6 : retour IDLE, lockout off.
 | t4 — contacteur confirmé | FALSE | 0 (IDLE) | TRUE ↑ | FALSE |
 
 Si `PowerContactorEngaged` ne passe pas TRUE avant timeout 2s à t4 : `EmergencyArmingFailed`
-+ `EmergencyArmingLockoutActive` 5s, retour direct à `ArmingSeqStep=0`.
+et `EmergencyArmingLockoutActive` 5s, retour direct à `ArmingSeqStep=0`.
 
 ### 4.3bis Auto-test A/B = essai `AUTO_PLC` intégré
 
