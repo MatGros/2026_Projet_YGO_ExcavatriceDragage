@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_Cycle [FAIL]</title>
+<title>Rapport de test — FB_Cycle [PASS]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -190,14 +190,14 @@
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-fail">FAIL</span>
+            <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 16:04:17</div>
+    <div class="exec-time">2026-08-26 16:24:14</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-fail"><a href="#test-fb-cycle-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-fail"><a href="#test-fb-cycle-1">TC-P04-010 DiveSearch : mise en service recherche de couche</a></li></ul>
+        <summary>📋 Sommaire (6 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-cycle-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycle-1">TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycle-2">TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycle-3">TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycle-4">TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycle-5">TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            0/2 vérifications validées
+            6/6 vérifications validées
         </div>
     </div>
     
@@ -509,6 +509,180 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 54 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ABORTCYCLE</code> jamais câblé en production</li><li>Pin <code>BENNE_BUSY</code> jamais câblé en production</li><li>Pin <code>BENNE_DONE</code> jamais câblé en production</li><li>Pin <code>BENNE_ISCLOSED</code> jamais câblé en production</li><li>Pin <code>BENNE_ISOPEN</code> jamais câblé en production</li><li>Pin <code>BENNE_ISROUGHLYCLOSED</code> jamais câblé en production</li><li>Pin <code>BUCKETCMD</code> jamais câblé en production</li><li>Pin <code>BUSY</code> jamais câblé en production</li><li>Pin <code>CABLELIMITM1ASCENTM</code> jamais câblé en production</li><li>Pin <code>CYCLEMOTIONPERMIT</code> jamais câblé en production</li><li>Pin <code>CYCLESTATESTR</code> jamais câblé en production</li><li>Pin <code>CYCLESTEP</code> jamais câblé en production</li><li>Pin <code>CYCLESTEPATERROR</code> jamais câblé en production</li><li>Pin <code>DEADMANARMED</code> jamais câblé en production</li><li>Pin <code>DONE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>ERROR</code> jamais câblé en production</li><li>Pin <code>ERRORID</code> jamais câblé en production</li><li>Pin <code>HEARTBEATIHMOK</code> jamais câblé en production</li><li>Pin <code>HOMEDM1</code> jamais câblé en production</li><li>Pin <code>HOMEDM2</code> jamais câblé en production</li><li>Pin <code>HOMINGREQUEST</code> jamais câblé en production</li><li>Pin <code>KOBOLDCONTACTFOND</code> jamais câblé en production</li><li>Pin <code>LIMITLEGALDEPTHM</code> jamais câblé en production</li><li>Pin <code>LIMITLEGALREACHED</code> jamais câblé en production</li><li>Pin <code>M1_CABLEPOSM</code> jamais câblé en production</li><li>Pin <code>M1_MEASUREDSPEEDMPS</code> jamais câblé en production</li><li>Pin <code>M2_CABLEPOSM</code> jamais câblé en production</li><li>Pin <code>M2_MEASUREDSPEEDMPS</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SAMPLECOUNT</code> jamais câblé en production</li><li>Pin <code>SELTARGET</code> jamais câblé en production</li><li>Pin <code>SETDEPTHM</code> jamais câblé en production</li><li>Pin <code>SETOFFSETM</code> jamais câblé en production</li><li>Pin <code>SPEEDMISMATCHACTIVE</code> jamais câblé en production</li><li>Pin <code>SPEEDMISMATCHCONFIRMED</code> jamais câblé en production</li><li>Pin <code>SPEEDMISMATCHMPS</code> jamais câblé en production</li><li>Pin <code>SPEEDMISMATCHTHRESHOLDMPS</code> jamais câblé en production</li><li>Pin <code>SPEEDMISMATCHTIMEOUT</code> jamais câblé en production</li><li>Pin <code>STARTCYCLE</code> jamais câblé en production</li><li>Pin <code>TOPPOSITIONSENSOR</code> jamais câblé en production</li><li>Pin <code>TRANSLATIONCMD</code> jamais câblé en production</li><li>Pin <code>TRANSLATION_AT_MAINTENANCE</code> jamais câblé en production</li><li>Pin <code>TRANSLATION_AT_P1</code> jamais câblé en production</li><li>Pin <code>TRANSLATION_AT_TREMIE</code> jamais câblé en production</li><li>Pin <code>TRANSLATION_BUSY</code> jamais câblé en production</li><li>Pin <code>TRANSLATION_DONE</code> jamais câblé en production</li><li>Pin <code>WINCHM1CMD</code> jamais câblé en production</li><li>Pin <code>WINCHM2CMD</code> jamais câblé en production</li><li>Pin <code>WINCHSYNCDELTAM</code> jamais câblé en production</li><li>Pin <code>WINCHSYNCERROR</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MODE <span class="pin-type">IEC_E_MODE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CYCLEMOTIONPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DEADMANARMED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HEARTBEATIHMOK <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">STARTCYCLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ABORTCYCLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SELTARGET <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SETDEPTHM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SETOFFSETM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">KOBOLDCONTACTFOND <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">LIMITLEGALREACHED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">LIMITLEGALDEPTHM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">WINCHSYNCERROR <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">WINCHSYNCDELTAM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1_CABLEPOSM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2_CABLEPOSM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1_MEASUREDSPEEDMPS <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2_MEASUREDSPEEDMPS <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDMISMATCHTHRESHOLDMPS <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDMISMATCHTIMEOUT <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CABLELIMITM1ASCENTM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TRANSLATION_AT_P1 <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TRANSLATION_AT_TREMIE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TRANSLATION_AT_MAINTENANCE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TRANSLATION_BUSY <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TRANSLATION_DONE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BENNE_BUSY <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BENNE_DONE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BENNE_ISOPEN <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BENNE_ISCLOSED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BENNE_ISROUGHLYCLOSED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMEDM1 <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMEDM2 <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TOPPOSITIONSENSOR <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMINGREQUEST <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SAMPLECOUNT<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_INT</span></div>
+        </div></div>
+            <div class="pin-block">FB_Cycle</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BUSY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DONE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">ERROR <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">ERRORID <span class="pin-type">IEC_WORD</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">SPEEDMISMATCHMPS <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">SPEEDMISMATCHACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">SPEEDMISMATCHCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">WINCHM1CMD <span class="pin-type">ST_WINCHCMDDEMAND</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">WINCHM2CMD <span class="pin-type">ST_WINCHCMDDEMAND</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">TRANSLATIONCMD <span class="pin-type">ST_TRANSLATIONCMDDEMAND</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BUCKETCMD <span class="pin-type">ST_BUCKETCMDDEMAND</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CYCLESTEP <span class="pin-type">IEC_E_CYCLESTEP</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CYCLESTATESTR <span class="pin-type">IECStringVar&lt;80&gt;</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CYCLESTEPATERROR <span class="pin-type">IEC_E_CYCLESTEP</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -589,32 +763,175 @@
         <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-cycle-0" class="test-card test-card-fail test-card-contract">
+        <article id="test-fb-cycle-0" class="test-card test-card-pass test-card-contract">
             <header>
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
             <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Prete en service</p><p class='comment'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</p></div>
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=FALSE -&gt; Busy=FALSE</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Au repos -&gt; Pas de cycle actif</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul></details>
-            <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB.READY expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_divesearch.st:16</div><div class='failure-msg'>Enable=TRUE -&gt; Ready=TRUE (nominal)</div></div>
             
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 2 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="172" viewBox="0 0 388 172" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="154" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="166" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="154" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="166" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="154" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="166" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">READY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>READY</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (61)</summary>
+        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>3</td></tr><tr><td><code>CYCLEMOTIONPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELTARGET</code></td><td>0</td></tr><tr><td><code>SETDEPTHM</code></td><td>0</td></tr><tr><td><code>SETOFFSETM</code></td><td>0</td></tr><tr><td><code>KOBOLDCONTACTFOND</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALREACHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALDEPTHM</code></td><td>0</td></tr><tr><td><code>WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHSYNCDELTAM</code></td><td>0</td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M1_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTHRESHOLDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTIMEOUT</code></td><td>0</td></tr><tr><td><code>CABLELIMITM1ASCENTM</code></td><td>0</td></tr><tr><td><code>TRANSLATION_AT_P1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_TREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_MAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDMISMATCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHM1CMD.STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHM2CMD.STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONCMD.START</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETCMD.OPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLESTEPATERROR</code></td><td>0</td></tr><tr><td><code>SAMPLECOUNT</code></td><td>0</td></tr><tr><td><code>STATE</code></td><td>0</td></tr><tr><td><code>SAVEDSTATE</code></td><td>0</td></tr><tr><td><code>TOUCHPOSITIONM</code></td><td>0</td></tr><tr><td><code>RAISETARGETM</code></td><td>0</td></tr><tr><td><code>SELECTEDWORKTARGET</code></td><td>0</td></tr><tr><td><code>CTRLASCENTDISTM</code></td><td>2</td></tr><tr><td><code>CTRLASCENTTOLERANCEM</code></td><td>0.25</td></tr><tr><td><code>CTRLASCENTTIMEOUT</code></td><td>30000000000</td></tr><tr><td><code>DRAININGTIME</code></td><td>5000000000</td></tr><tr><td><code>STEPMAXTIMEOUT</code></td><td>60000000000</td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-cycle-1" class="test-card test-card-fail">
+        <article id="test-fb-cycle-1" class="test-card test-card-pass">
             <header>
-                <span class="badge badge-fail">FAIL</span>
-                <h3>TC-P04-010 DiveSearch : mise en service recherche de couche </h3>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>M1 coupe sur retour neutre manche</li><li>M2 coupe sur retour neutre manche</li><li>Translation coupee</li><li>Etape conservee</li></ul></details>
             
-            <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB.READY expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_divesearch.st:27</div><div class='failure-msg'>Module DiveSearch pret</div></div>
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 4 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="252" viewBox="0 0 332 252" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="234" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="246" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="234" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="246" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">CYCLEMOTIONPERMIT</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">STARTCYCLE</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,108L256,108L256,108L256,134L312,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">BUSY</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">CYCLESTEP</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="219.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">0</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><rect x="275.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="197.0" class="wf-num-changed">1</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>CYCLEMOTIONPERMIT</th><th>STARTCYCLE</th><th>BUSY</th><th>CYCLESTEP</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>1</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (59)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>3</td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELTARGET</code></td><td>0</td></tr><tr><td><code>SETDEPTHM</code></td><td>0</td></tr><tr><td><code>SETOFFSETM</code></td><td>0</td></tr><tr><td><code>KOBOLDCONTACTFOND</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALREACHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALDEPTHM</code></td><td>0</td></tr><tr><td><code>WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHSYNCDELTAM</code></td><td>0</td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M1_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTHRESHOLDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTIMEOUT</code></td><td>0</td></tr><tr><td><code>CABLELIMITM1ASCENTM</code></td><td>0</td></tr><tr><td><code>TRANSLATION_AT_P1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_TREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_MAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDMISMATCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHM1CMD.STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHM2CMD.STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONCMD.START</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETCMD.OPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEPATERROR</code></td><td>0</td></tr><tr><td><code>SAMPLECOUNT</code></td><td>5</td></tr><tr><td><code>STATE</code></td><td>1</td></tr><tr><td><code>SAVEDSTATE</code></td><td>0</td></tr><tr><td><code>TOUCHPOSITIONM</code></td><td>0</td></tr><tr><td><code>RAISETARGETM</code></td><td>0</td></tr><tr><td><code>SELECTEDWORKTARGET</code></td><td>0</td></tr><tr><td><code>CTRLASCENTDISTM</code></td><td>2</td></tr><tr><td><code>CTRLASCENTTOLERANCEM</code></td><td>0.25</td></tr><tr><td><code>CTRLASCENTTIMEOUT</code></td><td>30000000000</td></tr><tr><td><code>DRAININGTIME</code></td><td>5000000000</td></tr><tr><td><code>STEPMAXTIMEOUT</code></td><td>60000000000</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-cycle-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Cycle actif (Busy=TRUE)</li><li>Pas d erreur au lancement</li><li>Transition vers X1_HOMING</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 5 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="292" viewBox="0 0 332 292" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="274" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="286" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="274" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="286" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">STARTCYCLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">BUSY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">WINCHM1CMD.STARTSTOP</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">WINCHM2CMD.STARTSTOP</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L256,214L256,188L312,188" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">CYCLESTEP</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><line x1="200" y1="242.0" x2="256" y2="242.0" class="wf-num-line"/><rect x="219.0" y="228.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="228.0" y="237.0" class="wf-num-changed">0</text><line x1="256" y1="242.0" x2="312" y2="242.0" class="wf-num-line"/><rect x="275.0" y="228.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="284.0" y="237.0" class="wf-num-changed">1</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>STARTCYCLE</th><th>BUSY</th><th>WINCHM1CMD.STARTSTOP</th><th>WINCHM2CMD.STARTSTOP</th><th>CYCLESTEP</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>1</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (58)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>3</td></tr><tr><td><code>CYCLEMOTIONPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELTARGET</code></td><td>0</td></tr><tr><td><code>SETDEPTHM</code></td><td>0</td></tr><tr><td><code>SETOFFSETM</code></td><td>0</td></tr><tr><td><code>KOBOLDCONTACTFOND</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALREACHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALDEPTHM</code></td><td>0</td></tr><tr><td><code>WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHSYNCDELTAM</code></td><td>0</td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M1_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTHRESHOLDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTIMEOUT</code></td><td>0</td></tr><tr><td><code>CABLELIMITM1ASCENTM</code></td><td>0</td></tr><tr><td><code>TRANSLATION_AT_P1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_TREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_MAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDMISMATCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONCMD.START</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETCMD.OPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEPATERROR</code></td><td>0</td></tr><tr><td><code>SAMPLECOUNT</code></td><td>0</td></tr><tr><td><code>STATE</code></td><td>1</td></tr><tr><td><code>SAVEDSTATE</code></td><td>0</td></tr><tr><td><code>TOUCHPOSITIONM</code></td><td>0</td></tr><tr><td><code>RAISETARGETM</code></td><td>0</td></tr><tr><td><code>SELECTEDWORKTARGET</code></td><td>0</td></tr><tr><td><code>CTRLASCENTDISTM</code></td><td>2</td></tr><tr><td><code>CTRLASCENTTOLERANCEM</code></td><td>0.25</td></tr><tr><td><code>CTRLASCENTTIMEOUT</code></td><td>30000000000</td></tr><tr><td><code>DRAININGTIME</code></td><td>5000000000</td></tr><tr><td><code>STEPMAXTIMEOUT</code></td><td>60000000000</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-cycle-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Bascule en STABILIZING</li><li>Drapeau Error actif</li><li>Commandes treuils neutralisees</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 9 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="452" viewBox="0 0 388 452" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="434" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="446" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="434" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="446" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="434" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="446" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">STARTCYCLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">WINCHSYNCERROR</text><circle cx="192" cy="122.0" r="4" fill="#dc2626"/><path d="M200,134L256,134L312,134L312,134L312,108L368,108" class="wf-line" stroke="#dc2626"/><text x="182" y="166.0" class="wf-label">BUSY</text><circle cx="192" cy="162.0" r="4" fill="#059669"/><path d="M200,174L256,174L256,174L256,148L312,148L368,148" class="wf-line" stroke="#059669"/><text x="182" y="206.0" class="wf-label">ERROR</text><circle cx="192" cy="202.0" r="4" fill="#b91c1c"/><path d="M200,214L256,214L312,214L312,214L312,188L368,188" class="wf-line" stroke="#b91c1c"/><text x="182" y="246.0" class="wf-label">ERRORID</text><circle cx="192" cy="242.0" r="4" fill="#f43f5e"/><line x1="200" y1="242.0" x2="256" y2="242.0" class="wf-num-line"/><rect x="219.0" y="228.0" width="18" height="13" rx="3" fill="#f43f5e" class="wf-chip"/><text x="228.0" y="237.0" class="wf-num-changed">0</text><line x1="256" y1="242.0" x2="312" y2="242.0" class="wf-num-line"/><text x="284.0" y="236.0" class="wf-num">0</text><line x1="312" y1="242.0" x2="368" y2="242.0" class="wf-num-line"/><rect x="331.0" y="228.0" width="18" height="13" rx="3" fill="#f43f5e" class="wf-chip"/><text x="340.0" y="237.0" class="wf-num-changed">2</text><text x="182" y="286.0" class="wf-label">WINCHM1CMD.STARTSTOP</text><circle cx="192" cy="282.0" r="4" fill="#0891b2"/><path d="M200,294L256,294L256,294L256,268L312,268L312,268L312,294L368,294" class="wf-line" stroke="#0891b2"/><text x="182" y="326.0" class="wf-label">WINCHM2CMD.STARTSTOP</text><circle cx="192" cy="322.0" r="4" fill="#65a30d"/><path d="M200,334L256,334L256,334L256,308L312,308L312,308L312,334L368,334" class="wf-line" stroke="#65a30d"/><text x="182" y="366.0" class="wf-label">CYCLESTEP</text><circle cx="192" cy="362.0" r="4" fill="#0d9488"/><line x1="200" y1="362.0" x2="256" y2="362.0" class="wf-num-line"/><rect x="219.0" y="348.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="228.0" y="357.0" class="wf-num-changed">0</text><line x1="256" y1="362.0" x2="312" y2="362.0" class="wf-num-line"/><rect x="275.0" y="348.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="284.0" y="357.0" class="wf-num-changed">1</text><line x1="312" y1="362.0" x2="368" y2="362.0" class="wf-num-line"/><rect x="331.0" y="348.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="340.0" y="357.0" class="wf-num-changed">14</text><text x="182" y="406.0" class="wf-label">STATE</text><circle cx="192" cy="402.0" r="4" fill="#1d4ed8"/><line x1="200" y1="402.0" x2="256" y2="402.0" class="wf-num-line"/><rect x="219.0" y="388.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="228.0" y="397.0" class="wf-num-changed">1</text><line x1="256" y1="402.0" x2="312" y2="402.0" class="wf-num-line"/><text x="284.0" y="396.0" class="wf-num">1</text><line x1="312" y1="402.0" x2="368" y2="402.0" class="wf-num-line"/><rect x="331.0" y="388.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="340.0" y="397.0" class="wf-num-changed">14</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>STARTCYCLE</th><th>WINCHSYNCERROR</th><th>BUSY</th><th>ERROR</th><th>ERRORID</th><th>WINCHM1CMD.STARTSTOP</th><th>WINCHM2CMD.STARTSTOP</th><th>CYCLESTEP</th><th>STATE</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>1</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>1</td><td>1</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>2</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>14</td><td class='changed'>14</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (54)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>3</td></tr><tr><td><code>CYCLEMOTIONPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELTARGET</code></td><td>0</td></tr><tr><td><code>SETDEPTHM</code></td><td>0</td></tr><tr><td><code>SETOFFSETM</code></td><td>0</td></tr><tr><td><code>KOBOLDCONTACTFOND</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALREACHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALDEPTHM</code></td><td>0</td></tr><tr><td><code>WINCHSYNCDELTAM</code></td><td>0</td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M1_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTHRESHOLDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTIMEOUT</code></td><td>0</td></tr><tr><td><code>CABLELIMITM1ASCENTM</code></td><td>0</td></tr><tr><td><code>TRANSLATION_AT_P1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_TREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_MAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDMISMATCHMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDMISMATCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONCMD.START</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETCMD.OPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEPATERROR</code></td><td>0</td></tr><tr><td><code>SAMPLECOUNT</code></td><td>0</td></tr><tr><td><code>SAVEDSTATE</code></td><td>0</td></tr><tr><td><code>TOUCHPOSITIONM</code></td><td>0</td></tr><tr><td><code>RAISETARGETM</code></td><td>0</td></tr><tr><td><code>SELECTEDWORKTARGET</code></td><td>0</td></tr><tr><td><code>CTRLASCENTDISTM</code></td><td>2</td></tr><tr><td><code>CTRLASCENTTOLERANCEM</code></td><td>0.25</td></tr><tr><td><code>CTRLASCENTTIMEOUT</code></td><td>30000000000</td></tr><tr><td><code>DRAININGTIME</code></td><td>5000000000</td></tr><tr><td><code>STEPMAXTIMEOUT</code></td><td>60000000000</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-cycle-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>Reste en STABILIZING sans Reset</li><li>Sortie de STABILIZING apres Reset + Start</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (4 scans, 8 variables actives)</summary>
+            <div class="wf-scroll"><svg width="444" height="412" viewBox="0 0 444 412" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="394" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="406" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="394" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="406" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="394" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="406" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="394" class="wf-grid"/><text x="396.0" y="52" class="wf-time">30ms</text><text x="396.0" y="406" class="wf-scan">#3</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L312,94L312,68L368,68L368,68L368,94L424,94" class="wf-line" stroke="#111827"/><text x="182" y="126.0" class="wf-label">STARTCYCLE</text><circle cx="192" cy="122.0" r="4" fill="#2563eb"/><path d="M200,134L256,134L312,134L368,134L368,134L368,108L424,108" class="wf-line" stroke="#2563eb"/><text x="182" y="166.0" class="wf-label">WINCHSYNCERROR</text><circle cx="192" cy="162.0" r="4" fill="#dc2626"/><path d="M200,148L256,148L256,148L256,174L312,174L368,174L424,174" class="wf-line" stroke="#dc2626"/><text x="182" y="206.0" class="wf-label">ERROR</text><circle cx="192" cy="202.0" r="4" fill="#b91c1c"/><path d="M200,188L256,188L312,188L312,188L312,214L368,214L424,214" class="wf-line" stroke="#b91c1c"/><text x="182" y="246.0" class="wf-label">ERRORID</text><circle cx="192" cy="242.0" r="4" fill="#f43f5e"/><line x1="200" y1="242.0" x2="256" y2="242.0" class="wf-num-line"/><rect x="219.0" y="228.0" width="18" height="13" rx="3" fill="#f43f5e" class="wf-chip"/><text x="228.0" y="237.0" class="wf-num-changed">2</text><line x1="256" y1="242.0" x2="312" y2="242.0" class="wf-num-line"/><text x="284.0" y="236.0" class="wf-num">2</text><line x1="312" y1="242.0" x2="368" y2="242.0" class="wf-num-line"/><rect x="331.0" y="228.0" width="18" height="13" rx="3" fill="#f43f5e" class="wf-chip"/><text x="340.0" y="237.0" class="wf-num-changed">0</text><line x1="368" y1="242.0" x2="424" y2="242.0" class="wf-num-line"/><text x="396.0" y="236.0" class="wf-num">0</text><text x="182" y="286.0" class="wf-label">CYCLESTEP</text><circle cx="192" cy="282.0" r="4" fill="#059669"/><line x1="200" y1="282.0" x2="256" y2="282.0" class="wf-num-line"/><rect x="219.0" y="268.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="277.0" class="wf-num-changed">14</text><line x1="256" y1="282.0" x2="312" y2="282.0" class="wf-num-line"/><text x="284.0" y="276.0" class="wf-num">14</text><line x1="312" y1="282.0" x2="368" y2="282.0" class="wf-num-line"/><rect x="331.0" y="268.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="340.0" y="277.0" class="wf-num-changed">0</text><line x1="368" y1="282.0" x2="424" y2="282.0" class="wf-num-line"/><text x="396.0" y="276.0" class="wf-num">0</text><text x="182" y="326.0" class="wf-label">CYCLESTEPATERROR</text><circle cx="192" cy="322.0" r="4" fill="#e11d48"/><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="219.0" y="308.0" width="18" height="13" rx="3" fill="#e11d48" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">0</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><rect x="275.0" y="308.0" width="18" height="13" rx="3" fill="#e11d48" class="wf-chip"/><text x="284.0" y="317.0" class="wf-num-changed">14</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><text x="340.0" y="316.0" class="wf-num">14</text><line x1="368" y1="322.0" x2="424" y2="322.0" class="wf-num-line"/><text x="396.0" y="316.0" class="wf-num">14</text><text x="182" y="366.0" class="wf-label">STATE</text><circle cx="192" cy="362.0" r="4" fill="#0891b2"/><line x1="200" y1="362.0" x2="256" y2="362.0" class="wf-num-line"/><rect x="219.0" y="348.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="357.0" class="wf-num-changed">14</text><line x1="256" y1="362.0" x2="312" y2="362.0" class="wf-num-line"/><text x="284.0" y="356.0" class="wf-num">14</text><line x1="312" y1="362.0" x2="368" y2="362.0" class="wf-num-line"/><rect x="331.0" y="348.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="340.0" y="357.0" class="wf-num-changed">0</text><line x1="368" y1="362.0" x2="424" y2="362.0" class="wf-num-line"/><rect x="387.0" y="348.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="396.0" y="357.0" class="wf-num-changed">1</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (4 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th><th>STARTCYCLE</th><th>WINCHSYNCERROR</th><th>ERROR</th><th>ERRORID</th><th>CYCLESTEP</th><th>CYCLESTEPATERROR</th><th>STATE</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td>2</td><td>14</td><td>0</td><td>14</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td>2</td><td>14</td><td class='changed'>14</td><td>14</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td><td class='changed'>0</td><td>14</td><td class='changed'>0</td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>30 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td>14</td><td class='changed'>1</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (55)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>3</td></tr><tr><td><code>CYCLEMOTIONPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELTARGET</code></td><td>0</td></tr><tr><td><code>SETDEPTHM</code></td><td>0</td></tr><tr><td><code>SETOFFSETM</code></td><td>0</td></tr><tr><td><code>KOBOLDCONTACTFOND</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALREACHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALDEPTHM</code></td><td>0</td></tr><tr><td><code>WINCHSYNCDELTAM</code></td><td>0</td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M1_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTHRESHOLDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTIMEOUT</code></td><td>0</td></tr><tr><td><code>CABLELIMITM1ASCENTM</code></td><td>0</td></tr><tr><td><code>TRANSLATION_AT_P1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_TREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_MAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDMISMATCHMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDMISMATCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHM1CMD.STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHM2CMD.STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONCMD.START</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETCMD.OPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SAMPLECOUNT</code></td><td>0</td></tr><tr><td><code>SAVEDSTATE</code></td><td>0</td></tr><tr><td><code>TOUCHPOSITIONM</code></td><td>0</td></tr><tr><td><code>RAISETARGETM</code></td><td>0</td></tr><tr><td><code>SELECTEDWORKTARGET</code></td><td>0</td></tr><tr><td><code>CTRLASCENTDISTM</code></td><td>2</td></tr><tr><td><code>CTRLASCENTTOLERANCEM</code></td><td>0.25</td></tr><tr><td><code>CTRLASCENTTIMEOUT</code></td><td>30000000000</td></tr><tr><td><code>DRAININGTIME</code></td><td>5000000000</td></tr><tr><td><code>STEPMAXTIMEOUT</code></td><td>60000000000</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-cycle-5" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Compteur SampleCount inaltere hors fin de cycle</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (63)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>3</td></tr><tr><td><code>CYCLEMOTIONPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELTARGET</code></td><td>0</td></tr><tr><td><code>SETDEPTHM</code></td><td>0</td></tr><tr><td><code>SETOFFSETM</code></td><td>0</td></tr><tr><td><code>KOBOLDCONTACTFOND</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALREACHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIMITLEGALDEPTHM</code></td><td>0</td></tr><tr><td><code>WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHSYNCDELTAM</code></td><td>0</td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>0</td></tr><tr><td><code>M1_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTHRESHOLDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHTIMEOUT</code></td><td>0</td></tr><tr><td><code>CABLELIMITM1ASCENTM</code></td><td>0</td></tr><tr><td><code>TRANSLATION_AT_P1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_TREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_AT_MAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATION_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERROR</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ERRORID</code></td><td>32</td></tr><tr><td><code>SPEEDMISMATCHMPS</code></td><td>0</td></tr><tr><td><code>SPEEDMISMATCHACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDMISMATCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHM1CMD.STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHM2CMD.STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONCMD.START</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETCMD.OPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>14</td></tr><tr><td><code>CYCLESTEPATERROR</code></td><td>0</td></tr><tr><td><code>SAMPLECOUNT</code></td><td>10</td></tr><tr><td><code>STATE</code></td><td>14</td></tr><tr><td><code>SAVEDSTATE</code></td><td>0</td></tr><tr><td><code>TOUCHPOSITIONM</code></td><td>0</td></tr><tr><td><code>RAISETARGETM</code></td><td>0</td></tr><tr><td><code>SELECTEDWORKTARGET</code></td><td>0</td></tr><tr><td><code>CTRLASCENTDISTM</code></td><td>2</td></tr><tr><td><code>CTRLASCENTTOLERANCEM</code></td><td>0.25</td></tr><tr><td><code>CTRLASCENTTIMEOUT</code></td><td>30000000000</td></tr><tr><td><code>DRAININGTIME</code></td><td>5000000000</td></tr><tr><td><code>STEPMAXTIMEOUT</code></td><td>60000000000</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>

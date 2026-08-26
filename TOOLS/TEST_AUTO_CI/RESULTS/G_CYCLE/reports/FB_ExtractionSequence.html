@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_ExtractionSequence [FAIL]</title>
+<title>Rapport de test — FB_ExtractionSequence [PASS]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -190,14 +190,14 @@
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-fail">FAIL</span>
+            <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 15:05:19</div>
+    <div class="exec-time">2026-08-26 16:24:07</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-fail"><a href="#test-fb-extractionsequence-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-fail"><a href="#test-fb-extractionsequence-1">TC-P04-020 Extraction : mise en service sequence extraction</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-0">PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X)</a></li><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-1">PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            0/2 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
@@ -413,96 +413,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 26 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BOTTOMCONFIRMATIONCONSUMED</code> jamais câblé en production</li><li>Pin <code>BOTTOMPOSITIONCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BUCKETBUSY</code> jamais câblé en production</li><li>Pin <code>BUCKETCLOSEREQUEST</code> jamais câblé en production</li><li>Pin <code>BUCKETERROR</code> jamais câblé en production</li><li>Pin <code>BUCKETISCLOSED</code> jamais câblé en production</li><li>Pin <code>CONTROLASCENTDISTANCE_M</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>EXTRACTIONSTATE</code> jamais câblé en production</li><li>Pin <code>FORCEMINSPEEDSTEP</code> jamais câblé en production</li><li>Pin <code>M1MEASUREDSPEEDVALID</code> jamais câblé en production</li><li>Pin <code>M1POSITION_M</code> jamais câblé en production</li><li>Pin <code>M2MEASUREDSPEEDVALID</code> jamais câblé en production</li><li>Pin <code>M2POSITION_M</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>MOTIONDIRECTION</code> jamais câblé en production</li><li>Pin <code>MOTIONREQUESTACTIVE</code> jamais câblé en production</li><li>Pin <code>OPERATORACTION</code> jamais câblé en production</li><li>Pin <code>OPERATORACTIONID</code> jamais câblé en production</li><li>Pin <code>POSITIONSVALID</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li><li>Pin <code>WINCHSYNCERROR</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MODE <span class="pin-type">IEC_E_MODE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MOTIONREQUESTACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MOTIONDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BOTTOMPOSITIONCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETISCLOSED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETBUSY <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETERROR <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">WINCHSYNCERROR <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1POSITION_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2POSITION_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1MEASUREDSPEEDVALID <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2MEASUREDSPEEDVALID <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POSITIONSVALID <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CONTROLASCENTDISTANCE_M <span class="pin-type">IEC_REAL</span></div>
-        </div></div>
-            <div class="pin-block">FB_ExtractionSequence</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STATUS <span class="pin-type">ST_FBSTATUS</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">EXTRACTIONSTATE <span class="pin-type">IEC_E_EXTRACTIONSEQUENCESTATE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BUCKETCLOSEREQUEST <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">ASCENTPERMIT <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">FORCEMINSPEEDSTEP <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BOTTOMCONFIRMATIONCONSUMED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">OPERATORACTIONID <span class="pin-type">IEC_WORD</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">OPERATORACTION <span class="pin-type">IECStringVar&lt;120&gt;</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -579,63 +489,36 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-extractionsequence-0" class="test-card test-card-fail test-card-contract">
-            <header>
-                <span class="badge badge-fail">FAIL</span>
-                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Prete en service</p><p class='comment'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE</li><li>Enable=FALSE -&gt; AscentPermit=FALSE</li><li>Enable=FALSE -&gt; BucketCloseRequest=FALSE</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Coupure -&gt; Ready retombe a FALSE</li><li>Coupure -&gt; AscentPermit=FALSE</li></ul></details>
-            <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB.READY expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_extractionsequence.st:18</div><div class='failure-msg'>Enable=TRUE -&gt; Ready=TRUE (nominal)</div></div>
-            
-    <div class="chronogram-group">
-        <div class="chrono-fail-note">⚠️ Trace interrompue au scan #1 — c'est le scan où l'assertion a échoué (le test s'arrête net, les scans suivants n'existent pas).</div>
-        <details open>
-            <summary>📊 Chronogramme graphique (2 scans, 4 variables actives)</summary>
-            <div class="wf-scroll"><svg width="332" height="252" viewBox="0 0 332 252" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="234" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="246" class="wf-scan">#0</text><rect x="256" y="56" width="56" height="178" class="wf-fail-band"/><text x="284.0" y="34" class="wf-fail-marker">⚠️ FAIL</text><line x1="256" y1="56" x2="256" y2="234" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="246" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">EXTRACTIONSTATE</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="219.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">0</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><rect x="275.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="284.0" y="117.0" class="wf-num-changed">5</text><text x="182" y="166.0" class="wf-label">OPERATORACTIONID</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="219.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">0</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="273.5" y="148.0" width="21" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">640</text><text x="182" y="206.0" class="wf-label">ERRORCAUSEPRESENT</text><circle cx="192" cy="202.0" r="4" fill="#dc2626"/><path d="M200,214L256,214L256,214L256,188L312,188" class="wf-line" stroke="#dc2626"/></svg></div>
-        </details>
-        <details open>
-            <summary>📋 Chronogramme tableau (2 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>EXTRACTIONSTATE</th><th>OPERATORACTIONID</th><th>ERRORCAUSEPRESENT</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-false">FALSE</span></td></tr><tr class='row-fail-scan'><td class='scan-idx'>#1 ⚠️</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>5</td><td class='changed'>640</td><td class='changed'><span class="v-true">TRUE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (24)</summary>
-        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>MOTIONREQUESTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOTIONDIRECTION</code></td><td>0</td></tr><tr><td><code>BOTTOMPOSITIONCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETISCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1POSITION_M</code></td><td>0</td></tr><tr><td><code>M2POSITION_M</code></td><td>0</td></tr><tr><td><code>M1MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTROLASCENTDISTANCE_M</code></td><td>0</td></tr><tr><td><code>READY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETCLOSEREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ASCENTPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FORCEMINSPEEDSTEP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BOTTOMCONFIRMATIONCONSUMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTROLSTARTM1POSITION_M</code></td><td>0</td></tr><tr><td><code>CONTROLSTARTM2POSITION_M</code></td><td>0</td></tr></tbody></table>
-    </details>
-    </div>
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-extractionsequence-1" class="test-card test-card-fail">
+        <article id="test-fb-extractionsequence-0" class="test-card test-card-pass">
             <header>
-                <span class="badge badge-fail">FAIL</span>
-                <h3>TC-P04-020 Extraction : mise en service sequence extraction </h3>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X) </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Sequence Extraction prete</li></ul></details>
-            <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB.READY expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_extractionsequence.st:30</div><div class='failure-msg'>Sequence Extraction prete</div></div>
             
-    <div class="chronogram-group">
-        <div class="chrono-fail-note">⚠️ Trace interrompue au scan #0 — c'est le scan où l'assertion a échoué (le test s'arrête net, les scans suivants n'existent pas).</div>
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (28)</summary>
-            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>MOTIONREQUESTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOTIONDIRECTION</code></td><td>0</td></tr><tr><td><code>BOTTOMPOSITIONCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETISCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1POSITION_M</code></td><td>0</td></tr><tr><td><code>M2POSITION_M</code></td><td>0</td></tr><tr><td><code>M1MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTROLASCENTDISTANCE_M</code></td><td>0</td></tr><tr><td><code>READY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EXTRACTIONSTATE</code></td><td>5</td></tr><tr><td><code>BUCKETCLOSEREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ASCENTPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FORCEMINSPEEDSTEP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BOTTOMCONFIRMATIONCONSUMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>OPERATORACTIONID</code></td><td>640</td></tr><tr><td><code>CONTROLSTARTM1POSITION_M</code></td><td>0</td></tr><tr><td><code>CONTROLSTARTM2POSITION_M</code></td><td>0</td></tr><tr><td><code>ERRORCAUSEPRESENT</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
-        </details>
-    </div>
+            
+            
+        </article>
+        <article id="test-fb-extractionsequence-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_02_Acquisition : Decodage capteurs Translation M3 et calcul mot de position </h3>
+            </header>
+            
+            
+            
+            
         </article>
         </div>
     </details>
@@ -925,11 +808,11 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
 
 test_fb_extractionsequence.st
          ASSERT_TRUE failed: FB.READY expected TRUE, got FALSE
-         at test_fb_extractionsequence.st:18
+         at test_fb_extractionsequence.st:16
          Message: Enable=TRUE -&gt; Ready=TRUE (nominal)
   [FAIL] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
          ASSERT_TRUE failed: FB.READY expected TRUE, got FALSE
-         at test_fb_extractionsequence.st:30
+         at test_fb_extractionsequence.st:27
          Message: Sequence Extraction prete
   [FAIL] TC-P04-020 Extraction : mise en service sequence extraction
 
