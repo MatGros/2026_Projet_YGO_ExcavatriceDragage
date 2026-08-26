@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Role : liste les defauts/warnings actifs de toute la machine,
       affiches un a la fois en rotation (FB_Hmi_BannerFormatter S5)
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md S4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md S6
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_AlarmBanner :
 STRUCT
