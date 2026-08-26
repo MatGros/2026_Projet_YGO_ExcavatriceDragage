@@ -177,6 +177,7 @@ Forme cible destinée à se généraliser aux autres FB `standard` (cf. §3).
 | `Texte` | `STRING` | Libellé IHM de la cause |
 
 **Comportement clé** (détail Cause/Ack : §4 + `CODE_QUALITY_STANDARDS.md §2quinquies/§9`) :
+
 - Une cause est classée Fault ou Warning par **`IsWarning`** (jamais les deux). `IsWarning=TRUE`
   → warning **auto-effacé** avec la cause (ne lève jamais `Error`) ; `IsWarning=FALSE` → défaut
   **laté** à acquitter, qui se re-lathe si la cause revient. Fail-safe : toute cause sans
@@ -218,6 +219,7 @@ Status := instFbStatus.Status;
 Exemple réel équivalent : `CODE/D_JOYSTICK/FB_Joystick.st` (`instFbStatus`).
 
 **⚠️ Limites restantes** (voir `DOC/WFLOW/TASKS.yaml`) :
+
 - **T147 — RÉSOLU** : le latch d'un défaut survit désormais à un cycle `Enable=FALSE` (décision (b)).
 - **T148** : un `Reset` simplement **maintenu** (niveau haut, pas de nouveau front) pendant que
   la cause disparaît acquitte silencieusement le défaut, sans confirmation au moment réel de la

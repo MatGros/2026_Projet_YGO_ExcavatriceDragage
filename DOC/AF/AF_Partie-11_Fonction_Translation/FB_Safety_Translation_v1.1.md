@@ -74,10 +74,12 @@ Produit `SafeStop` et `PowerCutOff`. 1 instance (`instSafetyTranslationM3`), Ena
 ## 4. Méca A et Méca B (détail)
 
 ### Méca A (bit5) — mouvement non commandé
+
 **Condition** : `Direction=0 AND NOT BrakeCmd` puis `ABS(DriveActualFreqHz) > 0.5Hz` pendant >1.0s.
 **Variateur tourne sans commande** → SafeStop + PowerCutOff.
 
 ### Méca B (bit4) — incohérence arrêt persistant
+
 **Condition standard** : `Direction=0 AND NOT BrakeCmd` puis `DriveStatusWord.0 OR NOT BrakeFeedback`
 pendant >3.0s. **Contacteur/frein ne confirment pas l'arrêt** → SafeStop + PowerCutOff.
 

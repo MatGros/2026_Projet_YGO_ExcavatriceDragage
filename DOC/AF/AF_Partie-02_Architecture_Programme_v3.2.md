@@ -158,7 +158,7 @@ creait les cycles Safety <-> Treuils et Safety <-> Translation. Correspondance d
 
 | POU actuel | Devient | Motif |
 |---|---|---|
-| `PRG_INPUTS_LD` | ✅ retiré | La qualification est absorbée par `PRG_02_Acquisition` ; retrait vérifié sur le code source (2026-08-26).
+| `PRG_INPUTS_LD` | ✅ retiré | La qualification est absorbée par `PRG_02_Acquisition` ; retrait vérifié sur le code source (2026-08-26). |
 | `PRG_ACQUISITION_CFC` + `PRG_01_Diagnostics` + `PRG_02_Encoders` + `PRG_AUXILIARY_CFC` | `PRG_02_Acquisition` | Acquérir une mesure, sa vitesse et sa santé est **une seule responsabilité** (ST pur). |
 | `PRG_MODES_CFC` + `PRG_05_Cycle` | `PRG_03_Modes_Cycle` | Autorisations et séquences de conduite au même endroit (ST pur). |
 | `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne` | M1 et M2 sont mécaniquement indissociables (benne suspendue) ; leur safety est appelée au même endroit (ST pur). |
@@ -171,6 +171,7 @@ creait les cycles Safety <-> Treuils et Safety <-> Translation. Correspondance d
 consommateurs, producteur unique et preuve de liaison.
 
 📌 Dossiers de revue et audits d'architecture :
+
 - `ARCHIVES/Doc/AUDITS/Architecture/TABLE_POU_ACTIFS_VS_LEGACY_v1.0.md` : Cartographie POU actifs vs legacy et procédure de nettoyage CODESYS.
 - `ARCHIVES/Doc/AUDITS/Architecture/PLAN_Migration_MainTask_CFC_v1.0.md` : Preuves des cycles supprimés par le découpage par procédé.
 Tant que les décisions de migration ne sont pas appliquées, cette section ne constitue pas une

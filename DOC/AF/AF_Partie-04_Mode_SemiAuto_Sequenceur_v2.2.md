@@ -83,6 +83,7 @@ Ces briques ne **pas** des modes machine.
 - En anomalie : arrêt sécurisé demandé + diagnostic.
 
 ### ⛏️ `FB_ExtractionSequence` — Extraction
+
 - S'active apres confirmation de fond valide, ou attestation manuelle explicite en maintenance.
 - Ferme la benne via le domaine Benne.
 - Remonte en phase de controle puis en phase nominale.
@@ -224,6 +225,7 @@ de rattrapage dédiée" — **non trouvée dans le code** (`FB_Cycle.st`, `FB_Wi
 TBD ci-dessous est donc restreint à ce qui est réellement encore ouvert.
 
 ### TBD synchro
+
 - **Manœuvre de rattrapage** (catch-up) : aucune machine d'état dédiée n'existe aujourd'hui pour
   ramener l'axe en retard — à concevoir si le besoin est confirmé.
 - **Axe prioritaire de rattrapage** en cas de future manœuvre de rattrapage.

@@ -152,9 +152,10 @@ flowchart LR
 | **4** | **`OperatorActionText`** *(Action)* | Consigne d'action physique attendue immédiatement du conducteur. | `[Organe] <Verbe d'action> > <Condition de fin>` | • `[JOYSTICK] Pousser Y- (Descente) > Attendre contact fond`<br>• `[PUPITRE] Appuyer sur Bouton HOMING M2` |
 
 ### 🧩 5.2 Principes de génération & Typage fort
-* **Pas de manipulation de texte dans les FB procédé** : Les FB métier (`FB_Cycle`, `FB_DiveSearch`, `FB_Safety_Winch`, etc.) publient exclusivement des états typés (`E_CycleStep`, `E_DiveSearchState`, `ActionId : WORD`, flags booléens de bypass).
-* **Arbitre central dans `PRG_07_Supervision`** : Le POU `PRG_07_Supervision` instancie un formateur dédié (`FB_Hmi_BannerFormatter`) qui assemble les 4 champs selon les priorités machine et met à jour `GVL_IHM.Banner`.
-* **Séparation stricte avec les alarmes** : Les alarmes et pannes restent publiées dans `Error`/`ErrorId` et traitées par le gestionnaire d'alarmes / journal de supervision IHM. Le bandeau d'information ne remplace pas le journal d'alarmes.
+
+- **Pas de manipulation de texte dans les FB procédé** : Les FB métier (`FB_Cycle`, `FB_DiveSearch`, `FB_Safety_Winch`, etc.) publient exclusivement des états typés (`E_CycleStep`, `E_DiveSearchState`, `ActionId : WORD`, flags booléens de bypass).
+- **Arbitre central dans `PRG_07_Supervision`** : Le POU `PRG_07_Supervision` instancie un formateur dédié (`FB_Hmi_BannerFormatter`) qui assemble les 4 champs selon les priorités machine et met à jour `GVL_IHM.Banner`.
+- **Séparation stricte avec les alarmes** : Les alarmes et pannes restent publiées dans `Error`/`ErrorId` et traitées par le gestionnaire d'alarmes / journal de supervision IHM. Le bandeau d'information ne remplace pas le journal d'alarmes.
 
 ### 🧊 5.3 Stratégie anti-clignotement (décision 2026-08-17)
 

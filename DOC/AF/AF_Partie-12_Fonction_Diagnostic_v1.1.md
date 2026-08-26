@@ -149,12 +149,14 @@ supervision) — migration 7 POU soldée, historique archivé (`ARCHIVES/Doc/AUD
 ## 📊 6 · ErrorId
 
 ### FB_Diag_CanOpen (DeviceJoystick.ErrorId)
+
 | Bit | Cause |
 |---|---|
 | 0 | Perte liaison CAN joystick |
 | 1 | Joystick non opérationnel (pas RUNNING) |
 
 ### FB_Diag_Ethercat
+
 | Device | Bit (intention) | Bit (code réel) | Cause |
 |---|---|---|---|
 | DeviceVariateur | 4 | 4 (`16#0010`) | Perte liaison variateur M3 |
