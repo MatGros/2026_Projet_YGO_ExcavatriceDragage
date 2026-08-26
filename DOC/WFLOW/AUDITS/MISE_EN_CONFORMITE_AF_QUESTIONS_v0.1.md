@@ -16,7 +16,8 @@
 | AF-05 | ✅ Fait | `98cf96ee` | 1 tour, nom de variable inexistant corrigé (`TglMaintenanceZoneAccess`→`SelMaintenanceZoneAccess`) |
 | AF-06 | ✅ Fait | `18ba121b` | 1 tour, ⛔ P0 sécurité trouvé (EncoderIncoherent non consommé par Modes/Safety) |
 | AF-07 | ✅ Fait | `6a8cec2b` | 2 tours (1er a échoué sur limite API), section §6 manquante depuis toujours écrite from scratch |
-| AF-10 | ✅ Fait (chapô seul, 9 fiches FB non retouchées) | (à suivre) | 1 tour, 4 liens morts + §5.1 fausse + refs tâches inexistantes |
+| AF-10 | ✅ Fait (chapô seul, 9 fiches FB non retouchées) | `951db663` | 1 tour, 4 liens morts + §5.1 fausse + refs tâches inexistantes |
+| AF-11 | ✅ Fait | (à suivre) | 1 tour, ⛔ catalogue TC inventé + anti-télescopage mal attribué (F_Safety_Translation au lieu de PRG_05 direct) |
 | AF-07 | ⬜ | — | — |
 | AF-08 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
 | AF-09 | ✅ Déjà fait (session précédente) | `a045b40c` | — |
@@ -114,6 +115,15 @@ Vu le volume (9 fiches FB dédiées, AF métier le plus dense traité jusqu'ici)
 aucun écart trouvé). **Question pour l'humain** : une passe dédiée sur les 9 fiches FB d'AF-10
 est-elle prioritaire, ou le rythme actuel (chapô uniquement pour les AF les plus denses) convient-il
 pour la suite (AF-11 à AF-14) ?
+
+### Q9 — F11.05 (anti-télescopage hauteur M1/M2) : aucun TC dédié, C4, non testé formellement
+Trouvé en review AF-11 (2026-08-26) : l'interlock anti-télescopage réel (`M3_HeightInterlockOk`,
+`PRG_05_Translation.st` §0) n'a jamais eu de fiche ni de `TC-P11-*` dédié — le chapô l'attribuait
+par erreur à `FB_Safety_Translation` (corrigé, section §1/Table des fonctions/diagramme). Fonction
+C4 (risque collision benne/translation), câblage direct hors FB, zéro test formel identifié à ce
+jour. **Décision requise** : créer un TC (root ID, propriétaire à désigner) et/ou une fiche
+dédiée, ou documenter explicitement pourquoi ce câblage reste hors périmètre de test formel.
+Documenté en TBD `AF_Partie-11_Fonction_Translation_v2.3.md §6`.
 
 ---
 

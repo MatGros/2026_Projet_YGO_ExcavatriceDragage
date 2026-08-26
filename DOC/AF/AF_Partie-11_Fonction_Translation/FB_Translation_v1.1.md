@@ -1,6 +1,6 @@
 # FB_Translation — Spec composant (v1.1)
 
-> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.2.md`](../AF_Partie-11_Fonction_Translation_v2.2.md) §4.
+> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.3.md`](../AF_Partie-11_Fonction_Translation_v2.3.md) §4.
 > Rôle de **ce** document : mouvement M3 (rampe, arbitrage, mot AC600, ralentissement PV,
 > arrêt sur capteur, frein) — et **catalogue unique** des `TC-P11-003` à `TC-P11-005`, `TC-P11-013`.
 > Compose `FB_Brake` (réutilisé depuis COMMUN) + `FB_Ramp` (continu %/s — contrairement aux treuils à paliers discrets).
