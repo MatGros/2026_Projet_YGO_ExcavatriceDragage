@@ -4,5 +4,27 @@
     "python.testing.pytestArgs": [
         "TOOLS"
     ],
-    "python.testing.autoTestDiscoverOnSaveEnabled": true
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    "folder-color.pathColors": [
+        {
+            "folderPath": "DOC\\",
+            "color": "foldercolorizer.color_00afff",
+            "isFolderOnly": true
+        },
+        {
+            "folderPath": "CODE\\",
+            "color": "foldercolorizer.color_afff5f",
+            "isFolderOnly": true
+        },
+        {
+            "folderPath": "TOOLS\\",
+            "color": "foldercolorizer.color_ff00d7",
+            "isFolderOnly": true
+        },
+        {
+            "folderPath": "TOOLS\\TEST_AUTO_CI\\",
+            "color": "foldercolorizer.color_8700ff",
+            "isFolderOnly": true
+        }
+    ]
 }
