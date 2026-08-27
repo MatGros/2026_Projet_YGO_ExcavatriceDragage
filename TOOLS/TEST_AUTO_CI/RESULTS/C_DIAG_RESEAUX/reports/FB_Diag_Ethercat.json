@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_diag_ethercat.st",
+  "file": "test_fb_modes.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P12-010 EtherCAT : surveillance maitre et esclaves",
+      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
       "passed": true
     }
   ],

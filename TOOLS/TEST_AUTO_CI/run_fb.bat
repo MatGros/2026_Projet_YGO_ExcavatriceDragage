@@ -1,6 +1,7 @@
 @echo off
 setlocal
 set "SCRIPT_DIR=%~dp0"
+pushd "%~dp0..\.."
 
 if "%~1"=="" (
     echo ========================================================
@@ -22,6 +23,7 @@ if "%~1"=="" (
 
 if "%FB_NAME%"=="" (
     echo Nom de FB non specifie. Annulation.
+    popd
     pause
     exit /b 1
 )
@@ -29,6 +31,8 @@ if "%FB_NAME%"=="" (
 echo ========================================================
 echo   Lancement du test pour %FB_NAME% (avec chronogrammes)
 echo ========================================================
-python "%SCRIPT_DIR%run_tests.py" --fb %FB_NAME% %1 %2 %3 %4 %5 %6 %7 %8 %9
+python "%SCRIPT_DIR%scripts\run_tests.py" --fb %FB_NAME% %1 %2 %3 %4 %5 %6 %7 %8 %9
 echo.
+popd
 pause
+

@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 21:38:26</div>
+    <div class="exec-time">2026-08-27 13:01:00</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (5 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-0">Sans front Execute, aucun verdict n est produit au demarrage (BootPending retire)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-1">Un front Execute machine immobile produit le verdict au meme scan</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-2">Execute pendant que la machine roule differe le verdict jusqu a l arret complet</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-3">Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-4">Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple)</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-1">TC-P05-010 Modes : selection et autorisation mode Maintenance N1</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/5 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
@@ -283,93 +283,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 25 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BRAKETHERMALOK</code> jamais câblé en production</li><li>Pin <code>EMERGENCYCHAINCLOSED</code> jamais câblé en production</li><li>Pin <code>ENCODERM1OPERATIONAL</code> jamais câblé en production</li><li>Pin <code>ENCODERM2OPERATIONAL</code> jamais câblé en production</li><li>Pin <code>EXECUTE</code> jamais câblé en production</li><li>Pin <code>HOMEDM1</code> jamais câblé en production</li><li>Pin <code>HOMEDM2</code> jamais câblé en production</li><li>Pin <code>M1BRAKEAPPLIED</code> jamais câblé en production</li><li>Pin <code>M1CONTACTORSRELEASED</code> jamais câblé en production</li><li>Pin <code>M1POSITIONINBOUNDS</code> jamais câblé en production</li><li>Pin <code>M1THERMALOK</code> jamais câblé en production</li><li>Pin <code>M2BRAKEAPPLIED</code> jamais câblé en production</li><li>Pin <code>M2CONTACTORSRELEASED</code> jamais câblé en production</li><li>Pin <code>M2POSITIONINBOUNDS</code> jamais câblé en production</li><li>Pin <code>M2THERMALOK</code> jamais câblé en production</li><li>Pin <code>M3BRAKEAPPLIED</code> jamais câblé en production</li><li>Pin <code>M3SENSORWORDINCOHERENT</code> jamais câblé en production</li><li>Pin <code>MACHINEISSTILL</code> jamais câblé en production</li><li>Pin <code>PHASEROTATIONOK</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>PREFLIGHTBUSY</code> jamais câblé en production</li><li>Pin <code>PREFLIGHTDONE</code> jamais câblé en production</li><li>Pin <code>PREFLIGHTERRORID</code> jamais câblé en production</li><li>Pin <code>PREFLIGHTOK</code> jamais câblé en production</li><li>Pin <code>SLACKCABLETENSIONED</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EXECUTE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MACHINEISSTILL <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1BRAKEAPPLIED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2BRAKEAPPLIED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M3BRAKEAPPLIED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1CONTACTORSRELEASED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2CONTACTORSRELEASED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1THERMALOK <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2THERMALOK <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BRAKETHERMALOK <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">PHASEROTATIONOK <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SLACKCABLETENSIONED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M3SENSORWORDINCOHERENT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EMERGENCYCHAINCLOSED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENCODERM1OPERATIONAL <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENCODERM2OPERATIONAL <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMEDM1 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMEDM2 <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1POSITIONINBOUNDS <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2POSITIONINBOUNDS <span class="pin-type">IEC_BOOL</span></div>
-        </div></div>
-            <div class="pin-block">FB_Acquisition_Preflight</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">PREFLIGHTOK <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">PREFLIGHTDONE <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">PREFLIGHTBUSY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">PREFLIGHTERRORID <span class="pin-type">IEC_WORD</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -446,64 +359,34 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-acquisition-preflight-0" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-acquisition-preflight-0" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Sans front Execute, aucun verdict n est produit au demarrage (BootPending retire) </h3>
-            </header>
-            
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>aucun front Execute -&gt; aucun verdict, meme machine immobile</li><li>aucune demande en attente sans front Execute</li></ul></details>
-            
-            
-        </article>
         <article id="test-fb-acquisition-preflight-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>Un front Execute machine immobile produit le verdict au meme scan </h3>
+                <h3>TC-P05-010 Modes : selection et autorisation mode Maintenance N1 </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>front Execute + machine immobile -&gt; verdict produit</li><li>toutes les conditions saines -&gt; verdict OK</li><li>aucun defaut -&gt; ErrorId a 0</li></ul></details>
             
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Execute pendant que la machine roule differe le verdict jusqu a l arret complet </h3>
-            </header>
-            <div class="comments"><p class='comment'>scan 1 : front Execute demande un preflight, machine deja a l arret, etat propre pour la suite</p><p class='comment'>scan 1bis : Execute retombe, pour que le prochain front soit bien detecte</p><p class='comment'>scan 2 : operateur demande un nouveau preflight (front Execute) PENDANT que la machine roule</p><p class='comment'>scan 3 : la machine s arrete, le verdict differe se calcule enfin</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>demande en attente tant que la machine roule</li><li>pas de verdict tant que la machine n est pas a l arret complet</li><li>machine arretee : le verdict differe se calcule</li><li>plus de demande en attente une fois le verdict rendu</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Un defaut isole (frein M1 non serre) leve le bit ErrorId correspondant </h3>
-            </header>
-            
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>frein M1 desserre a l arret -&gt; verdict NOK</li><li>bit0 (frein M1) seul leve, aucun autre bit parasite</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Contacteur puissance enclenche sans chaine AU fermee leve le bit dedie (logique AND, pas NOT simple) </h3>
-            </header>
-            <div class="comments"><p class='comment'>seule condition du FB qui n est pas un simple &quot;NOT X&quot; -- verifie explicitement</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>bit11 : contacteur engage alors que la chaine AU est ouverte -- anomalie</li></ul></details>
             
             
         </article>

@@ -1,23 +1,19 @@
 {
   "version": 1,
-  "file": "test_fb_filter.st",
+  "file": "test_fb_modes.st",
   "results": [
     {
-      "name": "Pass-through si TimeConst=0 (pas de lissage)",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "Pass-through si CycleTimeS=0 (temps de cycle invalide)",
-      "passed": true
-    },
-    {
-      "name": "Reponse PT1 : convergence progressive vers un echelon, pas instantanee",
+      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 2,
+    "passed": 2,
     "failed": 0
   }
 }

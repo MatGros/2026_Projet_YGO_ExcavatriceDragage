@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 23:59:21</div>
+    <div class="exec-time">2026-08-27 12:59:53</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (1 test)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-0">PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X)</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-0">PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-1">PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-2">PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-3">PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-4">PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            1/1 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -516,7 +516,7 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_02_Acquisition</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 84 flux entrants · 87 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_02_Acquisition</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 90 flux entrants · 87 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimBench <span style="color:var(--muted);font-weight:500;">(FB_SimBench)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instJoystick <span style="color:var(--muted);font-weight:500;">(FB_Joystick)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagCanOpen <span style="color:var(--muted);font-weight:500;">(FB_Diag_CanOpen)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagEthercat <span style="color:var(--muted);font-weight:500;">(FB_Diag_Ethercat)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM1 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM2 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ M2BucketRefOpenEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ M2BucketRefCloseEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwM1 <span style="color:var(--muted);font-weight:500;">(ST_EncoderHw)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwM2 <span style="color:var(--muted);font-weight:500;">(ST_EncoderHw)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeRise <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeFall <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span></div>
@@ -676,7 +676,7 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_IHM</span> <span style="font-size:11px;color:#38bdf8;">(4 signaux ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_IHM</span> <span style="font-size:11px;color:#38bdf8;">(10 signaux ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Lecture Globale</span></div>
                 </div>
             </summary>
@@ -694,7 +694,31 @@
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Network.Bypass.BusCanOpen</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Network.Bypass.BusEthercat</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Network.Bypass.EncoderM1</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Network.Bypass.EncoderM2</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Network.Bypass.Global</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Network.Bypass.Joystick</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Network.Bypass.VariateurM3</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
             </div></div>
         </details>
@@ -971,13 +995,13 @@
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
                     <div>• Entrées Formelles : <b style="color:#ffffff;">0</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">34</b></div>
-                    <div>• Lectures GVL : <b style="color:#ffffff;">9</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">15</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">24</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">4</b></div>
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">4</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">67</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">20</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">84 IN</b> / <b style="color:#ffffff;">87 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">90 IN</b> / <b style="color:#ffffff;">87 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -1489,14 +1513,14 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Diag_CanOpen</code></td>
-                <td>6</td><td>11</td>
-                <td>0</td><td>6</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (6 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>8</td><td>3</td>
+                <td>0</td><td>5</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (5 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Diag_Ethercat</code></td>
-                <td>9</td><td>14</td>
+                <td>13</td><td>5</td>
                 <td>0</td><td>10</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (10 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
@@ -1581,37 +1605,58 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-02-acquisition-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X) </h3>
+                <h3>PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires) </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>Structure Data: Homme-mort arme avec succes</li><li>Structure Data: Position cable M1 = 2.0m</li><li>Structure Data: Codeur M1 fiabilise</li><li>Sens X positif detecte (Translation Droite)</li><li>Consigne de vitesse non nulle transmise sur le bus Data</li><li>Structure HwIn: JoyXRaw_ANA1 transmis</li><li>Structure HwIn: JoyBtnRaw transmis</li></ul></details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (4 scans, 2 variables actives)</summary>
-            <div class="wf-scroll"><svg width="444" height="172" viewBox="0 0 444 172" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="154" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="166" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="154" class="wf-grid"/><text x="284.0" y="52" class="wf-time">60ms</text><text x="284.0" y="166" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="154" class="wf-grid"/><text x="340.0" y="52" class="wf-time">210ms</text><text x="340.0" y="166" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="154" class="wf-grid"/><text x="396.0" y="52" class="wf-time">220ms</text><text x="396.0" y="166" class="wf-scan">#3</text><text x="182" y="86.0" class="wf-label">JOYRAWX</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="214.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5000</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><text x="284.0" y="76.0" class="wf-num">5000</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><text x="340.0" y="76.0" class="wf-num">5000</text><line x1="368" y1="82.0" x2="424" y2="82.0" class="wf-num-line"/><rect x="382.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="77.0" class="wf-num-changed">8000</text><text x="182" y="126.0" class="wf-label">JOYBTNRAW</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L368,108L424,108" class="wf-line" stroke="#059669"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (4 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>JOYRAWX</th><th>JOYBTNRAW</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>5000</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>60 ms</td><td>5000</td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>210 ms</td><td>5000</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>220 ms</td><td class='changed'>8000</td><td><span class="v-true">TRUE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (37)</summary>
-        <table class="static-table"><tbody><tr><td><code>JOYRAWY</code></td><td>5000</td></tr><tr><td><code>COD1_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>COD2_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CANBUSOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ECATOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SIMULATIONMODEACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM1.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM2.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>HWM1.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>HWM2.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>NXMEM</code></td><td>5000</td></tr><tr><td><code>NYMEM</code></td><td>5000</td></tr><tr><td><code>CALIBINIT</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
-    </details>
-    </div>
+            
+        </article>
+        <article id="test-prg-02-acquisition-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-prg-02-acquisition-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-prg-02-acquisition-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1 </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-prg-02-acquisition-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale) </h3>
+            </header>
+            
+            
+            
+            
         </article>
         </div>
     </details>
@@ -2192,24 +2237,16 @@ VAR_INPUT
     // === BYPASS &amp; SIMULATION ===
     SimBypassActive             : BOOL;         // --&gt; [TST] TRUE = simulation active pour ce device
     NetworkBypassActive         : BOOL;         // --&gt; [TST] TRUE = bypass reseau global IHM
+    CanBusBypassActive          : BOOL;         // --&gt; [TST] TRUE = bypass specifique bus CANopen maître
+    JoystickBypassActive        : BOOL;         // --&gt; [TST] TRUE = bypass specifique esclave Joystick
 END_VAR
 VAR_OUTPUT
-    // === ETATS IEC &amp; CONFORMITE ===
+    // === ETAT DU BLOC ===
     Ready                       : BOOL;         // &lt;-- [STAT] Logique de surveillance active
-    Busy                        : BOOL;         // &lt;-- [STAT] Non utilise (conformite interface)
-    Done                        : BOOL;         // &lt;-- [STAT] Non utilise
-    State                       : E_Diag_State; // &lt;-- [STAT] Phase courante (INIT/SIMULATED/READY/ERROR)
 
-    // === DIAGNOSTICS &amp; ALARMES ===
-    Error                       : BOOL;         // &lt;-- [DIAG] Presence anomalie de communication
-    ErrorId                     : WORD;         // &lt;-- [DIAG] Code defaut global resume
-    StateAtError                : E_Diag_State; // &lt;-- [DIAG] Phase figee a l&#x27;apparition de l&#x27;erreur
-    DeviceCanOpenMaster         : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics bus CANopen
-    DeviceJoystick              : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics esclave Joystick
-
-    // === MIROIRS BRUTS MATERIEL ===
-    CANbusStateRawOut           : INT;          // &lt;-- [DIAG] Miroir brut status CANbus
-    DeviceJoystickStateRawOut   : DEVICE_STATE; // &lt;-- [DIAG] Miroir brut status Joystick
+    // === DIAGNOSTICS STRUCTURES PAR EQUIPEMENT ===
+    DeviceCanOpenMaster         : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics bus CANopen maître (Online, Op, Error, ErrorId, State)
+    DeviceJoystick              : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics esclave Joystick (Online, Op, Error, ErrorId, State)
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
@@ -2218,16 +2255,14 @@ VAR
     // === CALCULS ET ETATS INTERNES ===
     CANbusOnlineReal            : BOOL;         // . [LOC]  Bus reellement actif, hors tout bypass
     DeviceJoystickOnlineReal    : BOOL;         // . [LOC]  Joystick reellement RUNNING, hors tout bypass
-    BypassActive                : BOOL;         // . [LOC]  Simulation OU bypass reseau IHM
-    CANbusOnlineEff             : BOOL;         // . [LOC]  Online effectif (reel OU bypass)
-    DeviceJoystickOnlineEff     : BOOL;         // . [LOC]  Operational effectif (reel OU bypass)
+    CANbusOnlineEff             : BOOL;         // . [LOC]  Online effectif bus CAN (reel OU bypass)
+    DeviceJoystickOnlineEff     : BOOL;         // . [LOC]  Operational effectif joystick (reel OU bypass)
 END_VAR
 
 {region &quot;§1 Gate&quot;}
 // 🛑 1. GATE : Désactivation logique si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
-    State := E_Diag_State.DISABLED;
     DeviceJoystick.State := E_Diag_State.DISABLED;
     DeviceJoystick.Online := FALSE;
     DeviceJoystick.Operational := FALSE;
@@ -2236,10 +2271,8 @@ IF NOT Enable THEN
     DeviceCanOpenMaster.State := E_Diag_State.DISABLED;
     DeviceCanOpenMaster.Online := FALSE;
     DeviceCanOpenMaster.Operational := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
-    CANbusStateRawOut := CANbusStateRaw;
-    DeviceJoystickStateRawOut := DeviceJoystickStateRaw;
+    DeviceCanOpenMaster.Error := FALSE;
+    DeviceCanOpenMaster.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -2250,9 +2283,9 @@ Ready := TRUE;
 // 🧮 2. INTERPRÉTATION DES VALEURS BRUTES
 CANbusOnlineReal         := (CANbusStateRaw = 2);
 DeviceJoystickOnlineReal := (DeviceJoystickStateRaw = DEVICE_STATE.RUNNING);
-BypassActive             := SimBypassActive OR NetworkBypassActive;
-CANbusOnlineEff          := CANbusOnlineReal OR BypassActive;
-DeviceJoystickOnlineEff  := DeviceJoystickOnlineReal OR BypassActive;
+
+CANbusOnlineEff          := CANbusOnlineReal OR SimBypassActive OR NetworkBypassActive OR CanBusBypassActive;
+DeviceJoystickOnlineEff  := DeviceJoystickOnlineReal OR SimBypassActive OR NetworkBypassActive OR JoystickBypassActive;
 {endregion}
 
 {region &quot;§3 Reset front&quot;}
@@ -2261,7 +2294,7 @@ ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
     IF (CANbusOnlineEff AND DeviceJoystickOnlineEff) THEN
         DeviceJoystick.ErrorId := 16#0000;
-        StateAtError := E_Diag_State.DISABLED;
+        DeviceJoystick.StateAtError := E_Diag_State.DISABLED;
     END_IF;
 END_IF;
 {endregion}
@@ -2290,44 +2323,36 @@ END_IF;
 // 🚦 5. MACHINE D&#x27;ÉTAT JOYSTICK
 IF DeviceJoystick.ErrorId &lt;&gt; 0 THEN
     DeviceJoystick.State := E_Diag_State.ERROR;
-    IF StateAtError = E_Diag_State.DISABLED THEN
-        StateAtError := State;
-    END_IF;
 ELSIF NOT (DeviceJoystick.Online AND DeviceJoystick.Operational) THEN
     DeviceJoystick.State := E_Diag_State.INIT;
-ELSIF BypassActive AND NOT (CANbusOnlineReal AND DeviceJoystickOnlineReal) THEN
+ELSIF (SimBypassActive OR NetworkBypassActive OR JoystickBypassActive) AND NOT (CANbusOnlineReal AND DeviceJoystickOnlineReal) THEN
     DeviceJoystick.State := E_Diag_State.SIMULATED;
 ELSE
     DeviceJoystick.State := E_Diag_State.READY;
 END_IF;
-
-State := DeviceJoystick.State;
 {endregion}
 
 {region &quot;§6 Sorties globales&quot;}
 // 📤 6. SORTIES GLOBALES
 DeviceJoystick.Error := (DeviceJoystick.ErrorId &lt;&gt; 0);
-Error := DeviceJoystick.Error;
-ErrorId := DeviceJoystick.ErrorId;
 
 DeviceCanOpenMaster.Operational := CANbusOnlineEff;
 DeviceCanOpenMaster.Online := CANbusOnlineEff;
+DeviceCanOpenMaster.Error := NOT CANbusOnlineEff;
 
 IF NOT CANbusOnlineEff THEN
-    DeviceCanOpenMaster.State := E_Diag_State.INIT;
-ELSIF BypassActive AND NOT CANbusOnlineReal THEN
+    DeviceCanOpenMaster.ErrorId := 16#0001;
+    DeviceCanOpenMaster.State := E_Diag_State.ERROR;
+    IF DeviceCanOpenMaster.StateAtError = E_Diag_State.DISABLED THEN
+        DeviceCanOpenMaster.StateAtError := E_Diag_State.INIT;
+    END_IF;
+ELSIF (SimBypassActive OR NetworkBypassActive OR CanBusBypassActive) AND NOT CANbusOnlineReal THEN
+    DeviceCanOpenMaster.ErrorId := 16#0000;
     DeviceCanOpenMaster.State := E_Diag_State.SIMULATED;
 ELSE
+    DeviceCanOpenMaster.ErrorId := 16#0000;
     DeviceCanOpenMaster.State := E_Diag_State.READY;
 END_IF;
-
-// Miroirs bruts, toujours à jour
-CANbusStateRawOut := CANbusStateRaw;
-DeviceJoystickStateRawOut := DeviceJoystickStateRaw;
-
-// Briques génériques pour conformité standard
-Busy := FALSE;
-Done := FALSE;
 {endregion}
 </pre>
             </details>
@@ -2358,29 +2383,22 @@ VAR_INPUT
     DeviceEncoderM2StateRaw     : DEVICE_STATE; // --&gt; [HW]  Valeur brute COD2_CODEUR.GetDeviceState()
     DeviceEncoderM2SimBypass    : BOOL;         // --&gt; [TST] TRUE = simulation active encodeur M2
 
-    // === BYPASS RESEAU IHM ===
+    // === BYPASS RESEAU IHM &amp; GRANULAIRES ===
     NetworkBypassActive         : BOOL;         // --&gt; [TST] TRUE = bypass reseau global IHM
+    EcatBusBypassActive         : BOOL;         // --&gt; [TST] TRUE = bypass specifique bus EtherCAT maître
+    VariateurBypassActive       : BOOL;         // --&gt; [TST] TRUE = bypass specifique esclave variateur M3
+    EncoderM1BypassActive       : BOOL;         // --&gt; [TST] TRUE = bypass specifique esclave codeur M1
+    EncoderM2BypassActive       : BOOL;         // --&gt; [TST] TRUE = bypass specifique esclave codeur M2
 END_VAR
 VAR_OUTPUT
-    // === ETATS IEC &amp; CONFORMITE ===
+    // === ETAT DU BLOC ===
     Ready                       : BOOL;         // &lt;-- [STAT] Logique de surveillance active
-    Busy                        : BOOL;         // &lt;-- [STAT] Non utilise (conformite interface)
-    Done                        : BOOL;         // &lt;-- [STAT] Non utilise
-    State                       : E_Diag_State; // &lt;-- [STAT] Phase courante du diagnostic global
 
-    // === DIAGNOSTICS &amp; ALARMES ===
-    Error                       : BOOL;         // &lt;-- [DIAG] Resume anomalie de communication bus
-    ErrorId                     : WORD;         // &lt;-- [DIAG] Code defaut global resume
-    StateAtError                : E_Diag_State; // &lt;-- [DIAG] Phase figee a l&#x27;apparition de l&#x27;erreur
+    // === DIAGNOSTICS STRUCTURES PAR EQUIPEMENT ===
     DeviceEthercatMaster        : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics bus EtherCAT
     DeviceVariateur             : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics esclave AC600
     DeviceEncoderM1             : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics esclave COD1
     DeviceEncoderM2             : ST_Diag_Device; // &lt;-- [DIAG] Diagnostics esclave COD2
-
-    // === MIROIRS BRUTS MATERIEL ===
-    DeviceVariateurStateRawOut  : DEVICE_STATE; // &lt;-- [DIAG] Miroir brut status variateur M3
-    DeviceEncoderM1StateRawOut  : DEVICE_STATE; // &lt;-- [DIAG] Miroir brut status encodeur M1
-    DeviceEncoderM2StateRawOut  : DEVICE_STATE; // &lt;-- [DIAG] Miroir brut status encodeur M2
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
@@ -2402,7 +2420,6 @@ END_VAR
 // 🛑 1. GATE : Désactivation si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
-    State := E_Diag_State.DISABLED;
     DeviceVariateur.State := E_Diag_State.DISABLED;
     DeviceEncoderM1.State := E_Diag_State.DISABLED;
     DeviceEncoderM2.State := E_Diag_State.DISABLED;
@@ -2415,14 +2432,11 @@ IF NOT Enable THEN
     DeviceVariateur.Error := FALSE;
     DeviceEncoderM1.Error := FALSE;
     DeviceEncoderM2.Error := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
     DeviceEthercatMaster.State := E_Diag_State.DISABLED;
     DeviceEthercatMaster.Online := FALSE;
     DeviceEthercatMaster.Operational := FALSE;
-    DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
-    DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
-    DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
+    DeviceEthercatMaster.Error := FALSE;
+    DeviceEthercatMaster.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -2436,9 +2450,9 @@ VariateurOnlineReal := (DeviceVariateurStateRaw = DEVICE_STATE.RUNNING);
 EncoderM1OnlineReal := (DeviceEncoderM1StateRaw = DEVICE_STATE.RUNNING);
 EncoderM2OnlineReal := (DeviceEncoderM2StateRaw = DEVICE_STATE.RUNNING);
 
-VariateurBypass := DeviceVariateurSimBypass OR NetworkBypassActive;
-EncoderM1Bypass := DeviceEncoderM1SimBypass OR NetworkBypassActive;
-EncoderM2Bypass := DeviceEncoderM2SimBypass OR NetworkBypassActive;
+VariateurBypass := DeviceVariateurSimBypass OR NetworkBypassActive OR VariateurBypassActive;
+EncoderM1Bypass := DeviceEncoderM1SimBypass OR NetworkBypassActive OR EncoderM1BypassActive;
+EncoderM2Bypass := DeviceEncoderM2SimBypass OR NetworkBypassActive OR EncoderM2BypassActive;
 
 VariateurOnlineEff := VariateurOnlineReal OR VariateurBypass;
 EncoderM1OnlineEff := EncoderM1OnlineReal OR EncoderM1Bypass;
@@ -2514,13 +2528,6 @@ ELSE
     DeviceEncoderM2.State := E_Diag_State.READY;
 END_IF;
 
-// Fige la phase du diagnostic global sur le premier défaut
-IF (DeviceVariateur.ErrorId &lt;&gt; 0 OR DeviceEncoderM1.ErrorId &lt;&gt; 0 OR DeviceEncoderM2.ErrorId &lt;&gt; 0) THEN
-    IF StateAtError = E_Diag_State.DISABLED THEN
-        StateAtError := State;
-    END_IF;
-END_IF;
-
 {endregion}
 
 {region &quot;§5 Synthese EtherCAT et sorties&quot;}
@@ -2529,40 +2536,20 @@ DeviceVariateur.Error := (DeviceVariateur.ErrorId &lt;&gt; 0);
 DeviceEncoderM1.Error := (DeviceEncoderM1.ErrorId &lt;&gt; 0);
 DeviceEncoderM2.Error := (DeviceEncoderM2.ErrorId &lt;&gt; 0);
 
-Error := (DeviceVariateur.Error OR DeviceEncoderM1.Error OR DeviceEncoderM2.Error);
-
-ErrorId := 16#0000;
-IF DeviceVariateur.Error THEN
-    ErrorId := ErrorId OR 16#00F0;
-END_IF;
-IF DeviceEncoderM1.Error THEN
-    ErrorId := ErrorId OR 16#0F00;
-END_IF;
-IF DeviceEncoderM2.Error THEN
-    ErrorId := ErrorId OR 16#F000;
-END_IF;
-
-IF Error THEN
-    State := E_Diag_State.ERROR;
-ELSIF NOT (VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff) THEN
-    State := E_Diag_State.INIT;
-ELSIF (VariateurBypass OR EncoderM1Bypass OR EncoderM2Bypass)
-      AND NOT (VariateurOnlineReal AND EncoderM1OnlineReal AND EncoderM2OnlineReal) THEN
-    State := E_Diag_State.SIMULATED;
-ELSE
-    State := E_Diag_State.READY;
-END_IF;
-
-DeviceEthercatMaster.Online := VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff;
+DeviceEthercatMaster.Online := (VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff) OR NetworkBypassActive OR EcatBusBypassActive;
 DeviceEthercatMaster.Operational := DeviceEthercatMaster.Online;
+DeviceEthercatMaster.Error := NOT DeviceEthercatMaster.Operational;
 
-DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
-DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
-DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
-
-Busy := FALSE;
-Done := FALSE;
-
+IF DeviceEthercatMaster.Error THEN
+    DeviceEthercatMaster.ErrorId := 16#0001;
+    DeviceEthercatMaster.State := E_Diag_State.ERROR;
+ELSIF (VariateurBypass OR EncoderM1Bypass OR EncoderM2Bypass OR EcatBusBypassActive) THEN
+    DeviceEthercatMaster.ErrorId := 16#0000;
+    DeviceEthercatMaster.State := E_Diag_State.SIMULATED;
+ELSE
+    DeviceEthercatMaster.ErrorId := 16#0000;
+    DeviceEthercatMaster.State := E_Diag_State.READY;
+END_IF;
 {endregion}
 </pre>
             </details>

@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 18:43:04</div>
+    <div class="exec-time">2026-08-27 12:59:38</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (11 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-joystick-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-1">TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-2">TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-3">TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-4">TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-5">TC-P08-005 Changement de mode desarme le geste, nouvel appui exige</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-6">TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-7">TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-8">TC-P08-011 Fin de cycle benne desarme le geste par defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-9">TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-10">TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-joystick-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-joystick-1">TC-P05-010 Modes : selection et autorisation mode Maintenance N1</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            11/11 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
@@ -461,114 +461,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 5 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ARMINGPERMITDENIED</code> jamais câblé en production</li><li>Pin <code>BUTTON</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>SPEEDTGTY_PCT</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="TRUE" onclick="copyPinExpr(this)">TRUE</code></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="PRG_07_Supervision.FaultMachineReset_IHM" onclick="copyPinExpr(this)">PRG_07_Supervision.FaultMachineReset_IHM</code></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="TRUE" onclick="copyPinExpr(this)">TRUE</code></div>
-            <div class="pin-name">ARMINGPERMIT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="instDiagCanOpen.DeviceCanOpenMaster" onclick="copyPinExpr(this)">instDiagCanOpen.DeviceCanOpenMaster</code></div>
-            <div class="pin-name">BUSCANOPENOP <span class="pin-type">ST_DIAG_DEVICE</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="instDiagCanOpen.DeviceJoystick" onclick="copyPinExpr(this)">instDiagCanOpen.DeviceJoystick</code></div>
-            <div class="pin-name">JOYSTICKOP <span class="pin-type">ST_DIAG_DEVICE</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="HwIn.Operator.JoyXRaw_ANA1" onclick="copyPinExpr(this)">HwIn.Operator.JoyXRaw_ANA1</code></div>
-            <div class="pin-name">RAWX <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="HwIn.Operator.JoyYRaw_ANA2" onclick="copyPinExpr(this)">HwIn.Operator.JoyYRaw_ANA2</code></div>
-            <div class="pin-name">RAWY <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="HwIn.Operator.JoyBtnRaw" onclick="copyPinExpr(this)">HwIn.Operator.JoyBtnRaw</code></div>
-            <div class="pin-name">RAWBUTTON <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate" onclick="copyPinExpr(this)">GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate</code></div>
-            <div class="pin-name">BTNCALIBRATE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="_JoystickDeadbandRaw" onclick="copyPinExpr(this)">_JoystickDeadbandRaw</code></div>
-            <div class="pin-name">DEADBANDRAW <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="T#100MS" onclick="copyPinExpr(this)">T#100MS</code></div>
-            <div class="pin-name">NEUTRALHOLDTIME <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="T#100MS" onclick="copyPinExpr(this)">T#100MS</code></div>
-            <div class="pin-name">DEADMANARMHOLDTIME <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="T#3S" onclick="copyPinExpr(this)">T#3S</code></div>
-            <div class="pin-name">DEADMANARMGRACETIME <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="500" onclick="copyPinExpr(this)">500</code></div>
-            <div class="pin-name">RAWOUTOFRANGEMARGIN <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="_JoystickNeutralX" onclick="copyPinExpr(this)">_JoystickNeutralX</code></div>
-            <div class="pin-name">NEUTRALXMEM<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="_JoystickNeutralY" onclick="copyPinExpr(this)">_JoystickNeutralY</code></div>
-            <div class="pin-name">NEUTRALYMEM<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_INT</span></div>
-        </div></div>
-            <div class="pin-block">FB_Joystick</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BUTTON <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">ERROR <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Error;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Error;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">ERRORID <span class="pin-type">IEC_WORD</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instJoystick.ErrorId;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instJoystick.ErrorId;</code></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">ARMINGPERMITDENIED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STATUS <span class="pin-type">ST_FBSTATUS</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">AXISCMDX <span class="pin-type">ST_JOYSTICK_AXISCMD</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.instJoystick.AxisCmdX;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.instJoystick.AxisCmdX;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">AXISCMDY <span class="pin-type">ST_JOYSTICK_AXISCMD</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_04_Treuils_Benne.st: M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);" onclick="copyPinExpr(this)">M_MAIN/PRG_04_Treuils_Benne.st: M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);</code> <span class='pin-more'>(+2)</span></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">NEUTRALXACT <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">NEUTRALYACT <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">SPEEDTGTX_PCT <span class="pin-type">IEC_REAL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedTgtX_Pct);" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedTgtX_Pct);</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">DIRECTIONX <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickDirectionX   := instJoystick.DirectionX;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickDirectionX   := instJoystick.DirectionX;</code> <span class='pin-more'>(+1)</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">SPEEDTGTY_PCT <span class="pin-type">IEC_REAL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">DIRECTIONY <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickYNeutral     := (instJoystick.DirectionY = 0);" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickYNeutral     := (instJoystick.DirectionY = 0);</code> <span class='pin-more'>(+3)</span></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">DEADMANARMED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">ATNEUTRAL <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_03_Modes_Cycle.st: CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutral," onclick="copyPinExpr(this)">M_MAIN/PRG_03_Modes_Cycle.st: CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutral,</code> <span class='pin-more'>(+6)</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 3 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -677,118 +569,16 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 10 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-joystick-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour) </h3>
+                <h3>TC-P05-010 Modes : selection et autorisation mode Maintenance N1 </h3>
             </header>
-            <div class="comments"><p class='comment'>arme le geste au neutre, bus sain</p><p class='comment'>deplace le joystick : mouvement actif, bus toujours sain</p><p class='comment'>perte du bus CAN EN PLEIN MOUVEMENT : neutralisation immediate + desarmement</p><p class='comment'>bus revient : pas de rearmement automatique, nouvel appui conscient exige</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (19)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>mouvement actif : consigne non nulle (RawX=8000, Neutral=5000)</li><li>sens avant pendant le mouvement</li><li>RawY au neutre : axe Y reste a 0, aucun couplage entre les axes</li><li>axe Y au neutre : DirectionY=0</li><li>bus CAN non operationnel doit bloquer Ready</li><li>perte bus = Warning auto-efface, PAS un defaut a acquitter (socle FB_FbStatus)</li><li>perte de comm doit lever un Warning (liste de causes)</li><li>bit2 : HW/bus non operationnel porte par WarningId</li><li>sorties axe X neutralisees des la perte du bus, meme en plein mouvement</li><li>consigne X coupee immediatement, pas de decel progressive</li><li>sorties axe Y aussi neutralisees (gate global, pas seulement l axe en mouvement)</li><li>consigne Y aussi coupee</li><li>le geste est desarme par la perte du bus (AF08 TC-P08-001)</li><li>bus revenu : FB de nouveau pret</li><li>bus revenu : pas de defaut (bus = Warning, jamais un Fault a acquitter)</li><li>bus revenu : Warning auto-efface sans geste operateur</li><li>bit2 efface automatiquement</li><li>pas de rearmement automatique au retour du bus : nouvel appui conscient exige</li></ul></details>
             
             
-        </article>
-        <article id="test-fb-joystick-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant </h3>
-            </header>
-            <div class="comments"><p class='comment'>baseline : neutre, bouton relache</p><p class='comment'>front bouton : demarre le maintien, pas encore arme</p><p class='comment'>50ms plus tard : maintien pas termine -- l operateur bouge DEJA l axe X seul (Y reste
-       neutre) pendant l attente : aucune commande ne doit partir tant que ce n est pas arme</p><p class='comment'>20ms de plus (toujours &lt; 100ms) : cette fois l axe Y seul est pousse (X revient au
-       neutre) -- meme preuve, isolee sur l autre axe</p><p class='comment'>relache a 50ms, avant la fin des 100ms de maintien : annule la tentative</p><p class='comment'>le bouton reste relache PENDANT 1s ENTIERE, manche pousse a fond (RawX=8000) tout du
-       long : aucun armement differe, et surtout aucune commande de mouvement ne demarre,
-       meme apres une longue attente sur une position hors neutre</p><p class='comment'>nouveau front + maintien complet (110ms) : l armement redevient possible normalement</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (12)</span></summary><ul class="checks-list"><li>baseline : bouton relache, pas arme</li><li>front bouton seul ne doit pas armer immediatement (maintien requis)</li><li>50ms &lt; DeadmanArmHoldTime (100ms) : pas encore arme</li><li>consigne interne X (CmdXVal) forcee a 0 : pas encore arme</li><li>axe X seul pousse (RawX=8000, RawY neutre) mais pas encore arme : aucune commande ne part</li><li>70ms &lt; DeadmanArmHoldTime (100ms) : toujours pas arme</li><li>consigne interne Y (CmdYVal) forcee a 0 : pas encore arme</li><li>axe Y seul pousse (RawY=2000, RawX neutre) mais pas encore arme : aucune commande ne part</li><li>relachement avant la fin du maintien annule la tentative</li><li>pas d armement differe sur une tentative deja annulee, meme apres 1s (nouvel appui conscient exige)</li><li>manche a fond depuis 1s mais jamais arme : toujours aucune commande de mouvement</li><li>110ms &gt;= DeadmanArmHoldTime (100ms) : geste arme</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-joystick-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle </h3>
-            </header>
-            <div class="comments"><p class='comment'>Arme le geste avec le manche au neutre</p><p class='comment'>Test dans la zone morte superieure : RawX = 5150 (neutre 5000 + 150 &lt; 300)</p><p class='comment'>Test dans la zone morte inferieure : RawY = 4850 (neutre 5000 - 150 &gt; -300)</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>Geste arme au neutre</li><li>RawX=5150 dans deadband (300) : consigne X strictement 0.0</li><li>RawX dans deadband : DirectionX=0</li><li>Signal dans deadband : considere au neutre</li><li>RawY=4850 dans deadband (300) : consigne Y strictement 0.0</li><li>RawY dans deadband : DirectionY=0</li><li>Signal dans deadband : considere au neutre</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-joystick-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace </h3>
-            </header>
-            <div class="comments"><p class='comment'>nx/ny fixes explicitement a 5000 avant CHAQUE appel : STruCpp ne re-copie PAS la sortie
-       VAR_IN_OUT vers la variable de test entre deux appels fb() (limite outillage constatee,
-       round-trip IN_OUT absent -- cf. README). Sans ce forcage, NeutralXMem retomberait a 0
-       (valeur SETUP jamais appliquee non plus) des le 2e scan, et AtNeutral resterait FALSE.</p><p class='comment'>arme le geste au neutre</p><p class='comment'>bouton relache, reste au neutre : 500ms plus tard (largement &gt; NeutralHoldTime seul 100ms) mais &lt; grace (3s)</p><p class='comment'>2.6s de plus (total 3.1s depuis l armement) : la grace vient de s ecouler ce scan meme --
-       NeutralHoldTimer ne fait que DEMARRER (son IN passe a TRUE ce scan), pas encore Q</p><p class='comment'>100ms de plus (NeutralHoldTime ecoule depuis la fin de la grace) : desarme</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>la grace (3s) protege l armement malgre un neutre deja tenu bien plus longtemps que NeutralHoldTime seul (evite le REX terrain : desarmement 100-200ms apres l armement)</li><li>grace tout juste ecoulee : NeutralHoldTimer demarre seulement ce scan (pas encore ecoule)</li><li>grace ecoulee (3s) + neutre tenu (NeutralHoldTime) : desarmement</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-joystick-5" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-005 Changement de mode desarme le geste, nouvel appui exige </h3>
-            </header>
-            <div class="comments"><p class='comment'>arme en MAINT_N1</p><p class='comment'>désarmement externe (ex. changement de mode, fin benne) : ArmingPermit tombe à FALSE</p><p class='comment'>ArmingPermit reste FALSE, sans nouvel appui : reste desarme</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>ArmingPermit=FALSE desarme immediatement (désarmement externe, ex. changement de mode)</li><li>pas de rearmement automatique tant que ArmingPermit=FALSE : nouvel appui conscient + permission exigee</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-joystick-6" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu </h3>
-            </header>
-            <div class="comments"><p class='comment'>RawX/RawY hors zone neutre valide (2000..8000) + front BtnCalibrate</p><p class='comment'>Reset alors que la cause est toujours presente (axes toujours hors zone) : ne doit PAS acquitter</p><p class='comment'>Reset retombe (front consomme) ; axes reviennent en zone ; nouveau front Reset : doit acquitter</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>calibration hors zone doit lever Error</li><li>Reset ne doit PAS acquitter tant que les axes restent hors zone (cause toujours presente)</li><li>front Reset avec axes revenus en zone valide doit acquitter (cause disparue + appui conscient)</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-joystick-7" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur) </h3>
-            </header>
-            <div class="comments"><p class='comment'>init explicite -- STruCpp n applique pas &quot;:= 5000&quot; du SETUP, cf. README limite outillage</p><p class='comment'>arme le geste au neutre</p><p class='comment'>RawX/RawY au maximum nominal (10000) : saturation +100</p><p class='comment'>RawX/RawY au minimum nominal (0) : saturation -100</p><p class='comment'>Depassement franc au-dela de la plage ADC nominale + marge de tolerance (defaut
-       capteur/cablage Hall, ex: fil coupe -&gt; ADC fige a une valeur aberrante) : neutre +
-       defaut visible, PAS une saturation a pleine vitesse dans une direction sur une donnee
-       dont on ne peut plus garantir la validite (AF08 §5bis).</p><p class='comment'>Valeur negative (hors plage ADC + marge, meme scenario defaut cablage)</p><p class='comment'>Depassement leger (&lt; marge de tolerance) : ne doit PAS declencher le defaut -- evite les
-       faux positifs sur bruit ADC/overshoot mineur pres des bornes nominales</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (18)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>RawX au max nominal (10000) : SpeedRef sature a +100</li><li>meme comportement sur l axe Y</li><li>Direction coherente avec le signe de la consigne</li><li>RawX au min nominal (0) : SpeedRef sature a -100</li><li>Direction coherente avec le signe de la consigne</li><li>RawX=20000 (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse</li><li>meme garde-fou sur l axe Y</li><li>capteur hors plage = Warning, PAS un defaut a acquitter (socle FB_FbStatus)</li><li>capteur hors plage pendant fonctionnement : leve un Warning (visible operateur)</li><li>bit1 : capteur hors plage porte par WarningId</li><li>AF08 S5bis : Enable doit tomber a FALSE comme pour la perte bus (bit2), pas seulement SpeedRef=0 -- coherence de traitement entre les 2 causes de perte de confiance</li><li>meme coherence sur l axe Y</li><li>RawX negatif (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse</li><li>meme garde-fou sur l axe Y</li><li>RawX=10200 : dans la marge de tolerance (+500), toujours saturation normale +100, pas de defaut</li><li>leger depassement tolere : aucun warning leve</li><li>aucun bit warning actif</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-joystick-8" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-011 Fin de cycle benne desarme le geste par defaut </h3>
-            </header>
-            <div class="comments"><p class='comment'>arme le geste</p><p class='comment'>ArmingPermit actif : ne desarme pas seul (l&#x27;armement reste tant que la permission est accordee)</p><p class='comment'>retrait de permission (ex. fin de cycle benne) : desarme immediatement</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>ArmingPermit actif seul ne desarme pas (attend le retrait de permission, fin de cycle)</li><li>retrait de permission (ex. fin benne) desarme immediatement (pas de M1/M2 surprise)</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-joystick-9" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE </h3>
-            </header>
-            <div class="comments"><p class='comment'>arme le geste</p><p class='comment'>permission maintenue (ex. exception CLOSING Extraction) : l&#x27;armement est conserve</p><p class='comment'>permission toujours maintenue : l armement doit etre conserve</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>ArmingPermit maintenu : armement conserve (exception CLOSING Extraction gere par l externe qui maintient la permission - alerte P1 : ne jamais elargir hors CLOSING Extraction)</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-joystick-10" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes </h3>
-            </header>
-            <div class="comments"><p class='comment'>arme le geste au neutre</p><p class='comment'>RawX=9000 (au-dela du neutre 5000, hors zone morte) : OutPct = (9000-5000)/(10000-5000)*100 = 80%</p><p class='comment'>RawY=300 (en-deca du neutre 5000, hors zone morte) : OutPct = (300-5000)/5000*100 = -94%</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>RawX=9000 : proportionnel, 80% -- pas seulement correct aux bornes 0/10000</li><li>sens avant coherent</li><li>RawY toujours au neutre : axe Y inchange</li><li>RawY=300 : proportionnel, -94% -- pas seulement correct aux bornes 0/10000</li><li>sens arriere coherent</li><li>RawX revenu au neutre : axe X inchange</li></ul></details>
             
             
         </article>
@@ -802,7 +592,7 @@
         <summary>Code source ST original (10)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\F_MODES\E_Mode.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
@@ -820,7 +610,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
                 <pre>(* =======================================================================
    📊 E_Diag_State — Enumération des états du cycle de diagnostic réseau
    ───────────────────────────────────────────────────────────────
@@ -840,7 +630,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Diag_Device — Structure diagnostic d&#x27;un esclave ou bus
    ───────────────────────────────────────────────────────────────
@@ -860,7 +650,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -882,7 +672,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -918,7 +708,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
                 <pre>(* =======================================================================
    🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
    ───────────────────────────────────────────────────────────────
@@ -942,7 +732,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
                 <pre>(* =======================================================================
    🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
@@ -1083,7 +873,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\D_JOYSTICK\ST_Joystick_AxisCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_Joystick_AxisCmd.st</code></summary>
                 <pre>(* =======================================================================
    🕹️ ST_Joystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
@@ -1107,7 +897,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\D_JOYSTICK\FB_AxisScale.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\FB_AxisScale.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_AxisScale — Normalisation et zone morte d&#x27;un axe joystick
    ───────────────────────────────────────────────────────────────
@@ -1160,7 +950,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\D_JOYSTICK\FB_Joystick.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\FB_Joystick.st</code></summary>
                 <pre>(* =======================================================================
    🕹️ FB_Joystick — Acquisition &amp; conditionnement du geste opérateur
    ───────────────────────────────────────────────────────────────

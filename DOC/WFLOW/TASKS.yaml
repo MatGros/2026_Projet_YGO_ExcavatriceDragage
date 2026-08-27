@@ -285,27 +285,13 @@ tasks:
     objectifs: []
     bloque_par: []
 
-  - id: "T011"
-    parent_id: ""
-    statut: "⏳"
-    criticite: "C2"
-    domaine: "GÉNÉRAL"
-    agent: "DSH-02"
-    date: "2026-08-24T03:30:00"
-    titre: "EmergencyStopOk : confirmation temporisée post-r..."
-    contexte: "Intitulé complet : EmergencyStopOk : confirmation temporisée post-réarmement"
-    description: "✅ **Étude/design livrée + corrigée après revue indépendante** (`DOC/WFLOW/AUDITS/DESIGN_EMERGENCYSTOPOK_CONFIRMATION_TEMPORISEE_v0.2.md`) : EmergencyStopOk absent du code actuel (à recréer), basé sur **PowerContactorEngaged** (succès step 6) + stabilité + ¬défaut — **PAS sur Armable** (v0.1 corrigé : Armable exige NOT PowerContactorEngaged, serait toujours FALSE). Retombée immédiate fail-safe, Reset sur front. ⏳ **Implémentation en attente** : réf « AUDIT D93 » absente + 4 décisions (verrou mouvement vs diag, fenêtre, emplacement FB, spec D93)."
-    contrat: ""
-    objectifs: []
-    bloque_par: []
-
   - id: "T015"
     parent_id: ""
-    statut: "⏳"
+    statut: "⏸️"
     criticite: "C2"
     domaine: "TERRAIN"
     agent: "HUM"
-    date: "2026-07-20T08:00:00"
+    date: "2026-08-27T08:42:15"
     titre: "Validation câblage réel EmergencyStopOk_DI et réarmement"
     contexte: ""
     description: "AF_Partie-01, PRG_02_Acquisition"
@@ -315,11 +301,11 @@ tasks:
 
   - id: "T020"
     parent_id: ""
-    statut: "⬜"
+    statut: "🔍"
     criticite: "C2"
     domaine: "TREUILS"
     agent: "—"
-    date: "2026-07-20T08:00:00"
+    date: "2026-08-27T08:43:18"
     titre: "Sélecteur treuil IHM : widget visu physique restant..."
     contexte: ""
     description: "AF_Partie-05 §2, AF_Partie-09 §1"
@@ -726,8 +712,8 @@ tasks:
     domaine: "SÉCURITÉ"
     agent: "DSH-02"
     date: "2026-08-24T04:50:00"
-    titre: "Clarifier sémantique DriveStatusWord.0 AC600 (\\\"Power Ready\\\" vs..."
-    contexte: "Intitulé complet : Clarifier sémantique DriveStatusWord.0 AC600 (\\\"Power Ready\\\" vs \\\"Mouvement\\\" Méca B)"
+    titre: "Clarifier sémantique DriveStatusWord.0 AC600 (\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Power Ready\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" vs..."
+    contexte: "Intitulé complet : Clarifier sémantique DriveStatusWord.0 AC600 (\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Power Ready\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" vs \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Mouvement\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" Méca B)"
     description: "✅ **Fiche de clarification livrée** (`DOC/WFLOW/AUDITS/CLARIFICATION_T110_DRIVESTATUSWORD_v0.1.md`) : DriveStatusWord.0 utilisé comme preuve de mouvement (Méca B, FB_Safety_Translation L180-182) mais sémantique AC600 ambiguë (Power Ready vs mouvement). Proposition : baser Méca B sur ABS(DriveActualFreqHz)>0.5 (meilleure preuve). ⏳ **Résolution en attente** : doc AC600 du bit 0 + validation humaine (C4)."
     contrat: ""
     objectifs: []
@@ -1105,7 +1091,7 @@ tasks:
     agent: "AGY-01"
     date: "2026-08-19T12:00:00"
     titre: "Standardisation globale des 7 PRG : ordre strict des blocs de ..."
-    contexte: "Intitulé complet : Standardisation globale des 7 PRG : ordre strict des blocs de déclaration (VAR_INPUT $\\\\rightarrow$ VAR_OUTPUT $\\\\rightarrow$ VAR), bannières ASCII, tags CQS §2 et purge intégrale des commentaires REX / vestiges historiques"
+    contexte: "Intitulé complet : Standardisation globale des 7 PRG : ordre strict des blocs de déclaration (VAR_INPUT $\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\rightarrow$ VAR_OUTPUT $\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\rightarrow$ VAR), bannières ASCII, tags CQS §2 et purge intégrale des commentaires REX / vestiges historiques"
     description: "**Validé et commité (2026-08-19)** : PRG_02 à PRG_07 réordonnés et formatés selon CQS §2, Palier C PASS"
     contrat: ""
     objectifs: []
@@ -1202,7 +1188,7 @@ tasks:
     date: "2026-08-24T05:15:00"
     titre: "FB_FbStatus : fault latché perdu (silencieus..."
     contexte: "Intitulé complet : FB_FbStatus : fault latché perdu (silencieusement) sur un cycle Enable=FALSE→TRUE sans Reset | Audit indépendant 2026-08-22 (test_auto_ci + revue sécurité machine, sur CODE/A_COMMUN/FB_FbStatus.st, en cours de développement par un autre agent — pas de code touché ici). "
-    description: "**Constat** : le gate IF NOT Enable THEN ... ErrorIdLatched := 0; ... END_IF; (§1, ~ligne 55) remet la mémoire de défaut latché à zéro dès que Enable repasse à FALSE, **sans passer par un front Reset explicite**. Ça viole l'esprit \\\"Reset = front conscient, jamais de réarmement/acquittement accidentel\\\" (AGENTS.md). Scénario concret : un fault latché sur un FB standard (ex. futur treuil) ; l'opérateur change de mode ou un re-init logiciel fait retomber Enable un cycle puis remonter ; le fault disparaît de l'IHM sans qu'aucun Reset n'ait été appuyé → perte de traçabilité d'un défaut réel, l'opérateur croit la machine saine. <br>**Décision utilisateur (2026-08-22)** : la mémoire du dernier défaut latché **ne doit pas** être remise à zéro par Enable=FALSE — seul un front Reset explicite doit acquitter. <br>**Correctif proposé** : retirer ErrorIdLatched := 0; de la branche IF NOT Enable THEN dans FB_FbStatus.st §1 — le reste du gate neutre (façade Status.Error/ErrorId à 0 tant que Enable=FALSE) peut rester tel quel, seule la mémoire interne doit survivre au cycle désactivé. <br>**Doc à mettre à jour en parallèle** (DOC/STDS/CODE_QUALITY_STANDARDS.md §3bis) : documenter explicitement ce comportement (Enable=FALSE ne doit pas acquitter, seul Reset le fait) — actuellement non écrit nulle part (ni code ni standard) : trou d'audit distinct de l'ambiguïté elle-même. <br>**Autres trous identifiés dans le même audit (non bloquants, à trier séparément si besoin)** : cumul de 2 bits latchés jamais testé, priorité d'affichage texte fault vs warning simultanés non tranchée, standard CODE_QUALITY_STANDARDS.md décrit une \\\"rotation d'affichage 1s\\\" que le code n'implémente pas (§3bis, à corriger ou implémenter), Busy/Done \\\"hors socle\\\" non documenté dans le standard, WarningIdCause cité dans le standard mais absent de l'interface réelle (coquille)."
+    description: "**Constat** : le gate IF NOT Enable THEN ... ErrorIdLatched := 0; ... END_IF; (§1, ~ligne 55) remet la mémoire de défaut latché à zéro dès que Enable repasse à FALSE, **sans passer par un front Reset explicite**. Ça viole l'esprit \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Reset = front conscient, jamais de réarmement/acquittement accidentel\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" (AGENTS.md). Scénario concret : un fault latché sur un FB standard (ex. futur treuil) ; l'opérateur change de mode ou un re-init logiciel fait retomber Enable un cycle puis remonter ; le fault disparaît de l'IHM sans qu'aucun Reset n'ait été appuyé → perte de traçabilité d'un défaut réel, l'opérateur croit la machine saine. <br>**Décision utilisateur (2026-08-22)** : la mémoire du dernier défaut latché **ne doit pas** être remise à zéro par Enable=FALSE — seul un front Reset explicite doit acquitter. <br>**Correctif proposé** : retirer ErrorIdLatched := 0; de la branche IF NOT Enable THEN dans FB_FbStatus.st §1 — le reste du gate neutre (façade Status.Error/ErrorId à 0 tant que Enable=FALSE) peut rester tel quel, seule la mémoire interne doit survivre au cycle désactivé. <br>**Doc à mettre à jour en parallèle** (DOC/STDS/CODE_QUALITY_STANDARDS.md §3bis) : documenter explicitement ce comportement (Enable=FALSE ne doit pas acquitter, seul Reset le fait) — actuellement non écrit nulle part (ni code ni standard) : trou d'audit distinct de l'ambiguïté elle-même. <br>**Autres trous identifiés dans le même audit (non bloquants, à trier séparément si besoin)** : cumul de 2 bits latchés jamais testé, priorité d'affichage texte fault vs warning simultanés non tranchée, standard CODE_QUALITY_STANDARDS.md décrit une \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"rotation d'affichage 1s\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" que le code n'implémente pas (§3bis, à corriger ou implémenter), Busy/Done \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"hors socle\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" non documenté dans le standard, WarningIdCause cité dans le standard mais absent de l'interface réelle (coquille)."
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -1427,12 +1413,12 @@ tasks:
     agent: "CC-01"
     date: "2026-08-25T01:00:00"
     titre: "Renuméroter les régions sans préfixe §N (FB_Joystick, FB_Encoder)"
-    contexte: "Q13 de QUESTIONS_OUVERTES_PRG02_v0.1.md : régions {region \"...\"} sans préfixe §N contraire au format imposé par CODE_QUALITY_STANDARDS.md §2bis, dans FB_Joystick.st (saut S2→S5) et FB_Encoder.st (aucune region préfixée)."
+    contexte: "Q13 de QUESTIONS_OUVERTES_PRG02_v0.1.md : régions {region \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"...\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"} sans préfixe §N contraire au format imposé par CODE_QUALITY_STANDARDS.md §2bis, dans FB_Joystick.st (saut S2→S5) et FB_Encoder.st (aucune region préfixée)."
     description: "✅ **Fait 2026-08-25** : FB_Joystick.st (6 regions, sous-agent) et FB_Encoder.st (8 regions, moi — hook bloquant sur le sous-agent) renumérotés §1..§N contigu. 0 diff logique confirmé (git diff = uniquement lignes {region ...})."
     contrat: "TASK_CONTRACT_T152B_REGIONS_PREFIXE.yaml"
     objectifs:
-      - "Renuméroter les regions de FB_Joystick.st en {region \"§N ...\"} contigu (pas de saut de numéro)"
-      - "Renuméroter les regions de FB_Encoder.st en {region \"§N ...\"} contigu"
+      - "Renuméroter les regions de FB_Joystick.st en {region \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"§N ...\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"} contigu (pas de saut de numéro)"
+      - "Renuméroter les regions de FB_Encoder.st en {region \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"§N ...\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"} contigu"
       - "0 diff logique — uniquement les libellés de region changent"
     bloque_par: []
 
@@ -1525,8 +1511,7 @@ tasks:
       - "Décider et documenter l'articulation avec le pattern multi-fiches AF-09+ (table au chapô référençant la sous-fiche, ou dupliquée par sous-fiche — trancher)"
       - "Décider fusion avec §1 'Rôle et périmètre' vs section séparée, et documenter le choix"
       - "Produire DESIGN_TABLE_FONCTIONS_AF_v0.2.md (nouvelle version, v0.1 non écrasée)"
-    bloque_par:
-      - "T153-A"
+    bloque_par: []
 
   - id: "T153-C"
     parent_id: "T153"
@@ -1544,8 +1529,7 @@ tasks:
       - "Créer TOOLS/AGENT_WORKFLOW/scripts/extract_functions_matrix.py : parcourt DOC/AF/AF_Partie-NN_*.md, extrait Table des fonctions + Points de validation, produit un YAML consolidé (dict keyé par ID) TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml"
       - "Script testé sur AF-08 au minimum, ajouté à TOOLS/AGENT_WORKFLOW/tests/"
       - "Gates Palier C = PASS (G340 notamment, aucune régression doc)"
-    bloque_par:
-      - "T153-B"
+    bloque_par: []
 
   - id: "T154"
     parent_id: ""
@@ -1706,29 +1690,5 @@ tasks:
       - "Mettre à jour la doc AF-06 §5 et la tâche T108"
       - "Aucun changement de valeur ni de comportement logique — G200 PASS + gates palier C PASS"
       - "Device.export déjà régénéré par l'humain (export CODESYS manuel), cohérent avec le câblage réel"
-    bloque_par: []
-
-  - id: "T163"
-    parent_id: ""
-    statut: "✅"
-    criticite: "C3"
-    domaine: "SUPERVISION"
-    agent: "antigravity"
-    date: "2026-08-26T23:34:00"
-    completed_at: "2026-08-27T00:50:00"
-    titre: "Masquage des fausses alarmes en cascade (Root Cause Masking), qualification IO et bypass granulaires"
-    contexte: "Intitulé complet : Qualifier la validité des entrées matérielles dans l'IHM et implémenter le masquage des fausses alarmes en cascade (Root Cause Masking) dans FB_Hmi_BannerFormatter lors de la perte d'un module d'E/S (Local_Digital_IO, VH_0800END, VH_0808ETP, VH_0008ER, VH_0008ER_1), du bus CANopen/Joystick ou du bus EtherCAT/Codeurs/Variateur."
-    description: "Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T163_ROOT_CAUSE_MASKING_HMI_BANNER.yaml | Valid: check_task_contract PASS. Plan technique: DOC/WFLOW/CONTRACTS/PLAN_RootCauseMasking_HmiBanner_20260826.md. ✅ Implémenté et validé sur banc CODESYS 2026-08-27 : qualification des entrées matérielles et bus avec filtrage TON (4s) / TOF (1.5s), masquage exhaustif des alarmes filles dans le carrousel, consigne opérateur hiérarchisée, sorties structurées ST_Diag_Device épurées pour FB_Diag_CanOpen et FB_Diag_Ethercat, bypasses granulaires ST_BypassNetwork opérationnels et testés. Tests unitaires CI PASS, G200 PASS (0 erreur), 20/20 gates PASS."
-    contrat: "DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T163_ROOT_CAUSE_MASKING_HMI_BANNER.yaml"
-    objectifs:
-      - "La perte d'un module DI/DO physique affiche l'alarme parente [IO] dans le carrousel"
-      - "Toutes les alarmes filles portées par un module DI défaillant sont masquées dans le carrousel"
-      - "La perte du bus CAN ou du Joystick JOY1 affiche l'alarme [CAN] hiérarchisée"
-      - "La perte du bus EtherCAT, des codeurs COD1/COD2 ou variateur AC600 affiche l'alarme dédiée et masque les fausses dérives"
-      - "Sorties épurées et structurées (ST_Diag_Device) pour FB_Diag_CanOpen et FB_Diag_Ethercat"
-      - "Bypasses réseau granulaires découplés (BusCanOpen, BusEthercat, InputModules, Joystick, etc.)"
-      - "La consigne opérateur (OperatorActionText) hiérarchise le défaut matériel en priorité 1"
-      - "Temporisation de garde au démarrage (TON_BootInhibit 4s) et filtrage anti-bagotement (TOF 1.5s)"
-      - "G200 PASS + gates palier C PASS + bundle régénéré + validé sur banc CODESYS"
     bloque_par: []
 

@@ -1,43 +1,31 @@
 {
   "version": 1,
-  "file": "test_fb_hmi_bannerformatter.st",
+  "file": "test_prg_03_modes_cycle.st",
   "results": [
     {
-      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "name": "PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)",
       "passed": true
     },
     {
-      "name": "TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM",
+      "name": "PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)",
       "passed": true
     },
     {
-      "name": "TC-P07-010 AntiFlickerText : affichage instantane force",
+      "name": "PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)",
       "passed": true
     },
     {
-      "name": "TC-P07-020 RootCause : alarme fille visible quand materiel sain",
+      "name": "PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -> MAINT_N1",
       "passed": true
     },
     {
-      "name": "TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO",
-      "passed": true
-    },
-    {
-      "name": "TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END",
-      "passed": true
-    },
-    {
-      "name": "TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT",
-      "passed": true
-    },
-    {
-      "name": "TC-P07-024 Priorite absolue AU sur defaut module E/S",
+      "name": "PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 8,
-    "passed": 8,
+    "total": 5,
+    "passed": 5,
     "failed": 0
   }
 }

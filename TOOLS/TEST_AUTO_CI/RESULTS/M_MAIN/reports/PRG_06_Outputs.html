@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 23:38:21</div>
+    <div class="exec-time">2026-08-27 13:01:19</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (3 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-0">PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-1">PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-2">PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -1118,56 +1118,32 @@
         <article id="test-prg-06-outputs-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
+                <h3>PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Contacteur montee M1 active</li><li>Palier 1 M1 active</li><li>Commande desserrage frein M1 active</li><li>Commande desserrage frein M3 active</li></ul></details>
             
             
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (5)</summary>
-            <table class="static-table"><tbody><tr><td><code>FAULTRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYFWD</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1INTERLOCKENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3INTERLOCKENABLE</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
-        </details>
-    </div>
+            
         </article>
         <article id="test-prg-06-outputs-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
+                <h3>PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Contacteur montee M2 active</li><li>Palier 1 M2 active</li><li>Commande desserrage frein M2 active</li></ul></details>
             
             
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (5)</summary>
-            <table class="static-table"><tbody><tr><td><code>FAULTRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2INTERLOCKENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-        </details>
-    </div>
+            
         </article>
         <article id="test-prg-06-outputs-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
+                <h3>PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Relais montee M1 coupe</li><li>Contacteurs vitesse M1 coupes</li><li>Frein M1 retombe</li></ul></details>
             
             
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (5)</summary>
-            <table class="static-table"><tbody><tr><td><code>FAULTRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-        </details>
-    </div>
+            
         </article>
         </div>
     </details>
