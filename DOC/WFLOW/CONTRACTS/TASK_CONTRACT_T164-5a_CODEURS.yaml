@@ -13,7 +13,7 @@ contract:
   objective: >
     Migrer les 3 sous-FB du domaine E_CODEURS (FB_Encoder_Abs, FB_Encoder_Homing, FB_Encoder_Safety)
     qui portent encore Status:ST_Status vers le socle cible Fault:ST_Fault via FB_FaultCore et causes nommées
-    (avec Lifecycle:ST_Lifecycle pour FB_Encoder_Homing), mettre à jour ST_EncoderMeasurement et remapper
+    (avec Lifecycle:ST_Lifecycle pour FB_Encoder_Homing), mettre à jour ST_fbEncoder_Measurement et remapper
     les consommateurs dans FB_Encoder, PRG_04 et PRG_07 sans changer aucune valeur ni logique métier.
 
   acceptance:
@@ -24,7 +24,7 @@ contract:
       statement: "Toutes les causes d'erreur historiques (Com, Preset Timeout, Target, Boot Incoherence, Bornes) ont Latching := TRUE ; les alertes sans arrêt ont Latching := FALSE."
       verified_by: "Revue ligne à ligne des tables de causes dans chaque sous-FB"
     - id: AC3
-      statement: "ST_EncoderMeasurement est mis à jour (HomingFault:ST_Fault, HomingLifecycle:ST_Lifecycle, AbsFault:ST_Fault) et tous ses consommateurs dans PRG_04 et PRG_07 sont remappés fidèlement."
+      statement: "ST_fbEncoder_Measurement est mis à jour (HomingFault:ST_Fault, HomingLifecycle:ST_Lifecycle, AbsFault:ST_Fault) et tous ses consommateurs dans PRG_04 et PRG_07 sont remappés fidèlement."
       verified_by: "G200_check_linkage.py --report PASS (0 erreur)"
     - id: AC4
       statement: "G315 : le compteur legacy-status diminue de 3 et les 3 sous-FB passent en forme cible."
@@ -45,7 +45,7 @@ contract:
       - CODE/E_CODEURS/FB_Encoder_Homing.st
       - CODE/E_CODEURS/FB_Encoder_Safety.st
       - CODE/E_CODEURS/FB_Encoder.st
-      - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+      - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
       - CODE/M_MAIN/PRG_07_Supervision.st
       - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
@@ -62,7 +62,7 @@ contract:
       - "Reset sur front conscient uniquement (§9)."
       - "Gels odométriques hors Enable (OK-FIGE)."
     dropped_on_purpose:
-      - "Le type ST_Status dans les 3 sous-FB et dans ST_EncoderMeasurement."
+      - "Le type ST_Status dans les 3 sous-FB et dans ST_fbEncoder_Measurement."
 
   evidence_required:
     - check_linkage

@@ -12,7 +12,7 @@ contract:
   objective: >
     Mettre PRG_02_Acquisition en conformite avec AF_Partie-06 v2.4 §3ter : publier les
     mesures codeurs M1/M2 via la struct frontiere ST_EncoderMeasurements (sous-DUT M1/M2 de
-    type ST_EncoderMeasurement) au lieu des champs plats actuels de ST_AcquisitionInterPrg,
+    type ST_fbEncoder_Measurement) au lieu des champs plats actuels de ST_AcquisitionInterPrg,
     et remapper les 4 PRG consommateurs (PRG_03/04/05/07) sur cette struct, sans aucun
     changement de valeur ni de comportement logique.
 
@@ -22,7 +22,7 @@ contract:
       statement: "PRG_02_Acquisition publie les mesures codeurs via ST_EncoderMeasurements (Data.Encoders.M1/M2) et non plus via les champs plats CablePosM1/M1_Speed_Mps/M1_EncoderFault de ST_AcquisitionInterPrg."
       verified_by: "lecture PRG_02_Acquisition + grep : 0 occurrence des champs plats codeur dans ST_AcquisitionInterPrg"
     - id: AC2
-      statement: "Chaque champ de ST_EncoderMeasurement (RawPos, EncoderAvailable, CablePosM, CablePosMSafe, EncoderIncoherent, Speed_Mps, SignedSpeed_Mps, SpeedValid, HomingStatus, AbsStatus, HomingRefRaw) est alimente depuis instEncoderM1/instEncoderM2.Measurement."
+      statement: "Chaque champ de ST_fbEncoder_Measurement (RawPos, EncoderAvailable, CablePosM, CablePosMSafe, EncoderIncoherent, Speed_Mps, SignedSpeed_Mps, SpeedValid, HomingStatus, AbsStatus, HomingRefRaw) est alimente depuis instEncoderM1/instEncoderM2.Measurement."
       verified_by: "lecture PRG_02_Acquisition §4 + G200_check_linkage"
     - id: AC3
       statement: "Les 4 PRG consommateurs (PRG_03_Modes_Cycle, PRG_04_Treuils_Benne, PRG_05_Translation, PRG_07_Supervision) lisent les memes valeurs via Data.Encoders.M1/M2, sans changement de valeur ni de logique."
@@ -51,7 +51,7 @@ contract:
       - CODE/M_MAIN/PRG_07_Supervision.st              # remapper consommateurs codeur
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
-      - CODE/E_CODEURS/                                # FB_Encoder / ST_EncoderMeasurement* deja conformes, hors scope
+      - CODE/E_CODEURS/                                # FB_Encoder / ST_fbEncoder_Measurement* deja conformes, hors scope
       - CODE/H_TREUILS_BENNE/                          # FB_Bucket/FB_WinchSync/FB_SyncDeviation lisent des entrees, pas le bus
 
   # ── 4. Contrat de conservation (rebuild) ─────────────────────────────────

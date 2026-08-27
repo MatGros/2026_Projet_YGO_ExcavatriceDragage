@@ -10,7 +10,7 @@ FB_Encoder:
   # Deux instances production (un FB, deux treuils) -- le rapport affiche un bloc pinout par
   # instance avec son cablage reel propre (instEncoderM1 != instEncoderM2). Smoke test seul
   # pour l'instant : valide la population IN/OUT du rapport (structs ST_EncoderHw/
-  # ST_Encoder_Calib/ST_EncoderMeasurement, VAR_IN_OUT Calib), pas encore le catalogue AF-09.
+  # ST_Encoder_Calib/ST_fbEncoder_Measurement, VAR_IN_OUT Calib), pas encore le catalogue AF-09.
   prod_instances:
     - file: CODE/M_MAIN/PRG_02_Acquisition.st
       name: instEncoderM1
@@ -29,7 +29,7 @@ FB_Encoder:
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st
-    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
     - CODE/E_CODEURS/FB_Encoder_Abs.st
     - CODE/E_CODEURS/FB_Encoder_Homing.st
     - CODE/E_CODEURS/FB_Encoder_Scale.st
@@ -268,7 +268,7 @@ FB_SimBench:
     - CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
-    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
@@ -387,7 +387,7 @@ FB_Hmi_BannerFormatter:
     - CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
-    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
@@ -511,7 +511,7 @@ PRG_02_Acquisition:
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
     - CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st
-    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/E_CODEURS/FB_Encoder_Abs.st
     - CODE/E_CODEURS/FB_Encoder_Homing.st
@@ -580,7 +580,7 @@ PRG_04_Treuils_Benne:
     - CODE/A_COMMUN/FB_Brake.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
-    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
@@ -637,7 +637,7 @@ PRG_05_Translation:
     - CODE/A_COMMUN/FB_Brake.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
-    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/F_MODES/E_Mode.st
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
@@ -711,7 +711,7 @@ PRG_07_Supervision:
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
-    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st
@@ -770,7 +770,7 @@ MAIN_GLOBAL:
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
     - CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st
-    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/E_CODEURS/FB_Encoder_Abs.st
     - CODE/E_CODEURS/FB_Encoder_Homing.st

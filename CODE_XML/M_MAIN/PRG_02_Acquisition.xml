@@ -40,7 +40,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_EncoderMeasurement) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_fbEncoder_Measurement) ===
 ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)</xhtml>
               </documentation>
             </variable>
@@ -385,126 +385,6 @@
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_EncoderMeasurement">
-        <baseType>
-          <struct>
-            <variable name="RawPos">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES BRUTES &amp; STATUT BUS ===
-Position brute codeur (gelee si EncoderAvailable=FALSE)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderAvailable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bus/esclave EtherCAT operationnel et disponible</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE POSITION CABLE ===
-Position cable (m, signee, + enroule)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosMSafe">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable instantanee validee par EncoderIncoherent (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incoherence redemarrage ou hors bornes</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Speed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
-Vitesse absolue sur fenetre glissante (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SignedSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingFault">
-              <type>
-                <derived name="ST_Fault" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUTS DES SOUS-FB &amp; REFERENCE ===
-Défaut FB_Encoder_Homing (état du référencement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingLifecycle">
-              <type>
-                <derived name="ST_Lifecycle" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle FB_Encoder_Homing (Busy/Done)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AbsFault">
-              <type>
-                <derived name="ST_Fault" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut FB_Encoder_Abs (état acquisition bus)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingRefRaw">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference brute du dernier homing reussi (re-expose)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>499ca9fe-eaec-5231-81a8-db655268cece</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
-   🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_Encoder_Calib">
         <baseType>
           <struct>
@@ -767,6 +647,126 @@ TRUE des qu'un referencement a reussi</xhtml>
    🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
       vers le device.
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbEncoder_Measurement">
+        <baseType>
+          <struct>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES BRUTES &amp; STATUT BUS ===
+Position brute codeur (gelee si EncoderAvailable=FALSE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bus/esclave EtherCAT operationnel et disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE POSITION CABLE ===
+Position cable (m, signee, + enroule)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosMSafe">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable instantanee validee par EncoderIncoherent (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incoherence redemarrage ou hors bornes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
+Vitesse absolue sur fenetre glissante (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUTS DES SOUS-FB &amp; REFERENCE ===
+Défaut FB_Encoder_Homing (état du référencement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingLifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle FB_Encoder_Homing (Busy/Done)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbsFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut FB_Encoder_Abs (état acquisition bus)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference brute du dernier homing reussi (re-expose)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>db273cb7-b66e-5a93-99be-e648e3db5387</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_fbEncoder_Measurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
+   🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1334,7 +1334,7 @@ TRUE des qu'un referencement a reussi</xhtml>
           <struct>
             <variable name="M1">
               <type>
-                <derived name="ST_EncoderMeasurement" />
+                <derived name="ST_fbEncoder_Measurement" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAINES DE MESURE PAR TREUIL ===
@@ -1343,7 +1343,7 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
             </variable>
             <variable name="M2">
               <type>
-                <derived name="ST_EncoderMeasurement" />
+                <derived name="ST_fbEncoder_Measurement" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaine de mesure treuil M2 (COD2)</xhtml>
@@ -3002,7 +3002,7 @@ END_IF;
             </variable>
             <variable name="Measurement">
               <type>
-                <derived name="ST_EncoderMeasurement" />
+                <derived name="ST_fbEncoder_Measurement" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES CONDITIONNEES (struct frontiere) ===
@@ -8235,10 +8235,10 @@ TimeLast := TimeCurrent;
           <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
           <Folder Name="_TYPES">
             <Object Name="ST_fbEncoder_HwIn" ObjectId="e8c7e795-5e03-5a6a-b908-95ab92d42ee7" />
-            <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
             <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
             <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
             <Object Name="ST_fbEncoder_HwOut" ObjectId="1d8c05ba-e087-546f-9435-81c2f041e74c" />
+            <Object Name="ST_fbEncoder_Measurement" ObjectId="db273cb7-b66e-5a93-99be-e648e3db5387" />
             <Object Name="ST_EncoderMeasurements" ObjectId="65c54961-1ede-5088-bb46-6d69104691fb" />
             <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
           </Folder>

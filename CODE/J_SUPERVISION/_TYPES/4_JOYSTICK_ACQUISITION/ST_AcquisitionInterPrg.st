@@ -14,7 +14,7 @@ STRUCT
     // === 🧲 Mesures codeurs M1/M2 (struct frontiere AF-06 §3ter) ===
     Encoders                : ST_EncoderMeasurements; // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
 
-    // === 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_EncoderMeasurement) ===
+    // === 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_fbEncoder_Measurement) ===
     M1_EncoderFault          : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
     M2_EncoderFault          : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
     M1_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent

@@ -9,7 +9,7 @@
 TYPE ST_EncoderMeasurements :
 STRUCT
     // === CHAINES DE MESURE PAR TREUIL ===
-    M1 : ST_EncoderMeasurement; // Chaine de mesure treuil M1 (COD1)
-    M2 : ST_EncoderMeasurement; // Chaine de mesure treuil M2 (COD2)
+    M1 : ST_fbEncoder_Measurement; // Chaine de mesure treuil M1 (COD1)
+    M2 : ST_fbEncoder_Measurement; // Chaine de mesure treuil M2 (COD2)
 END_STRUCT
 END_TYPE

@@ -1,12 +1,12 @@
 (* =======================================================================
-   📊 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
+   📊 ST_fbEncoder_Measurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
    🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
    📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    ======================================================================= *)
 
-TYPE ST_EncoderMeasurement :
+TYPE ST_fbEncoder_Measurement :
 STRUCT
     // === DONNEES BRUTES & STATUT BUS ===
     RawPos            : UDINT;        // Position brute codeur (gelee si EncoderAvailable=FALSE)

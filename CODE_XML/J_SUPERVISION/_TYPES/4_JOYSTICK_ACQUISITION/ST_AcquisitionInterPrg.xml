@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T21:56:13.395763" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T21:56:13.395763">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:49:13.300019" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:49:13.300019">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -40,7 +40,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_EncoderMeasurement) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_fbEncoder_Measurement) ===
 ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)</xhtml>
               </documentation>
             </variable>
@@ -208,7 +208,7 @@
           <struct>
             <variable name="M1">
               <type>
-                <derived name="ST_EncoderMeasurement" />
+                <derived name="ST_fbEncoder_Measurement" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAINES DE MESURE PAR TREUIL ===
@@ -217,7 +217,7 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
             </variable>
             <variable name="M2">
               <type>
-                <derived name="ST_EncoderMeasurement" />
+                <derived name="ST_fbEncoder_Measurement" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaine de mesure treuil M2 (COD2)</xhtml>
@@ -240,7 +240,7 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_EncoderMeasurement">
+      <dataType name="ST_fbEncoder_Measurement">
         <baseType>
           <struct>
             <variable name="RawPos">
@@ -347,12 +347,12 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>499ca9fe-eaec-5231-81a8-db655268cece</ObjectId>
+            <ObjectId>db273cb7-b66e-5a93-99be-e648e3db5387</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
+   📊 ST_fbEncoder_Measurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
    🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
@@ -477,7 +477,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
         <Folder Name="E_CODEURS">
           <Folder Name="_TYPES">
             <Object Name="ST_EncoderMeasurements" ObjectId="65c54961-1ede-5088-bb46-6d69104691fb" />
-            <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
+            <Object Name="ST_fbEncoder_Measurement" ObjectId="db273cb7-b66e-5a93-99be-e648e3db5387" />
           </Folder>
         </Folder>
         <Folder Name="A_COMMUN">
