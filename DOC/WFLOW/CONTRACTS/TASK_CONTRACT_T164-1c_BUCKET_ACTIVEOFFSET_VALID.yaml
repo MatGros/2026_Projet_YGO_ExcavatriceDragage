@@ -1,0 +1,111 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T164-1c : FB_Bucket, gate complet + sortie ActiveOffsetValid
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1c_BUCKET_ACTIVEOFFSET_VALID.yaml
+# Parent : T164 · Issu de l'audit T164-1 (alerte securite §2) · Delegable a un agent d'execution
+# Decision de conception DEJA PRISE (utilisateur 2026-08-27) — voir acceptance, ne pas rouvrir.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T164-1c_BUCKET_ACTIVEOFFSET_VALID
+  criticality: C3
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Rendre sur la surveillance de desynchronisation M1/M2 le comportement de FB_Bucket
+    quand il est desactive (InhibitM2) : au lieu de laisser fuiter un ActiveOffsetM
+    perime (offset benne fantome pouvant masquer un vrai desync -> Meca E FB_Safety_Winch
+    -> SafeStop/PowerCutOff), le gate publie ActiveOffsetM := 0.0 (comparaison M1/M2
+    stricte, la plus prudente) et une nouvelle sortie ActiveOffsetValid := FALSE que
+    l'IHM et le troubleshooting affichent. Meme logique que FB_Encoder desactive qui
+    leve EncoderFault (E0, commit 0b0a2785).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_Bucket porte une nouvelle sortie ActiveOffsetValid : BOOL (VAR_OUTPUT, tag [STAT]) : TRUE quand FB_Bucket calcule un offset a jour, FALSE dans le gate de neutralisation NOT Enable."
+      verified_by: "lecture FB_Bucket.st : declaration VAR_OUTPUT ActiveOffsetValid ; affectation TRUE dans le corps apres le calcul de ActiveOffsetM, affectation FALSE dans le bloc du gate NOT Enable"
+    - id: AC2
+      statement: "Le gate de neutralisation NOT Enable de FB_Bucket affecte ActiveOffsetM := 0.0 (comparaison M1/M2 stricte, decision utilisateur : benne ouverte = 0 decalage, 0 est le fallback sur) ET ActiveOffsetValid := FALSE ET les deux autres sorties [DIAG] signalees par G127 (DeltaPosition_M := 0.0, RemainingTravelM := 0.0)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G127_check_neutralization_completeness.py . => FB_Bucket ne figure plus dans la liste des incomplets"
+    - id: AC3
+      statement: "La logique de Meca E (FB_Safety_Winch, desync M1/M2) N'EST PAS modifiee : elle recoit ExpectedOtherWinchPosM calcule avec ActiveOffsetM ; comme le gate met ActiveOffsetM := 0.0, la comparaison devient stricte (M1 == M2) automatiquement, sans nouveau bypass ni nouvelle branche."
+      verified_by: "git diff CODE/H_TREUILS_BENNE/FB_Safety_Winch.st => vide ; grep ExpectedOtherWinchPosM CODE/M_MAIN/PRG_04_Treuils_Benne.st => expression inchangee (M2.CablePosM - instBucket.ActiveOffsetM)"
+    - id: AC4
+      statement: "PRG_04_Treuils_Benne publie instBucket.ActiveOffsetValid dans ST_BucketState (nouveau champ ActiveOffsetValid : BOOL) pour visibilite IHM / troubleshooting ; le nom de fichier PRG_04_Treuils_Benne reste identique au nom de POU et le suffixe de langage du fichier correspond au langage genere dans le bundle (aucun renommage, aucun changement de langage)."
+      verified_by: "lecture ST_BucketState.st : + ActiveOffsetValid : BOOL ; lecture PRG_04_Treuils_Benne.st : BucketState.ActiveOffsetValid := instBucket.ActiveOffsetValid ; python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py + G320_check_bundle_main_coverage.py => PASS"
+    - id: AC5
+      statement: "AF_Partie-10 (chapo + fiche FB_Bucket) documente la nouvelle sortie ActiveOffsetValid et le comportement au gate (desactive donne ActiveOffsetM a 0.0, ActiveOffsetValid a FALSE, comparaison M1/M2 stricte). IHM_VARIABLES_MIGRATION.md recoit l'entree du nouveau sous-champ ST_BucketState.ActiveOffsetValid (chemin IHM inchange au niveau parent)."
+      verified_by: "grep ActiveOffsetValid DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md ; grep ActiveOffsetValid DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md ; G340_check_doc_links.py PASS"
+    - id: AC6
+      statement: "Aucune valeur, seuil, polarite ou tempo existant ne change ; aucun consommateur autre que l'ajout de publication BucketState n'est modifie ; le diff se limite a l'ajout de la sortie, sa neutralisation, sa publication et la doc."
+      verified_by: "revue git diff par l'orchestrateur ; G200_check_linkage.py PASS (0 erreur) ; tests CI H_TREUILS_BENNE existants au vert sans modification de leurs attendus de valeur"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/H_TREUILS_BENNE/BENNE/ST_BucketState.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md
+      - CODE_XML/**                     # bundle regenere en fin de tache
+    forbidden:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st   # Meca E : NE PAS toucher (AC3)
+      - CODE/H_TREUILS_BENNE/FB_WinchSync.st
+      - PRJ_CODESYS/**
+      - DOC/WFLOW/TASKS.yaml                       # l'orchestrateur seul remplit le tableau
+      - "toute autre logique de FB_Bucket que le gate + la nouvelle sortie"
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Calcul de ActiveOffsetM dans le corps : inchange (Config.OffsetCloseM ~1.5 m benne fermee, Config.OffsetOpenM ~0 benne ouverte, HoldOffsetM en position intermediaire)."
+      - "HoldOffsetM et sa memorisation en position intermediaire : inchanges."
+      - "Meca E (FB_Safety_Winch) et FB_WinchSync : zero modification ; la comparaison stricte resulte du seul ActiveOffsetM := 0.0 au gate."
+      - "instBucket.Enable := NOT InhibitM2 : inchange (declencheur du gate)."
+    dropped_on_purpose:
+      - "Publication d'un ActiveOffsetM perime hors autorisation (remplace par 0.0 + ActiveOffsetValid=FALSE)."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage            # G200 bloc "Auto-verification liaison"
+    - g127_report              # FB_Bucket sorti des incomplets
+    - run_all_gates            # palier C + G127 + G310 + G320 + G340
+    - bundle                   # CODE_XML/CODE_Bundle.xml regenere
+    - git_diff_review          # diff relu par l'orchestrateur
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Si la lecture de PRG_04 revele un AUTRE consommateur de instBucket.ActiveOffsetM
+    non liste ici (au-dela des lignes 540 / 701 / 757 / 1119 / 1123 constatees a l'audit),
+    ou si Meca E ne se contente pas de ExpectedOtherWinchPosM mais lit ActiveOffsetM
+    directement quelque part : STOP, remonter a l'orchestrateur avant d'ecrire. Ne jamais
+    toucher a FB_Safety_Winch ni a la logique desync : la comparaison stricte doit venir
+    du seul offset 0.0 au gate.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI (rempli par l'ORCHESTRATEUR)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    (rapport agent : sortie ajoutee, gate complete, publication, doc, preuves)
+  evidence_submitted: []
+
+validation:
+  validated_by: "..."          # = orchestrateur (CC)
+  validated_at: "..."
+  verdict: PENDING             # PENDING | ACCEPTED | REJECTED
+  notes: >
+    (visa orchestrateur apres lecture du git diff reel + G200/G127)
