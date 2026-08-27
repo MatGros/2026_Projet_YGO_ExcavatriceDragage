@@ -725,8 +725,10 @@ TimeLast := TimeCurrent;
       <ProjectStructure>
         <Folder Name="H_TREUILS_BENNE">
           <Object Name="FB_Winch_Symmetry" ObjectId="e8df262b-c45d-5348-8aea-652e2cf92204" />
-          <Object Name="ST_Winch_SymmetryCfg" ObjectId="cafdebf4-b7e5-5000-bdd0-033e76a6b7c7" />
-          <Object Name="ST_Winch_SymmetryData" ObjectId="f7635572-022c-5fdd-93e8-106b5d2eea3e" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Winch_SymmetryCfg" ObjectId="cafdebf4-b7e5-5000-bdd0-033e76a6b7c7" />
+            <Object Name="ST_Winch_SymmetryData" ObjectId="f7635572-022c-5fdd-93e8-106b5d2eea3e" />
+          </Folder>
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />

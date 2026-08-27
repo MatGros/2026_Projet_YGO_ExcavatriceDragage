@@ -4471,12 +4471,14 @@ Current := LIMIT(-100.0, Current, 100.0);
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
-          <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
+            <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
+            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          </Folder>
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
-          <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
-          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
       </ProjectStructure>
     </data>

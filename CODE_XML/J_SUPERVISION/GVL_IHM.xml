@@ -6076,8 +6076,10 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
           </Folder>
         </Folder>
         <Folder Name="E_CODEURS">
-          <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
-          <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
+            <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
+          </Folder>
         </Folder>
         <Folder Name="D_JOYSTICK">
           <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
@@ -6088,26 +6090,34 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
           <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
         </Folder>
         <Folder Name="G_CYCLE">
-          <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
-          <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
-          <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+          <Folder Name="_TYPES">
+            <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
+            <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
+            <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+          </Folder>
         </Folder>
         <Folder Name="F_MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
-          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
-          <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
+          <Folder Name="_TYPES">
+            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+            <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
+          </Folder>
         </Folder>
         <Folder Name="I_TRANSLATION">
           <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
         </Folder>
         <Folder Name="H_TREUILS_BENNE">
-          <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
-          <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
+          <Folder Name="_TYPES">
+            <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
+            <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
+          </Folder>
           <Folder Name="BENNE">
-            <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
-            <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
+            <Folder Name="_TYPES">
+              <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
+              <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
+            </Folder>
           </Folder>
         </Folder>
       </ProjectStructure>

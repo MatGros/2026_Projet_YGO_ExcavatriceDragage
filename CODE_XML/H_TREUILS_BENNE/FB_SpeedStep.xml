@@ -692,7 +692,9 @@ END_CASE;
       <ProjectStructure>
         <Folder Name="H_TREUILS_BENNE">
           <Object Name="FB_SpeedStep" ObjectId="12afad9c-c87d-50d6-b33c-dd7c6f83a8e4" />
-          <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

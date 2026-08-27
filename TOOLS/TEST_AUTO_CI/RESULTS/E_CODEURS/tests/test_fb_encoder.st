@@ -2,6 +2,8 @@ SETUP
 VAR
     fb    : FB_Encoder;
     calib : ST_Encoder_Calib;
+    hwIn  : ST_fbEncoder_HwIn;
+    cfg   : ST_fbEncoder_Cfg;
 END_VAR
 END_SETUP
 
@@ -26,4 +28,109 @@ END_TEST
 TEST 'TC-P09-010 Acquisition codeur : mise en service nominale'
     fb(Enable := TRUE, PointsPerRev := 4096, CableM_PerRev := 0.5, PositionMinM := -50.0, PositionMaxM := 50.0, Calib := calib);
     ASSERT_TRUE(fb.Ready, 'Codeur actif et pret');
+END_TEST
+
+TEST 'TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    hwIn.PresetStatusBit := FALSE;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 1234;
+
+    (* Front de demande : aucune calibration n est publiee avant verification. *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_FALSE(calib.Homed, 'Avant verification : Homed reste FALSE');
+    ASSERT_EQ(calib.HomingRefRaw, 1234, 'Avant verification : reference existante preservee');
+
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Homed, 'READBACK_ONLY : mesure egale a la cible -> sortie Homed');
+    ASSERT_FALSE(fb.HomingSuspect, 'READBACK_ONLY nominal : pas de suspicion');
+END_TEST
+
+TEST 'TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    hwIn.PresetStatusBit := FALSE;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_AND_STATUSBIT;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 2345;
+
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_FALSE(fb.Homed, 'READBACK_AND_STATUSBIT : bit FALSE -> pas de validation');
+    ASSERT_TRUE(fb.HomingSuspect, 'READBACK_AND_STATUSBIT : bit FALSE -> suspicion');
+    ASSERT_TRUE(fb.PresetConfirmationFailed, 'READBACK_AND_STATUSBIT : fait diagnostic publie');
+END_TEST
+
+TEST 'TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    hwIn.PresetStatusBit := FALSE;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 70000;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    hwIn.RawPosIn := 100205; (* +50mm a 4096 points/m *)
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_FALSE(fb.Homed, 'Echec relecture : sortie Homed non validee');
+    ASSERT_TRUE(fb.HomingSuspect, 'Echec relecture : suspicion active');
+    ASSERT_TRUE(fb.PresetConfirmationFailed, 'Echec relecture : fait diagnostic publie');
+END_TEST
+
+TEST 'TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    hwIn.PresetStatusBit := TRUE;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.STATUSBIT_ONLY;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Homed, 'STATUSBIT_ONLY : bit TRUE -> validation');
+END_TEST
+
+TEST 'TC-P09-015 Reset conscient : acquitte le latch sans valider le preset'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    hwIn.PresetStatusBit := FALSE;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 9999;
+    calib.LastKnownRawPos := 100000;
+
+    (* Echec de relecture : preset non confirme -> latch pose. *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    hwIn.RawPosIn := 100205; (* +50mm -> hors tolerance *)
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.PresetConfirmationFailed, 'echec : latch pose');
+    ASSERT_FALSE(fb.Homed, 'echec : pas de validation');
+
+    (* Reset front : acquitte le latch, ne valide pas le preset (Homed reste FALSE). *)
+    fb(Enable := TRUE, Reset := TRUE, HomingPermit := TRUE,
+       HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_FALSE(fb.PresetConfirmationFailed, 'Reset : latch acquitte');
+    ASSERT_FALSE(fb.Homed, 'Reset : ne valide pas le preset');
 END_TEST

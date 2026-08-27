@@ -19,6 +19,7 @@
 10. [📜 Suivi historique](#10--suivi-historique)
 11. [❓ TBD](#11--tbd)
 12. [📚 Documents liés](#12--documents-liés)
+13. [🔧 Transaction preset E-D1 (T164-4C)](#13--transaction-preset-e-d1-t164-4c)
 
 ---
 
@@ -144,7 +145,8 @@ cyan acquisition, violet référencement, jaune calcul, rouge sécurité/fiabili
 | `CfgHomingTargetM` / `CfgTopSensorPosM` | `REAL` | Cibles homing unitaire / nominal (m) | `GVL_PERSISTENT` (`_WinchM1CfgPersist`) |
 | `UseDynamicTarget` / `DynamicHomingTargetM` | `BOOL` / `REAL` | Cible dynamique | **M2 seul, actif** : `M2BucketRefRequested` (front `BtnConfirmOpenPos`/`ClosePos`, MAINT_N1/N2, treuils non busy) → auto-référence M2 sur `CablePosM1` (± `OffsetCloseM`). **M1** : `FALSE`/`0.0` fixe |
 | `TopPositionSensor` | `BOOL` | Capteur physique position haute | `HwIn.Winch.M1M2_TopPositionFree_DI` |
-| `Hw` (`IN_OUT`) | `ST_EncoderHw` | Frontière hardware EtherCAT | `HwIn.Winch.COD1/COD2_*` |
+| `HwIn` (`IN`) | `ST_fbEncoder_HwIn` | Faits hardware d'entrée EtherCAT (`RawPosIn`/`AlarmsIn`/`WarningsIn`/`SlaveOperational`/`PresetStatusBit`) | `HwIn.Winch.COD1/COD2_*` (PRG_02) |
+| `Cfg` | `ST_fbEncoder_Cfg` | Réglages technologiques (`PresetConfirmMode`) | `GVL_IHM.Commun.EncoderCfg` |
 | `PointsPerRev` / `CableM_PerRev` | `UDINT` / `REAL` | Constantes mécaniques (8192 pts/tour, 2.0 m/tour) | constantes d'appel |
 | `PositionMinM` / `PositionMaxM` | `REAL` | Bornage physique (déf. ±99m) | constantes d'appel |
 | `BypassGlobal` | `BOOL` | Neutralise les défauts bornage/cohérence (mise en service) | `GVL_IHM.M1TreuilRetenue.Bypass.Global` |
@@ -155,11 +157,12 @@ cyan acquisition, violet référencement, jaune calcul, rouge sécurité/fiabili
 | Port | Type | Rôle |
 |---|---|---|
 | `Ready` | `BOOL` | FB prêt |
-| `Status` | `ST_Status` | Statut synthèse façade (agrège Abs/Safety/Homing) — type legacy, cible `Fault : ST_Fault` via `FB_FaultCore` (AF03 §3 / §4.1), migration T164-5 |
-| `HwOut` | `ST_EncoderHw` | Sorties hardware (preset vers PDO) |
+| `Status` | `ST_Status` | Statut synthèse façade (agrège Abs/Safety/Homing) — forme transitoire du lot T164-4C ; migration `Fault : ST_Fault` via `FB_FaultCore` prévue par T164-4D |
+| `HwOut` | `ST_fbEncoder_HwOut` | Sorties hardware (preset vers PDO) |
 | `Measurement` | `ST_EncoderMeasurement` | Mesures + statuts (interface AF06) |
 | `Homed` | `BOOL` | Codeur référencé |
 | `HomingSuspect` | `BOOL` | Incohérence boot à confirmer |
+| `PresetConfirmationFailed` | `BOOL` | Latch diagnostic preset non confirmé (acquitté au `Reset`) |
 | `EncoderFault` | `BOOL` | Gate général fiabilité (sans `Homed`) |
 | `HomedAndReliable` | `BOOL` | Gate strict M3 (disponible ET référencé ET pas incohérent) |
 
@@ -344,3 +347,26 @@ dédiée (AF14) — pointeur, pas de duplication ici.
 | AF10 | Consommateur `Speed_Mps`/`Homed` (`FB_Safety_Winch`, treuils) |
 | AF14 | `ST_HomingChecklist` |
 | Code | `CODE/E_CODEURS/FB_Encoder.st` (façade) + 7 sous-FB |
+
+---
+
+## 13 · 🔧 Transaction preset E-D1 (T164-4C)
+
+La frontière hardware de `FB_Encoder` est séparée en `ST_fbEncoder_HwIn` (faits
+d'entrée, dont `PresetStatusBit`) et `ST_fbEncoder_HwOut` (ordres preset). Le bit
+`PresetStatusBit` est réservé au site : `PRG_02_Acquisition` le force à `FALSE`
+tant qu'aucun bit d'état réel n'est identifié.
+
+Après une demande preset, `FB_Encoder_Homing` conserve la calibration précédente
+et vérifie la mesure relue après la temporisation historique `T#500MS`. En mode
+`READBACK_ONLY` (défaut), le homing est confirmé si
+`ABS(CandidateCablePosM - TargetPositionM) <= 0.010 m`. Les modes
+`READBACK_AND_STATUSBIT` et `STATUSBIT_ONLY` exigent en plus, ou à la place, le
+bit optionnel. `Calib.Homed` et `Calib.HomingRefRaw` ne sont écrits ensemble
+qu'après confirmation ; un échec conserve la référence et lève le diagnostic
+« preset non confirmé » (`PresetConfirmationFailed`).
+
+Le suivi de cette transaction est interne à `FB_Encoder_Homing` et ne publie pas
+`Status.State = BUSY` : le treuil ne passe donc pas en mode de référencement de
+sécurité pendant la vérification du preset. Les protections du pipeline treuil
+restent actives pendant cette phase.

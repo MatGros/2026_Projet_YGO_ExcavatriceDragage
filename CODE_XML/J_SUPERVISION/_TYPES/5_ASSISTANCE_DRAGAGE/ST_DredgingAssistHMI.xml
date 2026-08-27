@@ -540,8 +540,10 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
           </Folder>
         </Folder>
         <Folder Name="G_CYCLE">
-          <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
-          <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+          <Folder Name="_TYPES">
+            <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
+            <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

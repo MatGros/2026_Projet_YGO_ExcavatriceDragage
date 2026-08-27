@@ -83,7 +83,7 @@ comble ça, sans jamais changer la sémantique :
 **1. Convertir** (fichier + ses dépendances de type) :
 ```bash
 python TOOLS/COMPILER_ST2C_STruCpp/convert_codesys_to_iec.py \
-  CODE/A_COMMUN/E_State.st CODE/E_CODEURS/FB_Encoder.st --out /tmp/converted
+  CODE/A_COMMUN/_TYPES/E_State.st CODE/E_CODEURS/FB_Encoder.st --out /tmp/converted
 ```
 Repérer les dépendances : `grep -oE ": (ST_|E_|FB_)[A-Za-z0-9_]+" CODE/E_CODEURS/FB_Encoder.st | sort -u`
 Une dépendance manquante lève `Undefined type 'X'` — itérer jusqu'à liste complète.

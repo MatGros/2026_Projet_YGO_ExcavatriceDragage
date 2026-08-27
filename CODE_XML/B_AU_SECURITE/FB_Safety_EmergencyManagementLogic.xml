@@ -743,7 +743,9 @@ Error := (ErrorId &lt;&gt; 16#0000);
       <ProjectStructure>
         <Folder Name="B_AU_SECURITE">
           <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
-          <Object Name="ST_Safety_Emergency_InternalCmd" ObjectId="231a5be8-1708-5e9a-a840-cc0ec056946d" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Safety_Emergency_InternalCmd" ObjectId="231a5be8-1708-5e9a-a840-cc0ec056946d" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

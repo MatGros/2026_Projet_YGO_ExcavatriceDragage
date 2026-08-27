@@ -42,8 +42,6 @@ VAR_OUTPUT
     TurnCount           : UDINT;       // <-- [DIAG] Nombre de tours bruts (RawPos / PointsPerRev)
 
     // === COMMANDES & ECHANGE BUS ETHERCAT ===
-    PresetAck           : BOOL;        // <-- [STAT] Pulse confirmation preset reussi
-    PresetNak           : BOOL;        // <-- [STAT] Pulse refus / timeout preset
     PresetTriggerCmd    : WORD;        // <-- [ACT]  Ordre declenchement preset vers PDO Rx
     CodeSeqTriggerCmd   : WORD;        // <-- [ACT]  Ordre sequence code vers PDO Rx
     PresetValueOut      : UDINT;       // <-- [ACT]  Valeur de preset transmise au PDO Rx
@@ -61,6 +59,7 @@ VAR
     // === VARIABLES INTERNES DE CALCUL & ETAT ===
     PresetSeqStep       : INT;         // . [LOC] Etape sequence preset (0:IDLE, 1:PULSE/WAIT)
     RawDiff             : DINT;        // . [LOC] Ecart signe entre RawPos et PresetValueOut
+    PresetCompleted     : BOOL;        // . [LOC] Fait de fin de maintien preset (un scan)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
@@ -73,8 +72,11 @@ IF NOT Enable THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
+    PresetCompleted := FALSE;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
     PresetTimerVisual(IN := FALSE, PT := T#500MS);
+    // RawPos, AngleRaw et TurnCount sont volontairement gelés hors Enable
+    // (AF09 F09.01 / AC5) : aucune lecture bus ni remise a zero dans ce gate.
     RETURN;
 END_IF;
 
@@ -114,7 +116,7 @@ END_IF;
 // masque de bits). CodeSeqTriggerCmd : rôle non identifié — laissé à 0, PAS piloté tant que sa
 // fonction n'est pas confirmée. Ne jamais lui donner une valeur arbitraire.
 PresetReqEdge(CLK := PresetRequest);
-PresetAck := FALSE; PresetNak := FALSE; // pulses 1 cycle uniquement
+PresetCompleted := FALSE;
 CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
 CASE PresetSeqStep OF
     0: // IDLE
@@ -132,13 +134,12 @@ CASE PresetSeqStep OF
             PresetTimerVisual(IN := TRUE, PT := T#500MS);
             IF PresetTimerVisual.Q THEN
                 PresetTriggerCmd := 0;
-                PresetAck := TRUE;
+                PresetCompleted := TRUE;
                 PresetSeqStep := 0;
                 PresetTimerVisual(IN := FALSE, PT := T#500MS);
             END_IF;
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
-            PresetNak := TRUE;
             Status.ErrorId := Status.ErrorId OR 16#0002;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
@@ -159,5 +160,5 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 Status.Busy := (PresetSeqStep <> 0);
-Status.Done := PresetAck;
+Status.Done := PresetCompleted;
 {endregion}

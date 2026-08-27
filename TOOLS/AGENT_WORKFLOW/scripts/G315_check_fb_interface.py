@@ -154,7 +154,7 @@ def analyze_fb_files(root: Path) -> tuple[list[Path], list[Path], list[tuple[Pat
 def dut_exists(root: Path) -> bool:
     """Le DUT cible ST_Fault doit exister dans CODE/ avant toute migration (T164-3)."""
     code_dir = root / "CODE" if (root / "CODE").is_dir() else root
-    return (code_dir / "A_COMMUN" / "ST_Fault.st").is_file()
+    return (code_dir / "A_COMMUN" / "ST_Fault.st").is_file() or (code_dir / "A_COMMUN" / "_TYPES" / "ST_Fault.st").is_file()
 
 
 def split_standard_by_form(standard_fbs: list[Path]) -> tuple[list[Path], list[Path], list[Path]]:

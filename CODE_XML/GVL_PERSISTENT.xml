@@ -1459,19 +1459,25 @@ Seuils de changement de palier (0..100%)</xhtml>
         </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
-            <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
-            <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
+            <Folder Name="_TYPES">
+              <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
+              <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
+            </Folder>
           </Folder>
-          <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
-          <Object Name="ST_WinchLoadEstimateTable" ObjectId="3ce84c87-ca73-5af4-aa58-4b48adcd8dc4" />
-          <Object Name="ST_WinchSpeedConfig" ObjectId="e42720b7-697f-5cd2-bd03-5cc46c6f51bc" />
-          <Object Name="ST_Winch_SymmetryCfg" ObjectId="cafdebf4-b7e5-5000-bdd0-033e76a6b7c7" />
-          <Object Name="ST_Winch_SymmetryData" ObjectId="f7635572-022c-5fdd-93e8-106b5d2eea3e" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
+            <Object Name="ST_WinchLoadEstimateTable" ObjectId="3ce84c87-ca73-5af4-aa58-4b48adcd8dc4" />
+            <Object Name="ST_WinchSpeedConfig" ObjectId="e42720b7-697f-5cd2-bd03-5cc46c6f51bc" />
+            <Object Name="ST_Winch_SymmetryCfg" ObjectId="cafdebf4-b7e5-5000-bdd0-033e76a6b7c7" />
+            <Object Name="ST_Winch_SymmetryData" ObjectId="f7635572-022c-5fdd-93e8-106b5d2eea3e" />
+          </Folder>
         </Folder>
         <Folder Name="E_CODEURS">
-          <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
-          <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
-          <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
+            <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
+            <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
+          </Folder>
         </Folder>
         <Folder Name="D_JOYSTICK">
           <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />

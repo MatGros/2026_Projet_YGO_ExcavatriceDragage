@@ -583,9 +583,11 @@ END_IF;
       <ProjectStructure>
         <Folder Name="A_COMMUN">
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
-          <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
-          <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
-          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
+            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
+            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

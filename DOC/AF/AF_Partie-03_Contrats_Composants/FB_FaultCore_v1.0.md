@@ -5,8 +5,8 @@
 > Rôle de **ce** document : le détail technique — interface complète, types `ST_Fault` et
 > `ST_FaultCause`, vue live vs vue latchée, câblage minimal, catalogue de tests — que le chapô ne
 > porte plus depuis la v2.3.
-> Source code : `CODE/A_COMMUN/FB_FaultCore.st`, `CODE/A_COMMUN/ST_Fault.st`,
-> `CODE/A_COMMUN/ST_FaultCause.st`, `CODE/A_COMMUN/ST_Lifecycle.st` · consommateur confirmé :
+> Source code : `CODE/A_COMMUN/FB_FaultCore.st`, `CODE/A_COMMUN/_TYPES/ST_Fault.st`,
+> `CODE/A_COMMUN/_TYPES/ST_FaultCause.st`, `CODE/A_COMMUN/_TYPES/ST_Lifecycle.st` · consommateur confirmé :
 > `CODE/D_JOYSTICK/FB_Joystick.st` (`instFault` + `instCauses`).
 
 ## 🧭 Sommaire
@@ -198,7 +198,7 @@ Exemple réel équivalent : `CODE/D_JOYSTICK/FB_Joystick.st` (`instFault` + `ins
 | AF03 (chapô) | [`AF_Partie-03_Contrats_Composants_v2.3.md`](../AF_Partie-03_Contrats_Composants_v2.3.md) — contrats socle `light` / `standard`, périmètre du socle (§3, §4.1) |
 | `DOC/STDS/CODE_QUALITY_STANDARDS.md` | §2quinquies (interfaces socle), §3 / §3bis (types `ST_Fault` / `ST_FaultCause`, socle `FB_FaultCore`), §9 (pattern Cause/Ack, `Reset` jamais conditionné) |
 | AF08 (Joystick) | Consommateur confirmé (`instFault` + `instCauses`) |
-| Code | `CODE/A_COMMUN/FB_FaultCore.st`, `CODE/A_COMMUN/ST_Fault.st`, `CODE/A_COMMUN/ST_FaultCause.st`, `CODE/A_COMMUN/ST_Lifecycle.st` |
+| Code | `CODE/A_COMMUN/FB_FaultCore.st`, `CODE/A_COMMUN/_TYPES/ST_Fault.st`, `CODE/A_COMMUN/_TYPES/ST_FaultCause.st`, `CODE/A_COMMUN/_TYPES/ST_Lifecycle.st` |
 | Tests | `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st` |
 </content>
 </invoke>

@@ -307,7 +307,7 @@ Destiné aux blocs qui **remontent un défaut** (acquittable ou non) ou pilotent
 > aucune n'est une forme de conformité cible :
 > 1. **Défaut à plat** (`Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError` déclarés
 >    individuellement en `VAR_OUTPUT`, sans textes) — FB antérieurs au socle, migration **T137**.
-> 2. **`Status : ST_Status`** (struct de statut agrégé legacy — `CODE/A_COMMUN/ST_Status.st`) —
+> 2. **`Status : ST_Status`** (struct de statut agrégé legacy — `CODE/A_COMMUN/_TYPES/ST_Status.st`) —
 >    **17 FB** encore concernés, tolérés **jusqu'à T164-5** (migration vers `Fault : ST_Fault`).
 >
 > Tout FB **nouveau** porte `Fault : ST_Fault` rempli via `FB_FaultCore` (+ `Lifecycle : ST_Lifecycle`
@@ -315,7 +315,7 @@ Destiné aux blocs qui **remontent un défaut** (acquittable ou non) ou pilotent
 > et les formes legacy et publie leur décompte (mesure de l'avancement des migrations).
 
 ### 3. Structures socle `ST_Fault` / `ST_FaultCause` / `ST_Lifecycle`
-Le défaut d'un FB `standard` est porté par la brique **`ST_Fault`** (`CODE/A_COMMUN/ST_Fault.st`) —
+Le défaut d'un FB `standard` est porté par la brique **`ST_Fault`** (`CODE/A_COMMUN/_TYPES/ST_Fault.st`) —
 **deux vues**, applicable dans TOUS les cas (acquittable ou non), sans brique warning séparée :
 
 ```pascal
@@ -329,7 +329,7 @@ END_STRUCT
 END_TYPE
 ```
 
-La cause élémentaire est **`ST_FaultCause`** (`CODE/A_COMMUN/ST_FaultCause.st`), exprimée EN CLAIR
+La cause élémentaire est **`ST_FaultCause`** (`CODE/A_COMMUN/_TYPES/ST_FaultCause.st`), exprimée EN CLAIR
 (pas de bitfield, pas de masque) :
 
 ```pascal
@@ -343,7 +343,7 @@ END_TYPE
 ```
 
 L'avancement d'une action à cycle est porté **séparément** par **`ST_Lifecycle`**
-(`CODE/A_COMMUN/ST_Lifecycle.st`), **optionnelle** — un FB purement synchrone ne la porte pas :
+(`CODE/A_COMMUN/_TYPES/ST_Lifecycle.st`), **optionnelle** — un FB purement synchrone ne la porte pas :
 
 ```pascal
 TYPE ST_Lifecycle :
@@ -359,7 +359,7 @@ END_TYPE
 > Si **plusieurs** causes sont actives, l'IHM choisit sa stratégie d'affichage (ex. rotation) — le
 > socle ne fait pas de rotation.
 
-> 🗂️ **Legacy** : 17 FB portent encore `Status : ST_Status` (`CODE/A_COMMUN/ST_Status.st`, struct
+> 🗂️ **Legacy** : 17 FB portent encore `Status : ST_Status` (`CODE/A_COMMUN/_TYPES/ST_Status.st`, struct
 > agrégée `Busy`/`Done`/`Error`/`ErrorId`/`State`/`StateAtError`/`Warning`/textes). **Toléré
 > jusqu'à T164-5**, pas la forme cible. Ces FB compilent et passent `G315` sans modification.
 
