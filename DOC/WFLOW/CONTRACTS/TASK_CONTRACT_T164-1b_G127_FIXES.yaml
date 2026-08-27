@@ -94,17 +94,36 @@ contract:
     valeur de neutralisation pour un FB C4 sans validation.
 
 # ═══════════════════════════════════════════════════════════════════════════
-# 🚦 SUIVI (rempli par l'ORCHESTRATEUR)
+# 🚦 SUIVI (rempli par l'ORCHESTRATEUR & AGENT)
 # ═══════════════════════════════════════════════════════════════════════════
 status: PENDING
 
 execution:
-  executed_by: "..."
-  completed_at: "..."
-  status: PENDING
+  executed_by: "Antigravity (Gemini 3.7 Flash)"
+  completed_at: "2026-08-27T18:02:00+02:00"
+  status: READY_FOR_REVIEW
   summary: >
-    (rapport agent : FB traites, gates completes, preuves G127/G200)
-  evidence_submitted: []
+    Correctifs de neutralisation appliqués sur les 9 FB des Lots A et C :
+    - Lot A (C4) : FB_Safety_Winch (MecaADriftM, MecaCDriftM, MecaBElapsedTime neutralisés à 0.0/T#0ms),
+      FB_Winch (ContactorsCheck.*, DirectionChangePending, SpeedGuardLimited neutralisés à FALSE),
+      FB_WinchOutputInterlock (commentaires AC3 explicitant la conservation de ErrorId, Reason, RestartInhibit, StateAtError),
+      FB_Translation (TargetReached neutralisé à FALSE).
+    - Lot C (non-C4) : FB_Brake (ContactorCheck.Command/Feedback, BrakeCommandOpenConfirmed neutralisés),
+      FB_Cycle (SpeedMismatchTimer reset, SpeedMismatch* neutralisés, commentaires AC3 sur Error/ErrorId/CycleStepAtError),
+      FB_Translation_PositionEstimator (commentaires AC3 sur persistance odométrique PositionEstimatedM/Initialized),
+      FB_TranslationOutputInterlock (commentaire AC3 sur RestartInhibit),
+      FB_Sim_Joystick (ReturningActive neutralisé à FALSE).
+    - Aucune auto-affectation X := X résiduelle (zéro altération des sorties de sûreté [SAFE]).
+    - G127 : 30/35 complets ; 4 OK-FIGE documentés AC3 + FB_Encoder_Abs exclu T164-4.
+    - G200 : PASS (0 erreur).
+    - Gates Palier C : 16/16 PASS (incluant G390 fraîcheur bundle).
+    - Aucun commit créé ; découpe AC6 en 2 commits (Lot A / Lot C) prête pour validation humaine.
+  evidence_submitted:
+    - check_linkage: PASS (0 erreur, 76 OK)
+    - g127_report: PASS (30/35 complets, 4 OK-FIGE documentés AC3, FB_Encoder_Abs exclu T164-4)
+    - run_all_gates: PASS (16/16 palier C, 22/22 total)
+    - bundle_freshness: PASS (CODE_XML/CODE_Bundle.xml is fresh)
+    - git_diff_st_only: 9 fichiers ST modifiés, zéro modification de logique métier
 
 validation:
   validated_by: "..."          # = orchestrateur (CC) — revue ligne a ligne des 4 FB C4

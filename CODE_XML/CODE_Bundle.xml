@@ -11774,6 +11774,10 @@ IF NOT Enable THEN
     BrakeCmd := FALSE;
     Status.State := E_State.DISABLED;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    ContactorCheck.Command := FALSE;          // 📊 Neutralisation : miroir de BrakeCmd := FALSE
+    ContactorCheck.Feedback := ContactorFeedback; // 📊 Neutralisation : miroir entrée physique
+    // 🔒 ContactorCheck.StuckClosed / StuckOpen et Status.ErrorId conservés (latch défaut, acquittement requis)
+    BrakeCommandOpenConfirmed := FALSE;       // 🛡️ Fail-Safe : frein commandé fermé hors Enable
     RETURN;
 END_IF;
 
@@ -13955,6 +13959,13 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready                := FALSE;
     Busy                 := FALSE;
     Done                 := FALSE;
+    SpeedMismatchTimer(IN := FALSE, PT := SpeedMismatchTimeout);
+    SpeedMismatchMps := 0.0;             // 📊 Neutralisation : aucun calcul d'écart vitesse hors Enable
+    SpeedMismatchActive := FALSE;        // 📊 Neutralisation : surveillance désynchro inactive hors Enable
+    SpeedMismatchConfirmed := FALSE;     // 📊 Neutralisation : confirmation désynchro inactive hors Enable
+    // 🔒 Sorties de diagnostic et latches de défaut VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
+    // - Error &amp; ErrorId : latch défaut cycle préservé (effacé uniquement sur front Reset conscient)
+    // - CycleStepAtError : étape du cycle au moment du défaut préservée pour diagnostic IHM
     RETURN;
 END_IF;
 {endregion}
@@ -23618,6 +23629,9 @@ IF NOT Enable THEN
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
+    MecaADriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive A valide hors Enable
+    MecaCDriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive C valide hors Enable
+    MecaBElapsedTime := T#0ms;     // ⏱️ Neutralisation : aucun temps écoulé Méca B valide hors Enable
     RETURN;
 END_IF;
 
@@ -25579,6 +25593,7 @@ IF NOT Enable THEN
     RawX       := NeutralRaw;
     RawY       := NeutralRaw;
     RawButton  := FALSE;
+    ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
     RETURN;
 END_IF;
 {endregion}
@@ -27670,6 +27685,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 
     Status.State := E_State.DISABLED;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    TargetReached := FALSE; // 📊 Neutralisation : aucune cible atteinte garantie hors Enable
     RETURN;
 END_IF;
 
@@ -28205,6 +28221,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
     Status.State := E_State.DISABLED;
     Reason := E_TranslationFinalInterlockReason.NONE;
+    // 🔒 Latch de sûreté VOLONTAIREMENT conservé hors Enable (AC3 / §9) :
+    // RestartInhibit : latch anti-redémarrage auto après timeout frein préservé (doit survivre à la perte d'Enable)
     RETURN;
 END_IF;
 
@@ -28943,6 +28961,8 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
 IF NOT Enable THEN
     Recalibrated := FALSE;
     RecalibratedSensorId := -1;
+    // 🔒 Sorties odométriques VOLONTAIREMENT conservées hors Enable (AC3 / persistance continue RETAIN) :
+    // - PositionEstimatedM &amp; Initialized : estimation odométrique et référence absolue maintenues pour ne pas perdre la position M3 hors Enable
     RETURN;
 END_IF;
 
@@ -30719,6 +30739,12 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     Status.Error := FALSE;
     Status.ErrorId := 16#0000;
+    ContactorsCheck.Command := FALSE;     // 📊 Neutralisation : aucun contacteur commandé hors Enable
+    ContactorsCheck.Feedback := FALSE;    // 📊 Neutralisation : retour contacteur non surveillé hors Enable
+    ContactorsCheck.StuckClosed := FALSE; // 📊 Neutralisation : détection collage contacteur inactive hors Enable
+    ContactorsCheck.StuckOpen := FALSE;   // 📊 Neutralisation : détection ouverture contacteur inactive hors Enable
+    DirectionChangePending := FALSE;      // 📊 Neutralisation : aucun changement de sens en cours hors Enable
+    SpeedGuardLimited := FALSE;           // 📊 Neutralisation : aucune limitation garde-fou hors Enable
     RETURN;
 END_IF;
 
@@ -31738,6 +31764,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId &lt;&gt; 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
+    // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
+    // - ErrorId &amp; RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
+    // - StateAtError &amp; Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
     RETURN;
 END_IF;
 

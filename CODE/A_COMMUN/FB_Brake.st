@@ -55,6 +55,10 @@ IF NOT Enable THEN
     BrakeCmd := FALSE;
     Status.State := E_State.DISABLED;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    ContactorCheck.Command := FALSE;          // 📊 Neutralisation : miroir de BrakeCmd := FALSE
+    ContactorCheck.Feedback := ContactorFeedback; // 📊 Neutralisation : miroir entrée physique
+    // 🔒 ContactorCheck.StuckClosed / StuckOpen et Status.ErrorId conservés (latch défaut, acquittement requis)
+    BrakeCommandOpenConfirmed := FALSE;       // 🛡️ Fail-Safe : frein commandé fermé hors Enable
     RETURN;
 END_IF;
 

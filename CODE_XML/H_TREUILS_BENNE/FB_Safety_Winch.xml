@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:50:28.171818" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:50:28.171818">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:50:19.325228" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:50:19.325228">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1062,6 +1062,9 @@ IF NOT Enable THEN
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
+    MecaADriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive A valide hors Enable
+    MecaCDriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive C valide hors Enable
+    MecaBElapsedTime := T#0ms;     // ⏱️ Neutralisation : aucun temps écoulé Méca B valide hors Enable
     RETURN;
 END_IF;
 

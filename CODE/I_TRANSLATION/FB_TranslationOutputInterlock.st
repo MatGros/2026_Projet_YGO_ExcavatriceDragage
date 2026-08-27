@@ -81,6 +81,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Status.Error := (Status.ErrorId <> 16#0000);
     Status.State := E_State.DISABLED;
     Reason := E_TranslationFinalInterlockReason.NONE;
+    // 🔒 Latch de sûreté VOLONTAIREMENT conservé hors Enable (AC3 / §9) :
+    // RestartInhibit : latch anti-redémarrage auto après timeout frein préservé (doit survivre à la perte d'Enable)
     RETURN;
 END_IF;
 

@@ -62,6 +62,8 @@ END_VAR
 IF NOT Enable THEN
     Recalibrated := FALSE;
     RecalibratedSensorId := -1;
+    // 🔒 Sorties odométriques VOLONTAIREMENT conservées hors Enable (AC3 / persistance continue RETAIN) :
+    // - PositionEstimatedM & Initialized : estimation odométrique et référence absolue maintenues pour ne pas perdre la position M3 hors Enable
     RETURN;
 END_IF;
 
