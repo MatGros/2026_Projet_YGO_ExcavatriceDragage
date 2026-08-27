@@ -675,8 +675,10 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
           </Folder>
         </Folder>
         <Folder Name="E_CODEURS">
-          <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
-          <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
+            <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

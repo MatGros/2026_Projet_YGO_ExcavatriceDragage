@@ -380,11 +380,15 @@
           </Folder>
         </Folder>
         <Folder Name="A_COMMUN">
-          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          <Folder Name="_TYPES">
+            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          </Folder>
         </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
-            <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
+            <Folder Name="_TYPES">
+              <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
+            </Folder>
           </Folder>
         </Folder>
       </ProjectStructure>

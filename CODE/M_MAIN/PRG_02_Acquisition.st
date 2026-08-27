@@ -38,8 +38,8 @@ VAR
     M2BucketRefCloseEdge     : R_TRIG; // . [LOC] Front demande reference benne fermee
     M2BucketRefRequested     : BOOL;   // . [LOC] Demande d'etalonnage M2 active
     M2BucketRefTargetM       : REAL;   // . [LOC] Cible metrique etalonnage M2
-    HwM1                     : ST_EncoderHw; // . [LOC] Frontiere hardware codeur M1 (in/out)
-    HwM2                     : ST_EncoderHw; // . [LOC] Frontiere hardware codeur M2 (in/out)
+    HwInM1                   : ST_fbEncoder_HwIn; // . [LOC] Entrees hardware codeur M1
+    HwInM2                   : ST_fbEncoder_HwIn; // . [LOC] Entrees hardware codeur M2
 
     WinchInputSourceSimulated         : BOOL; // . [LOC] Source Winch simulee active
     TranslationInputSourceSimulated   : BOOL; // . [LOC] Source Translation simulee active
@@ -338,10 +338,11 @@ Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
 // Facade codeur complete : Abs→Homing→Scale→Safety→Reliability→Speed.
 // L'autorisation de homing est calculee ici (mode + treuil selectionne).
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
-HwM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
-HwM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
-HwM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
-HwM1.SlaveOperational  := instDiagEthercat.DeviceEncoderM1.Operational;
+HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
+HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
+HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
+HwInM1.SlaveOperational  := instDiagEthercat.DeviceEncoderM1.Operational;
+HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -355,9 +356,10 @@ instEncoderM1(
     UseDynamicTarget      := FALSE,
     DynamicHomingTargetM  := 0.0,
     TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
-    Hw                    := HwM1,
+    HwIn                  := HwInM1,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,
+    Cfg                   := GVL_IHM.Commun.EncoderCfg,
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     Calib                 := _CalibM1
 );
@@ -384,10 +386,11 @@ ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
 END_IF;
 
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
-HwM2.RawPosIn          := HwIn.Winch.COD2_PosValue;
-HwM2.AlarmsIn          := HwIn.Winch.COD2_Alarms;
-HwM2.WarningsIn        := HwIn.Winch.COD2_Warnings;
-HwM2.SlaveOperational  := instDiagEthercat.DeviceEncoderM2.Operational;
+HwInM2.RawPosIn          := HwIn.Winch.COD2_PosValue;
+HwInM2.AlarmsIn          := HwIn.Winch.COD2_Alarms;
+HwInM2.WarningsIn        := HwIn.Winch.COD2_Warnings;
+HwInM2.SlaveOperational  := instDiagEthercat.DeviceEncoderM2.Operational;
+HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -401,9 +404,10 @@ instEncoderM2(
     UseDynamicTarget      := M2BucketRefRequested,
     DynamicHomingTargetM  := M2BucketRefTargetM,
     TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
-    Hw                    := HwM2,
+    HwIn                  := HwInM2,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,
+    Cfg                   := GVL_IHM.Commun.EncoderCfg,
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global,
     Calib                 := _CalibM2
 );

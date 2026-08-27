@@ -266,3 +266,15 @@ Le pont unique est `FB_CfgPersistBridge_fbEncoder_Cfg` dans `PRG_07_Supervision`
 `Initialized` est un drapeau interne de restauration et n'est pas un réglage IHM.
 Les cibles `CfgHomingTarget_M` / `CfgTopSensorPos_M` restent sous
 `GVL_IHM.M1TreuilRetenue.Cfg` / `GVL_IHM.M2TreuilBenne.Cfg`.
+
+## 🆕 Lot T164-4C — Frontière HwIn/HwOut codeur (transaction preset)
+
+Aucun chemin IHM renommé/supprimé. `PresetStatusBit` est une **entrée hardware**
+réservée (`ST_fbEncoder_HwIn`), **pas un chemin IHM** : `PRG_02_Acquisition` la
+force à `FALSE` tant qu'aucun bit d'état réel n'est identifié.
+
+| Fait | Rôle | Source d'ownership |
+|---|---|---|
+| `FB_Encoder.Cfg` | `ST_fbEncoder_Cfg` (`PresetConfirmMode`) lu par la façade | `GVL_IHM.Commun.EncoderCfg` (IHM publique) → pont `FB_CfgPersistBridge_fbEncoder_Cfg` (PRG_07) → `GVL_PERSISTENT._EncoderCfgPersist`. La façade lit l'**IHM publique**, jamais le persistant directement. |
+| `FB_Encoder.HwOut` | Ordres preset (type `ST_fbEncoder_HwOut`) | produit par `FB_Encoder`, relayé par `PRG_02` vers le device. |
+| `FB_Encoder.HwIn` | Faits hardware d'entrée (type `ST_fbEncoder_HwIn`) | rempli par `PRG_02` depuis `HwIn.Winch.*` + `PresetStatusBit := FALSE`. |

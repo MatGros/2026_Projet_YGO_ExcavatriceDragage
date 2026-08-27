@@ -1382,16 +1382,22 @@ END_IF;
       <ProjectStructure>
         <Folder Name="G_CYCLE">
           <Object Name="FB_Cycle" ObjectId="17fb99b4-f1ad-50d8-8736-de2357b93935" />
-          <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
+          <Folder Name="_TYPES">
+            <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
+          </Folder>
         </Folder>
         <Folder Name="F_MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
-            <Object Name="ST_BucketCmdDemand" ObjectId="e0ba9d9d-5f49-57f9-aa65-51128070b971" />
+            <Folder Name="_TYPES">
+              <Object Name="ST_BucketCmdDemand" ObjectId="e0ba9d9d-5f49-57f9-aa65-51128070b971" />
+            </Folder>
           </Folder>
-          <Object Name="ST_WinchCmdDemand" ObjectId="e1cb8f0c-a5a5-5b87-b439-8e0b245904de" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_WinchCmdDemand" ObjectId="e1cb8f0c-a5a5-5b87-b439-8e0b245904de" />
+          </Folder>
         </Folder>
         <Folder Name="I_TRANSLATION">
           <Object Name="ST_TranslationCmdDemand" ObjectId="0b5f8faa-764b-51e3-b87f-be2bae8212ac" />

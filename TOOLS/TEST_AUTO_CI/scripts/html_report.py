@@ -1216,10 +1216,10 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
     if not is_prg:
         if has_enable and has_ready and has_reset and has_status:
             contract_badge = '<span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD AF03</span>'
-            contract_desc = "✅ Enable + Reset + Ready + Status (ST_FbStatus complet)"
+            contract_desc = "✅ Enable + Reset + Ready + Status (ST_Status complet)"
         elif has_enable and (has_ready or "DONE" in out_keys) and (has_reset or has_flat_error):
             contract_badge = '<span style="background:rgba(245,158,11,0.18);color:#fbbf24;border:1px solid #d97706;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD (Tolérance T137 Flat)</span>'
-            contract_desc = "⚠️ Signaux à plat (Reset/Error/Busy/Done) sans ST_FbStatus"
+            contract_desc = "⚠️ Signaux à plat (Reset/Error/Busy/Done) sans ST_Status"
         elif has_enable and has_ready:
             contract_badge = '<span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT LIGHT AF03</span>'
             contract_desc = "✅ Enable + Ready (Calculateur / Brique sans défaut)"

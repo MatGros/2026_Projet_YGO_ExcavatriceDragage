@@ -360,7 +360,9 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
           </Folder>
         </Folder>
         <Folder Name="G_CYCLE">
-          <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
+          <Folder Name="_TYPES">
+            <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

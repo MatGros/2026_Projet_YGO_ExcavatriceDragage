@@ -1357,9 +1357,11 @@ Diag.LockoutActive        := LockoutActive;
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
           <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
           <Object Name="FB_Safety_EmergencyManagementOutput" ObjectId="d3f89721-8269-5526-aac8-48009a2f16a2" />
-          <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
-          <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
-          <Object Name="ST_Safety_Emergency_InternalCmd" ObjectId="231a5be8-1708-5e9a-a840-cc0ec056946d" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
+            <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
+            <Object Name="ST_Safety_Emergency_InternalCmd" ObjectId="231a5be8-1708-5e9a-a840-cc0ec056946d" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

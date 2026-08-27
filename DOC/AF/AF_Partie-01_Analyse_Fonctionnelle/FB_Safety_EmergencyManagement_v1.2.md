@@ -82,7 +82,7 @@ Trait plein = composition/données transférées. `Logic` et `Output` sont des s
 
 #### 🧩 `ST_Safety_Emergency_InternalCmd` *(DUT Bus Interne)*
 
-- **Fichier Source** : [`ST_Safety_Emergency_InternalCmd.st`](../../../../CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st)
+- **Fichier Source** : [`ST_Safety_Emergency_InternalCmd.st`](../../../../CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st)
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Transporte les ordres logiques entre le bloc de décision et le bloc de sortie`
 - **Responsabilité** : Structure d'échange interne à 3 champs `BOOL` reliant `Logic` et `Output`.
 
@@ -547,9 +547,9 @@ Fichiers code de référence :
 - `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st`
 - `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st`
 - `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st`
-- `CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st` (interne Logic→Output)
-- `CODE/B_AU_SECURITE/ST_Safety_Emergency_State.st` (bus état public)
-- `CODE/B_AU_SECURITE/ST_Safety_Emergency_Diag.st` (bus diagnostic)
+- `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st` (interne Logic→Output)
+- `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st` (bus état public)
+- `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st` (bus diagnostic)
 - `ARCHIVES/Code/SUPERVISION/ST_Safety_Emergency_HmiCmd.st` (bus commande IHM, test archivé T99)
 - `ARCHIVES/Code/SUPERVISION/ST_Safety_Emergency_HmiState.st` (bus état IHM, test archivé T99)
 - `ARCHIVES/Code/SUPERVISION/GVL_IHM_AU.st` (interface IHM archivée T99)

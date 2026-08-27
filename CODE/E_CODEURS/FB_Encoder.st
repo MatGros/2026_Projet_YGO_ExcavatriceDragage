@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regrouper toute la chaine codeur derriere une interface unique :
       Abs → Homing → Scale → Safety → Reliability → Speed.
-   🔌 Frontiere hardware exposee en IN/OUT via le bus ST_EncoderHw (testable).
+   🔌 Frontiere hardware separee HwIn/HwOut (testable).
    🔒 Homing : autorise par HomingPermit (calcule par le caller), declenche
       par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
@@ -33,13 +33,14 @@ VAR_INPUT
     TopPositionSensor     : BOOL;        // --> [HW]  Capteur physique position haute unique
 
     // === BUS ETHERCAT & CAPTEUR HW (frontiere testable) ===
-    Hw                    : ST_EncoderHw; // <-> [BUS] Entrees/sorties hardware codeur
+    HwIn                  : ST_fbEncoder_HwIn; // --> [HW] Retours hardware codeur
 
     // === MECANIQUE (constantes) ===
     PointsPerRev          : UDINT := 8192; // --> [CFG] Resolution codeur (pts/tour)
     CableM_PerRev         : REAL := 2.0;   // --> [CFG] Developpement cable par tour (m/tour)
 
-    // === REGLAGES (modifiables) ===
+    // === REGLAGES & CONFIGURATION ===
+    Cfg                   : ST_fbEncoder_Cfg; // --> [CFG] Mode de confirmation preset
     PositionMinM          : REAL := -99.0; // --> [CFG] Plafond bornage physique bas (m)
     PositionMaxM          : REAL := 99.0;  // --> [CFG] Plafond bornage physique haut (m)
     BypassGlobal          : BOOL := FALSE; // --> [TST] Neutralisation defauts pour mise en service
@@ -50,7 +51,7 @@ VAR_OUTPUT
     Status                : ST_Status; // <-- [STAT] Statut transverse facade (synthese)
 
     // === FRONTIERE HW SORTIE (testable) ===
-    HwOut                 : ST_EncoderHw; // <-- [BUS] Sorties hardware codeur (preset...)
+    HwOut                 : ST_fbEncoder_HwOut; // <-- [ACT] Ordres hardware codeur (preset)
 
     // === MESURES CONDITIONNEES (struct frontiere) ===
     Measurement           : ST_EncoderMeasurement; // <-- [BUS] Mesures + statuts (interface)
@@ -60,6 +61,7 @@ VAR_OUTPUT
     HomingSuspect         : BOOL;        // <-- [DIAG] Incoherence redemarrage a lever
     EncoderFault          : BOOL;        // <-- [SAFE] Gate general fiabilite (sans Homed)
     HomedAndReliable      : BOOL;        // <-- [STAT] Gate strict M3 : dispo ET ref ET pas incoherent
+    PresetConfirmationFailed : BOOL;     // <-- [DIAG] Latch derniere verification preset echouee
 END_VAR
 VAR
     // === SOUS-INSTANCES FB (chaine codeur complete) ===
@@ -94,6 +96,8 @@ IF NOT Enable THEN
     Homed := Calib.Homed;
     HomingSuspect := Calib.HomingSuspect;
     Measurement.HomingRefRaw := Calib.HomingRefRaw;
+    // PresetConfirmationFailed est un diagnostic latch : il reste gele hors Enable
+    // et ne doit pas etre efface par ce gate (AC3).
     RETURN;
 END_IF;
 Ready := TRUE;
@@ -101,13 +105,13 @@ Status.State := E_State.READY;
 {endregion}
 
 {region "§2 Abs"}
-instAbs(
+    instAbs(
     Enable              := Enable,
     Reset               := Reset,
-    RawPosIn            := Hw.RawPosIn,
-    AlarmsIn            := Hw.AlarmsIn,
-    WarningsIn          := Hw.WarningsIn,
-    SlaveOperational    := Hw.SlaveOperational,
+    RawPosIn            := HwIn.RawPosIn,
+    AlarmsIn            := HwIn.AlarmsIn,
+    WarningsIn          := HwIn.WarningsIn,
+    SlaveOperational    := HwIn.SlaveOperational,
     PresetRequest       := instHoming.PresetRequest,
     PresetValue         := instHoming.PresetValue,
     PointsPerRev        := PointsPerRev
@@ -128,8 +132,8 @@ instHoming(
     TopPositionSensor    := TopPositionSensor,
     RawPos               := instAbs.RawPos,
     EncoderAvailable     := instAbs.EncoderAvailable,
-    PresetAck            := instAbs.PresetAck,
-    PresetNak            := instAbs.PresetNak,
+    PresetStatusBit      := HwIn.PresetStatusBit,
+    Cfg                  := Cfg,
     PointsPerRev         := PointsPerRev,
     MultiTurnRevsMax     := 4096,
     CableM_PerRev        := CableM_PerRev,
@@ -199,6 +203,7 @@ Homed            := instHoming.Homed;
 HomingSuspect    := instHoming.HomingSuspect;
 EncoderFault     := instRel.EncoderFault;
 HomedAndReliable := instRel.HomedAndReliable;
+PresetConfirmationFailed := instHoming.PresetConfirmationFailed;
 
 // Synthese statut facade
 Status.Busy := instAbs.Status.Busy;

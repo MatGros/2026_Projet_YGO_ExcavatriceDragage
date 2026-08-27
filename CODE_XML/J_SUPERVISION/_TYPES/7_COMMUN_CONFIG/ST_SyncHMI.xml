@@ -343,7 +343,9 @@
           </Folder>
         </Folder>
         <Folder Name="A_COMMUN">
-          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          <Folder Name="_TYPES">
+            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>
