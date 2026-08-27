@@ -23,51 +23,57 @@ class TestFbInterfaceGuard(unittest.TestCase):
         standard_fbs, light_fbs, documented_exceptions, unauthorized = analyze_fb_files(REPO_ROOT)
 
         total = len(standard_fbs) + len(light_fbs) + len(documented_exceptions) + len(unauthorized)
-        self.assertEqual(total, 57, f"Attendu 57 FB au total, obtenu {total}")
+        self.assertEqual(total, 58, f"Attendu 58 FB au total, obtenu {total}")
         self.assertEqual(len(standard_fbs), 18, f"Attendu 18 FB standard, obtenu {len(standard_fbs)}")
-        self.assertEqual(len(light_fbs), 31, f"Attendu 31 FB light, obtenu {len(light_fbs)}")
-        self.assertEqual(len(documented_exceptions), 8, f"Attendu 8 exceptions, obtenu {len(documented_exceptions)}")
+        self.assertEqual(len(light_fbs), 34, f"Attendu 34 FB light, obtenu {len(light_fbs)}")
+        self.assertEqual(len(documented_exceptions), 6, f"Attendu 6 exceptions, obtenu {len(documented_exceptions)}")
         self.assertEqual(len(unauthorized), 0, f"Aucun FB non autorisé attendu, obtenu {len(unauthorized)}")
 
     def test_documented_exceptions_presence(self):
         standard_fbs, light_fbs, documented_exceptions, unauthorized = analyze_fb_files(REPO_ROOT)
         exception_names = {p.stem for p, _ in documented_exceptions}
 
+        # T164-3 : FB_Diag_CanOpen / FB_Diag_Ethercat portent desormais `Status : ST_Status`
+        # -> classes standard (forme legacy-status), plus des exceptions. FB_Joystick est passe
+        # en forme cible `Fault : ST_Fault` -> plus une exception non plus.
         expected_exceptions = {
             "FB_Safety_EmergencyManagement",
             "FB_Safety_EmergencyManagementLogic",
             "FB_Safety_EmergencyManagementOutput",
-            "FB_Diag_CanOpen",
-            "FB_Diag_Ethercat",
             "FB_Cycle",
             "FB_WinchOutputInterlock",
             "FB_SimBench",
         }
         self.assertEqual(exception_names, expected_exceptions)
 
-    def test_dut_st_fbstatus_existe(self):
-        self.assertTrue(dut_exists(REPO_ROOT), "Le DUT ST_FbStatus doit exister dans CODE/A_COMMUN/")
+    def test_dut_st_fault_existe(self):
+        self.assertTrue(dut_exists(REPO_ROOT), "Le DUT cible ST_Fault doit exister dans CODE/A_COMMUN/")
 
-    def test_les_16_standard_formes_apres_pilote(self):
+    def test_repartition_des_formes_standard(self):
         standard, _, _, _ = analyze_fb_files(REPO_ROOT)
-        cible, heritee = split_standard_by_form(standard)
+        cible, legacy_status, legacy_flat = split_standard_by_form(standard)
         self.assertEqual(
-            len(heritee), 0,
-            "Cloture T137 : tous les FB standard sont migres en forme cible (plus de forme a plat)",
+            len(legacy_flat), 0,
+            "Cloture T137 : plus aucune forme a plat parmi les FB standard",
         )
         self.assertEqual(
-            len(cible), 18,
-            "Cloture T137 : les 18 FB standard sont en forme cible (Status : ST_FbStatus)",
+            len(cible), 2,
+            "Forme cible (Fault : ST_Fault) : FB_Joystick pilote + le socle FB_FaultCore",
         )
+        self.assertEqual(
+            len(legacy_status), 16,
+            "16 FB en forme legacy-status (Status : ST_Status), a migrer en T164-5",
+        )
+        self.assertEqual(len(cible) + len(legacy_status) + len(legacy_flat), len(standard))
 
 
 class TestStFbStatusRecognition(unittest.TestCase):
     """Non-regression du defaut corrige le 2026-08-19.
 
     Avant correction, le guard ne detectait que les membres A PLAT. Un FB migre
-    vers `Status : ST_FbStatus` perdait ces membres, tombait a 0/5, etait classe
-    « light » et le script sortait en SUCCES sans rien signaler : le garde-fou se
-    degradait en silence des le premier FB migre par T137.
+    vers un membre struct de statut perdait ces membres, tombait a 0/5, etait classe
+    « light » et le script sortait en SUCCES sans rien signaler.
+    T164-3 : la forme cible reconnue est desormais `Fault : ST_Fault`.
     """
 
     FB_MIGRE = """FUNCTION_BLOCK FB_ExempleMigre
@@ -77,7 +83,19 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     Ready  : BOOL;
-    Status : ST_FbStatus;
+    Fault  : ST_Fault;
+END_VAR
+END_FUNCTION_BLOCK
+"""
+
+    FB_LEGACY_STATUS = """FUNCTION_BLOCK FB_ExempleLegacy
+VAR_INPUT
+    Enable : BOOL;
+    Reset  : BOOL;
+END_VAR
+VAR_OUTPUT
+    Ready  : BOOL;
+    Status : ST_Status;
 END_VAR
 END_FUNCTION_BLOCK
 """
@@ -112,34 +130,38 @@ END_FUNCTION_BLOCK
         standard, light, exceptions, unauthorized = self._analyze(
             {"FB_ExempleMigre.st": self.FB_MIGRE}
         )
-        self.assertEqual(len(standard), 1, "Un FB portant Status : ST_FbStatus doit etre STANDARD")
+        self.assertEqual(len(standard), 1, "Un FB portant Fault : ST_Fault doit etre STANDARD")
         self.assertEqual(len(light), 0, "Il ne doit surtout pas retomber en profil light")
         self.assertEqual(len(exceptions), 0)
         self.assertEqual(len(unauthorized), 0)
+
+    def test_fb_legacy_status_est_standard(self):
+        standard, light, exceptions, unauthorized = self._analyze(
+            {"FB_ExempleLegacy.st": self.FB_LEGACY_STATUS}
+        )
+        self.assertEqual(len(standard), 1, "Un FB portant Status : ST_Status reste STANDARD (legacy tolere T164-5)")
+        self.assertEqual(len(light), 0)
 
     def test_fb_sans_status_reste_light(self):
         standard, light, _, _ = self._analyze({"FB_ExempleLight.st": self.FB_LIGHT})
         self.assertEqual(len(light), 1, "Un calculateur pur reste en profil light")
         self.assertEqual(len(standard), 0)
 
-    def test_indicateur_avancement_t137(self):
-        _, (cible, heritee) = self._analyze(
-            {"FB_ExempleMigre.st": self.FB_MIGRE}, avec_split=True
+    def test_split_3_formes(self):
+        _, (cible, legacy_status, legacy_flat) = self._analyze(
+            {"FB_ExempleMigre.st": self.FB_MIGRE, "FB_ExempleLegacy.st": self.FB_LEGACY_STATUS},
+            avec_split=True,
         )
-        self.assertEqual(len(cible), 1, "Le FB migre compte dans la forme cible")
-        self.assertEqual(len(heritee), 0)
+        self.assertEqual(len(cible), 1, "FB_ExempleMigre compte en forme cible (Fault : ST_Fault)")
+        self.assertEqual(len(legacy_status), 1, "FB_ExempleLegacy compte en forme legacy-status")
+        self.assertEqual(len(legacy_flat), 0)
 
-    def test_les_16_standard_formes_apres_pilote(self):
+    def test_repartition_repo(self):
         standard, _, _, _ = analyze_fb_files(REPO_ROOT)
-        cible, heritee = split_standard_by_form(standard)
-        self.assertEqual(
-            len(heritee), 0,
-            "Cloture T137 : tous les FB standard sont migres en forme cible (plus de forme a plat)",
-        )
-        self.assertEqual(
-            len(cible), 18,
-            "Cloture T137 : les 18 FB standard sont en forme cible (Status : ST_FbStatus)",
-        )
+        cible, legacy_status, legacy_flat = split_standard_by_form(standard)
+        self.assertEqual(len(legacy_flat), 0, "Cloture T137 : plus aucune forme a plat")
+        self.assertEqual(len(cible), 2, "Forme cible : FB_Joystick + FB_FaultCore")
+        self.assertEqual(len(legacy_status), 16, "16 FB legacy-status a migrer en T164-5")
 
 
 class TestStateAwareGuard(unittest.TestCase):
