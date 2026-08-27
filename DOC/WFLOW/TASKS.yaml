@@ -1947,11 +1947,11 @@ tasks:
   bloque_par: []
 - id: T164-1
   parent_id: T164
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: SÉCURITÉ
   agent: CC-sub
-  date: '2026-08-27T14:47:00'
+  date: '2026-08-27T15:05:00'
   titre: Audit des 16 gates NOT Enable incomplets (G127)
   contexte: 'Intitulé complet : Auditer les 16 FB signalés par G127 (gate IF NOT Enable ... RETURN qui ne
     republie pas toutes ses sorties), dont 4 C4 (FB_Safety_Winch, FB_WinchOutputInterlock, FB_Winch, FB_Translation).
@@ -1968,7 +1968,41 @@ tasks:
   - Proposer pour chaque BUG un correctif isolé (diff minimal, sans changement d'interface) + preuve G127
   - Prioriser les 4 FB C4 ; livrer un fichier d'audit DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md
   - Aucune modification de CODE/ par l'agent d'audit — correctifs appliqués séparément après revue
+  resultat: '✅ VALIDÉ orchestrateur (CC) 2026-08-27. Audit DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md
+    (443 l.). Spot-check A/B/C concordant. Bilan sur 58 sorties : 21 BUG confirmés, 24 OK-ALIM = faux positifs
+    parseur G127 (ne découpait pas A:=x; B:=y; sur une ligne), 13 OK-FIGE justifiés. → G127 corrigé (split sur ;)
+    16→11 incomplets + test regression test_g127_neutralization.py (4 PASS). Sur les 21 BUG : tous [DIAG]/[STAT]
+    sauf 1 — FB_Bucket.ActiveOffsetM (tag [DIAG] mais câblé PRG_04:701/757 vers FB_Safety_Winch Méca E →
+    SafeStop/PowerCutOff, valeur périmée = offset benne fantôme masquant un désync M1/M2). Les sorties [ACT/SAFE]
+    des 4 FB C4 sont toutes correctement neutralisées. Application des correctifs → T164-1b.'
   bloque_par: []
+- id: T164-1b
+  parent_id: T164
+  statut: ⬜
+  criticite: C3
+  domaine: SÉCURITÉ
+  agent: ''
+  date: '2026-08-27T15:05:00'
+  titre: Application des 21 correctifs G127 (issus de l'audit T164-1)
+  contexte: 'Intitulé complet : Appliquer, par lots isolés type E0, les correctifs de neutralisation
+    proposés dans DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md pour les 11 FB encore
+    signalés par G127 (après correction du parseur). Chaque correctif = affectation(s) ajoutée(s) dans
+    le gate IF NOT Enable, sans changement d''interface.'
+  description: 'Découpage recommandé : lot A = 4 FB C4 (FB_Safety_Winch, FB_Winch, FB_WinchOutputInterlock,
+    FB_Translation) — revue orchestrateur ligne à ligne obligatoire ; lot B = FB_Bucket SEUL (bloqué par
+    décision AF-10 sur ActiveOffsetM, voir alerte §2 de l''audit) ; lot C = le reste (FB_Brake, FB_Encoder_Abs,
+    FB_Cycle, FB_Translation_PositionEstimator, FB_TranslationOutputInterlock, FB_Sim_Joystick). Chaque lot :
+    bundle + G200 + G127 (FB sorti des incomplets) + commit séparé. L''orchestrateur applique/valide, pas
+    l''agent d''audit.'
+  contrat: ''
+  objectifs:
+  - 'Lot A (4 C4) — gate complété pour MecaADriftM/MecaBElapsedTime/MecaCDriftM, ContactorsCheck/DirectionChangePending/SpeedGuardLimited, ErrorId/Reason/RestartInhibit/StateAtError, TargetReached ; ces FB sortent des incomplets G127'
+  - "Lot B (FB_Bucket) — trancher AF-10 (valeur d'ActiveOffsetM quand FB_Bucket désactivé, 0.0 vs offset repos) puis appliquer"
+  - 'Lot C (reste) — correctifs appliqués, chacun avec commentaire explicite AU gate (REX FB_Encoder : gel volontaire doit être visible au gate)'
+  - "Chaque lot — aucun changement d'interface, G200 PASS, bundle régénéré, commit séparé validé par l'orchestrateur"
+  - 'À la fin — G127 informatif ne signale plus que des OK-FIGE explicitement commentés'
+  bloque_par:
+  - T164-1
 - id: T164-2
   parent_id: T164
   statut: ✅
