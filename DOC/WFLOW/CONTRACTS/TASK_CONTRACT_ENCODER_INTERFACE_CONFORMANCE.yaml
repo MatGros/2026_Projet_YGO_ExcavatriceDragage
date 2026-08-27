@@ -11,8 +11,8 @@ preconditions:                 # bloquantes — verifiees par l'orchestrateur av
     statement: "Decision preset tranchee. => LEVEE 2026-08-27 : variante C (transaction reelle, confirmation par relecture mesure ABS(CablePosM-cible) <= CST_HomingVerifyToleranceM ; ports PresetAck/PresetNak supprimes ; nouveau bit ErrorId 'preset non confirme')."
     source: "DOC/WFLOW/CONTRACTS/DECISION_ENCODER_PRESET_TRANSACTION.md — section Reponse remplie"
   - id: PRE2
-    statement: "Chantier #3 livre : socle Fault:ST_Fault + FB_FaultCore documente (AF03 §3, CQS §2quinquies) et G315 reecrit sur la forme cible ST_Fault."
-    source: "commit sur main + G315 vert avec la nouvelle forme"
+    statement: "Chantier #3 livre. => LEVEE 2026-08-27 : docs commit b2a68763 (AF03 §3 + CQS §2quinquies + fiche FB_FaultCore_v1.0.md), G315 commit b1cd9a05 (reconnait Fault:ST_Fault comme forme cible 5/5)."
+    source: "commits b2a68763 + b1cd9a05 sur main ; G315 PASS avec 2 FB forme cible"
 
 contract:
   task_id: LOT_E_ENCODER_INTERFACE_CONFORMANCE
@@ -30,8 +30,8 @@ contract:
   # ── 2. Criteres testables ─────────────────────────────────────────────────
   acceptance:
     - id: AC1
-      statement: "FB_Encoder expose `Fault : ST_Fault` rempli par une instance FB_FaultCore alimentee par une liste de causes NOMMEES (ARRAY OF ST_FaultCause) ; plus aucune fusion par OR des ErrorId des sous-FB dans une sortie de statut."
-      verified_by: "grep -n 'ErrorId :=' CODE/E_CODEURS/FB_Encoder.st => aucune ligne avec plusieurs `OR` de sous-instances ; G315 vert sur la forme cible"
+      statement: "SEULE la facade FB_Encoder expose `Fault : ST_Fault` rempli par une instance FB_FaultCore alimentee par une liste de causes NOMMEES (ARRAY OF ST_FaultCause) ; plus aucune fusion par OR des ErrorId des sous-FB dans une sortie de statut. Les sous-FB (FB_Encoder_Abs, FB_Encoder_Homing, FB_Encoder_Safety) GARDENT leur `Status : ST_Status` (migration = T164-5, hors de cette tache) ; de meme Measurement.HomingStatus / Measurement.AbsStatus restent typees ST_Status (miroirs des sous-FB non migres)."
+      verified_by: "grep -n 'ErrorId :=' CODE/E_CODEURS/FB_Encoder.st => aucune ligne avec plusieurs `OR` de sous-instances ; grep 'Status : ST_Status' CODE/E_CODEURS/FB_Encoder_Abs.st => toujours present ; G315 : FB_Encoder passe de legacy-status a forme cible, les sous-FB restent legacy-status"
     - id: AC2
       statement: "La frontiere hardware est separee : entree `HwIn : ST_fbEncoder_HwIn` (RawPos, alarmes, etat esclave, PresetAck/Nak selon PRE1) et sortie `HwOut : ST_fbEncoder_HwOut` (ordres preset). Plus de DUT unique etiquete IN/OUT ni de copie partielle."
       verified_by: "lecture interface FB_Encoder.st ; G120 : ST_fbEncoder_HwIn/HwOut conformes NC-110"
@@ -42,8 +42,8 @@ contract:
       statement: "`_EncoderCfgPersist : ST_fbEncoder_Cfg` ajoute en FIN de GVL_PERSISTENT.st (jamais insere/deplace au milieu) + pont FB_CfgPersistBridge_fbEncoder_Cfg instancie en PRG_07_Supervision §2."
       verified_by: "git diff CODE/GVL_PERSISTENT.st (ajout en fin seulement) ; G200 : pont non orphelin"
     - id: AC5
-      statement: "Le gate de neutralisation (front NOT Enable, sortie anticipee) publie TOUTES les sorties (VAR_OUTPUT + champs HwOut / Measurement), reference maintenue depuis Calib (AF09 §4)."
-      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G127_check_neutralization_completeness.py . => FB_Encoder absent de la liste des incomplets"
+      statement: "Le gate de neutralisation (front NOT Enable, sortie anticipee) de FB_Encoder ET de FB_Encoder_Abs publie TOUTES leurs sorties (VAR_OUTPUT + champs HwOut / Measurement), reference maintenue depuis Calib (AF09 §4). FB_Encoder_Abs est traite ICI (et pas en T164-1b) car sa refonte d'interface et son gate incomplet se recouvrent."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G127_check_neutralization_completeness.py . => ni FB_Encoder ni FB_Encoder_Abs dans la liste des incomplets"
     - id: AC6
       statement: "Aucune valeur de mesure, seuil, polarite, tempo ou logique homing / securite ne change : le diff se limite a la forme d'interface et au remplissage des causes."
       verified_by: "revue git diff par l'orchestrateur ; tests CI E_CODEURS existants (TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS) au vert sans modification de leurs attendus de valeur"
