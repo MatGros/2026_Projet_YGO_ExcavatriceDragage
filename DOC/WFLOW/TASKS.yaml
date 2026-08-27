@@ -1988,19 +1988,47 @@ tasks:
     proposés dans DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md pour les 11 FB encore
     signalés par G127 (après correction du parseur). Chaque correctif = affectation(s) ajoutée(s) dans
     le gate IF NOT Enable, sans changement d''interface.'
-  description: 'Découpage recommandé : lot A = 4 FB C4 (FB_Safety_Winch, FB_Winch, FB_WinchOutputInterlock,
-    FB_Translation) — revue orchestrateur ligne à ligne obligatoire ; lot B = FB_Bucket SEUL (bloqué par
-    décision AF-10 sur ActiveOffsetM, voir alerte §2 de l''audit) ; lot C = le reste (FB_Brake, FB_Encoder_Abs,
-    FB_Cycle, FB_Translation_PositionEstimator, FB_TranslationOutputInterlock, FB_Sim_Joystick). Chaque lot :
-    bundle + G200 + G127 (FB sorti des incomplets) + commit séparé. L''orchestrateur applique/valide, pas
-    l''agent d''audit.'
+  description: 'Découpage : lot A = 4 FB C4 (FB_Safety_Winch, FB_Winch, FB_WinchOutputInterlock,
+    FB_Translation) — revue orchestrateur ligne à ligne obligatoire ; lot C = le reste (FB_Brake,
+    FB_Encoder_Abs, FB_Cycle, FB_Translation_PositionEstimator, FB_TranslationOutputInterlock,
+    FB_Sim_Joystick). FB_Bucket EXCLU de T164-1b — déplacé en T164-1c (changement d''interface,
+    sortie ActiveOffsetValid). Chaque lot : bundle + G200 + G127 (FB sorti des incomplets) +
+    commit séparé. L''orchestrateur applique/valide.'
   contrat: ''
   objectifs:
   - 'Lot A (4 C4) — gate complété pour MecaADriftM/MecaBElapsedTime/MecaCDriftM, ContactorsCheck/DirectionChangePending/SpeedGuardLimited, ErrorId/Reason/RestartInhibit/StateAtError, TargetReached ; ces FB sortent des incomplets G127'
-  - "Lot B (FB_Bucket) — trancher AF-10 (valeur d'ActiveOffsetM quand FB_Bucket désactivé, 0.0 vs offset repos) puis appliquer"
   - 'Lot C (reste) — correctifs appliqués, chacun avec commentaire explicite AU gate (REX FB_Encoder : gel volontaire doit être visible au gate)'
   - "Chaque lot — aucun changement d'interface, G200 PASS, bundle régénéré, commit séparé validé par l'orchestrateur"
-  - 'À la fin — G127 informatif ne signale plus que des OK-FIGE explicitement commentés'
+  - 'À la fin (avec T164-1c) — G127 informatif ne signale plus que des OK-FIGE explicitement commentés'
+  bloque_par:
+  - T164-1
+- id: T164-1c
+  parent_id: T164
+  statut: ⬜
+  criticite: C3
+  domaine: SÉCURITÉ
+  agent: ''
+  date: '2026-08-27T15:20:00'
+  titre: FB_Bucket — gate complet + sortie ActiveOffsetValid (audit T164-1 §2)
+  contexte: 'Intitulé complet : FB_Bucket désactivé (InhibitM2) laisse fuiter un ActiveOffsetM périmé
+    (offset benne fantôme → PRG_04:701/757 → FB_Safety_Winch Méca E → SafeStop/PowerCutOff, masquage
+    possible d''un désync M1/M2 réel — alerte §2 de l''audit T164-1). Décision utilisateur 2026-08-27 :
+    gate publie ActiveOffsetM := 0.0 (comparaison M1/M2 stricte, benne ouverte = 0 décalage) + nouvelle
+    sortie ActiveOffsetValid : BOOL := FALSE, affichée IHM/troubleshooting. Même logique que FB_Encoder
+    désactivé qui lève EncoderFault (E0, commit 0b0a2785).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1c_BUCKET_ACTIVEOFFSET_VALID.yaml
+    (check_task_contract PASS). Délégable à un agent d''exécution (git diff revu par l''orchestrateur).
+    Changement d''interface léger : + ActiveOffsetValid dans FB_Bucket + ST_BucketState + publication
+    PRG_04. Méca E / FB_Safety_Winch NE sont PAS touchés (la comparaison stricte résulte du seul
+    ActiveOffsetM := 0.0 au gate). Périmètre : FB_Bucket.st, ST_BucketState.st, PRG_04_Treuils_Benne.st,
+    AF-10 (chapô + fiche FB_Bucket), IHM_VARIABLES_MIGRATION.md.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1c_BUCKET_ACTIVEOFFSET_VALID.yaml
+  objectifs:
+  - 'FB_Bucket : + VAR_OUTPUT ActiveOffsetValid : BOOL (TRUE si offset à jour, FALSE dans le gate NOT Enable)'
+  - 'Gate NOT Enable : ActiveOffsetM := 0.0, ActiveOffsetValid := FALSE, DeltaPosition_M := 0.0, RemainingTravelM := 0.0 → FB_Bucket sort des incomplets G127'
+  - 'FB_Safety_Winch et FB_WinchSync : zéro modification ; la comparaison M1/M2 stricte vient du seul offset 0.0'
+  - 'PRG_04 publie instBucket.ActiveOffsetValid dans ST_BucketState (nouveau champ) ; nom fichier = nom POU, suffixe = langage bundle inchangés'
+  - 'AF-10 + IHM_VARIABLES_MIGRATION.md à jour ; G200 PASS, G340 PASS, bundle régénéré, diff revu par l''orchestrateur'
   bloque_par:
   - T164-1
 - id: T164-2
