@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 13:01:01</div>
+    <div class="exec-time">2026-08-27 17:37:41</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-canopen-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-canopen-1">TC-P05-010 Modes : selection et autorisation mode Maintenance N1</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-canopen-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-canopen-1">TC-P12-001 CanOpen : surveillance bus et esclave</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -394,6 +394,51 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 11 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>CANBUSBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>CANBUSSTATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICECANOPENMASTER</code> jamais câblé en production</li><li>Pin <code>DEVICEJOYSTICK</code> jamais câblé en production</li><li>Pin <code>DEVICEJOYSTICKSTATERAW</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>JOYSTICKBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>NETWORKBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SIMBYPASSACTIVE</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CANBUSSTATERAW <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DEVICEJOYSTICKSTATERAW <span class="pin-type">IEC_DEVICE_STATE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SIMBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">NETWORKBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CANBUSBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">JOYSTICKBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Diag_CanOpen</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DEVICECANOPENMASTER <span class="pin-type">ST_DIAG_DEVICE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DEVICEJOYSTICK <span class="pin-type">ST_DIAG_DEVICE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -494,10 +539,10 @@
         <article id="test-fb-diag-canopen-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P05-010 Modes : selection et autorisation mode Maintenance N1 </h3>
+                <h3>TC-P12-001 CanOpen : surveillance bus et esclave </h3>
             </header>
             
-            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Bus et esclave sains</li><li>Aucune erreur bus maitre</li><li>Aucune erreur joystick</li></ul></details>
             
             
         </article>

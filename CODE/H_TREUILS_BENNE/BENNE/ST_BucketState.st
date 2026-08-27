@@ -13,6 +13,7 @@ STRUCT
     IsIntermediate  : BOOL;                                           // Position intermediaire (entre Ouvert et Ferme)
     LastPosM2Open   : REAL;                                           // Derniere position M2 memorisee ouvert (m)
     LastPosM2Close  : REAL;                                           // Derniere position M2 memorisee ferme (m)
+    ActiveOffsetValid : BOOL;                                         // Validite offset actif calcule a jour
     StateIncoherent : BOOL;                                           // Etat non sur (divergence boot/reel)
 END_STRUCT
 END_TYPE

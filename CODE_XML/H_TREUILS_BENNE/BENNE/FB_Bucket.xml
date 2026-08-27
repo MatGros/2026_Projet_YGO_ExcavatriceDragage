@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:50:28.163675" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:50:28.163675">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:36:03.918431" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:36:03.918431">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -196,6 +196,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ferme (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveOffsetValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour</xhtml>
               </documentation>
             </variable>
             <variable name="StateIncoherent">
@@ -609,6 +617,14 @@
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
+            <variable name="ActiveOffsetValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Validite offset actif calcule a jour</xhtml>
+              </documentation>
+            </variable>
             <variable name="Status">
               <type>
                 <derived name="ST_Status" />
@@ -852,6 +868,10 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
     Ready := FALSE;
+    ActiveOffsetValid := FALSE;
+    ActiveOffsetM := 0.0;
+    DeltaPosition_M := 0.0;
+    RemainingTravelM := 0.0;
     Status.Busy := FALSE;
     Status.Done := FALSE;
     M2_StartStop := FALSE;
@@ -1280,6 +1300,7 @@ ELSE
     // sauter vers la config. Évite l'à-coup sur la position corrigée M2 / la synchro.
     ActiveOffsetM := HoldOffsetM;
 END_IF;
+ActiveOffsetValid := TRUE;
 
 {endregion}
 </xhtml>

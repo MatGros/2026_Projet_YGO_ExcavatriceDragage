@@ -62,10 +62,10 @@ Pas de moteur propre — effet de bord de la désynchronisation M1/M2 :
 | `ConfirmOpenPosition`/`ClosePosition` | BOOL (front) | Référencement manuel MAINT_N1/N2 |
 | `Config` (ST_BucketConfig) | — | `OffsetOpenM`, `OffsetCloseM`, `CoherenceLimitM`(0.05m) |
 
-**Sorties** : `Ready/Busy/Done/Error`, `ErrorId` (bit0 Timeout 30s, bit1 incohérence boot, bit2 limites dépassées, bit3 codeur non référencé, bit4 glissement M1), `M1SlipDetected`, `M2_StartStop`/`Direction`/`ForceSlowSpeed`.
+**Sorties** : `Ready/ActiveOffsetValid/Busy/Done/Error`, `ErrorId` (bit0 Timeout 30s, bit1 incohérence boot, bit2 limites dépassées, bit3 codeur non référencé, bit4 glissement M1), `M1SlipDetected`, `ActiveOffsetM`, `DeltaPosition_M`, `RemainingTravelM`, `M2_StartStop`/`Direction`/`ForceSlowSpeed`.
 
 **Machine d'état** :
-- **DISABLED** si `NOT Enable OR NOT PowerContactorEngaged`
+- **DISABLED** si `NOT Enable OR NOT PowerContactorEngaged` : neutralisation complète (`Ready := FALSE`, `ActiveOffsetValid := FALSE`, `ActiveOffsetM := 0.0` pour comparaison M1/M2 stricte sans fuite d'offset périmé vers Méca E, `DeltaPosition_M := 0.0`, `RemainingTravelM := 0.0`, `M2_StartStop := FALSE`, `M1SlipDetected := FALSE`, réinitialisation des requêtes).
 - **READY** : accepte requête seulement si `NOT M1_Busy AND NOT M2_Busy` (anti-traversée)
 - **BUSY** : pilote M2 seul, vitesse forcée lente ; sens inverse toléré mais **borné** à la position de départ (`M2StartPosM`)
 - **DONE** : attend relâchement demande pour repasser READY

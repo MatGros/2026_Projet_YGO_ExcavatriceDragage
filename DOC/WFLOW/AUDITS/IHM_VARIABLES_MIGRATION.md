@@ -64,6 +64,7 @@ Groupe déplacé : `GVL_IHM.M2Benne` → nesté sous `GVL_IHM.M2TreuilBenne.Buck
 | `GVL_IHM.M2Benne.BtnConfirmOpenPos` | `GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos` |
 | `GVL_IHM.M2Benne.BtnConfirmClosePos` | `GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos` |
 | `GVL_IHM.M2Benne.State` (mémoire ouverte/fermée) | `GVL_IHM.M2TreuilBenne.Bucket.State.MechState` |
+| — (nouveau sous-champ `ST_BucketState`) | `GVL_IHM.M2TreuilBenne.Bucket.State.MechState.ActiveOffsetValid` |
 | `GVL_IHM.M2Benne.FBState` | `GVL_IHM.M2TreuilBenne.Bucket.State.FBState` |
 | `GVL_IHM.M2Benne.ActiveOffset_M` | `GVL_IHM.M2TreuilBenne.Bucket.State.ActiveOffset_M` |
 | `GVL_IHM.M2Benne.M2StartStop` | `GVL_IHM.M2TreuilBenne.Bucket.State.M2StartStop` |

@@ -1,19 +1,27 @@
 {
   "version": 1,
-  "file": "test_fb_modes.st",
+  "file": "test_fb_ramp.st",
   "results": [
     {
-      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "name": "Accel : consigne progresse par pas de AccelRate*CycleTimeS vers la cible",
       "passed": true
     },
     {
-      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
+      "name": "Decel : retour vers zero utilise DecelRate (taux different d Accel)",
+      "passed": true
+    },
+    {
+      "name": "Atteinte de la cible : la rampe s arrete pile dessus, pas de depassement",
+      "passed": true
+    },
+    {
+      "name": "Garde-fou : une valeur Current deja hors plage (etat corrompu) reste bornee a +/-100",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 4,
+    "passed": 4,
     "failed": 0
   }
 }
