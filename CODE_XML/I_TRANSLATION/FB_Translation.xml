@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:50:28.242852" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:50:28.242852">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:50:25.083641" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:50:25.083641">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -876,6 +876,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 
     Status.State := E_State.DISABLED;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    TargetReached := FALSE; // 📊 Neutralisation : aucune cible atteinte garantie hors Enable
     RETURN;
 END_IF;
 
@@ -1336,6 +1337,10 @@ IF NOT Enable THEN
     BrakeCmd := FALSE;
     Status.State := E_State.DISABLED;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    ContactorCheck.Command := FALSE;          // 📊 Neutralisation : miroir de BrakeCmd := FALSE
+    ContactorCheck.Feedback := ContactorFeedback; // 📊 Neutralisation : miroir entrée physique
+    // 🔒 ContactorCheck.StuckClosed / StuckOpen et Status.ErrorId conservés (latch défaut, acquittement requis)
+    BrakeCommandOpenConfirmed := FALSE;       // 🛡️ Fail-Safe : frein commandé fermé hors Enable
     RETURN;
 END_IF;
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:50:28.254639" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:50:28.254639">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:56:14.990445" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:56:14.990445">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -515,6 +515,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
     Status.State := E_State.DISABLED;
     Reason := E_TranslationFinalInterlockReason.NONE;
+    // 🔒 Latch de sûreté VOLONTAIREMENT conservé hors Enable (AC3 / §9) :
+    // RestartInhibit : latch anti-redémarrage auto après timeout frein préservé (doit survivre à la perte d'Enable)
     RETURN;
 END_IF;
 

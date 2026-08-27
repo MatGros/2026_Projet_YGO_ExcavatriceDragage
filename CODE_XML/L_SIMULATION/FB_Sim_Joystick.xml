@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.195839" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.195839">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:50:56.141984" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:50:56.141984">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -427,6 +427,7 @@ IF NOT Enable THEN
     RawX       := NeutralRaw;
     RawY       := NeutralRaw;
     RawButton  := FALSE;
+    ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
     RETURN;
 END_IF;
 {endregion}

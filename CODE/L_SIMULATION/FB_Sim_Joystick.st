@@ -91,6 +91,7 @@ IF NOT Enable THEN
     RawX       := NeutralRaw;
     RawY       := NeutralRaw;
     RawButton  := FALSE;
+    ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
     RETURN;
 END_IF;
 {endregion}

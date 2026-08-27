@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.148384" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.148384">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:56:19.652736" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:56:19.652736">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -990,6 +990,13 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready                := FALSE;
     Busy                 := FALSE;
     Done                 := FALSE;
+    SpeedMismatchTimer(IN := FALSE, PT := SpeedMismatchTimeout);
+    SpeedMismatchMps := 0.0;             // 📊 Neutralisation : aucun calcul d'écart vitesse hors Enable
+    SpeedMismatchActive := FALSE;        // 📊 Neutralisation : surveillance désynchro inactive hors Enable
+    SpeedMismatchConfirmed := FALSE;     // 📊 Neutralisation : confirmation désynchro inactive hors Enable
+    // 🔒 Sorties de diagnostic et latches de défaut VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
+    // - Error &amp; ErrorId : latch défaut cycle préservé (effacé uniquement sur front Reset conscient)
+    // - CycleStepAtError : étape du cycle au moment du défaut préservée pour diagnostic IHM
     RETURN;
 END_IF;
 {endregion}

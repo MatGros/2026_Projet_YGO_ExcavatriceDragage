@@ -6275,6 +6275,9 @@ IF NOT Enable THEN
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
+    MecaADriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive A valide hors Enable
+    MecaCDriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive C valide hors Enable
+    MecaBElapsedTime := T#0ms;     // ⏱️ Neutralisation : aucun temps écoulé Méca B valide hors Enable
     RETURN;
 END_IF;
 
@@ -7213,6 +7216,12 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     Status.Error := FALSE;
     Status.ErrorId := 16#0000;
+    ContactorsCheck.Command := FALSE;     // 📊 Neutralisation : aucun contacteur commandé hors Enable
+    ContactorsCheck.Feedback := FALSE;    // 📊 Neutralisation : retour contacteur non surveillé hors Enable
+    ContactorsCheck.StuckClosed := FALSE; // 📊 Neutralisation : détection collage contacteur inactive hors Enable
+    ContactorsCheck.StuckOpen := FALSE;   // 📊 Neutralisation : détection ouverture contacteur inactive hors Enable
+    DirectionChangePending := FALSE;      // 📊 Neutralisation : aucun changement de sens en cours hors Enable
+    SpeedGuardLimited := FALSE;           // 📊 Neutralisation : aucune limitation garde-fou hors Enable
     RETURN;
 END_IF;
 

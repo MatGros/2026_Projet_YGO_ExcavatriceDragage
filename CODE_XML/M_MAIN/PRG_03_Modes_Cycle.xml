@@ -1382,6 +1382,13 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready                := FALSE;
     Busy                 := FALSE;
     Done                 := FALSE;
+    SpeedMismatchTimer(IN := FALSE, PT := SpeedMismatchTimeout);
+    SpeedMismatchMps := 0.0;             // 📊 Neutralisation : aucun calcul d'écart vitesse hors Enable
+    SpeedMismatchActive := FALSE;        // 📊 Neutralisation : surveillance désynchro inactive hors Enable
+    SpeedMismatchConfirmed := FALSE;     // 📊 Neutralisation : confirmation désynchro inactive hors Enable
+    // 🔒 Sorties de diagnostic et latches de défaut VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
+    // - Error &amp; ErrorId : latch défaut cycle préservé (effacé uniquement sur front Reset conscient)
+    // - CycleStepAtError : étape du cycle au moment du défaut préservée pour diagnostic IHM
     RETURN;
 END_IF;
 {endregion}

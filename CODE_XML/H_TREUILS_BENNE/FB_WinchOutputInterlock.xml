@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.160117" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.160117">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:56:10.041377" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:56:10.041377">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -565,6 +565,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId &lt;&gt; 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
+    // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
+    // - ErrorId &amp; RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
+    // - StateAtError &amp; Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
     RETURN;
 END_IF;
 
