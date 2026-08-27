@@ -5,7 +5,7 @@
 ## 🎯 Rôle et périmètre
 
 - **Rôle** : définir les modes machine, les droits et les arbitrages de source.
-- **Périmètre** : `E_Mode`, bus `Auth : ST_Modes_Autorisations`, sélection de commande,
+- **Périmètre** : `E_Mode`, bus `Auth : ST_fbModes_Autorisations`, sélection de commande,
   limite légale. Les sorties physiques et la chaîne AU restent hors de ce document (Parties 01/06).
 - **Type de composant** : `FB_Modes` (contrat AF03 `standard`) — Transverse.
 
@@ -55,7 +55,7 @@
 `FB_Modes` / `PRG_MODES_CFC` (POU ST actuel ; cible `PRG_03_Modes_Cycle_CFC`, rang 03) arbitre :
 
 - le mode actif ;
-- le bus d'autorisations `Auth : ST_Modes_Autorisations` (mode arbitré, SyncEnable, InhibitM1/2, sélection joystick, homing approach, cible maintenance).
+- le bus d'autorisations `Auth : ST_fbModes_Autorisations` (mode arbitré, SyncEnable, InhibitM1/2, sélection joystick, homing approach, cible maintenance).
 
 Il ne produit aucune sortie physique.
 
@@ -98,7 +98,7 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 
 - L'inhibition d'un treuil est une action de maintenance distincte.
 - Elle neutralise le mouvement de l'axe concerne et impose les consequences de synchro.
-- Elle est pilotée via `Auth.InhibitM1/2` (bus `Auth : ST_Modes_Autorisations`).
+- Elle est pilotée via `Auth.InhibitM1/2` (bus `Auth : ST_fbModes_Autorisations`).
 - Matrice complete des bypass : **TBD**.
 
 > 📌 **Authentification** : gérée côté IHM (visibilité des actions selon niveau utilisateur).
@@ -109,7 +109,7 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 
 ## 📐 5 · Bus d'autorisations
 
-`FB_Modes` (via `PRG_MODES_CFC` actuel, `PRG_03_Modes_Cycle_CFC` en cible) produit le bus typé `Auth : ST_Modes_Autorisations` :
+`FB_Modes` (via `PRG_MODES_CFC` actuel, `PRG_03_Modes_Cycle_CFC` en cible) produit le bus typé `Auth : ST_fbModes_Autorisations` :
 
 | Champ | Rôle |
 |---|---|
@@ -156,7 +156,7 @@ La chaine AU, `PowerKeepAlive` et le rearmement sont proprietaires de la Partie 
 
 | Version | Date | Changement |
 |---|---|---|
-| v2.1 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, section « Bus d'autorisations » intégrée à la numérotation (§5, était orpheline), Suivi historique ajouté, renumérotation complète + réfs `§N` cascadées. Correctif de fond (review sous-agent expert automatisme, vérifié contre `FB_Modes.st`) : §5 citait `TglMaintenanceZoneAccess`, nom inexistant dans le code — corrigé en `SelMaintenanceZoneAccess` (variable réelle, ligne 165). Struct `ST_Modes_Autorisations`, `E_Mode`, logique booléenne `MaintenanceM3TargetEnable`, absence de garde mot de passe PLC (§4) et propriété `FB_Safety_Winch` de la limite légale (§6) tous vérifiés conformes au code |
+| v2.1 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, section « Bus d'autorisations » intégrée à la numérotation (§5, était orpheline), Suivi historique ajouté, renumérotation complète + réfs `§N` cascadées. Correctif de fond (review sous-agent expert automatisme, vérifié contre `FB_Modes.st`) : §5 citait `TglMaintenanceZoneAccess`, nom inexistant dans le code — corrigé en `SelMaintenanceZoneAccess` (variable réelle, ligne 165). Struct `ST_fbModes_Autorisations`, `E_Mode`, logique booléenne `MaintenanceM3TargetEnable`, absence de garde mot de passe PLC (§4) et propriété `FB_Safety_Winch` de la limite légale (§6) tous vérifiés conformes au code |
 | v2.0 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
 ## ❓ 9 · TBD

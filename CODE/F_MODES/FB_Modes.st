@@ -34,7 +34,7 @@ VAR_OUTPUT
     Fault                   : ST_Fault;
 
     // === BUS D'AUTORISATIONS ARBITREES ===
-    Auth                    : ST_Modes_Autorisations; // <-- [STAT] Bus d'autorisations typees machine
+    Auth                    : ST_fbModes_Autorisations; // <-- [STAT] Bus d'autorisations typees machine
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===

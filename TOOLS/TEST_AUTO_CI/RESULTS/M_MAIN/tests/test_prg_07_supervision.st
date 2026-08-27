@@ -2,7 +2,7 @@ SETUP
 VAR
     harness         : FB_TestHarness_PRG_07;
     acqData         : ST_AcquisitionInterPrg;
-    modesAuth       : ST_Modes_Autorisations;
+    modesAuth       : ST_fbModes_Autorisations;
     winchData       : ST_WinchInterPrg;
     translationData : ST_TranslationInterPrg;
 END_VAR

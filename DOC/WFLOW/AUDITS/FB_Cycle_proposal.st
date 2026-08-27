@@ -77,10 +77,10 @@ VAR_OUTPUT
     SpeedMismatchConfirmed  : BOOL;         // Écart vitesse confirmé pendant SpeedMismatchTimeout
 
     // Commandes structurées (demandes de mouvement)
-    WinchM1Cmd              : ST_WinchCmdDemand;        // Demande treuil M1
-    WinchM2Cmd              : ST_WinchCmdDemand;        // Demande treuil M2
-    TranslationCmd          : ST_TranslationCmdDemand;  // Demande translation M3
-    BucketCmd               : ST_BucketCmdDemand;       // Demande benne
+    WinchM1Cmd              : ST_fbCycle_WinchCmdDemand;        // Demande treuil M1
+    WinchM2Cmd              : ST_fbCycle_WinchCmdDemand;        // Demande treuil M2
+    TranslationCmd          : ST_fbCycle_TranslationCmdDemand;  // Demande translation M3
+    BucketCmd               : ST_fbCycle_BucketCmdDemand;       // Demande benne
 
     // Métadonnées d'affichage IHM
     CycleStep               : E_CycleStep;  // Étape active du Grafcet

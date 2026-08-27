@@ -34,7 +34,7 @@ END_VAR
 VAR_OUTPUT
     // === 🚌 Bus Publics Inter-PRG Produits ===
     BusAcq                  : ST_AcquisitionInterPrg;
-    BusModes                : ST_Modes_Autorisations;
+    BusModes                : ST_fbModes_Autorisations;
     BusWinch                : ST_WinchInterPrg;
     BusTranslation          : ST_TranslationInterPrg;
     BusOutputs              : ST_OutputsInterPrg;

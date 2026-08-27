@@ -37,7 +37,7 @@ contract:
       - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
       - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
       - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
-      - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
+      - CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st
       - DOC/STDS/CODE_QUALITY_STANDARDS.md
       - DOC/STDS/NAMING_CONVENTION.md
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_REFACTOR_DECLARATIONS_I_TRANSLATION.yaml

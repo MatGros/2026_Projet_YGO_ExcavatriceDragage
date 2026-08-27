@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.163117" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.163117">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:37:02.452618" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:37:02.452618">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,46 +23,38 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_WinchCmdDemand">
+      <dataType name="ST_fbCycle_TranslationCmdDemand">
         <baseType>
           <struct>
-            <variable name="StartStop">
+            <variable name="Start">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arret mouvement (TRUE=Marche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de demarrage du mouvement</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="Target">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens de marche (-1: Descente, 0: Stop, 1: Montee)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedPct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse (0.0 a 100.0 %)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Cible de position (1=Tremie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e1cb8f0c-a5a5-5b87-b439-8e0b245904de</ObjectId>
+            <ObjectId>e3302f93-57a8-5949-b90f-a1621e17cb50</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_WinchCmdDemand — Structure de demande de commande treuil
+   🎯 ST_fbCycle_TranslationCmdDemand — Demande de commande translation M3
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupement des consignes de mouvement treuil (StartStop, Direction, Vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🎯 Rôle : Regroupement des consignes de mouvement translation M3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -75,10 +67,8 @@
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="H_TREUILS_BENNE">
-          <Folder Name="_TYPES">
-            <Object Name="ST_WinchCmdDemand" ObjectId="e1cb8f0c-a5a5-5b87-b439-8e0b245904de" />
-          </Folder>
+        <Folder Name="I_TRANSLATION">
+          <Object Name="ST_fbCycle_TranslationCmdDemand" ObjectId="e3302f93-57a8-5949-b90f-a1621e17cb50" />
         </Folder>
       </ProjectStructure>
     </data>

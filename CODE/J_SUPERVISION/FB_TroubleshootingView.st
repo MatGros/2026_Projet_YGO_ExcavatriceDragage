@@ -30,7 +30,7 @@ VAR_INPUT
     Vh0808EtpOk              : BOOL; (* --> [HW] idem *)
 
     (* 🎚️ PRG_03_Modes_Cycle *)
-    Auth                     : ST_Modes_Autorisations;   (* --> [SAFE] Autorisations machine *)
+    Auth                     : ST_fbModes_Autorisations;   (* --> [SAFE] Autorisations machine *)
 
     (* 🛗 PRG_04_Treuils_Benne — demandes publiques déjà arbitrées *)
     M1LogicRequestSpeedCmd_Pct : REAL;   (* --> [CMD] Consigne vitesse M1 *)

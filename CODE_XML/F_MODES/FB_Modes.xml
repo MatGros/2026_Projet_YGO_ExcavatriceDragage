@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T19:45:09.934815" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T19:45:09.934815">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:37:02.430333" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:37:02.430333">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -184,7 +184,7 @@
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_Modes_Autorisations">
+      <dataType name="ST_fbModes_Autorisations">
         <baseType>
           <struct>
             <variable name="Mode">
@@ -247,12 +247,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>fd63c0a6-3caa-5a6f-9077-b79ee39469f5</ObjectId>
+            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎚️ ST_Modes_Autorisations — Bus d'autorisations du mode machine
+   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
                    DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
@@ -379,7 +379,7 @@
             </variable>
             <variable name="Auth">
               <type>
-                <derived name="ST_Modes_Autorisations" />
+                <derived name="ST_fbModes_Autorisations" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS D'AUTORISATIONS ARBITREES ===
@@ -762,7 +762,7 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
             <Folder Name="3_CYCLE_ET_MODES">
-              <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
+              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
             </Folder>
           </Folder>
         </Folder>

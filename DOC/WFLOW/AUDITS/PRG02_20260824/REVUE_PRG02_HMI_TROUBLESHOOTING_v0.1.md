@@ -61,7 +61,7 @@ déjà portés ponctuellement par certains FB sources.
 |---|---|
 | `ST_WinchFinalInterlockRequest.st:4-5` | `PRG_TREUILS_CFC`, `PRG_10_Outputs_LD` |
 | `ST_TranslationCmd.st:14` | `PRG_10_Outputs_LD` |
-| `ST_Modes_Autorisations.st:6,8` | `PRG_MODES_CFC` (×2) |
+| `ST_fbModes_Autorisations.st:6,8` | `PRG_MODES_CFC` (×2) |
 | `ST_CommunHMI.st:22,42` | `PRG_AUXILIARY_CFC`, `PRG_SUPERVISION_CFC` |
 
 + `ST_TranslationHMI.st:16` : commentaire syntaxiquement cassé (reliquat d'édition).
