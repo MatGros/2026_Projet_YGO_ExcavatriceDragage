@@ -134,3 +134,55 @@ TEST 'TC-P09-015 Reset conscient : acquitte le latch sans valider le preset'
     ASSERT_FALSE(fb.PresetConfirmationFailed, 'Reset : latch acquitte');
     ASSERT_FALSE(fb.Homed, 'Reset : ne valide pas le preset');
 END_TEST
+
+TEST 'TC-P09-016 Fault live : perte materiel codeur (Cause 0)'
+    hwIn.SlaveOperational := FALSE;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Fault.Error, 'perte materiel -> Fault.Error live');
+    ASSERT_TRUE((fb.Fault.ErrorId AND 16#0001) <> 0, 'bit0 = cause perte materiel');
+    ASSERT_FALSE(fb.Fault.Latched, 'cause live non latchee');
+
+    hwIn.SlaveOperational := TRUE;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.Fault.Error, 'cause disparue -> Error retombe seule');
+END_TEST
+
+TEST 'TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2)'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    hwIn.PresetStatusBit := FALSE;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 70000;
+    calib.LastKnownRawPos := 100000;
+
+    (* Echec de relecture : preset non confirme -> latch pose. *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    hwIn.RawPosIn := 100205; (* +50mm -> hors tolerance *)
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.PresetConfirmationFailed, 'echec : latch preset pose');
+    ASSERT_TRUE(fb.Fault.Latched, 'echec preset -> Fault.Latched');
+    ASSERT_TRUE((fb.Fault.LatchedId AND 16#0004) <> 0, 'bit2 = cause preset latched');
+
+    (* Reset front : acquitte le latch. *)
+    fb(Enable := TRUE, Reset := TRUE, HomingPermit := TRUE,
+       HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_FALSE(fb.Fault.Latched, 'Reset -> latch acquitte');
+END_TEST
+
+TEST 'TC-P09-018 Fault live : incoherence mesure (Cause 1)'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := TRUE;  (* -> Safety.EncoderIncoherent -> Cause 1 *)
+    calib.HomingRefRaw := 70000;
+
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Fault.Error, 'incoherence -> Fault.Error live');
+    ASSERT_TRUE((fb.Fault.ErrorId AND 16#0002) <> 0, 'bit1 = cause incoherence');
+    ASSERT_FALSE(fb.Fault.Latched, 'cause live non latchee');
+END_TEST

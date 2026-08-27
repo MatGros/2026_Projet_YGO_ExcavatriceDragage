@@ -278,3 +278,17 @@ force à `FALSE` tant qu'aucun bit d'état réel n'est identifié.
 | `FB_Encoder.Cfg` | `ST_fbEncoder_Cfg` (`PresetConfirmMode`) lu par la façade | `GVL_IHM.Commun.EncoderCfg` (IHM publique) → pont `FB_CfgPersistBridge_fbEncoder_Cfg` (PRG_07) → `GVL_PERSISTENT._EncoderCfgPersist`. La façade lit l'**IHM publique**, jamais le persistant directement. |
 | `FB_Encoder.HwOut` | Ordres preset (type `ST_fbEncoder_HwOut`) | produit par `FB_Encoder`, relayé par `PRG_02` vers le device. |
 | `FB_Encoder.HwIn` | Faits hardware d'entrée (type `ST_fbEncoder_HwIn`) | rempli par `PRG_02` depuis `HwIn.Winch.*` + `PresetStatusBit := FALSE`. |
+
+## 🆕 Lot T164-4D — Façade `FB_Encoder` : `Status:ST_Status` → `Fault:ST_Fault`
+
+**Inventaire consommateurs (AC6)** : la sortie `Status` de la **façade** `FB_Encoder` n'a
+**aucun consommateur** (ni `instEncoderM1/M2.Status`, ni `.Ready`, ni `.Fault`). Les
+consommateurs utilisent `Measurement.AbsStatus`/`HomingStatus`, `Homed`, `HomingSuspect`,
+`EncoderFault`, `HomedAndReliable`, `HwOut.*` — tous **conservés**. → **Aucun chemin IHM à
+remapper** ; `Fault` est un **nouveau diagnostic** (brique socle `FB_FaultCore`).
+
+| Fait | Rôle | Source d'ownership |
+|---|---|---|
+| `FB_Encoder.Fault` | Brique défaut socle (`ST_Fault` : vue live `Error`/`ErrorId` + vue latchée `Latched`/`LatchedId`) | produit par `FB_Encoder` via `instFault:FB_FaultCore` + `instCauses` (3 causes : perte matériel live, incohérence live, échec preset latched). Texte IHM dérivé côté IHM depuis `ErrorId`/`LatchedId` (non stocké dans `ST_Fault`). |
+| `FB_Encoder.Ready` | `Enable AND NOT Fault.Latched` | produit par `FB_Encoder` ; non consommé actuellement. |
+| `FB_Encoder.Status` | **supprimé** (fusion OR des `ErrorId` sous-FB abandonnée, contrat AC1) | aucun consommateur → suppression sans remappage. |

@@ -67,15 +67,19 @@ contract:
   models_allowed:
     - "omni/cc/claude-sonnet-5"
   alert_duty: "Tout consumer facade Status non trace, toute lecture d'interne ou toute modification de sous-FB impose STOP."
-status: PENDING
+status: VALIDATED
 execution:
-  executed_by: "..."
-  completed_at: "..."
-  status: PENDING
-  summary: "..."
-  evidence_submitted: []
+  executed_by: "AGY-01"
+  completed_at: "2026-08-27T21:20:00"
+  status: SUCCESS
+  summary: "Migration de la façade FB_Encoder vers Fault:ST_Fault via FB_FaultCore (3 causes nommées), G315 forme cible validée, 10/10 tests unitaires STruCpp PASS, 22/22 gates PASS."
+  evidence_submitted:
+    - check_linkage: "PASS (0 erreur, 1236 instances vérifiées)"
+    - run_all_gates: "22/22 PASS"
+    - bundle: "CODE_XML/CODE_Bundle.xml frais et valide"
+    - git_diff_review: "Scope FB_Encoder.st strict, sous-FB et consommateurs préservés"
 validation:
-  status: PENDING
-  validated_by: "..."
-  validated_at: "..."
-  notes: "Depend de T164-4C."
+  status: VALIDATED
+  validated_by: "HUMAN_SUPERVISOR"
+  validated_at: "2026-08-27T21:20:00"
+  notes: "Preuves conformes AC1-AC7, tests STruCpp 10/10 PASS, zero régression."

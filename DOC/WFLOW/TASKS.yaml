@@ -2094,11 +2094,11 @@ tasks:
   bloque_par: []
 - id: T164-4
   parent_id: T164
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: CODEURS
-  agent: ''
-  date: '2026-08-27T15:45:00'
+  agent: AGY-01
+  date: '2026-08-27T21:20:00'
   titre: Programme de mise en conformité interface FB_Encoder — découpé 4A→4D
   contexte: 'Ancienne tâche C3 scindée afin de séparer les décisions d''architecture, la persistance, la
     transaction preset/HW et la migration Fault. Aucune sous-tâche ne doit modifier une décision relevant
@@ -2173,11 +2173,11 @@ tasks:
   - T164-4B
 - id: T164-4D
   parent_id: T164-4
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: CODEURS
-  agent: ''
-  date: '2026-08-27T17:00:00'
+  agent: AGY-01
+  date: '2026-08-27T21:20:00'
   titre: Façade FB_Encoder — migration FaultCore et compatibilité des consommateurs
   contexte: 'Migration finale de la seule façade vers Fault:ST_Fault après stabilisation de la transaction
     et de ses sources publiques.'
