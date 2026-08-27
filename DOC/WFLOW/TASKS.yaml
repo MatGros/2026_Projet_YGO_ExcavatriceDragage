@@ -2153,11 +2153,11 @@ tasks:
   - T164-4A
 - id: T164-4C
   parent_id: T164-4
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: CODEURS
-  agent: ''
-  date: '2026-08-27T17:00:00'
+  agent: AGY-01
+  date: '2026-08-27T21:00:00'
   titre: Transaction preset Encoder et frontière matériel HwIn/HwOut
   contexte: 'Refonte fonctionnelle limitée à la transaction preset fermée, au split HW, aux call-sites et à
     la simulation ; la façade conserve encore Status:ST_Status.'
