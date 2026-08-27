@@ -1,0 +1,18 @@
+Error compiling source files:
+
+FB_Safety_Translation.st:208:18: error: Expected `Assign`, found `.`.
+ 208 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR; // No-op
+     |                  ^
+
+FB_Safety_Translation.st:208:30: error: Expected `Semicolon`, found `TO`.
+ 208 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR; // No-op
+     |                              ^
+
+FB_Safety_Translation.st:208:44: error: Expected `END_IF`, found `END_FOR`.
+ 208 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR; // No-op
+     |                                            ^
+
+FB_Safety_Translation.st:209:1: error: Expected `END_FUNCTION_BLOCK`, found `END_IF`.
+ 209 | END_IF;
+     | ^
+

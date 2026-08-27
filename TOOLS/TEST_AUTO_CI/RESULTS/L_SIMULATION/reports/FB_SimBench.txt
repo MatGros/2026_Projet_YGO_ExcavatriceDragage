@@ -4,3 +4,11 @@ ST_AcquisitionInterPrg.st:15:31: error: Undefined type 'ST_ENCODERMEASUREMENTS' 
   15 |     Encoders                : ST_EncoderMeasurements; // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
      |                               ^
 
+ST_JoystickHMI.st:13:13: error: Undefined type 'ST_FBJOYSTICK_CFG' in STRUCT 'ST_JOYSTICKHMI'
+  13 |     Cfg   : ST_fbJoystick_Cfg;
+     |             ^
+
+ST_CommunHMI.st:54:18: error: Undefined type 'ST_FBENCODER_CFG' in STRUCT 'ST_COMMUNHMI'
+  54 |     EncoderCfg : ST_fbEncoder_Cfg; (* Réglage mode confirmation preset, ponté vers GVL_PERSISTENT *)
+     |                  ^
+

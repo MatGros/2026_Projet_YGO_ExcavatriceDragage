@@ -27,9 +27,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
     Ready                 : BOOL;        // <-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: "Bornes", bit1: "Boot suspect".
-    Status                : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                 : ST_Fault;
 
     // === MESURES SURE & SECURITE ===
     CablePosMSafe         : REAL;        // <-- [DIAG] Position cable instantanee transmise (m)
@@ -38,69 +37,46 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONT ===
     ResetEdge             : R_TRIG;      // . [LOC] Detecteur front montant Reset
-    ErrorEdge             : R_TRIG;      // . [LOC] Detecteur front montant Error
+
+    // === SOCLE DEFAUT (FB_FaultCore) ===
+    instFault             : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses            : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
-{region "§1 Gate"}
-// 🛑 1. GATE
+// === IMPLEMENTATION ===
+
+{region "§1 Causes & Socle Défaut (évalué en continu)"}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🔍 2. SURVEILLANCE BORNAGE & INCOHÉRENCE BOOT
+instCauses[0].Active   := NOT BypassGlobal AND ((CablePosM < PositionMinM) OR (CablePosM > PositionMaxM));
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := 'Depassement bornes physiques absolues cable';
+
+instCauses[1].Active   := NOT BypassGlobal AND HomingSuspect;
+instCauses[1].Latching := FALSE;
+instCauses[1].Texte    := 'Incoherence position au redemarrage';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
 IF NOT Enable THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     CablePosMSafe := CablePosM;
     EncoderIncoherent := FALSE;
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region "§2 Reset front"}
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-{endregion}
-
-{region "§3 Bypass global"}
-// 🌐 3. BYPASS GLOBAL
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-END_IF;
-{endregion}
-
-{region "§4 Surveillance bornage"}
-// 🔍 4. SURVEILLANCE BORNAGE PHYSIQUE ABSOLU (bit0)
-IF NOT BypassGlobal AND ((CablePosM < PositionMinM) OR (CablePosM > PositionMaxM)) THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
-END_IF;
-{endregion}
-
-{region "§5 Relais incohérence redémarrage"}
-// 🔍 5. RELAIS INCOHÉRENCE REDÉMARRAGE (bit1)
-IF NOT BypassGlobal THEN
-    IF HomingSuspect THEN
-        Status.ErrorId := Status.ErrorId OR 16#0002;
-    ELSE
-        Status.ErrorId := Status.ErrorId AND 16#FFFD;
-    END_IF;
-END_IF;
-{endregion}
-
-{region "§6 Transmission mesure"}
-// 📏 6. TRANSMISSION DE LA MESURE (Toujours réelle, non figée)
+{region "§3 Transmission mesure et sécurité"}
+// 📏 3. TRANSMISSION DE LA MESURE & SÉCURITÉ
 CablePosMSafe := CablePosM;
-{endregion}
-
-{region "§7 Sorties état et sécurité"}
-// 📤 7. SORTIES ÉTAT & SÉCURITÉ
-Status.Error := (Status.ErrorId <> 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-EncoderIncoherent := Status.Error;
-Status.Busy := FALSE;
-Status.Done := FALSE;
+EncoderIncoherent := Fault.Error;
 {endregion}

@@ -32,8 +32,9 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
     Ready                   : BOOL;         // <-- [STAT] FB pret a fonctionner
-    // Status.ErrorId : bit0 precond, bit1 seq, bit2 cfg
-    Status                  : ST_Status;  // <-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
+    // 🧩 Statut transverse (forme cible ST_Fault + ST_Lifecycle)
+    Fault                   : ST_Fault;
+    Lifecycle               : ST_Lifecycle;
     DiveState               : E_DiveSearchState; // <-- [STAT] Phase interne de recherche fond
 
     // === PERMIS & AUTORISATIONS ===
@@ -54,59 +55,76 @@ VAR
     // === VARIABLES LOCALES INTERNES ===
     ImmersionConfirmed      : BOOL;         // . [LOC] Immersion dans la fenetre d'eau validee
     ErrorCausePresent       : BOOL;         // . [LOC] Presence d'une cause de defaut parametrage
+    SeqErrorFault           : BOOL;         // . [LOC] Latch erreur séquence immersion
+
+    // === SOCLE DEFAUT ===
+    instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
+    instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 END_VAR
 
-{region "§1 Gate desactivation"}
-IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
-    BottomTouchConfirmed := FALSE;
-    Status.State := E_State.DISABLED;
-    Status.StateAtError := E_State.DISABLED;
-    DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
-    OperatorActionId := 0; OperatorAction := '';
-    ImmersionConfirmed := FALSE;
-    RETURN;
-END_IF;
+// === IMPLEMENTATION ===
 
-{endregion}
-
-{region "§2 Preconditions fronts et rearmement"}
+{region "§1 Causes & Socle Défaut (évalué en continu)"}
+// 🔑 1. FRONTS
 ResetEdge(CLK := Reset);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 
 ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M < ImmersionUpper_M)
                   OR (ImmersionUpper_M <= ImmersionLower_M));
-IF ErrorCausePresent THEN
-    Status.ErrorId := Status.ErrorId OR 16#0004;
-END_IF;
 
-(* Reset = front + causes disparues ; aucun redémarrage automatique. *)
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
-    Status.ErrorId := 16#0000;
+    SeqErrorFault := FALSE;
     ImmersionConfirmed := FALSE;
     BottomTouchConfirmed := FALSE;
-    Status.StateAtError := E_State.DISABLED;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 
-DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
-Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-OperatorActionId := 0; OperatorAction := '';
+instCauses[0].Active   := SeqErrorFault;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Incoherence sequence immersion Kobold';
 
+instCauses[2].Active   := ErrorCausePresent;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := 'Parametrage invalide des seuils de plongee';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Ready := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    DescendPermit := FALSE;
+    KoboldMeasureEnable := FALSE;
+    BottomTouchConfirmed := FALSE;
+    DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    OperatorActionId := 0;
+    OperatorAction := '';
+    ImmersionConfirmed := FALSE;
+    RETURN;
+END_IF;
+
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region "§3 Machine etat plongee recherche fond"}
-IF Status.ErrorId <> 16#0000 THEN
-    Status.State := E_State.READY;
+DescendPermit := FALSE;
+KoboldMeasureEnable := FALSE;
+Lifecycle.Busy := FALSE;
+Lifecycle.Done := FALSE;
+
+IF Fault.Error THEN
     DiveState := E_DiveSearchState.ERROR_HOLD;
     OperatorActionId := 16#0180;
     OperatorAction := 'Vérifier les conditions puis réarmer avant une nouvelle plongée.';
 ELSE
     CASE DiveState OF
         E_DiveSearchState.WAIT_PRECONDITIONS:
-            Status.State := E_State.INIT;
             IF NOT BypassPreconditions
                AND (NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
                     OR (M1Position_M < DiveStartMin_M) OR (M2Position_M < DiveStartMin_M)) THEN
@@ -117,7 +135,6 @@ ELSE
             END_IF;
 
         E_DiveSearchState.READY_TO_DESCEND:
-            Status.State := E_State.READY;
             Ready := TRUE;
             OperatorActionId := 16#0101;
             OperatorAction := 'Demander une descente pour rechercher le fond.';
@@ -126,8 +143,7 @@ ELSE
             END_IF;
 
         E_DiveSearchState.SEARCHING_IMMERSION:
-            Status.State := E_State.BUSY;
-            Status.Busy := TRUE;
+            Lifecycle.Busy := TRUE;
             DescendPermit := MotionRequestActive AND (MotionDirection = -1);
             KoboldMeasureEnable := TRUE;
             OperatorActionId := 16#0102;
@@ -138,17 +154,14 @@ ELSE
                     ImmersionConfirmed := TRUE;
                     DiveState := E_DiveSearchState.SEARCHING_BOTTOM;
                 ELSE
-                    Status.ErrorId := Status.ErrorId OR 16#0002;
-                    Status.StateAtError := Status.State;
+                    SeqErrorFault := TRUE;
                 END_IF;
             ELSIF (M1Position_M < ImmersionLower_M) OR (M2Position_M < ImmersionLower_M) THEN
-                Status.ErrorId := Status.ErrorId OR 16#0002;
-                Status.StateAtError := Status.State;
+                SeqErrorFault := TRUE;
             END_IF;
 
         E_DiveSearchState.SEARCHING_BOTTOM:
-            Status.State := E_State.BUSY;
-            Status.Busy := TRUE;
+            Lifecycle.Busy := TRUE;
             DescendPermit := MotionRequestActive AND (MotionDirection = -1);
             KoboldMeasureEnable := TRUE;
             OperatorActionId := 16#0103;
@@ -160,16 +173,14 @@ ELSE
             END_IF;
 
         E_DiveSearchState.BOTTOM_CONFIRMED:
-            Status.State := E_State.DONE;
-            Status.Done := TRUE;
+            Lifecycle.Done := TRUE;
             OperatorActionId := 16#0104;
             OperatorAction := 'Fond détecté : demander la fermeture ou l extraction.';
 
         E_DiveSearchState.ERROR_HOLD:
-            Status.State := E_State.READY;
+            ;
     END_CASE;
 END_IF;
-
-Status.Error := (Status.ErrorId <> 16#0000);
-
 {endregion}
+
+END_FUNCTION_BLOCK

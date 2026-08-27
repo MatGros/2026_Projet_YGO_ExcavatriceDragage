@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T16:59:28.303953" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T16:59:28.303953">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:27:32.922582" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:27:32.922582">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6712,7 +6712,7 @@ GVL_IHM.Cycle.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1
 GVL_IHM.Cycle.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
 GVL_IHM.Cycle.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
 GVL_IHM.Cycle.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
-GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.instWinchSync.Status.Error;
+GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.instWinchSync.Fault.Error;
 GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM;
 GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchMps;
 GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive;
@@ -6736,8 +6736,8 @@ instHmiBannerFormatter(
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
     HomingActive          := (NOT PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed),
-    HomingStepM1          := SEL(PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Busy, 0, 1),
-    HomingStepM2          := SEL(PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Busy, 0, 1),
+    HomingStepM1          := SEL(PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy, 0, 1),
+    HomingStepM2          := SEL(PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Busy, 0, 1),
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
@@ -6834,7 +6834,7 @@ instTroubleshootingView(
     CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     CycleSpeedMismatchActive := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive,
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
-    CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Status.Error,
+    CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Fault.Error,
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutralXY,
     HomedM1              := PRG_02_Acquisition.instEncoderM1.Homed,

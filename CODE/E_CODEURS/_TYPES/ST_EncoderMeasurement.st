@@ -23,8 +23,9 @@ STRUCT
     SpeedValid        : BOOL;         // TRUE si 6 echantillons valides sur au moins 50 ms
 
     // === STATUTS DES SOUS-FB & REFERENCE ===
-    HomingStatus      : ST_Status;  // Statut FB_Encoder_Homing (etat du referencement)
-    AbsStatus         : ST_Status;  // Statut FB_Encoder_Abs (etat acquisition bus)
+    HomingFault       : ST_Fault;     // Défaut FB_Encoder_Homing (état du référencement)
+    HomingLifecycle   : ST_Lifecycle; // Cycle FB_Encoder_Homing (Busy/Done)
+    AbsFault          : ST_Fault;     // Défaut FB_Encoder_Abs (état acquisition bus)
     HomingRefRaw      : UDINT;        // Reference brute du dernier homing reussi (re-expose)
 END_STRUCT
 END_TYPE

@@ -1,0 +1,18 @@
+Error compiling source files:
+
+FB_DiveSearch.st:36:31: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_DIVESEARCH'
+  36 |     Fault                   : ST_Fault;
+     |                               ^
+
+FB_DiveSearch.st:37:31: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_DIVESEARCH'
+  37 |     Lifecycle               : ST_Lifecycle;
+     |                               ^
+
+FB_DiveSearch.st:61:31: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_DIVESEARCH'
+  61 |     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
+     |                               ^
+
+FB_DiveSearch.st:62:5: error: Undefined type 'ST_FAULTCAUSE' in FUNCTION_BLOCK 'FB_DIVESEARCH'
+  62 |     instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+     |     ^
+

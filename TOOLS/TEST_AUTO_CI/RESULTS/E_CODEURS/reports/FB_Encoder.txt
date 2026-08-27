@@ -1,0 +1,10 @@
+Error compiling source files:
+
+FB_Encoder_Homing.st:51:30: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_ENCODER_HOMING'
+  51 |     Lifecycle              : ST_Lifecycle;
+     |                              ^
+
+ST_EncoderMeasurement.st:27:25: error: Undefined type 'ST_LIFECYCLE' in STRUCT 'ST_ENCODERMEASUREMENT'
+  27 |     HomingLifecycle   : ST_Lifecycle; // Cycle FB_Encoder_Homing (Busy/Done)
+     |                         ^
+

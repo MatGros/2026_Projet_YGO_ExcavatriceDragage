@@ -463,7 +463,7 @@ class STParser:
                     categories["VAR_LOCAL"].append(p)
             elif base in hw_map:
                 categories["HW_IO"][p] = hw_map[base]
-            elif base in devices or base.upper() in ("CANBUS", "ETHERCAT_MASTER", "LOCAL_DIGITAL_IO", "VH_0800END", "VH_0808ETP", "COD1_CODEUR", "COD2_CODEUR", "AC600_ECAT_DRIVE", "JOY1_JOYSTICK_MCB560_CO4201A"):
+            elif base in devices or base.upper() in ("CANBUS", "ETHERCAT_MASTER", "LOCAL_DIGITAL_IO", "VH_0800END", "VH_0808ETP", "VH_0008ER", "VH_0008ER_1", "COD1_CODEUR", "COD2_CODEUR", "AC600_ECAT_DRIVE", "JOY1_JOYSTICK_MCB560_CO4201A"):
                 categories["DEVICES"].append(p)
             elif base.startswith("E_") or base.upper() in ("DEVICE_STATE", "E_STATE", "E_MODE", "E_DIAG_STATE"):
                 categories["ENUMS"].append(p)

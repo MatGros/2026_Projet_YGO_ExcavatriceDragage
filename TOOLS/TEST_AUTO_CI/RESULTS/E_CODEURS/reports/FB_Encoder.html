@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 13:01:01</div>
+    <div class="exec-time">2026-08-27 21:49:45</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-encoder-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-1">TC-P05-010 Modes : selection et autorisation mode Maintenance N1</a></li></ul>
+        <summary>📋 Sommaire (10 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-encoder-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-1">TC-P09-010 Acquisition codeur : mise en service nominale</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-2">TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-3">TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-4">TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-5">TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-6">TC-P09-015 Reset conscient : acquitte le latch sans valider le preset</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-7">TC-P09-016 Fault live : perte materiel codeur (Cause 0)</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-8">TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2)</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-9">TC-P09-018 Fault live : incoherence mesure (Cause 1)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,12 +206,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            10/10 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 12 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 19 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -224,7 +224,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_FbStatus.st</code></td>
+                <td><code>ST_Status.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -232,7 +232,55 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_EncoderHw.st</code></td>
+                <td><code>ST_Fault.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FaultCause.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Lifecycle.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_PresetConfirmMode.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbEncoder_Cfg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbEncoder_HwIn.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbEncoder_HwOut.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -304,6 +352,14 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
+                <td><code>FB_FaultCore.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
                 <td><code>FB_Encoder.st</code></td>
                 <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -314,50 +370,37 @@
         </table>
     </details>
     
+    <div class="af-warning-banner">
+        <div class="af-warning-title">⚠️ 8 test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
+        <ul><li><code>TC-P09-011</code></li><li><code>TC-P09-012</code></li><li><code>TC-P09-013</code></li><li><code>TC-P09-014</code></li><li><code>TC-P09-015</code></li><li><code>TC-P09-016</code></li><li><code>TC-P09-017</code></li><li><code>TC-P09-018</code></li></ul>
+    </div>
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Encoder</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 20 flux entrants · 24 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Encoder</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 19 flux entrants · 28 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instAbs <span style="color:var(--muted);font-weight:500;">(FB_Encoder_Abs)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instHoming <span style="color:var(--muted);font-weight:500;">(FB_Encoder_Homing)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instScale <span style="color:var(--muted);font-weight:500;">(FB_Encoder_Scale)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSafety <span style="color:var(--muted);font-weight:500;">(FB_Encoder_Safety)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instRel <span style="color:var(--muted);font-weight:500;">(FB_EncoderReliability)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSpeed <span style="color:var(--muted);font-weight:500;">(FB_Encoder_SpeedMeasure)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instAbs <span style="color:var(--muted);font-weight:500;">(FB_Encoder_Abs)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instHoming <span style="color:var(--muted);font-weight:500;">(FB_Encoder_Homing)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instScale <span style="color:var(--muted);font-weight:500;">(FB_Encoder_Scale)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSafety <span style="color:var(--muted);font-weight:500;">(FB_Encoder_Safety)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instRel <span style="color:var(--muted);font-weight:500;">(FB_EncoderReliability)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSpeed <span style="color:var(--muted);font-weight:500;">(FB_Encoder_SpeedMeasure)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instFault <span style="color:var(--muted);font-weight:500;">(FB_FaultCore)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingPermit <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingAtTargetM <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingAtZero <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ConfirmCoherence <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgHomingTargetM <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgTopSensorPosM <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">UseDynamicTarget <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DynamicHomingTargetM <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TopPositionSensor <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Hw <span class="pin-type" style="color:var(--muted);">ST_EncoderHw</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PointsPerRev <span class="pin-type" style="color:var(--muted);">UDINT := 8192</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CableM_PerRev <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionMinM <span class="pin-type" style="color:var(--muted);">REAL := -99.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionMaxM <span class="pin-type" style="color:var(--muted);">REAL := 99.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassGlobal <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">Calib <span class="pin-type" style="color:var(--muted);">ST_Encoder_Calib</span></div></div>
-        <details style="margin:4px 0;">
-            <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">(2 constantes ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.3);color:#f1f5f9;">Type Global</span></div>
-                </div>
-            </summary>
-            <div style="margin-top:2px;">
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.DISABLED</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.READY</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div></div>
-        </details></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingPermit <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingAtTargetM <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingAtZero <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ConfirmCoherence <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgHomingTargetM <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgTopSensorPosM <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">UseDynamicTarget <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DynamicHomingTargetM <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TopPositionSensor <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HwIn <span class="pin-type" style="color:var(--muted);">ST_fbEncoder_HwIn</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PointsPerRev <span class="pin-type" style="color:var(--muted);">UDINT := 8192</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CableM_PerRev <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Cfg <span class="pin-type" style="color:var(--muted);">ST_fbEncoder_Cfg</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionMinM <span class="pin-type" style="color:var(--muted);">REAL := -99.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionMaxM <span class="pin-type" style="color:var(--muted);">REAL := 99.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassGlobal <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">Calib <span class="pin-type" style="color:var(--muted);">ST_Encoder_Calib</span></div></div></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Encoder</span>
                 
-        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD AF03</span></div>
-        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">✅ Enable + Reset + Ready + Status (ST_FbStatus complet)</div>
+        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(245,158,11,0.18);color:#fbbf24;border:1px solid #d97706;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD (Tolérance T137 Flat)</span></div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">⚠️ Signaux à plat (Reset/Error/Busy/Done) sans ST_Status</div>
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">18</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">19</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">8</b></div>
-                    <div>• Champs Out : <b style="color:#ffffff;">19</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">9</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">21</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">20 IN</b> / <b style="color:#ffffff;">24 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">19 IN</b> / <b style="color:#ffffff;">28 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -373,66 +416,49 @@
                 <div class="pin-name"><b>Ready</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Fault</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_Fault</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Status</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_FbStatus</span> <span style="font-size:11px;color:#a5b4fc;">(5 champs ▾)</span></div>
-                        <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
-                    </div>
-                </summary>
-                <div style="margin-top:2px;">
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Busy</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Done</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Error</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.ErrorId</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.State</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
-                </div></div>
-            </details>
-            <details style="margin:4px 0;">
-                <summary style="list-style:none;cursor:pointer;">
-                    <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>HwOut</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_EncoderHw</span> <span style="font-size:11px;color:#a5b4fc;">(3 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>HwOut</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_fbEncoder_HwOut</span> <span style="font-size:11px;color:#a5b4fc;">(3 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
                 <div style="margin-top:2px;">
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>HwOut</b>.CodeSeqTriggerCmd</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderHw</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_fbEncoder_HwOut</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>HwOut</b>.PresetTriggerCmd</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderHw</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_fbEncoder_HwOut</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>HwOut</b>.PresetValueOut</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderHw</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_fbEncoder_HwOut</span></div>
                 </div></div>
             </details>
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Measurement</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_EncoderMeasurement</span> <span style="font-size:11px;color:#a5b4fc;">(11 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Measurement</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_EncoderMeasurement</span> <span style="font-size:11px;color:#a5b4fc;">(18 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
                 <div style="margin-top:2px;">
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.AbsStatus</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.AbsFault</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.AbsFault.Error</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.AbsFault.ErrorId</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -452,11 +478,31 @@
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.HomingRefRaw</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.HomingFault</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.HomingStatus</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.HomingFault.Error</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.HomingFault.ErrorId</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.HomingLifecycle</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.HomingLifecycle.Busy</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.HomingLifecycle.Done</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Measurement</b>.HomingRefRaw</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_EncoderMeasurement</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -491,13 +537,207 @@
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>HomedAndReliable</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>PresetConfirmationFailed</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div></div>
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production — M1</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 6 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>POSITIONMAXM</code> jamais câblé en production</li><li>Pin <code>POSITIONMINM</code> jamais câblé en production</li><li>Pin <code>PRESETCONFIRMATIONFAILED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Argument <code>CALIB</code> câblé en production mais absent de l'interface (interface modifiée ?)</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="TRUE" onclick="copyPinExpr(this)">TRUE</code></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="PRG_07_Supervision.FaultMachineReset_IHM" onclick="copyPinExpr(this)">PRG_07_Supervision.FaultMachineReset_IHM</code></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="(PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2)" onclick="copyPinExpr(this)">(PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2)</code></div>
+            <div class="pin-name">HOMINGPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M1TreuilRetenue.Cmd.BtnHome" onclick="copyPinExpr(this)">GVL_IHM.M1TreuilRetenue.Cmd.BtnHome</code></div>
+            <div class="pin-name">HOMINGATTARGETM <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero" onclick="copyPinExpr(this)">GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero</code></div>
+            <div class="pin-name">HOMINGATZERO <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence" onclick="copyPinExpr(this)">GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence</code></div>
+            <div class="pin-name">CONFIRMCOHERENCE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="_WinchM1CfgPersist.CfgHomingTarget_M" onclick="copyPinExpr(this)">_WinchM1CfgPersist.CfgHomingTarget_M</code></div>
+            <div class="pin-name">CFGHOMINGTARGETM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="_WinchM1CfgPersist.CfgTopSensorPos_M" onclick="copyPinExpr(this)">_WinchM1CfgPersist.CfgTopSensorPos_M</code></div>
+            <div class="pin-name">CFGTOPSENSORPOSM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="FALSE" onclick="copyPinExpr(this)">FALSE</code></div>
+            <div class="pin-name">USEDYNAMICTARGET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="0.0" onclick="copyPinExpr(this)">0.0</code></div>
+            <div class="pin-name">DYNAMICHOMINGTARGETM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="HwIn.Winch.M1M2_TopPositionFree_DI" onclick="copyPinExpr(this)">HwIn.Winch.M1M2_TopPositionFree_DI</code></div>
+            <div class="pin-name">TOPPOSITIONSENSOR <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="HwInM1" onclick="copyPinExpr(this)">HwInM1</code></div>
+            <div class="pin-name">HWIN <span class="pin-type">ST_FBENCODER_HWIN</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="ENCODER_POINTS_PER_REV" onclick="copyPinExpr(this)">ENCODER_POINTS_PER_REV</code></div>
+            <div class="pin-name">POINTSPERREV <span class="pin-type">IEC_UDINT</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="WINCH_CABLE_M_PER_REV" onclick="copyPinExpr(this)">WINCH_CABLE_M_PER_REV</code></div>
+            <div class="pin-name">CABLEM_PERREV <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.Commun.EncoderCfg" onclick="copyPinExpr(this)">GVL_IHM.Commun.EncoderCfg</code></div>
+            <div class="pin-name">CFG <span class="pin-type">ST_FBENCODER_CFG</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POSITIONMINM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POSITIONMAXM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M1TreuilRetenue.Bypass.Global" onclick="copyPinExpr(this)">GVL_IHM.M1TreuilRetenue.Bypass.Global</code></div>
+            <div class="pin-name">BYPASSGLOBAL <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Encoder (M1)</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HWOUT <span class="pin-type">ST_FBENCODER_HWOUT</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: M1_PresetTriggerCmd      := instEncoderM1.HwOut.PresetTriggerCmd," onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: M1_PresetTriggerCmd      := instEncoderM1.HwOut.PresetTriggerCmd,</code> <span class='pin-more'>(+6)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">MEASUREMENT <span class="pin-type">ST_ENCODERMEASUREMENT</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Encoders.M1           := instEncoderM1.Measurement;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Encoders.M1           := instEncoderM1.Measurement;</code> <span class='pin-more'>(+12)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_03_Modes_Cycle.st: HomedM1                 := PRG_02_Acquisition.instEncoderM1.Homed," onclick="copyPinExpr(this)">M_MAIN/PRG_03_Modes_Cycle.st: HomedM1                 := PRG_02_Acquisition.instEncoderM1.Homed,</code> <span class='pin-more'>(+6)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMINGSUSPECT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_04_Treuils_Benne.st: HomingSuspect          := PRG_02_Acquisition.instEncoderM1.HomingSuspect," onclick="copyPinExpr(this)">M_MAIN/PRG_04_Treuils_Benne.st: HomingSuspect          := PRG_02_Acquisition.instEncoderM1.HomingSuspect,</code> <span class='pin-more'>(+3)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">ENCODERFAULT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.M1_EncoderFault        := instEncoderM1.EncoderFault;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.M1_EncoderFault        := instEncoderM1.EncoderFault;</code></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMEDANDRELIABLE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;</code></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">PRESETCONFIRMATIONFAILED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production — M2</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 6 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>POSITIONMAXM</code> jamais câblé en production</li><li>Pin <code>POSITIONMINM</code> jamais câblé en production</li><li>Pin <code>PRESETCONFIRMATIONFAILED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Argument <code>CALIB</code> câblé en production mais absent de l'interface (interface modifiée ?)</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="TRUE" onclick="copyPinExpr(this)">TRUE</code></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="PRG_07_Supervision.FaultMachineReset_IHM" onclick="copyPinExpr(this)">PRG_07_Supervision.FaultMachineReset_IHM</code></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="(PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1)" onclick="copyPinExpr(this)">(PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1)</code></div>
+            <div class="pin-name">HOMINGPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR M2BucketRefRequested" onclick="copyPinExpr(this)">GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR M2BucketRefRequested</code></div>
+            <div class="pin-name">HOMINGATTARGETM <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero" onclick="copyPinExpr(this)">GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero</code></div>
+            <div class="pin-name">HOMINGATZERO <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence" onclick="copyPinExpr(this)">GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence</code></div>
+            <div class="pin-name">CONFIRMCOHERENCE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="_WinchM2CfgPersist.CfgHomingTarget_M" onclick="copyPinExpr(this)">_WinchM2CfgPersist.CfgHomingTarget_M</code></div>
+            <div class="pin-name">CFGHOMINGTARGETM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="_WinchM2CfgPersist.CfgTopSensorPos_M" onclick="copyPinExpr(this)">_WinchM2CfgPersist.CfgTopSensorPos_M</code></div>
+            <div class="pin-name">CFGTOPSENSORPOSM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="M2BucketRefRequested" onclick="copyPinExpr(this)">M2BucketRefRequested</code></div>
+            <div class="pin-name">USEDYNAMICTARGET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="M2BucketRefTargetM" onclick="copyPinExpr(this)">M2BucketRefTargetM</code></div>
+            <div class="pin-name">DYNAMICHOMINGTARGETM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="HwIn.Winch.M1M2_TopPositionFree_DI" onclick="copyPinExpr(this)">HwIn.Winch.M1M2_TopPositionFree_DI</code></div>
+            <div class="pin-name">TOPPOSITIONSENSOR <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="HwInM2" onclick="copyPinExpr(this)">HwInM2</code></div>
+            <div class="pin-name">HWIN <span class="pin-type">ST_FBENCODER_HWIN</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="ENCODER_POINTS_PER_REV" onclick="copyPinExpr(this)">ENCODER_POINTS_PER_REV</code></div>
+            <div class="pin-name">POINTSPERREV <span class="pin-type">IEC_UDINT</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="WINCH_CABLE_M_PER_REV" onclick="copyPinExpr(this)">WINCH_CABLE_M_PER_REV</code></div>
+            <div class="pin-name">CABLEM_PERREV <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.Commun.EncoderCfg" onclick="copyPinExpr(this)">GVL_IHM.Commun.EncoderCfg</code></div>
+            <div class="pin-name">CFG <span class="pin-type">ST_FBENCODER_CFG</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POSITIONMINM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POSITIONMAXM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M2TreuilBenne.Bypass.Global" onclick="copyPinExpr(this)">GVL_IHM.M2TreuilBenne.Bypass.Global</code></div>
+            <div class="pin-name">BYPASSGLOBAL <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Encoder (M2)</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HWOUT <span class="pin-type">ST_FBENCODER_HWOUT</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: M2_PresetTriggerCmd      := instEncoderM2.HwOut.PresetTriggerCmd," onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: M2_PresetTriggerCmd      := instEncoderM2.HwOut.PresetTriggerCmd,</code> <span class='pin-more'>(+6)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">MEASUREMENT <span class="pin-type">ST_ENCODERMEASUREMENT</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Encoders.M2           := instEncoderM2.Measurement;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Encoders.M2           := instEncoderM2.Measurement;</code> <span class='pin-more'>(+12)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_03_Modes_Cycle.st: HomedM2                 := PRG_02_Acquisition.instEncoderM2.Homed," onclick="copyPinExpr(this)">M_MAIN/PRG_03_Modes_Cycle.st: HomedM2                 := PRG_02_Acquisition.instEncoderM2.Homed,</code> <span class='pin-more'>(+6)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMINGSUSPECT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_04_Treuils_Benne.st: HomingSuspect          := PRG_02_Acquisition.instEncoderM2.HomingSuspect," onclick="copyPinExpr(this)">M_MAIN/PRG_04_Treuils_Benne.st: HomingSuspect          := PRG_02_Acquisition.instEncoderM2.HomingSuspect,</code> <span class='pin-more'>(+3)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">ENCODERFAULT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.M2_EncoderFault        := instEncoderM2.EncoderFault;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.M2_EncoderFault        := instEncoderM2.EncoderFault;</code></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMEDANDRELIABLE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;</code></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">PRESETCONFIRMATIONFAILED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
-        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 7 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 8 FB de la chaine, encapsulation propre (0 violation)</summary>
         
         <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
             <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
@@ -564,16 +804,16 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Encoder_Abs</code></td>
-                <td>11</td><td>11</td>
-                <td>0</td><td>7</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (7 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>11</td><td>9</td>
+                <td>0</td><td>10</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (10 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Encoder_Homing</code></td>
-                <td>20</td><td>7</td>
-                <td>1</td><td>16</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (16 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>18</td><td>9</td>
+                <td>1</td><td>30</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (30 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -586,8 +826,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Encoder_Safety</code></td>
                 <td>7</td><td>4</td>
-                <td>0</td><td>2</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -605,10 +845,17 @@
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FaultCore</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Encoder</code></td>
-                <td>17</td><td>8</td>
-                <td>1</td><td>6</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (6 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>18</td><td>9</td>
+                <td>1</td><td>8</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (8 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -626,35 +873,283 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 3 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="212" viewBox="0 0 388 212" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="194" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="206" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="194" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="206" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="194" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="206" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">READY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">FAULT.ERROR</text><circle cx="192" cy="162.0" r="4" fill="#dc2626"/><path d="M200,174L256,174L256,174L256,148L312,148L312,148L312,174L368,174" class="wf-line" stroke="#dc2626"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>READY</th><th>FAULT.ERROR</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (24)</summary>
+        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGATTARGETM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWIN.RAWPOSIN</code></td><td>0</td></tr><tr><td><code>POINTSPERREV</code></td><td>8192</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>2</td></tr><tr><td><code>POSITIONMINM</code></td><td>-99</td></tr><tr><td><code>POSITIONMAXM</code></td><td>99</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWOUT.PRESETTRIGGERCMD</code></td><td>0</td></tr><tr><td><code>MEASUREMENT.RAWPOS</code></td><td>0</td></tr><tr><td><code>HOMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERFAULT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PRESETCONFIRMATIONFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIB.HOMINGREFRAW</code></td><td>0</td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 9 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-encoder-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P05-010 Modes : selection et autorisation mode Maintenance N1 </h3>
+                <h3>TC-P09-010 Acquisition codeur : mise en service nominale </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Codeur actif et pret</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (27)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGATTARGETM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWIN.RAWPOSIN</code></td><td>0</td></tr><tr><td><code>POINTSPERREV</code></td><td>4096</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>0.5</td></tr><tr><td><code>POSITIONMINM</code></td><td>-50</td></tr><tr><td><code>POSITIONMAXM</code></td><td>50</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWOUT.PRESETTRIGGERCMD</code></td><td>0</td></tr><tr><td><code>MEASUREMENT.RAWPOS</code></td><td>0</td></tr><tr><td><code>HOMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERFAULT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PRESETCONFIRMATIONFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIB.HOMINGREFRAW</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+        <article id="test-fb-encoder-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms </h3>
+            </header>
+            <div class="comments"><p class='comment'>Front de demande : aucune calibration n est publiee avant verification.</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Avant verification : Homed reste FALSE</li><li>Avant verification : reference existante preservee</li><li>READBACK_ONLY : mesure egale a la cible -&gt; sortie Homed</li><li>READBACK_ONLY nominal : pas de suspicion</li></ul></details>
             
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 4 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="252" viewBox="0 0 332 252" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="234" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="246" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="234" class="wf-grid"/><text x="284.0" y="52" class="wf-time">600ms</text><text x="284.0" y="246" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">HOMINGATTARGETM</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">HOMED</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">HOMEDANDRELIABLE</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">CALIB.HOMINGREFRAW</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="214.0" y="188.0" width="28" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">1234</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><rect x="266.5" y="188.0" width="35" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="197.0" class="wf-num-changed">95904</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>HOMINGATTARGETM</th><th>HOMED</th><th>HOMEDANDRELIABLE</th><th>CALIB.HOMINGREFRAW</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>1234</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>600 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>95904</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (23)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>1</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWIN.RAWPOSIN</code></td><td>100000</td></tr><tr><td><code>POINTSPERREV</code></td><td>8192</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>2</td></tr><tr><td><code>POSITIONMINM</code></td><td>-99</td></tr><tr><td><code>POSITIONMAXM</code></td><td>99</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWOUT.PRESETTRIGGERCMD</code></td><td>0</td></tr><tr><td><code>MEASUREMENT.RAWPOS</code></td><td>100000</td></tr><tr><td><code>HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PRESETCONFIRMATIONFAILED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-encoder-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>READBACK_AND_STATUSBIT : bit FALSE -&gt; pas de validation</li><li>READBACK_AND_STATUSBIT : bit FALSE -&gt; suspicion</li><li>READBACK_AND_STATUSBIT : fait diagnostic publie</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 6 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="332" viewBox="0 0 332 332" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="314" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="326" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="314" class="wf-grid"/><text x="284.0" y="52" class="wf-time">600ms</text><text x="284.0" y="326" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">HOMINGATTARGETM</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">READY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,108L256,108L256,108L256,134L312,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">FAULT.ERROR</text><circle cx="192" cy="162.0" r="4" fill="#dc2626"/><path d="M200,174L256,174L256,174L256,148L312,148" class="wf-line" stroke="#dc2626"/><text x="182" y="206.0" class="wf-label">HOMINGSUSPECT</text><circle cx="192" cy="202.0" r="4" fill="#0891b2"/><path d="M200,214L256,214L256,214L256,188L312,188" class="wf-line" stroke="#0891b2"/><text x="182" y="246.0" class="wf-label">ENCODERFAULT</text><circle cx="192" cy="242.0" r="4" fill="#65a30d"/><path d="M200,254L256,254L256,254L256,228L312,228" class="wf-line" stroke="#65a30d"/><text x="182" y="286.0" class="wf-label">PRESETCONFIRMATIONFAILED</text><circle cx="192" cy="282.0" r="4" fill="#111827"/><path d="M200,294L256,294L256,294L256,268L312,268" class="wf-line" stroke="#111827"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>HOMINGATTARGETM</th><th>READY</th><th>FAULT.ERROR</th><th>HOMINGSUSPECT</th><th>ENCODERFAULT</th><th>PRESETCONFIRMATIONFAILED</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>600 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (21)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>1</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWIN.RAWPOSIN</code></td><td>100000</td></tr><tr><td><code>POINTSPERREV</code></td><td>8192</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>2</td></tr><tr><td><code>POSITIONMINM</code></td><td>-99</td></tr><tr><td><code>POSITIONMAXM</code></td><td>99</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWOUT.PRESETTRIGGERCMD</code></td><td>0</td></tr><tr><td><code>MEASUREMENT.RAWPOS</code></td><td>100000</td></tr><tr><td><code>HOMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIB.HOMINGREFRAW</code></td><td>2345</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-encoder-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation </h3>
+            </header>
+            <div class="comments"><p class='comment'>+50mm a 4096 points/m</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Echec relecture : sortie Homed non validee</li><li>Echec relecture : suspicion active</li><li>Echec relecture : fait diagnostic publie</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 10 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="492" viewBox="0 0 332 492" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="474" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="486" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="474" class="wf-grid"/><text x="284.0" y="52" class="wf-time">600ms</text><text x="284.0" y="486" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">HOMINGATTARGETM</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">HWIN.RAWPOSIN</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="207.0" y="108.0" width="42" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">100000</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><rect x="263.0" y="108.0" width="42" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="284.0" y="117.0" class="wf-num-changed">100205</text><text x="182" y="166.0" class="wf-label">READY</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L256,148L256,174L312,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">FAULT.ERROR</text><circle cx="192" cy="202.0" r="4" fill="#dc2626"/><path d="M200,214L256,214L256,214L256,188L312,188" class="wf-line" stroke="#dc2626"/><text x="182" y="246.0" class="wf-label">MEASUREMENT.RAWPOS</text><circle cx="192" cy="242.0" r="4" fill="#65a30d"/><line x1="200" y1="242.0" x2="256" y2="242.0" class="wf-num-line"/><rect x="207.0" y="228.0" width="42" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="237.0" class="wf-num-changed">100000</text><line x1="256" y1="242.0" x2="312" y2="242.0" class="wf-num-line"/><rect x="263.0" y="228.0" width="42" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="237.0" class="wf-num-changed">100205</text><text x="182" y="286.0" class="wf-label">HOMED</text><circle cx="192" cy="282.0" r="4" fill="#0d9488"/><path d="M200,268L256,268L256,268L256,294L312,294" class="wf-line" stroke="#0d9488"/><text x="182" y="326.0" class="wf-label">HOMINGSUSPECT</text><circle cx="192" cy="322.0" r="4" fill="#1d4ed8"/><path d="M200,334L256,334L256,334L256,308L312,308" class="wf-line" stroke="#1d4ed8"/><text x="182" y="366.0" class="wf-label">ENCODERFAULT</text><circle cx="192" cy="362.0" r="4" fill="#2563eb"/><path d="M200,374L256,374L256,374L256,348L312,348" class="wf-line" stroke="#2563eb"/><text x="182" y="406.0" class="wf-label">HOMEDANDRELIABLE</text><circle cx="192" cy="402.0" r="4" fill="#059669"/><path d="M200,388L256,388L256,388L256,414L312,414" class="wf-line" stroke="#059669"/><text x="182" y="446.0" class="wf-label">PRESETCONFIRMATIONFAILED</text><circle cx="192" cy="442.0" r="4" fill="#111827"/><path d="M200,454L256,454L256,454L256,428L312,428" class="wf-line" stroke="#111827"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>HOMINGATTARGETM</th><th>HWIN.RAWPOSIN</th><th>READY</th><th>FAULT.ERROR</th><th>MEASUREMENT.RAWPOS</th><th>HOMED</th><th>HOMINGSUSPECT</th><th>ENCODERFAULT</th><th>HOMEDANDRELIABLE</th><th>PRESETCONFIRMATIONFAILED</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td>100000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>100000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>600 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>100205</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>100205</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (17)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>1</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POINTSPERREV</code></td><td>8192</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>2</td></tr><tr><td><code>POSITIONMINM</code></td><td>-99</td></tr><tr><td><code>POSITIONMAXM</code></td><td>99</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWOUT.PRESETTRIGGERCMD</code></td><td>0</td></tr><tr><td><code>CALIB.HOMINGREFRAW</code></td><td>70000</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-encoder-5" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>STATUSBIT_ONLY : bit TRUE -&gt; validation</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 4 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="252" viewBox="0 0 332 252" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="234" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="246" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="234" class="wf-grid"/><text x="284.0" y="52" class="wf-time">600ms</text><text x="284.0" y="246" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">HOMINGATTARGETM</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">HOMED</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">HOMEDANDRELIABLE</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">CALIB.HOMINGREFRAW</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="219.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">0</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><rect x="266.5" y="188.0" width="35" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="197.0" class="wf-num-changed">95904</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>HOMINGATTARGETM</th><th>HOMED</th><th>HOMEDANDRELIABLE</th><th>CALIB.HOMINGREFRAW</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>600 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>95904</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (23)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>1</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWIN.RAWPOSIN</code></td><td>100000</td></tr><tr><td><code>POINTSPERREV</code></td><td>8192</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>2</td></tr><tr><td><code>POSITIONMINM</code></td><td>-99</td></tr><tr><td><code>POSITIONMAXM</code></td><td>99</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWOUT.PRESETTRIGGERCMD</code></td><td>0</td></tr><tr><td><code>MEASUREMENT.RAWPOS</code></td><td>100000</td></tr><tr><td><code>HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PRESETCONFIRMATIONFAILED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-encoder-6" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P09-015 Reset conscient : acquitte le latch sans valider le preset </h3>
+            </header>
+            <div class="comments"><p class='comment'>Echec de relecture : preset non confirme -&gt; latch pose.</p><p class='comment'>+50mm -&gt; hors tolerance</p><p class='comment'>Reset front : acquitte le latch, ne valide pas le preset (Homed reste FALSE).</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>echec : latch pose</li><li>echec : pas de validation</li><li>Reset : latch acquitte</li><li>Reset : ne valide pas le preset</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 10 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="492" viewBox="0 0 388 492" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="474" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="486" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="474" class="wf-grid"/><text x="284.0" y="52" class="wf-time">600ms</text><text x="284.0" y="486" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="474" class="wf-grid"/><text x="340.0" y="52" class="wf-time">610ms</text><text x="340.0" y="486" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L312,94L312,68L368,68" class="wf-line" stroke="#111827"/><text x="182" y="126.0" class="wf-label">HOMINGATTARGETM</text><circle cx="192" cy="122.0" r="4" fill="#2563eb"/><path d="M200,108L256,108L256,108L256,134L312,134L368,134" class="wf-line" stroke="#2563eb"/><text x="182" y="166.0" class="wf-label">HWIN.RAWPOSIN</text><circle cx="192" cy="162.0" r="4" fill="#059669"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="207.0" y="148.0" width="42" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">100000</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="263.0" y="148.0" width="42" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">100205</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><text x="340.0" y="156.0" class="wf-num">100205</text><text x="182" y="206.0" class="wf-label">READY</text><circle cx="192" cy="202.0" r="4" fill="#0891b2"/><path d="M200,188L256,188L256,188L256,214L312,214L312,214L312,188L368,188" class="wf-line" stroke="#0891b2"/><text x="182" y="246.0" class="wf-label">FAULT.ERROR</text><circle cx="192" cy="242.0" r="4" fill="#dc2626"/><path d="M200,254L256,254L256,254L256,228L312,228L312,228L312,254L368,254" class="wf-line" stroke="#dc2626"/><text x="182" y="286.0" class="wf-label">HWOUT.PRESETTRIGGERCMD</text><circle cx="192" cy="282.0" r="4" fill="#111827"/><line x1="200" y1="282.0" x2="256" y2="282.0" class="wf-num-line"/><rect x="219.0" y="268.0" width="18" height="13" rx="3" fill="#111827" class="wf-chip"/><text x="228.0" y="277.0" class="wf-num-changed">0</text><line x1="256" y1="282.0" x2="312" y2="282.0" class="wf-num-line"/><text x="284.0" y="276.0" class="wf-num">0</text><line x1="312" y1="282.0" x2="368" y2="282.0" class="wf-num-line"/><rect x="331.0" y="268.0" width="18" height="13" rx="3" fill="#111827" class="wf-chip"/><text x="340.0" y="277.0" class="wf-num-changed">2</text><text x="182" y="326.0" class="wf-label">MEASUREMENT.RAWPOS</text><circle cx="192" cy="322.0" r="4" fill="#65a30d"/><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="207.0" y="308.0" width="42" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">100000</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><rect x="263.0" y="308.0" width="42" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="317.0" class="wf-num-changed">100205</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><text x="340.0" y="316.0" class="wf-num">100205</text><text x="182" y="366.0" class="wf-label">HOMINGSUSPECT</text><circle cx="192" cy="362.0" r="4" fill="#0d9488"/><path d="M200,374L256,374L256,374L256,348L312,348L312,348L312,374L368,374" class="wf-line" stroke="#0d9488"/><text x="182" y="406.0" class="wf-label">ENCODERFAULT</text><circle cx="192" cy="402.0" r="4" fill="#1d4ed8"/><path d="M200,414L256,414L256,414L256,388L312,388L312,388L312,414L368,414" class="wf-line" stroke="#1d4ed8"/><text x="182" y="446.0" class="wf-label">PRESETCONFIRMATIONFAILED</text><circle cx="192" cy="442.0" r="4" fill="#111827"/><path d="M200,454L256,454L256,454L256,428L312,428L312,428L312,454L368,454" class="wf-line" stroke="#111827"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th><th>HOMINGATTARGETM</th><th>HWIN.RAWPOSIN</th><th>READY</th><th>FAULT.ERROR</th><th>HWOUT.PRESETTRIGGERCMD</th><th>MEASUREMENT.RAWPOS</th><th>HOMINGSUSPECT</th><th>ENCODERFAULT</th><th>PRESETCONFIRMATIONFAILED</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td>100000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>100000</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>600 ms</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>100205</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td>0</td><td class='changed'>100205</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>610 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>100205</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>2</td><td>100205</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (17)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>1</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POINTSPERREV</code></td><td>8192</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>2</td></tr><tr><td><code>POSITIONMINM</code></td><td>-99</td></tr><tr><td><code>POSITIONMAXM</code></td><td>99</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIB.HOMINGREFRAW</code></td><td>9999</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-encoder-7" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P09-016 Fault live : perte materiel codeur (Cause 0) </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>perte materiel -&gt; Fault.Error live</li><li>bit0 = cause perte materiel</li><li>cause live non latchee</li><li>cause disparue -&gt; Error retombe seule</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 2 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="172" viewBox="0 0 332 172" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="154" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="166" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="154" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="166" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">FAULT.ERROR</text><circle cx="192" cy="82.0" r="4" fill="#dc2626"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94" class="wf-line" stroke="#dc2626"/><text x="182" y="126.0" class="wf-label">ENCODERFAULT</text><circle cx="192" cy="122.0" r="4" fill="#2563eb"/><path d="M200,108L256,108L256,108L256,134L312,134" class="wf-line" stroke="#2563eb"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>FAULT.ERROR</th><th>ENCODERFAULT</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (25)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGATTARGETM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWIN.RAWPOSIN</code></td><td>0</td></tr><tr><td><code>POINTSPERREV</code></td><td>8192</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>2</td></tr><tr><td><code>POSITIONMINM</code></td><td>-99</td></tr><tr><td><code>POSITIONMAXM</code></td><td>99</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWOUT.PRESETTRIGGERCMD</code></td><td>0</td></tr><tr><td><code>MEASUREMENT.RAWPOS</code></td><td>0</td></tr><tr><td><code>HOMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PRESETCONFIRMATIONFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIB.HOMINGREFRAW</code></td><td>0</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-encoder-8" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2) </h3>
+            </header>
+            <div class="comments"><p class='comment'>Echec de relecture : preset non confirme -&gt; latch pose.</p><p class='comment'>+50mm -&gt; hors tolerance</p><p class='comment'>Reset front : acquitte le latch.</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>echec : latch preset pose</li><li>echec preset -&gt; Fault.Latched</li><li>bit2 = cause preset latched</li><li>Reset -&gt; latch acquitte</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 12 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="572" viewBox="0 0 388 572" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="554" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="566" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="554" class="wf-grid"/><text x="284.0" y="52" class="wf-time">600ms</text><text x="284.0" y="566" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="554" class="wf-grid"/><text x="340.0" y="52" class="wf-time">610ms</text><text x="340.0" y="566" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L312,94L312,68L368,68" class="wf-line" stroke="#111827"/><text x="182" y="126.0" class="wf-label">HOMINGATTARGETM</text><circle cx="192" cy="122.0" r="4" fill="#2563eb"/><path d="M200,108L256,108L256,108L256,134L312,134L368,134" class="wf-line" stroke="#2563eb"/><text x="182" y="166.0" class="wf-label">HWIN.RAWPOSIN</text><circle cx="192" cy="162.0" r="4" fill="#059669"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="207.0" y="148.0" width="42" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">100000</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="263.0" y="148.0" width="42" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">100205</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><text x="340.0" y="156.0" class="wf-num">100205</text><text x="182" y="206.0" class="wf-label">READY</text><circle cx="192" cy="202.0" r="4" fill="#0891b2"/><path d="M200,188L256,188L256,188L256,214L312,214L312,214L312,188L368,188" class="wf-line" stroke="#0891b2"/><text x="182" y="246.0" class="wf-label">FAULT.ERROR</text><circle cx="192" cy="242.0" r="4" fill="#dc2626"/><path d="M200,254L256,254L256,254L256,228L312,228L312,228L312,254L368,254" class="wf-line" stroke="#dc2626"/><text x="182" y="286.0" class="wf-label">HWOUT.PRESETTRIGGERCMD</text><circle cx="192" cy="282.0" r="4" fill="#111827"/><line x1="200" y1="282.0" x2="256" y2="282.0" class="wf-num-line"/><rect x="219.0" y="268.0" width="18" height="13" rx="3" fill="#111827" class="wf-chip"/><text x="228.0" y="277.0" class="wf-num-changed">0</text><line x1="256" y1="282.0" x2="312" y2="282.0" class="wf-num-line"/><text x="284.0" y="276.0" class="wf-num">0</text><line x1="312" y1="282.0" x2="368" y2="282.0" class="wf-num-line"/><rect x="331.0" y="268.0" width="18" height="13" rx="3" fill="#111827" class="wf-chip"/><text x="340.0" y="277.0" class="wf-num-changed">2</text><text x="182" y="326.0" class="wf-label">MEASUREMENT.RAWPOS</text><circle cx="192" cy="322.0" r="4" fill="#65a30d"/><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="207.0" y="308.0" width="42" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">100000</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><rect x="263.0" y="308.0" width="42" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="317.0" class="wf-num-changed">100205</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><text x="340.0" y="316.0" class="wf-num">100205</text><text x="182" y="366.0" class="wf-label">HOMED</text><circle cx="192" cy="362.0" r="4" fill="#0d9488"/><path d="M200,348L256,348L256,348L256,374L312,374L312,374L312,348L368,348" class="wf-line" stroke="#0d9488"/><text x="182" y="406.0" class="wf-label">HOMINGSUSPECT</text><circle cx="192" cy="402.0" r="4" fill="#1d4ed8"/><path d="M200,414L256,414L256,414L256,388L312,388L312,388L312,414L368,414" class="wf-line" stroke="#1d4ed8"/><text x="182" y="446.0" class="wf-label">ENCODERFAULT</text><circle cx="192" cy="442.0" r="4" fill="#2563eb"/><path d="M200,454L256,454L256,454L256,428L312,428L312,428L312,454L368,454" class="wf-line" stroke="#2563eb"/><text x="182" y="486.0" class="wf-label">HOMEDANDRELIABLE</text><circle cx="192" cy="482.0" r="4" fill="#059669"/><path d="M200,468L256,468L256,468L256,494L312,494L312,494L312,468L368,468" class="wf-line" stroke="#059669"/><text x="182" y="526.0" class="wf-label">PRESETCONFIRMATIONFAILED</text><circle cx="192" cy="522.0" r="4" fill="#111827"/><path d="M200,534L256,534L256,534L256,508L312,508L312,508L312,534L368,534" class="wf-line" stroke="#111827"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th><th>HOMINGATTARGETM</th><th>HWIN.RAWPOSIN</th><th>READY</th><th>FAULT.ERROR</th><th>HWOUT.PRESETTRIGGERCMD</th><th>MEASUREMENT.RAWPOS</th><th>HOMED</th><th>HOMINGSUSPECT</th><th>ENCODERFAULT</th><th>HOMEDANDRELIABLE</th><th>PRESETCONFIRMATIONFAILED</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td>100000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>100000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>600 ms</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>100205</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td>0</td><td class='changed'>100205</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>610 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>100205</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>2</td><td>100205</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (15)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>1</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POINTSPERREV</code></td><td>8192</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>2</td></tr><tr><td><code>POSITIONMINM</code></td><td>-99</td></tr><tr><td><code>POSITIONMAXM</code></td><td>99</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIB.HOMINGREFRAW</code></td><td>70000</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-encoder-9" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P09-018 Fault live : incoherence mesure (Cause 1) </h3>
+            </header>
+            <div class="comments"><p class='comment'>-&gt; Safety.EncoderIncoherent -&gt; Cause 1</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>incoherence -&gt; Fault.Error live</li><li>bit1 = cause incoherence</li><li>cause live non latchee</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (27)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGATTARGETM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGATZERO</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCOHERENCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>CFGTOPSENSORPOSM</code></td><td>0</td></tr><tr><td><code>USEDYNAMICTARGET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DYNAMICHOMINGTARGETM</code></td><td>0</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWIN.RAWPOSIN</code></td><td>100000</td></tr><tr><td><code>POINTSPERREV</code></td><td>8192</td></tr><tr><td><code>CABLEM_PERREV</code></td><td>2</td></tr><tr><td><code>POSITIONMINM</code></td><td>-99</td></tr><tr><td><code>POSITIONMAXM</code></td><td>99</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWOUT.PRESETTRIGGERCMD</code></td><td>0</td></tr><tr><td><code>MEASUREMENT.RAWPOS</code></td><td>100000</td></tr><tr><td><code>HOMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGSUSPECT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PRESETCONFIRMATIONFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIB.HOMINGREFRAW</code></td><td>70000</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (12)</summary>
-        <ul><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/E_CODEURS/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/ST_EncoderMeasurement.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li></ul>
+        <summary>Fichiers source compilés (19)</summary>
+        <ul><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Status.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (12)</summary>
+        <summary>Code source ST original (19)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -676,23 +1171,23 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Status.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Status — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
       avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
       côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
+      migre pas vers ST_Status (exception documentée).
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    ======================================================================= *)
 
-TYPE ST_FbStatus :
+TYPE ST_Status :
 STRUCT
     (* ---- membres historiques (conservés) ---- *)
     Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
@@ -712,35 +1207,164 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_EncoderHw.st</code></summary>
-                <pre>(* ═══════════════════════════════════════════════════════════════
-   🔌 ST_EncoderHw — Frontière hardware codeur (IN/OUT)
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Fault.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Regroupe les entrées/sorties hardware d&#x27;un codeur absolu EtherCAT
-      pour exposer l&#x27;interface physique de FB_Encoder de façon testable.
-   🔌 Producteur/consommateur : PRG_02_Acquisition câble ce bus vers le device.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
-   ═══════════════════════════════════════════════════════════════ *)
-TYPE ST_EncoderHw :
-STRUCT
-    // === ENTREES BUS ETHERCAT (vers le codeur) ===
-    RawPosIn            : UDINT;        // Position brute EtherCAT (in)
-    AlarmsIn            : UINT;        // Codes alarmes bruts EtherCAT
-    WarningsIn          : UINT;        // Codes avertissements bruts EtherCAT
-    SlaveOperational    : BOOL;        // Esclave EtherCAT operationnel
-    PresetAck           : BOOL;        // Pulse confirmation preset reussi
-    PresetNak           : BOOL;        // Pulse echec / timeout preset
+   🎯 Rôle : porter l&#x27;état défaut d&#x27;un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu&#x27;au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l&#x27;acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
 
-    // === SORTIES BUS (vers le codeur) ===
-    PresetTriggerCmd    : WORD;        // Ordre declenchement preset vers PDO Rx
-    CodeSeqTriggerCmd   : WORD;        // Ordre sequence code vers PDO Rx
-    PresetValueOut      : UDINT;       // Valeur de preset transmise au PDO Rx
+TYPE ST_Fault :
+STRUCT
+    Error     : BOOL;   (* &lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant *)
+    ErrorId   : WORD;    (* &lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune) *)
+    Latched   : BOOL;    (* &lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu&#x27;au front Reset *)
+    LatchedId : WORD;    (* &lt;-- [DIAG] ErrorId figé à l&#x27;apparition du défaut, effacé au Reset *)
 END_STRUCT
 END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_Encoder_Calib.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_FaultCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n&#x27;alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FaultCause :
+STRUCT
+    Active   : BOOL;    (* 1 = cause présente maintenant (interlock sur cette valeur) *)
+    Latching : BOOL;    (* 1 = cause à acquitter (arme Latched) ; 0 = live seulement *)
+    Texte    : STRING;  (* libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM) *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Lifecycle.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d&#x27;exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l&#x27;avancement d&#x27;une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   ======================================================================= *)
+
+TYPE ST_Lifecycle :
+STRUCT
+    Busy : BOOL;   (* &lt;-- [STAT] 1 = action en cours *)
+    Done : BOOL;   (* &lt;-- [STAT] 1 = action terminée avec succès *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\E_PresetConfirmMode.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_PresetConfirmMode — Mode de confirmation du preset codeur
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : sélectionner le fait public utilisé pour valider un preset.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE E_PresetConfirmMode :
+ENUM
+    READBACK_ONLY        := 0, // Confirmation par relecture de position
+    READBACK_AND_STATUSBIT := 1, // Relecture et bit d&#x27;état matériel
+    STATUSBIT_ONLY       := 2  // Bit d&#x27;état matériel uniquement
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_fbEncoder_Cfg.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ ST_fbEncoder_Cfg — Réglages technologiques publics de FB_Encoder
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
+   🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE ST_fbEncoder_Cfg :
+STRUCT
+    PresetConfirmMode : E_PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY; // Mode de confirmation preset, défaut relecture
+    Initialized       : BOOL := FALSE;                        // 🚦 TRUE après restauration du pont persistant
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_fbEncoder_HwIn.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_fbEncoder_HwIn — Faits hardware d&#x27;entrée codeur (HwIn)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les SEULES entrées/faits hardware d&#x27;un codeur absolu
+      EtherCAT consommés par FB_Encoder (lecture seule côté automate).
+   🔒 Ownership : PRG_02_Acquisition câble ce bus depuis le device/simulé.
+   🛡️ PresetStatusBit : bit du mot d&#x27;état codeur, réservé site futur —
+      câblé à FALSE tant qu&#x27;aucun bit n&#x27;est identifié (aucun signal absent
+      ne confirme implicitement le preset).
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE ST_fbEncoder_HwIn :
+STRUCT
+    // === ENTRÉES BUS ETHERCAT (faits d&#x27;entrée, lecture seule) ===
+    RawPosIn           : UDINT; // --&gt; [HW] Position brute codeur
+    AlarmsIn           : UINT;  // --&gt; [HW] Alarmes brutes codeur
+    WarningsIn         : UINT;  // --&gt; [HW] Avertissements bruts codeur
+    SlaveOperational   : BOOL;  // --&gt; [HW] Esclave EtherCAT operationnel
+    PresetStatusBit    : BOOL;  // --&gt; [HW] Bit d&#x27;etat preset optionnel, FALSE si non cable
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_fbEncoder_HwOut.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_fbEncoder_HwOut — Ordres preset de sortie codeur (HwOut)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les SEULES sorties/ordres preset d&#x27;un codeur absolu
+      EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
+   🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
+      vers le device.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE ST_fbEncoder_HwOut :
+STRUCT
+    // === SORTIES BUS ETHERCAT (ordres preset vers PDO Rx) ===
+    PresetTriggerCmd   : WORD;   // &lt;-- [ACT] Declenchement preset vers PDO Rx
+    CodeSeqTriggerCmd  : WORD;   // &lt;-- [ACT] Sequence code vers PDO Rx, maintenue a 0
+    PresetValueOut     : UDINT;  // &lt;-- [ACT] Valeur brute envoyee au preset
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_Encoder_Calib.st</code></summary>
                 <pre>(* =======================================================================
    💾 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
@@ -766,7 +1390,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_EncoderMeasurement.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_EncoderMeasurement.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
@@ -792,8 +1416,9 @@ STRUCT
     SpeedValid        : BOOL;         // TRUE si 6 echantillons valides sur au moins 50 ms
 
     // === STATUTS DES SOUS-FB &amp; REFERENCE ===
-    HomingStatus      : ST_FbStatus;  // Statut FB_Encoder_Homing (etat du referencement)
-    AbsStatus         : ST_FbStatus;  // Statut FB_Encoder_Abs (etat acquisition bus)
+    HomingFault       : ST_Fault;     // Défaut FB_Encoder_Homing (état du référencement)
+    HomingLifecycle   : ST_Lifecycle; // Cycle FB_Encoder_Homing (Busy/Done)
+    AbsFault          : ST_Fault;     // Défaut FB_Encoder_Abs (état acquisition bus)
     HomingRefRaw      : UDINT;        // Reference brute du dernier homing reussi (re-expose)
 END_STRUCT
 END_TYPE
@@ -834,9 +1459,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; SYNOPTIQUE ===
     Ready               : BOOL;        // &lt;-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: &quot;Com&quot;, bit1: &quot;Preset Timeout&quot;.
-    Status              : ST_FbStatus;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault               : ST_Fault;
 
     // === MESURES &amp; DONNEES CODEUR ===
     RawPos              : UDINT;       // &lt;-- [DIAG] Position brute gelee si non disponible
@@ -845,8 +1469,6 @@ VAR_OUTPUT
     TurnCount           : UDINT;       // &lt;-- [DIAG] Nombre de tours bruts (RawPos / PointsPerRev)
 
     // === COMMANDES &amp; ECHANGE BUS ETHERCAT ===
-    PresetAck           : BOOL;        // &lt;-- [STAT] Pulse confirmation preset reussi
-    PresetNak           : BOOL;        // &lt;-- [STAT] Pulse refus / timeout preset
     PresetTriggerCmd    : WORD;        // &lt;-- [ACT]  Ordre declenchement preset vers PDO Rx
     CodeSeqTriggerCmd   : WORD;        // &lt;-- [ACT]  Ordre sequence code vers PDO Rx
     PresetValueOut      : UDINT;       // &lt;-- [ACT]  Valeur de preset transmise au PDO Rx
@@ -854,7 +1476,6 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONT ===
     ResetEdge           : R_TRIG;      // . [LOC] Detecteur front montant Reset
-    ErrorEdge           : R_TRIG;      // . [LOC] Detecteur front montant Error
     PresetReqEdge       : R_TRIG;      // . [LOC] Detecteur front montant PresetRequest
 
     // === TEMPORISATEURS INTERNES ===
@@ -864,44 +1485,60 @@ VAR
     // === VARIABLES INTERNES DE CALCUL &amp; ETAT ===
     PresetSeqStep       : INT;         // . [LOC] Etape sequence preset (0:IDLE, 1:PULSE/WAIT)
     RawDiff             : DINT;        // . [LOC] Ecart signe entre RawPos et PresetValueOut
+    PresetCompleted     : BOOL;        // . [LOC] Fait de fin de maintien preset (un scan)
+    PresetTimeoutError  : BOOL;        // . [LOC] Latch interne timeout séquence preset
+
+    // === SOCLE DEFAUT (FB_FaultCore) ===
+    instFault           : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses          : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
 
-{region &quot;§1 Gate&quot;}
-// 🛑 1. GATE
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🔍 2. DIAGNOSTIC BUS / ALARME (Cause 0 : live)
+instCauses[0].Active   := (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational;
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := &#x27;Defaut communication EtherCAT codeur absolu&#x27;;
+
+// ⏱️ 3. TIMEOUT PRESET (Cause 1 : latched)
+IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
+    PresetTimeoutError := FALSE;
+END_IF;
+instCauses[1].Active   := PresetTimeoutError;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := &#x27;Timeout sequence preset SDO codeur&#x27;;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+
+EncoderAvailable := NOT instCauses[0].Active;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Ready := FALSE;
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
+    PresetCompleted := FALSE;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
     PresetTimerVisual(IN := FALSE, PT := T#500MS);
+    // RawPos, AngleRaw et TurnCount sont volontairement gelés hors Enable
+    // (AF09 F09.01 / AC5) : aucune lecture bus ni remise a zero dans ce gate.
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region &quot;§2 Reset front&quot;}
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-{endregion}
-
-{region &quot;§3 Diagnostic bus et alarme&quot;}
-// 🔍 3. DIAGNOSTIC BUS / ALARME
-IF (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l&#x27;esclave sont OK *)
-END_IF;
-EncoderAvailable := (Status.ErrorId AND 16#0001) = 0;
-{endregion}
-
-{region &quot;§4 Lecture position&quot;}
-// 📥 4. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
+{region &quot;§3 Lecture position&quot;}
+// 📥 3. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
 // Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
 // global ici pour ne pas geler aussi la séquence preset/l&#x27;état — seule la lecture est gelée).
 IF EncoderAvailable THEN
@@ -911,13 +1548,13 @@ IF EncoderAvailable THEN
 END_IF;
 {endregion}
 
-{region &quot;§5 Séquence preset&quot;}
-// 🔧 5. SÉQUENCE PRESET (écriture bus)
+{region &quot;§4 Séquence preset&quot;}
+// 🔧 4. SÉQUENCE PRESET (écriture bus)
 // PresetTriggerCmd := 2 déclenche le référencement à PresetValue (valeur de commande, pas un
 // masque de bits). CodeSeqTriggerCmd : rôle non identifié — laissé à 0, PAS piloté tant que sa
 // fonction n&#x27;est pas confirmée. Ne jamais lui donner une valeur arbitraire.
 PresetReqEdge(CLK := PresetRequest);
-PresetAck := FALSE; PresetNak := FALSE; // pulses 1 cycle uniquement
+PresetCompleted := FALSE;
 CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
 CASE PresetSeqStep OF
     0: // IDLE
@@ -935,34 +1572,18 @@ CASE PresetSeqStep OF
             PresetTimerVisual(IN := TRUE, PT := T#500MS);
             IF PresetTimerVisual.Q THEN
                 PresetTriggerCmd := 0;
-                PresetAck := TRUE;
+                PresetCompleted := TRUE;
                 PresetSeqStep := 0;
                 PresetTimerVisual(IN := FALSE, PT := T#500MS);
             END_IF;
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
-            PresetNak := TRUE;
-            Status.ErrorId := Status.ErrorId OR 16#0002;
+            PresetTimeoutError := TRUE;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
             PresetTimerVisual(IN := FALSE, PT := T#500MS);
         END_IF;
 END_CASE;
-IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFD;
-END_IF;
-{endregion}
-
-{region &quot;§6 Error et StateAtError&quot;}
-// 🧾 6. ERROR / STATEATERROR
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-Status.Busy := (PresetSeqStep &lt;&gt; 0);
-Status.Done := PresetAck;
 {endregion}
 </pre>
             </details>
@@ -996,14 +1617,13 @@ VAR_INPUT
 
     // === RETOURS HW &amp; CAPTEURS ===
     TopPositionSensor      : BOOL;        // --&gt; [HW]  Capteur physique position haute unique
-    FwdRevSpeedFeedbackOff : BOOL;        // --&gt; [HW]  Contacteurs sens et vitesse retombes
-    BrakeFeedback          : BOOL;        // --&gt; [HW]  Contacteur frein ouvert/desserre
-
     // === MESURES &amp; RETOURS FB CODEUR ABSOLU ===
     RawPos                 : UDINT;       // --&gt; [HW]  Position brute codeur (sortie FB_Encoder_Abs)
     EncoderAvailable       : BOOL;        // --&gt; [HW]  Codeur absolu disponible et valide
-    PresetAck              : BOOL;        // --&gt; [HW]  Pulse confirmation ecriture preset reussie
-    PresetNak              : BOOL;        // --&gt; [HW]  Pulse echec / timeout ecriture preset
+    PresetStatusBit        : BOOL;        // --&gt; [HW]  Bit d&#x27;etat preset optionnel, FALSE si non cable
+
+    // === REGLAGES TRANSACTION PRESET ===
+    Cfg                    : ST_fbEncoder_Cfg; // --&gt; [CFG] Mode de confirmation preset
 
     // === CARACTERISTIQUES MECANIQUES &amp; BUS ===
     PointsPerRev           : UDINT := 8192; // --&gt; [CFG] Resolution codeur (pts/tour)
@@ -1016,9 +1636,10 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; SYNOPTIQUE ===
     Ready                  : BOOL;        // &lt;-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5: preset, bit9: incoherence boot).
-    Status                 : ST_FbStatus;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                  : ST_Fault;
+    // 🧩 Cycle de vie (forme cible ST_Lifecycle)
+    Lifecycle              : ST_Lifecycle;
 
     // === COMMANDES VERS FB_ENCODER_ABS ===
     PresetRequest          : BOOL;        // &lt;-- [ACT]  Pulse demande d&#x27;ecriture preset SDO
@@ -1028,6 +1649,7 @@ VAR_OUTPUT
     Homed                  : BOOL;        // &lt;-- [STAT] Codeur pagine et referencie
     HomingSuspect          : BOOL;        // &lt;-- [DIAG] Incoherence redemarrage a lever
     HomingRefRaw           : UDINT;       // &lt;-- [DIAG] Offset de reference brut calcule
+    PresetConfirmationFailed : BOOL;      // &lt;-- [DIAG] Latch derniere verification preset echouee
 END_VAR
 VAR_IN_OUT
     // === STRUCTURE DE CALIBRATION PERSISTANTE ===
@@ -1036,7 +1658,6 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONT ===
     ResetEdge              : R_TRIG;      // . [LOC] Detecteur front montant Reset
-    ErrorEdge              : R_TRIG;      // . [LOC] Detecteur front montant Error
     HomeEdge               : R_TRIG;      // . [LOC] Detecteur front montant Home
     ConfirmCoherenceEdge   : R_TRIG;      // . [LOC] Detecteur front montant BtnConfirmCoherence
     TopSensorEdge          : R_TRIG;      // . [LOC] Detecteur front montant TopPositionSensor
@@ -1044,100 +1665,144 @@ VAR
 
     // === ETATS &amp; DRAPEAUX INTERNES ===
     InitDone               : BOOL;        // . [LOC] Controle incoherence boot effectue
-    ArretConfirme          : BOOL;        // . [LOC] Condition d&#x27;arret moteur confirmee
     HomingModeOk           : BOOL;        // . [LOC] Mode de fonctionnement valide pour homing
     NominalHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing nominal
     UnitaryHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing unitaire
     DynamicHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing dynamique
     HomingTrigger          : BOOL;        // . [LOC] Synthese declenchement homing
+    PresetVerificationActive : BOOL;      // . [LOC] Verification preset en attente
+    PresetConfirmed        : BOOL;        // . [LOC] Resultat du mode de confirmation selectionne
+
+    // === DRAPEAUX DEFAUTS INTERNES ===
+    HomingModeError        : BOOL;        // . [LOC] Latch erreur mode
+    TargetOutOfRangeError  : BOOL;        // . [LOC] Latch cible hors limites
+    PresetFailError        : BOOL;        // . [LOC] Latch échec preset
+    BootIncoherentError    : BOOL;        // . [LOC] Latch incohérence boot
 
     // === VARIABLES DE CALCUL ===
     TargetPoints           : DINT;        // . [LOC] Ecart cible converti en points
     TargetPositionM        : REAL;        // . [LOC] Cible retenue en metres
     RawDiffRestart         : DINT;        // . [LOC] Ecart brut de position au redemarrage
+    PendingHomingRefRaw    : UDINT;       // . [LOC] Reference candidate, non publiee avant succes
+    CandidateRawDiff       : DINT;        // . [LOC] Ecart brut de la mesure candidate
+    CandidateCablePosM     : REAL;        // . [LOC] Position candidate calculee avant commit
+    ReadbackOk             : BOOL;        // . [LOC] Mesure candidate dans la tolerance
+    StatusBitOk            : BOOL;        // . [LOC] Etat du bit optionnel de confirmation
+    PresetVerifyTimer      : TON;         // . [LOC] Temporisation historique de verification 500ms
+
+    // === SOCLE DEFAUT (FB_FaultCore) ===
+    instFault              : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses             : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
+END_VAR
+
+VAR CONSTANT
+    // === TOLERANCE &amp; TEMPORISATION TRANSACTION ===
+    CST_HomingVerifyToleranceM : REAL := 0.010; // Tolerance mesure cible (m)
+    CST_PresetVerifyTime        : TIME := T#500MS; // Latence historique avant relecture
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
 
-{region &quot;§1 Gate neutralisation&quot;}
-// 🛑 1. GATE — neutralisation ; on continue toutefois d&#x27;exposer le dernier état RETAIN connu
-// (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-// PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
-IF NOT Enable THEN
-    PresetRequest := FALSE;
-    PresetValue := 0;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    InitDone := FALSE;   // Force un nouveau contrôle §3.7 à la prochaine activation
-    Homed := Calib.Homed;
-    HomingSuspect := Calib.HomingSuspect;
-    HomingRefRaw := Calib.HomingRefRaw;
-    RETURN;
-END_IF;
-
-Ready := TRUE;
-
-{endregion}
-
-{region &quot;§2 Fronts et coherence demarrage&quot;}
-// 🔑 2. FRONTS
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. FRONTS
 ResetEdge(CLK := Reset);
 HomeEdge(CLK := Home);
 ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
 
-// 🔍 3. COHÉRENCE AU REDÉMARRAGE (§3.7) — une fois par session Enable, dès que le codeur répond
+// Effacement des latches d&#x27;erreur sur Reset conscient
+IF ResetEdge.Q THEN
+    PresetConfirmationFailed := FALSE;
+    HomingModeError := FALSE;
+    TargetOutOfRangeError := FALSE;
+    PresetFailError := FALSE;
+END_IF;
+
+// Levée de doute incohérence boot (BtnConfirmCoherence)
+IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
+    Calib.HomingSuspect := FALSE;
+    BootIncoherentError := FALSE;
+END_IF;
+
+// Configuration des causes nommées
+instCauses[0].Active   := HomingModeError;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := &#x27;Homing non autorise dans ce mode&#x27;;
+
+instCauses[1].Active   := TargetOutOfRangeError;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := &#x27;Cible de homing hors plage&#x27;;
+
+instCauses[2].Active   := PresetFailError;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := &#x27;Echec confirmation transaction preset&#x27;;
+
+instCauses[3].Active   := BootIncoherentError;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := &#x27;Incoherence position codeur au demarrage&#x27;;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE — neutralisation ; on continue toutefois d&#x27;exposer le dernier état RETAIN connu
+// (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
+IF NOT Enable THEN
+    PresetRequest := FALSE;
+    PresetValue := 0;
+    Ready := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    InitDone := FALSE;   // Force un nouveau contrôle à la prochaine activation
+    PresetVerificationActive := FALSE;
+    PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
+    Homed := Calib.Homed;
+    HomingSuspect := Calib.HomingSuspect;
+    HomingRefRaw := Calib.HomingRefRaw;
+    // PresetConfirmationFailed est un diagnostic latch : il est gelé hors Enable
+    RETURN;
+END_IF;
+
+Ready := Enable AND NOT Fault.Latched;
+{endregion}
+
+{region &quot;§3 Cohérence au redémarrage&quot;}
+// 🔍 3. COHÉRENCE AU REDÉMARRAGE — une fois par session Enable, dès que le codeur répond
 IF NOT InitDone THEN
-    Status.State := E_State.INIT;
     IF EncoderAvailable THEN
         RawDiffRestart := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Calib.LastKnownRawPos);
         IF Calib.Homed AND (ABS(RawDiffRestart) &gt; UDINT_TO_DINT(Calib.RestartCoherenceTolerancePts)) THEN
             Calib.HomingSuspect := TRUE;
-            Status.ErrorId := Status.ErrorId OR 16#0200;   // bit9 : incohérence codeur au redémarrage
+            BootIncoherentError := TRUE;
         END_IF;
         InitDone := TRUE;
     END_IF;
-ELSE
-    IF Status.State = E_State.INIT THEN Status.State := E_State.READY; END_IF;
 END_IF;
-
 {endregion}
 
-{region &quot;§3 Confirmation coherence et demande homing&quot;}
-// ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
-IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
-    Calib.HomingSuspect := FALSE;
-    Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
-END_IF;
-
+{region &quot;§4 Demande et déclenchement homing&quot;}
+// ⚙️ 4. DEMANDE &amp; DÉCLENCHEMENT HOMING
 PresetRequest := FALSE;
+PresetValue := 0;
 TopSensorEdge(CLK := TopPositionSensor);
 DynamicTargetEdge(CLK := UseDynamicTarget);
-
-// Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
-// chaque scan, jamais latchées, aucun Reset requis pour les effacer.
-Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
 
 HomingModeOk := HomingPermit;
 
 IF HomeEdge.Q AND NOT HomingModeOk THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : homing non autorise
+    HomingModeError := TRUE;
 END_IF;
 
-// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
-// (FB_Safety_Winch) coupe déjà la montée indépendamment dès que TopPositionSensor est actif ;
-// attendre l&#x27;arrêt casserait la répétabilité recherchée à vitesse d&#x27;accostage constante.
-// Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
-// quand Home est pressé.
 NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget
                          AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
 
-// Unitaire : cible libre (CfgHomingTargetM), déclenchée par la demande (front).
 UnitaryHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND HomeEdge.Q;
 
-// Dynamique (benne) : HomingModeOk vérifié ici en défense.
 DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
-HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
+HomingTrigger := (NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger)
+                 AND NOT PresetVerificationActive;
 
 IF HomingTrigger THEN
     IF UseDynamicTarget THEN
@@ -1148,70 +1813,74 @@ IF HomingTrigger THEN
         TargetPositionM := CfgHomingTargetM;
     END_IF;
 
-    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
-    // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
-    // physique documentée [-99;+99] m avant d&#x27;être gravée dans la référence codeur.
+    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) [-99;+99] m
     IF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
-        Status.ErrorId := Status.ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
+        TargetOutOfRangeError := TRUE;
     ELSE
         TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-        Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
+        PendingHomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
+        PresetValue := RawPos;
+        PresetRequest := TRUE;
+        PresetVerificationActive := TRUE;
+        Lifecycle.Done := FALSE;
+    END_IF;
+END_IF;
+{endregion}
+
+{region &quot;§5 Suivi de transaction preset&quot;}
+// ⏳ 5. SUIVI DE LA TRANSACTION PRESET
+PresetVerifyTimer(IN := PresetVerificationActive, PT := CST_PresetVerifyTime);
+IF PresetVerificationActive AND PresetVerifyTimer.Q THEN
+    CandidateRawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PendingHomingRefRaw);
+    IF PointsPerRev &lt;&gt; 0 THEN
+        CandidateCablePosM := DINT_TO_REAL(CandidateRawDiff) * CableM_PerRev / UDINT_TO_REAL(PointsPerRev);
+    ELSE
+        CandidateCablePosM := 0.0;
+    END_IF;
+    ReadbackOk := ABS(CandidateCablePosM - TargetPositionM) &lt;= CST_HomingVerifyToleranceM;
+    StatusBitOk := PresetStatusBit;
+
+    CASE Cfg.PresetConfirmMode OF
+        E_PresetConfirmMode.READBACK_ONLY:
+            PresetConfirmed := ReadbackOk;
+        E_PresetConfirmMode.READBACK_AND_STATUSBIT:
+            PresetConfirmed := ReadbackOk AND StatusBitOk;
+        E_PresetConfirmMode.STATUSBIT_ONLY:
+            PresetConfirmed := StatusBitOk;
+        ELSE
+            PresetConfirmed := FALSE;
+    END_CASE;
+
+    IF PresetConfirmed THEN
+        Calib.HomingRefRaw := PendingHomingRefRaw;
         Calib.Homed := TRUE;
         Calib.HomingSuspect := FALSE;
         Calib.LastKnownRawPos := RawPos;
-        HomingRefRaw := Calib.HomingRefRaw;
-        Homed := TRUE;
-        HomingSuspect := FALSE;
-        Status.Done := TRUE;
-        Status.ErrorId := 16#0000;
-        Status.State := E_State.READY;
-
-        // Envoi de la demande de Preset SDO au matériel : la valeur brute injectee
-        // correspond a la cible (calcul inverse) pour que CablePosM = cible.
-        PresetValue := DINT_TO_UDINT(UDINT_TO_DINT(Calib.HomingRefRaw) + TargetPoints);
-        PresetRequest := TRUE;
+        PresetConfirmationFailed := FALSE;
+        PresetFailError := FALSE;
+        Lifecycle.Done := TRUE;
+    ELSE
+        Calib.HomingSuspect := TRUE;
+        PresetConfirmationFailed := TRUE;
+        PresetFailError := TRUE;
+        Lifecycle.Done := FALSE;
     END_IF;
-END_IF;
 
+    PresetVerificationActive := FALSE;
+    PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
+END_IF;
 {endregion}
 
-{region &quot;§4 Suivi SDO reset et sorties etat&quot;}
-// ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
-IF Status.State = E_State.BUSY THEN
-    IF PresetAck THEN
-        Status.Done := TRUE;
-        Status.State := E_State.READY;
-        // Un homing réussi efface l&#x27;intégralité de ErrorId
-        Status.ErrorId := 16#0000;
-    ELSIF PresetNak THEN
-        Status.ErrorId := Status.ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
-        Status.State := E_State.READY;
-    END_IF;
-END_IF;
-
-// 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
-// à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
-IF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
-END_IF;
-
-// 📤 8. SORTIES ÉTAT
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-// Mise à jour continue du point brut valide connu (hors séquence de homing elle-même)
-IF EncoderAvailable AND (Status.State &lt;&gt; E_State.BUSY) THEN
+{region &quot;§6 Sorties état &amp; calibration&quot;}
+// 📤 6. SORTIES ÉTAT &amp; CALIBRATION
+IF EncoderAvailable AND NOT PresetVerificationActive THEN
     Calib.LastKnownRawPos := RawPos;
 END_IF;
 
-Status.Busy := (Status.State = E_State.BUSY);
-Homed := Calib.Homed AND NOT Calib.HomingSuspect; // Perd l&#x27;état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
+Lifecycle.Busy := PresetVerificationActive;
+Homed := Calib.Homed AND NOT Calib.HomingSuspect;
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
-
 {endregion}
 </pre>
             </details>
@@ -1291,9 +1960,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; SYNOPTIQUE ===
     Ready                 : BOOL;        // &lt;-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: &quot;Bornes&quot;, bit1: &quot;Boot suspect&quot;.
-    Status                : ST_FbStatus;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                 : ST_Fault;
 
     // === MESURES SURE &amp; SECURITE ===
     CablePosMSafe         : REAL;        // &lt;-- [DIAG] Position cable instantanee transmise (m)
@@ -1302,71 +1970,48 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONT ===
     ResetEdge             : R_TRIG;      // . [LOC] Detecteur front montant Reset
-    ErrorEdge             : R_TRIG;      // . [LOC] Detecteur front montant Error
+
+    // === SOCLE DEFAUT (FB_FaultCore) ===
+    instFault             : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses            : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
-{region &quot;§1 Gate&quot;}
-// 🛑 1. GATE
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🔍 2. SURVEILLANCE BORNAGE &amp; INCOHÉRENCE BOOT
+instCauses[0].Active   := NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM));
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := &#x27;Depassement bornes physiques absolues cable&#x27;;
+
+instCauses[1].Active   := NOT BypassGlobal AND HomingSuspect;
+instCauses[1].Latching := FALSE;
+instCauses[1].Texte    := &#x27;Incoherence position au redemarrage&#x27;;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE
 IF NOT Enable THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     CablePosMSafe := CablePosM;
     EncoderIncoherent := FALSE;
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region &quot;§2 Reset front&quot;}
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-{endregion}
-
-{region &quot;§3 Bypass global&quot;}
-// 🌐 3. BYPASS GLOBAL
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-END_IF;
-{endregion}
-
-{region &quot;§4 Surveillance bornage&quot;}
-// 🔍 4. SURVEILLANCE BORNAGE PHYSIQUE ABSOLU (bit0)
-IF NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM)) THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
-END_IF;
-{endregion}
-
-{region &quot;§5 Relais incohérence redémarrage&quot;}
-// 🔍 5. RELAIS INCOHÉRENCE REDÉMARRAGE (bit1)
-IF NOT BypassGlobal THEN
-    IF HomingSuspect THEN
-        Status.ErrorId := Status.ErrorId OR 16#0002;
-    ELSE
-        Status.ErrorId := Status.ErrorId AND 16#FFFD;
-    END_IF;
-END_IF;
-{endregion}
-
-{region &quot;§6 Transmission mesure&quot;}
-// 📏 6. TRANSMISSION DE LA MESURE (Toujours réelle, non figée)
+{region &quot;§3 Transmission mesure et sécurité&quot;}
+// 📏 3. TRANSMISSION DE LA MESURE &amp; SÉCURITÉ
 CablePosMSafe := CablePosM;
-{endregion}
-
-{region &quot;§7 Sorties état et sécurité&quot;}
-// 📤 7. SORTIES ÉTAT &amp; SÉCURITÉ
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-EncoderIncoherent := Status.Error;
-Status.Busy := FALSE;
-Status.Done := FALSE;
+EncoderIncoherent := Fault.Error;
 {endregion}
 </pre>
             </details>
@@ -1555,17 +2200,107 @@ END_IF;
 </pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FaultCore.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d&#x27;une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l&#x27;apparition d&#x27;une
+          cause `Active AND Latching`, conservé jusqu&#x27;au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d&#x27;effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FaultCore
+VAR_INPUT
+    Enable  : BOOL;                          // --&gt; [CMD] Autorisation générale du FB porteur
+    Reset   : BOOL;                          // --&gt; [CMD] Front d&#x27;acquittement (jamais conditionné, §9)
+    Causes  : ARRAY[0..15] OF ST_FaultCause; // --&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)
+END_VAR
+VAR_OUTPUT
+    Ready   : BOOL;                          // &lt;-- [STAT] FB porteur autorisé (= Enable)
+    Fault   : ST_Fault;                      // &lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)
+END_VAR
+VAR
+    ResetEdge : R_TRIG;                      // . [LOC] Front montant Reset
+    Latch     : ARRAY[0..15] OF BOOL;        // . [LOC] Bit laté par cause, jusqu&#x27;au Reset
+    i         : INT;                         // . [LOC] Index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Reset (front, toujours effectif)&quot;}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§2 Vue LIVE — Error / ErrorId&quot;}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region &quot;§3 Armement des latches (causes à acquitter)&quot;}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu&#x27;au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§4 Vue LATCHÉE — Latched / LatchedId&quot;}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\FB_Encoder.st</code></summary>
                 <pre>(* =======================================================================
    🔌 FB_Encoder — Objet codeur complet (1 par treuil M1/M2)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regrouper toute la chaine codeur derriere une interface unique :
       Abs → Homing → Scale → Safety → Reliability → Speed.
-   🔌 Frontiere hardware exposee en IN/OUT via le bus ST_EncoderHw (testable).
+   🔌 Frontiere hardware separee HwIn/HwOut (testable).
    🔒 Homing : autorise par HomingPermit (calcule par le caller), declenche
       par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
       de vitesse au meme scan. HomedAndReliable = gate strict interlock M3.
+   🧩 Defaut : Fault:ST_Fault rempli par FB_FaultCore (instFault) depuis une liste
+      de causes en clair (instCauses) — pattern FB_Joystick. Ready = Enable ET pas de
+      defaut late. Interlocks machine sur les faits bruts, jamais sur Fault.Latched.
    📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ======================================================================= *)
 
@@ -1591,24 +2326,25 @@ VAR_INPUT
     TopPositionSensor     : BOOL;        // --&gt; [HW]  Capteur physique position haute unique
 
     // === BUS ETHERCAT &amp; CAPTEUR HW (frontiere testable) ===
-    Hw                    : ST_EncoderHw; // &lt;-&gt; [BUS] Entrees/sorties hardware codeur
+    HwIn                  : ST_fbEncoder_HwIn; // --&gt; [HW] Retours hardware codeur
 
     // === MECANIQUE (constantes) ===
     PointsPerRev          : UDINT := 8192; // --&gt; [CFG] Resolution codeur (pts/tour)
     CableM_PerRev         : REAL := 2.0;   // --&gt; [CFG] Developpement cable par tour (m/tour)
 
-    // === REGLAGES (modifiables) ===
+    // === REGLAGES &amp; CONFIGURATION ===
+    Cfg                   : ST_fbEncoder_Cfg; // --&gt; [CFG] Mode de confirmation preset
     PositionMinM          : REAL := -99.0; // --&gt; [CFG] Plafond bornage physique bas (m)
     PositionMaxM          : REAL := 99.0;  // --&gt; [CFG] Plafond bornage physique haut (m)
     BypassGlobal          : BOOL := FALSE; // --&gt; [TST] Neutralisation defauts pour mise en service
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; SYNOPTIQUE ===
-    Ready                 : BOOL;        // &lt;-- [STAT] FB pret a fonctionner
-    Status                : ST_FbStatus; // &lt;-- [STAT] Statut transverse facade (synthese)
+    Ready                 : BOOL;        // &lt;-- [STAT] FB pret a fonctionner (Enable ET pas de defaut late)
+    Fault                 : ST_Fault;    // &lt;-- [DIAG] Brique defaut socle (live + latchee), remplie par FB_FaultCore
 
     // === FRONTIERE HW SORTIE (testable) ===
-    HwOut                 : ST_EncoderHw; // &lt;-- [BUS] Sorties hardware codeur (preset...)
+    HwOut                 : ST_fbEncoder_HwOut; // &lt;-- [ACT] Ordres hardware codeur (preset)
 
     // === MESURES CONDITIONNEES (struct frontiere) ===
     Measurement           : ST_EncoderMeasurement; // &lt;-- [BUS] Mesures + statuts (interface)
@@ -1618,6 +2354,7 @@ VAR_OUTPUT
     HomingSuspect         : BOOL;        // &lt;-- [DIAG] Incoherence redemarrage a lever
     EncoderFault          : BOOL;        // &lt;-- [SAFE] Gate general fiabilite (sans Homed)
     HomedAndReliable      : BOOL;        // &lt;-- [STAT] Gate strict M3 : dispo ET ref ET pas incoherent
+    PresetConfirmationFailed : BOOL;     // &lt;-- [DIAG] Latch derniere verification preset echouee
 END_VAR
 VAR
     // === SOUS-INSTANCES FB (chaine codeur complete) ===
@@ -1627,6 +2364,8 @@ VAR
     instSafety     : FB_Encoder_Safety;       // * [INST] Bornage &amp; coherence mesure
     instRel        : FB_EncoderReliability;   // * [INST] Gates de fiabilite
     instSpeed      : FB_Encoder_SpeedMeasure; // * [INST] Calcul vitesse cable
+    instFault      : FB_FaultCore;            // * [INST] Socle de defaut (liste de causes -&gt; ST_Fault)
+    instCauses     : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Liste des causes pour le socle FB_FaultCore
 END_VAR
 VAR_IN_OUT
     // === CALIBRATION PERSISTANTE (externe RETAIN, jamais membre) ===
@@ -1635,27 +2374,43 @@ END_VAR
 
 {region &quot;§1 Gate neutralisation&quot;}
 IF NOT Enable THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
-    Measurement.CablePosM := 0.0; Measurement.EncoderIncoherent := FALSE;
+    Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
+    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 16#0000;
+    Measurement.HomingLifecycle.Busy := FALSE; Measurement.HomingLifecycle.Done := FALSE;
+    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 16#0000;
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
+    // Frontiere HW sortie : aucun ordre preset publie hors autorisation
+    // (sinon PRG_02_Acquisition relaie une valeur perimee au codeur absolu -&gt; preset parasite, reference corrompue)
+    HwOut.PresetTriggerCmd := 0; HwOut.CodeSeqTriggerCmd := 0; HwOut.PresetValueOut := 0;
+    // Reference connue MAINTENUE depuis Calib (RETAIN) meme FB desactive (AF09 §4) :
+    // un FB desactive ne doit pas faire perdre la reference aux consommateurs aval (PRG_04, FB_Encoder_Scale).
+    Homed := Calib.Homed;
+    HomingSuspect := Calib.HomingSuspect;
+    Measurement.HomingRefRaw := Calib.HomingRefRaw;
+    // PresetConfirmationFailed est un diagnostic latch : il reste gele hors Enable
+    // et ne doit pas etre efface par ce gate (AC3).
+    // Socle appele meme Enable=FALSE : maintient le latch non acquitte et traite le Reset
+    // hors autorisation (AC4). Les causes ne sont pas evaluees (Enable=FALSE -&gt; vue live a 0),
+    // les latches sont preserves.
+    instFault(Enable := FALSE, Reset := Reset, Causes := instCauses);
+    Fault := instFault.Fault;
     RETURN;
 END_IF;
 Ready := TRUE;
-Status.State := E_State.READY;
 {endregion}
 
 {region &quot;§2 Abs&quot;}
-instAbs(
+    instAbs(
     Enable              := Enable,
     Reset               := Reset,
-    RawPosIn            := Hw.RawPosIn,
-    AlarmsIn            := Hw.AlarmsIn,
-    WarningsIn          := Hw.WarningsIn,
-    SlaveOperational    := Hw.SlaveOperational,
+    RawPosIn            := HwIn.RawPosIn,
+    AlarmsIn            := HwIn.AlarmsIn,
+    WarningsIn          := HwIn.WarningsIn,
+    SlaveOperational    := HwIn.SlaveOperational,
     PresetRequest       := instHoming.PresetRequest,
     PresetValue         := instHoming.PresetValue,
     PointsPerRev        := PointsPerRev
@@ -1676,8 +2431,8 @@ instHoming(
     TopPositionSensor    := TopPositionSensor,
     RawPos               := instAbs.RawPos,
     EncoderAvailable     := instAbs.EncoderAvailable,
-    PresetAck            := instAbs.PresetAck,
-    PresetNak            := instAbs.PresetNak,
+    PresetStatusBit      := HwIn.PresetStatusBit,
+    Cfg                  := Cfg,
     PointsPerRev         := PointsPerRev,
     MultiTurnRevsMax     := 4096,
     CableM_PerRev        := CableM_PerRev,
@@ -1733,8 +2488,9 @@ Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
 Measurement.SpeedValid        := instSpeed.Valid;
-Measurement.HomingStatus      := instHoming.Status;
-Measurement.AbsStatus         := instAbs.Status;
+Measurement.HomingFault        := instHoming.Fault;
+Measurement.HomingLifecycle    := instHoming.Lifecycle;
+Measurement.AbsFault           := instAbs.Fault;
 Measurement.HomingRefRaw      := instHoming.HomingRefRaw;
 
 // Frontiere HW sortie (preset)
@@ -1747,12 +2503,26 @@ Homed            := instHoming.Homed;
 HomingSuspect    := instHoming.HomingSuspect;
 EncoderFault     := instRel.EncoderFault;
 HomedAndReliable := instRel.HomedAndReliable;
+PresetConfirmationFailed := instHoming.PresetConfirmationFailed;
 
-// Synthese statut facade
-Status.Busy := instAbs.Status.Busy;
-Status.Done := instSpeed.Valid AND instAbs.Ready;
-Status.Error := instAbs.Status.Error OR instSafety.Status.Error OR instHoming.Status.Error;
-Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHoming.Status.ErrorId;
+// Synthese statut facade : brique defaut socle (Fault:ST_Fault), pattern FB_Joystick.
+// Causes exprimees en CLAIR (ST_FaultCause), alimentees UNIQUEMENT depuis les sorties
+// publiques des sous-FB (encapsulation stricte, jamais de lecture VAR interne).
+//   - Cause 0/1 : LIVE (Latching=FALSE) -&gt; Fault.Error, retombe seule.
+//   - Cause 2   : LATCHED (Latching=TRUE) -&gt; arme Fault.Latched, acquittee au Reset front.
+// Interlock machine toujours sur les faits bruts (EncoderFault, HomedAndReliable,
+// EncoderIncoherent), jamais sur Fault.Latched (conservation).
+instCauses[0].Active := NOT instAbs.EncoderAvailable; instCauses[0].Latching := FALSE;
+instCauses[0].Texte := &#x27;Perte materiel / communication codeur EtherCAT&#x27;;
+instCauses[1].Active := instSafety.EncoderIncoherent; instCauses[1].Latching := FALSE;
+instCauses[1].Texte := &#x27;Incoherence mesure / saut de position codeur&#x27;;
+instCauses[2].Active := instHoming.PresetConfirmationFailed; instCauses[2].Latching := TRUE;
+instCauses[2].Texte := &#x27;Echec confirmation transaction preset codeur&#x27;;
+
+// Socle appele APRES le pipeline : causes du scan courant, aucun scan de retard (AC4).
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;     // source de verite = socle
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 </pre>
             </details>
@@ -1764,9 +2534,17 @@ Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHom
 test_fb_encoder.st
   [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
   [PASS] TC-P09-010 Acquisition codeur : mise en service nominale
+  [PASS] TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms
+  [PASS] TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider
+  [PASS] TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation
+  [PASS] TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction
+  [PASS] TC-P09-015 Reset conscient : acquitte le latch sans valider le preset
+  [PASS] TC-P09-016 Fault live : perte materiel codeur (Cause 0)
+  [PASS] TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2)
+  [PASS] TC-P09-018 Fault live : incoherence mesure (Cause 1)
 
 -----------------------------------------
-2 tests, 2 passed, 0 failed
+10 tests, 10 passed, 0 failed
 </pre>
     </details>
 </div>

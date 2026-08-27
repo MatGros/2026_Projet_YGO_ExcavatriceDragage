@@ -26,9 +26,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DERIVATION ===
     Ready                   : BOOL;               // <-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: "incoherence retour contacteur".
-    Status                  : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                   : ST_Fault;
 
     // === COMMANDES ET CONFIRMATIONS ===
     BrakeCmd                : BOOL;               // <-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)
@@ -38,37 +37,56 @@ END_VAR
 VAR
     // === TRIGGERS ET DETECTION FRONTS ===
     ResetEdge               : R_TRIG;             // . [LOC]  Detecteur front acquittement
-    ErrorEdge               : R_TRIG;             // . [LOC]  Detecteur front apparition defaut
     BypassEdge              : R_TRIG;             // . [LOC]  Detecteur front activation bypass
 
     // === TEMPORISATEURS INTERNES ===
     TonMagnetise            : TON;                // . [LOC]  Temporisation avant relachement frein
     TonDecel                : TON;                // . [LOC]  Temporisation avant collage frein
     TonFeedback             : TON;                // . [LOC]  Timeout de coherence commande/retour
+
+    // === GESTION DES DEFAUTS ===
+    ContactorIncoherentError: BOOL;               // . [LOC]  Défaut mémorisé incohérence contacteur
+    instFault               : FB_FaultCore;       // * [INST] Socle de défaut
+    instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 END_VAR
 
-{region "§1 Gate"}
-// 🛑 1. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
+// === IMPLEMENTATION ===
+
+{region "§1 Causes & Socle Défaut (évalué en continu)"}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+BypassEdge(CLK := BypassContactorCheck);
+
+// Surveillance et verrouillage incohérence contacteur (Cause 0)
+IF ResetEdge.Q OR BypassContactorCheck THEN
+    ContactorIncoherentError := FALSE;
+    ContactorCheck.StuckClosed := FALSE;
+    ContactorCheck.StuckOpen   := FALSE;
+END_IF;
+
+instCauses[0].Active   := ContactorIncoherentError;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Incoherence retour contacteur frein';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
 IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Ready := FALSE;
     ContactorCheck.Command := FALSE;          // 📊 Neutralisation : miroir de BrakeCmd := FALSE
     ContactorCheck.Feedback := ContactorFeedback; // 📊 Neutralisation : miroir entrée physique
-    // 🔒 ContactorCheck.StuckClosed / StuckOpen et Status.ErrorId conservés (latch défaut, acquittement requis)
     BrakeCommandOpenConfirmed := FALSE;       // 🛡️ Fail-Safe : frein commandé fermé hors Enable
     RETURN;
 END_IF;
 
-Ready := TRUE;
-{endregion}
-
-{region "§2 Reset et fronts"}
-// 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
-ResetEdge(CLK := Reset);
-BypassEdge(CLK := BypassContactorCheck);
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region "§3 Séquence temporisée"}
@@ -78,21 +96,15 @@ IF MovementRequested THEN
     TonMagnetise(IN := TRUE, PT := DelayMagnetise + DelayContactClose);
     IF TonMagnetise.Q THEN
         BrakeCmd := TRUE;              // ✅ Contacteur + magnétisation acquis → relâche
-        Status.State := E_State.DONE;
     ELSE
         BrakeCmd := FALSE;             // ⏳ Encore collé pendant la magnétisation
-        Status.State := E_State.BUSY;
     END_IF;
 ELSE
     // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
-    Status.State := E_State.READY;
 END_IF;
-
-Status.Busy := (Status.State = E_State.BUSY);
-Status.Done := (Status.State = E_State.DONE);
 {endregion}
 
 {region "§4 Double vérification contacteur"}
@@ -101,48 +113,25 @@ ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
 // ContactorFeedback est dans le MÊME sens que BrakeCmd (TRUE = relâché = frein ouvert).
-// En marche saine les deux sont ÉGAUX → c'est leur DIFFÉRENCE qui signale l'incohérence
-// (contacteur collé). Le test compare donc `<>`.
 TonFeedback(IN := (BrakeCmd <> ContactorFeedback), PT := FeedbackTimeout);
 IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
-        ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);            // relâche commandée (BrakeCmd=TRUE), frein reste serré (ContactorFeedback=FALSE)
-        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);             // serrage commandé (BrakeCmd=FALSE), frein reste ouvert (ContactorFeedback=TRUE)
-        Status.ErrorId := Status.ErrorId OR 16#0001;
-    ELSIF ResetEdge.Q THEN
-        ContactorCheck.StuckClosed := FALSE;
-        ContactorCheck.StuckOpen   := FALSE;
-        Status.ErrorId := Status.ErrorId AND 16#FFFE;
+        ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);
+        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);
+        ContactorIncoherentError   := TRUE;
     END_IF;
-ELSE
-    ContactorCheck.StuckClosed := FALSE;
-    ContactorCheck.StuckOpen   := FALSE;
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
-    IF BypassEdge.Q THEN
-        Status.StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
-    END_IF;
-END_IF;
-
-{endregion}
-
-{region "§5 Arbitrage error"}
-// 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
-Status.Error := (Status.ErrorId <> 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
 END_IF;
 {endregion}
 
-{region "§6 Sortie sûre"}
-// 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
-IF Status.Error THEN
+{region "§5 Sortie sûre"}
+// 🛡️ 5. SORTIE SÛRE SUR DÉFAUT
+IF Fault.Error THEN
     BrakeCmd := FALSE;
 END_IF;
 {endregion}
 
-{region "§7 Confirmation ouverture"}
-// 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback, ou image de BrakeCmd si BypassContactorCheck=TRUE)
+{region "§6 Confirmation ouverture"}
+// 📤 6. CONFIRMATION OUVERTURE FREIN
 IF BypassContactorCheck THEN
     BrakeCommandOpenConfirmed := BrakeCmd;
 ELSE

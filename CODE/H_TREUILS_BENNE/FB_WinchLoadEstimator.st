@@ -28,9 +28,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: "entrée/table invalide".
-    Status                          : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                           : ST_Fault;
 
     // === DIAGNOSTICS ET ESTIMATIONS ===
     SpeedBand                       : INT;                            // <-- [DIAG] Bande de vitesse courante (0..5)
@@ -41,23 +40,41 @@ END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===
     ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
-    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
 
     // === VARIABLES LOCALES CALCULÉES ===
     PreviousSpeedBand               : INT;                            // . [LOC] Memoire bande de vitesse cycle precedent
     HasPreviousBand                 : BOOL;                           // . [LOC] Indicateur premiere bande memorisee
     SelectedLoadPct                 : REAL;                           // . [LOC] Valeur de charge extraite de la table
+    ConfigOrSpeedFault              : BOOL;                           // . [LOC] Latch défaut configuration / vitesse
+
+    // === SOCLE DEFAUT ===
+    instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
-{region "§1 Gate"}
-// 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.
+// === IMPLEMENTATION ===
+
+{region "§1 Causes & Socle Défaut (évalué en continu)"}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+
+IF ResetEdge.Q AND (MeasuredSpeedMps >= 0.0) THEN
+    ConfigOrSpeedFault := FALSE;
+END_IF;
+
+instCauses[0].Active   := ConfigOrSpeedFault;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Parametrage ou vitesse estimation charge invalide';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
-    Status.Busy := FALSE;
-    Status.Done := FALSE;
-    Status.Error := FALSE;
-    Status.ErrorId := 16#0000;
-    Status.State := E_State.DISABLED;
     SpeedBand := 0;
     EstimatedLoadPct := 0.0;
     Configured := FALSE;
@@ -66,22 +83,15 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.Busy := FALSE;
-Status.Done := FALSE;
-Status.State := E_State.READY;
-ResetEdge(CLK := Reset);
+Ready := Enable AND NOT Fault.Latched;
 Configured := LoadTable.IsConfigured;
-// 📈 L'estimation de charge n'a de sens qu'en montée.
-// La bande de vitesse reste calculée pour le diagnostic et le garde-fou de palier,
-// mais EstimatedLoadPct est forcée à zéro à l'arrêt et en descente.
 Ascending := (MeasuredSpeedSignedMps > 0.0);
 {endregion}
 
-{region "§2 Classement vitesse"}
-// 📏 2. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
+{region "§3 Classement vitesse"}
+// 📏 3. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
 IF (MeasuredSpeedMps < 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps <= 0.0) THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
+    ConfigOrSpeedFault := TRUE;
     SpeedBand := 0;
 ELSIF NOT HasPreviousBand THEN
     IF MeasuredSpeedMps <= SpeedConfig.SpeedBandMaxMps[1] THEN
@@ -98,14 +108,11 @@ ELSIF NOT HasPreviousBand THEN
     HasPreviousBand := TRUE;
     SpeedBand := PreviousSpeedBand;
 ELSE
-    // 🔒 Valider l'état mémorisé avant toute indexation dynamique.
     IF PreviousSpeedBand < 1 OR PreviousSpeedBand > 5 THEN
         PreviousSpeedBand := 1;
-        Status.ErrorId := Status.ErrorId OR 16#0001;
+        ConfigOrSpeedFault := TRUE;
     END_IF;
 
-    // CODESYS ne garantit pas le court-circuit des expressions AND :
-    // chaque borne est donc testée dans une branche séparée avant accès.
     IF PreviousSpeedBand < 5 THEN
         IF MeasuredSpeedMps > (SpeedConfig.SpeedBandMaxMps[PreviousSpeedBand]
                                + SpeedConfig.SpeedBandHysteresisMps) THEN
@@ -122,8 +129,8 @@ ELSE
 END_IF;
 {endregion}
 
-{region "§3 Lecture table"}
-// 📊 3. LECTURE TABLE — bornes séparées avant l'accès au tableau 5x5.
+{region "§4 Lecture table"}
+// 📊 4. LECTURE TABLE
 EstimatedLoadPct := 0.0;
 IF Configured THEN
     IF Ascending THEN
@@ -133,7 +140,7 @@ IF Configured THEN
                     IF SpeedBand <= 5 THEN
                         SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep][SpeedBand];
                         IF (SelectedLoadPct < 0.0) OR (SelectedLoadPct > 100.0) THEN
-                            Status.ErrorId := Status.ErrorId OR 16#0001;
+                            ConfigOrSpeedFault := TRUE;
                         ELSE
                             EstimatedLoadPct := SelectedLoadPct;
                         END_IF;
@@ -145,14 +152,4 @@ IF Configured THEN
 END_IF;
 {endregion}
 
-{region "§4 Sorties et acquittement"}
-// 📤 4. SORTIES D'ÉTAT ET ACQUITTEMENT.
-IF ResetEdge.Q AND (Status.ErrorId <> 16#0000) AND (MeasuredSpeedMps >= 0.0) THEN
-    Status.ErrorId := 16#0000;
-END_IF;
-Status.Error := (Status.ErrorId <> 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-{endregion}
+END_FUNCTION_BLOCK

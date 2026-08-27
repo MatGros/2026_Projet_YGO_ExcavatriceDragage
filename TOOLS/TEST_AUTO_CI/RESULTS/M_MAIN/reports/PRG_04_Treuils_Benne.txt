@@ -1,6 +1,18 @@
 Error compiling source files:
 
-ST_AcquisitionInterPrg.st:15:31: error: Undefined type 'ST_ENCODERMEASUREMENTS' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  15 |     Encoders                : ST_EncoderMeasurements; // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
-     |                               ^
+FB_Safety_Winch.st:343:18: error: Expected `Assign`, found `.`.
+ 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
+     |                  ^
+
+FB_Safety_Winch.st:343:30: error: Expected `Semicolon`, found `TO`.
+ 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
+     |                              ^
+
+FB_Safety_Winch.st:343:44: error: Expected `END_IF`, found `END_FOR`.
+ 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
+     |                                            ^
+
+FB_Safety_Winch.st:344:1: error: Expected `END_FUNCTION_BLOCK`, found `END_IF`.
+ 344 | END_IF;
+     | ^
 

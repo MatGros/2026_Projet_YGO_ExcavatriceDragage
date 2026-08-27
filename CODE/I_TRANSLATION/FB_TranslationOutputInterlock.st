@@ -13,7 +13,7 @@ VAR_INPUT
     Enable                       : BOOL;   // --> [CMD] Autorisation generale FB (TRUE=Autorise)
     Reset                        : BOOL;   // --> [CMD] Acquittement defaut sur front
     SafeStop                     : BOOL;   // --> [SAFE] Entree securite pour interface standard
-    PowerContactorEngaged              : BOOL;   // --> [SAFE] Chaine AU rearmee et puissance OK
+    PowerContactorEngaged        : BOOL;   // --> [SAFE] Chaine AU rearmee et puissance OK
 
     // === DEMANDES DE COMMANDE AMONT ===
     BrakeReleaseRequest          : BOOL;   // --> [CMD] Demande de desserrage frein
@@ -24,9 +24,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
     Ready                        : BOOL;   // <-- [STAT] FB pret a fonctionner (sortie libre, hors ST_Status)
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: "timeout desserrage frein".
-    Status                       : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                        : ST_Fault;
     Reason                       : E_TranslationFinalInterlockReason;   // <-- [DIAG] Cause de blocage
 
     // === ORDRES ACTIONNEURS VALIDES ===
@@ -42,7 +41,6 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONTS ===
     ResetEdge                    : R_TRIG;   // . [LOC] Detecteur front montant Reset
-    ErrorEdge                    : R_TRIG;   // . [LOC] Detecteur front montant Erreur
     BrakeTimeoutCauseEdge        : R_TRIG;   // . [LOC] Detecteur nouvelle occurrence cause timeout
 
     // === TEMPORISATEURS INTERNES ===
@@ -54,6 +52,10 @@ VAR
     ResetRequired                : BOOL;   // . [LOC] Front Reset obligatoire avant nouvelle marche
     BrakeTimeoutCause            : BOOL;   // . [LOC] Cause brute timeout desserrage frein
     BrakeTimeoutAck              : BOOL := TRUE;   // . [LOC] Accuse operateur (TRUE = pas d'alarme)
+
+    // === SOCLE DEFAUT ===
+    instFault                    : FB_FaultCore;                  // * [INST] Socle défaut transverse
+    instCauses                   : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 END_VAR
 VAR CONSTANT
     // === ECHELLE & BORNES REGISTRE PDO ===
@@ -62,12 +64,8 @@ VAR CONSTANT
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
-// Le front est échantillonné même pendant Enable/AU faux. Un Reset maintenu
-// durant une gate ne peut donc jamais devenir un faux acquittement au retour.
 ResetEdge(CLK := Reset);
 
-// RestartInhibit et ResetRequired sont volontairement conservés : un changement
-// Enable/AU ne doit jamais réautoriser automatiquement le mouvement après timeout.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     DriveControlWord := 0;
@@ -75,64 +73,49 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DriveFreqCmdWord := 0;
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    // ErrorId reste publiquement visible même hors Enable/AU : une retombée de gate
-    // ne doit jamais masquer un timeout mémorisé ni remplacer l'acquittement conscient.
-    Status.Error := (Status.ErrorId <> 16#0000);
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     Reason := E_TranslationFinalInterlockReason.NONE;
-    // 🔒 Latch de sûreté VOLONTAIREMENT conservé hors Enable (AC3 / §9) :
-    // RestartInhibit : latch anti-redémarrage auto après timeout frein préservé (doit survivre à la perte d'Enable)
     RETURN;
 END_IF;
 
 MovementRequested := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2);
 
 // ── 2. Watchdog : exclusivement après ordre effectif de desserrage ──────
-// Pendant RestartInhibit, BrakeCmd reste coupé : l'ordre amont n'est donc plus
-// effectif et le watchdog ne doit pas créer une nouvelle faute en boucle.
-// Pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) : le Reset est TOUJOURS effectif sur
-// l'acquittement (BrakeTimeoutAck), sans condition externe — un front Reset ne peut
-// jamais être perdu si la confirmation rebondit au même scan. L'interlock de sécurité
-// (RestartInhibit, §3) reste basé sur la cause brute (BrakeTimeoutCause / Error), jamais
-// sur l'acquittement seul — l'acquittement n'ouvre jamais l'interlock.
-BrakeTimeout(IN := BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed
-                   AND NOT RestartInhibit, PT := T#500ms);
+BrakeTimeout(
+    IN := BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed AND NOT RestartInhibit,
+    PT := T#500ms
+);
 BrakeTimeoutElapsed := BrakeTimeout.ET;
+
 IF BrakeTimeout.Q THEN
     BrakeTimeoutCause := TRUE;
 ELSIF BrakeCommandOpenConfirmed THEN
-    BrakeTimeoutCause := FALSE;   // cause réellement disparue (retour desserrage confirmé)
+    BrakeTimeoutCause := FALSE;
 END_IF;
+
 BrakeTimeoutCauseEdge(CLK := BrakeTimeoutCause);
 IF BrakeTimeoutCauseEdge.Q THEN
-    BrakeTimeoutAck := FALSE;    // nouvelle occurrence -> ré-alarme, ack remis à zéro
+    BrakeTimeoutAck := FALSE;
     RestartInhibit := TRUE;
     ResetRequired := TRUE;
     NeutralRequestSeen := FALSE;
     Reason := E_TranslationFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED;
 END_IF;
+
 IF ResetEdge.Q THEN
-    BrakeTimeoutAck := TRUE;     // toujours effectif, sans condition externe
+    BrakeTimeoutAck := TRUE;
     ResetRequired := FALSE;
 END_IF;
-IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;
-END_IF;
 
-Status.Error := (Status.ErrorId <> 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
+instCauses[0].Active   := BrakeTimeoutCause OR NOT BrakeTimeoutAck;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Timeout confirmation ouverture frein translation';
+
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
 
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
-// Le mot 7 est un reset AC600, pas un neutre opérateur : il reste autorisé avec
-// fréquence nulle mais ne solde pas RestartInhibit. Seul le mot 0, vu APRÈS
-// disparition de la cause et front Reset, autorise ensuite une nouvelle demande.
-IF RestartInhibit AND NOT Status.Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
+IF RestartInhibit AND NOT Fault.Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
     IF RequestedDriveControlWord = 0 THEN
         NeutralRequestSeen := TRUE;
     ELSIF NeutralRequestSeen AND MovementRequested THEN
@@ -145,40 +128,24 @@ END_IF;
 DriveControlWord := 0;
 DriveFreqCmd_Hz := 0.0;
 DriveFreqCmdWord := 0;
-// SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
-// maintenu. La commande/frein suivent cette rampe jusqu'à demande nulle ; seul
-// un gate dur, timeout ou défaut final impose ici la coupure immédiate.
-BrakeCmd := BrakeReleaseRequest AND NOT Status.Error AND NOT RestartInhibit;
-Ready := NOT Status.Error AND NOT RestartInhibit;
-Status.Busy := FALSE;
-Status.Done := FALSE;
-Status.State := E_State.READY;
 
-IF Status.Error THEN
+BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
+Ready := NOT Fault.Error AND NOT RestartInhibit;
+
+IF Fault.Error THEN
     BrakeCmd := FALSE;
-    Status.State := E_State.DISABLED;
 ELSIF RequestedDriveControlWord = 7 THEN
-    // Reset AC600 préservé, toujours sans consigne fréquence ni couple utile.
     DriveControlWord := 7;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
-    Status.State := E_State.INIT;
 ELSIF MovementRequested THEN
-    // Double condition obligatoire : ordre effectif de desserrage ET confirmation
-    // contacteur/bobine. Une confirmation résiduelle seule ne peut jamais autoriser
-    // couple ou fréquence AC600.
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
         DriveFreqCmd_Hz := MAX(0.0, RequestedDriveFreqHz);
-        Status.Busy := TRUE;
-        Status.State := E_State.BUSY;
-    ELSE
-        Status.Busy := TRUE;
-        Status.State := E_State.INIT;
     END_IF;
 END_IF;
 
 // ── 5. Mise à l'échelle finale REAL Hz -> WORD registre PDO 0x3100 ──────
-// Conversion unique en sortie de chaîne, quelle que soit la branche qui a fixé
-// DriveFreqCmd_Hz ci-dessus — jamais recalculée ailleurs (producteur unique).
 DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz) * DriveFreqWordScale);
+
+END_FUNCTION_BLOCK

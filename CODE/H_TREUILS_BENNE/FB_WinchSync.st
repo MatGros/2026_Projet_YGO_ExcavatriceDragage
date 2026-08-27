@@ -6,11 +6,7 @@
       - FB_SyncContactor  (coherence commandes/contacteurs)
       et produire SyncActive (autorisation de couplage) + le statut
       transverse d'ensemble pour les consommateurs (PRG_04/PRG_07/IHM).
-   🧬 Responsabilite : coordination + autorisation de couplage. L'ecart
-      codeur vit dans FB_SyncDeviation, la coherence contacteurs dans
-      FB_SyncContactor. Ce bloc NE calcule PAS l'ecart lui-meme.
-   🔒 SyncActive : autorisation de couplage (anti-telescopage), independante
-      de l'erreur — le probleme est porte par SyncDeviationWarn/Fault.
+   🧬 Responsabilite : coordination + autorisation de couplage.
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 
@@ -53,8 +49,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
-    // ErrorId : <-- [DIAG] bitmask (bit0: ecart Warn, bit1: discordance contacteurs, bit2: ecart Fault)
-    Status                          : ST_Status;                    // <-- [STAT] Statut FB groupe (Busy/Done/Error/State/StateAtError)
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                           : ST_Fault;
 
     // === MESURES ET DIAGNOSTICS DE SYNCHRO ===
     DeltaPosM                       : REAL;                           // <-- [DIAG] Ecart absolu position |M1 - M2| (m)
@@ -67,38 +63,36 @@ END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===
     ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
-    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
 
     // === SOUS-INSTANCES FB ===
     instDeviation                   : FB_SyncDeviation;               // * [INST] Comparateur ecart codeurs (pur)
     instContactor                   : FB_SyncContactor;               // * [INST] Coherence commandes/contacteurs
+
+    // === SOCLE DEFAUT ===
+    instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
+
+// === IMPLEMENTATION ===
 
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     DeltaPosM := 0.0; SignedDeltaPosM := 0.0;
     SyncActive := FALSE;
     SyncWarn := FALSE; SyncDeviationWarn := FALSE; SyncDeviationFault := FALSE;
-    Status.Error := FALSE; Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
+
 Ready := TRUE;
-Status.State := E_State.READY;
 {endregion}
 
 {region "§2 Activation synchro"}
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
-// 🌐 BYPASS GLOBAL : force ErrorId = 0 et ignore toute la surveillance synchro
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-END_IF;
-
-// 🎚️ 3. SyncActive SELON MODE (Partie9 §9) — autorisation de couplage, independante de l'erreur
+// 🎚️ 3. SyncActive SELON MODE (Partie9 §9)
 CASE Mode OF
     E_Mode.MAINT_N1:
         SyncActive := TRUE;                  // Imposée, non désactivable (sécurité maintenue N1)
@@ -149,38 +143,31 @@ instContactor(
 );
 {endregion}
 
-{region "§4 Synthese statut"}
-// 📤 5. SYNTHESE STATUT — consommateurs (PRG_04/PRG_07/IHM) lisent ce Status
+{region "§4 Causes & Socle Défaut"}
 IF NOT BypassGlobal THEN
-    // bit0 : ecart seuil 1 (Warn) — force palier 1
-    IF instDeviation.SyncDeviationWarn THEN
-        Status.ErrorId := Status.ErrorId OR 16#0001;
-    ELSIF ResetEdge.Q AND NOT instDeviation.SyncDeviationWarn THEN
-        Status.ErrorId := Status.ErrorId AND 16#FFFE;
-    END_IF;
-    // bit1 : discordance contacteurs
-    IF instContactor.ContactorMismatch THEN
-        Status.ErrorId := Status.ErrorId OR 16#0002;
-    ELSIF ResetEdge.Q THEN
-        Status.ErrorId := Status.ErrorId AND 16#FFFD;
-    END_IF;
-    // bit2 : ecart seuil 2 (Fault) — critique
-    IF instDeviation.SyncDeviationFault THEN
-        Status.ErrorId := Status.ErrorId OR 16#0004;
-    ELSIF ResetEdge.Q AND NOT instDeviation.SyncDeviationFault THEN
-        Status.ErrorId := Status.ErrorId AND 16#FFFB;
-    END_IF;
+    instCauses[0].Active   := instDeviation.SyncDeviationWarn;
+    instCauses[0].Latching := FALSE;
+    instCauses[0].Texte    := 'Alerte ecart synchronisation M1/M2';
+
+    instCauses[1].Active   := instContactor.ContactorMismatch;
+    instCauses[1].Latching := TRUE;
+    instCauses[1].Texte    := 'Discordance contacteurs treuils M1/M2';
+
+    instCauses[2].Active   := instDeviation.SyncDeviationFault;
+    instCauses[2].Latching := TRUE;
+    instCauses[2].Texte    := 'Ecart critique synchronisation treuils M1/M2';
 ELSE
-    Status.ErrorId := 16#0000;
+    instCauses[0].Active := FALSE;
+    instCauses[1].Active := FALSE;
+    instCauses[2].Active := FALSE;
 END_IF;
 
-Status.Error := (Status.ErrorId <> 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
 
-SyncWarn := Status.Error;   // ⚠️ IHM uniquement — pas de SafeStop
-Status.Busy := FALSE;
-Status.Done := FALSE;
+SyncWarn := Fault.Error;
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
+
+END_FUNCTION_BLOCK

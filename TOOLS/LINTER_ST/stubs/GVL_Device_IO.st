@@ -61,6 +61,8 @@ VAR_GLOBAL
     Local_Digital_IO             : FB_DeviceStub;
     VH_0800END                   : FB_DeviceStub;
     VH_0808ETP                   : FB_DeviceStub;
+    VH_0008ER                    : FB_DeviceStub;
+    VH_0008ER_1                  : FB_DeviceStub;
 
     // === 📤 SORTIES MATÉRIELLES (PRG_06_Outputs) ===
 

@@ -1206,11 +1206,11 @@ tasks:
   bloque_par: []
 - id: T146
   parent_id: ''
-  statut: 🔒
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
-  agent: DSH-02
-  date: '2026-08-22T12:00:00'
+  agent: AGY-01
+  date: '2026-08-27T21:25:00'
   titre: 'Référencement / homing des codeurs : état incohérent & suspect'
   contexte: 'Intitulé complet : Référencement / homing des codeurs : état incohérent & suspect — mise à plat, challenge &
     simplification'
@@ -1846,10 +1846,10 @@ tasks:
   bloque_par: []
 - id: T160
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: GÉNÉRAL
-  agent: DSH-02
+  agent: AGY-01
   date: '2026-08-26T22:02:00'
   titre: Refactor ST_EncoderMeasurements dans PRG_02_Acquisition (conformité AF-06 v2.4 §3ter)
   contexte: 'Intitulé complet : Mettre PRG_02_Acquisition en conformité avec AF_Partie-06 v2.4 §3ter : publier les mesures
@@ -1872,10 +1872,10 @@ tasks:
   bloque_par: []
 - id: T161
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: TRANSLATION
-  agent: DSH-02
+  agent: AGY-01
   date: '2026-08-26T22:10:00'
   titre: 'Migration décodeur M3 de PRG_02 vers PRG_05 (conformité AF-02 TBD §8 #5)'
   contexte: 'Intitulé complet : Déplacer le décodage de position M3 (FB_Translation_PositionDecoder) de PRG_02_Acquisition
@@ -1899,10 +1899,10 @@ tasks:
   bloque_par: []
 - id: T162
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: GÉNÉRAL
-  agent: DSH-02
+  agent: AGY-01
   date: '2026-08-26T22:05:00'
   titre: Renommage signal TremieFull_OR_GateRaised_DI (ex HopperFull_OR_GateRaised_DI)
   contexte: 'Intitulé complet : Renommer le point d''entrée physique HopperFull_OR_GateRaised_DI en TremieFull_OR_GateRaised_DI
@@ -1978,11 +1978,11 @@ tasks:
   bloque_par: []
 - id: T164-1b
   parent_id: T164
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: SÉCURITÉ
-  agent: ''
-  date: '2026-08-27T15:05:00'
+  agent: AGY-01
+  date: '2026-08-27T21:30:00'
   titre: Application des 21 correctifs G127 (issus de l'audit T164-1)
   contexte: 'Intitulé complet : Appliquer, par lots isolés type E0, les correctifs de neutralisation
     proposés dans DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md pour les 11 FB encore
@@ -2004,11 +2004,11 @@ tasks:
   - T164-1
 - id: T164-1c
   parent_id: T164
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: SÉCURITÉ
-  agent: ''
-  date: '2026-08-27T15:20:00'
+  agent: AGY-01
+  date: '2026-08-27T21:30:00'
   titre: FB_Bucket — gate complet + sortie ActiveOffsetValid (audit T164-1 §2)
   contexte: 'Intitulé complet : FB_Bucket désactivé (InhibitM2) laisse fuiter un ActiveOffsetM périmé
     (offset benne fantôme → PRG_04:701/757 → FB_Safety_Winch Méca E → SafeStop/PowerCutOff, masquage

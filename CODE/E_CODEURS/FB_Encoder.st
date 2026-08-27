@@ -88,8 +88,9 @@ IF NOT Enable THEN
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
-    Measurement.HomingStatus.State := E_State.DISABLED; Measurement.HomingStatus.Error := FALSE; Measurement.HomingStatus.ErrorId := 16#0000;
-    Measurement.AbsStatus.State := E_State.DISABLED;    Measurement.AbsStatus.Error := FALSE;    Measurement.AbsStatus.ErrorId := 16#0000;
+    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 16#0000;
+    Measurement.HomingLifecycle.Busy := FALSE; Measurement.HomingLifecycle.Done := FALSE;
+    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 16#0000;
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
     // Frontiere HW sortie : aucun ordre preset publie hors autorisation
@@ -197,8 +198,9 @@ Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
 Measurement.SpeedValid        := instSpeed.Valid;
-Measurement.HomingStatus      := instHoming.Status;
-Measurement.AbsStatus         := instAbs.Status;
+Measurement.HomingFault        := instHoming.Fault;
+Measurement.HomingLifecycle    := instHoming.Lifecycle;
+Measurement.AbsFault           := instAbs.Fault;
 Measurement.HomingRefRaw      := instHoming.HomingRefRaw;
 
 // Frontiere HW sortie (preset)

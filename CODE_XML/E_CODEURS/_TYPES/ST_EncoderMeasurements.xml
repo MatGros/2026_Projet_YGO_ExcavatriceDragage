@@ -130,21 +130,29 @@ Vitesse absolue sur fenetre glissante (m/s)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingStatus">
+            <variable name="HomingFault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUTS DES SOUS-FB &amp; REFERENCE ===
-Statut FB_Encoder_Homing (etat du referencement)</xhtml>
+Défaut FB_Encoder_Homing (état du référencement)</xhtml>
               </documentation>
             </variable>
-            <variable name="AbsStatus">
+            <variable name="HomingLifecycle">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Lifecycle" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut FB_Encoder_Abs (etat acquisition bus)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle FB_Encoder_Homing (Busy/Done)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbsFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut FB_Encoder_Abs (état acquisition bus)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRefRaw">
@@ -172,32 +180,15 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_Status">
+      <dataType name="ST_Fault">
         <baseType>
           <struct>
-            <variable name="Busy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres historiques (conservés) ----
-1 = Bloc en cours d'exécution</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
-              </documentation>
-            </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut à acquitter (laté jusqu'au Reset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -205,154 +196,87 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune)</xhtml>
               </documentation>
             </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Warning">
+            <variable name="Latched">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres ajoutés (forme cible enrichie) ----
-1 = warning actif (auto-effacé, aucun acquittement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="WarningId">
+            <variable name="LatchedId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code warning courant (bitfield)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis WarningId (prêt IHM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis ErrorId</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetRequested">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = un Reset est nécessaire / en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ErrorId figé à l'apparition du défaut, effacé au Reset</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>537f3533-9d7c-5703-b6a3-978725c61956</ObjectId>
+            <ObjectId>ffe904a3-501c-5aac-bc38-202f178a61f2</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_Status — Socle transverse de statut d'un FB métier
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
-      avec les textes prêts pour l'IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_Status (exception documentée).
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   🎯 Rôle : porter l'état défaut d'un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu'au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l'acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="E_State">
+      <dataType name="ST_Lifecycle">
         <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="INIT" value="1" />
-              <value name="READY" value="2" />
-              <value name="BUSY" value="3" />
-              <value name="DONE" value="4" />
-              <value name="STOPPING" value="5" />
-            </values>
-          </enum>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+          </struct>
         </baseType>
         <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BUSY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>DONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STOPPING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
+            <ObjectId>b6983c9c-4d76-5d4e-899b-e996cbf34849</ObjectId>
           </data>
         </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d'exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'avancement d'une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
     </dataTypes>
     <pous />
@@ -371,8 +295,8 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
         </Folder>
         <Folder Name="A_COMMUN">
           <Folder Name="_TYPES">
-            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
-            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
           </Folder>
         </Folder>
       </ProjectStructure>
