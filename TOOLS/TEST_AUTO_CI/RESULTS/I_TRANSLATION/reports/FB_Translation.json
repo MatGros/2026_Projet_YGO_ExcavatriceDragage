@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "file": "test_prg_06_outputs.st",
+  "file": "test_fb_translation.st",
   "results": [
     {
-      "name": "PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "PRG_06_Outputs : Transmission Ordre M2 en Marche Normale",
+      "name": "TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations",
       "passed": true
     },
     {
-      "name": "PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1",
+      "name": "TC-P11-010 Translation : commande variateur nominale",
       "passed": true
     }
   ],

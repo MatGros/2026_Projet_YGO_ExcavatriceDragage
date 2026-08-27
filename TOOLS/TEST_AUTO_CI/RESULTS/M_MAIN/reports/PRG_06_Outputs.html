@@ -193,7 +193,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 21:30:05</div>
+    <div class="exec-time">2026-08-27 23:12:26</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (3 tests)</summary>
@@ -211,7 +211,7 @@
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 24 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 26 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -232,7 +232,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_Status.st</code></td>
+                <td><code>ST_Fault.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -248,8 +248,24 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
+                <td><code>ST_Lifecycle.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
                 <td><code>ST_ContactorCheck.st</code></td>
                 <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_FaultCore.st</code></td>
+                <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1001,7 +1017,7 @@
     
     
     <details class="encaps-details" >
-        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 3 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 4 FB de la chaine, encapsulation propre (0 violation)</summary>
         
         <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
             <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
@@ -1067,6 +1083,13 @@
             <tbody>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FaultCore</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_WinchOutputInterlock</code></td>
                 <td>13</td><td>20</td>
                 <td>0</td><td>14</td>
@@ -1076,8 +1099,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_TranslationOutputInterlock</code></td>
                 <td>8</td><td>9</td>
-                <td>0</td><td>11</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (11 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>12</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (12 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1157,11 +1180,11 @@
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (24)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Status.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_06.st</code></li></ul>
+        <summary>Fichiers source compilés (26)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_06.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (24)</summary>
+        <summary>Code source ST original (26)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -1208,37 +1231,29 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Status.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Fault.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_Status — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
-      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_Status (exception documentée).
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   🎯 Rôle : porter l&#x27;état défaut d&#x27;un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu&#x27;au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l&#x27;acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    ======================================================================= *)
 
-TYPE ST_Status :
+TYPE ST_Fault :
 STRUCT
-    (* ---- membres historiques (conservés) ---- *)
-    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
-    Done         : BOOL;    (* 1 = Action terminée avec succès *)
-    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
-    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
-    State        : E_State; (* État courant de la machine d&#x27;état *)
-    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
-    (* ---- membres ajoutés (forme cible enrichie) ---- *)
-    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
-    WarningId      : WORD;  (* Code warning courant (bitfield) *)
-    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
-    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
-    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
+    Error     : BOOL;   (* &lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant *)
+    ErrorId   : WORD;    (* &lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune) *)
+    Latched   : BOOL;    (* &lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu&#x27;au front Reset *)
+    LatchedId : WORD;    (* &lt;-- [DIAG] ErrorId figé à l&#x27;apparition du défaut, effacé au Reset *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -1269,6 +1284,26 @@ END_TYPE
 </pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Lifecycle.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d&#x27;exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l&#x27;avancement d&#x27;une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   ======================================================================= *)
+
+TYPE ST_Lifecycle :
+STRUCT
+    Busy : BOOL;   (* &lt;-- [STAT] 1 = action en cours *)
+    Done : BOOL;   (* &lt;-- [STAT] 1 = action terminée avec succès *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_ContactorCheck.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
@@ -1286,6 +1321,93 @@ STRUCT
     StuckOpen   : BOOL;   // Diag : commande ON mais retour OFF depuis trop longtemps
 END_STRUCT
 END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FaultCore.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d&#x27;une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l&#x27;apparition d&#x27;une
+          cause `Active AND Latching`, conservé jusqu&#x27;au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d&#x27;effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FaultCore
+VAR_INPUT
+    Enable  : BOOL;                          // --&gt; [CMD] Autorisation générale du FB porteur
+    Reset   : BOOL;                          // --&gt; [CMD] Front d&#x27;acquittement (jamais conditionné, §9)
+    Causes  : ARRAY[0..15] OF ST_FaultCause; // --&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)
+END_VAR
+VAR_OUTPUT
+    Ready   : BOOL;                          // &lt;-- [STAT] FB porteur autorisé (= Enable)
+    Fault   : ST_Fault;                      // &lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)
+END_VAR
+VAR
+    ResetEdge : R_TRIG;                      // . [LOC] Front montant Reset
+    Latch     : ARRAY[0..15] OF BOOL;        // . [LOC] Bit laté par cause, jusqu&#x27;au Reset
+    i         : INT;                         // . [LOC] Index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Reset (front, toujours effectif)&quot;}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§2 Vue LIVE — Error / ErrorId&quot;}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region &quot;§3 Armement des latches (causes à acquitter)&quot;}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu&#x27;au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§4 Vue LATCHÉE — Latched / LatchedId&quot;}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+
+END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
@@ -1617,7 +1739,7 @@ VAR_INPUT
     Enable                       : BOOL;   // --&gt; [CMD] Autorisation generale FB (TRUE=Autorise)
     Reset                        : BOOL;   // --&gt; [CMD] Acquittement defaut sur front
     SafeStop                     : BOOL;   // --&gt; [SAFE] Entree securite pour interface standard
-    PowerContactorEngaged              : BOOL;   // --&gt; [SAFE] Chaine AU rearmee et puissance OK
+    PowerContactorEngaged        : BOOL;   // --&gt; [SAFE] Chaine AU rearmee et puissance OK
 
     // === DEMANDES DE COMMANDE AMONT ===
     BrakeReleaseRequest          : BOOL;   // --&gt; [CMD] Demande de desserrage frein
@@ -1628,9 +1750,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; SYNOPTIQUE ===
     Ready                        : BOOL;   // &lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_Status)
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: &quot;timeout desserrage frein&quot;.
-    Status                       : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                        : ST_Fault;
     Reason                       : E_TranslationFinalInterlockReason;   // &lt;-- [DIAG] Cause de blocage
 
     // === ORDRES ACTIONNEURS VALIDES ===
@@ -1646,7 +1767,6 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONTS ===
     ResetEdge                    : R_TRIG;   // . [LOC] Detecteur front montant Reset
-    ErrorEdge                    : R_TRIG;   // . [LOC] Detecteur front montant Erreur
     BrakeTimeoutCauseEdge        : R_TRIG;   // . [LOC] Detecteur nouvelle occurrence cause timeout
 
     // === TEMPORISATEURS INTERNES ===
@@ -1658,6 +1778,10 @@ VAR
     ResetRequired                : BOOL;   // . [LOC] Front Reset obligatoire avant nouvelle marche
     BrakeTimeoutCause            : BOOL;   // . [LOC] Cause brute timeout desserrage frein
     BrakeTimeoutAck              : BOOL := TRUE;   // . [LOC] Accuse operateur (TRUE = pas d&#x27;alarme)
+
+    // === SOCLE DEFAUT ===
+    instFault                    : FB_FaultCore;                  // * [INST] Socle défaut transverse
+    instCauses                   : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 END_VAR
 VAR CONSTANT
     // === ECHELLE &amp; BORNES REGISTRE PDO ===
@@ -1666,12 +1790,8 @@ VAR CONSTANT
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
-// Le front est échantillonné même pendant Enable/AU faux. Un Reset maintenu
-// durant une gate ne peut donc jamais devenir un faux acquittement au retour.
 ResetEdge(CLK := Reset);
 
-// RestartInhibit et ResetRequired sont volontairement conservés : un changement
-// Enable/AU ne doit jamais réautoriser automatiquement le mouvement après timeout.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     DriveControlWord := 0;
@@ -1679,64 +1799,49 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DriveFreqCmdWord := 0;
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    // ErrorId reste publiquement visible même hors Enable/AU : une retombée de gate
-    // ne doit jamais masquer un timeout mémorisé ni remplacer l&#x27;acquittement conscient.
-    Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     Reason := E_TranslationFinalInterlockReason.NONE;
-    // 🔒 Latch de sûreté VOLONTAIREMENT conservé hors Enable (AC3 / §9) :
-    // RestartInhibit : latch anti-redémarrage auto après timeout frein préservé (doit survivre à la perte d&#x27;Enable)
     RETURN;
 END_IF;
 
 MovementRequested := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2);
 
 // ── 2. Watchdog : exclusivement après ordre effectif de desserrage ──────
-// Pendant RestartInhibit, BrakeCmd reste coupé : l&#x27;ordre amont n&#x27;est donc plus
-// effectif et le watchdog ne doit pas créer une nouvelle faute en boucle.
-// Pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) : le Reset est TOUJOURS effectif sur
-// l&#x27;acquittement (BrakeTimeoutAck), sans condition externe — un front Reset ne peut
-// jamais être perdu si la confirmation rebondit au même scan. L&#x27;interlock de sécurité
-// (RestartInhibit, §3) reste basé sur la cause brute (BrakeTimeoutCause / Error), jamais
-// sur l&#x27;acquittement seul — l&#x27;acquittement n&#x27;ouvre jamais l&#x27;interlock.
-BrakeTimeout(IN := BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed
-                   AND NOT RestartInhibit, PT := T#500ms);
+BrakeTimeout(
+    IN := BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed AND NOT RestartInhibit,
+    PT := T#500ms
+);
 BrakeTimeoutElapsed := BrakeTimeout.ET;
+
 IF BrakeTimeout.Q THEN
     BrakeTimeoutCause := TRUE;
 ELSIF BrakeCommandOpenConfirmed THEN
-    BrakeTimeoutCause := FALSE;   // cause réellement disparue (retour desserrage confirmé)
+    BrakeTimeoutCause := FALSE;
 END_IF;
+
 BrakeTimeoutCauseEdge(CLK := BrakeTimeoutCause);
 IF BrakeTimeoutCauseEdge.Q THEN
-    BrakeTimeoutAck := FALSE;    // nouvelle occurrence -&gt; ré-alarme, ack remis à zéro
+    BrakeTimeoutAck := FALSE;
     RestartInhibit := TRUE;
     ResetRequired := TRUE;
     NeutralRequestSeen := FALSE;
     Reason := E_TranslationFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED;
 END_IF;
+
 IF ResetEdge.Q THEN
-    BrakeTimeoutAck := TRUE;     // toujours effectif, sans condition externe
+    BrakeTimeoutAck := TRUE;
     ResetRequired := FALSE;
 END_IF;
-IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;
-END_IF;
 
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
+instCauses[0].Active   := BrakeTimeoutCause OR NOT BrakeTimeoutAck;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := &#x27;Timeout confirmation ouverture frein translation&#x27;;
+
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
 
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
-// Le mot 7 est un reset AC600, pas un neutre opérateur : il reste autorisé avec
-// fréquence nulle mais ne solde pas RestartInhibit. Seul le mot 0, vu APRÈS
-// disparition de la cause et front Reset, autorise ensuite une nouvelle demande.
-IF RestartInhibit AND NOT Status.Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
+IF RestartInhibit AND NOT Fault.Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
     IF RequestedDriveControlWord = 0 THEN
         NeutralRequestSeen := TRUE;
     ELSIF NeutralRequestSeen AND MovementRequested THEN
@@ -1749,43 +1854,27 @@ END_IF;
 DriveControlWord := 0;
 DriveFreqCmd_Hz := 0.0;
 DriveFreqCmdWord := 0;
-// SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
-// maintenu. La commande/frein suivent cette rampe jusqu&#x27;à demande nulle ; seul
-// un gate dur, timeout ou défaut final impose ici la coupure immédiate.
-BrakeCmd := BrakeReleaseRequest AND NOT Status.Error AND NOT RestartInhibit;
-Ready := NOT Status.Error AND NOT RestartInhibit;
-Status.Busy := FALSE;
-Status.Done := FALSE;
-Status.State := E_State.READY;
 
-IF Status.Error THEN
+BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
+Ready := NOT Fault.Error AND NOT RestartInhibit;
+
+IF Fault.Error THEN
     BrakeCmd := FALSE;
-    Status.State := E_State.DISABLED;
 ELSIF RequestedDriveControlWord = 7 THEN
-    // Reset AC600 préservé, toujours sans consigne fréquence ni couple utile.
     DriveControlWord := 7;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
-    Status.State := E_State.INIT;
 ELSIF MovementRequested THEN
-    // Double condition obligatoire : ordre effectif de desserrage ET confirmation
-    // contacteur/bobine. Une confirmation résiduelle seule ne peut jamais autoriser
-    // couple ou fréquence AC600.
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
         DriveFreqCmd_Hz := MAX(0.0, RequestedDriveFreqHz);
-        Status.Busy := TRUE;
-        Status.State := E_State.BUSY;
-    ELSE
-        Status.Busy := TRUE;
-        Status.State := E_State.INIT;
     END_IF;
 END_IF;
 
 // ── 5. Mise à l&#x27;échelle finale REAL Hz -&gt; WORD registre PDO 0x3100 ──────
-// Conversion unique en sortie de chaîne, quelle que soit la branche qui a fixé
-// DriveFreqCmd_Hz ci-dessus — jamais recalculée ailleurs (producteur unique).
 DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz) * DriveFreqWordScale);
+
+END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>

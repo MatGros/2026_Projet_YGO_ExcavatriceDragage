@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 12:59:53</div>
+    <div class="exec-time">2026-08-27 23:12:11</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (5 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-0">PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-1">PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-2">PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-3">PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-4">PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)</a></li></ul>
+        <summary>📋 Sommaire (1 test)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-0">PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,12 +206,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/5 vérifications validées
+            1/1 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 37 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 43 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -232,7 +232,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_FbStatus.st</code></td>
+                <td><code>ST_Fault.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -240,7 +240,15 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_FbCause.st</code></td>
+                <td><code>ST_FaultCause.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Lifecycle.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -250,6 +258,14 @@
             <tr class="compil-row-pass">
                 <td><code>ST_ContactorCheck.st</code></td>
                 <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_FaultCore.st</code></td>
+                <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -273,14 +289,6 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>FB_Acquisition_Preflight.st</code></td>
-                <td>FB</td>
-                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
-                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
-                <td><span class="badge badge-pass">PASS</span></td>
-                <td>Aucune erreur</td>
-            </tr>
-            <tr class="compil-row-pass">
-                <td><code>FB_FbStatus.st</code></td>
                 <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -328,7 +336,15 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_Joystick_AxisCmd.st</code></td>
+                <td><code>ST_fbJoystick_AxisCmd.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbJoystick_Cfg.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -346,6 +362,38 @@
             <tr class="compil-row-pass">
                 <td><code>FB_Joystick.st</code></td>
                 <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_PresetConfirmMode.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbEncoder_Cfg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbEncoder_HwIn.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbEncoder_HwOut.st</code></td>
+                <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -519,7 +567,7 @@
         <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_02_Acquisition</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 90 flux entrants · 87 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimBench <span style="color:var(--muted);font-weight:500;">(FB_SimBench)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instJoystick <span style="color:var(--muted);font-weight:500;">(FB_Joystick)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagCanOpen <span style="color:var(--muted);font-weight:500;">(FB_Diag_CanOpen)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagEthercat <span style="color:var(--muted);font-weight:500;">(FB_Diag_Ethercat)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM1 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM2 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ M2BucketRefOpenEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ M2BucketRefCloseEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwM1 <span style="color:var(--muted);font-weight:500;">(ST_EncoderHw)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwM2 <span style="color:var(--muted);font-weight:500;">(ST_EncoderHw)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeRise <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeFall <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimBench <span style="color:var(--muted);font-weight:500;">(FB_SimBench)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instJoystick <span style="color:var(--muted);font-weight:500;">(FB_Joystick)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagCanOpen <span style="color:var(--muted);font-weight:500;">(FB_Diag_CanOpen)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagEthercat <span style="color:var(--muted);font-weight:500;">(FB_Diag_Ethercat)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM1 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM2 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ M2BucketRefOpenEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ M2BucketRefCloseEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwInM1 <span style="color:var(--muted);font-weight:500;">(ST_fbEncoder_HwIn)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwInM2 <span style="color:var(--muted);font-weight:500;">(ST_fbEncoder_HwIn)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeRise <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeFall <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span></div>
         </div>
         
         <div style="margin:6px 0;font-size:13px;color:var(--muted);">
@@ -682,7 +730,7 @@
             </summary>
             <div style="margin-top:2px;">
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate</code></div>
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.JOY1Joystick.Cmd.Calibrate</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
@@ -719,6 +767,19 @@
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Network.Bypass.VariateurM3</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div></div>
+        </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_PERSISTENT</span> <span style="font-size:11px;color:#38bdf8;">(1 signaux ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Lecture Globale</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_PERSISTENT._JoystickCfgPersist</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
             </div></div>
         </details>
@@ -789,11 +850,11 @@
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.instWinchM1.Status.Busy</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.instWinchM1.StepNumber</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.instWinchM2.Status.Busy</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.instWinchM2.StepNumber</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div></div>
         </details>
@@ -965,17 +1026,13 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(217,119,6,0.18);border:1px solid #92400e;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#fde68a;font-weight:700;font-size:12px;">💾 Variables Rémanentes Persistantes / RETAIN</span> <span style="font-size:11px;color:#fcd34d;">(4 variables ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#fde68a;font-weight:700;font-size:12px;">💾 Variables Rémanentes Persistantes / RETAIN</span> <span style="font-size:11px;color:#fcd34d;">(3 variables ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.3);color:#fef3c7;font-weight:700;">VAR PERSISTENT</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #d97706;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#fcd34d;background:rgba(217,119,6,0.2);font-size:11px;">_BucketCfgPersist.Config.OffsetCloseM</code> <span style="font-size:10px;color:var(--muted);">[VAR_GLOBAL PERSISTENT RETAIN]</span></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.25);color:#fde68a;font-size:10px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #d97706;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#fcd34d;background:rgba(217,119,6,0.2);font-size:11px;">_JoystickDeadbandRaw</code> <span style="font-size:10px;color:var(--muted);">[VAR_GLOBAL PERSISTENT RETAIN]</span></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.25);color:#fde68a;font-size:10px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #d97706;margin-top:2px;">
@@ -995,9 +1052,9 @@
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
                     <div>• Entrées Formelles : <b style="color:#ffffff;">0</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">34</b></div>
-                    <div>• Lectures GVL : <b style="color:#ffffff;">15</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">16</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">24</b></div>
-                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">4</b></div>
+                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">3</b></div>
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">4</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">67</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">20</b></div>
@@ -1477,6 +1534,13 @@
             <tbody>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FaultCore</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_CycleTime</code></td>
                 <td>1</td><td>1</td>
                 <td>0</td><td>4</td>
@@ -1495,13 +1559,6 @@
                 <td>21</td><td>4</td>
                 <td>0</td><td>2</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
-            </tr>
-            <tr class="encaps-row-pass">
-                <td><span class="badge badge-pass">PASS</span></td>
-                <td><code>FB_FbStatus</code></td>
-                <td>3</td><td>2</td>
-                <td>0</td><td>4</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1534,23 +1591,23 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Joystick</code></td>
-                <td>14</td><td>16</td>
+                <td>10</td><td>9</td>
                 <td>2</td><td>15</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (15 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Encoder_Abs</code></td>
-                <td>11</td><td>11</td>
-                <td>0</td><td>7</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (7 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>11</td><td>9</td>
+                <td>0</td><td>10</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (10 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Encoder_Homing</code></td>
-                <td>20</td><td>7</td>
-                <td>1</td><td>16</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (16 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>18</td><td>9</td>
+                <td>1</td><td>30</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (30 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1563,8 +1620,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Encoder_Safety</code></td>
                 <td>7</td><td>4</td>
-                <td>0</td><td>2</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1583,16 +1640,16 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Encoder</code></td>
-                <td>17</td><td>8</td>
-                <td>1</td><td>6</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (6 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>18</td><td>9</td>
+                <td>1</td><td>8</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (8 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_TestHarness_PRG_02</code></td>
                 <td>30</td><td>2</td>
-                <td>0</td><td>14</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (14 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>16</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (16 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -1605,67 +1662,46 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-02-acquisition-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires) </h3>
+                <h3>PRG_02_Acquisition : Qualification joystick (neutre -&gt; armement -&gt; consigne X) </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>Structure Data: Homme-mort arme avec succes</li><li>Structure Data: Position cable M1 = 2.0m</li><li>Structure Data: Codeur M1 fiabilise</li><li>Sens X positif detecte (Translation Droite)</li><li>Consigne de vitesse non nulle transmise sur le bus Data</li><li>Structure HwIn: JoyXRaw_ANA1 transmis</li><li>Structure HwIn: JoyBtnRaw transmis</li></ul></details>
             
             
-            
-        </article>
-        <article id="test-prg-02-acquisition-1" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance) </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-prg-02-acquisition-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives) </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-prg-02-acquisition-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1 </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-prg-02-acquisition-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale) </h3>
-            </header>
-            
-            
-            
-            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (4 scans, 2 variables actives)</summary>
+            <div class="wf-scroll"><svg width="444" height="172" viewBox="0 0 444 172" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="154" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="166" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="154" class="wf-grid"/><text x="284.0" y="52" class="wf-time">60ms</text><text x="284.0" y="166" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="154" class="wf-grid"/><text x="340.0" y="52" class="wf-time">210ms</text><text x="340.0" y="166" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="154" class="wf-grid"/><text x="396.0" y="52" class="wf-time">220ms</text><text x="396.0" y="166" class="wf-scan">#3</text><text x="182" y="86.0" class="wf-label">JOYRAWX</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="214.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5000</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><text x="284.0" y="76.0" class="wf-num">5000</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><text x="340.0" y="76.0" class="wf-num">5000</text><line x1="368" y1="82.0" x2="424" y2="82.0" class="wf-num-line"/><rect x="382.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="77.0" class="wf-num-changed">8000</text><text x="182" y="126.0" class="wf-label">JOYBTNRAW</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L368,108L424,108" class="wf-line" stroke="#059669"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (4 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>JOYRAWX</th><th>JOYBTNRAW</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>5000</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>60 ms</td><td>5000</td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>210 ms</td><td>5000</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>220 ms</td><td class='changed'>8000</td><td><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (37)</summary>
+        <table class="static-table"><tbody><tr><td><code>JOYRAWY</code></td><td>5000</td></tr><tr><td><code>COD1_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>COD2_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CANBUSOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ECATOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SIMULATIONMODEACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM1.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM2.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>HWINM1.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>HWINM2.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>NXMEM</code></td><td>5000</td></tr><tr><td><code>NYMEM</code></td><td>5000</td></tr><tr><td><code>CALIBINIT</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (37)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/A_COMMUN/ST_FbCause.st</code></li><li><code>CODE/A_COMMUN/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_FbStatus.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st</code></li><li><code>CODE/D_JOYSTICK/ST_Joystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/FB_AxisScale.st</code></li><li><code>CODE/D_JOYSTICK/FB_Joystick.st</code></li><li><code>CODE/E_CODEURS/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/ST_EncoderMeasurement.st</code></li><li><code>CODE/E_CODEURS/ST_EncoderMeasurements.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/ST_TranslationCmdDemand.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st</code></li></ul>
+        <summary>Fichiers source compilés (43)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/D_JOYSTICK/FB_AxisScale.st</code></li><li><code>CODE/D_JOYSTICK/FB_Joystick.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/ST_TranslationCmdDemand.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (37)</summary>
+        <summary>Code source ST original (43)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -1690,7 +1726,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -1712,67 +1748,80 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Fault.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
-      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
-   ======================================================================= *)
-
-TYPE ST_FbStatus :
-STRUCT
-    (* ---- membres historiques (conservés) ---- *)
-    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
-    Done         : BOOL;    (* 1 = Action terminée avec succès *)
-    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
-    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
-    State        : E_State; (* État courant de la machine d&#x27;état *)
-    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
-    (* ---- membres ajoutés (forme cible enrichie) ---- *)
-    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
-    WarningId      : WORD;  (* Code warning courant (bitfield) *)
-    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
-    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
-    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
-END_STRUCT
-END_TYPE
-</pre>
-            </details>
-            <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
-                <pre>(* =======================================================================
-   🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : une cause de défaut/warning exprimée en CLAIR (BOOL + libellé),
-      sans bitfield ni masque. Le FB métier remplit une liste de causes
-      (ARRAY[0..15] OF ST_FbCause) ; le socle gère latch/reset/textes.
-   🧬 Contrat : remplacer l&#x27;ancien couple WORD bitfield + tableaux de textes
-      indexés par bit par une liste lisible (maintenance, « avec une liste »).
-   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur
-      l&#x27;acquittement. IsWarning distingue warning (auto) / fault (à acquitter).
+   🎯 Rôle : porter l&#x27;état défaut d&#x27;un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu&#x27;au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l&#x27;acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    ======================================================================= *)
 
-TYPE ST_FbCause :
+TYPE ST_Fault :
 STRUCT
-    Active     : BOOL;   (* 1 = cause présente (interlock sur la cause brute) *)
-    IsWarning  : BOOL;   (* 1 = warning auto-effacé ; 0 = défaut à acquitter *)
-    Texte      : STRING; (* libellé prêt IHM de la cause *)
+    Error     : BOOL;   (* &lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant *)
+    ErrorId   : WORD;    (* &lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune) *)
+    Latched   : BOOL;    (* &lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu&#x27;au front Reset *)
+    LatchedId : WORD;    (* &lt;-- [DIAG] ErrorId figé à l&#x27;apparition du défaut, effacé au Reset *)
 END_STRUCT
 END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_FaultCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n&#x27;alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FaultCause :
+STRUCT
+    Active   : BOOL;    (* 1 = cause présente maintenant (interlock sur cette valeur) *)
+    Latching : BOOL;    (* 1 = cause à acquitter (arme Latched) ; 0 = live seulement *)
+    Texte    : STRING;  (* libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM) *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Lifecycle.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d&#x27;exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l&#x27;avancement d&#x27;une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   ======================================================================= *)
+
+TYPE ST_Lifecycle :
+STRUCT
+    Busy : BOOL;   (* &lt;-- [STAT] 1 = action en cours *)
+    Done : BOOL;   (* &lt;-- [STAT] 1 = action terminée avec succès *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_ContactorCheck.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
@@ -1789,6 +1838,93 @@ STRUCT
     StuckOpen   : BOOL;   // Diag : commande ON mais retour OFF depuis trop longtemps
 END_STRUCT
 END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FaultCore.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d&#x27;une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l&#x27;apparition d&#x27;une
+          cause `Active AND Latching`, conservé jusqu&#x27;au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d&#x27;effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FaultCore
+VAR_INPUT
+    Enable  : BOOL;                          // --&gt; [CMD] Autorisation générale du FB porteur
+    Reset   : BOOL;                          // --&gt; [CMD] Front d&#x27;acquittement (jamais conditionné, §9)
+    Causes  : ARRAY[0..15] OF ST_FaultCause; // --&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)
+END_VAR
+VAR_OUTPUT
+    Ready   : BOOL;                          // &lt;-- [STAT] FB porteur autorisé (= Enable)
+    Fault   : ST_Fault;                      // &lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)
+END_VAR
+VAR
+    ResetEdge : R_TRIG;                      // . [LOC] Front montant Reset
+    Latch     : ARRAY[0..15] OF BOOL;        // . [LOC] Bit laté par cause, jusqu&#x27;au Reset
+    i         : INT;                         // . [LOC] Index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Reset (front, toujours effectif)&quot;}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§2 Vue LIVE — Error / ErrorId&quot;}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region &quot;§3 Armement des latches (causes à acquitter)&quot;}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu&#x27;au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§4 Vue LATCHÉE — Latched / LatchedId&quot;}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+
+END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
@@ -1995,147 +2131,6 @@ IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightError
 {region &quot;§3 Sortie&quot;}
 PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; RequestPending := FALSE;
 {endregion}
-</pre>
-            </details>
-            <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
-                <pre>(* =======================================================================
-   🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : remplit de façon standardisée `Status : ST_FbStatus`
-      à partir d&#x27;une LISTE de causes claires (ARRAY[0..15] OF ST_FbCause).
-      Plus de bitfield WORD en entrée, plus de masque, plus de tableau de
-      textes indexé par bit — le FB métier exprime ses défauts en clair.
-   🧬 Contrat : tout FB `standard` expose `Status : ST_FbStatus`
-      rempli via UNE instance de ce socle → même comportement partout.
-   🔒 Sécurité :
-      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur l&#x27;acquittement.
-      - Reset TOUJOURS effectif (std §9), jamais conditionné.
-      - IsWarning=1 → warning AUTO-EFFACÉ (ne lève jamais Error) ; IsWarning=0 → fault à acquitter (laté).
-      - une cause fault réapparue se re-lathe automatiquement (ré-alarme).
-      - une cause reclassée warning purge son latch résiduel (pas de défaut fantôme).
-      - StateAtError : capture UNIQUE au premier défaut, gelé jusqu&#x27;au Reset.
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
-   ======================================================================= *)
-
-FUNCTION_BLOCK FB_FbStatus
-VAR_INPUT
-    // === PERMIS &amp; ACQUITTEMENT ===
-    Enable          : BOOL;    // --&gt; [CMD] Autorisation générale FB
-    Reset           : BOOL;    // --&gt; [CMD] Front acquittement défaut (jamais conditionné, §9)
-
-    // --- CAUSES (producteur = bloc métier, en clair) ---
-    Causes          : ARRAY[0..15] OF ST_FbCause;  // --&gt; [HW] Liste des causes (Active/IsWarning/Texte)
-END_VAR
-VAR_OUTPUT
-    // --- ÉTAT &amp; SYNOPTIQUE (forme cible) ---
-    Ready           : BOOL;    // &lt;-- [STAT] FB prêt (Enable)
-    Status          : ST_FbStatus; // &lt;-- [STAT] Statut complet (mappé 1:1 sur la sortie du bloc)
-END_VAR
-VAR
-    // --- SOUS-INSTANCES &amp; MEMOIRES ---
-    ResetEdge         : R_TRIG;              // * [INST] Front Reset
-    Latch             : ARRAY[0..15] OF BOOL;// . [LOC] Défaut laté par cause (jusqu&#x27;au Reset)
-    StateAtErrorArmed : BOOL;                // . [LOC] Flag : StateAtError capturé UNE fois
-    i                 : INT;                 // . [LOC] index de parcours de la liste
-END_VAR
-
-{region &quot;§1 Gate neutralisation&quot;}
-// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr.
-//    ⚠️ Les latches de défaut sont CONSERVÉS (décision utilisateur) : un défaut
-//    non acquitté ne doit pas être effacé silencieusement par une bascule Enable
-//    OFF→ON sans Reset (jamais de redémarrage auto après défaut). Au ré-enable,
-//    §3 relatche naturellement toute cause encore active ; un défaut laté persistant
-//    redevient visible jusqu&#x27;au Reset.
-Ready := Enable;
-IF NOT Enable THEN
-    Status.Busy := FALSE; Status.Done := FALSE;
-    Status.Error := FALSE; Status.ErrorId := 0;
-    Status.Warning := FALSE; Status.WarningId := 0;
-    Status.State := E_State.DISABLED; Status.StateAtError := E_State.DISABLED;
-    Status.ResetRequested := FALSE;
-    Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
-    RETURN;
-END_IF;
-Status.State := E_State.READY;
-{endregion}
-
-{region &quot;=== §2 Reset (front, toujours effectif) ===&quot;}
-// 2. Front Reset : TOUJOURS effectif, jamais conditionné (std §9).
-ResetEdge(CLK := Reset);
-IF ResetEdge.Q THEN
-    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
-    StateAtErrorArmed := FALSE;
-END_IF;
-{endregion}
-
-{region &quot;=== §3 Classification + latch par cause ===&quot;}
-// 3. Parcours de la LISTE (source de vérité = cause brute Active).
-//    - IsWarning=TRUE  → warning : auto-effacé + purge d&#x27;un latch résiduel (reclassement, sans défaut fantôme).
-//    - IsWarning=FALSE → fault : laté dès qu&#x27;Active ; conservé après disparition ; re-laté s&#x27;il revient.
-FOR i := 0 TO 15 DO
-    IF Causes[i].IsWarning THEN
-        Latch[i] := FALSE;
-    ELSE
-        IF Causes[i].Active THEN Latch[i] := TRUE; END_IF;
-    END_IF;
-END_FOR;
-{endregion}
-
-{region &quot;=== §4 StateAtError — capture au premier défaut ===&quot;}
-// 4. État mémorisé au moment de l&#x27;apparition du défaut (gelé jusqu&#x27;au Reset).
-IF NOT StateAtErrorArmed THEN
-    FOR i := 0 TO 15 DO
-        IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
-            Status.StateAtError := Status.State;   // State déjà READY (§1)
-            StateAtErrorArmed := TRUE;
-            EXIT;
-        END_IF;
-    END_FOR;
-END_IF;
-{endregion}
-
-{region &quot;=== §5 Sorties Error / Warning / ResetRequested ===&quot;}
-// 5. Sorties : ErrorId réservé aux DÉFAUTS (à acquitter) ; les warnings sont
-//    séparés dans WarningId. Un warning ne lève JAMAIS Error ni ne pollue ErrorId
-//    (décision utilisateur : un IHM qui lit ErrorId ne voit pas de faux défaut).
-Status.ErrorId := 0; Status.WarningId := 0;
-Status.Error := FALSE; Status.Warning := FALSE; Status.ResetRequested := FALSE;
-FOR i := 0 TO 15 DO
-    // Défaut laté OU actif
-    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
-        Status.ErrorId := Status.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
-        Status.Error := TRUE;
-        Status.ResetRequested := TRUE;
-    END_IF;
-    // Warning auto-effacé : uniquement dans WarningId (séparé de ErrorId)
-    IF Causes[i].Active AND Causes[i].IsWarning THEN
-        Status.WarningId := Status.WarningId OR SHL(WORD#1, INT_TO_DWORD(i));
-        Status.Warning := TRUE;
-    END_IF;
-END_FOR;
-{endregion}
-
-{region &quot;=== §6 Textes IHM — parcours de liste ===&quot;}
-// 6. Sélection du texte par parcours de la LISTE (première cause active, index le plus bas).
-//    Plus de WHILE ni de masque. Hypothèse : `Causes[i].Texte` reste renseigné par l&#x27;appelant.
-Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
-FOR i := 0 TO 15 DO
-    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
-        Status.ErrorIdTxt := Causes[i].Texte; EXIT;
-    END_IF;
-END_FOR;
-FOR i := 0 TO 15 DO
-    IF Causes[i].Active AND Causes[i].IsWarning THEN
-        Status.WarningIdTxt := Causes[i].Texte; EXIT;
-    END_IF;
-END_FOR;
-{endregion}
-
-// Busy/Done : pilotés par le FB MÉTIER (cycle propre), pas par le socle.
-// Un conditionneur synchrone (joystick) les laisse à FALSE ; un organe à cycle les pilote lui-même.
-
-END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
@@ -2554,16 +2549,16 @@ END_IF;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_Joystick_AxisCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_fbJoystick_AxisCmd.st</code></summary>
                 <pre>(* =======================================================================
-   🕹️ ST_Joystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
+   🕹️ ST_fbJoystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
    📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    ======================================================================= *)
 
-TYPE ST_Joystick_AxisCmd :
+TYPE ST_fbJoystick_AxisCmd :
 STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
@@ -2572,7 +2567,35 @@ STRUCT
     DirectionNegative   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     DirectionPositive   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     AtNeutral   : BOOL;   // --&gt; [CMD] TRUE si axes en zone morte (position centrale)
-    // Remplacé par bit qui donne la direction Direction   : INT;  // --&gt; [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)
+
+    // === MONITORING IHM (derive des bits ci-dessus, jamais lu en interlock) ===
+    Direction   : INT;   // &lt;-- [STAT] Sens -1=Rev / 0=Neutre / +1=Fwd (anim IHM fleche ; lu aussi logique treuils PRG_04)
+    Deflection  : INT;   // &lt;-- [STAT] Deflexion signee -100..+100 % (anim IHM jauge/barre)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_fbJoystick_Cfg.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ ST_fbJoystick_Cfg — Réglages regroupés de FB_Joystick
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter en un bloc les 5 paramètres de conditionnement du geste
+      (zone morte, temporisations homme-mort, marge défaut capteur).
+      Passé à FB_Joystick via l&#x27;entrée `Cfg` — échange bloc IHM / persistant.
+   🧬 Pattern cfg : aligné sur ST_CycleCfg / ST_WinchCfg (préfixe ST_&lt;Domaine&gt;Cfg,
+      instance persistante dans GVL_PERSISTENT, pont FB_CfgPersistBridge_* à venir).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
+   ======================================================================= *)
+
+TYPE ST_fbJoystick_Cfg :
+STRUCT
+    DeadbandRaw          : INT  := 300;      // Zone morte en points ADC bruts (0..10000)
+    NeutralHoldTime      : TIME := T#100MS;  // Maintien continu au neutre avant désarmement homme-mort
+    DeadmanArmHoldTime   : TIME := T#100MS;  // Appui continu bouton requis pour armer le geste
+    DeadmanArmGraceTime  : TIME := T#3S;     // Délai de grâce post-armement avant désarmement neutre
+    RawOutOfRangeMargin  : INT  := 500;      // Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)
+    Initialized          : BOOL := FALSE;    // 🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)
 END_STRUCT
 END_TYPE
 </pre>
@@ -2636,21 +2659,28 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
    🕹️ FB_Joystick — Acquisition &amp; conditionnement du geste opérateur
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
-              Pipeline par axe : FB_AxisScale -&gt; Homme-Mort -&gt; ST_Joystick_AxisCmd.
+              Pipeline par axe : FB_AxisScale -&gt; Homme-Mort -&gt; ST_fbJoystick_AxisCmd.
    🔒 Sécurité : Armement homme-mort par maintien au neutre.
                   Armement STRICTEMENT conditionné par ArmingPermit (permission
                   externe, vue joystick) ; FALSE = armement bloqué + warning.
                   Désarmement sur neutre prolongé ; le changement de mode / fin de
                   cycle benne est géré par l&#x27;externe via ArmingPermit (vue joystick).
-   📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
+   📤 Sorties : AxisCmdX/Y (struct = source unique : SpeedTgt NON signee + bits sens
+                + Direction -1/0/+1 et Deflection -100..+100 % pour anim IHM), Fault : ST_Fault
+                (socle FB_FaultCore), AtNeutralXY (permis logique), NeutralXAct/YAct (miroirs IHM).
+   🧬 Contrat : `standard` — pas de struct métier propre → `Fault : ST_Fault` à plat.
+                Pas de `State` (aucune machine d&#x27;état), pas de `ST_Lifecycle` (FB synchrone).
+   ⚙️ Réglages regroupés dans `Cfg : ST_fbJoystick_Cfg` (échange bloc IHM / persistant).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (F08.01, F08.03-F08.07)
    ===================================================================== *)
 
 FUNCTION_BLOCK FB_Joystick
 VAR_INPUT
-    // === PERMIS SÉCURITÉ &amp; ETATS SYSTEME ===
+    // === CONTRAT STANDARD (Enable + Reset) ===
     Enable                    : BOOL;       // --&gt; [CMD]  Active la logique du bloc (TRUE=Autorise)
-    Reset                     : BOOL;       // --&gt; [CMD]  Acquittement defaut
+    Reset                     : BOOL;       // --&gt; [CMD]  Acquittement defaut (front, jamais conditionne)
+
+    // === PERMIS SECURITE ===
     ArmingPermit              : BOOL;       // --&gt; [SAFE] Permission d&#x27;armement homme-mort ; FALSE = armement bloqué
 
     // === ACQUISITION MATERIELLE &amp; DIAGNOSTIC ===
@@ -2660,40 +2690,31 @@ VAR_INPUT
     RawY                      : INT;        // --&gt; [HW]   Valeur brute axe Y (0..10000)
     RawButton                 : BOOL;       // --&gt; [HW]   Etat brut bouton homme-mort
 
-    // === COMMANDES OPÉRATEUR &amp; CALIBRATION ===
-    BtnCalibrate              : BOOL;       // --&gt; [CMD]  Demande de recalage neutre
+    // === COMMANDES OPERATEUR &amp; CALIBRATION ===
+    Calibrate                 : BOOL;       // --&gt; [CMD]  Front : lance la calibration (recalage du neutre)
 
     // === REGLAGES &amp; CONFIGURATION ===
-    DeadbandRaw               : INT := 300;      // --&gt; [CFG]  Zone morte en points ADC bruts (0..10000)
-    NeutralHoldTime           : TIME := T#100MS; // --&gt; [CFG]  Maintien continu au neutre avant desarmement
-    DeadmanArmHoldTime        : TIME := T#100MS; // --&gt; [CFG]  Appui continu bouton requis pour armer
-    DeadmanArmGraceTime       : TIME := T#3S;    // --&gt; [CFG]  Delai de grace post-armement avant desarmement neutre
-    RawOutOfRangeMargin       : INT := 500;     // --&gt; [CFG]  Marge tolerance ADC autour des bornes nominales [0..10000] avant defaut capteur (AF08 §5bis)
+    Cfg                       : ST_fbJoystick_Cfg; // --&gt; [CFG]  Réglages groupés (deadband, temporisations, marge ADC)
 END_VAR
 VAR_OUTPUT
-    // === ETATS IEC &amp; SYNOPTIQUE ===
-    Ready                     : BOOL;       // &lt;-- [STAT] FB pret a fonctionner (Enable + bus OK + pas de defaut)
-    Button                    : BOOL;       // &lt;-- [STAT] Bouton homme-mort filtre
-
-    // === DIAGNOSTIC &amp; ANOMALIES ===
-    Error                     : BOOL;       // &lt;-- [DIAG] Presence defaut (miroir Status.Error)
-    ErrorId                   : WORD;       // &lt;-- [DIAG] Identifiant defaut courant (reconstruit par le socle)
-    ArmingPermitDenied        : BOOL;       // &lt;-- [DIAG] Warning &quot;armement non permis&quot; : appui homme-mort mais ArmingPermit=FALSE (sortie dediee, AC2)
-    Status                    : ST_FbStatus; // &lt;-- [STAT] Statut standard complet (socle FB_FbStatus)
+    // === CONTRAT STANDARD (Ready + Fault) ===
+    Ready                     : BOOL;       // &lt;-- [STAT] FB pret a fonctionner (Enable + bus OK + pas de defaut late)
+    Fault                     : ST_Fault;   // &lt;-- [DIAG] Brique defaut socle (live + latche), remplie par FB_FaultCore
 
     // === CONSIGNES AXES NORMALISEES ===
-    AxisCmdX                  : ST_Joystick_AxisCmd; // &lt;-- [ACT]  Sortie normalisee axe X
-    AxisCmdY                  : ST_Joystick_AxisCmd; // &lt;-- [ACT]  Sortie normalisee axe Y
+    AxisCmdX                  : ST_fbJoystick_AxisCmd; // &lt;-- [ACT]  Consigne axe X : SpeedTgt (non signee 0..100) + bits sens + Direction/Deflection (monitoring)
+    AxisCmdY                  : ST_fbJoystick_AxisCmd; // &lt;-- [ACT]  Consigne axe Y : SpeedTgt (non signee 0..100) + bits sens + Direction/Deflection (monitoring)
 
-    // === MESURES &amp; MIROIRS MAINTENANCE ===
-    NeutralXAct               : INT;        // &lt;-- [STAT] Point neutre X actuel pour IHM/Test
-    NeutralYAct               : INT;        // &lt;-- [STAT] Point neutre Y actuel pour IHM/Test
-    SpeedTgtX_Pct             : REAL;       // &lt;-- [STAT] Vitesse cible axe X signee (-100..+100 %), miroir AxisCmdX.SpeedTgt
-    DirectionX                : INT;        // &lt;-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdX.DirectionPositive/Negative
-    SpeedTgtY_Pct             : REAL;       // &lt;-- [STAT] Vitesse cible axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedTgt
-    DirectionY                : INT;        // &lt;-- [STAT] Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdY.DirectionPositive/Negative
-    DeadmanArmed              : BOOL;       // &lt;-- [STAT] Geste arme (bouton appuye au neutre) - IHM/diagnostic
-    AtNeutral                 : BOOL;       // &lt;-- [STAT] TRUE si les 2 axes sont en zone morte (position centrale)
+    // === HOMME-MORT ===
+    DeadmanArmed              : BOOL;       // &lt;-- [STAT] Geste arme (bouton maintenu + ArmingPermit) - IHM/diagnostic
+    ArmingPermitDenied        : BOOL;       // &lt;-- [DIAG] Appui homme-mort refuse (ArmingPermit=FALSE) - warning non latche (F08.08)
+
+    // === ETAT LOGIQUE ===
+    AtNeutralXY               : BOOL;       // &lt;-- [STAT] Les 2 axes en zone morte BRUTE (ScaleX/Y.OutPct=0, AVANT homme-mort) - permis mouvement, LU EN LOGIQUE (PRG_03/04/07)
+
+    // === MIROIRS IHM / TEST ===
+    NeutralXAct               : INT;        // &lt;-- [STAT] Point neutre X calibre courant
+    NeutralYAct               : INT;        // &lt;-- [STAT] Point neutre Y calibre courant
 END_VAR
 VAR_IN_OUT
     // === RETENTION &amp; CALIBRATION PERSISTANTE ===
@@ -2708,66 +2729,65 @@ VAR
     NeutralHoldTimer          : TON;                 // * [INST] Temporisation maintien au neutre
     DeadmanArmTimer           : TON;                 // * [INST] Temporisation maintien bouton armement
     DeadmanArmGraceTimer      : TON;                 // * [INST] Temporisation delai de grace post-armement
-    instFbStatus              : FB_FbStatus;         // * [INST] Socle de statut standard (liste de causes)
+    instFault                 : FB_FaultCore;        // * [INST] Socle de defaut (liste de causes -&gt; ST_Fault)
 
     // === VARIABLES LOCALES INTERNES ===
     CmdXVal                   : REAL;                // . [LOC]  Consigne axe X calculee apres filtrage/homme-mort
     CmdYVal                   : REAL;                // . [LOC]  Consigne axe Y calculee apres filtrage/homme-mort
-    LastCalibrate             : BOOL;                // . [LOC]  Memorisation etat precedent bouton calibration
+    LastCalibrate             : BOOL;                // . [LOC]  Memorisation etat precedent commande Calibrate (front)
     DeadmanArmPending         : BOOL;                // . [LOC]  Armement en cours d&#x27;attente de la temporisation maintien
     RawOutOfRange             : BOOL;                // . [LOC]  Surveillance capteur continue (AF08 §5bis) : RawX/RawY hors plage nominale+marge
-    CalibFail                 : BOOL;                // . [LOC]  Echec recalage neutre (front BtnCalibrate hors zone) - cause fault (liste)
-    BusLost                   : BOOL;                // . [LOC]  Perte liaison bus / device non operationnel - cause warning (liste)
-    instCauses                : ARRAY[0..15] OF ST_FbCause;   // . [LOC] Liste des causes pour le socle FB_FbStatus
+    CalibFail                 : BOOL;                // . [LOC]  Echec calibration (front Calibrate hors zone) - cause a acquitter (latching)
+    BusLost                   : BOOL;                // . [LOC]  Perte liaison bus / device non operationnel - cause live seulement
+    instCauses                : ARRAY[0..15] OF ST_FaultCause;   // . [LOC] Liste des causes pour le socle FB_FaultCore
 END_VAR
 
 {region &quot;§1 CAUSES + SOCLE (appele AVANT le gate)&quot;}
-// 🎯 CAUSES exprimées en CLAIR (liste ST_FbCause) — plus de bitfield WORD.
-//    - CalibFail : fault à acquitter (IsWarning=FALSE).
-//    - RawOutOfRange / BusLost : warning auto-effacés (décision utilisateur).
-//    Interlock sur la cause brute ; le socle gère latch/reset/textes.
-RawOutOfRange := (RawX &lt; (0 - RawOutOfRangeMargin))
-              OR (RawX &gt; (10000 + RawOutOfRangeMargin))
-              OR (RawY &lt; (0 - RawOutOfRangeMargin))
-              OR (RawY &gt; (10000 + RawOutOfRangeMargin));
+// 🎯 CAUSES exprimées en CLAIR (liste ST_FaultCause) — plus de bitfield WORD.
+//    - CalibFail : cause A ACQUITTER (Latching=TRUE) -&gt; arme Fault.Latched.
+//    - RawOutOfRange / BusLost : cause LIVE seulement (Latching=FALSE) -&gt; Fault.Error, retombe seule.
+//    Interlock sur la cause brute ; le socle gère latch/reset.
+RawOutOfRange := (RawX &lt; (0 - Cfg.RawOutOfRangeMargin))
+              OR (RawX &gt; (10000 + Cfg.RawOutOfRangeMargin))
+              OR (RawY &lt; (0 - Cfg.RawOutOfRangeMargin))
+              OR (RawY &gt; (10000 + Cfg.RawOutOfRangeMargin));
 BusLost := (NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational);
 
-// Calibration : un front (BtnCalibrate) hors zone -&gt; fault. La cause reste active tant que les
-// axes sont HORS zone valide [2000..8000] : Reset ne l&#x27;acquitte que si la cause a disparu
-// (interlock socle sur la cause brute). Effacée par un Reset avec axes en zone.
-IF BtnCalibrate AND NOT LastCalibrate THEN
+// Calibration : un front (Calibrate) hors zone -&gt; cause a acquitter. La cause reste active tant que
+// les axes sont HORS zone valide [2000..8000] : Reset ne l&#x27;efface que si la cause a disparu
+// (interlock socle sur la cause brute). Effacee par un Reset avec axes en zone.
+IF Calibrate AND NOT LastCalibrate THEN
     IF RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000 THEN
         NeutralXMem := RawX;       // memorisation nouvelle position neutre X
         NeutralYMem := RawY;       // memorisation nouvelle position neutre Y
         CalibFail := FALSE;        // calibration valide : plus de cause
     ELSE
-        CalibFail := TRUE;         // échec : cause fault (persistante tant que hors zone)
+        CalibFail := TRUE;         // échec : cause a acquitter (persistante tant que hors zone)
     END_IF;
 END_IF;
-LastCalibrate := BtnCalibrate;
+LastCalibrate := Calibrate;
 // Ré-acquisition de la cause (front Reset + cause disparue) : n&#x27;efface la cause QUE si les
-// axes sont revenus en zone valide. Reste laté tant que hors zone (interlock sur cause brute).
+// axes sont revenus en zone valide. Reste latee tant que hors zone (interlock sur cause brute).
 IF Reset AND (RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000) THEN
     CalibFail := FALSE;
 END_IF;
 
 // Remplissage de la LISTE de causes pour le socle (index 0..2)
-// Cause en clair (Active/IsWarning/Texte) ; 3 causes fixes.
-instCauses[0].Active := CalibFail;     instCauses[0].IsWarning := FALSE;
-instCauses[0].Texte := &#x27;Echec recalage neutre joystick (RawX/Y hors zone)&#x27;;
-instCauses[1].Active := RawOutOfRange; instCauses[1].IsWarning := TRUE;
+// Cause en clair (Active/Latching/Texte) ; 3 causes fixes.
+instCauses[0].Active := CalibFail;     instCauses[0].Latching := TRUE;
+instCauses[0].Texte := &#x27;Echec calibration joystick (RawX/Y hors zone)&#x27;;
+instCauses[1].Active := RawOutOfRange; instCauses[1].Latching := FALSE;
 instCauses[1].Texte := &#x27;Capteur joystick hors plage ADC&#x27;;
-instCauses[2].Active := BusLost;       instCauses[2].IsWarning := TRUE;
+instCauses[2].Active := BusLost;       instCauses[2].Latching := FALSE;
 instCauses[2].Texte := &#x27;Perte liaison bus CAN joystick&#x27;;
 
 // Appel du socle TOUJOURS (meme si le gate RETURN ensuite) : la cause bus doit etre vue.
-instFbStatus(Enable := Enable, Reset := Reset, Causes := instCauses);
-Status := instFbStatus.Status;
-Error := Status.Error;        // miroir (source de verite = socle)
-ErrorId := Status.ErrorId;    // miroir
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;     // source de verite = socle
 
-// Disponibilite = Enable + bus OK + pas de defaut. Un warning ne rend PAS indisponible.
-Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT Error;
+// Disponibilite = Enable + bus OK + pas de defaut LATE. Une cause live (bus, capteur) ne latche pas
+// -&gt; elle n&#x27;entre pas dans Fault.Latched ; le bus est deja couvert par ...OP.Operational ci-dessous.
+Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT Fault.Latched;
 {endregion}
 
 {region &quot;§2 Gate securite (neutralisation pipeline, n efface pas le statut)&quot;}
@@ -2777,39 +2797,36 @@ IF NOT Enable OR BusLost THEN
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
     AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
-    SpeedTgtX_Pct := 0.0; DirectionX := 0;
-    SpeedTgtY_Pct := 0.0; DirectionY := 0;
-    Button := FALSE;
-    AtNeutral := TRUE;
+    AxisCmdX.Direction := 0; AxisCmdX.Deflection := 0;
+    AxisCmdY.Direction := 0; AxisCmdY.Deflection := 0;
+    AtNeutralXY := TRUE;
     DeadmanArmed := FALSE;
     DeadmanArmPending := FALSE;
     ArmingPermitDenied := FALSE;
-    NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);
-    DeadmanArmTimer(IN := FALSE, PT := DeadmanArmHoldTime);
-    DeadmanArmGraceTimer(IN := FALSE, PT := DeadmanArmGraceTime);
+    NeutralHoldTimer(IN := FALSE, PT := Cfg.NeutralHoldTime);
+    DeadmanArmTimer(IN := FALSE, PT := Cfg.DeadmanArmHoldTime);
+    DeadmanArmGraceTimer(IN := FALSE, PT := Cfg.DeadmanArmGraceTime);
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
     RETURN;
 END_IF;
 {endregion}
 
-{region &quot;§3 Acquisition bouton + mise a l echelle&quot;}
-Button := RawButton;
-
+{region &quot;§3 Acquisition + mise a l echelle&quot;}
 // Mise a l&#x27;echelle (deadband) - le neutre s&#x27;evalue sur les 2 axes
-ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
-ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
-AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic - position centrale
+ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := Cfg.DeadbandRaw);
+ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := Cfg.DeadbandRaw);
+AtNeutralXY := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // les 2 axes en zone morte - permis mouvement
 {endregion}
 
 {region &quot;§4 Armement homme mort&quot;}
-// Bouton homme-mort : armement par MAINTIEN (DeadmanArmHoldTime), independant de la position.
+// Bouton homme-mort : armement par MAINTIEN (Cfg.DeadmanArmHoldTime), independant de la position.
 DeadmanEdge(CLK := RawButton);
 IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
 IF NOT RawButton THEN DeadmanArmPending := FALSE; END_IF;
 
 // Securite : armage UNIQUEMENT si DeadmanArmPending ET ArmingPermit.
-DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit, PT := DeadmanArmHoldTime);
+DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit, PT := Cfg.DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;
     DeadmanArmPending := FALSE;
@@ -2826,8 +2843,8 @@ END_IF;
 ArmingPermitDenied := RawButton AND NOT ArmingPermit;
 
 // Desarmage par maintien au neutre (apres grace)
-DeadmanArmGraceTimer(IN := DeadmanArmed, PT := DeadmanArmGraceTime);
-NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q, PT := NeutralHoldTime);
+DeadmanArmGraceTimer(IN := DeadmanArmed, PT := Cfg.DeadmanArmGraceTime);
+NeutralHoldTimer(IN := DeadmanArmed AND AtNeutralXY AND DeadmanArmGraceTimer.Q, PT := Cfg.NeutralHoldTime);
 IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 {endregion}
 
@@ -2835,7 +2852,7 @@ IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdX.SpeedTgt := CmdXVal;
+AxisCmdX.SpeedTgt := ABS(CmdXVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdX.Direction)
 AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
 
 AxisCmdX.DirectionPositive := (CmdXVal &gt; 0.1);
@@ -2843,18 +2860,18 @@ AxisCmdX.DirectionNegative := (CmdXVal &lt; -0.1);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
 IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
-// Miroirs
-SpeedTgtX_Pct := AxisCmdX.SpeedTgt;
-IF AxisCmdX.DirectionPositive THEN DirectionX := 1;
-ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
-ELSE DirectionX := 0; END_IF;
+// Projections monitoring dans le struct (les bits restent la source logique)
+IF AxisCmdX.DirectionPositive THEN AxisCmdX.Direction := 1;
+ELSIF AxisCmdX.DirectionNegative THEN AxisCmdX.Direction := -1;
+ELSE AxisCmdX.Direction := 0; END_IF;
+AxisCmdX.Deflection := REAL_TO_INT(CmdXVal);   // deflexion signee -100..+100 % (anim IHM)
 {endregion}
 
 {region &quot;§6 Pipeline axe Y et sorties&quot;}
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
-AxisCmdY.SpeedTgt := CmdYVal;
+AxisCmdY.SpeedTgt := ABS(CmdYVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdY.Direction)
 AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
 
 AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
@@ -2862,13 +2879,13 @@ AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
 IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
-// Miroirs
-SpeedTgtY_Pct := AxisCmdY.SpeedTgt;
-IF AxisCmdY.DirectionPositive THEN DirectionY := 1;
-ELSIF AxisCmdY.DirectionNegative THEN DirectionY := -1;
-ELSE DirectionY := 0; END_IF;
+// Projections monitoring dans le struct (les bits restent la source logique)
+IF AxisCmdY.DirectionPositive THEN AxisCmdY.Direction := 1;
+ELSIF AxisCmdY.DirectionNegative THEN AxisCmdY.Direction := -1;
+ELSE AxisCmdY.Direction := 0; END_IF;
+AxisCmdY.Deflection := REAL_TO_INT(CmdYVal);   // deflexion signee -100..+100 % (anim IHM)
 
-// Validation des sorties etat
+// Miroirs point neutre courant
 NeutralXAct := NeutralXMem;
 NeutralYAct := NeutralYMem;
 {endregion}
@@ -2877,7 +2894,91 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_EncoderHw.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\E_PresetConfirmMode.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_PresetConfirmMode — Mode de confirmation du preset codeur
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : sélectionner le fait public utilisé pour valider un preset.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE E_PresetConfirmMode :
+ENUM
+    READBACK_ONLY        := 0, // Confirmation par relecture de position
+    READBACK_AND_STATUSBIT := 1, // Relecture et bit d&#x27;état matériel
+    STATUSBIT_ONLY       := 2  // Bit d&#x27;état matériel uniquement
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_fbEncoder_Cfg.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ ST_fbEncoder_Cfg — Réglages technologiques publics de FB_Encoder
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
+   🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE ST_fbEncoder_Cfg :
+STRUCT
+    PresetConfirmMode : E_PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY; // Mode de confirmation preset, défaut relecture
+    Initialized       : BOOL := FALSE;                        // 🚦 TRUE après restauration du pont persistant
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_fbEncoder_HwIn.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_fbEncoder_HwIn — Faits hardware d&#x27;entrée codeur (HwIn)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les SEULES entrées/faits hardware d&#x27;un codeur absolu
+      EtherCAT consommés par FB_Encoder (lecture seule côté automate).
+   🔒 Ownership : PRG_02_Acquisition câble ce bus depuis le device/simulé.
+   🛡️ PresetStatusBit : bit du mot d&#x27;état codeur, réservé site futur —
+      câblé à FALSE tant qu&#x27;aucun bit n&#x27;est identifié (aucun signal absent
+      ne confirme implicitement le preset).
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE ST_fbEncoder_HwIn :
+STRUCT
+    // === ENTRÉES BUS ETHERCAT (faits d&#x27;entrée, lecture seule) ===
+    RawPosIn           : UDINT; // --&gt; [HW] Position brute codeur
+    AlarmsIn           : UINT;  // --&gt; [HW] Alarmes brutes codeur
+    WarningsIn         : UINT;  // --&gt; [HW] Avertissements bruts codeur
+    SlaveOperational   : BOOL;  // --&gt; [HW] Esclave EtherCAT operationnel
+    PresetStatusBit    : BOOL;  // --&gt; [HW] Bit d&#x27;etat preset optionnel, FALSE si non cable
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_fbEncoder_HwOut.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_fbEncoder_HwOut — Ordres preset de sortie codeur (HwOut)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les SEULES sorties/ordres preset d&#x27;un codeur absolu
+      EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
+   🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
+      vers le device.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE ST_fbEncoder_HwOut :
+STRUCT
+    // === SORTIES BUS ETHERCAT (ordres preset vers PDO Rx) ===
+    PresetTriggerCmd   : WORD;   // &lt;-- [ACT] Declenchement preset vers PDO Rx
+    CodeSeqTriggerCmd  : WORD;   // &lt;-- [ACT] Sequence code vers PDO Rx, maintenue a 0
+    PresetValueOut     : UDINT;  // &lt;-- [ACT] Valeur brute envoyee au preset
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_EncoderHw.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🔌 ST_EncoderHw — Frontière hardware codeur (IN/OUT)
    ───────────────────────────────────────────────────────────────
@@ -2905,7 +3006,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_Encoder_Calib.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_Encoder_Calib.st</code></summary>
                 <pre>(* =======================================================================
    💾 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
@@ -2931,7 +3032,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_EncoderMeasurement.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_EncoderMeasurement.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
@@ -2957,15 +3058,16 @@ STRUCT
     SpeedValid        : BOOL;         // TRUE si 6 echantillons valides sur au moins 50 ms
 
     // === STATUTS DES SOUS-FB &amp; REFERENCE ===
-    HomingStatus      : ST_FbStatus;  // Statut FB_Encoder_Homing (etat du referencement)
-    AbsStatus         : ST_FbStatus;  // Statut FB_Encoder_Abs (etat acquisition bus)
+    HomingFault       : ST_Fault;     // Défaut FB_Encoder_Homing (état du référencement)
+    HomingLifecycle   : ST_Lifecycle; // Cycle FB_Encoder_Homing (Busy/Done)
+    AbsFault          : ST_Fault;     // Défaut FB_Encoder_Abs (état acquisition bus)
     HomingRefRaw      : UDINT;        // Reference brute du dernier homing reussi (re-expose)
 END_STRUCT
 END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_EncoderMeasurements.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_EncoderMeasurements.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
    ───────────────────────────────────────────────────────────────
@@ -3018,9 +3120,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; SYNOPTIQUE ===
     Ready               : BOOL;        // &lt;-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: &quot;Com&quot;, bit1: &quot;Preset Timeout&quot;.
-    Status              : ST_FbStatus;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault               : ST_Fault;
 
     // === MESURES &amp; DONNEES CODEUR ===
     RawPos              : UDINT;       // &lt;-- [DIAG] Position brute gelee si non disponible
@@ -3029,8 +3130,6 @@ VAR_OUTPUT
     TurnCount           : UDINT;       // &lt;-- [DIAG] Nombre de tours bruts (RawPos / PointsPerRev)
 
     // === COMMANDES &amp; ECHANGE BUS ETHERCAT ===
-    PresetAck           : BOOL;        // &lt;-- [STAT] Pulse confirmation preset reussi
-    PresetNak           : BOOL;        // &lt;-- [STAT] Pulse refus / timeout preset
     PresetTriggerCmd    : WORD;        // &lt;-- [ACT]  Ordre declenchement preset vers PDO Rx
     CodeSeqTriggerCmd   : WORD;        // &lt;-- [ACT]  Ordre sequence code vers PDO Rx
     PresetValueOut      : UDINT;       // &lt;-- [ACT]  Valeur de preset transmise au PDO Rx
@@ -3038,7 +3137,6 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONT ===
     ResetEdge           : R_TRIG;      // . [LOC] Detecteur front montant Reset
-    ErrorEdge           : R_TRIG;      // . [LOC] Detecteur front montant Error
     PresetReqEdge       : R_TRIG;      // . [LOC] Detecteur front montant PresetRequest
 
     // === TEMPORISATEURS INTERNES ===
@@ -3048,44 +3146,60 @@ VAR
     // === VARIABLES INTERNES DE CALCUL &amp; ETAT ===
     PresetSeqStep       : INT;         // . [LOC] Etape sequence preset (0:IDLE, 1:PULSE/WAIT)
     RawDiff             : DINT;        // . [LOC] Ecart signe entre RawPos et PresetValueOut
+    PresetCompleted     : BOOL;        // . [LOC] Fait de fin de maintien preset (un scan)
+    PresetTimeoutError  : BOOL;        // . [LOC] Latch interne timeout séquence preset
+
+    // === SOCLE DEFAUT (FB_FaultCore) ===
+    instFault           : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses          : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
 
-{region &quot;§1 Gate&quot;}
-// 🛑 1. GATE
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🔍 2. DIAGNOSTIC BUS / ALARME (Cause 0 : live)
+instCauses[0].Active   := (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational;
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := &#x27;Defaut communication EtherCAT codeur absolu&#x27;;
+
+// ⏱️ 3. TIMEOUT PRESET (Cause 1 : latched)
+IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
+    PresetTimeoutError := FALSE;
+END_IF;
+instCauses[1].Active   := PresetTimeoutError;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := &#x27;Timeout sequence preset SDO codeur&#x27;;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+
+EncoderAvailable := NOT instCauses[0].Active;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Ready := FALSE;
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
+    PresetCompleted := FALSE;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
     PresetTimerVisual(IN := FALSE, PT := T#500MS);
+    // RawPos, AngleRaw et TurnCount sont volontairement gelés hors Enable
+    // (AF09 F09.01 / AC5) : aucune lecture bus ni remise a zero dans ce gate.
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region &quot;§2 Reset front&quot;}
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-{endregion}
-
-{region &quot;§3 Diagnostic bus et alarme&quot;}
-// 🔍 3. DIAGNOSTIC BUS / ALARME
-IF (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l&#x27;esclave sont OK *)
-END_IF;
-EncoderAvailable := (Status.ErrorId AND 16#0001) = 0;
-{endregion}
-
-{region &quot;§4 Lecture position&quot;}
-// 📥 4. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
+{region &quot;§3 Lecture position&quot;}
+// 📥 3. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
 // Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
 // global ici pour ne pas geler aussi la séquence preset/l&#x27;état — seule la lecture est gelée).
 IF EncoderAvailable THEN
@@ -3095,13 +3209,13 @@ IF EncoderAvailable THEN
 END_IF;
 {endregion}
 
-{region &quot;§5 Séquence preset&quot;}
-// 🔧 5. SÉQUENCE PRESET (écriture bus)
+{region &quot;§4 Séquence preset&quot;}
+// 🔧 4. SÉQUENCE PRESET (écriture bus)
 // PresetTriggerCmd := 2 déclenche le référencement à PresetValue (valeur de commande, pas un
 // masque de bits). CodeSeqTriggerCmd : rôle non identifié — laissé à 0, PAS piloté tant que sa
 // fonction n&#x27;est pas confirmée. Ne jamais lui donner une valeur arbitraire.
 PresetReqEdge(CLK := PresetRequest);
-PresetAck := FALSE; PresetNak := FALSE; // pulses 1 cycle uniquement
+PresetCompleted := FALSE;
 CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
 CASE PresetSeqStep OF
     0: // IDLE
@@ -3119,34 +3233,18 @@ CASE PresetSeqStep OF
             PresetTimerVisual(IN := TRUE, PT := T#500MS);
             IF PresetTimerVisual.Q THEN
                 PresetTriggerCmd := 0;
-                PresetAck := TRUE;
+                PresetCompleted := TRUE;
                 PresetSeqStep := 0;
                 PresetTimerVisual(IN := FALSE, PT := T#500MS);
             END_IF;
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
-            PresetNak := TRUE;
-            Status.ErrorId := Status.ErrorId OR 16#0002;
+            PresetTimeoutError := TRUE;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
             PresetTimerVisual(IN := FALSE, PT := T#500MS);
         END_IF;
 END_CASE;
-IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFD;
-END_IF;
-{endregion}
-
-{region &quot;§6 Error et StateAtError&quot;}
-// 🧾 6. ERROR / STATEATERROR
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-Status.Busy := (PresetSeqStep &lt;&gt; 0);
-Status.Done := PresetAck;
 {endregion}
 </pre>
             </details>
@@ -3180,14 +3278,13 @@ VAR_INPUT
 
     // === RETOURS HW &amp; CAPTEURS ===
     TopPositionSensor      : BOOL;        // --&gt; [HW]  Capteur physique position haute unique
-    FwdRevSpeedFeedbackOff : BOOL;        // --&gt; [HW]  Contacteurs sens et vitesse retombes
-    BrakeFeedback          : BOOL;        // --&gt; [HW]  Contacteur frein ouvert/desserre
-
     // === MESURES &amp; RETOURS FB CODEUR ABSOLU ===
     RawPos                 : UDINT;       // --&gt; [HW]  Position brute codeur (sortie FB_Encoder_Abs)
     EncoderAvailable       : BOOL;        // --&gt; [HW]  Codeur absolu disponible et valide
-    PresetAck              : BOOL;        // --&gt; [HW]  Pulse confirmation ecriture preset reussie
-    PresetNak              : BOOL;        // --&gt; [HW]  Pulse echec / timeout ecriture preset
+    PresetStatusBit        : BOOL;        // --&gt; [HW]  Bit d&#x27;etat preset optionnel, FALSE si non cable
+
+    // === REGLAGES TRANSACTION PRESET ===
+    Cfg                    : ST_fbEncoder_Cfg; // --&gt; [CFG] Mode de confirmation preset
 
     // === CARACTERISTIQUES MECANIQUES &amp; BUS ===
     PointsPerRev           : UDINT := 8192; // --&gt; [CFG] Resolution codeur (pts/tour)
@@ -3200,9 +3297,10 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; SYNOPTIQUE ===
     Ready                  : BOOL;        // &lt;-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5: preset, bit9: incoherence boot).
-    Status                 : ST_FbStatus;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                  : ST_Fault;
+    // 🧩 Cycle de vie (forme cible ST_Lifecycle)
+    Lifecycle              : ST_Lifecycle;
 
     // === COMMANDES VERS FB_ENCODER_ABS ===
     PresetRequest          : BOOL;        // &lt;-- [ACT]  Pulse demande d&#x27;ecriture preset SDO
@@ -3212,6 +3310,7 @@ VAR_OUTPUT
     Homed                  : BOOL;        // &lt;-- [STAT] Codeur pagine et referencie
     HomingSuspect          : BOOL;        // &lt;-- [DIAG] Incoherence redemarrage a lever
     HomingRefRaw           : UDINT;       // &lt;-- [DIAG] Offset de reference brut calcule
+    PresetConfirmationFailed : BOOL;      // &lt;-- [DIAG] Latch derniere verification preset echouee
 END_VAR
 VAR_IN_OUT
     // === STRUCTURE DE CALIBRATION PERSISTANTE ===
@@ -3220,7 +3319,6 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONT ===
     ResetEdge              : R_TRIG;      // . [LOC] Detecteur front montant Reset
-    ErrorEdge              : R_TRIG;      // . [LOC] Detecteur front montant Error
     HomeEdge               : R_TRIG;      // . [LOC] Detecteur front montant Home
     ConfirmCoherenceEdge   : R_TRIG;      // . [LOC] Detecteur front montant BtnConfirmCoherence
     TopSensorEdge          : R_TRIG;      // . [LOC] Detecteur front montant TopPositionSensor
@@ -3228,100 +3326,144 @@ VAR
 
     // === ETATS &amp; DRAPEAUX INTERNES ===
     InitDone               : BOOL;        // . [LOC] Controle incoherence boot effectue
-    ArretConfirme          : BOOL;        // . [LOC] Condition d&#x27;arret moteur confirmee
     HomingModeOk           : BOOL;        // . [LOC] Mode de fonctionnement valide pour homing
     NominalHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing nominal
     UnitaryHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing unitaire
     DynamicHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing dynamique
     HomingTrigger          : BOOL;        // . [LOC] Synthese declenchement homing
+    PresetVerificationActive : BOOL;      // . [LOC] Verification preset en attente
+    PresetConfirmed        : BOOL;        // . [LOC] Resultat du mode de confirmation selectionne
+
+    // === DRAPEAUX DEFAUTS INTERNES ===
+    HomingModeError        : BOOL;        // . [LOC] Latch erreur mode
+    TargetOutOfRangeError  : BOOL;        // . [LOC] Latch cible hors limites
+    PresetFailError        : BOOL;        // . [LOC] Latch échec preset
+    BootIncoherentError    : BOOL;        // . [LOC] Latch incohérence boot
 
     // === VARIABLES DE CALCUL ===
     TargetPoints           : DINT;        // . [LOC] Ecart cible converti en points
     TargetPositionM        : REAL;        // . [LOC] Cible retenue en metres
     RawDiffRestart         : DINT;        // . [LOC] Ecart brut de position au redemarrage
+    PendingHomingRefRaw    : UDINT;       // . [LOC] Reference candidate, non publiee avant succes
+    CandidateRawDiff       : DINT;        // . [LOC] Ecart brut de la mesure candidate
+    CandidateCablePosM     : REAL;        // . [LOC] Position candidate calculee avant commit
+    ReadbackOk             : BOOL;        // . [LOC] Mesure candidate dans la tolerance
+    StatusBitOk            : BOOL;        // . [LOC] Etat du bit optionnel de confirmation
+    PresetVerifyTimer      : TON;         // . [LOC] Temporisation historique de verification 500ms
+
+    // === SOCLE DEFAUT (FB_FaultCore) ===
+    instFault              : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses             : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
+END_VAR
+
+VAR CONSTANT
+    // === TOLERANCE &amp; TEMPORISATION TRANSACTION ===
+    CST_HomingVerifyToleranceM : REAL := 0.010; // Tolerance mesure cible (m)
+    CST_PresetVerifyTime        : TIME := T#500MS; // Latence historique avant relecture
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
 
-{region &quot;§1 Gate neutralisation&quot;}
-// 🛑 1. GATE — neutralisation ; on continue toutefois d&#x27;exposer le dernier état RETAIN connu
-// (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-// PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
-IF NOT Enable THEN
-    PresetRequest := FALSE;
-    PresetValue := 0;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    InitDone := FALSE;   // Force un nouveau contrôle §3.7 à la prochaine activation
-    Homed := Calib.Homed;
-    HomingSuspect := Calib.HomingSuspect;
-    HomingRefRaw := Calib.HomingRefRaw;
-    RETURN;
-END_IF;
-
-Ready := TRUE;
-
-{endregion}
-
-{region &quot;§2 Fronts et coherence demarrage&quot;}
-// 🔑 2. FRONTS
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. FRONTS
 ResetEdge(CLK := Reset);
 HomeEdge(CLK := Home);
 ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
 
-// 🔍 3. COHÉRENCE AU REDÉMARRAGE (§3.7) — une fois par session Enable, dès que le codeur répond
+// Effacement des latches d&#x27;erreur sur Reset conscient
+IF ResetEdge.Q THEN
+    PresetConfirmationFailed := FALSE;
+    HomingModeError := FALSE;
+    TargetOutOfRangeError := FALSE;
+    PresetFailError := FALSE;
+END_IF;
+
+// Levée de doute incohérence boot (BtnConfirmCoherence)
+IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
+    Calib.HomingSuspect := FALSE;
+    BootIncoherentError := FALSE;
+END_IF;
+
+// Configuration des causes nommées
+instCauses[0].Active   := HomingModeError;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := &#x27;Homing non autorise dans ce mode&#x27;;
+
+instCauses[1].Active   := TargetOutOfRangeError;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := &#x27;Cible de homing hors plage&#x27;;
+
+instCauses[2].Active   := PresetFailError;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := &#x27;Echec confirmation transaction preset&#x27;;
+
+instCauses[3].Active   := BootIncoherentError;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := &#x27;Incoherence position codeur au demarrage&#x27;;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE — neutralisation ; on continue toutefois d&#x27;exposer le dernier état RETAIN connu
+// (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
+IF NOT Enable THEN
+    PresetRequest := FALSE;
+    PresetValue := 0;
+    Ready := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    InitDone := FALSE;   // Force un nouveau contrôle à la prochaine activation
+    PresetVerificationActive := FALSE;
+    PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
+    Homed := Calib.Homed;
+    HomingSuspect := Calib.HomingSuspect;
+    HomingRefRaw := Calib.HomingRefRaw;
+    // PresetConfirmationFailed est un diagnostic latch : il est gelé hors Enable
+    RETURN;
+END_IF;
+
+Ready := Enable AND NOT Fault.Latched;
+{endregion}
+
+{region &quot;§3 Cohérence au redémarrage&quot;}
+// 🔍 3. COHÉRENCE AU REDÉMARRAGE — une fois par session Enable, dès que le codeur répond
 IF NOT InitDone THEN
-    Status.State := E_State.INIT;
     IF EncoderAvailable THEN
         RawDiffRestart := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Calib.LastKnownRawPos);
         IF Calib.Homed AND (ABS(RawDiffRestart) &gt; UDINT_TO_DINT(Calib.RestartCoherenceTolerancePts)) THEN
             Calib.HomingSuspect := TRUE;
-            Status.ErrorId := Status.ErrorId OR 16#0200;   // bit9 : incohérence codeur au redémarrage
+            BootIncoherentError := TRUE;
         END_IF;
         InitDone := TRUE;
     END_IF;
-ELSE
-    IF Status.State = E_State.INIT THEN Status.State := E_State.READY; END_IF;
 END_IF;
-
 {endregion}
 
-{region &quot;§3 Confirmation coherence et demande homing&quot;}
-// ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
-IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
-    Calib.HomingSuspect := FALSE;
-    Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
-END_IF;
-
+{region &quot;§4 Demande et déclenchement homing&quot;}
+// ⚙️ 4. DEMANDE &amp; DÉCLENCHEMENT HOMING
 PresetRequest := FALSE;
+PresetValue := 0;
 TopSensorEdge(CLK := TopPositionSensor);
 DynamicTargetEdge(CLK := UseDynamicTarget);
-
-// Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
-// chaque scan, jamais latchées, aucun Reset requis pour les effacer.
-Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
 
 HomingModeOk := HomingPermit;
 
 IF HomeEdge.Q AND NOT HomingModeOk THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : homing non autorise
+    HomingModeError := TRUE;
 END_IF;
 
-// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
-// (FB_Safety_Winch) coupe déjà la montée indépendamment dès que TopPositionSensor est actif ;
-// attendre l&#x27;arrêt casserait la répétabilité recherchée à vitesse d&#x27;accostage constante.
-// Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
-// quand Home est pressé.
 NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget
                          AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
 
-// Unitaire : cible libre (CfgHomingTargetM), déclenchée par la demande (front).
 UnitaryHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND HomeEdge.Q;
 
-// Dynamique (benne) : HomingModeOk vérifié ici en défense.
 DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
-HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
+HomingTrigger := (NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger)
+                 AND NOT PresetVerificationActive;
 
 IF HomingTrigger THEN
     IF UseDynamicTarget THEN
@@ -3332,70 +3474,74 @@ IF HomingTrigger THEN
         TargetPositionM := CfgHomingTargetM;
     END_IF;
 
-    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
-    // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
-    // physique documentée [-99;+99] m avant d&#x27;être gravée dans la référence codeur.
+    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) [-99;+99] m
     IF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
-        Status.ErrorId := Status.ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
+        TargetOutOfRangeError := TRUE;
     ELSE
         TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-        Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
+        PendingHomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
+        PresetValue := RawPos;
+        PresetRequest := TRUE;
+        PresetVerificationActive := TRUE;
+        Lifecycle.Done := FALSE;
+    END_IF;
+END_IF;
+{endregion}
+
+{region &quot;§5 Suivi de transaction preset&quot;}
+// ⏳ 5. SUIVI DE LA TRANSACTION PRESET
+PresetVerifyTimer(IN := PresetVerificationActive, PT := CST_PresetVerifyTime);
+IF PresetVerificationActive AND PresetVerifyTimer.Q THEN
+    CandidateRawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PendingHomingRefRaw);
+    IF PointsPerRev &lt;&gt; 0 THEN
+        CandidateCablePosM := DINT_TO_REAL(CandidateRawDiff) * CableM_PerRev / UDINT_TO_REAL(PointsPerRev);
+    ELSE
+        CandidateCablePosM := 0.0;
+    END_IF;
+    ReadbackOk := ABS(CandidateCablePosM - TargetPositionM) &lt;= CST_HomingVerifyToleranceM;
+    StatusBitOk := PresetStatusBit;
+
+    CASE Cfg.PresetConfirmMode OF
+        E_PresetConfirmMode.READBACK_ONLY:
+            PresetConfirmed := ReadbackOk;
+        E_PresetConfirmMode.READBACK_AND_STATUSBIT:
+            PresetConfirmed := ReadbackOk AND StatusBitOk;
+        E_PresetConfirmMode.STATUSBIT_ONLY:
+            PresetConfirmed := StatusBitOk;
+        ELSE
+            PresetConfirmed := FALSE;
+    END_CASE;
+
+    IF PresetConfirmed THEN
+        Calib.HomingRefRaw := PendingHomingRefRaw;
         Calib.Homed := TRUE;
         Calib.HomingSuspect := FALSE;
         Calib.LastKnownRawPos := RawPos;
-        HomingRefRaw := Calib.HomingRefRaw;
-        Homed := TRUE;
-        HomingSuspect := FALSE;
-        Status.Done := TRUE;
-        Status.ErrorId := 16#0000;
-        Status.State := E_State.READY;
-
-        // Envoi de la demande de Preset SDO au matériel : la valeur brute injectee
-        // correspond a la cible (calcul inverse) pour que CablePosM = cible.
-        PresetValue := DINT_TO_UDINT(UDINT_TO_DINT(Calib.HomingRefRaw) + TargetPoints);
-        PresetRequest := TRUE;
+        PresetConfirmationFailed := FALSE;
+        PresetFailError := FALSE;
+        Lifecycle.Done := TRUE;
+    ELSE
+        Calib.HomingSuspect := TRUE;
+        PresetConfirmationFailed := TRUE;
+        PresetFailError := TRUE;
+        Lifecycle.Done := FALSE;
     END_IF;
-END_IF;
 
+    PresetVerificationActive := FALSE;
+    PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
+END_IF;
 {endregion}
 
-{region &quot;§4 Suivi SDO reset et sorties etat&quot;}
-// ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
-IF Status.State = E_State.BUSY THEN
-    IF PresetAck THEN
-        Status.Done := TRUE;
-        Status.State := E_State.READY;
-        // Un homing réussi efface l&#x27;intégralité de ErrorId
-        Status.ErrorId := 16#0000;
-    ELSIF PresetNak THEN
-        Status.ErrorId := Status.ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
-        Status.State := E_State.READY;
-    END_IF;
-END_IF;
-
-// 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
-// à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
-IF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
-END_IF;
-
-// 📤 8. SORTIES ÉTAT
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-// Mise à jour continue du point brut valide connu (hors séquence de homing elle-même)
-IF EncoderAvailable AND (Status.State &lt;&gt; E_State.BUSY) THEN
+{region &quot;§6 Sorties état &amp; calibration&quot;}
+// 📤 6. SORTIES ÉTAT &amp; CALIBRATION
+IF EncoderAvailable AND NOT PresetVerificationActive THEN
     Calib.LastKnownRawPos := RawPos;
 END_IF;
 
-Status.Busy := (Status.State = E_State.BUSY);
-Homed := Calib.Homed AND NOT Calib.HomingSuspect; // Perd l&#x27;état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
+Lifecycle.Busy := PresetVerificationActive;
+Homed := Calib.Homed AND NOT Calib.HomingSuspect;
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
-
 {endregion}
 </pre>
             </details>
@@ -3475,9 +3621,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; SYNOPTIQUE ===
     Ready                 : BOOL;        // &lt;-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: &quot;Bornes&quot;, bit1: &quot;Boot suspect&quot;.
-    Status                : ST_FbStatus;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                 : ST_Fault;
 
     // === MESURES SURE &amp; SECURITE ===
     CablePosMSafe         : REAL;        // &lt;-- [DIAG] Position cable instantanee transmise (m)
@@ -3486,71 +3631,48 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONT ===
     ResetEdge             : R_TRIG;      // . [LOC] Detecteur front montant Reset
-    ErrorEdge             : R_TRIG;      // . [LOC] Detecteur front montant Error
+
+    // === SOCLE DEFAUT (FB_FaultCore) ===
+    instFault             : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses            : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
-{region &quot;§1 Gate&quot;}
-// 🛑 1. GATE
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🔍 2. SURVEILLANCE BORNAGE &amp; INCOHÉRENCE BOOT
+instCauses[0].Active   := NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM));
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := &#x27;Depassement bornes physiques absolues cable&#x27;;
+
+instCauses[1].Active   := NOT BypassGlobal AND HomingSuspect;
+instCauses[1].Latching := FALSE;
+instCauses[1].Texte    := &#x27;Incoherence position au redemarrage&#x27;;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE
 IF NOT Enable THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     CablePosMSafe := CablePosM;
     EncoderIncoherent := FALSE;
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region &quot;§2 Reset front&quot;}
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-{endregion}
-
-{region &quot;§3 Bypass global&quot;}
-// 🌐 3. BYPASS GLOBAL
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-END_IF;
-{endregion}
-
-{region &quot;§4 Surveillance bornage&quot;}
-// 🔍 4. SURVEILLANCE BORNAGE PHYSIQUE ABSOLU (bit0)
-IF NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM)) THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
-END_IF;
-{endregion}
-
-{region &quot;§5 Relais incohérence redémarrage&quot;}
-// 🔍 5. RELAIS INCOHÉRENCE REDÉMARRAGE (bit1)
-IF NOT BypassGlobal THEN
-    IF HomingSuspect THEN
-        Status.ErrorId := Status.ErrorId OR 16#0002;
-    ELSE
-        Status.ErrorId := Status.ErrorId AND 16#FFFD;
-    END_IF;
-END_IF;
-{endregion}
-
-{region &quot;§6 Transmission mesure&quot;}
-// 📏 6. TRANSMISSION DE LA MESURE (Toujours réelle, non figée)
+{region &quot;§3 Transmission mesure et sécurité&quot;}
+// 📏 3. TRANSMISSION DE LA MESURE &amp; SÉCURITÉ
 CablePosMSafe := CablePosM;
-{endregion}
-
-{region &quot;§7 Sorties état et sécurité&quot;}
-// 📤 7. SORTIES ÉTAT &amp; SÉCURITÉ
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-EncoderIncoherent := Status.Error;
-Status.Busy := FALSE;
-Status.Done := FALSE;
+EncoderIncoherent := Fault.Error;
 {endregion}
 </pre>
             </details>
@@ -3745,11 +3867,14 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regrouper toute la chaine codeur derriere une interface unique :
       Abs → Homing → Scale → Safety → Reliability → Speed.
-   🔌 Frontiere hardware exposee en IN/OUT via le bus ST_EncoderHw (testable).
+   🔌 Frontiere hardware separee HwIn/HwOut (testable).
    🔒 Homing : autorise par HomingPermit (calcule par le caller), declenche
       par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
       de vitesse au meme scan. HomedAndReliable = gate strict interlock M3.
+   🧩 Defaut : Fault:ST_Fault rempli par FB_FaultCore (instFault) depuis une liste
+      de causes en clair (instCauses) — pattern FB_Joystick. Ready = Enable ET pas de
+      defaut late. Interlocks machine sur les faits bruts, jamais sur Fault.Latched.
    📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ======================================================================= *)
 
@@ -3775,24 +3900,25 @@ VAR_INPUT
     TopPositionSensor     : BOOL;        // --&gt; [HW]  Capteur physique position haute unique
 
     // === BUS ETHERCAT &amp; CAPTEUR HW (frontiere testable) ===
-    Hw                    : ST_EncoderHw; // &lt;-&gt; [BUS] Entrees/sorties hardware codeur
+    HwIn                  : ST_fbEncoder_HwIn; // --&gt; [HW] Retours hardware codeur
 
     // === MECANIQUE (constantes) ===
     PointsPerRev          : UDINT := 8192; // --&gt; [CFG] Resolution codeur (pts/tour)
     CableM_PerRev         : REAL := 2.0;   // --&gt; [CFG] Developpement cable par tour (m/tour)
 
-    // === REGLAGES (modifiables) ===
+    // === REGLAGES &amp; CONFIGURATION ===
+    Cfg                   : ST_fbEncoder_Cfg; // --&gt; [CFG] Mode de confirmation preset
     PositionMinM          : REAL := -99.0; // --&gt; [CFG] Plafond bornage physique bas (m)
     PositionMaxM          : REAL := 99.0;  // --&gt; [CFG] Plafond bornage physique haut (m)
     BypassGlobal          : BOOL := FALSE; // --&gt; [TST] Neutralisation defauts pour mise en service
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; SYNOPTIQUE ===
-    Ready                 : BOOL;        // &lt;-- [STAT] FB pret a fonctionner
-    Status                : ST_FbStatus; // &lt;-- [STAT] Statut transverse facade (synthese)
+    Ready                 : BOOL;        // &lt;-- [STAT] FB pret a fonctionner (Enable ET pas de defaut late)
+    Fault                 : ST_Fault;    // &lt;-- [DIAG] Brique defaut socle (live + latchee), remplie par FB_FaultCore
 
     // === FRONTIERE HW SORTIE (testable) ===
-    HwOut                 : ST_EncoderHw; // &lt;-- [BUS] Sorties hardware codeur (preset...)
+    HwOut                 : ST_fbEncoder_HwOut; // &lt;-- [ACT] Ordres hardware codeur (preset)
 
     // === MESURES CONDITIONNEES (struct frontiere) ===
     Measurement           : ST_EncoderMeasurement; // &lt;-- [BUS] Mesures + statuts (interface)
@@ -3802,6 +3928,7 @@ VAR_OUTPUT
     HomingSuspect         : BOOL;        // &lt;-- [DIAG] Incoherence redemarrage a lever
     EncoderFault          : BOOL;        // &lt;-- [SAFE] Gate general fiabilite (sans Homed)
     HomedAndReliable      : BOOL;        // &lt;-- [STAT] Gate strict M3 : dispo ET ref ET pas incoherent
+    PresetConfirmationFailed : BOOL;     // &lt;-- [DIAG] Latch derniere verification preset echouee
 END_VAR
 VAR
     // === SOUS-INSTANCES FB (chaine codeur complete) ===
@@ -3811,6 +3938,8 @@ VAR
     instSafety     : FB_Encoder_Safety;       // * [INST] Bornage &amp; coherence mesure
     instRel        : FB_EncoderReliability;   // * [INST] Gates de fiabilite
     instSpeed      : FB_Encoder_SpeedMeasure; // * [INST] Calcul vitesse cable
+    instFault      : FB_FaultCore;            // * [INST] Socle de defaut (liste de causes -&gt; ST_Fault)
+    instCauses     : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Liste des causes pour le socle FB_FaultCore
 END_VAR
 VAR_IN_OUT
     // === CALIBRATION PERSISTANTE (externe RETAIN, jamais membre) ===
@@ -3819,27 +3948,43 @@ END_VAR
 
 {region &quot;§1 Gate neutralisation&quot;}
 IF NOT Enable THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
-    Measurement.CablePosM := 0.0; Measurement.EncoderIncoherent := FALSE;
+    Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
+    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 16#0000;
+    Measurement.HomingLifecycle.Busy := FALSE; Measurement.HomingLifecycle.Done := FALSE;
+    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 16#0000;
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
+    // Frontiere HW sortie : aucun ordre preset publie hors autorisation
+    // (sinon PRG_02_Acquisition relaie une valeur perimee au codeur absolu -&gt; preset parasite, reference corrompue)
+    HwOut.PresetTriggerCmd := 0; HwOut.CodeSeqTriggerCmd := 0; HwOut.PresetValueOut := 0;
+    // Reference connue MAINTENUE depuis Calib (RETAIN) meme FB desactive (AF09 §4) :
+    // un FB desactive ne doit pas faire perdre la reference aux consommateurs aval (PRG_04, FB_Encoder_Scale).
+    Homed := Calib.Homed;
+    HomingSuspect := Calib.HomingSuspect;
+    Measurement.HomingRefRaw := Calib.HomingRefRaw;
+    // PresetConfirmationFailed est un diagnostic latch : il reste gele hors Enable
+    // et ne doit pas etre efface par ce gate (AC3).
+    // Socle appele meme Enable=FALSE : maintient le latch non acquitte et traite le Reset
+    // hors autorisation (AC4). Les causes ne sont pas evaluees (Enable=FALSE -&gt; vue live a 0),
+    // les latches sont preserves.
+    instFault(Enable := FALSE, Reset := Reset, Causes := instCauses);
+    Fault := instFault.Fault;
     RETURN;
 END_IF;
 Ready := TRUE;
-Status.State := E_State.READY;
 {endregion}
 
 {region &quot;§2 Abs&quot;}
-instAbs(
+    instAbs(
     Enable              := Enable,
     Reset               := Reset,
-    RawPosIn            := Hw.RawPosIn,
-    AlarmsIn            := Hw.AlarmsIn,
-    WarningsIn          := Hw.WarningsIn,
-    SlaveOperational    := Hw.SlaveOperational,
+    RawPosIn            := HwIn.RawPosIn,
+    AlarmsIn            := HwIn.AlarmsIn,
+    WarningsIn          := HwIn.WarningsIn,
+    SlaveOperational    := HwIn.SlaveOperational,
     PresetRequest       := instHoming.PresetRequest,
     PresetValue         := instHoming.PresetValue,
     PointsPerRev        := PointsPerRev
@@ -3860,8 +4005,8 @@ instHoming(
     TopPositionSensor    := TopPositionSensor,
     RawPos               := instAbs.RawPos,
     EncoderAvailable     := instAbs.EncoderAvailable,
-    PresetAck            := instAbs.PresetAck,
-    PresetNak            := instAbs.PresetNak,
+    PresetStatusBit      := HwIn.PresetStatusBit,
+    Cfg                  := Cfg,
     PointsPerRev         := PointsPerRev,
     MultiTurnRevsMax     := 4096,
     CableM_PerRev        := CableM_PerRev,
@@ -3917,8 +4062,9 @@ Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
 Measurement.SpeedValid        := instSpeed.Valid;
-Measurement.HomingStatus      := instHoming.Status;
-Measurement.AbsStatus         := instAbs.Status;
+Measurement.HomingFault        := instHoming.Fault;
+Measurement.HomingLifecycle    := instHoming.Lifecycle;
+Measurement.AbsFault           := instAbs.Fault;
 Measurement.HomingRefRaw      := instHoming.HomingRefRaw;
 
 // Frontiere HW sortie (preset)
@@ -3931,12 +4077,26 @@ Homed            := instHoming.Homed;
 HomingSuspect    := instHoming.HomingSuspect;
 EncoderFault     := instRel.EncoderFault;
 HomedAndReliable := instRel.HomedAndReliable;
+PresetConfirmationFailed := instHoming.PresetConfirmationFailed;
 
-// Synthese statut facade
-Status.Busy := instAbs.Status.Busy;
-Status.Done := instSpeed.Valid AND instAbs.Ready;
-Status.Error := instAbs.Status.Error OR instSafety.Status.Error OR instHoming.Status.Error;
-Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHoming.Status.ErrorId;
+// Synthese statut facade : brique defaut socle (Fault:ST_Fault), pattern FB_Joystick.
+// Causes exprimees en CLAIR (ST_FaultCause), alimentees UNIQUEMENT depuis les sorties
+// publiques des sous-FB (encapsulation stricte, jamais de lecture VAR interne).
+//   - Cause 0/1 : LIVE (Latching=FALSE) -&gt; Fault.Error, retombe seule.
+//   - Cause 2   : LATCHED (Latching=TRUE) -&gt; arme Fault.Latched, acquittee au Reset front.
+// Interlock machine toujours sur les faits bruts (EncoderFault, HomedAndReliable,
+// EncoderIncoherent), jamais sur Fault.Latched (conservation).
+instCauses[0].Active := NOT instAbs.EncoderAvailable; instCauses[0].Latching := FALSE;
+instCauses[0].Texte := &#x27;Perte materiel / communication codeur EtherCAT&#x27;;
+instCauses[1].Active := instSafety.EncoderIncoherent; instCauses[1].Latching := FALSE;
+instCauses[1].Texte := &#x27;Incoherence mesure / saut de position codeur&#x27;;
+instCauses[2].Active := instHoming.PresetConfirmationFailed; instCauses[2].Latching := TRUE;
+instCauses[2].Texte := &#x27;Echec confirmation transaction preset codeur&#x27;;
+
+// Socle appele APRES le pipeline : causes du scan courant, aucun scan de retard (AC4).
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;     // source de verite = socle
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 </pre>
             </details>
@@ -4210,8 +4370,10 @@ VAR
     diagEcatDev           : ST_Diag_Device;
     calibM1               : ST_Encoder_Calib;
     calibM2               : ST_Encoder_Calib;
-    hwM1                  : ST_EncoderHw;
-    hwM2                  : ST_EncoderHw;
+    HwInM1                : ST_fbEncoder_HwIn;
+    HwInM2                : ST_fbEncoder_HwIn;
+    encoderCfg            : ST_fbEncoder_Cfg;
+    joyCfg                : ST_fbJoystick_Cfg;
     nxMem                 : INT := 5000;
     nyMem                 : INT := 5000;
     calibInit             : BOOL := FALSE;
@@ -4219,6 +4381,10 @@ END_VAR
 
 {region &quot;Corps d&#x27;exécution PRG_02 encapsulé&quot;}
 IF NOT calibInit THEN
+    joyCfg.NeutralHoldTime := T#50ms;
+    joyCfg.DeadmanArmHoldTime := T#50ms;
+    joyCfg.DeadmanArmGraceTime := T#3s;
+    joyCfg.DeadbandRaw := 300;
     calibM1.Homed := TRUE;
     calibM1.HomingRefRaw := 1000000;
     calibM1.LastKnownRawPos := 1008192;
@@ -4258,51 +4424,50 @@ instJoystick(
     RawX := JoyRawX,
     RawY := JoyRawY,
     RawButton := JoyBtnRaw,
-    NeutralHoldTime := T#50ms,
-    DeadmanArmHoldTime := T#50ms,
-    DeadmanArmGraceTime := T#3s,
-    DeadbandRaw := 300,
+    Cfg := joyCfg,
     NeutralXMem := nxMem,
     NeutralYMem := nyMem
 );
 
 
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
-Data.JoystickXNeutral     := instJoystick.AxisCmdX.AtNeutral;
-Data.JoystickYNeutral     := instJoystick.AxisCmdY.AtNeutral;
-Data.JoystickDirectionX   := instJoystick.DirectionX;
-Data.JoystickSpeedPctX    := instJoystick.AxisCmdX.SpeedTgt;
+Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
+Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
+Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
+Data.JoystickSpeedPctX    := ABS(instJoystick.AxisCmdX.SpeedTgt);
 
 
 // 3. Traitement Codeurs Treuils M1 / M2
-hwM1.RawPosIn := COD1_PosValue;
-hwM1.SlaveOperational := EcatOperational;
+HwInM1.RawPosIn := COD1_PosValue;
+HwInM1.SlaveOperational := EcatOperational;
 instEncoderM1(
     Enable := TRUE,
     Reset := BtnReset_IHM,
     HomingPermit := TRUE,
     TopPositionSensor := TRUE,
-    Hw := hwM1,
+    HwIn := HwInM1,
     PointsPerRev := 8192,
     CableM_PerRev := 2.0,
     BypassGlobal := FALSE,
+    Cfg := encoderCfg,
     Calib := calibM1
 );
 Data.Encoders.M1            := instEncoderM1.Measurement;
 Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
 Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
 
-hwM2.RawPosIn := COD2_PosValue;
-hwM2.SlaveOperational := EcatOperational;
+HwInM2.RawPosIn := COD2_PosValue;
+HwInM2.SlaveOperational := EcatOperational;
 instEncoderM2(
     Enable := TRUE,
     Reset := BtnReset_IHM,
     HomingPermit := TRUE,
     TopPositionSensor := TRUE,
-    Hw := hwM2,
+    HwIn := HwInM2,
     PointsPerRev := 8192,
     CableM_PerRev := 2.0,
     BypassGlobal := FALSE,
+    Cfg := encoderCfg,
     Calib := calibM2
 );
 

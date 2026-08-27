@@ -89,12 +89,12 @@ instSafetyWinchM1(
     FwdRevSpeedFeedbackOff  := M1_ContactorsReleased,
     BrakeFeedback           := M1_BrakeFeedbackOpen,
     JoystickYNeutral        := AcqData.JoystickYNeutral,
-    CablePosM               := AcqData.CablePosM1,
+    CablePosM               := AcqData.Encoders.M1.CablePosM,
     CfgCableLimitDescentM   := -20.0,
     TopLimitM               := 7.5,
-    MeasuredSpeedMps        := AcqData.M1_Speed_Mps,
-    MeasuredSpeedSignedMps  := AcqData.M1_SignedSpeed_Mps,
-    MeasuredSpeedValid      := AcqData.M1_SpeedValid
+    MeasuredSpeedMps        := AcqData.Encoders.M1.Speed_Mps,
+    MeasuredSpeedSignedMps  := AcqData.Encoders.M1.SignedSpeed_Mps,
+    MeasuredSpeedValid      := AcqData.Encoders.M1.SpeedValid
 );
 Data.WinchM1Safety.SafeStop      := instSafetyWinchM1.SafeStop;
 Data.WinchM1Safety.DescendPermit := instSafetyWinchM1.DescendPermit;
@@ -121,12 +121,12 @@ instSafetyWinchM2(
 
     BrakeFeedback           := M2_BrakeFeedbackOpen,
     JoystickYNeutral        := AcqData.JoystickYNeutral,
-    CablePosM               := AcqData.CablePosM2,
+    CablePosM               := AcqData.Encoders.M2.CablePosM,
     CfgCableLimitDescentM   := -20.0,
     TopLimitM               := 7.5,
-    MeasuredSpeedMps        := AcqData.M2_Speed_Mps,
-    MeasuredSpeedSignedMps  := AcqData.M2_SignedSpeed_Mps,
-    MeasuredSpeedValid      := AcqData.M2_SpeedValid
+    MeasuredSpeedMps        := AcqData.Encoders.M2.Speed_Mps,
+    MeasuredSpeedSignedMps  := AcqData.Encoders.M2.SignedSpeed_Mps,
+    MeasuredSpeedValid      := AcqData.Encoders.M2.SpeedValid
 );
 Data.WinchM2Safety.SafeStop      := instSafetyWinchM2.SafeStop;
 Data.WinchM2Safety.DescendPermit := instSafetyWinchM2.DescendPermit;
@@ -164,7 +164,7 @@ instWinchM1(
     Mode                    := ModesAuth.Mode,
     DescendPermit           := Data.WinchM1Safety.DescendPermit,
     AscentPermit            := Data.WinchM1Safety.AscentPermit,
-    CablePosM               := AcqData.CablePosM1,
+    CablePosM               := AcqData.Encoders.M1.CablePosM,
     Homed                   := TRUE,
     MaxStepAscent           := 5,
     CfgMaxStepDescente      := 3,

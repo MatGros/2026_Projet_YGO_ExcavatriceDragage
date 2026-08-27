@@ -7176,7 +7176,7 @@ IF ResetEdge.Q OR BypassGlobal THEN
     ContactorsCheck.StuckClosed := FALSE;
 END_IF;
 
-IF SpeedStep.ConfigError THEN
+IF Enable AND SpeedStep.ConfigError THEN
     SpeedStepConfigFaultLatched := TRUE;
 END_IF;
 
@@ -7200,7 +7200,7 @@ Fault := instFault.Fault;
 {region "§2 Gate neutralisation"}
 // 🛑 2. GATE
 IF NOT Enable THEN
-    SpeedStep(Enable := FALSE);
+    SpeedStep(Enable := FALSE, Table := SpeedStepTable);
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;

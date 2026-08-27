@@ -38,7 +38,6 @@ TEST 'Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayCont
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
     ASSERT_FALSE(fb.BRAKECMD, 't=0 : magnetisation demarre, frein encore colle');
-    ASSERT_EQ(fb.STATUS.STATE, E_STATE.BUSY, 'sequence en cours -> BUSY');
 
     ADVANCE_TIME(399000000);
     fb(ENABLE := TRUE, RESET := FALSE, MOVEMENTREQUESTED := TRUE,
@@ -53,7 +52,6 @@ TEST 'Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayCont
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
     ASSERT_TRUE(fb.BRAKECMD, 't=401ms >= 400ms : magnetisation acquise, frein relache');
-    ASSERT_EQ(fb.STATUS.STATE, E_STATE.DONE, 'sequence terminee -> DONE');
     ASSERT_TRUE(fb.BRAKECOMMANDOPENCONFIRMED, 'bypass actif : confirmation = image de BrakeCmd');
 END_TEST
 
@@ -81,7 +79,7 @@ TEST 'Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (T
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
     ASSERT_FALSE(fb.BRAKECMD, 'MovementRequested retombe : frein colle DES CE SCAN, aucun delai observe');
-    ASSERT_EQ(fb.STATUS.STATE, E_STATE.READY, 'retour a READY immediat');
+    ASSERT_TRUE(fb.READY, 'FB reste Ready');
 END_TEST
 
 TEST 'Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture'
@@ -103,8 +101,9 @@ TEST 'Double verification contacteur : StuckClosed si le retour ne confirme jama
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
     ASSERT_TRUE(fb.CONTACTORCHECK.STUCKCLOSED, 'commande ouverture emise mais jamais confirmee -> StuckClosed');
-    ASSERT_TRUE(fb.STATUS.ERROR, 'defaut visible sur Status.Error');
-    ASSERT_EQ(fb.STATUS.ERRORID, 16#0001, 'bit0 : incoherence retour contacteur');
+    ASSERT_TRUE(fb.FAULT.ERROR, 'defaut visible sur Fault.Error');
+    ASSERT_TRUE(fb.FAULT.LATCHED, 'defaut latche');
+    ASSERT_EQ(fb.FAULT.ERRORID, 16#0001, 'bit0 : incoherence retour contacteur');
     ASSERT_FALSE(fb.BRAKECMD, 'sortie sure sur defaut : BrakeCmd force a FALSE malgre la sequence terminee');
 END_TEST
 
@@ -123,7 +122,7 @@ TEST 'Reset n acquitte le defaut contacteur que si la cause (retour) a reellemen
        CONTACTORFEEDBACK := FALSE, BYPASSCONTACTORCHECK := FALSE,
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
-    ASSERT_TRUE(fb.STATUS.ERROR, 'precondition : defaut StuckClosed actif');
+    ASSERT_TRUE(fb.FAULT.ERROR, 'precondition : defaut StuckClosed actif');
 
     (* la cause disparait (le retour confirme enfin), mais SANS Reset : le defaut reste affiche *)
     ADVANCE_TIME(10000000);
@@ -131,7 +130,7 @@ TEST 'Reset n acquitte le defaut contacteur que si la cause (retour) a reellemen
        CONTACTORFEEDBACK := TRUE, BYPASSCONTACTORCHECK := FALSE,
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
-    ASSERT_TRUE(fb.STATUS.ERROR, 'cause disparue mais pas acquittee : le defaut reste affiche (pas d auto-effacement)');
+    ASSERT_TRUE(fb.FAULT.LATCHED, 'cause disparue mais pas acquittee : le latch reste actif');
 
     (* front Reset, cause deja disparue : acquitte *)
     ADVANCE_TIME(10000000);
@@ -139,6 +138,7 @@ TEST 'Reset n acquitte le defaut contacteur que si la cause (retour) a reellemen
        CONTACTORFEEDBACK := TRUE, BYPASSCONTACTORCHECK := FALSE,
        DELAYCONTACTCLOSE := T#100MS, DELAYMAGNETISE := T#300MS,
        DELAYMOTORDECEL := T#500MS, FEEDBACKTIMEOUT := T#1S);
-    ASSERT_FALSE(fb.STATUS.ERROR, 'Reset avec cause disparue (retour coherent) : defaut acquitte');
+    ASSERT_FALSE(fb.FAULT.ERROR, 'Reset avec cause disparue (retour coherent) : defaut live acquitte');
+    ASSERT_FALSE(fb.FAULT.LATCHED, 'Reset avec cause disparue : latch acquitte');
     ASSERT_TRUE(fb.BRAKECMD, 'plus de defaut : frein a nouveau relache (mouvement toujours demande)');
 END_TEST

@@ -52,25 +52,17 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
-{region "§1 Causes & Socle Défaut (évalué en continu)"}
+{region "§1 Fronts"}
 // 🔑 1. FRONTS
 ResetEdge(CLK := Reset);
 BypassEdge(CLK := BypassContactorCheck);
 
-// Surveillance et verrouillage incohérence contacteur (Cause 0)
+// Acquittement des drapeaux contacteur
 IF ResetEdge.Q OR BypassContactorCheck THEN
     ContactorIncoherentError := FALSE;
     ContactorCheck.StuckClosed := FALSE;
     ContactorCheck.StuckOpen   := FALSE;
 END_IF;
-
-instCauses[0].Active   := ContactorIncoherentError;
-instCauses[0].Latching := TRUE;
-instCauses[0].Texte    := 'Incoherence retour contacteur frein';
-
-// Appel du socle de défaut
-instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
-Fault := instFault.Fault;
 {endregion}
 
 {region "§2 Gate neutralisation"}
@@ -78,15 +70,21 @@ Fault := instFault.Fault;
 IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
+    TonFeedback(IN := FALSE, PT := FeedbackTimeout);
     BrakeCmd := FALSE;
     Ready := FALSE;
     ContactorCheck.Command := FALSE;          // 📊 Neutralisation : miroir de BrakeCmd := FALSE
     ContactorCheck.Feedback := ContactorFeedback; // 📊 Neutralisation : miroir entrée physique
     BrakeCommandOpenConfirmed := FALSE;       // 🛡️ Fail-Safe : frein commandé fermé hors Enable
+    
+    // Évaluation du socle de défaut sous neutralisation (permet acquittement Reset hors Enable)
+    instCauses[0].Active   := FALSE;
+    instCauses[0].Latching := TRUE;
+    instCauses[0].Texte    := 'Incoherence retour contacteur frein';
+    instFault(Enable := FALSE, Reset := Reset, Causes := instCauses);
+    Fault := instFault.Fault;
     RETURN;
 END_IF;
-
-Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region "§3 Séquence temporisée"}
@@ -123,9 +121,19 @@ IF NOT BypassContactorCheck THEN
 END_IF;
 {endregion}
 
-{region "§5 Sortie sûre"}
-// 🛡️ 5. SORTIE SÛRE SUR DÉFAUT
-IF Fault.Error THEN
+{region "§5 Causes & Socle Défaut"}
+// 🚨 5. SOCLE DÉFAUT & SORTIE SÛRE
+instCauses[0].Active   := NOT BypassContactorCheck AND (ContactorCheck.StuckClosed OR ContactorCheck.StuckOpen OR (TonFeedback.Q AND (BrakeCmd <> ContactorFeedback)));
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Incoherence retour contacteur frein';
+
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+
+Ready := Enable AND NOT Fault.Latched;
+
+// Sortie sûre immédiate
+IF Fault.Error OR Fault.Latched THEN
     BrakeCmd := FALSE;
 END_IF;
 {endregion}
@@ -135,6 +143,6 @@ END_IF;
 IF BypassContactorCheck THEN
     BrakeCommandOpenConfirmed := BrakeCmd;
 ELSE
-    BrakeCommandOpenConfirmed := ContactorFeedback;  (* TRUE = frein ouvert = desserrage confirmé *)
+    BrakeCommandOpenConfirmed := ContactorFeedback AND NOT Fault.Latched;  (* TRUE = frein ouvert = desserrage confirmé *)
 END_IF;
 {endregion}

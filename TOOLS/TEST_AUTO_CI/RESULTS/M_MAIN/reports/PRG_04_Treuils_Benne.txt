@@ -1,18 +1,37 @@
-Error compiling source files:
-
-FB_Safety_Winch.st:343:18: error: Expected `Assign`, found `.`.
- 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
-     |                  ^
-
-FB_Safety_Winch.st:343:30: error: Expected `Semicolon`, found `TO`.
- 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
-     |                              ^
-
-FB_Safety_Winch.st:343:44: error: Expected `END_IF`, found `END_FOR`.
- 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
-     |                                            ^
-
-FB_Safety_Winch.st:344:1: error: Expected `END_FUNCTION_BLOCK`, found `END_IF`.
- 344 | END_IF;
-     | ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\test_main.cpp:29:19: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM1'
+   29 |         s.ACQDATA.CABLEPOSM1 = 2.0;
+      |                   ^~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\test_main.cpp:30:19: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SPEED_MPS'
+   30 |         s.ACQDATA.M1_SPEED_MPS = 0.0;
+      |                   ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_04::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp:14414:43: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM1'
+14414 |     INSTSAFETYWINCHM1.CABLEPOSM = ACQDATA.CABLEPOSM1;
+      |                                           ^~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp:14417:50: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SPEED_MPS'
+14417 |     INSTSAFETYWINCHM1.MEASUREDSPEEDMPS = ACQDATA.M1_SPEED_MPS;
+      |                                                  ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp:14418:56: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SIGNEDSPEED_MPS'
+14418 |     INSTSAFETYWINCHM1.MEASUREDSPEEDSIGNEDMPS = ACQDATA.M1_SIGNEDSPEED_MPS;
+      |                                                        ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp:14419:52: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SPEEDVALID'
+14419 |     INSTSAFETYWINCHM1.MEASUREDSPEEDVALID = ACQDATA.M1_SPEEDVALID;
+      |                                                    ^~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp:14442:43: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM2'
+14442 |     INSTSAFETYWINCHM2.CABLEPOSM = ACQDATA.CABLEPOSM2;
+      |                                           ^~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp:14445:50: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M2_SPEED_MPS'
+14445 |     INSTSAFETYWINCHM2.MEASUREDSPEEDMPS = ACQDATA.M2_SPEED_MPS;
+      |                                                  ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp:14446:56: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M2_SIGNEDSPEED_MPS'
+14446 |     INSTSAFETYWINCHM2.MEASUREDSPEEDSIGNEDMPS = ACQDATA.M2_SIGNEDSPEED_MPS;
+      |                                                        ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp:14447:52: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M2_SPEEDVALID'
+14447 |     INSTSAFETYWINCHM2.MEASUREDSPEEDVALID = ACQDATA.M2_SPEEDVALID;
+      |                                                    ^~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_04_Treuils_Benne_i_o30fcm\strucpp-test-V9V5oX\generated.cpp:14478:37: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM1'
+14478 |     INSTWINCHM1.CABLEPOSM = ACQDATA.CABLEPOSM1;
+      |                                     ^~~~~~~~~~
 

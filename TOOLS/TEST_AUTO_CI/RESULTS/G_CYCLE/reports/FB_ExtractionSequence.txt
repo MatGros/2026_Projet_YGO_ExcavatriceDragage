@@ -1,18 +1,9 @@
-Error compiling source files:
-
-FB_ExtractionSequence.st:37:35: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
-  37 |     Fault                       : ST_Fault;
-     |                                   ^
-
-FB_ExtractionSequence.st:38:35: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
-  38 |     Lifecycle                   : ST_Lifecycle;
-     |                                   ^
-
-FB_ExtractionSequence.st:65:35: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
-  65 |     instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
-     |                                   ^
-
-FB_ExtractionSequence.st:66:5: error: Undefined type 'ST_FAULTCAUSE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
-  66 |     instCauses                  : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
-     |     ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_ExtractionSequence_ughjijwm\strucpp-test-5eMWeC\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_ExtractionSequence_ughjijwm\strucpp-test-5eMWeC\test_main.cpp:96:14: error: 'class strucpp::FB_EXTRACTIONSEQUENCE' has no member named 'BUCKETCLOSEDCONFIRMED'
+   96 |         s.FB.BUCKETCLOSEDCONFIRMED = true;
+      |              ^~~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_ExtractionSequence_ughjijwm\strucpp-test-5eMWeC\test_main.cpp:107:14: error: 'class strucpp::FB_EXTRACTIONSEQUENCE' has no member named 'BUCKETCLOSEDCONFIRMED'
+  107 |         s.FB.BUCKETCLOSEDCONFIRMED = true;
+      |              ^~~~~~~~~~~~~~~~~~~~~
 

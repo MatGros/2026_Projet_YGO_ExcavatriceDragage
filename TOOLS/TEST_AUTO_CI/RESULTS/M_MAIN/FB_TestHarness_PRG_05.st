@@ -149,7 +149,8 @@ Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz      := instTranslati
 
 Data.TranslationState.ActiveDirection                          := m3Direction;
 Data.TranslationState.SpeedCmd_Pct                             := m3SpeedTgt;
-Data.TranslationState.Busy                                     := instTranslationM3.Status.Busy;
+Data.TranslationState.Busy                                     := (instTranslationM3.RequestedDriveControlWord <> 0);
+Data.TranslationState.Ready                                    := instTranslationM3.Ready;
 {endregion}
 END_FUNCTION_BLOCK
 

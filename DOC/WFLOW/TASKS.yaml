@@ -2192,11 +2192,11 @@ tasks:
   - T164-4C
 - id: T164-5
   parent_id: T164
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: GÉNÉRAL
-  agent: ''
-  date: '2026-08-27T14:39:34'
+  agent: AGY-01
+  date: '2026-08-27T23:00:00'
   titre: Migration des 17 FB legacy Status:ST_Status vers Fault:ST_Fault
   contexte: 'Intitulé complet : Migrer un par un (un domaine par lot) les 17 FB portant encore Status:ST_Status
     (FB_Brake, FB_Encoder_*, FB_Modes, FB_DiveSearch, FB_ExtractionSequence, FB_Bucket, FB_Safety_Winch,

@@ -60,13 +60,27 @@ TEST 'PRG_05_Translation : Commande Translation Rev (Joystick X negatif)'
     modesAuth.Mode := E_Mode.MAINT_N1;
     acqData.JoystickDeadmanArmed := TRUE;
     acqData.JoystickDirectionX := -1;
-    acqData.JoystickSpeedPctX := -60.0;
+    acqData.JoystickSpeedPctX := 60.0;
 
     harness(
         AcqData := acqData,
         ModesAuth := modesAuth,
         WinchM1CablePosM := 5.0,
         WinchM2CablePosM := 5.0,
+        M3_PosP1_DI := TRUE,
+        M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE,
+        DriveOnline := TRUE,
+        DriveOperational := TRUE
+    );
+    ADVANCE_TIME(1000000000);
+    harness(
+        AcqData := acqData,
+        ModesAuth := modesAuth,
+        WinchM1CablePosM := 5.0,
+        WinchM2CablePosM := 5.0,
+        M3_PosP1_DI := TRUE,
+        M3_PosMaintenance_DI := TRUE,
         PowerContactorEngaged := TRUE,
         DriveOnline := TRUE,
         DriveOperational := TRUE
@@ -76,15 +90,8 @@ TEST 'PRG_05_Translation : Commande Translation Rev (Joystick X negatif)'
         ModesAuth := modesAuth,
         WinchM1CablePosM := 5.0,
         WinchM2CablePosM := 5.0,
-        PowerContactorEngaged := TRUE,
-        DriveOnline := TRUE,
-        DriveOperational := TRUE
-    );
-    harness(
-        AcqData := acqData,
-        ModesAuth := modesAuth,
-        WinchM1CablePosM := 5.0,
-        WinchM2CablePosM := 5.0,
+        M3_PosP1_DI := TRUE,
+        M3_PosMaintenance_DI := TRUE,
         PowerContactorEngaged := TRUE,
         DriveOnline := TRUE,
         DriveOperational := TRUE

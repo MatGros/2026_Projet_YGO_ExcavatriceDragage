@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 21:29:59</div>
+    <div class="exec-time">2026-08-27 23:12:10</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (3 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-winch-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-winch-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-1">TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-2">TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -211,7 +211,7 @@
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 15 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 17 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -232,7 +232,15 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_Status.st</code></td>
+                <td><code>ST_Fault.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FaultCause.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -242,6 +250,14 @@
             <tr class="compil-row-pass">
                 <td><code>ST_ContactorCheck.st</code></td>
                 <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_FaultCore.st</code></td>
+                <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -340,61 +356,32 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Winch</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 37 flux entrants · 26 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Winch</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 32 flux entrants · 21 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedStep <span style="color:var(--muted);font-weight:500;">(FB_SpeedStep)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CycleTimeCalc <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ErrorEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ DirectionChangeDelay <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonContactorsDropped <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BusinessStepDelay <span style="color:var(--muted);font-weight:500;">(TON)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedStep <span style="color:var(--muted);font-weight:500;">(FB_SpeedStep)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CycleTimeCalc <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ DirectionChangeDelay <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonContactorsDropped <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BusinessStepDelay <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instFault <span style="color:var(--muted);font-weight:500;">(FB_FaultCore)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">StartStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Direction <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTgt_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Mode <span class="pin-type" style="color:var(--muted);">E_Mode</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SafeStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DescendPermit <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">AscentPermit <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedStepTable <span class="pin-type" style="color:var(--muted);">ST_SpeedStepTable</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgMaxStepDescente <span class="pin-type" style="color:var(--muted);">INT := 3</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MaxStepAscent <span class="pin-type" style="color:var(--muted);">INT := 5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingApproachActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedStepHystMargin <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DirectionInterlockDelayDescent <span class="pin-type" style="color:var(--muted);">TIME := T#400ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DirectionInterlockDelayAscent <span class="pin-type" style="color:var(--muted);">TIME := T#900ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ContactorFeedbackTimeout <span class="pin-type" style="color:var(--muted);">TIME := T#500ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TopLimitM <span class="pin-type" style="color:var(--muted);">REAL := 8.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BottomLimitM <span class="pin-type" style="color:var(--muted);">REAL := -20.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgSlowdownDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgSlowdownMaxStep <span class="pin-type" style="color:var(--muted);">INT := 1</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">FwdRevSpeedFeedbackOff <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Homed <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingSuspect <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CablePosM <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MeasuredSpeedBand <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedGuardEnable <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedGuardReady <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassContactorCheck <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassGlobal <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">(4 constantes ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.3);color:#f1f5f9;">Type Global</span></div>
-                </div>
-            </summary>
-            <div style="margin-top:2px;">
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.BUSY</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.DISABLED</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.READY</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.STOPPING</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div></div>
-        </details>
-        <details style="margin:4px 0;">
-            <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#fecdd3;font-weight:700;font-size:12px;">❓ Inconnues / Non Déclarées</span> <span style="font-size:11px;color:#fda4af;">(2 identifiants ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#fecdd3;font-weight:700;font-size:12px;">❓ Inconnues / Non Déclarées</span> <span style="font-size:11px;color:#fda4af;">(1 identifiants ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.3);color:#ffe4e6;">Alerte</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">IN</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">PT</code></div>
+                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">Table</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
             </div></div>
         </details></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Winch</span>
                 
-        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD AF03</span></div>
-        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">✅ Enable + Reset + Ready + Status (ST_Status complet)</div>
+        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(245,158,11,0.18);color:#fbbf24;border:1px solid #d97706;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD (Tolérance T137 Flat)</span></div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">⚠️ Signaux à plat (Reset/Error/Busy/Done) sans ST_Status</div>
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
@@ -404,9 +391,9 @@
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">18</b></div>
-                    <div>• Champs Out : <b style="color:#ffffff;">10</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">4</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">37 IN</b> / <b style="color:#ffffff;">26 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">32 IN</b> / <b style="color:#ffffff;">21 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -422,39 +409,10 @@
                 <div class="pin-name"><b>Ready</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
-            <details style="margin:4px 0;">
-                <summary style="list-style:none;cursor:pointer;">
-                    <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Status</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Status</span> <span style="font-size:11px;color:#a5b4fc;">(6 champs ▾)</span></div>
-                        <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
-                    </div>
-                </summary>
-                <div style="margin-top:2px;">
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Busy</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Done</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Error</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.ErrorId</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.State</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.StateAtError</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div></div>
-            </details>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Fault</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_Fault</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>RelayFwd</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
@@ -543,9 +501,168 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 49 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BOTTOMLIMITM</code> jamais câblé en production</li><li>Pin <code>BUSINESSSTEPDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BYPASSGLOBAL</code> jamais câblé en production</li><li>Pin <code>CABLEPOSM</code> jamais câblé en production</li><li>Pin <code>CFGMAXSTEPDESCENTE</code> jamais câblé en production</li><li>Pin <code>CFGSLOWDOWNDISTANCEM</code> jamais câblé en production</li><li>Pin <code>CFGSLOWDOWNMAXSTEP</code> jamais câblé en production</li><li>Pin <code>COMMANDEDDIRECTION</code> jamais câblé en production</li><li>Pin <code>CONTACTOR1</code> jamais câblé en production</li><li>Pin <code>CONTACTOR2</code> jamais câblé en production</li><li>Pin <code>CONTACTOR3</code> jamais câblé en production</li><li>Pin <code>CONTACTOR4</code> jamais câblé en production</li><li>Pin <code>CONTACTORFEEDBACKTIMEOUT</code> jamais câblé en production</li><li>Pin <code>CONTACTORSCHECK</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIRECTION</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEPENDING</code> jamais câblé en production</li><li>Pin <code>DIRECTIONINTERLOCKDELAYASCENT</code> jamais câblé en production</li><li>Pin <code>DIRECTIONINTERLOCKDELAYDESCENT</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>FWDREVSPEEDFEEDBACKOFF</code> jamais câblé en production</li><li>Pin <code>HOMED</code> jamais câblé en production</li><li>Pin <code>HOMINGAPPROACHACTIVE</code> jamais câblé en production</li><li>Pin <code>HOMINGSUSPECT</code> jamais câblé en production</li><li>Pin <code>INBOTTOMSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>INTOPSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>MAXSTEPASCENT</code> jamais câblé en production</li><li>Pin <code>MEASUREDSPEEDBAND</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RELAYFWD</code> jamais câblé en production</li><li>Pin <code>RELAYREV</code> jamais câblé en production</li><li>Pin <code>REQUESTEDSTEP</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SAFESTOP</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDENABLE</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDLIMITED</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDREADY</code> jamais câblé en production</li><li>Pin <code>SPEEDSTEPHYSTMARGIN</code> jamais câblé en production</li><li>Pin <code>SPEEDSTEPTABLE</code> jamais câblé en production</li><li>Pin <code>SPEEDTGT_PCT</code> jamais câblé en production</li><li>Pin <code>STARTSTOP</code> jamais câblé en production</li><li>Pin <code>STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>TOPLIMITM</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">STARTSTOP <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DIRECTION <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDTGT_PCT <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MODE <span class="pin-type">IEC_E_MODE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SAFESTOP <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DESCENDPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ASCENTPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDSTEPTABLE <span class="pin-type">ST_SPEEDSTEPTABLE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CFGMAXSTEPDESCENTE <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MAXSTEPASCENT <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMINGAPPROACHACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDSTEPHYSTMARGIN <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DIRECTIONINTERLOCKDELAYDESCENT <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DIRECTIONINTERLOCKDELAYASCENT <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CONTACTORFEEDBACKTIMEOUT <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TOPLIMITM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BOTTOMLIMITM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CFGSLOWDOWNDISTANCEM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CFGSLOWDOWNMAXSTEP <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">FWDREVSPEEDFEEDBACKOFF <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMINGSUSPECT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CABLEPOSM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MEASUREDSPEEDBAND <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDGUARDENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDGUARDREADY <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSCONTACTORCHECK <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSGLOBAL <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Winch</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">RELAYFWD <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">RELAYREV <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTOR1 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTOR2 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTOR3 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTOR4 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">REQUESTEDSTEP <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">STEPNUMBER <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BUSINESSSTEPDELAYELAPSED <span class="pin-type">IEC_TIME</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">SPEEDGUARDLIMITED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTORSCHECK <span class="pin-type">ST_CONTACTORCHECK</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">INTOPSLOWDOWNZONE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">INBOTTOMSLOWDOWNZONE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">COMMANDEDDIRECTION <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DIRECTIONCHANGEDELAYELAPSED <span class="pin-type">IEC_TIME</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DIRECTIONCHANGEPENDING <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
-        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 8 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 9 FB de la chaine, encapsulation propre (0 violation)</summary>
         
         <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
             <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
@@ -618,6 +735,13 @@
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FaultCore</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_CycleTime</code></td>
                 <td>1</td><td>1</td>
                 <td>0</td><td>4</td>
@@ -627,8 +751,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Brake</code></td>
                 <td>9</td><td>5</td>
-                <td>0</td><td>6</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (6 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>8</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (8 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -655,68 +779,68 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Safety_Winch</code></td>
                 <td>58</td><td>9</td>
-                <td>0</td><td>16</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (16 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>27</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (27 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Winch</code></td>
                 <td>31</td><td>18</td>
-                <td>0</td><td>14</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (14 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>16</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (16 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-winch-0" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation initiale</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Premier scan d initialisation</p><p class='comment'>Scan 2 : Regime nominal etabli -&gt; Ready=TRUE</p><p class='comment'>Scan 3 : Enable=FALSE -&gt; Coupure nette et re-neutralisation</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE etabli -&gt; Ready=TRUE (nominal)</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li></ul></details>
+            
+            
+        </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-winch-0" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
-            </header>
-            
-            
-            
-            
-        </article>
         <article id="test-fb-winch-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
+                <h3>TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations </h3>
             </header>
             
-            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Ready doit etre FALSE sans Enable</li></ul></details>
             
             
         </article>
         <article id="test-fb-winch-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
+                <h3>TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse </h3>
             </header>
-            
-            
+            <div class="comments"><p class='comment'>1er scan init</p><p class='comment'>Treuil actif et pret</p><p class='comment'>Commande de montee palier 1</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Treuil pret a fonctionner</li><li>Ordre montee -&gt; RelayFwd enclenche</li><li>Montee -&gt; RelayRev reste inactif</li></ul></details>
             
             
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (15)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Status.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li></ul>
+        <summary>Fichiers source compilés (17)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (15)</summary>
+        <summary>Code source ST original (17)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\HYSTERESIS.st</code></summary>
@@ -768,37 +892,54 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Status.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Fault.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_Status — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
-      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_Status (exception documentée).
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   🎯 Rôle : porter l&#x27;état défaut d&#x27;un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu&#x27;au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l&#x27;acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    ======================================================================= *)
 
-TYPE ST_Status :
+TYPE ST_Fault :
 STRUCT
-    (* ---- membres historiques (conservés) ---- *)
-    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
-    Done         : BOOL;    (* 1 = Action terminée avec succès *)
-    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
-    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
-    State        : E_State; (* État courant de la machine d&#x27;état *)
-    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
-    (* ---- membres ajoutés (forme cible enrichie) ---- *)
-    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
-    WarningId      : WORD;  (* Code warning courant (bitfield) *)
-    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
-    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
-    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
+    Error     : BOOL;   (* &lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant *)
+    ErrorId   : WORD;    (* &lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune) *)
+    Latched   : BOOL;    (* &lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu&#x27;au front Reset *)
+    LatchedId : WORD;    (* &lt;-- [DIAG] ErrorId figé à l&#x27;apparition du défaut, effacé au Reset *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_FaultCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n&#x27;alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FaultCause :
+STRUCT
+    Active   : BOOL;    (* 1 = cause présente maintenant (interlock sur cette valeur) *)
+    Latching : BOOL;    (* 1 = cause à acquitter (arme Latched) ; 0 = live seulement *)
+    Texte    : STRING;  (* libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM) *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -821,6 +962,93 @@ STRUCT
     StuckOpen   : BOOL;   // Diag : commande ON mais retour OFF depuis trop longtemps
 END_STRUCT
 END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FaultCore.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d&#x27;une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l&#x27;apparition d&#x27;une
+          cause `Active AND Latching`, conservé jusqu&#x27;au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d&#x27;effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FaultCore
+VAR_INPUT
+    Enable  : BOOL;                          // --&gt; [CMD] Autorisation générale du FB porteur
+    Reset   : BOOL;                          // --&gt; [CMD] Front d&#x27;acquittement (jamais conditionné, §9)
+    Causes  : ARRAY[0..15] OF ST_FaultCause; // --&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)
+END_VAR
+VAR_OUTPUT
+    Ready   : BOOL;                          // &lt;-- [STAT] FB porteur autorisé (= Enable)
+    Fault   : ST_Fault;                      // &lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)
+END_VAR
+VAR
+    ResetEdge : R_TRIG;                      // . [LOC] Front montant Reset
+    Latch     : ARRAY[0..15] OF BOOL;        // . [LOC] Bit laté par cause, jusqu&#x27;au Reset
+    i         : INT;                         // . [LOC] Index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Reset (front, toujours effectif)&quot;}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§2 Vue LIVE — Error / ErrorId&quot;}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region &quot;§3 Armement des latches (causes à acquitter)&quot;}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu&#x27;au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§4 Vue LATCHÉE — Latched / LatchedId&quot;}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+
+END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
@@ -914,9 +1142,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; DERIVATION ===
     Ready                   : BOOL;               // &lt;-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: &quot;incoherence retour contacteur&quot;.
-    Status                  : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                   : ST_Fault;
 
     // === COMMANDES ET CONFIRMATIONS ===
     BrakeCmd                : BOOL;               // &lt;-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)
@@ -926,37 +1153,54 @@ END_VAR
 VAR
     // === TRIGGERS ET DETECTION FRONTS ===
     ResetEdge               : R_TRIG;             // . [LOC]  Detecteur front acquittement
-    ErrorEdge               : R_TRIG;             // . [LOC]  Detecteur front apparition defaut
     BypassEdge              : R_TRIG;             // . [LOC]  Detecteur front activation bypass
 
     // === TEMPORISATEURS INTERNES ===
     TonMagnetise            : TON;                // . [LOC]  Temporisation avant relachement frein
     TonDecel                : TON;                // . [LOC]  Temporisation avant collage frein
     TonFeedback             : TON;                // . [LOC]  Timeout de coherence commande/retour
+
+    // === GESTION DES DEFAUTS ===
+    ContactorIncoherentError: BOOL;               // . [LOC]  Défaut mémorisé incohérence contacteur
+    instFault               : FB_FaultCore;       // * [INST] Socle de défaut
+    instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 END_VAR
 
-{region &quot;§1 Gate&quot;}
-// 🛑 1. GATE — pas d&#x27;Enable = frein collé (sécurité positive), aucune temporisation en cours
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Fronts&quot;}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+BypassEdge(CLK := BypassContactorCheck);
+
+// Acquittement des drapeaux contacteur
+IF ResetEdge.Q OR BypassContactorCheck THEN
+    ContactorIncoherentError := FALSE;
+    ContactorCheck.StuckClosed := FALSE;
+    ContactorCheck.StuckOpen   := FALSE;
+END_IF;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE — pas d&#x27;Enable = frein collé (sécurité positive), aucune temporisation en cours
 IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
+    TonFeedback(IN := FALSE, PT := FeedbackTimeout);
     BrakeCmd := FALSE;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Ready := FALSE;
     ContactorCheck.Command := FALSE;          // 📊 Neutralisation : miroir de BrakeCmd := FALSE
     ContactorCheck.Feedback := ContactorFeedback; // 📊 Neutralisation : miroir entrée physique
-    // 🔒 ContactorCheck.StuckClosed / StuckOpen et Status.ErrorId conservés (latch défaut, acquittement requis)
     BrakeCommandOpenConfirmed := FALSE;       // 🛡️ Fail-Safe : frein commandé fermé hors Enable
+    
+    // Évaluation du socle de défaut sous neutralisation (permet acquittement Reset hors Enable)
+    instCauses[0].Active   := FALSE;
+    instCauses[0].Latching := TRUE;
+    instCauses[0].Texte    := &#x27;Incoherence retour contacteur frein&#x27;;
+    instFault(Enable := FALSE, Reset := Reset, Causes := instCauses);
+    Fault := instFault.Fault;
     RETURN;
 END_IF;
-
-Ready := TRUE;
-{endregion}
-
-{region &quot;§2 Reset et fronts&quot;}
-// 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
-ResetEdge(CLK := Reset);
-BypassEdge(CLK := BypassContactorCheck);
 {endregion}
 
 {region &quot;§3 Séquence temporisée&quot;}
@@ -966,21 +1210,15 @@ IF MovementRequested THEN
     TonMagnetise(IN := TRUE, PT := DelayMagnetise + DelayContactClose);
     IF TonMagnetise.Q THEN
         BrakeCmd := TRUE;              // ✅ Contacteur + magnétisation acquis → relâche
-        Status.State := E_State.DONE;
     ELSE
         BrakeCmd := FALSE;             // ⏳ Encore collé pendant la magnétisation
-        Status.State := E_State.BUSY;
     END_IF;
 ELSE
     // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s&#x27;ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
-    Status.State := E_State.READY;
 END_IF;
-
-Status.Busy := (Status.State = E_State.BUSY);
-Status.Done := (Status.State = E_State.DONE);
 {endregion}
 
 {region &quot;§4 Double vérification contacteur&quot;}
@@ -989,52 +1227,39 @@ ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
 // ContactorFeedback est dans le MÊME sens que BrakeCmd (TRUE = relâché = frein ouvert).
-// En marche saine les deux sont ÉGAUX → c&#x27;est leur DIFFÉRENCE qui signale l&#x27;incohérence
-// (contacteur collé). Le test compare donc `&lt;&gt;`.
 TonFeedback(IN := (BrakeCmd &lt;&gt; ContactorFeedback), PT := FeedbackTimeout);
 IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
-        ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);            // relâche commandée (BrakeCmd=TRUE), frein reste serré (ContactorFeedback=FALSE)
-        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);             // serrage commandé (BrakeCmd=FALSE), frein reste ouvert (ContactorFeedback=TRUE)
-        Status.ErrorId := Status.ErrorId OR 16#0001;
-    ELSIF ResetEdge.Q THEN
-        ContactorCheck.StuckClosed := FALSE;
-        ContactorCheck.StuckOpen   := FALSE;
-        Status.ErrorId := Status.ErrorId AND 16#FFFE;
+        ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);
+        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);
+        ContactorIncoherentError   := TRUE;
     END_IF;
-ELSE
-    ContactorCheck.StuckClosed := FALSE;
-    ContactorCheck.StuckOpen   := FALSE;
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
-    IF BypassEdge.Q THEN
-        Status.StateAtError := E_State.DISABLED; // Front activation bypass : débloque l&#x27;état figé
-    END_IF;
-END_IF;
-
-{endregion}
-
-{region &quot;§5 Arbitrage error&quot;}
-// 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu&#x27;à acquittement)
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
 END_IF;
 {endregion}
 
-{region &quot;§6 Sortie sûre&quot;}
-// 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
-IF Status.Error THEN
+{region &quot;§5 Causes &amp; Socle Défaut&quot;}
+// 🚨 5. SOCLE DÉFAUT &amp; SORTIE SÛRE
+instCauses[0].Active   := NOT BypassContactorCheck AND (ContactorCheck.StuckClosed OR ContactorCheck.StuckOpen OR (TonFeedback.Q AND (BrakeCmd &lt;&gt; ContactorFeedback)));
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := &#x27;Incoherence retour contacteur frein&#x27;;
+
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+
+Ready := Enable AND NOT Fault.Latched;
+
+// Sortie sûre immédiate
+IF Fault.Error OR Fault.Latched THEN
     BrakeCmd := FALSE;
 END_IF;
 {endregion}
 
-{region &quot;§7 Confirmation ouverture&quot;}
-// 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback, ou image de BrakeCmd si BypassContactorCheck=TRUE)
+{region &quot;§6 Confirmation ouverture&quot;}
+// 📤 6. CONFIRMATION OUVERTURE FREIN
 IF BypassContactorCheck THEN
     BrakeCommandOpenConfirmed := BrakeCmd;
 ELSE
-    BrakeCommandOpenConfirmed := ContactorFeedback;  (* TRUE = frein ouvert = desserrage confirmé *)
+    BrakeCommandOpenConfirmed := ContactorFeedback AND NOT Fault.Latched;  (* TRUE = frein ouvert = desserrage confirmé *)
 END_IF;
 {endregion}
 </pre>
@@ -1784,12 +2009,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // &lt;-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bitmask: bit0: &quot;Perte comms opérateur&quot; ; bit1: &quot;Perte codeur&quot; ; bit2: &quot;Surchauffe moteur&quot; ;
-    // bit3: &quot;Mou de câble&quot; ; bit4: &quot;Rotation phases&quot; ; bit5: &quot;Fin de course haut capteur&quot; ;
-    // bit6: &quot;Limite max câble&quot; ; bit7: &quot;Méca A&quot; ; bit8: &quot;Méca B&quot; ; bit9: &quot;Méca C&quot; ; bit10: &quot;Thermique frein&quot; ;
-    // bit11: &quot;Méca D&quot; ; bit12/13: &quot;Méca E écart synchro&quot; ; bit14: &quot;Sens opposé&quot; ; bit15: &quot;Absence mouvement&quot;.
-    Status                         : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                           : ST_Fault;
 
     // === SORTIES DE SÉCURITÉ ET AUTORISATIONS ===
     SafeStop                        : BOOL;                           // &lt;-- [SAFE] Arret rapide 2 sens (Enable maintenu)
@@ -1806,388 +2027,299 @@ VAR
     // === SOUS-INSTANCES FB ===
     DriftGuardA                     : FB_DriftGuard;                  // * [INST] Surveillance derive Meca A
     DriftGuardC                     : FB_DriftGuard;                  // * [INST] Surveillance derive Meca C
+    ResetEdge                       : R_TRIG;                         // . [LOC] Front Reset
 
-    // === DETECTEURS ET TIMERS INTERNES ===
-    ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
-    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
-    TonMecaB                        : TON;                            // . [LOC] Tempo confirmation arret Meca B
-    TonMecaD                        : TON;                            // . [LOC] Tempo arret fin de course haut Meca D
-    TonMecaE                        : TON;                            // . [LOC] Tempo confirmation arret synchro Meca E
-    TonOppositeDirection            : TON;                            // . [LOC] Tempo confirmation sens oppose
-    TonNoMovement                   : TON;                            // . [LOC] Tempo confirmation absence mouvement
-    TonMecaStopSettled              : TON;                            // . [LOC] Tempo &quot;arret confirme&quot; Meca A (purge fenetre vitesse)
-    TonStartupWarmup                : TON;                            // . [LOC] Tempo masquage transitoire au boot
+    // === TIMERS INTERNES ===
+    TonMecaB                        : TON;                            // . [LOC] Delai confirmation arret contacteurs/frein
+    TonMecaD                        : TON;                            // . [LOC] Delai confirmation arret fin de course haut
+    TonMecaE                        : TON;                            // . [LOC] Delai confirmation arret ecart synchro
+    TonOppositeDirection            : TON;                            // . [LOC] Delai confirmation sens oppose
+    TonNoMovement                   : TON;                            // . [LOC] Delai confirmation absence mouvement
+    TonStartupWarmup                : TON;                            // . [LOC] Inhibition transitoire boot (3s)
 
-    // === VARIABLES LOCALES INTERNES ===
-    FirstScanDone                   : BOOL;                           // . [LOC] Premier cycle effectue
-    MecaB_NoOperatorCmd             : BOOL;                           // . [LOC] Absence commande operateur
-    LastInReferencingMode           : BOOL;                           // . [LOC] Memorisation etat homing precedent
-    OppositeDirectionActive         : BOOL;                           // . [LOC] Sens oppose confirme actif
-    EncoderAvailableEffective       : BOOL;                           // . [LOC] Codeur valide ou bypass effectif
+    // === VARIABLES LOCALES CALCULÉES ===
+    UncommandedActiveB              : BOOL;                           // . [LOC] Condition active Meca B
+    UncommandedActiveD              : BOOL;                           // . [LOC] Condition active Meca D
+    OppositeDirectionActive         : BOOL;                           // . [LOC] Condition active sens oppose
+    FirstScanDone                   : BOOL;                           // . [LOC] Initialisation premier scan
+
+    // Latches défauts
+    EncoderFaultLatched             : BOOL;
+    MotorThermalFaultLatched        : BOOL;
+    PhaseRotationFaultLatched       : BOOL;
+    MecaAFaultLatched               : BOOL;
+    MecaBFaultLatched               : BOOL;
+    MecaCFaultLatched               : BOOL;
+    BrakeThermalFaultLatched        : BOOL;
+    MecaDFaultLatched               : BOOL;
+    MecaEFaultLatched               : BOOL;
+    MecaEEscaladeFaultLatched       : BOOL;
+    OppositeDirectionFaultLatched   : BOOL;
+    NoMovementFaultLatched          : BOOL;
+
+    // Socle défaut
+    instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
+// === IMPLEMENTATION ===
 
-{region &quot;§1 Gate neutralisation&quot;}
-// 🛑 1. GATE — neutralisation si désactivé
-IF NOT Enable THEN
-    // 🔑 RESET effectif même en DISABLE : le gate RETURNe avant le ResetEdge du chemin
-    // principal, sinon une cause resterait figée et la machine serait impossible à réarmer
-    // (récupération). On traite ici le front Reset pour effacer la cause en mode neutre.
-    ResetEdge(CLK := Reset);
-    IF ResetEdge.Q THEN
-        Status.ErrorId := 16#0000;
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. FRONTS &amp; REARMENT
+ResetEdge(CLK := Reset);
+
+IF ResetEdge.Q OR BypassGlobal THEN
+    EncoderFaultLatched           := FALSE;
+    MotorThermalFaultLatched      := FALSE;
+    PhaseRotationFaultLatched     := FALSE;
+    MecaAFaultLatched             := FALSE;
+    MecaBFaultLatched             := FALSE;
+    MecaCFaultLatched             := FALSE;
+    BrakeThermalFaultLatched      := FALSE;
+    MecaDFaultLatched             := FALSE;
+    MecaEFaultLatched             := FALSE;
+    MecaEEscaladeFaultLatched     := FALSE;
+    OppositeDirectionFaultLatched := FALSE;
+    NoMovementFaultLatched        := FALSE;
+END_IF;
+
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    EncoderFaultLatched           := FALSE;
+    MotorThermalFaultLatched      := FALSE;
+    PhaseRotationFaultLatched     := FALSE;
+    MecaAFaultLatched             := FALSE;
+    MecaBFaultLatched             := FALSE;
+    MecaCFaultLatched             := FALSE;
+    BrakeThermalFaultLatched      := FALSE;
+    MecaDFaultLatched             := FALSE;
+    MecaEFaultLatched             := FALSE;
+    MecaEEscaladeFaultLatched     := FALSE;
+    OppositeDirectionFaultLatched := FALSE;
+    NoMovementFaultLatched        := FALSE;
+END_IF;
+
+IF NOT BypassGlobal THEN
+    TonStartupWarmup(IN := Enable, PT := T#3s);
+
+    // Cause 0 : Perte com opérateur (live)
+    IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
+        instCauses[0].Active := (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk);
+    ELSE
+        instCauses[0].Active := FALSE;
     END_IF;
-    Ready := FALSE;
-    Status.Busy := FALSE;
-    Status.Done := FALSE;
-    SafeStop := TRUE;
-    DescendPermit := FALSE; // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
-    AscentPermit := FALSE;  // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
+    instCauses[0].Latching := FALSE;
+    instCauses[0].Texte    := &#x27;Perte communication operateur treuil&#x27;;
+
+    // Cause 1 : Perte codeur (latched)
+    IF NOT (BypassProcess OR EncoderFaultBypass) AND NOT EncoderAvailable THEN
+        EncoderFaultLatched := TRUE;
+    END_IF;
+    instCauses[1].Active   := EncoderFaultLatched;
+    instCauses[1].Latching := TRUE;
+    instCauses[1].Texte    := &#x27;Perte ou defaut codeur treuil&#x27;;
+
+    // Cause 2 : Surchauffe thermique moteur (latched)
+    IF NOT (BypassSafety OR BypassMotorThermal) AND ThermalFeedback THEN
+        MotorThermalFaultLatched := TRUE;
+    END_IF;
+    instCauses[2].Active   := MotorThermalFaultLatched;
+    instCauses[2].Latching := TRUE;
+    instCauses[2].Texte    := &#x27;Surchauffe thermique moteur treuil&#x27;;
+
+    // Cause 3 : Mou de câble (live / auto-effaçable)
+    IF NOT BypassProcess AND SlackCableDetected THEN
+        instCauses[3].Active := TRUE;
+    ELSE
+        instCauses[3].Active := FALSE;
+    END_IF;
+    instCauses[3].Latching := FALSE;
+    instCauses[3].Texte    := &#x27;Detection mou de cable treuil&#x27;;
+
+    // Cause 4 : Rotation phases (latched)
+    IF NOT (BypassProcess OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN
+        PhaseRotationFaultLatched := TRUE;
+    END_IF;
+    instCauses[4].Active   := PhaseRotationFaultLatched;
+    instCauses[4].Latching := TRUE;
+    instCauses[4].Texte    := &#x27;Defaut rotation de phases treuil&#x27;;
+
+    // Cause 5 : Fin de course haut capteur (live)
+    IF NOT (BypassProcess OR BypassTopLimitSwitch) AND (NOT TopPositionSensor AND NOT InReferencingMode) THEN
+        instCauses[5].Active := TRUE;
+    ELSE
+        instCauses[5].Active := FALSE;
+    END_IF;
+    instCauses[5].Latching := FALSE;
+    instCauses[5].Texte    := &#x27;Fin de course haut capteur atteint&#x27;;
+
+    // Cause 6 : Limite max câble descente (live)
+    IF NOT (BypassProcess OR BypassCableLimitSwitch) AND ((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) THEN
+        instCauses[6].Active := TRUE;
+    ELSE
+        instCauses[6].Active := FALSE;
+    END_IF;
+    instCauses[6].Latching := FALSE;
+    instCauses[6].Texte    := &#x27;Limite basse cable atteinte&#x27;;
+
+    // Cause 7 : Méca A dérive à l&#x27;arrêt (latched)
+    DriftGuardA(
+        Arm        := NOT (BypassSafety OR BypassMecaA) AND JoystickYNeutral AND NOT BenneHoldStillActive,
+        PositionM  := CablePosM,
+        ToleranceM := UncommandedDriftToleranceM
+    );
+    MecaADriftM := DriftGuardA.DriftM;
+    IF DriftGuardA.Violation THEN MecaAFaultLatched := TRUE; END_IF;
+    instCauses[7].Active   := MecaAFaultLatched;
+    instCauses[7].Latching := TRUE;
+    instCauses[7].Texte    := &#x27;Derive non commandee treuil (Meca A)&#x27;;
+
+    // Cause 8 : Méca B absence confirmation arrêt (latched)
+    IF NOT (BypassSafety OR BypassMecaB) THEN
+        UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+        TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
+        IF TonMecaB.Q THEN MecaBFaultLatched := TRUE; END_IF;
+    ELSE
+        TonMecaB(IN := FALSE);
+    END_IF;
+    MecaBElapsedTime := TonMecaB.ET;
+    instCauses[8].Active   := MecaBFaultLatched;
+    instCauses[8].Latching := TRUE;
+    instCauses[8].Texte    := &#x27;Absence confirmation arret contacteurs/frein (Meca B)&#x27;;
+
+    // Cause 9 : Méca C glissement benne (latched)
+    DriftGuardC(
+        Arm        := NOT (BypassSafety OR BypassMecaC) AND BenneHoldStillActive,
+        PositionM  := CablePosM,
+        ToleranceM := BenneSlipToleranceM
+    );
+    MecaCDriftM := DriftGuardC.DriftM;
+    IF DriftGuardC.Violation THEN MecaCFaultLatched := TRUE; END_IF;
+    instCauses[9].Active   := MecaCFaultLatched;
+    instCauses[9].Latching := TRUE;
+    instCauses[9].Texte    := &#x27;Glissement treuil pendant cycle benne (Meca C)&#x27;;
+
+    // Cause 10 : Surchauffe thermique frein (latched)
+    IF NOT (BypassSafety OR BypassBrakeThermal) AND BrakeThermalFeedback THEN
+        BrakeThermalFaultLatched := TRUE;
+    END_IF;
+    instCauses[10].Active   := BrakeThermalFaultLatched;
+    instCauses[10].Latching := TRUE;
+    instCauses[10].Texte    := &#x27;Surchauffe thermique frein treuil&#x27;;
+
+    // Cause 11 : Méca D escalade capteur haut (latched)
+    IF NOT (BypassSafety OR BypassMecaD) THEN
+        UncommandedActiveD := NOT TopPositionSensor AND NOT InReferencingMode AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+        TonMecaD(IN := UncommandedActiveD, PT := PostRampTimeout);
+        IF TonMecaD.Q THEN MecaDFaultLatched := TRUE; END_IF;
+    ELSE
+        TonMecaD(IN := FALSE);
+    END_IF;
+    instCauses[11].Active   := MecaDFaultLatched;
+    instCauses[11].Latching := TRUE;
+    instCauses[11].Texte    := &#x27;Escalade fin de course haut (Meca D)&#x27;;
+
+    // Cause 12 &amp; 13 : Méca E écart critique synchro &amp; escalade (latched)
+    IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
+       AND (ABS(CablePosM - ExpectedOtherWinchPosM) &gt; CriticalSyncToleranceM) THEN
+        MecaEFaultLatched := TRUE;
+    END_IF;
+    instCauses[12].Active   := MecaEFaultLatched;
+    instCauses[12].Latching := TRUE;
+    instCauses[12].Texte    := &#x27;Ecart critique synchronisation treuil (Meca E)&#x27;;
+
+    TonMecaE(
+        IN := NOT (BypassSafety OR BypassMecaE) AND MecaEFaultLatched AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback),
+        PT := PostRampTimeout
+    );
+    IF TonMecaE.Q THEN MecaEEscaladeFaultLatched := TRUE; END_IF;
+    instCauses[13].Active   := MecaEEscaladeFaultLatched;
+    instCauses[13].Latching := TRUE;
+    instCauses[13].Texte    := &#x27;Escalade ecart synchronisation (Meca E)&#x27;;
+
+    // Cause 14 : Sens opposé (latched)
+    OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
+        AND (((Direction &gt; 0) AND (MeasuredSpeedSignedMps &lt; -MovementSpeedThresholdMps))
+          OR ((Direction &lt; 0) AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps))));
+    TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
+    IF TonOppositeDirection.Q THEN OppositeDirectionFaultLatched := TRUE; END_IF;
+    instCauses[14].Active   := OppositeDirectionFaultLatched;
+    instCauses[14].Latching := TRUE;
+    instCauses[14].Texte    := &#x27;Sens reel oppose a la commande treuil&#x27;;
+
+    // Cause 15 : Absence mouvement (latched)
+    TonNoMovement(
+        IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
+              AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps)),
+        PT := NoMovementTimeout
+    );
+    IF TonNoMovement.Q THEN NoMovementFaultLatched := TRUE; END_IF;
+    instCauses[15].Active   := NoMovementFaultLatched;
+    instCauses[15].Latching := TRUE;
+    instCauses[15].Texte    := &#x27;Absence mouvement malgre commande treuil&#x27;;
+
+ELSE
+    TonMecaB(IN := FALSE);
+    TonMecaD(IN := FALSE);
+    TonMecaE(IN := FALSE);
+    TonOppositeDirection(IN := FALSE);
+    TonNoMovement(IN := FALSE);
+END_IF;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE
+IF NOT Enable THEN
+    SafeStop := FALSE;
+    DescendPermit := FALSE;
+    AscentPermit := FALSE;
     PowerCutOff := FALSE;
-    Status.State := E_State.DISABLED;
-    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
-    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessus).
-    Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-    // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard.
-    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
-    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
     TonMecaB(IN := FALSE);
     TonMecaD(IN := FALSE);
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
-    MecaADriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive A valide hors Enable
-    MecaCDriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive C valide hors Enable
-    MecaBElapsedTime := T#0ms;     // ⏱️ Neutralisation : aucun temps écoulé Méca B valide hors Enable
+    MecaBElapsedTime := T#0s;
+    Ready := FALSE;
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
-
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region &quot;§2 Initialisation et bypass global&quot;}
-// Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
-IF LastInReferencingMode AND NOT InReferencingMode THEN
-    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
-END_IF;
-LastInReferencingMode := InReferencingMode;
-
-// Si le contacteur de puissance est ouvert (PowerContactorEngaged = FALSE), on force les sorties de sécurité
-// mais on ne fait pas de RETURN pour permettre le diagnostic et l&#x27;acquittement (Reset) des défauts.
-IF NOT PowerContactorEngaged THEN
-    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
-    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
-END_IF;
-
-// 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
-ResetEdge(CLK := Reset);
-
-// 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
-IF NOT FirstScanDone THEN
-    FirstScanDone := TRUE;
-    Status.ErrorId := 16#0000;
-    RETURN;
-END_IF;
-
-// 🌐 BYPASS GLOBAL : si TRUE, on force ErrorId = 0 ET on saute toute la logique de sécurité
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-    TonMecaB(IN := FALSE);
-    TonMecaD(IN := FALSE);
-    TonOppositeDirection(IN := FALSE);
-    TonMecaE(IN := FALSE);
-END_IF;
-
-{endregion}
-
-{region &quot;§3 Protections immediates position&quot;}
-// 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
-// ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
-// position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
-// (TopPositionSensor=FALSE), qu&#x27;on n&#x27;est pas en phase de référencement (homing), ET qu&#x27;on
-// commande un mouvement vers le haut (Direction &gt; 0), alors on lève le défaut.
-// SORTI du bloc &quot;IF NOT BypassGlobal&quot; ci-dessous — même doctrine que le blocage réel (§4) :
-// BypassGlobal M1/M2 ne doit masquer NI le mouvement NI l&#x27;alarme IHM de ces 2 fins de course
-// physiques. Seuls BypassProcess (groupé, conscient) ou BypassTopLimitSwitch (individuel)
-// peuvent encore éteindre CETTE alarme — exactement comme tous les autres bypass individuels du
-// fichier (une alarme ne s&#x27;éteint QUE si on a explicitement demandé à ignorer CETTE protection
-// précise, jamais via le bypass global qui vise le reste du domaine : Méca A-E, thermique, phase,
-// comm, sync, codeur).
-IF NOT (BypassProcess OR BypassTopLimitSwitch) AND NOT TopPositionSensor AND NOT InReferencingMode AND (Direction &gt; 0) THEN
-    Status.ErrorId := Status.ErrorId OR 16#0020;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFDF;
-END_IF;
-
-// 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
-// Sécurité active hors référencement. Si la position de câble descend sous la limite basse
-// physique (CablePosM &lt;= CfgCableLimitDescentM), alors on interdit uniquement la descente.
-// SORTI du bloc &quot;IF NOT BypassGlobal&quot; — même doctrine que bit5 ci-dessus.
-IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
-    Status.ErrorId := Status.ErrorId OR 16#0040;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFBF;
-END_IF;
-
-{endregion}
-
-{region &quot;§4 Diagnostics et protections treuil&quot;}
-// 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
-IF NOT BypassGlobal THEN
-
-    // ⏱️ Temporisation 3s de mise en route des bus de terrain au boot (CANopen / Modbus IHM)
-    TonStartupWarmup(IN := Enable, PT := T#3s);
-
-    IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
-        IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
-            Status.ErrorId := Status.ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
-        ELSE
-            Status.ErrorId := Status.ErrorId AND 16#FFFE;      // Effacement auto si la com repasse saine
-        END_IF;
-    ELSIF NOT TonStartupWarmup.Q THEN
-        Status.ErrorId := Status.ErrorId AND 16#FFFE;          // Inhibition pendant l&#x27;initialisation boot
-    END_IF;
-    IF ResetEdge.Q THEN
-        Status.ErrorId := Status.ErrorId AND 16#FFFE;
-    END_IF;
-
-// 🔍 3bis. PERTE CODEUR DE CE TREUIL
-// Le fonctionnement sans codeur reste interdit par défaut.
-// Le bypass est individuel, maintenu consciemment depuis l&#x27;IHM et strictement limité à MAINT_N2.
-// Il ne masque aucun autre défaut du treuil et n&#x27;agit jamais sur l&#x27;autre instance.
-EncoderAvailableEffective := EncoderAvailable
-                             OR BypassGlobal
-                             OR ((EncoderFaultBypass OR BypassProcess) AND (Mode = E_Mode.MAINT_N2));
-IF NOT EncoderAvailableEffective THEN
-    Status.ErrorId := Status.ErrorId OR 16#0002;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Effacement auto si le codeur est dispo OU bypassé *)
-END_IF;
-
-// 🔍 3ter. SURCHAUFFE MOTEUR — bit2, participe au SafeStop total
-// ET BypassMotorThermal — même doctrine que BypassBrakeThermal (§3sexies-ter),
-// bypass dédié plutôt que de dépendre uniquement du bypass groupé BypassSafety.
-IF NOT (BypassSafety OR BypassMotorThermal) AND ThermalFeedback THEN
-    Status.ErrorId := Status.ErrorId OR 16#0004;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFB;
-END_IF;
-
-// 🔍 3quater. MOU DE CÂBLE (physiquement sur tambour M2, câblé sur les 2 instances Safety)
-// Mode NORMAL (SyncEnable=TRUE) → SafeStop M1+M2 (bit3 inclus dans SafeStop)
-// Mode RÉCUPÉRATION (SyncEnable=FALSE) → DescendPermit uniquement (descente interdite pour ne pas dérouler, montée OK pour retendre/fermer)
-IF NOT BypassProcess AND SlackCableDetected THEN
-    Status.ErrorId := Status.ErrorId OR 16#0008;
-ELSIF ResetEdge.Q AND NOT SlackCableDetected THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFF7;
-END_IF;
-
-// 🔍 3quinquies. ROTATION DE PHASE —
-// bit4, participe au SafeStop total (sens moteur potentiellement inversé, danger 2 sens).
-IF NOT (BypassProcess OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN
-    Status.ErrorId := Status.ErrorId OR 16#0010;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFEF;
-END_IF;
-
-// 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL — bit7
-// Armé quand tout est physiquement confirmé coupé (contacteurs + frein). Si dérive ou vitesse
-// détectée pendant que c&#x27;est armé → roue libre / frein insuffisant.
-// La chaîne codeur produit la mesure ; ce bloc safety la surveille seulement.
-DriftGuardA(
-    Arm        := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode,
-    PositionM  := CablePosM,
-    ToleranceM := UncommandedDriftToleranceM
-);
-MecaADriftM := DriftGuardA.DriftM;   // Diagnostic IHM
-
-// 🕐 La vitesse Meca A est une derive de position sur fenetre glissante 50ms : a l&#x27;arret, elle met
-// ~50ms a retomber a 0 alors que l&#x27;armement (contacts/frein) est instantane -&gt; faux Meca a chaque
-// arret. Exiger une confirmation &quot;vitesse &lt; seuil&quot; maintenue &gt;= 1 fenetre (100ms) avant d&#x27;armer la
-// detection de VITESSE Meca. Impact securite negligeable : une vraie roue libre dure &gt;&gt; 100ms.
-TonMecaStopSettled(IN := (MeasuredSpeedMps &lt; UncommandedSpeedThresholdMps), PT := T#100ms);
-
-IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND TonMecaStopSettled.Q AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
-    Status.ErrorId := Status.ErrorId OR 16#0080;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FF7F;
-END_IF;
-
-// 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR — bit8
-// Indépendant de FB_Winch (défense en profondeur). Perte CAN (bit0) OU joystick au neutre ;
-// si les contacteurs OU LE FREIN ne confirment pas être retombés/serrés dans PostRampTimeout, défaut.
-// Un frein qui ne confirme pas son engagement dans ce délai est tout aussi dangereux qu&#x27;un
-// contacteur qui ne retombe pas (risque de mouvement/roue libre non détecté).
-MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
-                       OR (NOT HeartbeatIhmOk) OR JoystickYNeutral;
-TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback), PT := PostRampTimeout);
-MecaBElapsedTime := TonMecaB.ET;   // Diagnostic IHM
-IF TonMecaB.Q THEN
-    Status.ErrorId := Status.ErrorId OR 16#0100;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FEFF;
-END_IF;
-
-// 🔍 3decies. MÉCA C — GLISSEMENT M1 PENDANT BENNE, ESCALADE — bit9
-// Armé UNIQUEMENT pour l&#x27;instance M1 (BenneHoldStillActive câblé sur instBucket.Busy côté M1
-// seulement, toujours FALSE côté M2). Tolérance plus large que celle de FB_Bucket (1.0 m) —
-// n&#x27;intervient que si la couche Benne (SafeStop M1 seul) n&#x27;a pas suffi.
-// Dérive surveillée via FB_DriftGuard.
-DriftGuardC(
-    Arm        := NOT (BypassSafety OR BypassMecaC) AND BenneHoldStillActive,
-    PositionM  := CablePosM,
-    ToleranceM := BenneSlipToleranceM
-);
-MecaCDriftM := DriftGuardC.DriftM;   // Diagnostic IHM
-
-IF DriftGuardC.Violation THEN
-    Status.ErrorId := Status.ErrorId OR 16#0200;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FDFF;
-END_IF;
-
-// 🔍 3undecies. THERMIQUE FREIN COMMUN M1/M2/M3 — bit10
-// Signal commun (1 seul fil, câblé identiquement sur les 3 instances Safety) : sa perte peut
-// signifier qu&#x27;un frein colle instantanément (frein à manque de courant) → SafeStop ET
-// PowerCutOff (voir bandeau en-tête).
-IF NOT (BypassSafety OR BypassBrakeThermal) AND BrakeThermalFeedback THEN
-    Status.ErrorId := Status.ErrorId OR 16#0400;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FBFF;
-END_IF;
-
-// 🔍 3duodecies. MÉCA D — ARRIVÉE CAPTEUR HAUT HORS RÉFÉRENCEMENT — bit11
-// Complète le bit5 (AscentPermit immédiat) : arme la MÊME condition (capteur haut atteint, hors
-// homing) mais avec un délai de confirmation, comme Méca B. Si les contacteurs ET le frein ne
-// confirment pas être retombés/serrés dans PostRampTimeout après l&#x27;arrivée au capteur → défaut
-// → SafeStop ET PowerCutOff (la coupure AscentPermit seule ne suffit pas à arrêter réellement
-// le treuil : roue libre ou contacteur/frein défaillant).
-TonMecaD(
-    IN := NOT (BypassSafety OR BypassMecaD) AND ((((NOT TopPositionSensor AND NOT InReferencingMode) 
-            OR (Homed AND NOT HomingSuspect AND (CablePosM &gt;= (TopLimitM + 0.10))))
-           AND (Direction &gt;= 0)) // Neutralise la butée haute en descente (Direction = -1)
-          AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)), 
-    PT := PostRampTimeout
-);
-IF TonMecaD.Q THEN
-    Status.ErrorId := Status.ErrorId OR 16#0800;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#F7FF;
-END_IF;
-
-// 🔍 3terdecies. MÉCA E — ÉCART SYNCHRO M1/M2 CRITIQUE — bits 12/13
-// Couche INDÉPENDANTE de FB_WinchSync (écart mineur, 1er niveau) — défense en profondeur pour un
-// écart VRAIMENT important. ExpectedOtherWinchPosM est DÉJÀ corrigé de l&#x27;offset benne actif par
-// l&#x27;appelant : comparaison directe valable que le benne soit ouvert, fermé, ou absent du calcul.
-// Suppression pendant BenneBusy (trajet actif = écart transitoire normal, pas un défaut),
-// InReferencingMode (position pas fiable pendant homing) et OtherWinchInhibited (l&#x27;autre treuil
-// en maintenance a une position figée, non comparable).
-// Bit12 : détection → SafeStop immédiat. Bit13 : escalade si pas confirmé arrêté → PowerCutOff.
-IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
-   AND (ABS(CablePosM - ExpectedOtherWinchPosM) &gt; CriticalSyncToleranceM) THEN
-    Status.ErrorId := Status.ErrorId OR 16#1000;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#EFFF;
-END_IF;
-
-TonMecaE(IN := NOT (BypassSafety OR BypassMecaE) AND (((Status.ErrorId AND 16#1000) &lt;&gt; 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)),
-         PT := PostRampTimeout);
-IF TonMecaE.Q THEN
-    Status.ErrorId := Status.ErrorId OR 16#2000;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#DFFF;
-END_IF;
-
-// 🔍 3quaterdecies — SENS RÉEL OPPOSÉ À LA COMMANDE (bit14)
-// Le signe de la vitesse câble est comparé à la direction commandée uniquement pendant un
-// mouvement effectivement demandé. La temporisation filtre bruit codeur et inversion transitoire.
-OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
-    AND (((Direction &gt; 0) AND (MeasuredSpeedSignedMps &lt; -MovementSpeedThresholdMps))
-      OR ((Direction &lt; 0) AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps))));
-TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
-IF TonOppositeDirection.Q THEN
-    Status.ErrorId := Status.ErrorId OR 16#4000;
-ELSIF ResetEdge.Q AND NOT OppositeDirectionActive THEN
-    Status.ErrorId := Status.ErrorId AND 16#BFFF;
-END_IF;
-
-// ⏱️ 3quindecies — ABSENCE DE MOUVEMENT MALGRÉ COMMANDE (bit15)
-// Détecte charge coincée, contacteur inefficace ou chaîne mécanique non entraînée. SafeStop seul :
-// aucun retour ne justifie une coupure puissance brutale immédiate ; l&#x27;escalade reste matérielle.
-TonNoMovement(
-    IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
-          AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps)),
-    PT := NoMovementTimeout
-);
-IF TonNoMovement.Q THEN
-    Status.ErrorId := Status.ErrorId OR 16#8000;
-ELSIF ResetEdge.Q AND (NOT MeasuredSpeedValid OR NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) &gt;= MovementSpeedThresholdMps)) THEN
-    Status.ErrorId := Status.ErrorId AND 16#7FFF;
-END_IF;
-
-END_IF; // fin IF NOT BypassGlobal
-
-{endregion}
-
-{region &quot;§5 Arbitrage sorties securite&quot;}
-// 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-// 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
-// (Méca A/B/C) + 10 (thermique frein commun) + 11 (Méca D) + 12/13 (Méca E, écart synchro critique) ou si contacteur coupé
+{region &quot;§3 Arbitrage sorties securite&quot;}
+// 📤 3. ARBITRAGE SÉCURITÉ
 IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
-    SafeStop := (Status.ErrorId AND 16#FF97) &lt;&gt; 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
+    SafeStop := (Fault.ErrorId AND 16#FF97) &lt;&gt; 16#0000;
 ELSE
-    SafeStop := (Status.ErrorId AND 16#FF9F) &lt;&gt; 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
+    SafeStop := (Fault.ErrorId AND 16#FF9F) &lt;&gt; 16#0000;
 END_IF;
 
-// ⬇️ DescendPermit : TRUE = descente autorisée (pas de limite basse, pas de mou câble en mode récup, contacteur engagé)
-// Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 DescendPermit := NOT (
-    (((Status.ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
+    (((Fault.ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
     OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal))
-    OR (((Status.ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
+    OR (((Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
 );
 
-// ⬆️ AscentPermit : TRUE = montée autorisée (pas de fin course haut, pas de dépassement position)
-// Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 AscentPermit := NOT (
-    (((Status.ErrorId AND 16#0020) &lt;&gt; 16#0000
+    (((Fault.ErrorId AND 16#0020) &lt;&gt; 16#0000
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
     OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM)) AND NOT BypassTopLimitSoftware)
 );
 
-// PowerCutOff — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
-// Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
-// SafeStop seul ne sert à rien dans ces 3 cas précis.
-// bit2 (surchauffe/perte thermique MOTEUR) et bit10 (surchauffe/perte thermique FREIN commun) :
-// un frein à manque de courant peut coller instantanément sur perte de son retour thermique ;
-// une rampe SafeStop seule ne protège pas la mécanique dans ce cas, coupure puissance immédiate
-// nécessaire. Même raisonnement appliqué au thermique moteur par cohérence/défense en profondeur.
-// bit11 (Méca D, capteur haut) : même raisonnement que Méca A/B — contacteurs/frein déjà censés
-// être coupés (AscentPermit immédiat sur capteur), une confirmation manquante après délai signifie
-// que la coupure locale n&#x27;a pas suffi.
-// bit13 (Méca E escalade) : PAS bit12 seul (détection immédiate = SafeStop uniquement ;
-// PowerCutOff seulement si l&#x27;arrêt n&#x27;est pas confirmé après délai).
-PowerCutOff := (Status.ErrorId AND 16#2F84) &lt;&gt; 16#0000;
-
-// Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)
-Status.Busy := FALSE;
-Status.Done := FALSE;
-
+PowerCutOff := (Fault.ErrorId AND 16#2F84) &lt;&gt; 16#0000;
 {endregion}
+
+END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
@@ -2247,9 +2379,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // &lt;-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // Code erreur bitmask.
-    Status                          : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                           : ST_Fault;
 
     // === ORDRES ACTIONNEURS (CONTACTEURS) ===
     RelayFwd                        : BOOL;                           // &lt;-- [ACT] Ordre contacteur sens montee
@@ -2278,7 +2409,6 @@ VAR
 
     // === DETECTEURS ET TIMERS INTERNES ===
     ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
-    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
     DirectionChangeDelay            : TON;                            // . [LOC] Temporisation changement de sens
     TonContactorsDropped            : TON;                            // . [LOC] Temporisation retombee contacteurs
     BusinessStepDelay               : TON;                            // . [LOC] Temporisation hausse de palier
@@ -2291,304 +2421,216 @@ VAR
     EffectiveSafeStop               : BOOL;                           // . [LOC] SafeStop effectif incluant permis
     ActiveMaxStep                   : INT;                            // . [LOC] Plafond palier actif dynamique
     FirstScanDone                   : BOOL;                           // . [LOC] Indicateur premier cycle passe
+
+    // Latches défauts
+    SpeedStepConfigFaultLatched     : BOOL;
+
+    // Socle défaut
+    instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
-{region &quot;§1 Gate et initialisation&quot;}
-IF NOT Enable OR NOT PowerContactorEngaged THEN
-    RelayFwd := FALSE; RelayRev := FALSE;
-    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-    SpeedStep(Enable := FALSE, SpeedTgt_Pct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
-    RequestedStep := SpeedStep.StepNumber;
-    StepNumber := 0;
-    BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
-    BusinessStepDelayElapsed := T#0ms;
-    CommandedDirection := 0;
-    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelayAscent);
-    DirectionChangeDelayElapsed := T#0ms;
-    InTopSlowdownZone := FALSE;
-    InBottomSlowdownZone := FALSE;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    Status.Error := FALSE;
-    Status.ErrorId := 16#0000;
-    ContactorsCheck.Command := FALSE;     // 📊 Neutralisation : aucun contacteur commandé hors Enable
-    ContactorsCheck.Feedback := FALSE;    // 📊 Neutralisation : retour contacteur non surveillé hors Enable
-    ContactorsCheck.StuckClosed := FALSE; // 📊 Neutralisation : détection collage contacteur inactive hors Enable
-    ContactorsCheck.StuckOpen := FALSE;   // 📊 Neutralisation : détection ouverture contacteur inactive hors Enable
-    DirectionChangePending := FALSE;      // 📊 Neutralisation : aucun changement de sens en cours hors Enable
-    SpeedGuardLimited := FALSE;           // 📊 Neutralisation : aucune limitation garde-fou hors Enable
-    RETURN;
-END_IF;
+// === IMPLEMENTATION ===
 
-// 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
-IF NOT FirstScanDone THEN
-    FirstScanDone := TRUE;
-    Status.ErrorId := 16#0000;
-    StepNumber := 0;
-    RequestedStep := 0;
-    BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
-    BusinessStepDelayElapsed := T#0ms;
-    RETURN;
-END_IF;
-
-{endregion}
-
-{region &quot;§2 Preparation commande et limites vitesse&quot;}
-Ready := TRUE;
-CycleTimeCalc(DefaultValueS := 0.010);
-
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. FRONTS &amp; REARMEMENT
 ResetEdge(CLK := Reset);
 
-DirectionChangePending := (Direction &lt;&gt; CommandedDirection) AND (CommandedDirection &lt;&gt; 0);
-
-// Mou de câble / limite basse (DescendPermit=FALSE) et Fin de course haut (AscentPermit=FALSE)
-// intégrés à une VRAIE décélération rapide (comme SafeStop) :
-// - NOT DescendPermit est INHIBÉ si CommandedDirection = 1 (montée libre pour reprendre le mou)
-// - NOT AscentPermit est INHIBÉ si CommandedDirection = -1 (descente libre pour dégager le câble)
-EffectiveSafeStop := SafeStop 
-                     OR (NOT DescendPermit AND (CommandedDirection &lt;&gt; 1))
-                     OR (NOT AscentPermit AND (CommandedDirection &lt;&gt; -1));
-
-RampTargetPct := 0.0;
-IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
-    RampTargetPct := ABS(SpeedTgt_Pct);
+IF ResetEdge.Q OR BypassGlobal THEN
+    SpeedStepConfigFaultLatched := FALSE;
+    ContactorsCheck.StuckClosed := FALSE;
 END_IF;
 
-// RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect) — permet d&#x27;approcher
-// les fins de course / limites en vitesse lente de façon progressive.
-// Plafond palier direct (ActiveMaxStep := 1, ci-dessous, même mécanisme que
-// CfgMaxStepDescente/MaxStepAscent) — un treuil ne connaît que 5 paliers de contacteurs, pas une
-// vitesse continue ; palier 1 = tous contacteurs de vitesse relâchés = vitesse minimale, sans
-// dépendre d&#x27;un % qui doit rester sous le 1er seuil de la table pour produire le même effet.
-InTopSlowdownZone := Homed AND NOT HomingSuspect
-                      AND ((CommandedDirection = 1) OR (Direction = 1))
-                      AND (CablePosM &gt;= (TopLimitM - CfgSlowdownDistanceM));
-InBottomSlowdownZone := Homed AND NOT HomingSuspect
-                         AND ((CommandedDirection = -1) OR (Direction = -1))
-                         AND (CablePosM &lt;= (BottomLimitM + CfgSlowdownDistanceM));
+IF Enable AND SpeedStep.ConfigError THEN
+    SpeedStepConfigFaultLatched := TRUE;
+END_IF;
 
-// Délai asymétrique selon le sens ENTRANT (Direction) — descente sans effort
-// (câble mou/gravité favorable) réengage plus vite que montée (charge en traction). La tempo
-// palier se DÉDUIT de cet interlock (+100ms) : jamais besoin de resynchroniser deux réglages.
-IF Direction = -1 THEN
-    EffectiveDirectionInterlockDelay := DirectionInterlockDelayDescent;
+IF NOT BypassGlobal AND NOT BypassContactorCheck THEN
+    instCauses[1].Active   := ContactorsCheck.StuckClosed;
+    instCauses[1].Latching := TRUE;
+    instCauses[1].Texte    := &#x27;Contacteurs sens ou vitesse bloques fermes&#x27;;
 ELSE
-    EffectiveDirectionInterlockDelay := DirectionInterlockDelayAscent;
-END_IF;
-EffectiveStepDelay := EffectiveDirectionInterlockDelay + T#100ms;
-
-IF Direction &lt;&gt; CommandedDirection THEN
-    // Démarrage depuis le neutre/arrêt (CommandedDirection = 0) pris en compte IMMÉDIATE (0ms),
-    // pas de tempo interlock. L&#x27;interlock DirectionChangeDelay (400ms descente / 900ms montée) ne
-    // s&#x27;applique QU&#x27;EN CAS d&#x27;inversion active de sens en mouvement (ex: de -1 vers +1 direct).
-    IF CommandedDirection = 0 THEN
-        CommandedDirection := Direction;
-        DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
-    ELSIF StepNumber = 0 THEN
-        DirectionChangeDelay(IN := TRUE, PT := EffectiveDirectionInterlockDelay);
-        IF DirectionChangeDelay.Q THEN
-            CommandedDirection := Direction;
-            DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
-        END_IF;
-    ELSE
-        DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
-    END_IF;
-ELSE
-    DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
-END_IF;
-DirectionChangeDelayElapsed := DirectionChangeDelay.ET; // Diagnostic, miroir pur
-
-// Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,
-// Palier 1 en approche homing, MaxStepAscent en montée normale)
-IF NOT Homed OR HomingSuspect THEN
-    // Bypass.Global = TRUE → pas de limitation, on applique la règle normale
-    IF BypassGlobal THEN
-        ActiveMaxStep := SEL(CommandedDirection = -1, MaxStepAscent, CfgMaxStepDescente);
-    ELSE
-        ActiveMaxStep := 1;
-    END_IF;
-ELSIF CommandedDirection = -1 THEN
-    ActiveMaxStep := CfgMaxStepDescente;
-ELSIF (CommandedDirection = 1) AND HomingApproachActive THEN
-    ActiveMaxStep := 1;
-ELSIF CommandedDirection = 1 THEN
-    ActiveMaxStep := MaxStepAscent;
-ELSE
-    ActiveMaxStep := 5;
+    instCauses[1].Active := FALSE;
 END_IF;
 
-// Ralentissement sur bordure (voir plus haut) — plafond palier direct (CfgSlowdownMaxStep,
-// défaut 1 = vitesse mini, réglable IHM), appliqué APRÈS le calcul normal ci-dessus via MIN
-// (ne peut qu&#x27;abaisser, jamais relever le plafond déjà décidé par ailleurs — ex.
-// CfgMaxStepDescente déjà plus restrictif).
-IF InTopSlowdownZone OR InBottomSlowdownZone THEN
-    ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
-END_IF;
+instCauses[2].Active   := SpeedStepConfigFaultLatched;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := &#x27;Configuration table des paliers vitesse invalide&#x27;;
 
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
 {endregion}
 
-{region &quot;§3 Selection et temporisation paliers&quot;}
-SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedTgt_Pct := RampTargetPct,
-          Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
-          MaxStepNumber := ActiveMaxStep,
-          MeasuredSpeedBand := MeasuredSpeedBand,
-          SpeedGuardEnable := SpeedGuardEnable,
-          SpeedGuardReady := SpeedGuardReady);
-// 🪜 Tempo métier nominale : le décollage initial de StepNumber=0 vers 1 est IMMÉDIAT (0ms).
-// Toute hausse ultérieure (1-&gt;2-&gt;3) exige EffectiveStepDelay (interlock + 100ms) et progresse par pas adjacents.
-// Toute baisse reste immédiate pour ne jamais retarder un arrêt/safety.
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE
+IF NOT Enable THEN
+    SpeedStep(Enable := FALSE, Table := SpeedStepTable);
+    RelayFwd := FALSE;
+    RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    RequestedStep := 0;
+    StepNumber := 0;
+    CommandedDirection := 0;
+    DirectionChangePending := FALSE;
+    BusinessStepDelay(IN := FALSE);
+    DirectionChangeDelay(IN := FALSE);
+    TonContactorsDropped(IN := FALSE);
+    ContactorsCheck.Command := FALSE;
+    ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
+    InTopSlowdownZone := FALSE;
+    InBottomSlowdownZone := FALSE;
+    Ready := FALSE;
+    RETURN;
+END_IF;
+
+Ready := Enable AND NOT Fault.Latched;
+{endregion}
+
+{region &quot;§3 Premier scan et temps de cycle&quot;}
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    CommandedDirection := Direction;
+END_IF;
+
+CycleTimeCalc();
+{endregion}
+
+{region &quot;§4 Permis et zones de ralentissement&quot;}
+EffectiveSafeStop := SafeStop OR (Direction &gt; 0 AND NOT AscentPermit) OR (Direction &lt; 0 AND NOT DescendPermit);
+
+InTopSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM &gt;= (TopLimitM - CfgSlowdownDistanceM));
+InBottomSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM &lt;= (BottomLimitM + CfgSlowdownDistanceM));
+
+IF Direction &gt; 0 THEN
+    ActiveMaxStep := MaxStepAscent;
+    IF InTopSlowdownZone THEN
+        ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
+    END_IF;
+ELSIF Direction &lt; 0 THEN
+    ActiveMaxStep := CfgMaxStepDescente;
+    IF InBottomSlowdownZone THEN
+        ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
+    END_IF;
+ELSE
+    ActiveMaxStep := MaxStepAscent;
+END_IF;
+
+IF HomingApproachActive THEN
+    ActiveMaxStep := 1;
+END_IF;
+{endregion}
+
+{region &quot;§5 Interlock direction&quot;}
+IF Direction &gt; 0 THEN
+    EffectiveDirectionInterlockDelay := DirectionInterlockDelayAscent;
+ELSE
+    EffectiveDirectionInterlockDelay := DirectionInterlockDelayDescent;
+END_IF;
+
+DirectionChangeDelay(
+    IN := (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) AND (StepNumber = 0) AND FwdRevSpeedFeedbackOff,
+    PT := EffectiveDirectionInterlockDelay
+);
+DirectionChangeDelayElapsed := DirectionChangeDelay.ET;
+
+IF (CommandedDirection = 0) AND (Direction &lt;&gt; 0) THEN
+    CommandedDirection := Direction;
+    DirectionChangePending := FALSE;
+ELSIF DirectionChangeDelay.Q THEN
+    CommandedDirection := Direction;
+    DirectionChangePending := FALSE;
+ELSIF (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) THEN
+    DirectionChangePending := TRUE;
+ELSE
+    DirectionChangePending := FALSE;
+END_IF;
+
+IF Direction = 0 THEN
+    CommandedDirection := 0;
+    DirectionChangePending := FALSE;
+END_IF;
+{endregion}
+
+{region &quot;§6 Paliers vitesse et contacteurs&quot;}
+IF DirectionChangePending OR (Direction = 0) OR EffectiveSafeStop OR NOT StartStop THEN
+    RampTargetPct := 0.0;
+ELSE
+    RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
+END_IF;
+
+SpeedStep(
+    Enable := (RampTargetPct &gt; 0.1),
+    SpeedTgt_Pct := RampTargetPct,
+    Table := SpeedStepTable,
+    HystMargin := SpeedStepHystMargin,
+    MaxStepNumber := ActiveMaxStep,
+    MeasuredSpeedBand := MeasuredSpeedBand,
+    SpeedGuardEnable := SpeedGuardEnable,
+    SpeedGuardReady := SpeedGuardReady
+);
 RequestedStep := SpeedStep.StepNumber;
-IF RequestedStep &gt; StepNumber THEN
+
+EffectiveStepDelay := SEL(CommandedDirection = -1, DirectionInterlockDelayAscent, DirectionInterlockDelayDescent) + T#100ms;
+
+BusinessStepDelay(
+    IN := (RequestedStep &gt; StepNumber) AND (StepNumber &gt; 0),
+    PT := EffectiveStepDelay
+);
+BusinessStepDelayElapsed := BusinessStepDelay.ET;
+
+IF RequestedStep = 0 THEN
+    StepNumber := 0;
+ELSIF RequestedStep &lt; StepNumber THEN
+    StepNumber := RequestedStep;
+ELSIF RequestedStep &gt; StepNumber THEN
     IF StepNumber = 0 THEN
         StepNumber := 1;
-        BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
-        BusinessStepDelayElapsed := T#0ms;
-    ELSE
-        BusinessStepDelay(IN := TRUE, PT := EffectiveStepDelay);
-        BusinessStepDelayElapsed := BusinessStepDelay.ET;
-        IF BusinessStepDelay.Q THEN
+    ELSIF BusinessStepDelay.Q THEN
+        IF SpeedGuardEnable AND SpeedGuardReady AND (MeasuredSpeedBand &lt; StepNumber) THEN
+            SpeedGuardLimited := TRUE;
+        ELSE
             StepNumber := StepNumber + 1;
-            BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
+            SpeedGuardLimited := FALSE;
         END_IF;
     END_IF;
-ELSE
-    BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
-    BusinessStepDelayElapsed := BusinessStepDelay.ET;
-    StepNumber := RequestedStep;
-END_IF;
-SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
-
-{endregion}
-
-{region &quot;§4 Commandes contacteurs et sens&quot;}
-// Les sorties métier suivent le palier temporisé. FB_Winch/SpeedStepTable reste
-// propriétaire unique des combinaisons, y compris les mappings M2 Benne dynamiques.
-// FB_WinchOutputInterlock ne fait qu&#x27;autoriser ou masquer ces quatre demandes.
-CASE StepNumber OF
-    1:
-        Contactor1 := SpeedStepTable.P1R1; Contactor2 := SpeedStepTable.P1R2;
-        Contactor3 := SpeedStepTable.P1R3; Contactor4 := SpeedStepTable.P1R4;
-    2:
-        Contactor1 := SpeedStepTable.P2R1; Contactor2 := SpeedStepTable.P2R2;
-        Contactor3 := SpeedStepTable.P2R3; Contactor4 := SpeedStepTable.P2R4;
-    3:
-        Contactor1 := SpeedStepTable.P3R1; Contactor2 := SpeedStepTable.P3R2;
-        Contactor3 := SpeedStepTable.P3R3; Contactor4 := SpeedStepTable.P3R4;
-    4:
-        Contactor1 := SpeedStepTable.P4R1; Contactor2 := SpeedStepTable.P4R2;
-        Contactor3 := SpeedStepTable.P4R3; Contactor4 := SpeedStepTable.P4R4;
-    5:
-        Contactor1 := SpeedStepTable.P5R1; Contactor2 := SpeedStepTable.P5R2;
-        Contactor3 := SpeedStepTable.P5R3; Contactor4 := SpeedStepTable.P5R4;
-ELSE
-    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-END_CASE;
-
-// Coupure INSTANTANÉE de tous les contacteurs de vitesse dès que l&#x27;opérateur relâche le
-// joystick (Direction=0) — ne pas attendre la fin de la rampe de décélération. Sinon,
-// StepNumber suivrait la rampe (décélération progressive), gardant les contacteurs de vitesse
-// engagés plusieurs secondes après l&#x27;ordre d&#x27;arrêt.
-IF Direction = 0 THEN
-    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
 
-// Le sens et la pré-magnétisation suivent la demande brute ; le palier métier
-// temporisé reste seul transmis à l&#x27;interlock final pour autoriser la puissance.
-// ET Direction=1/-1 (demande OPÉRATEUR brute, pas CommandedDirection qui reste au dernier sens
-// jusqu&#x27;à la retombée de la rampe) — coupure instantanée du contacteur de sens dès le
-// relâchement du joystick, même sécurité que ci-dessus.
-// Le frein n&#x27;est pas une condition d&#x27;engagement des relais de sens : c&#x27;est l&#x27;inverse
-// (voir FB_WinchOutputInterlock §6 : BrakeCmd := RelayFwd OR RelayRev, calculé APRÈS ces relais).
-RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep &gt; 0);
-RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep &gt; 0);
-
-IF NOT DescendPermit THEN
+IF StepNumber &gt; 0 AND CommandedDirection = 1 THEN
+    RelayFwd := TRUE;
+    RelayRev := FALSE;
+ELSIF StepNumber &gt; 0 AND CommandedDirection = -1 THEN
+    RelayFwd := FALSE;
+    RelayRev := TRUE;
+ELSE
+    RelayFwd := FALSE;
     RelayRev := FALSE;
 END_IF;
 
-IF NOT AscentPermit THEN
-    RelayFwd := FALSE;
-END_IF;
+Contactor1 := (StepNumber = 1);
+Contactor2 := (StepNumber = 2);
+Contactor3 := (StepNumber = 3);
+Contactor4 := (StepNumber = 4);
 
-// Vérification UNIQUEMENT à l&#x27;arrêt commandé (voir bandeau en-tête).
-// AllContactorsCommandedOff = tout ce que FB_Winch commande est à FALSE.
 AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
 
-ContactorsCheck.Command  := NOT AllContactorsCommandedOff;   // TRUE = au moins un contacteur commandé
-ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;      // TRUE = au moins un contacteur pas retombé
+ContactorsCheck.Command  := NOT AllContactorsCommandedOff;
+ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
 TonContactorsDropped(IN := AllContactorsCommandedOff AND NOT FwdRevSpeedFeedbackOff, PT := ContactorFeedbackTimeout);
 IF TonContactorsDropped.Q THEN
     ContactorsCheck.StuckClosed := TRUE;
-ELSIF ResetEdge.Q THEN
-    ContactorsCheck.StuckClosed := FALSE;
 END_IF;
-ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de confirmation par sens, voir bandeau)
+ContactorsCheck.StuckOpen := FALSE;
 
-{endregion}
-
-{region &quot;§5 Diagnostic contacteurs et configuration&quot;}
-// 🌐 BYPASS GLOBAL : force ErrorId = 0 et saute toute la logique d&#x27;erreur
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-END_IF;
-
-IF NOT BypassGlobal THEN
-// bit0 ErrorId libre — la cohérence commande/retour du frein est surveillée dans
-// FB_WinchOutputInterlock (BrakeFeedback).
-
-// 🧪 Simulation (GVL_Simulation.SensorMxContactorFeedbackIsReal, passé par l&#x27;appelant via
-// BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed
-// se déclenche à tort et bloque RelayFwd/RelayRev (voir Error plus bas).
-// bit2 libre/inutilisé.
-IF NOT BypassContactorCheck THEN
-    IF ContactorsCheck.StuckClosed THEN
-        Status.ErrorId := Status.ErrorId OR 16#0002;
-    ELSIF ResetEdge.Q THEN
-        Status.ErrorId := Status.ErrorId AND 16#FFFD;
-    END_IF;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
-END_IF;
-
-// 🪜 Remonte le défaut de configuration interne de FB_SpeedStep.
-// Le bit reste mémorisé après correction de la table ; cause disparue + nouveau front Reset
-// sont obligatoires avant de rendre le treuil disponible, conformément à Partie 3 §5.
-IF SpeedStep.ConfigError THEN
-    Status.ErrorId := Status.ErrorId OR 16#0004;    // bit2 = table/plafond/hystérésis invalide
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFB;
-END_IF;
-
-END_IF; // fin IF NOT BypassGlobal
-
-{endregion}
-
-{region &quot;§6 Etats et repli defaut&quot;}
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-IF (NOT StartStop OR EffectiveSafeStop OR DirectionChangePending) AND StepNumber &gt; 0 THEN
-    Status.State := E_State.STOPPING;
-ELSIF StepNumber &gt; 0 THEN
-    Status.State := E_State.BUSY;
-ELSE
-    Status.State := E_State.READY;
-END_IF;
-
-Status.Busy := (Status.State = E_State.BUSY) OR (Status.State = E_State.STOPPING);
-Status.Done := FALSE;
-
-IF Status.Error THEN
+IF Fault.Error THEN
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
-
 {endregion}
+
+END_FUNCTION_BLOCK
 </pre>
             </details>
     </details>

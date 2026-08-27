@@ -1,23 +1,19 @@
 {
   "version": 1,
-  "file": "test_prg_06_outputs.st",
+  "file": "test_fb_bucket.st",
   "results": [
     {
-      "name": "PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "PRG_06_Outputs : Transmission Ordre M2 en Marche Normale",
-      "passed": true
-    },
-    {
-      "name": "PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1",
+      "name": "TC-P10-023 Benne : mise en service et verrouillage securite",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 2,
+    "passed": 2,
     "failed": 0
   }
 }

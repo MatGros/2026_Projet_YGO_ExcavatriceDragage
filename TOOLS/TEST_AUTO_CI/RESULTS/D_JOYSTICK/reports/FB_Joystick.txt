@@ -1,14 +1,11 @@
-Error compiling source files:
-
-FB_Joystick.st:40:33: error: Undefined type 'ST_FBJOYSTICK_CFG' in FUNCTION_BLOCK 'FB_JOYSTICK'
-  40 |     Cfg                       : ST_fbJoystick_Cfg; // --> [CFG]  Réglages groupés (deadband, temporisations, marge ADC)
-     |                                 ^
-
-FB_Joystick.st:45:33: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_JOYSTICK'
-  45 |     Fault                     : ST_Fault;   // <-- [DIAG] Brique defaut socle (live + latche), remplie par FB_FaultCore
-     |                                 ^
-
-FB_Joystick.st:75:33: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_JOYSTICK'
-  75 |     instFault                 : FB_FaultCore;        // * [INST] Socle de defaut (liste de causes -> ST_Fault)
-     |                                 ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Joystick_qmv_0ig6\strucpp-test-CxK0EH\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Joystick_qmv_0ig6\strucpp-test-CxK0EH\test_main.cpp:429:53: error: 'class strucpp::FB_JOYSTICK' has no member named 'ATNEUTRAL'; did you mean 'ATNEUTRALXY'?
+  429 |         if (!ctx.assert_true(static_cast<bool>(s.FB.ATNEUTRAL), "FB.ATNEUTRAL", 249, "Signal dans deadband : considere au neutre")) return false;
+      |                                                     ^~~~~~~~~
+      |                                                     ATNEUTRALXY
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Joystick_qmv_0ig6\strucpp-test-CxK0EH\test_main.cpp:449:53: error: 'class strucpp::FB_JOYSTICK' has no member named 'ATNEUTRAL'; did you mean 'ATNEUTRALXY'?
+  449 |         if (!ctx.assert_true(static_cast<bool>(s.FB.ATNEUTRAL), "FB.ATNEUTRAL", 261, "Signal dans deadband : considere au neutre")) return false;
+      |                                                     ^~~~~~~~~
+      |                                                     ATNEUTRALXY
 

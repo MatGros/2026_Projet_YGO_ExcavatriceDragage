@@ -15,8 +15,8 @@ TEST 'PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth'
     acqData.JoystickDeadmanArmed := TRUE;
     acqData.JoystickYNeutral := FALSE;
     acqData.JoystickDirectionX := 0;
-    acqData.CablePosM1 := 2.0;
-    acqData.M1_Speed_Mps := 0.0;
+    acqData.Encoders.M1.CablePosM := 2.0;
+    acqData.Encoders.M1.Speed_Mps := 0.0;
 
     // 3. Execution PRG_04 (2 cycles pour passer le premier scan d'init FirstScanDone)
     harness(
@@ -45,6 +45,7 @@ END_TEST
 
 
 TEST 'PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)'
+    modesAuth.Mode := E_Mode.MAINT_N1;
     // Stimulus : Defaut codeur remonte par le bus PRG_02
     acqData.M1_EncoderFault := TRUE;
 
