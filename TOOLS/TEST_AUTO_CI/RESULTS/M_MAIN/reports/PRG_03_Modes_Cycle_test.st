@@ -11,7 +11,7 @@ TEST 'PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unita
         SelJoystickWinch := 1,        // Selection Joystick M1
         TglMaintenanceZoneAccess := TRUE
     );
-    // ---- ST_Modes_Autorisations : arbitrage mode ----
+    // ---- ST_fbModes_Autorisations : arbitrage mode ----
     ASSERT_EQ(harness.Auth.Mode, E_Mode.MAINT_N1, 'Auth.Mode: MAINT_N1 arbitre');
     // SyncEnable actif par defaut en MAINT_N1 (case IHM cochee par defaut TRUE)
     ASSERT_TRUE(harness.Auth.SyncEnable, 'Auth.SyncEnable vrai en N1 par defaut');

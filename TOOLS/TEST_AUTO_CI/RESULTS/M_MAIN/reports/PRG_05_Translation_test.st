@@ -2,7 +2,7 @@ SETUP
 VAR
     harness   : FB_TestHarness_PRG_05;
     acqData   : ST_AcquisitionInterPrg;
-    modesAuth : ST_Modes_Autorisations;
+    modesAuth : ST_fbModes_Autorisations;
 END_VAR
 END_SETUP
 

@@ -2219,16 +2219,20 @@ tasks:
   - T164-4
 - id: T164-6
   parent_id: T164
-  statut: ⬜
+  statut: ✅
   criticite: C1
   domaine: STANDARDS
-  agent: ''
-  date: '2026-08-27T14:39:34'
+  agent: DSH
+  date: '2026-08-27T21:52:46'
   titre: Lots nommage (G120 12 DUT + champs encodeur + GVL_Simulation)
   contexte: 'Intitulé complet : Renommages cosmétiques différés — 12 DUT signalés par G120 (ST_EncoderHw,
     ST_BucketConfig, ST_*CmdDemand, ST_Winch_Symmetry*, …) vers ST_fb<Fb>_<Rôle> ; champs encodeur
     CablePosM → CablePosition_M et HomingAtTargetM → CmdHoming… (NC-030/NC-050) ; GVL_Simulation.'
-  description: 'DERNIER, ou jamais. Blast radius élevé (consommateurs + tags IHM + troubleshooting + snapshots
+  description: '✅ CLÔTURÉ 2026-08-27 (lot dédié NC-110) : 11 DUT propriétaires renommés vers ST_fb<Fb>_<Role>
+    (ST_fbModes_Autorisations, ST_fbCycle_{Bucket,Winch,Translation}CmdDemand, ST_fbBucket_{Config,State},
+    ST_fbWinchLoadEstimator_{Table,SpeedCfg}, ST_fbWinch_Symmetry_{Cfg,Data}, ST_fbEncoder_Measurement),
+    ST_EncoderMeasurements pluriel préservé. Bundle régénéré, G200 PASS (0 erreur), 22 gates PASS,
+    CI 27/27 suites (100%), G120 : 15 DUT conformes / 0 à migrer. — Règle d''origine : DERNIER, ou jamais. Blast radius élevé (consommateurs + tags IHM + troubleshooting + snapshots
     CSV + fixtures CI), valeur sécurité nulle. Règle : ne renommer que les champs qui bougent déjà pour une
     autre raison (ride-along d''un déplacement fait en T164-4/T164-5). Sinon lot dédié explicite, jamais au fil de l''eau.'
   contrat: ''
