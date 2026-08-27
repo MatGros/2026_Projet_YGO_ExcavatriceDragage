@@ -387,6 +387,7 @@
         <div class="controls-row" style="background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);">
             <span style="font-size: 11px; font-weight: bold; color: var(--subtext); text-transform: uppercase;">Filtres :</span>
             <button class="filter-btn active" onclick="setFilter('ALL', this)">Tous</button>
+            <button class="filter-btn" onclick="setFilter('ACTIVE', this)">🔄 Non finalisés</button>
             <button class="filter-btn" onclick="setFilter('WORK_LOCK', this)">🔒 Travail attribué</button>
             <button class="filter-btn" onclick="setFilter('⬜', this)">⬜ À faire</button>
             <button class="filter-btn" onclick="setFilter('⏳', this)">⏳ En attente</button>
@@ -857,7 +858,7 @@
             `;
 
             let filtered = tasks.filter(t => {
-                const matchStatus = currentStatus === 'ALL' || t.statut === currentStatus || (currentStatus === 'WORK_LOCK' && (Boolean(t.work_lock) || t.statut === '🔒'));
+                const matchStatus = currentStatus === 'ALL' || t.statut === currentStatus || (currentStatus === 'WORK_LOCK' && (Boolean(t.work_lock) || t.statut === '🔒')) || (currentStatus === 'ACTIVE' && t.statut !== '✅' && t.statut !== '❌');
                 const matchDomain = currentDomain === 'ALL' || t.domaine === currentDomain;
                 const matchText = (t.id + ' ' + (t.parent_id || '') + ' ' + t.titre + ' ' + t.description + ' ' + t.domaine + ' ' + (t.agent || '')).toLowerCase().includes(search);
                 return matchStatus && matchDomain && matchText;
