@@ -5031,7 +5031,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
           <struct>
             <variable name="Config">
               <type>
-                <derived name="ST_BucketConfig" />
+                <derived name="ST_fbBucket_Config" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Offsets Open/Close/Coherence</xhtml>
@@ -5149,7 +5149,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
           <struct>
             <variable name="MechState">
               <type>
-                <derived name="ST_BucketState" />
+                <derived name="ST_fbBucket_State" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚥 État mécanique mémorisé (IsOpen, IsClosed...)</xhtml>
@@ -5683,7 +5683,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_BucketConfig">
+      <dataType name="ST_fbBucket_Config">
         <baseType>
           <struct>
             <variable name="OffsetOpenM">
@@ -5736,19 +5736,19 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00315f60-8cf4-50aa-8e85-badae3d657b1</ObjectId>
+            <ObjectId>b2af5901-62ea-5239-8b5e-fb6f7afb8a12</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_BucketConfig — Configuration des offsets du benne
+   ⚙️ ST_fbBucket_Config — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_BucketState">
+      <dataType name="ST_fbBucket_State">
         <baseType>
           <struct>
             <variable name="IsOpen">
@@ -5827,12 +5827,12 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a8523258-d2bb-591c-8a54-f00784419808</ObjectId>
+            <ObjectId>74e82ca6-a865-5827-ba17-53f56d8b0f29</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🚦 ST_BucketState — État mémorisé et diagnostic du benne
+   🚦 ST_fbBucket_State — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -7050,8 +7050,8 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
           </Folder>
           <Folder Name="BENNE">
             <Folder Name="_TYPES">
-              <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
-              <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
+              <Object Name="ST_fbBucket_Config" ObjectId="b2af5901-62ea-5239-8b5e-fb6f7afb8a12" />
+              <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />
             </Folder>
           </Folder>
         </Folder>

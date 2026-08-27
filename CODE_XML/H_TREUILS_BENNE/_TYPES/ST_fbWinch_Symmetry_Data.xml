@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.165818" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.165818">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.553807" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.553807">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_Winch_SymmetryData">
+      <dataType name="ST_fbWinch_Symmetry_Data">
         <baseType>
           <struct>
             <variable name="DeltaStartDelay_Ms">
@@ -78,12 +78,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>f7635572-022c-5fdd-93e8-106b5d2eea3e</ObjectId>
+            <ObjectId>30d10f2c-209a-59ac-ab89-aae03e9399fe</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 ST_Winch_SymmetryData — Données mesurées de symétrie M1/M2
+   📊 ST_fbWinch_Symmetry_Data — Données mesurées de symétrie M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure des résultats de mesures et d'écarts du diagnostic symétrie
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -101,7 +101,7 @@
       <ProjectStructure>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="_TYPES">
-            <Object Name="ST_Winch_SymmetryData" ObjectId="f7635572-022c-5fdd-93e8-106b5d2eea3e" />
+            <Object Name="ST_fbWinch_Symmetry_Data" ObjectId="30d10f2c-209a-59ac-ab89-aae03e9399fe" />
           </Folder>
         </Folder>
       </ProjectStructure>

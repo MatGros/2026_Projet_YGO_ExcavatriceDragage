@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.165282" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.165282">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.552299" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.552299">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_Winch_SymmetryCfg">
+      <dataType name="ST_fbWinch_Symmetry_Cfg">
         <baseType>
           <struct>
             <variable name="DeltaStartDelay_Ms">
@@ -107,12 +107,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cafdebf4-b7e5-5000-bdd0-033e76a6b7c7</ObjectId>
+            <ObjectId>b3edf443-a7a8-5125-8877-3148f355844d</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚖️ ST_Winch_SymmetryCfg — Configuration des seuils de symétrie M1/M2
+   ⚖️ ST_fbWinch_Symmetry_Cfg — Configuration des seuils de symétrie M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -130,7 +130,7 @@
       <ProjectStructure>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="_TYPES">
-            <Object Name="ST_Winch_SymmetryCfg" ObjectId="cafdebf4-b7e5-5000-bdd0-033e76a6b7c7" />
+            <Object Name="ST_fbWinch_Symmetry_Cfg" ObjectId="b3edf443-a7a8-5125-8877-3148f355844d" />
           </Folder>
         </Folder>
       </ProjectStructure>

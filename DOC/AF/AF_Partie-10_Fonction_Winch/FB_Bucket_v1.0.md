@@ -60,7 +60,7 @@ Pas de moteur propre — effet de bord de la désynchronisation M1/M2 :
 | `M1_Busy`/`M2_Busy` | BOOL | Interlock avant armement demande |
 | `M1SlipToleranceM` :=1.0 | REAL | Tolérance glissement (couche 1) |
 | `ConfirmOpenPosition`/`ClosePosition` | BOOL (front) | Référencement manuel MAINT_N1/N2 |
-| `Config` (ST_BucketConfig) | — | `OffsetOpenM`, `OffsetCloseM`, `CoherenceLimitM`(0.05m) |
+| `Config` (ST_fbBucket_Config) | — | `OffsetOpenM`, `OffsetCloseM`, `CoherenceLimitM`(0.05m) |
 
 **Sorties** : `Ready/ActiveOffsetValid/Busy/Done/Error`, `ErrorId` (bit0 Timeout 30s, bit1 incohérence boot, bit2 limites dépassées, bit3 codeur non référencé, bit4 glissement M1), `M1SlipDetected`, `ActiveOffsetM`, `DeltaPosition_M`, `RemainingTravelM`, `M2_StartStop`/`Direction`/`ForceSlowSpeed`.
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:36:09.877362" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:36:09.877362">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.556413" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.556413">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_BucketState">
+      <dataType name="ST_fbBucket_State">
         <baseType>
           <struct>
             <variable name="IsOpen">
@@ -102,12 +102,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a8523258-d2bb-591c-8a54-f00784419808</ObjectId>
+            <ObjectId>74e82ca6-a865-5827-ba17-53f56d8b0f29</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🚦 ST_BucketState — État mémorisé et diagnostic du benne
+   🚦 ST_fbBucket_State — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -126,7 +126,7 @@
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
             <Folder Name="_TYPES">
-              <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
+              <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />
             </Folder>
           </Folder>
         </Folder>

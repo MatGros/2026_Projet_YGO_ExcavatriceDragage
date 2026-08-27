@@ -8,7 +8,7 @@
 
 ## 📐 1. Description Fonctionnelle
 
-`FB_WinchLoadEstimator` croise le **palier de vitesse commandé** (1..5) et la **bande de vitesse mesurée réelle** (1..5) avec une table matricielle 2D empirique (`ST_WinchLoadEstimateTable`) pour estimer le pourcentage de charge du treuil.
+`FB_WinchLoadEstimator` croise le **palier de vitesse commandé** (1..5) et la **bande de vitesse mesurée réelle** (1..5) avec une table matricielle 2D empirique (`ST_fbWinchLoadEstimator_Table`) pour estimer le pourcentage de charge du treuil.
 
 Il permet à l'opérateur sur l'IHM d'avoir un retour visuel informatif du taux d'effort, notamment au démarrage et en montée.
 
@@ -26,8 +26,8 @@ VAR_INPUT
     ActiveSpeedStep        : INT;                         // Palier commandé (0..5)
     MeasuredSpeedMps       : REAL;                        // Vitesse mesurée (m/s)
     MeasuredSpeedSignedMps : REAL;                        // Vitesse signée (positive = montée)
-    SpeedConfig            : ST_WinchSpeedConfig;         // Configuration des plages de vitesse
-    LoadTable              : ST_WinchLoadEstimateTable;   // Table d'estimation 5x5
+    SpeedConfig            : ST_fbWinchLoadEstimator_SpeedCfg;         // Configuration des plages de vitesse
+    LoadTable              : ST_fbWinchLoadEstimator_Table;   // Table d'estimation 5x5
 END_VAR
 VAR_OUTPUT
     Ready                  : BOOL;

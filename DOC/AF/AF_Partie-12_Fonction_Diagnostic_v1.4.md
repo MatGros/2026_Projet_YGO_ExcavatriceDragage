@@ -108,8 +108,8 @@ Couverture CI **existante mais superficielle** (pas un substitut au catalogue ci
 | `ST_NetworkDiagHMI` | `BusCanOpen`, `Joystick`, `CanError`, `CanErrorId`, `BusEthercat`, `EncoderM1/M2`, `VariateurM3`, `EcatError`, `EcatErrorId`, `InputModules`, `Bypass` | `PRG_07_Supervision` | IHM (Visu, Bandeau, Diagnostics) |
 | `ST_InputModuleDiagHMI` | `LocalDigitalIoOk`, `Vh0800EndOk`, `Vh0808EtpOk`, `Vh0008ErOk`, `Vh0008Er1Ok`, `Fault` | `PRG_02` / `PRG_07` | `FB_Hmi_BannerFormatter`, IHM |
 | `E_Diag_State` | `DISABLED`, `READY`, `INIT`, `MONITORING`, `ERROR`, `SIMULATED` | FB diag | IHM, Modes |
-| `ST_Winch_SymmetryCfg` | Seuils (`DeltaStartDelay_Ms`, etc.) | GVL_PERSISTENT | `FB_Winch_Symmetry` |
-| `ST_Winch_SymmetryData` | Mesures (`DeltaStartDelay_Ms`, `MaxSyncDeviation_M`, etc.) | `FB_Winch_Symmetry` | IHM, GVL_PERSISTENT |
+| `ST_fbWinch_Symmetry_Cfg` | Seuils (`DeltaStartDelay_Ms`, etc.) | GVL_PERSISTENT | `FB_Winch_Symmetry` |
+| `ST_fbWinch_Symmetry_Data` | Mesures (`DeltaStartDelay_Ms`, `MaxSyncDeviation_M`, etc.) | `FB_Winch_Symmetry` | IHM, GVL_PERSISTENT |
 
 ---
 

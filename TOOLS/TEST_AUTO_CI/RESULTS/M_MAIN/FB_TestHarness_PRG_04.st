@@ -43,8 +43,8 @@ VAR
     instWinchM1             : FB_Winch;
     instWinchM2             : FB_Winch;
     
-    speedCfg                : ST_WinchSpeedConfig;
-    bucketCfg               : ST_BucketConfig;
+    speedCfg                : ST_fbWinchLoadEstimator_SpeedCfg;
+    bucketCfg               : ST_fbBucket_Config;
     m1StartStop             : BOOL;
     m1Direction             : INT;
     m1SpeedTgt              : REAL;
