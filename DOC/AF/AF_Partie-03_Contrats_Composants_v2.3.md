@@ -184,6 +184,20 @@ Un DUT de flux n'est ni une GVL, ni une copie de la structure IHM. Il est specif
 incomplete, device hors OP). `Enable` n'est pas un champ d'en-tete de bus : c'est une commande
 de cycle de vie du FB.
 
+### Projections de monitoring dans un DUT — bits = verite, INT/enum = vue derivee
+
+Quand un DUT porte a la fois la **verite logique** (bits) et une **vue derivee** pour l'IHM ou le
+monitoring, la regle est :
+
+| Regle | Exigence |
+|---|---|
+| 🔩 Source unique | Les bits (`DirectionPositive`/`DirectionNegative`, `AtNeutral`…) sont la **verite** — toute logique d'interlock, de sens et de commande se base sur eux. |
+| 📊 Vue derivee | Les champs `INT`/`ENUM` de synthese (`Direction : INT` -1/0/+1, `Deflection : INT` -100..+100) sont **produits par le FB proprietaire** a partir des bits, dans la meme passe. |
+| 🚫 Pas de recalcul | Un consommateur **lit** la vue derivee ; il ne la recalcule **jamais** a partir des bits (sinon N formules paralleles a maintenir). |
+| ➕ Non signe par defaut | Une consigne de vitesse (`SpeedTgt`) est **non signee** (`ABS`) ; le sens est porte par les bits + la vue `Direction`, jamais par le signe de la consigne. |
+
+Reference appliquee : `ST_fbJoystick_AxisCmd` (`FB_Joystick`, 2026-08-27).
+
 ### Integrite des liaisons — rester simple
 
 | Moyen | Usage |

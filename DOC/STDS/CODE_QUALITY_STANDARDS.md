@@ -561,6 +561,21 @@ Commentaires en français, orientés **rôle / raison / risque**. Détail obliga
 interlock, temporisation, polarité, ordre d'appel et correction de bug. Pas de commentaire sur
 une affectation évidente.
 
+#### En-têtes de section dans un FB — `// === TITRE ===`
+
+À l'intérieur des blocs `VAR_INPUT` / `VAR_OUTPUT` / `VAR` et du corps, les regroupements sont
+titrés par `// === TITRE ===` — **MAJUSCULES, sans accents** (ASCII pur, cf. `G405`), un espace
+de part et d'autre du titre.
+
+- Le **premier** bloc de `VAR_INPUT` est `// === CONTRAT STANDARD (Enable + Reset) ===` ;
+  le **premier** bloc de `VAR_OUTPUT` est `// === CONTRAT STANDARD (Ready + Fault) ===`
+  (champs socle §2quinquies) — ils viennent toujours en tête, avant tout champ métier.
+- Un **permis de sécurité** (`ArmingPermit`, `DescendPermit`…) va dans son propre bloc
+  `// === PERMIS SECURITE ===`, jamais mêlé aux entrées d'acquisition ou de commande.
+- Entrées et sorties portent des titres **cohérents entre eux** (mêmes intitulés de familles :
+  `ACQUISITION MATERIELLE & DIAGNOSTIC`, `COMMANDES OPERATEUR`, `REGLAGES & CONFIGURATION`,
+  `MIROIRS IHM / TEST`…). Référence appliquée : `FB_Joystick` (2026-08-27).
+
 ---
 
 ### 7bis. Regions Pragma CODESYS — repli visuel
