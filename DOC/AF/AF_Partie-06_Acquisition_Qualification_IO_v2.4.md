@@ -219,8 +219,8 @@ Facts de la chaîne de mesure pure (Abs → Scale → Safety → SpeedMeasure), 
 
 ```text
 ST_EncoderMeasurements
-├── M1 : ST_EncoderMeasurement
-└── M2 : ST_EncoderMeasurement
+├── M1 : ST_fbEncoder_Measurement
+└── M2 : ST_fbEncoder_Measurement
 ```
 
 | Champ | Type | Source FB | Unités | Invalidité |

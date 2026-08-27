@@ -161,7 +161,7 @@ cyan acquisition, violet référencement, jaune calcul, rouge sécurité/fiabili
 | `Ready` | `BOOL` | FB prêt (`Enable` ET pas de défaut laté non acquitté) |
 | `Fault` | `ST_Fault` | Brique défaut socle (vue live `Error`/`ErrorId` + vue latchée `Latched`/`LatchedId`), remplie par `FB_FaultCore` — table des causes §14 |
 | `HwOut` | `ST_fbEncoder_HwOut` | Sorties hardware (preset vers PDO) |
-| `Measurement` | `ST_EncoderMeasurement` | Mesures + statuts (interface AF06) |
+| `Measurement` | `ST_fbEncoder_Measurement` | Mesures + statuts (interface AF06) |
 | `Homed` | `BOOL` | Codeur référencé |
 | `HomingSuspect` | `BOOL` | Incohérence boot à confirmer |
 | `PresetConfirmationFailed` | `BOOL` | Latch diagnostic preset non confirmé (acquitté au `Reset`) |

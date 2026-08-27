@@ -64,7 +64,7 @@ contract:
       - CODE/E_CODEURS/FB_Encoder_Abs.st
       - CODE/E_CODEURS/FB_Encoder_Homing.st
       - CODE/E_CODEURS/ST_EncoderHw.st          # -> scission ST_fbEncoder_HwIn / ST_fbEncoder_HwOut
-      - CODE/E_CODEURS/ST_EncoderMeasurement.st
+      - CODE/E_CODEURS/ST_fbEncoder_Measurement.st
       - CODE/E_CODEURS/ST_fbEncoder_Cfg.st      # nouveau
       - CODE/E_CODEURS/ST_fbEncoder_HwIn.st     # nouveau
       - CODE/E_CODEURS/ST_fbEncoder_HwOut.st    # nouveau

@@ -57,7 +57,7 @@ VAR_OUTPUT
     HwOut                 : ST_fbEncoder_HwOut; // <-- [ACT] Ordres hardware codeur (preset)
 
     // === MESURES CONDITIONNEES (struct frontiere) ===
-    Measurement           : ST_EncoderMeasurement; // <-- [BUS] Mesures + statuts (interface)
+    Measurement           : ST_fbEncoder_Measurement; // <-- [BUS] Mesures + statuts (interface)
 
     // === ETATS CODEUR ===
     Homed                 : BOOL;        // <-- [STAT] Codeur reference (sortie homing)
