@@ -1997,11 +1997,11 @@ tasks:
   bloque_par: []
 - id: T164-3
   parent_id: T164
-  statut: ⬜
+  statut: ⏳
   criticite: C2
   domaine: STANDARDS
-  agent: ''
-  date: '2026-08-27T14:39:34'
+  agent: CC-sub
+  date: '2026-08-27T14:53:00'
   titre: Chantier #3 — socle ST_Fault universel (docs + G315)
   contexte: 'Intitulé complet : Acter dans les docs standards et l''outillage que la forme cible du contrat
     FB standard est Ready + Fault:ST_Fault (rempli par FB_FaultCore, causes nommées ARRAY OF ST_FaultCause)
@@ -2013,16 +2013,18 @@ tasks:
     G315_check_fb_interface.py (forme cible Status:ST_FbStatus → Fault:ST_Fault) + baseline +
     TASK_CONTRACT_STANDARD_INTERFACES_FB.yaml ; balayage terminologique FB_FbStatus/ST_FbCause résiduels.
     Change le PASS/FAIL de G315 → revue orchestrateur obligatoire. Clé de voûte : débloque T164-4 et T164-5.
-    À faire APRÈS que les hotfixes de T164-1 soient poussés (éviter la course doc/gate vs code sur les mêmes FB safety).'
-  contrat: ''
+    Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-3_SOCLE_ST_FAULT.yaml (check_task_contract PASS).
+    Partage : partie DOCS déléguée à un sous-agent natif CC ; partie OUTILLAGE (G315 + baseline + T136) =
+    orchestrateur CC uniquement, l''agent docs n''y touche pas (forbidden). Lancé en parallèle de T164-1
+    (aucun conflit de fichiers : T164-1 = CODE/*.st, T164-3 = docs + G315). bloque_par relâché.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-3_SOCLE_ST_FAULT.yaml
   objectifs:
   - AF_Partie-03 et CODE_QUALITY_STANDARDS décrivent Fault:ST_Fault comme forme cible du contrat standard
   - Sous-fiche renommée FB_FaultCore_v1.0.md, contenu réécrit sur FB_FaultCore/ST_FaultCause (Latching, pas IsWarning)
   - G315 reconnaît Fault:ST_Fault comme forme 5/5 ; baseline + task contract T136 mis à jour ; G315 vert
   - 0 occurrence FB_FbStatus/ST_FbCause dans DOC/ hors mentions historiques datées ; G340 PASS
   - Les 17 FB portant Status:ST_Status restent valides (legacy tracé) — aucune modif de leur code
-  bloque_par:
-  - T164-1
+  bloque_par: []
 - id: T164-4
   parent_id: T164
   statut: ⬜
