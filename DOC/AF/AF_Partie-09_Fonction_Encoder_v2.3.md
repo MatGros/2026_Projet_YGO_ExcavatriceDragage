@@ -256,6 +256,21 @@ Consommateurs directs de la façade (hors AF06) :
 
 ## 9 · 🖥️ IHM, Configuration & Dépannage
 
+### 9bis · ⚙️ Configuration technologique et persistance
+
+Le seul réglage technologique public commun aux deux codeurs est
+`GVL_IHM.Commun.EncoderCfg : ST_fbEncoder_Cfg`. Il porte exclusivement
+`PresetConfirmMode : E_PresetConfirmMode` (défaut `READBACK_ONLY`, valeurs stables
+`0/1/2`) et le drapeau interne de pont `Initialized := FALSE`. Le pont unique
+`FB_CfgPersistBridge_fbEncoder_Cfg`, appelé dans `PRG_07_Supervision` §2, restaure
+`GVL_PERSISTENT._EncoderCfgPersist` au premier cycle puis recopie la structure IHM
+vers le persistant à chaque scan.
+
+Les cibles homing `CfgHomingTarget_M` / `CfgTopSensorPos_M` restent les réglages
+métier indépendants M1/M2 dans `ST_WinchCfg`; `PointsPerRev`, `CableM_PerRev`,
+`PositionMinM` et `PositionMaxM` restent hors IHM à chaud. `Calib` reste séparé
+en `VAR_IN_OUT` (`_CalibM1` / `_CalibM2`).
+
 `ST_EncoderHMI` = état seul (pas de `Cmd` dédié — les commandes homing vivent dans
 `ST_WinchHMI.Cmd` du treuil porteur) : `RawPos`, `Alarms`/`Warnings`, `SlaveOperational`,
 `Homed`/`HomingBusy`/`HomingDone`/`HomingSuspect`/`HomingRefRaw`, `Error`/`ErrorId`.

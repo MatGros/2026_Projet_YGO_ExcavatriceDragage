@@ -1,6 +1,7 @@
 # 🧭 Décision requise — Preset codeur : transaction matérielle ou echo ?
 
-> **Statut** : OUVERTE · **Bloque** : `TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml` (lot E1)
+> **Statut** : **DÉCIDÉE — variante C** · **Visa humain consigné** : 2026-08-27
+> · **Précondition PRE1 levée** pour `TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml` (lot E1)
 > **Décideur** : humain avec connaissance du codeur absolu EtherCAT réel (pas un agent)
 > **Créé** : 2026-08-27 · Origine : revue façade `FB_Encoder` (agent externe) + audit orchestrateur
 
@@ -82,6 +83,52 @@ basculer **sans refonte** :
   - `presetConfirmed=FALSE` après N cycles → `Homed` inchangé + `HomingSuspect` + bit `ErrorId`.
 - Sur site : câbler `PresetStatusBit` depuis le mot d'état + changer `Cfg.PresetConfirmMode`.
   Aucun autre code à toucher.
+
+## Invariants obligatoires de la transaction
+
+Ces invariants rendent la variante C non ambiguë pour T164-4C :
+
+1. `Calib.Homed` et `Calib.HomingRefRaw` forment un **commit atomique** : ils
+   sont écrits ensemble, uniquement après confirmation du preset. Une tentative
+   en cours ne modifie ni l'un ni l'autre.
+2. Après la temporisation historique de commande, si la confirmation échoue (relecture
+   hors tolérance ou mode `PresetStatusBit` non satisfait), l'ancienne valeur de
+   `Calib.Homed` est conservée, l'ancienne référence brute est conservée,
+   `Calib.HomingSuspect` passe à `TRUE` et le fait public
+   `PresetConfirmationFailed` ainsi que son bit `ErrorId` dédié sont publiés.
+3. Le front `Reset` acquitte la vue latchée du défaut ; il ne valide jamais un
+   preset, ne remet pas `Homed` à `TRUE` et ne réécrit pas `HomingRefRaw`. Une
+   confirmation explicite ou une nouvelle tentative réussie est nécessaire.
+4. `READBACK_ONLY` reste le mode par défaut. `PresetStatusBit` est optionnel et
+   vaut `FALSE` tant qu'il n'est pas câblé ; aucun signal matériel absent ne peut
+   confirmer implicitement le preset.
+
+### Clarification de la relecture avant commit
+
+Avant le commit, la mesure publique `CablePosM` continue légalement à utiliser
+`Calib.HomingRefRaw` **ancien**. Elle ne peut donc pas être comparée directement
+à la cible sans rendre le commit non atomique. La confirmation `READBACK_ONLY`
+doit calculer localement la mesure candidate à partir de la relecture `RawPos`
+et de `PendingHomingRefRaw` :
+
+`CandidateCablePosM := (RawPos - PendingHomingRefRaw) × CableM_PerRev / PointsPerRev`.
+
+Cette candidate est une preuve de relecture du matériel ; elle n'est pas publiée
+vers les consommateurs. Au succès seulement, le commit atomique rend ensuite
+`CablePosM` publique cohérente avec la cible. `Calib.Homed` reste inchangé en
+échec ; la sortie publique `Homed` conserve sa règle safety existante
+`Calib.Homed AND NOT Calib.HomingSuspect` et retombe donc à `FALSE` sur doute.
+
+### Temporisation de transaction
+
+`PresetLatencyCycles` n'existe pas dans le code de référence et ne doit pas être
+inventé. La transaction conserve la temporisation existante `T#500MS` qui maintient
+la commande preset ; la vérification candidate ne démarre qu'après cette même durée.
+`PresetTimeout := T#2s` reste inchangé dans l'interface legacy de l'Abs, sans
+introduire de nouvelle valeur, seuil ou polarité.
+
+Le statut « DÉCIDÉE » concerne la décision d'architecture. L'implémentation et
+les tests restent dans les lots T164-4B/4C et exigent leur propre validation.
 
 **Conséquences pour `TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml` (T164-4) :**
 

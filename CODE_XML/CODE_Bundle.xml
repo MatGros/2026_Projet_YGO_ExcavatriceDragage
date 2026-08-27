@@ -390,6 +390,50 @@
           </data>
         </addData>
       </dataType>
+      <dataType name="E_PresetConfirmMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="READBACK_ONLY" value="0" />
+              <value name="READBACK_AND_STATUSBIT" value="1" />
+              <value name="STATUSBIT_ONLY" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>READBACK_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation par relecture de position</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READBACK_AND_STATUSBIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Relecture et bit d'état matériel</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STATUSBIT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit d'état matériel uniquement</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>57a2dfc8-cdc9-581a-8092-09f21d5e6939</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -4237,6 +4281,15 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderCfg">
+              <type>
+                <derived name="ST_fbEncoder_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Configuration technologique codeur commune M1/M2
+Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="Cfg">
@@ -10906,6 +10959,48 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbEncoder_Cfg">
+        <baseType>
+          <struct>
+            <variable name="PresetConfirmMode">
+              <type>
+                <derived name="E_PresetConfirmMode" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_PresetConfirmMode.READBACK_ONLY" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode de confirmation preset, défaut relecture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE après restauration du pont persistant</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b06fb1f4-e990-5b56-b842-84de93b5b40e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbEncoder_Cfg — Réglages technologiques publics de FB_Encoder
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
+   🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_fbJoystick_AxisCmd">
         <baseType>
           <struct>
@@ -13220,6 +13315,70 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>45adcc1b-fe93-5f2e-8192-a109f147a5f3</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_CfgPersistBridge_fbEncoder_Cfg" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars>
+            <variable name="JustRestored">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <derived name="ST_fbEncoder_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM commune</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Persist">
+              <type>
+                <derived name="ST_fbEncoder_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_fbEncoder_Cfg — Pont persistance pour ST_fbEncoder_Cfg
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : restauration et synchronisation bidirectionnelle IHM / Persist.
+   💾 Persistance : transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+JustRestored := FALSE;
+IF NOT Hmi.Initialized THEN
+    Hmi := Persist;
+    Hmi.Initialized := TRUE;
+    JustRestored := TRUE;
+ELSE
+    Persist := Hmi;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6a644b30-2e21-500a-820f-c38e8cb68b8e</ObjectId>
           </data>
         </addData>
       </pou>
@@ -36566,6 +36725,14 @@ PowerCutOffActive := PowerCutOffReq;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config joystick</xhtml>
               </documentation>
             </variable>
+            <variable name="instCfgPersistBridgeEncoder">
+              <type>
+                <derived name="FB_CfgPersistBridge_fbEncoder_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config codeur commune M1/M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="instDiagIhmHeartbeat">
               <type>
                 <derived name="FB_Diag_IhmHeartbeat" />
@@ -36863,6 +37030,11 @@ END_IF;
 
 instCfgPersistBridgeJoystick(Hmi := GVL_IHM.JOY1Joystick.Cfg, Persist := _JoystickCfgPersist);
 IF instCfgPersistBridgeJoystick.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeEncoder(Hmi := GVL_IHM.Commun.EncoderCfg, Persist := _EncoderCfgPersist);
+IF instCfgPersistBridgeEncoder.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -38033,6 +38205,21 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
           <Object Name="FB_Modes" ObjectId="472bf31b-6364-520b-84dc-569fca7609c9" />
         </Folder>
+        <Folder Name="E_CODEURS">
+          <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
+          <Object Name="FB_Encoder" ObjectId="290327ae-3055-58e1-9bbd-038d8cd93901" />
+          <Object Name="FB_EncoderReliability" ObjectId="2f0260c4-bd51-584e-a910-46b30488f46d" />
+          <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
+          <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
+          <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
+          <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
+          <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
+          <Object Name="ST_EncoderHw" ObjectId="d49fb2dc-e3eb-5045-a9d9-c8cacf52184b" />
+          <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
+          <Object Name="ST_EncoderMeasurements" ObjectId="65c54961-1ede-5088-bb46-6d69104691fb" />
+          <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
+          <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
+        </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
           <Object Name="FB_Acquisition_Preflight" ObjectId="78a087ce-501c-55a1-a50d-014fd4495703" />
@@ -38097,6 +38284,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
             <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
             <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
             <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
+            <Object Name="FB_CfgPersistBridge_fbEncoder_Cfg" ObjectId="6a644b30-2e21-500a-820f-c38e8cb68b8e" />
             <Object Name="FB_CfgPersistBridge_fbJoystick_Cfg" ObjectId="fffdfae7-d9f7-530c-8ef8-ba79e94ff2d7" />
           </Folder>
           <Folder Name="_TYPES">
@@ -38204,19 +38392,6 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
           <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
           <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
-        </Folder>
-        <Folder Name="E_CODEURS">
-          <Object Name="FB_Encoder" ObjectId="290327ae-3055-58e1-9bbd-038d8cd93901" />
-          <Object Name="FB_EncoderReliability" ObjectId="2f0260c4-bd51-584e-a910-46b30488f46d" />
-          <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
-          <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
-          <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
-          <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
-          <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
-          <Object Name="ST_EncoderHw" ObjectId="d49fb2dc-e3eb-5045-a9d9-c8cacf52184b" />
-          <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
-          <Object Name="ST_EncoderMeasurements" ObjectId="65c54961-1ede-5088-bb46-6d69104691fb" />
-          <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
         </Folder>
         <Folder Name="B_AU_SECURITE">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />

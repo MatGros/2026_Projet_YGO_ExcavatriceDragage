@@ -148,4 +148,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _SimEncoderRawPosM1 : UDINT := 1000000; // Simulation : survit au reset froid
     _SimEncoderRawPosM2 : UDINT := 1000000; // Simulation : survit au reset froid
 
+    // ⚙️ CONFIGURATION TECHNOLOGIQUE CODEUR COMMUNE M1/M2
+    _EncoderCfgPersist : ST_fbEncoder_Cfg; // 🌉 Pont FB_CfgPersistBridge_fbEncoder_Cfg
+
 END_VAR

@@ -2094,31 +2094,102 @@ tasks:
   bloque_par: []
 - id: T164-4
   parent_id: T164
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: CODEURS
   agent: ''
   date: '2026-08-27T15:45:00'
-  titre: Mise en conformité interface FB_Encoder (E1+E2)
-  contexte: 'Intitulé complet : Aligner la façade FB_Encoder sur les contrats cibles (Fault:ST_Fault à causes
-    nommées, frontière HW entrée/sortie séparée ST_fbEncoder_HwIn/HwOut, réglages regroupés ST_fbEncoder_Cfg
-    NC-110 + pont FB_CfgPersistBridge_fbEncoder_Cfg) SANS changer aucune sémantique de mesure/homing/sécurité.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml
-    (check PASS, 9 AC). 🔓 DÉBLOQUÉ 2026-08-27 : PRE1 (décision preset E-D1) + PRE2 (T164-3, commits
-    b2a68763 + b1cd9a05) levées. Challenge orchestrateur : SEULE la façade FB_Encoder passe Fault:ST_Fault ;
-    les sous-FB (FB_Encoder_Abs/Homing/Safety) GARDENT Status:ST_Status → T164-5 ; Measurement.HomingStatus/
-    AbsStatus restent ST_Status (miroirs). FB_Encoder_Abs traité ICI (gate G127 + refonte HwIn/HwOut +
-    drop PresetAck/Nak), PAS en T164-1b. Ne PAS toucher FB_Encoder_Scale/Safety/Reliability/SpeedMeasure.
-    Délégable ; git diff revu ligne à ligne par l''orchestrateur.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml
+  titre: Programme de mise en conformité interface FB_Encoder — découpé 4A→4D
+  contexte: 'Ancienne tâche C3 scindée afin de séparer les décisions d''architecture, la persistance, la
+    transaction preset/HW et la migration Fault. Aucune sous-tâche ne doit modifier une décision relevant
+    d''une dépendance non validée.'
+  description: 'NE PAS déléguer T164-4 directement : elle est remplacée par T164-4A, T164-4B, T164-4C et
+    T164-4D. Le contrat initial TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml est conservé comme historique
+    de cadrage, non comme autorisation d''implémentation. Chaque sous-tâche possède son contrat propre et une
+    revue orchestrateur obligatoire.'
+  contrat: ''
   objectifs:
-  - Façade FB_Encoder expose Fault:ST_Fault via FB_FaultCore + causes nommées (fin de la fusion OR des ErrorId sous-FB)
-  - Sous-FB Abs/Homing/Safety gardent Status:ST_Status (T164-5) ; Measurement.HomingStatus/AbsStatus restent ST_Status
-  - Frontière HW séparée ST_fbEncoder_HwIn/HwOut ; réglages dans ST_fbEncoder_Cfg + _EncoderCfgPersist en FIN de GVL_PERSISTENT
-  - Confirmation preset par Cfg.PresetConfirmMode (READBACK_ONLY défaut) + entrée optionnelle PresetStatusBit ; PresetNak supprimé
-  - Gate NOT Enable complet pour FB_Encoder ET FB_Encoder_Abs (G127) ; aucune valeur/seuil/logique modifiée ; tests CI E_CODEURS verts
-  - G200 PASS + palier C PASS + bundle régénéré + git diff revu par l'orchestrateur
+  - T164-4A fixe explicitement les propriétaires de configuration, les invariants et le contrat d''exécution
+  - T164-4B établit la persistance après visa de T164-4A
+  - T164-4C réalise le split HW et la transaction preset après visa de T164-4A/4B
+  - T164-4D migre uniquement la façade vers Fault:ST_Fault après visa de T164-4C
   bloque_par: []
+- id: T164-4A
+  parent_id: T164-4
+  statut: ✅
+  criticite: C3
+  domaine: CODEURS
+  agent: CODEX
+  date: '2026-08-27T18:00:00'
+  titre: Cadrage d'architecture Encoder — propriétaires, invariants et contrat d'exécution
+  contexte: 'Décision documentaire préalable : lever les ambiguïtés de configuration M1/M2, HMI/persistance,
+    gate G127 et sources publiques des causes avant toute modification ST.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4A_ENCODER_ARCHITECTURE.yaml. Livrable
+    documentaire terminé et revu ; décision d''exécution autonome accordée par l''utilisateur le 2026-08-27.
+    Les confirmations physiques/IHM restantes sont tracées dans QUESTIONS_T164-4.md.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4A_ENCODER_ARCHITECTURE.yaml
+  objectifs:
+  - Définir un propriétaire public de configuration sans fusionner les réglages M1/M2
+  - Figer les constantes mécaniques et formaliser l'exception G127 OK-FIGE de FB_Encoder_Abs
+  - Définir des causes FaultCore à partir de faits publics, sans lire les VAR privées de sous-FB
+  bloque_par: []
+- id: T164-4B
+  parent_id: T164-4
+  statut: ✅
+  criticite: C3
+  domaine: SUPERVISION
+  agent: CODEX
+  date: '2026-08-27T18:05:00'
+  titre: Configuration et persistance Encoder — type, bridge et restauration
+  contexte: 'Implémentation strictement postérieure à la décision 4A ; n''embarque aucune transaction preset
+    ni migration Fault.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4B_ENCODER_CFG_PERSISTENCE.yaml. Propriétaire
+    HMI concret : GVL_IHM.Commun.EncoderCfg via ST_CommunHMI ; revu après génération bundle fraîche.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4B_ENCODER_CFG_PERSISTENCE.yaml
+  objectifs:
+  - Créer le type de configuration minimal et le bridge de persistance à propriétaire unique
+  - Ajouter la persistance sans déplacer les réglages métier M1/M2 ni rendre les constantes modifiables
+  bloque_par:
+  - T164-4A
+- id: T164-4C
+  parent_id: T164-4
+  statut: ⬜
+  criticite: C3
+  domaine: CODEURS
+  agent: ''
+  date: '2026-08-27T17:00:00'
+  titre: Transaction preset Encoder et frontière matériel HwIn/HwOut
+  contexte: 'Refonte fonctionnelle limitée à la transaction preset fermée, au split HW, aux call-sites et à
+    la simulation ; la façade conserve encore Status:ST_Status.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4C_ENCODER_PRESET_HW.yaml. Ne démarre
+    qu''après les visas 4A et 4B ; aucun changement de seuil, polarité, tempo ou logique sécurité/homing.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4C_ENCODER_PRESET_HW.yaml
+  objectifs:
+  - Implémenter PresetConfirmMode/PresetStatusBit et la confirmation par relecture sans ports fantômes
+  - Scinder les ports matériel tout en conservant les sous-FB au profil Status:ST_Status
+  - Aligner les simulateurs et documenter le gel normatif des mesures brutes hors Enable
+  bloque_par:
+  - T164-4A
+  - T164-4B
+- id: T164-4D
+  parent_id: T164-4
+  statut: ⬜
+  criticite: C3
+  domaine: CODEURS
+  agent: ''
+  date: '2026-08-27T17:00:00'
+  titre: Façade FB_Encoder — migration FaultCore et compatibilité des consommateurs
+  contexte: 'Migration finale de la seule façade vers Fault:ST_Fault après stabilisation de la transaction
+    et de ses sources publiques.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4D_ENCODER_FAULT_FACADE.yaml. Sous-FB
+    Abs/Homing/Safety et Measurement.HomingStatus/AbsStatus restent Status:ST_Status jusqu''à T164-5.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4D_ENCODER_FAULT_FACADE.yaml
+  objectifs:
+  - Remplacer uniquement Status de façade par Fault:ST_Fault via FB_FaultCore et causes justifiées
+  - Préserver Reset/latches et l'ordre composite sans lecture de membres privés des sous-FB
+  - Remapper tout consommateur réel et prouver G200/G315/G127/G380/palier C
+  bloque_par:
+  - T164-4C
 - id: T164-5
   parent_id: T164
   statut: ⬜

@@ -1,0 +1,67 @@
+# Contrat T164-4A — fermeture architecture encodeur avant implementation
+contract:
+  task_id: T164-4A_ENCODER_ARCHITECTURE
+  criticality: C3
+  strategy: patch
+  objective: >
+    Figer, sans modifier le code PLC, les decisions d'architecture qui rendent les lots
+    T164-4B a T164-4D executables sans changer les reglages mecaniques M1/M2,
+    la semantique homing ou les contrats publics non prevus.
+  acceptance:
+    - id: AC1
+      statement: "Une decision versionnee identifie le proprietaire public de ST_fbEncoder_Cfg, son bridge PRG_07 et sa persistance ; aucun bridge local non accessible a PRG_02 n'est admis."
+      verified_by: "lecture DOC/WFLOW/CONTRACTS/DECISION_ENCODER_CFG_OWNERSHIP.md"
+    - id: AC2
+      statement: "La decision preserve CfgHomingTarget_M et CfgTopSensorPos_M dans les deux ST_WinchCfg M1/M2, ainsi que PointsPerRev, CableM_PerRev et les bornes mecaniques hors reglages IHM a chaud, sauf decision humaine explicitement tracee."
+      verified_by: "table proprietaire -> consommateur dans la decision"
+    - id: AC3
+      statement: "Le comportement gate de FB_Encoder_Abs est tranche : RawPos, AngleRaw et TurnCount sont OK-FIGE documentes ; aucun X := X, aucune remise a zero et aucune lecture RawPosIn dans le gate."
+      verified_by: "amendement AC5 propose dans la decision"
+    - id: AC4
+      statement: "La table de causes de facade definit uniquement des sources publiques ou des faits bruts explicitement exposes ; aucun acces a VAR interne des sous-FB n'est admis."
+      verified_by: "table cause -> source -> live/latched -> reset dans la decision"
+    - id: AC5
+      statement: "Le contrat parent T164-4 est amende seulement apres visa humain : AC3, AC4, AC5, scope et preconditions deviennent coherents avec la decision retenue."
+      verified_by: "check_task_contract.py du contrat parent apres visa humain"
+    - id: AC6
+      statement: "La decision preset est remise a un statut non ambigu et fixe les invariants transactionnels : Homed et HomingRefRaw ne sont commits qu'apres confirmation ; echec apres le nombre de cycles deja decide conserve Homed, pose HomingSuspect et publie le fait/erreur dedie. Elle tranche aussi le devenir des ports FwdRevSpeedFeedbackOff et BrakeFeedback de FB_Encoder_Homing."
+      verified_by: "lecture DECISION_ENCODER_PRESET_TRANSACTION.md et table d'impact"
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/DECISION_ENCODER_CFG_OWNERSHIP.md
+      - DOC/WFLOW/CONTRACTS/DECISION_ENCODER_PRESET_TRANSACTION.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4A_ENCODER_ARCHITECTURE.yaml
+    forbidden:
+      - CODE/**
+      - CODE_XML/**
+      - PRJ_CODESYS/**
+      - DOC/WFLOW/TASKS.yaml
+  conservation:
+    must_survive:
+      - "Deux configurations homing metier independantes M1/M2."
+      - "Constantes de mesure et bornes non modifiables a chaud sans decision safety dediee."
+      - "Sous-FB Encoder_Abs, Encoder_Homing et Encoder_Safety en Status:ST_Status jusqu'a T164-5."
+    dropped_on_purpose: []
+  evidence_required:
+    - contract_check
+    - human_decision
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    Toute proposition de Cfg unique fusionnant M1/M2, de bridge sans proprietaire public,
+    de constante mecanique rendue modifiable ou d'acces a VAR interne impose STOP.
+status: COMPLETED
+execution:
+  executed_by: "Codex 5.6 Luna"
+  completed_at: "2026-08-27T18:00:00"
+  status: COMPLETED
+  summary: "Decision ownership/preset produite et revue par l'orchestrateur."
+  evidence_submitted:
+    - "check_task_contract.py PASS"
+    - "git diff --check PASS"
+validation:
+  status: VALIDATED
+  validated_by: "Orchestrateur Codex — autonomie autorisee par utilisateur"
+  validated_at: "2026-08-27T18:00:00"
+  notes: "Confirmation physique/IHM reportee dans QUESTIONS_T164-4.md."
