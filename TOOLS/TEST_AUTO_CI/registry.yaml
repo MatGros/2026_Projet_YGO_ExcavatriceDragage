@@ -21,6 +21,8 @@ FB_Encoder:
   sources:
     - CODE/A_COMMUN/_TYPES/E_State.st
     - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
     - CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st
@@ -33,6 +35,7 @@ FB_Encoder:
     - CODE/E_CODEURS/FB_Encoder_Safety.st
     - CODE/E_CODEURS/FB_EncoderReliability.st
     - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/E_CODEURS/FB_Encoder.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS/tests/test_fb_encoder.st
 

@@ -8,6 +8,9 @@
       par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
       de vitesse au meme scan. HomedAndReliable = gate strict interlock M3.
+   🧩 Defaut : Fault:ST_Fault rempli par FB_FaultCore (instFault) depuis une liste
+      de causes en clair (instCauses) — pattern FB_Joystick. Ready = Enable ET pas de
+      defaut late. Interlocks machine sur les faits bruts, jamais sur Fault.Latched.
    📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    ======================================================================= *)
 
@@ -47,8 +50,8 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
-    Ready                 : BOOL;        // <-- [STAT] FB pret a fonctionner
-    Status                : ST_Status; // <-- [STAT] Statut transverse facade (synthese)
+    Ready                 : BOOL;        // <-- [STAT] FB pret a fonctionner (Enable ET pas de defaut late)
+    Fault                 : ST_Fault;    // <-- [DIAG] Brique defaut socle (live + latchee), remplie par FB_FaultCore
 
     // === FRONTIERE HW SORTIE (testable) ===
     HwOut                 : ST_fbEncoder_HwOut; // <-- [ACT] Ordres hardware codeur (preset)
@@ -71,6 +74,8 @@ VAR
     instSafety     : FB_Encoder_Safety;       // * [INST] Bornage & coherence mesure
     instRel        : FB_EncoderReliability;   // * [INST] Gates de fiabilite
     instSpeed      : FB_Encoder_SpeedMeasure; // * [INST] Calcul vitesse cable
+    instFault      : FB_FaultCore;            // * [INST] Socle de defaut (liste de causes -> ST_Fault)
+    instCauses     : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Liste des causes pour le socle FB_FaultCore
 END_VAR
 VAR_IN_OUT
     // === CALIBRATION PERSISTANTE (externe RETAIN, jamais membre) ===
@@ -79,8 +84,7 @@ END_VAR
 
 {region "§1 Gate neutralisation"}
 IF NOT Enable THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
@@ -98,10 +102,14 @@ IF NOT Enable THEN
     Measurement.HomingRefRaw := Calib.HomingRefRaw;
     // PresetConfirmationFailed est un diagnostic latch : il reste gele hors Enable
     // et ne doit pas etre efface par ce gate (AC3).
+    // Socle appele meme Enable=FALSE : maintient le latch non acquitte et traite le Reset
+    // hors autorisation (AC4). Les causes ne sont pas evaluees (Enable=FALSE -> vue live a 0),
+    // les latches sont preserves.
+    instFault(Enable := FALSE, Reset := Reset, Causes := instCauses);
+    Fault := instFault.Fault;
     RETURN;
 END_IF;
 Ready := TRUE;
-Status.State := E_State.READY;
 {endregion}
 
 {region "§2 Abs"}
@@ -205,9 +213,22 @@ EncoderFault     := instRel.EncoderFault;
 HomedAndReliable := instRel.HomedAndReliable;
 PresetConfirmationFailed := instHoming.PresetConfirmationFailed;
 
-// Synthese statut facade
-Status.Busy := instAbs.Status.Busy;
-Status.Done := instSpeed.Valid AND instAbs.Ready;
-Status.Error := instAbs.Status.Error OR instSafety.Status.Error OR instHoming.Status.Error;
-Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHoming.Status.ErrorId;
+// Synthese statut facade : brique defaut socle (Fault:ST_Fault), pattern FB_Joystick.
+// Causes exprimees en CLAIR (ST_FaultCause), alimentees UNIQUEMENT depuis les sorties
+// publiques des sous-FB (encapsulation stricte, jamais de lecture VAR interne).
+//   - Cause 0/1 : LIVE (Latching=FALSE) -> Fault.Error, retombe seule.
+//   - Cause 2   : LATCHED (Latching=TRUE) -> arme Fault.Latched, acquittee au Reset front.
+// Interlock machine toujours sur les faits bruts (EncoderFault, HomedAndReliable,
+// EncoderIncoherent), jamais sur Fault.Latched (conservation).
+instCauses[0].Active := NOT instAbs.EncoderAvailable; instCauses[0].Latching := FALSE;
+instCauses[0].Texte := 'Perte materiel / communication codeur EtherCAT';
+instCauses[1].Active := instSafety.EncoderIncoherent; instCauses[1].Latching := FALSE;
+instCauses[1].Texte := 'Incoherence mesure / saut de position codeur';
+instCauses[2].Active := instHoming.PresetConfirmationFailed; instCauses[2].Latching := TRUE;
+instCauses[2].Texte := 'Echec confirmation transaction preset codeur';
+
+// Socle appele APRES le pipeline : causes du scan courant, aucun scan de retard (AC4).
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;     // source de verite = socle
+Ready := Enable AND NOT Fault.Latched;
 {endregion}

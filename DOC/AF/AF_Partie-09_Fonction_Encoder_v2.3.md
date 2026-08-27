@@ -20,6 +20,7 @@
 11. [❓ TBD](#11--tbd)
 12. [📚 Documents liés](#12--documents-liés)
 13. [🔧 Transaction preset E-D1 (T164-4C)](#13--transaction-preset-e-d1-t164-4c)
+14. [🧩 Brique défaut façade `Fault : ST_Fault` (T164-4D)](#14--brique-défaut-façade-fault--st_fault-t164-4d)
 
 ---
 
@@ -32,10 +33,11 @@
   de `HomingPermit` (entrée externe, calculée par l'appelant).
 - **Type de composant** : Brique de mesure (façade composite de 7 sous-FB).
 - **Contrat AF03** : `standard`. Forme cible = `Fault : ST_Fault` rempli via `FB_FaultCore`
-  (AF03 §3 / §4.1). État actuel du code : défaut bus/preset/homing/bornage remonté via
-  `Status : ST_Status` (struct de statut agrégé legacy), rempli à plat par masques de bits dans
-  chaque sous-FB — **forme legacy tolérée jusqu'à T164-5** (AF03 §3 point 4). Le repointage vers
-  `Fault : ST_Fault` est un pointeur de contrat ; la migration du code n'est pas portée ici.
+  (AF03 §3 / §4.1). **Implémenté (T164-4D)** : la façade expose `Fault : ST_Fault` alimenté par
+  `instFault : FB_FaultCore` depuis une liste de causes en clair `instCauses` (pattern
+  `FB_Joystick`). Les sous-FB (Abs/Homing/Safety) conservent `Status : ST_Status` (forme legacy
+  tolérée jusqu'à T164-5, AF03 §3 point 4) ; la télémétrie fine reste exposée via
+  `Measurement.AbsStatus` / `Measurement.HomingStatus`.
 
 ### Table des fonctions
 
@@ -156,8 +158,8 @@ cyan acquisition, violet référencement, jaune calcul, rouge sécurité/fiabili
 
 | Port | Type | Rôle |
 |---|---|---|
-| `Ready` | `BOOL` | FB prêt |
-| `Status` | `ST_Status` | Statut synthèse façade (agrège Abs/Safety/Homing) — forme transitoire du lot T164-4C ; migration `Fault : ST_Fault` via `FB_FaultCore` prévue par T164-4D |
+| `Ready` | `BOOL` | FB prêt (`Enable` ET pas de défaut laté non acquitté) |
+| `Fault` | `ST_Fault` | Brique défaut socle (vue live `Error`/`ErrorId` + vue latchée `Latched`/`LatchedId`), remplie par `FB_FaultCore` — table des causes §14 |
 | `HwOut` | `ST_fbEncoder_HwOut` | Sorties hardware (preset vers PDO) |
 | `Measurement` | `ST_EncoderMeasurement` | Mesures + statuts (interface AF06) |
 | `Homed` | `BOOL` | Codeur référencé |
@@ -370,3 +372,31 @@ Le suivi de cette transaction est interne à `FB_Encoder_Homing` et ne publie pa
 `Status.State = BUSY` : le treuil ne passe donc pas en mode de référencement de
 sécurité pendant la vérification du preset. Les protections du pipeline treuil
 restent actives pendant cette phase.
+
+---
+
+## 14 · 🧩 Brique défaut façade `Fault : ST_Fault` (T164-4D)
+
+La façade `FB_Encoder` expose `Fault : ST_Fault` rempli par `instFault : FB_FaultCore`
+depuis une liste de causes en clair `instCauses : ARRAY[0..15] OF ST_FaultCause`
+(pattern `FB_Joystick`). **Table fermée** — chaque cause est alimentée **uniquement**
+depuis une sortie publique d'un sous-FB (encapsulation stricte, jamais de lecture de
+`VAR` interne) :
+
+| Cause | Source publique | Sémantique | `Latching` | Condition de Reset |
+|---|---|---|---|---|
+| 0 — Perte matériel / communication codeur EtherCAT | `NOT instAbs.EncoderAvailable` | live | `FALSE` | auto (retombe seule) |
+| 1 — Incohérence mesure / saut de position codeur | `instSafety.EncoderIncoherent` | live | `FALSE` | auto |
+| 2 — Échec confirmation transaction preset codeur | `instHoming.PresetConfirmationFailed` | latched | `TRUE` | front `Reset` |
+
+- **Vue live** (`Fault.Error`/`ErrorId`) : suit les causes actives, retombe seule.
+- **Vue latchée** (`Fault.Latched`/`LatchedId`) : cause 2 arme le bit, conservé jusqu'au
+  front `Reset` (le socle est appelé même `Enable=FALSE` pour maintenir le latch et traiter
+  le Reset hors autorisation — AC4).
+- **Interlocks machine** : toujours sur les faits bruts (`EncoderFault`,
+  `HomedAndReliable`, `EncoderIncoherent`), **jamais** sur `Fault.Latched` (conservation).
+- **Abandon assumé** : la fusion OR des `Status.ErrorId` des sous-FB (Abs/Safety/Homing)
+  dans la façade est supprimée (contrat AC1 / `dropped_on_purpose`). La télémétrie fine
+  reste exposée via `Measurement.AbsStatus` / `Measurement.HomingStatus` (conservés).
+- **`Ready`** : `Enable AND NOT Fault.Latched` (un défaut laté non acquitté rend le FB
+  non-prêt jusqu'au `Reset`).

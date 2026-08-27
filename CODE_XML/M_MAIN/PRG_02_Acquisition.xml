@@ -563,212 +563,6 @@ TRUE des qu'un referencement a reussi</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_Status">
-        <baseType>
-          <struct>
-            <variable name="Busy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres historiques (conservés) ----
-1 = Bloc en cours d'exécution</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut à acquitter (laté jusqu'au Reset)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Warning">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres ajoutés (forme cible enrichie) ----
-1 = warning actif (auto-effacé, aucun acquittement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code warning courant (bitfield)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis WarningId (prêt IHM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis ErrorId</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetRequested">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = un Reset est nécessaire / en cours</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>537f3533-9d7c-5703-b6a3-978725c61956</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_Status — Socle transverse de statut d'un FB métier
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
-      avec les textes prêts pour l'IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_Status (exception documentée).
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbEncoder_Cfg">
-        <baseType>
-          <struct>
-            <variable name="PresetConfirmMode">
-              <type>
-                <derived name="E_PresetConfirmMode" />
-              </type>
-              <initialValue>
-                <simpleValue value="E_PresetConfirmMode.READBACK_ONLY" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode de confirmation preset, défaut relecture</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE après restauration du pont persistant</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b06fb1f4-e990-5b56-b842-84de93b5b40e</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_fbEncoder_Cfg — Réglages technologiques publics de FB_Encoder
-   ───────────────────────────────────────────────────────────────────────
-   🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
-   🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbEncoder_HwOut">
-        <baseType>
-          <struct>
-            <variable name="PresetTriggerCmd">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES BUS ETHERCAT (ordres preset vers PDO Rx) ===
-&lt;-- [ACT] Declenchement preset vers PDO Rx</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CodeSeqTriggerCmd">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Sequence code vers PDO Rx, maintenue a 0</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetValueOut">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Valeur brute envoyee au preset</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>1d8c05ba-e087-546f-9435-81c2f041e74c</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_fbEncoder_HwOut — Ordres preset de sortie codeur (HwOut)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regrouper les SEULES sorties/ordres preset d'un codeur absolu
-      EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
-   🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
-      vers le device.
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_Fault">
         <baseType>
           <struct>
@@ -876,6 +670,95 @@ TRUE des qu'un referencement a reussi</xhtml>
       Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
       pour la rendre acquittable, il faut le déclarer explicitement.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbEncoder_Cfg">
+        <baseType>
+          <struct>
+            <variable name="PresetConfirmMode">
+              <type>
+                <derived name="E_PresetConfirmMode" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_PresetConfirmMode.READBACK_ONLY" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode de confirmation preset, défaut relecture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE après restauration du pont persistant</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b06fb1f4-e990-5b56-b842-84de93b5b40e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbEncoder_Cfg — Réglages technologiques publics de FB_Encoder
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
+   🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbEncoder_HwOut">
+        <baseType>
+          <struct>
+            <variable name="PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES BUS ETHERCAT (ordres preset vers PDO Rx) ===
+&lt;-- [ACT] Declenchement preset vers PDO Rx</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CodeSeqTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Sequence code vers PDO Rx, maintenue a 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Valeur brute envoyee au preset</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1d8c05ba-e087-546f-9435-81c2f041e74c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_fbEncoder_HwOut — Ordres preset de sortie codeur (HwOut)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les SEULES sorties/ordres preset d'un codeur absolu
+      EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
+   🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
+      vers le device.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1540,6 +1423,167 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_Status">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres historiques (conservés) ----
+1 = Bloc en cours d'exécution</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut à acquitter (laté jusqu'au Reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Warning">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres ajoutés (forme cible enrichie) ----
+1 = warning actif (auto-effacé, aucun acquittement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code warning courant (bitfield)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningIdTxt">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis WarningId (prêt IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorIdTxt">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis ErrorId</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = un Reset est nécessaire / en cours</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>537f3533-9d7c-5703-b6a3-978725c61956</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Status — Socle transverse de statut d'un FB métier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
+      avec les textes prêts pour l'IHM (plus de conditions complexes
+      côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
+   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
+      rempli via le socle `FB_FbStatus` (même comportement partout).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_Status (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_PresetConfirmMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="READBACK_ONLY" value="0" />
+              <value name="READBACK_AND_STATUSBIT" value="1" />
+              <value name="STATUSBIT_ONLY" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>READBACK_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation par relecture de position</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READBACK_AND_STATUSBIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Relecture et bit d'état matériel</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STATUSBIT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit d'état matériel uniquement</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>57a2dfc8-cdc9-581a-8092-09f21d5e6939</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -1602,50 +1646,6 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_PresetConfirmMode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="READBACK_ONLY" value="0" />
-              <value name="READBACK_AND_STATUSBIT" value="1" />
-              <value name="STATUSBIT_ONLY" value="2" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>READBACK_ONLY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation par relecture de position</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READBACK_AND_STATUSBIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Relecture et bit d'état matériel</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STATUSBIT_ONLY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit d'état matériel uniquement</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>57a2dfc8-cdc9-581a-8092-09f21d5e6939</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -3116,15 +3116,15 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
-&lt;-- [STAT] FB pret a fonctionner</xhtml>
+&lt;-- [STAT] FB pret a fonctionner (Enable ET pas de defaut late)</xhtml>
               </documentation>
             </variable>
-            <variable name="Status">
+            <variable name="Fault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Statut transverse facade (synthese)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Brique defaut socle (live + latchee), remplie par FB_FaultCore</xhtml>
               </documentation>
             </variable>
             <variable name="HwOut">
@@ -3248,6 +3248,27 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Calcul vitesse cable</xhtml>
               </documentation>
             </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle de defaut (liste de causes -&gt; ST_Fault)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Liste des causes pour le socle FB_FaultCore</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -3260,6 +3281,9 @@ END_IF;
       par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
       de vitesse au meme scan. HomedAndReliable = gate strict interlock M3.
+   🧩 Defaut : Fault:ST_Fault rempli par FB_FaultCore (instFault) depuis une liste
+      de causes en clair (instCauses) — pattern FB_Joystick. Ready = Enable ET pas de
+      defaut late. Interlocks machine sur les faits bruts, jamais sur Fault.Latched.
    📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================</xhtml>
           </documentation>
@@ -3270,8 +3294,7 @@ END_IF;
 
 {region "§1 Gate neutralisation"}
 IF NOT Enable THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
@@ -3289,10 +3312,14 @@ IF NOT Enable THEN
     Measurement.HomingRefRaw := Calib.HomingRefRaw;
     // PresetConfirmationFailed est un diagnostic latch : il reste gele hors Enable
     // et ne doit pas etre efface par ce gate (AC3).
+    // Socle appele meme Enable=FALSE : maintient le latch non acquitte et traite le Reset
+    // hors autorisation (AC4). Les causes ne sont pas evaluees (Enable=FALSE -&gt; vue live a 0),
+    // les latches sont preserves.
+    instFault(Enable := FALSE, Reset := Reset, Causes := instCauses);
+    Fault := instFault.Fault;
     RETURN;
 END_IF;
 Ready := TRUE;
-Status.State := E_State.READY;
 {endregion}
 
 {region "§2 Abs"}
@@ -3396,11 +3423,24 @@ EncoderFault     := instRel.EncoderFault;
 HomedAndReliable := instRel.HomedAndReliable;
 PresetConfirmationFailed := instHoming.PresetConfirmationFailed;
 
-// Synthese statut facade
-Status.Busy := instAbs.Status.Busy;
-Status.Done := instSpeed.Valid AND instAbs.Ready;
-Status.Error := instAbs.Status.Error OR instSafety.Status.Error OR instHoming.Status.Error;
-Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHoming.Status.ErrorId;
+// Synthese statut facade : brique defaut socle (Fault:ST_Fault), pattern FB_Joystick.
+// Causes exprimees en CLAIR (ST_FaultCause), alimentees UNIQUEMENT depuis les sorties
+// publiques des sous-FB (encapsulation stricte, jamais de lecture VAR interne).
+//   - Cause 0/1 : LIVE (Latching=FALSE) -&gt; Fault.Error, retombe seule.
+//   - Cause 2   : LATCHED (Latching=TRUE) -&gt; arme Fault.Latched, acquittee au Reset front.
+// Interlock machine toujours sur les faits bruts (EncoderFault, HomedAndReliable,
+// EncoderIncoherent), jamais sur Fault.Latched (conservation).
+instCauses[0].Active := NOT instAbs.EncoderAvailable; instCauses[0].Latching := FALSE;
+instCauses[0].Texte := 'Perte materiel / communication codeur EtherCAT';
+instCauses[1].Active := instSafety.EncoderIncoherent; instCauses[1].Latching := FALSE;
+instCauses[1].Texte := 'Incoherence mesure / saut de position codeur';
+instCauses[2].Active := instHoming.PresetConfirmationFailed; instCauses[2].Latching := TRUE;
+instCauses[2].Texte := 'Echec confirmation transaction preset codeur';
+
+// Socle appele APRES le pipeline : causes du scan courant, aucun scan de retard (AC4).
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;     // source de verite = socle
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 </xhtml>
           </ST>
@@ -6574,105 +6614,6 @@ END_IF;
           </data>
         </addData>
       </pou>
-      <pou name="FB_AxisScale" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="RawIn">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ENTRÉES MESURÉES &amp; CONFIGURATION ===
---&gt; [HW]  Valeur brute potentiometre/Hall (0..10000)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Neutral">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Point milieu calibre (compte brut ADC)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeadbandRaw">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Zone morte en unites brutes ADC (ex: 300)</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="OutPct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES CALCULÉES ===
-&lt;-- [STAT] Consigne d'axe mise a l'echelle (-100.0..+100.0 %)</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="Delta">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
-. [LOC]  Amplitude utile de la demi-plage d'axe</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ FB_AxisScale — Normalisation et zone morte d'un axe joystick
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Normalise une valeur brute (0..10000) selon le neutre calibré
-             et applique une zone morte en unités brutes (compte ADC).
-   🛡️ Garde-fou : Saturation stricte de la consigne à +/-100.0 %.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (F08.02)
-   =======================================================================</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-IF RawIn &gt;= Neutral THEN
-    Delta := INT_TO_REAL(10000 - Neutral);
-    IF Delta &gt; 0.0 THEN
-        OutPct := (INT_TO_REAL(RawIn - Neutral) / Delta) * 100.0;
-    ELSE
-        OutPct := 0.0;
-    END_IF;
-ELSE
-    Delta := INT_TO_REAL(Neutral);
-    IF Delta &gt; 0.0 THEN
-        OutPct := (INT_TO_REAL(RawIn - Neutral) / Delta) * 100.0;
-    ELSE
-        OutPct := 0.0;
-    END_IF;
-END_IF;
-
-IF ABS(RawIn - Neutral) &lt;= DeadbandRaw THEN
-    OutPct := 0.0;
-END_IF;
-
-// 🛡️ Limitation de plage : une valeur brute hors plage nominale ne doit jamais
-// produire une consigne supérieure à ±100 %. Ce garde-fou protège les
-// consommateurs en aval, notamment la translation M3.
-OutPct := LIMIT(-100.0, OutPct, 100.0);
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e974ff21-ff4c-5a4b-ba11-7923dd2c8334</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="FB_FaultCore" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -6832,6 +6773,105 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>182a55ac-4f1f-5204-b2e2-869f3904964e</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_AxisScale" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="RawIn">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ENTRÉES MESURÉES &amp; CONFIGURATION ===
+--&gt; [HW]  Valeur brute potentiometre/Hall (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Neutral">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Point milieu calibre (compte brut ADC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadbandRaw">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Zone morte en unites brutes ADC (ex: 300)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="OutPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES CALCULÉES ===
+&lt;-- [STAT] Consigne d'axe mise a l'echelle (-100.0..+100.0 %)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Delta">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC]  Amplitude utile de la demi-plage d'axe</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_AxisScale — Normalisation et zone morte d'un axe joystick
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Normalise une valeur brute (0..10000) selon le neutre calibré
+             et applique une zone morte en unités brutes (compte ADC).
+   🛡️ Garde-fou : Saturation stricte de la consigne à +/-100.0 %.
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (F08.02)
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF RawIn &gt;= Neutral THEN
+    Delta := INT_TO_REAL(10000 - Neutral);
+    IF Delta &gt; 0.0 THEN
+        OutPct := (INT_TO_REAL(RawIn - Neutral) / Delta) * 100.0;
+    ELSE
+        OutPct := 0.0;
+    END_IF;
+ELSE
+    Delta := INT_TO_REAL(Neutral);
+    IF Delta &gt; 0.0 THEN
+        OutPct := (INT_TO_REAL(RawIn - Neutral) / Delta) * 100.0;
+    ELSE
+        OutPct := 0.0;
+    END_IF;
+END_IF;
+
+IF ABS(RawIn - Neutral) &lt;= DeadbandRaw THEN
+    OutPct := 0.0;
+END_IF;
+
+// 🛡️ Limitation de plage : une valeur brute hors plage nominale ne doit jamais
+// produire une consigne supérieure à ±100 %. Ce garde-fou protège les
+// consommateurs en aval, notamment la translation M3.
+OutPct := LIMIT(-100.0, OutPct, 100.0);
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e974ff21-ff4c-5a4b-ba11-7923dd2c8334</ObjectId>
           </data>
         </addData>
       </pou>
@@ -8328,14 +8368,14 @@ TimeLast := TimeCurrent;
           </Folder>
         </Folder>
         <Folder Name="A_COMMUN">
-          <Folder Name="_TYPES">
-            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
-            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
-            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
-            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
-          </Folder>
           <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
+            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
+            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>
