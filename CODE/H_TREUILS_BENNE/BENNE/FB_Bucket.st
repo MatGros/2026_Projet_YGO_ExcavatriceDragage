@@ -42,6 +42,7 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
+    ActiveOffsetValid               : BOOL;                           // <-- [STAT] Validite offset actif calcule a jour
     Status                          : ST_Status;                    // <-- [FB] Statut complet (Busy/Done/Error/ErrorId/State/StateAtError)
 
     // === DEMANDES ET ORDRES ACTIONNEURS ===
@@ -89,6 +90,10 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
     Ready := FALSE;
+    ActiveOffsetValid := FALSE;
+    ActiveOffsetM := 0.0;
+    DeltaPosition_M := 0.0;
+    RemainingTravelM := 0.0;
     Status.Busy := FALSE;
     Status.Done := FALSE;
     M2_StartStop := FALSE;
@@ -517,5 +522,6 @@ ELSE
     // sauter vers la config. Évite l'à-coup sur la position corrigée M2 / la synchro.
     ActiveOffsetM := HoldOffsetM;
 END_IF;
+ActiveOffsetValid := TRUE;
 
 {endregion}

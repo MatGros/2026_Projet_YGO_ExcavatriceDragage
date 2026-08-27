@@ -1115,6 +1115,7 @@ SyncState.ErrorId := instWinchSync.Status.ErrorId;
 SyncState.FBState := instWinchSync.Status.State;
 
 BucketState.MechState := _BucketState;
+BucketState.MechState.ActiveOffsetValid := instBucket.ActiveOffsetValid;
 BucketState.FBState := instBucket.Status.State;
 BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
 BucketState.M2StartStop := instBucket.M2_StartStop;

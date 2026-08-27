@@ -219,8 +219,10 @@ de leur **combinaison**. Une seule page les porte, avec leur safety.
 
 | Ce qui est porté par `PRG_04_Treuils_Benne` | Rôle |
 |---|---|
-| Arbitrages M1/M2, benne, synchro, assistants plongée/extraction | Conduite treuils |
+| Arbitrages M1/M2, benne (`FB_Bucket`), synchro, assistants plongée/extraction | Conduite treuils |
 | `instSafetyWinchM1/M2`, `instLoadEstimatorM1/M2` | Safety treuils & benne |
+
+> 📌 **Neutralisation et validité offset benne (`FB_Bucket`)** : lorsque `FB_Bucket` est désactivé (`InhibitM2`), son gate neutralise `ActiveOffsetM := 0.0` (comparaison M1/M2 stricte sans fuite d'offset périmé vers Méca E `FB_Safety_Winch`) et publie la sortie `ActiveOffsetValid := FALSE` (exposée dans `ST_BucketState` pour l'IHM et le diagnostic).
 
 ⚠️ **Aucune sémantique safety ne change** : les mécanismes Méca A→E, les bits `ErrorId` 14/15,
 `AscentPermit`/`DescendPermit` (logique positive fail-safe), les seuils et les polarités restent ceux décrits dans les fiches FB.

@@ -1,33 +1,35 @@
 {
   "version": 1,
-  "file": "test_fb_divesearch.st",
+  "file": "test_fb_cycle.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.READY expected TRUE, got FALSE",
-        "file": "test_fb_divesearch.st",
-        "line": 16,
-        "message": "Enable=TRUE -> Ready=TRUE (nominal)"
-      }
+      "passed": true
     },
     {
-      "name": "TC-P04-010 DiveSearch : mise en service recherche de couche",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.READY expected TRUE, got FALSE",
-        "file": "test_fb_divesearch.st",
-        "line": 27,
-        "message": "Module DiveSearch pret"
-      }
+      "name": "TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 0,
-    "failed": 2
+    "total": 6,
+    "passed": 6,
+    "failed": 0
   }
 }
