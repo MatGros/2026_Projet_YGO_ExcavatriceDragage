@@ -44,9 +44,60 @@ ou un simple aller optionnel dont on ignore le retour ?**
 ## Réponse
 
 ```
-Décision retenue : [ A | B | C ]
-Par : ____________________   Date : ____________
-Justification / précision :
-
-
+Décision retenue : C  (variante de A — transaction réelle, confirmation par relecture mesure)
+Par : utilisateur (connaissance hardware)   Date : 2026-08-27
 ```
+
+**Précision — mécanisme retenu :**
+
+Le preset EST une transaction réelle (le succès conditionne `Calib.Homed`), MAIS la
+confirmation ne passe **pas** par un bit d'accusé du codeur : elle se fait par **relecture
+de la valeur mesurée**.
+
+1. Référencement (front capteur haut **ou** bouton IHM) → charge la valeur preset calculée
+   dans le port de sortie + **front montant** sur le bit de commande preset.
+2. Après le front, `RawPos` change ; laisser passer N cycles (`PresetLatencyCycles`, déjà
+   présent) pour que la valeur se propage → `CablePosM` recalculée par la chaîne.
+3. **Vérification boucle fermée** : `ABS(CablePosM − cibleAttendueM) <= CST_HomingVerifyToleranceM`
+   (quelques mm, valeur à caler site — défaut proposé `0.010` m).
+   - OK → `Calib.Homed := TRUE`, `Calib.HomingRefRaw` committé au même instant.
+   - Écart trop grand après N cycles → preset échoué : `Homed` **inchangé**,
+     `HomingSuspect := TRUE` + bit `ErrorId` dédié (nouveau).
+
+### Extension prévue — bit du mot d'état codeur (site)
+
+La relecture mesure fonctionne **sans matériel réel** (banc). Sur site, un bit du **mot
+d'état** du codeur pourra confirmer le preset directement. Le programme doit permettre d'y
+basculer **sans refonte** :
+
+- Entrée optionnelle `PresetStatusBit : BOOL` dans `ST_fbEncoder_HwIn` — **non câblée
+  aujourd'hui** (laissée à `FALSE`), destinée à recevoir le bit extrait du mot d'état.
+- Sélecteur dans `Cfg : ST_fbEncoder_Cfg` : `PresetConfirmMode : E_PresetConfirmMode`
+  (nouvel ENUM) = `READBACK_ONLY` (défaut) | `READBACK_AND_STATUSBIT` | `STATUSBIT_ONLY`.
+- Logique de confirmation dans `FB_Encoder_Homing` :
+  - `okReadback := (ABS(CablePosM - cibleAttendueM) <= CST_HomingVerifyToleranceM)` après N cycles.
+  - `READBACK_ONLY`        → `presetConfirmed := okReadback`
+  - `READBACK_AND_STATUSBIT` → `presetConfirmed := okReadback AND PresetStatusBit`
+  - `STATUSBIT_ONLY`       → `presetConfirmed := PresetStatusBit`
+  - `presetConfirmed=FALSE` après N cycles → `Homed` inchangé + `HomingSuspect` + bit `ErrorId`.
+- Sur site : câbler `PresetStatusBit` depuis le mot d'état + changer `Cfg.PresetConfirmMode`.
+  Aucun autre code à toucher.
+
+**Conséquences pour `TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml` (T164-4) :**
+
+- `ST_EncoderHw.PresetNak` : **supprimé** (pas de bit d'échec fiable ; l'échec = mesure hors
+  tolérance après N cycles, ou `PresetStatusBit` absent selon le mode).
+- `ST_EncoderHw.PresetAck` : **remplacé** par l'entrée optionnelle `PresetStatusBit`
+  (sémantique « bit du mot d'état », pas « pulse d'accusé »), non câblée aujourd'hui.
+- `FB_Encoder_Abs` : la séquence preset garde chargement valeur + front commande + latence ;
+  perd l'attente d'ack. Extrait le `PresetStatusBit` du mot d'état si un bit est identifié
+  (sinon le laisse à `FALSE`).
+- `FB_Encoder_Homing` : ajoute l'étape de vérification (§3 + modes ci-dessus) + 1 bit
+  `ErrorId` « preset non confirmé ».
+- Nouveaux : `CST_HomingVerifyToleranceM : REAL := 0.010` (VAR CONSTANT, à caler site),
+  ENUM `E_PresetConfirmMode`, champ `Cfg.PresetConfirmMode` (défaut `READBACK_ONLY`).
+- `CodeSeqTriggerCmd` (déjà à 0 par construction, `AF-09 §11 TBD`) : reste hors périmètre.
+- `AF_Partie-09 §4 / §5 / F09.01` + `§11` : mettre à jour la séquence preset (relecture +
+  option mot d'état).
+
+→ Précondition **PRE1 levée** pour T164-4. Reste PRE2 (chantier #3 / T164-3).

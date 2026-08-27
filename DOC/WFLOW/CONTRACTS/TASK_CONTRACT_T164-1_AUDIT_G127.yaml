@@ -1,0 +1,88 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T164-1 : Audit des 16 gates NOT Enable incomplets (G127)
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1_AUDIT_G127.yaml
+# Parent : T164 · Delegable : OUI (lecture seule, zero modif CODE/) · Modele : sonnet
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T164-1_AUDIT_G127
+  criticality: C3
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Pour chacun des 16 FB signales par G127 (gate de neutralisation NOT Enable a sortie
+    anticipee qui ne republie pas toutes ses sorties), etablir si chaque sortie manquante
+    fait publier une valeur perimee hors autorisation (BUG, meme classe que FB_Encoder et
+    FB_Joystick) ou est legitimement geree autrement, et proposer pour chaque BUG un
+    correctif isole a inserer dans le gate.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Un fichier d'audit DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md existe et couvre les 16 FB listes par G127 (aucun oubli, aucun ajout hors liste)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G127_check_neutralization_completeness.py . => les 16 FB du rapport figurent tous dans l'audit"
+    - id: AC2
+      statement: "Pour chaque FB, chaque sortie ecrite dans le corps mais absente du gate est listee avec un verdict parmi exactement : BUG (le gate laisse publier une valeur perimee hors Enable) | OK-ALIM (alimentee autrement dans le gate) | OK-FIGE (valeur figee volontairement, justifie par la spec ou un commentaire code)."
+      verified_by: "lecture de l'audit : chaque ligne porte FB, sortie, verdict, et une phrase de preuve (fichier:ligne du corps + comportement observe)"
+    - id: AC3
+      statement: "Chaque verdict BUG est accompagne d'un correctif propose : le diff minimal a inserer dans le gate (affectation de neutralisation ou reprise depuis une source RETAIN), sans aucun changement d'interface (pas de nouveau VAR, pas de type modifie)."
+      verified_by: "lecture de l'audit : chaque BUG a un bloc `Correctif propose` avec le code exact et la source de la valeur (0 / FALSE / depuis Calib / etc.)"
+    - id: AC4
+      statement: "Les 4 FB C4 (FB_Safety_Winch, FB_WinchOutputInterlock, FB_Winch, FB_Translation) sont traites en premier dans l'audit et signales explicitement C4, avec pour chacun une evaluation du risque physique si le bug est reel (quelle sortie, vers quel actionneur/interlock)."
+      verified_by: "lecture de l'audit : section C4 en tete, mention `criticite : C4` et `risque physique :` pour chaque"
+    - id: AC5
+      statement: "L'audit ne modifie AUCUN fichier CODE/*.st, TOOLS/*, ni le tableau TASKS.yaml : c'est un livrable documentaire pur ; l'application des correctifs et la mise a jour du statut sont faites par l'orchestrateur apres revue."
+      verified_by: "git diff --name-only => seul DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md est ajoute/modifie"
+    - id: AC6
+      statement: "Tout doute de securite, incoherence de spec AF, ou FB dont le gate a une structure non couverte par G127 (ex. neutralisation sans RETURN) est remonte dans une section `Devoir d'alerte` de l'audit, pas corrige."
+      verified_by: "lecture de l'audit : section `Devoir d'alerte` presente (vide explicitement si rien)"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md   # nouveau, seul livrable
+    forbidden:
+      - CODE/**                        # lecture seule — aucune modif code
+      - TOOLS/**                       # ne pas toucher aux gates ni scripts
+      - DOC/WFLOW/TASKS.yaml           # l'orchestrateur seul remplit le tableau
+      - DOC/WFLOW/CONTRACTS/**
+      - PRJ_CODESYS/**
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - g127_report              # sortie de G127_check_neutralization_completeness.py (liste des 16)
+    - audit_file               # chemin + resume par FB (verdict counts : n BUG / n OK-ALIM / n OK-FIGE)
+    - git_status               # confirmer : 1 seul fichier ajoute (l'audit)
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout doute de securite sur un FB C4, toute sortie dont le comportement au gate
+    n'est pas tranchable a la lecture seule, toute divergence entre le code et la spec
+    AF concernee : remonter dans la section `Devoir d'alerte` de l'audit et dans la
+    restitution — ne jamais corriger le code, ne jamais elargir a l'application des fixes.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI (rempli par l'ORCHESTRATEUR, pas par l'agent executant)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    (rapport de l'agent : counts BUG/OK par FB, alertes)
+  evidence_submitted: []
+
+validation:
+  validated_by: "..."           # = orchestrateur (CC)
+  validated_at: "..."
+  verdict: PENDING              # PENDING | ACCEPTED | REJECTED
+  notes: >
+    (visa orchestrateur apres lecture de l'audit + recoupement avec le code)

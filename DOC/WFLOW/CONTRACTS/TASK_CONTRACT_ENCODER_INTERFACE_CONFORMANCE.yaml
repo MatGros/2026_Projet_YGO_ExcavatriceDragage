@@ -8,7 +8,7 @@
 
 preconditions:                 # bloquantes — verifiees par l'orchestrateur avant delegation
   - id: PRE1
-    statement: "Decision preset tranchee (A/B/C)."
+    statement: "Decision preset tranchee. => LEVEE 2026-08-27 : variante C (transaction reelle, confirmation par relecture mesure ABS(CablePosM-cible) <= CST_HomingVerifyToleranceM ; ports PresetAck/PresetNak supprimes ; nouveau bit ErrorId 'preset non confirme')."
     source: "DOC/WFLOW/CONTRACTS/DECISION_ENCODER_PRESET_TRANSACTION.md — section Reponse remplie"
   - id: PRE2
     statement: "Chantier #3 livre : socle Fault:ST_Fault + FB_FaultCore documente (AF03 §3, CQS §2quinquies) et G315 reecrit sur la forme cible ST_Fault."
@@ -48,8 +48,11 @@ contract:
       statement: "Aucune valeur de mesure, seuil, polarite, tempo ou logique homing / securite ne change : le diff se limite a la forme d'interface et au remplissage des causes."
       verified_by: "revue git diff par l'orchestrateur ; tests CI E_CODEURS existants (TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS) au vert sans modification de leurs attendus de valeur"
     - id: AC7
-      statement: "Ports morts tranches : FwdRevSpeedFeedbackOff / BrakeFeedback de FB_Encoder_Homing soit alimentes par la facade avec une precondition AF09 reelle, soit supprimes. PresetAck / PresetNak selon PRE1."
-      verified_by: "grep sur FB_Encoder_Homing => plus aucun VAR_INPUT non cable ; AF09 §11 mis a jour"
+      statement: "Ports morts tranches : FwdRevSpeedFeedbackOff / BrakeFeedback de FB_Encoder_Homing soit alimentes par la facade avec une precondition AF09 reelle, soit supprimes. PresetNak supprime ; PresetAck remplace par une entree optionnelle PresetStatusBit:BOOL (bit du mot d'etat codeur), non cablee aujourd'hui."
+      verified_by: "grep 'PresetNak' CODE/E_CODEURS/ => 0 occurrence ; grep 'PresetStatusBit' => declare dans ST_fbEncoder_HwIn, laisse a FALSE au call-site PRG_02 ; grep sur FB_Encoder_Homing => plus aucun VAR_INPUT non cable ; AF09 §11 mis a jour"
+    - id: AC9
+      statement: "Le referencement confirme Homed selon Cfg.PresetConfirmMode (E_PresetConfirmMode : READBACK_ONLY defaut | READBACK_AND_STATUSBIT | STATUSBIT_ONLY) : okReadback := ABS(CablePosM - cibleAttendueM) <= CST_HomingVerifyToleranceM (VAR CONSTANT, defaut 0.010 m) apres N cycles de latence ; Homed passe TRUE seulement si la condition du mode est vraie, sinon Homed inchange + HomingSuspect + bit ErrorId dedie. Basculer vers le bit du mot d'etat sur site = cabler PresetStatusBit + changer Cfg.PresetConfirmMode, aucun autre code touche."
+      verified_by: "lecture FB_Encoder_Homing.st : les 3 modes traites ; test CI homing en READBACK_ONLY : cible atteinte => Homed, cible ratee de 50 mm => NOT Homed + ErrorId ; E_PresetConfirmMode et Cfg.PresetConfirmMode declares ; defaut = READBACK_ONLY"
     - id: AC8
       statement: "Pour chaque fichier CODE/M_MAIN touche (PRG_02_Acquisition, PRG_07_Supervision) : le nom de fichier reste identique au nom de POU declare, et le suffixe de langage du fichier correspond au langage genere dans le bundle (aucun renommage, aucun changement de langage)."
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py ; python TOOLS/AGENT_WORKFLOW/scripts/G320_check_bundle_main_coverage.py => PASS"
@@ -93,10 +96,13 @@ contract:
       - "Retard d'un scan sur HomingPermit / HomingRefRaw (accepte, AF09 §8) — ne pas tenter de le corriger."
       - "Reference ré-exposee depuis Calib quand Enable=FALSE (AF09 §4, deja corrige lot E0)."
       - "Consommateurs actuels lisent les MEMES faits : PRG_04 (Homed, HomingSuspect, Speed_Mps, Measurement.HomingStatus.Busy), AF06 ST_EncoderMeasurements, FB_Safety_Winch."
+      - "Confirmation preset en READBACK_ONLY (mode par defaut) doit fonctionner sans aucun signal materiel (banc / simulation)."
     dropped_on_purpose:
       - "DUT unique ST_EncoderHw etiquete IN/OUT + copie partielle HwOut (remplace par HwIn/HwOut separes)."
       - "Fusion OR des ErrorId des sous-FB dans Status (remplace par causes nommees)."
-      - "Selon PRE1 option B : sequence timeout preset + ports PresetAck/PresetNak + CodeSeqTriggerCmd."
+      - "ST_EncoderHw.PresetNak + l'attente d'ack dans FB_Encoder_Abs (decision E-D1 variante C : confirmation par relecture mesure)."
+      - "PresetAck (pulse) remplace par PresetStatusBit (bit du mot d'etat), entree OPTIONNELLE non cablee ce jour, activable via Cfg.PresetConfirmMode sur site."
+      - "CodeSeqTriggerCmd : reste a 0 par construction, hors perimetre (AF09 §11 TBD, ne pas piloter)."
 
   # ── 5. Preuves attendues en restitution ───────────────────────────────────
   evidence_required:
