@@ -1,0 +1,151 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — projet Excavatrice Dragage
+# Audit inventaire : toutes les structures / enums du programme automate,
+# et surtout leurs membres REELLEMENT mappes / lus / ecrits par les blocs.
+# But : disposer de faits chiffres pour definir des standards socle REALISTES
+# (ST_FbFault / ST_FbWarning / ST_FbState, contrats light | standard/status |
+#  standard/struct) — pas des standards theoriques.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: AUDIT_STRUCTS_MAPPING
+  criticality: C1            # analyse / doc — aucun changement de comportement machine
+  strategy: patch            # produit UN rapport, ne touche a aucun .st
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Produire un rapport d'inventaire exhaustif des DUT (STRUCT) et enums declares
+    dans CODE/, avec pour CHAQUE membre de structure et CHAQUE valeur d'enum :
+    est-il ecrit quelque part ? lu quelque part ? par quel FB/PRG ? dans une
+    logique de commande (interlock, start/stop, coupure, defaut) ou seulement
+    dans un mapping IHM/SCADA / vue troubleshooting ? Les membres declares mais
+    jamais lus, ou jamais ecrits, sont listes comme "morts". Ce rapport sert
+    d'entree factuelle a la revision du §2quinquies (contrats socle).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Le rapport liste 100 pourcent des blocs TYPE STRUCT END_STRUCT trouves sous
+        CODE/**/*.st : nom, fichier, cartouche doc referencee, liste des membres
+        (nom puis type). Un compteur total est donne et rapproche du nombre de
+        fichiers ST prefixes plus les structs inline.
+      verified_by: "rapport §1 ; `rg -l 'STRUCT' CODE --glob '*.st' | wc -l` recoupe le compte"
+    - id: AC2
+      statement: >
+        Le rapport liste 100 pourcent des enums (TYPE a parentheses et TYPE ENUM)
+        sous CODE/**/*.st : nom, fichier, valeurs avec litteraux numeriques.
+      verified_by: "rapport §2"
+    - id: AC3
+      statement: >
+        Pour chaque STRUCT : table des PRODUCTEURS (FB/PRG qui l'exposent en
+        VAR_OUTPUT/VAR_IN_OUT ou ecrivent ses membres) et des CONSOMMATEURS
+        (VAR_INPUT ou lecture de ses membres). Une structure sans aucun
+        consommateur est signalee "PUBLIEE NON CONSOMMEE".
+      verified_by: "rapport §3, une sous-section par struct"
+    - id: AC4
+      statement: >
+        Analyse membre par membre pour les structures porteuses d'etat ou de
+        diagnostic (au minimum : ST_FbStatus, ST_Diag_Device, chaque ST prefixe
+        State, ST_Safety_Emergency_State, ST_SyncState, ST_WinchState,
+        ST_TranslationState, ST_BucketHMIState, ST_EncoderHMI, et toute autre
+        struct exposee par un FB prefixe en VAR_OUTPUT). Pour chaque membre le
+        rapport donne : ecrit par quels FB ou PRG, lu par quels FB ou PRG, lu en
+        logique de commande oui ou non, lu en mapping IHM oui ou non, mort oui ou non.
+      verified_by: "rapport §4, une table par struct"
+    - id: AC5
+      statement: >
+        Pour chaque enum chaque valeur est classee : comparee en logique de
+        commande par quels FB ou PRG, comparee en mapping IHM par quels FB ou PRG,
+        jamais comparee oui ou non, jamais assignee oui ou non. Le rapport traite
+        nommement E_State (DISABLED INIT READY BUSY DONE STOPPING) et E_Diag_State
+        (DISABLED READY INIT MONITORING ERROR SIMULATED).
+      verified_by: "rapport §5"
+    - id: AC6
+      statement: >
+        Table de synthese des candidats socle : chaque nom de membre recurrent
+        (Error, ErrorId, Warning, WarningId, State, StateAtError, Busy, Done,
+        Online, Operational, ResetRequested, membres de texte suffixes Txt) avec
+        le nombre de structs distinctes ou il apparait et le nombre ou il est
+        reellement lu. Distingue recurrent et lu (candidat socle obligatoire) de
+        one-shot ou jamais lu.
+      verified_by: "rapport §6"
+    - id: AC7
+      statement: >
+        Table des FB_* par profil d'interface constate (light | standard forme
+        a plat | standard Status:ST_FbStatus | standard/struct = >=1 struct de
+        diag par entite | exception G315), avec la forme reelle du VAR_OUTPUT.
+        Recoupe la liste EXCEPTIONS_JUSTIFICATION de G315_check_fb_interface.py.
+      verified_by: "rapport §7 ; recoupe `python TOOLS/AGENT_WORKFLOW/scripts/G315_check_fb_interface.py --report`"
+    - id: AC8
+      statement: >
+        Section "Faits pour la revision du §2quinquies" : 5 a 10 constats chiffres
+        actionnables (ex. "membre X declare sur N structs, lu sur 0", "valeur
+        E_Diag_State.MONITORING jamais assignee", "Reset de FB_Diag_Ethercat :
+        ResetEdge.Q jamais lu"). Aucune recommandation de conception — que des
+        faits sourcables (fichier:ligne).
+      verified_by: "rapport §8"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - DOC/STDS/AUDIT_STRUCTS_MAPPING_20260827.md   # le rapport, SEUL fichier cree
+    forbidden:
+      - CODE/**                                       # LECTURE SEULE — aucune edition .st
+      - PRJ_CODESYS/**                                # Device.export interdit meme en lecture (CLAUDE.md)
+      - TOOLS/**                                      # pas de modif d'outillage ni de gate
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md            # la revision §2quinquies est une AUTRE tache
+      - DOC/STDS/NAMING_CONVENTION.md
+      - DOC/AF/**
+      - DOC/WFLOW/TASKS.yaml
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "n/a — tache read-only, ne modifie aucun lien ni aucun comportement"
+    dropped_on_purpose:
+      - "n/a"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - "Le rapport DOC/STDS/AUDIT_STRUCTS_MAPPING_20260827.md complet (AC1..AC8)"
+    - "Bloc METHODE en tete du rapport : commandes exactes utilisees (rg/grep/parcours), \
+       date, commit HEAD analyse, perimetre de fichiers (glob), limites connues de la methode"
+    - "Compteurs de couverture : nb fichiers .st scannes, nb structs, nb enums, nb FB_*"
+    - "AUCUN run_all_gates / check_linkage / bundle attendu (aucun code modifie) — \
+       si l'agent en lance, c'est une alerte"
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout bug prexistant repere pendant l'audit (membre incoherent, front calcule
+    non lu, valeur d'enum morte, structure publiee non cablee, double ecriture
+    enum/bits) est remonte IMMEDIATEMENT a l'orchestrateur ET consigne en §8 du
+    rapport avec fichier:ligne — jamais corrige, jamais tu. Signaler n'est pas
+    elargir le scope. La source de verite est CODE/*.st versionne uniquement,
+    jamais un Device.export (le considerer comme perime — CLAUDE.md).
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    ...
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    ...

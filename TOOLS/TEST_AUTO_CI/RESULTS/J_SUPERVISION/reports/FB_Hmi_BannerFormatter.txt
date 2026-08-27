@@ -1,6 +1,14 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Hmi_BannerFormatter_zjw0vh5y\strucpp-test-iAwLsY\test_main.cpp: In member function 'void TestSetup_1::setup()':
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Hmi_BannerFormatter_zjw0vh5y\strucpp-test-iAwLsY\test_main.cpp:21:17: error: 'struct strucpp::ST_NETWORKDIAGHMI' has no member named 'CANERROR'
-   21 |         NETDIAG.CANERROR = false;
-      |                 ^~~~~~~~
+STruC++ Test Runner v1.0
 
+test_fb_hmi_bannerformatter.st
+  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  [PASS] TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM
+  [PASS] TC-P07-010 AntiFlickerText : affichage instantane force
+  [PASS] TC-P07-020 RootCause : alarme fille visible quand materiel sain
+  [PASS] TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO
+  [PASS] TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END
+  [PASS] TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT
+  [PASS] TC-P07-024 Priorite absolue AU sur defaut module E/S
+
+-----------------------------------------
+8 tests, 8 passed, 0 failed

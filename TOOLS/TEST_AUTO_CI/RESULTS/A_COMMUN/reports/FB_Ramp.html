@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 18:43:03</div>
+    <div class="exec-time">2026-08-27 13:01:01</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (4 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-ramp-0">Accel : consigne progresse par pas de AccelRate*CycleTimeS vers la cible</a></li><li class="toc-item toc-pass"><a href="#test-fb-ramp-1">Decel : retour vers zero utilise DecelRate (taux different d Accel)</a></li><li class="toc-item toc-pass"><a href="#test-fb-ramp-2">Atteinte de la cible : la rampe s arrete pile dessus, pas de depassement</a></li><li class="toc-item toc-pass"><a href="#test-fb-ramp-3">Garde-fou : une valeur Current deja hors plage (etat corrompu) reste bornee a +/-100</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-ramp-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-ramp-1">TC-P05-010 Modes : selection et autorisation mode Maintenance N1</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            4/4 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
@@ -271,33 +271,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 5 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ACCELRATE</code> jamais câblé en production</li><li>Pin <code>CURRENT</code> jamais câblé en production</li><li>Pin <code>CYCLETIMES</code> jamais câblé en production</li><li>Pin <code>DECELRATE</code> jamais câblé en production</li><li>Pin <code>TARGET</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TARGET <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ACCELRATE <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DECELRATE <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLETIMES <span class="pin-type">IEC_REAL</span></div>
-        </div></div>
-            <div class="pin-block">FB_Ramp</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CURRENT <span class="pin-type">IEC_REAL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -374,55 +347,34 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-ramp-0" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-ramp-0" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Accel : consigne progresse par pas de AccelRate*CycleTimeS vers la cible </h3>
-            </header>
-            
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>pas 1 : 0 -&gt; 5.0 (50%/s * 0.1s), s eloigne de zero donc AccelRate</li><li>pas 2 : 5.0 -&gt; 10.0, meme taux tant que la cible n est pas atteinte</li></ul></details>
-            
-            
-        </article>
         <article id="test-fb-ramp-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>Decel : retour vers zero utilise DecelRate (taux different d Accel) </h3>
-            </header>
-            <div class="comments"><p class='comment'>monte a 40% avec Accel</p><p class='comment'>cible ramenee a 0 : retour vers zero -&gt; DecelRate, taux bien plus faible ici</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>montee : AccelRate (50%/s)</li><li>montee : toujours AccelRate, cible pas encore atteinte</li><li>retour vers zero : DecelRate (10%/s), pas de 1.0 seulement -- pas AccelRate</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-ramp-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Atteinte de la cible : la rampe s arrete pile dessus, pas de depassement </h3>
+                <h3>TC-P05-010 Modes : selection et autorisation mode Maintenance N1 </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>le pas (5.0) depasserait la cible (3.0) : clampe exactement dessus, pas de depassement</li><li>cible deja atteinte : reste stable, aucune oscillation autour de la cible</li></ul></details>
             
-            
-        </article>
-        <article id="test-fb-ramp-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Garde-fou : une valeur Current deja hors plage (etat corrompu) reste bornee a +/-100 </h3>
-            </header>
-            <div class="comments"><p class='comment'>Simule un etat interne deja corrompu au-dela de la plage normalisee -- le FB doit se
-       proteger lui-meme, pas seulement empecher d y entrer</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Target hors plage (500) et grand pas (1000%/s) : Current ne depasse jamais +100</li></ul></details>
             
             
         </article>
@@ -436,7 +388,7 @@
         <summary>Code source ST original (1)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\A_COMMUN\FB_Ramp.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Ramp.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Ramp — Rampe d&#x27;accélération et décélération asymétrique
    ───────────────────────────────────────────────────────────────

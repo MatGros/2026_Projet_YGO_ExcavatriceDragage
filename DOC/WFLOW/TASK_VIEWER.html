@@ -101,14 +101,21 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 8px;
-            overflow: hidden;
+            overflow-x: auto;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
             font-size: 13px;
             text-align: left;
+        }
+        .col-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
         }
         thead {
             background: #191a21;
@@ -325,12 +332,17 @@
         <button class="btn-action btn-cancel" onclick="reloadFromYamlFile()" title="Recharger directement depuis le fichier TASKS.yaml">🔄 Recharger TASKS.yaml</button>
         <input type="file" id="yaml-file-input" accept=".yaml,.yml" style="display:none;" onchange="handleYamlFileSelect(event)">
         
-        <div id="sync-warning-badge" style="display:none; align-items:center; gap:8px; background: rgba(255, 85, 85, 0.15); border: 1px solid #ff5555; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #ff5555; font-weight: bold;">
-            <span style="width:10px; height:10px; background:#ff5555; border-radius:50%; box-shadow:0 0 10px #ff5555; animation: pulse 1.2s infinite; display:inline-block;"></span>
-            <span>Modifications non exportées</span>
+        <div id="server-status-badge" style="display:inline-flex; align-items:center; gap:8px; background: rgba(80, 250, 123, 0.15); border: 1px solid #50fa7b; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #50fa7b; font-weight: bold;">
+            <span style="width:9px; height:9px; background:#50fa7b; border-radius:50%; box-shadow:0 0 8px #50fa7b; display:inline-block;"></span>
+            <span id="server-status-text">Mode Serveur Connecté ⚡ (Auto-Save Actif)</span>
         </div>
 
-        <button class="btn-action btn-primary" onclick="exportJsonYaml()" id="btn-export">
+        <div id="sync-warning-badge" style="display:none; align-items:center; gap:8px; background: rgba(255, 85, 85, 0.15); border: 1px solid #ff5555; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #ff5555; font-weight: bold;">
+            <span style="width:10px; height:10px; background:#ff5555; border-radius:50%; box-shadow:0 0 10px #ff5555; animation: pulse 1.2s infinite; display:inline-block;"></span>
+            <span>Non synchronisé</span>
+        </div>
+
+        <button class="btn-action btn-primary" onclick="exportJsonYaml()" id="btn-export" style="display:none;">
             <span>💾 Exporter TASKS.yaml</span>
         </button>
     </div>
@@ -341,15 +353,15 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 40px; text-align: center;" onclick="sortBy('statut')" id="th-statut">État ↕</th>
-                    <th style="width: 75px;" onclick="sortBy('id')" id="th-id">ID ↕</th>
-                    <th style="width: 55px;" onclick="sortBy('parent_id')" id="th-parent_id">Parent ↕</th>
-                    <th style="width: 60px;" onclick="sortBy('agent')" id="th-agent">Agent ↕</th>
-                    <th style="width: 95px;" onclick="sortBy('date')" id="th-date">Date ↕</th>
-                    <th style="width: 30px; text-align: center;" onclick="sortBy('criticite')" id="th-criticite">Crit. ↕</th>
-                    <th style="width: 85px;" onclick="sortBy('domaine')" id="th-domaine">Domaine ↕</th>
-                    <th onclick="sortBy('titre')" id="th-titre">Titre (Cliquer pour trier ou déplier la ligne) ↕</th>
-
+                    <th style="width: 38px; text-align: center;" onclick="sortBy('statut')" id="th-statut">État ↕</th>
+                    <th style="width: 88px;" onclick="sortBy('id')" id="th-id">ID ↕</th>
+                    <th style="width: 56px;" onclick="sortBy('parent_id')" id="th-parent_id">Parent ↕</th>
+                    <th style="width: 58px;" onclick="sortBy('agent')" id="th-agent">Agent ↕</th>
+                    <th style="width: 88px;" onclick="sortBy('date')" id="th-date">Date ↕</th>
+                    <th style="width: 36px; text-align: center;" onclick="sortBy('criticite')" id="th-criticite">Crit. ↕</th>
+                    <th style="width: 92px;" onclick="sortBy('domaine')" id="th-domaine">Domaine ↕</th>
+                    <th onclick="sortBy('titre')" id="th-titre">Titre (Cliquer pour trier ou déplier) ↕</th>
+                    <th style="width: 175px; text-align: center;">Actions ⚡</th>
                 </tr>
             </thead>
             <tbody id="table-body"></tbody>
@@ -479,25 +491,106 @@
             localStorage.removeItem('TASK_VIEWER_UNSAVED');
         } catch(e) {}
 
-        function updateSyncIndicator() {
-            const badge = document.getElementById('sync-warning-badge');
-            const btn = document.getElementById('btn-export');
-            if (!badge || !btn) return;
+        let isServerMode = (window.location.protocol === 'http:' || window.location.protocol === 'https:');
 
-            if (hasUnsavedChanges) {
-                badge.style.display = 'inline-flex';
-                btn.style.background = '#ff5555';
-                btn.style.color = '#fff';
+        function updateSyncIndicator() {
+            const serverBadge = document.getElementById('server-status-badge');
+            const serverText = document.getElementById('server-status-text');
+            const warningBadge = document.getElementById('sync-warning-badge');
+            const exportBtn = document.getElementById('btn-export');
+
+            if (isServerMode) {
+                if (serverBadge) serverBadge.style.display = 'inline-flex';
+                if (exportBtn) exportBtn.style.display = 'none'; // Masquer bouton d'export superflu en mode serveur
+                if (hasUnsavedChanges) {
+                    if (serverBadge) {
+                        serverBadge.style.borderColor = '#ffb86c';
+                        serverBadge.style.background = 'rgba(255, 184, 108, 0.15)';
+                    }
+                    if (serverText) {
+                        serverText.innerText = 'Synchronisation en cours...';
+                        serverText.style.color = '#ffb86c';
+                    }
+                } else {
+                    if (serverBadge) {
+                        serverBadge.style.borderColor = '#50fa7b';
+                        serverBadge.style.background = 'rgba(80, 250, 123, 0.15)';
+                    }
+                    if (serverText) {
+                        serverText.innerText = 'Serveur Connecté ⚡ (Auto-Save Actif)';
+                        serverText.style.color = '#50fa7b';
+                    }
+                }
             } else {
-                badge.style.display = 'none';
-                btn.style.background = 'var(--primary)';
-                btn.style.color = '#fff';
+                // Mode autonome hors serveur (file://)
+                if (serverBadge) {
+                    serverBadge.style.borderColor = '#bd93f9';
+                    serverBadge.style.background = 'rgba(189, 147, 249, 0.15)';
+                }
+                if (serverText) {
+                    serverText.innerText = 'Mode Autonome (file://)';
+                    serverText.style.color = '#bd93f9';
+                }
+                if (exportBtn) exportBtn.style.display = 'inline-flex';
+
+                if (warningBadge) {
+                    warningBadge.style.display = hasUnsavedChanges ? 'inline-flex' : 'none';
+                }
             }
         }
 
-        function persistTasks() {
+        async function autoSaveTasks() {
+            const yamlText = generateYamlText();
+
+            // Mode 1 : Enregistrement direct via API Serveur HTTP
+            if (isServerMode) {
+                try {
+                    const res = await fetch('/api/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/yaml; charset=utf-8' },
+                        body: yamlText
+                    });
+                    if (res.ok) {
+                        const jsonRes = await res.json();
+                        hasUnsavedChanges = false;
+                        updateSyncIndicator();
+                        showToast(`💾 TASKS.yaml synchronisé en direct (${jsonRes.task_count || tasks.length} tâches) !`);
+                        return true;
+                    } else {
+                        const errText = await res.text();
+                        console.error('Erreur API save :', errText);
+                        showToast(`❌ Erreur écriture serveur : ${errText}`);
+                    }
+                } catch (e) {
+                    console.warn('Échec requête save serveur :', e);
+                    showToast(`⚠️ Échec connexion serveur. Sauvegarde locale.`);
+                }
+            }
+
+            // Mode 2 : Enregistrement direct via File System Access API
+            if (savedFileHandle) {
+                try {
+                    const writable = await savedFileHandle.createWritable();
+                    await writable.write(yamlText);
+                    await writable.close();
+                    hasUnsavedChanges = false;
+                    updateSyncIndicator();
+                    showToast(`💾 TASKS.yaml mis à jour via FileSystem !`);
+                    return true;
+                } catch (e) {
+                    console.warn('Erreur écriture handle :', e);
+                    savedFileHandle = null;
+                }
+            }
+
+            // Mode 3 : Fallback marqué non exporté
             hasUnsavedChanges = true;
             updateSyncIndicator();
+            return false;
+        }
+
+        function persistTasks() {
+            autoSaveTasks();
         }
 
 
@@ -778,21 +871,50 @@
                 tr.onclick = () => toggleDetail(t.id);
 
                 
+                const isLocked = (t.statut === '🔒' || t.statut === '🔍');
+                
+                // Badge d'état interactif et visuel
+                let statusBadge = '';
+                if (t.statut === '🔒') {
+                    statusBadge = `<span title="Tâche VERROUILLÉE par ${t.agent || 'un agent'}" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(255,85,85,0.25); border:1px solid #ff5555; border-radius:5px; font-size:13px; cursor:pointer;" onclick="unlockTask('${t.id}', event)">🔒</span>`;
+                } else if (t.statut === '🔍') {
+                    statusBadge = `<span title="En analyse / étude par ${t.agent || 'un agent'}" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(255,184,108,0.25); border:1px solid #ffb86c; border-radius:5px; font-size:13px;">🔍</span>`;
+                } else if (t.statut === '✅') {
+                    statusBadge = `<span title="Validée & Clôturée" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(80,250,123,0.2); border:1px solid #50fa7b; border-radius:5px; font-size:13px;">✅</span>`;
+                } else if (t.statut === '⏳') {
+                    statusBadge = `<span title="En attente essais terrain" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(241,250,140,0.2); border:1px solid #f1fa8c; border-radius:5px; font-size:13px;">⏳</span>`;
+                } else if (t.statut === '⏸️') {
+                    statusBadge = `<span title="Bloquée / Différée" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(189,147,249,0.2); border:1px solid #bd93f9; border-radius:5px; font-size:13px;">⏸️</span>`;
+                } else if (t.statut === '❌') {
+                    statusBadge = `<span title="Annulée" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(100,100,100,0.2); border:1px solid #666; border-radius:5px; font-size:13px;">❌</span>`;
+                } else {
+                    statusBadge = `<span title="Libre / À traiter (Cliquer pour verrouiller)" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.18); border-radius:5px; font-size:13px; cursor:pointer;" onclick="lockTask('${t.id}', event)">⬜</span>`;
+                }
+
                 tr.innerHTML = `
-                    <td class="col-status">${t.statut}</td>
-                    <td><span style="background: rgba(255,255,255,0.06); color: ${famColor}; border: 1px solid ${famColor}55; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">${t.id}</span></td>
+                    <td class="col-status" style="text-align:center;">${statusBadge}</td>
+                    <td><span style="background: rgba(255,255,255,0.06); color: ${famColor}; border: 1px solid ${famColor}55; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace; white-space: nowrap;">${t.id}</span></td>
                     <td>${t.parent_id ? '<span class="parent-tag" style="background: rgba(255,255,255,0.06); color: ' + famColor + '; border: 1px dashed ' + famColor + '77;">↳ ' + t.parent_id + '</span>' : '<span style="color:#6272a4;">—</span>'}</td>
                     <td class="col-agent">${t.agent && t.agent !== '—' ? t.agent : '—'}</td>
                     <td class="${dateCls}">${dateHtml}</td>
                     <td class="col-crit crit-${t.criticite}">${t.criticite}</td>
                     <td><span class="col-domain">${t.domaine}</span></td>
                     <td class="col-title">${t.titre}</td>
+                    <td style="text-align: center; white-space: nowrap;" onclick="event.stopPropagation();">
+                        <div style="display:inline-flex; gap:5px; align-items:center; justify-content:center;">
+                            ${isLocked ? 
+                                `<button class="btn-action" style="background:#50fa7b; color:#000; padding:3px 6px; font-size:11px; font-weight:bold; border-radius:4px;" title="Déverrouiller et libérer" onclick="unlockTask('${t.id}', event)">🔓</button>` : 
+                                `<button class="btn-action" style="background:rgba(255,255,255,0.08); color:#8be9fd; border:1px solid #8be9fd55; padding:3px 6px; font-size:11px; font-weight:bold; border-radius:4px;" title="Verrouiller cette tâche" onclick="lockTask('${t.id}', event)">🔒</button>`
+                            }
+                            <button class="btn-action" style="background:#ffb86c; color:#000; padding:3px 8px; font-size:11px; font-weight:bold; border-radius:4px;" title="Modifier la tâche" onclick="openEditModal('${t.id}', event)">✏️ Modif</button>
+                            <button class="btn-action" style="background:#bd93f9; color:#000; padding:3px 8px; font-size:11px; font-weight:bold; border-radius:4px;" title="Dupliquer la tâche" onclick="duplicateTask('${t.id}', event)">📋 Copie</button>
+                            <button class="btn-action" style="background:#ff5555; color:#fff; padding:3px 7px; font-size:11px; font-weight:bold; border-radius:4px;" title="Supprimer la tâche" onclick="deleteTask('${t.id}', false, event)">🗑️</button>
+                        </div>
+                    </td>
                 `;
                 tbody.appendChild(tr);
 
-
-
-                // Ligne de détail dépliable avec 3 volets toujours présents et couleurs dédiées
+                // Ligne de détail dépliable épurée avec 3 volets et actions en bas
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row' + (isExp ? ' show' : '');
                 trDetail.id = 'detail-' + t.id;
@@ -811,9 +933,18 @@
                     '<div class="detail-desc">' + t.description + '</div>' :
                     '<div style="font-size: 13px; color: var(--subtext); font-style: italic; margin-top: 2px;">Aucune description detaillee.</div>';
 
+                // Tag visuel du verrou
+                let lockStatusTag = '';
+                if (isLocked) {
+                    lockStatusTag = `<span style="background:rgba(255,85,85,0.2); border:1px solid #ff5555; color:#ff5555; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:12px;">🔒 VERROUILLÉE par <strong>${t.agent || 'inconnu'}</strong></span>`;
+                } else if (t.statut === '✅') {
+                    lockStatusTag = `<span style="background:rgba(80,250,123,0.2); border:1px solid #50fa7b; color:#50fa7b; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:12px;">✅ VALIDÉE & CLÔTURÉE</span>`;
+                } else {
+                    lockStatusTag = `<span style="background:rgba(80,250,123,0.15); border:1px solid #50fa7b; color:#50fa7b; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:12px;">🟢 LIBRE / DISPONIBLE</span>`;
+                }
 
                 trDetail.innerHTML = `
-                    <td colspan="8">
+                    <td colspan="9">
                         <div class="detail-box">
                             <div>
                                 <div class="detail-title" style="color: var(--orange);">🗓️ 1. Contexte & Origine :</div>
@@ -827,15 +958,21 @@
                                 <div class="detail-title" style="color: var(--green);">🎯 3. Objectifs Mesurables & Attendus :</div>
                                 ${objectifsBody}
                             </div>
-                            <div class="detail-meta" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px;">
-                                <div>
-                                    <span>📄 Contrat : <strong>${t.contrat || 'Aucun contrat dédié'}</strong></span> &nbsp;|&nbsp; 
-                                    <span>🏷️ Statut : <strong>${t.statut}</strong></span> &nbsp;|&nbsp; 
-                                    <span>🔒 Agent : <strong>${t.agent || 'Non assigné'}</strong></span>
+
+                            <!-- Barre d'actions et de statut BAS -->
+                            <div class="detail-meta" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                    ${lockStatusTag}
+                                    <span>📄 Contrat : <strong>${t.contrat || 'Aucun'}</strong></span>
                                 </div>
                                 <div style="display:flex; gap:8px;">
-                                    <button class="btn-action" style="background:#ffb86c; color:#000; padding:4px 10px; font-size:12px;" onclick="openEditModal('${t.id}', event)">✏️ Modifier</button>
-                                    <button class="btn-action" style="background:#bd93f9; color:#000; padding:4px 10px; font-size:12px;" onclick="duplicateTask('${t.id}', event)">📋 Dupliquer</button>
+                                    ${isLocked ? 
+                                        `<button class="btn-action" style="background:#50fa7b; color:#000; padding:6px 12px; font-size:12px;" onclick="unlockTask('${t.id}', event)">🔓 Déverrouiller</button>` : 
+                                        `<button class="btn-action" style="background:rgba(255,255,255,0.1); color:#8be9fd; border:1px solid #8be9fd; padding:6px 12px; font-size:12px;" onclick="lockTask('${t.id}', event)">🔒 Verrouiller</button>`
+                                    }
+                                    <button class="btn-action" style="background:#ffb86c; color:#000; padding:6px 12px; font-size:12px;" onclick="openEditModal('${t.id}', event)">✏️ Modifier</button>
+                                    <button class="btn-action" style="background:#bd93f9; color:#000; padding:6px 12px; font-size:12px;" onclick="duplicateTask('${t.id}', event)">📋 Dupliquer</button>
+                                    <button class="btn-action" style="background:#ff5555; color:#fff; padding:6px 12px; font-size:12px;" onclick="deleteTask('${t.id}', false, event)">🗑️ Supprimer</button>
                                 </div>
                             </div>
                         </div>
@@ -845,11 +982,123 @@
             });
         }
 
-        function deleteTask(taskId, event) {
+        async function deleteTask(taskId, force = false, event) {
             if (event) event.stopPropagation();
-            tasks = tasks.filter(t => t.id !== taskId);
+
+            const t = tasks.find(item => item.id === taskId);
+            if (!t) return;
+
+            if (t.statut === '🔒' && !force) {
+                if (!confirm(`⚠️ La tâche ${taskId} est actuellement VERROUILLÉE (🔒) par ${t.agent || 'un agent'}.\n\nVoulez-vous forcer son déverrouillage et sa suppression ?`)) {
+                    return;
+                }
+                force = true;
+            } else if (!force) {
+                if (!confirm(`Confirmez-vous la suppression définitive de la tâche ${taskId} (${t.titre}) ?`)) {
+                    return;
+                }
+            }
+
+            if (isServerMode) {
+                try {
+                    const res = await fetch('/api/task/delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: taskId, force: force })
+                    });
+                    if (res.ok) {
+                        tasks = tasks.filter(item => item.id !== taskId);
+                        render();
+                        showToast(`🗑️ Tâche ${taskId} supprimée du catalogue.`);
+                        return;
+                    } else {
+                        const err = await res.json();
+                        alert(err.error || 'Erreur lors de la suppression.');
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Erreur API delete :', e);
+                }
+            }
+
+            // Mode autonome fallback
+            tasks = tasks.filter(item => item.id !== taskId);
             persistTasks();
             render();
+            showToast(`🗑️ Tâche ${taskId} supprimée.`);
+        }
+
+                async function lockTask(taskId, event) {
+            if (event) event.stopPropagation();
+
+            if (isServerMode) {
+                try {
+                    const res = await fetch('/api/task/lock', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: taskId, agent: 'HUM' })
+                    });
+                    if (res.ok) {
+                        const idx = tasks.findIndex(item => item.id === taskId);
+                        if (idx >= 0) {
+                            tasks[idx].statut = '🔒';
+                            tasks[idx].agent = 'HUM';
+                        }
+                        render();
+                        showToast(`🔒 Tâche ${taskId} verrouillée par HUMAIN.`);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Erreur API lock :', e);
+                }
+            }
+
+            // Fallback
+            const idx = tasks.findIndex(item => item.id === taskId);
+            if (idx >= 0) {
+                tasks[idx].statut = '🔒';
+                tasks[idx].agent = 'HUM';
+                persistTasks();
+                render();
+                showToast(`🔒 Tâche ${taskId} verrouillée.`);
+            }
+        }
+
+        async function unlockTask(taskId, event) {
+            if (event) event.stopPropagation();
+
+            if (isServerMode) {
+                try {
+                    const res = await fetch('/api/task/unlock', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: taskId })
+                    });
+                    if (res.ok) {
+                        const jsonRes = await res.json();
+                        const idx = tasks.findIndex(item => item.id === taskId);
+                        if (idx >= 0) {
+                            tasks[idx].statut = '⬜';
+                            tasks[idx].agent = '—';
+                        }
+                        render();
+                        showToast(`🔓 Tâche ${taskId} déverrouillée et libérée (Statut: ⬜) !`);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Erreur API unlock :', e);
+                }
+            }
+
+            // Fallback
+            const idx = tasks.findIndex(item => item.id === taskId);
+            if (idx >= 0) {
+                tasks[idx].statut = '⬜';
+                tasks[idx].agent = '—';
+                persistTasks();
+                render();
+                showToast(`🔓 Tâche ${taskId} déverrouillée.`);
+            }
         }
 
         // --- Fonctions d'Édition / Création / Duplication ---
@@ -946,7 +1195,7 @@
             document.getElementById('task-modal').style.display = 'none';
         }
 
-        function saveTaskModal() {
+        async function saveTaskModal() {
             const idVal = document.getElementById('edit-id').value.trim();
             if (!idVal) {
                 alert('Veuillez renseigner un identifiant (ID) !');
@@ -955,7 +1204,6 @@
 
             const rawObj = document.getElementById('edit-obj').value.trim();
             const objList = rawObj ? rawObj.split('\n').map(s => s.trim()).filter(s => s.length > 0) : [];
-            
             const nowIso = new Date().toISOString().substring(0, 19);
 
             const taskData = {
@@ -974,17 +1222,41 @@
                 bloque_par: []
             };
 
+            // Mode Serveur Granulaire : Envoi uniquement de la tâche modifiée
+            if (isServerMode) {
+                try {
+                    const res = await fetch('/api/task/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(taskData)
+                    });
+                    if (res.ok) {
+                        const resJson = await res.json();
+                        if (editingIndex >= 0) {
+                            tasks[editingIndex] = taskData;
+                        } else {
+                            tasks.unshift(taskData);
+                        }
+                        closeModal();
+                        render();
+                        showToast(`💾 Tâche ${idVal} sauvegardée et fusionnée avec succès !`);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Erreur API save granular :', e);
+                }
+            }
+
+            // Mode autonome / fallback
             if (editingIndex >= 0) {
                 tasks[editingIndex] = taskData;
             } else {
-                // Nouvelle tâche en tête de liste
                 tasks.unshift(taskData);
             }
 
-            persistTasks();
             closeModal();
             render();
-            alert('✅ Tâche ' + idVal + ' enregistrée avec succès dans le visualiseur !\n\nCliquez sur "💾 Copier / Exporter" pour récupérer le YAML mis à jour.');
+            autoSaveTasks();
 
         }
 
@@ -1135,6 +1407,9 @@
             if (!isShown) {
                 detailEl.classList.add('show');
                 rowEl.classList.add('expanded');
+                expandedId = id;
+            } else {
+                expandedId = null;
             }
         }
 
@@ -1167,24 +1442,47 @@
         render();
         updateSyncIndicator();
 
-        // 🔄 Chargement automatique en direct depuis TASKS.yaml (rafraîchissement automatique au F5)
-        (async function autoLoadFreshYaml() {
+        // 🔄 Chargement initial et synchronisation en arrière-plan temps réel
+        async function fetchFreshTasksSilently() {
+            // Ne pas écraser l'affichage si l'utilisateur est en train d'éditer une tâche dans la modale
+            const modalOpen = document.getElementById('task-modal').style.display === 'flex';
+            if (modalOpen) return;
+
             try {
-                const res = await fetch('TASKS.yaml?' + Date.now());
-                if (res.ok) {
-                    const text = await res.text();
-                    const parsed = parseYamlTasks(text);
-                    if (parsed && parsed.length > 0) {
-                        tasks = parsed;
-                        hasUnsavedChanges = false;
-                        updateSyncIndicator();
-                        render();
+                if (isServerMode) {
+                    const res = await fetch('/api/tasks/json?' + Date.now());
+                    if (res.ok) {
+                        const freshTasks = await res.json();
+                        if (freshTasks && freshTasks.length > 0) {
+                            tasks = freshTasks;
+                            hasUnsavedChanges = false;
+                            updateSyncIndicator();
+                            render();
+                        }
+                    }
+                } else {
+                    const res = await fetch('TASKS.yaml?' + Date.now());
+                    if (res.ok) {
+                        const text = await res.text();
+                        const parsed = parseYamlTasks(text);
+                        if (parsed && parsed.length > 0) {
+                            tasks = parsed;
+                            hasUnsavedChanges = false;
+                            updateSyncIndicator();
+                            render();
+                        }
                     }
                 }
-            } catch (e) {
-                // Fallback silencieux sur defaultTasks si protocole file:// strict
-            }
-        })();
+            } catch (e) {}
+        }
+
+        // Chargement initial
+        fetchFreshTasksSilently();
+
+        // Rafraîchissement périodique automatique toutes les 8 secondes pour refléter les actions des agents IA
+        if (isServerMode) {
+            setInterval(fetchFreshTasksSilently, 8000);
+        }
     </script>
 </body>
 </html>

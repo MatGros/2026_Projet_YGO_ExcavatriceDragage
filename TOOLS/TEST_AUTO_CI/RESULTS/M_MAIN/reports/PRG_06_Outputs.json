@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "file": "test_prg_06_outputs.st",
+  "file": "test_prg_07_supervision.st",
   "results": [
     {
-      "name": "PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale",
+      "name": "PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut",
       "passed": true
     },
     {
-      "name": "PRG_06_Outputs : Transmission Ordre M2 en Marche Normale",
+      "name": "PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil",
       "passed": true
     },
     {
-      "name": "PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1",
+      "name": "PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau",
       "passed": true
     }
   ],

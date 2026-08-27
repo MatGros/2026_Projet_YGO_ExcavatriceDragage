@@ -1,6 +1,8 @@
-Error compiling source files:
+STruC++ Test Runner v1.0
 
-FB_Diag_CanOpen.st:77:9: error: Undeclared variable 'STATEATERROR'
-  77 |         StateAtError := E_Diag_State.DISABLED;
-     |         ^
+test_fb_diag_canopen.st
+  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  [PASS] TC-P12-001 CanOpen : surveillance bus et esclave
 
+-----------------------------------------
+2 tests, 2 passed, 0 failed

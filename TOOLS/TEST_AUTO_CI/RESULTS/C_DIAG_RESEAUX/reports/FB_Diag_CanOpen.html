@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 00:46:26</div>
+    <div class="exec-time">2026-08-27 13:01:01</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-canopen-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-canopen-1">TC-P12-001 CanOpen : surveillance bus et esclave</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-canopen-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-canopen-1">TC-P05-010 Modes : selection et autorisation mode Maintenance N1</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -394,51 +394,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 11 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>CANBUSBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>CANBUSSTATERAW</code> jamais câblé en production</li><li>Pin <code>DEVICECANOPENMASTER</code> jamais câblé en production</li><li>Pin <code>DEVICEJOYSTICK</code> jamais câblé en production</li><li>Pin <code>DEVICEJOYSTICKSTATERAW</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>JOYSTICKBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>NETWORKBYPASSACTIVE</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SIMBYPASSACTIVE</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CANBUSSTATERAW <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DEVICEJOYSTICKSTATERAW <span class="pin-type">IEC_DEVICE_STATE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">NETWORKBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CANBUSBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">JOYSTICKBYPASSACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div></div>
-            <div class="pin-block">FB_Diag_CanOpen</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DEVICECANOPENMASTER <span class="pin-type">ST_DIAG_DEVICE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DEVICEJOYSTICK <span class="pin-type">ST_DIAG_DEVICE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -528,25 +483,6 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>State doit etre DISABLED sans Enable</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>State doit etre READY</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li><li>State retombe a DISABLED</li></ul></details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (3 scans, 8 variables actives)</summary>
-            <div class="wf-scroll"><svg width="388" height="412" viewBox="0 0 388 412" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="394" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="406" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="394" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="406" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="394" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="406" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">READY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">DEVICECANOPENMASTER.ONLINE</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148L312,148L312,174L368,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">DEVICEJOYSTICK.ONLINE</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L256,214L256,188L312,188L312,188L312,214L368,214" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">CANBUSONLINEREAL</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,254L256,254L256,254L256,228L312,228L368,228" class="wf-line" stroke="#0d9488"/><text x="182" y="286.0" class="wf-label">DEVICEJOYSTICKONLINEREAL</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><path d="M200,294L256,294L256,294L256,268L312,268L368,268" class="wf-line" stroke="#1d4ed8"/><text x="182" y="326.0" class="wf-label">CANBUSONLINEEFF</text><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><path d="M200,334L256,334L256,334L256,308L312,308L368,308" class="wf-line" stroke="#2563eb"/><text x="182" y="366.0" class="wf-label">DEVICEJOYSTICKONLINEEFF</text><circle cx="192" cy="362.0" r="4" fill="#059669"/><path d="M200,374L256,374L256,374L256,348L312,348L368,348" class="wf-line" stroke="#059669"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (3 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>READY</th><th>DEVICECANOPENMASTER.ONLINE</th><th>DEVICEJOYSTICK.ONLINE</th><th>CANBUSONLINEREAL</th><th>DEVICEJOYSTICKONLINEREAL</th><th>CANBUSONLINEEFF</th><th>DEVICEJOYSTICKONLINEEFF</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (7)</summary>
-        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CANBUSSTATERAW</code></td><td>2</td></tr><tr><td><code>DEVICEJOYSTICKSTATERAW</code></td><td>9</td></tr><tr><td><code>SIMBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NETWORKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CANBUSBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYSTICKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         </div>
     </details>
@@ -558,20 +494,12 @@
         <article id="test-fb-diag-canopen-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P12-001 CanOpen : surveillance bus et esclave </h3>
+                <h3>TC-P05-010 Modes : selection et autorisation mode Maintenance N1 </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Bus et esclave sains</li><li>Aucune erreur bus maitre</li><li>Aucune erreur joystick</li></ul></details>
             
             
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (15)</summary>
-            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CANBUSSTATERAW</code></td><td>2</td></tr><tr><td><code>DEVICEJOYSTICKSTATERAW</code></td><td>9</td></tr><tr><td><code>SIMBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NETWORKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CANBUSBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYSTICKBYPASSACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICECANOPENMASTER.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEJOYSTICK.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CANBUSONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEJOYSTICKONLINEREAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CANBUSONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEVICEJOYSTICKONLINEEFF</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
-        </details>
-    </div>
+            
         </article>
         </div>
     </details>

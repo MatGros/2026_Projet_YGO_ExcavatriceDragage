@@ -1,33 +1,23 @@
 {
   "version": 1,
-  "file": "test_fb_extractionsequence.st",
+  "file": "test_fb_winch.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.READY expected TRUE, got FALSE",
-        "file": "test_fb_extractionsequence.st",
-        "line": 16,
-        "message": "Enable=TRUE -> Ready=TRUE (nominal)"
-      }
+      "passed": true
     },
     {
-      "name": "TC-P04-020 Extraction : mise en service sequence extraction",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.READY expected TRUE, got FALSE",
-        "file": "test_fb_extractionsequence.st",
-        "line": 27,
-        "message": "Sequence Extraction prete"
-      }
+      "name": "TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 0,
-    "failed": 2
+    "total": 3,
+    "passed": 3,
+    "failed": 0
   }
 }

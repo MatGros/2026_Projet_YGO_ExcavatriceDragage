@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_cycletime.st",
+  "file": "test_fb_modes.st",
   "results": [
     {
-      "name": "Premier cycle retourne la valeur de secours (pas de dt mesurable)",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "Cycle suivant calcule le dt reel ecoule (ms->s)",
+      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
       "passed": true
     }
   ],

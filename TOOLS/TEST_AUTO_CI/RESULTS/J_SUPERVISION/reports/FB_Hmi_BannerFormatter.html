@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 00:30:21</div>
+    <div class="exec-time">2026-08-27 12:59:55</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (8 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-1">TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-2">TC-P07-010 AntiFlickerText : affichage instantane force</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-3">TC-P07-020 RootCause : alarme fille visible quand materiel sain</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-4">TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-5">TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-6">TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-7">TC-P07-024 Priorite absolue AU sur defaut module E/S</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-0">PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-1">PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-2">PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-3">PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-4">PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            8/8 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -1173,171 +1173,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 51 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ALARMHOLDTIME</code> jamais câblé en production</li><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BANNER</code> jamais câblé en production</li><li>Pin <code>BOTHAXESCOUPLED</code> jamais câblé en production</li><li>Pin <code>BUCKETERRORID</code> jamais câblé en production</li><li>Pin <code>BUCKETISCLOSED</code> jamais câblé en production</li><li>Pin <code>BUCKETISOPEN</code> jamais câblé en production</li><li>Pin <code>BYPASSGLOBALACTIVE</code> jamais câblé en production</li><li>Pin <code>BYPASSSYNCACTIVE</code> jamais câblé en production</li><li>Pin <code>BYPASSTRANSLATION</code> jamais câblé en production</li><li>Pin <code>BYPASSWINCHM1ACTIVE</code> jamais câblé en production</li><li>Pin <code>BYPASSWINCHM2ACTIVE</code> jamais câblé en production</li><li>Pin <code>COUPLEDUSERREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>CURRENTMODE</code> jamais câblé en production</li><li>Pin <code>CYCLEAUTOBUSY</code> jamais câblé en production</li><li>Pin <code>CYCLEERRORID</code> jamais câblé en production</li><li>Pin <code>CYCLEREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>CYCLESTATESTR</code> jamais câblé en production</li><li>Pin <code>CYCLESTEP</code> jamais câblé en production</li><li>Pin <code>CYCLESTEPATERROR</code> jamais câblé en production</li><li>Pin <code>DEADMANARMED</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIVEACTIVE</code> jamais câblé en production</li><li>Pin <code>DIVEERRORID</code> jamais câblé en production</li><li>Pin <code>DIVESTATE</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMINGFAILED</code> jamais câblé en production</li><li>Pin <code>EMERGENCYCHAINCLOSED</code> jamais câblé en production</li><li>Pin <code>EMERGENCYERRORID</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>EXTRACTIONERRORID</code> jamais câblé en production</li><li>Pin <code>EXTRACTIONSTATE</code> jamais câblé en production</li><li>Pin <code>HOMINGACTIVE</code> jamais câblé en production</li><li>Pin <code>HOMINGSTEPM1</code> jamais câblé en production</li><li>Pin <code>HOMINGSTEPM2</code> jamais câblé en production</li><li>Pin <code>JOYSTICKATNEUTRAL</code> jamais câblé en production</li><li>Pin <code>LEGALLIMITREACHED</code> jamais câblé en production</li><li>Pin <code>M1LOGICREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>M2LOGICREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>NETWORK</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFFACTIVEANY</code> jamais câblé en production</li><li>Pin <code>REDUNDANCYTESTFAILED</code> jamais câblé en production</li><li>Pin <code>SAFESTOPACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMULATIONMODEACTIVE</code> jamais câblé en production</li><li>Pin <code>SYNCDEGRADEDACTIVE</code> jamais câblé en production</li><li>Pin <code>SYNCERRORID</code> jamais câblé en production</li><li>Pin <code>TOPLIMITREACHED</code> jamais câblé en production</li><li>Pin <code>TRANSLATIONSAFETY</code> jamais câblé en production</li><li>Pin <code>WINCHM1SAFETY</code> jamais câblé en production</li><li>Pin <code>WINCHM2SAFETY</code> jamais câblé en production</li><li>Pin <code>WINCHSELECTED</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMULATIONMODEACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CURRENTMODE <span class="pin-type">IEC_E_MODE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BOTHAXESCOUPLED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">WINCHSELECTED <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLESTEP <span class="pin-type">IEC_E_CYCLESTEP</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLESTATESTR <span class="pin-type">IECStringVar&lt;80&gt;</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLEERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLESTEPATERROR <span class="pin-type">IEC_E_CYCLESTEP</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIVESTATE <span class="pin-type">IEC_E_DIVESEARCHSTATE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EXTRACTIONSTATE <span class="pin-type">IEC_E_EXTRACTIONSEQUENCESTATE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGSTEPM1 <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGSTEPM2 <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSGLOBALACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSWINCHM1ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSWINCHM2ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSTRANSLATION <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSSYNCACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SYNCDEGRADEDACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">LEGALLIMITREACHED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EMERGENCYCHAINCLOSED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCUTOFFACTIVEANY <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SAFESTOPACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DESCENDPERMIT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ASCENTPERMIT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETISOPEN <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETISCLOSED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIVEACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TOPLIMITREACHED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">COUPLEDUSERREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1LOGICREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2LOGICREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLEREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DEADMANARMED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">JOYSTICKATNEUTRAL <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLEAUTOBUSY <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">WINCHM1SAFETY <span class="pin-type">ST_SAFETYWINCH</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">WINCHM2SAFETY <span class="pin-type">ST_SAFETYWINCH</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TRANSLATIONSAFETY <span class="pin-type">ST_SAFETYTRANSLATION</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SYNCERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIVEERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EXTRACTIONERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EMERGENCYERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">REDUNDANCYTESTFAILED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EMERGENCYARMINGFAILED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ALARMHOLDTIME <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">NETWORK <span class="pin-type">ST_NETWORKDIAGHMI</span></div>
-        </div></div>
-            <div class="pin-block">FB_Hmi_BannerFormatter</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BANNER <span class="pin-type">ST_HMIBANNER</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 2 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -1421,94 +1256,64 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-hmi-bannerformatter-0" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Demarrage boot</p><p class='comment'>Scan 2 : Formatage actif post-boot</p><p class='comment'>Scan 3 : Enable=FALSE -&gt; Re-neutralisation</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; texte vide</li><li>Enable=TRUE -&gt; non vide (nominal)</li><li>Coupure -&gt; retombe a texte vide</li></ul></details>
-            
-            
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 7 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
+        <article id="test-fb-hmi-bannerformatter-0" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
         <article id="test-fb-hmi-bannerformatter-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM </h3>
+                <h3>PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance) </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>GlobalContextText non vide</li></ul></details>
+            
             
             
         </article>
         <article id="test-fb-hmi-bannerformatter-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-010 AntiFlickerText : affichage instantane force </h3>
+                <h3>PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives) </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Texte instantane</li></ul></details>
+            
             
             
         </article>
         <article id="test-fb-hmi-bannerformatter-3" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-020 RootCause : alarme fille visible quand materiel sain </h3>
+                <h3>PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1 </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Alarme presente</li><li>1 alarme au carrousel</li><li>Alarme fille correctement affichee</li><li>Tableau AlarmArray[0] correctement rempli</li></ul></details>
+            
             
             
         </article>
         <article id="test-fb-hmi-bannerformatter-4" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO </h3>
+                <h3>PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale) </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary><ul class="checks-list"><li>Alarme presente</li><li>1 alarme (parent seul)</li><li>Alarme parente affichee</li><li>AlarmArray[0] porte le parent</li><li>Consigne operateur cible la panne materielle</li></ul></details>
             
-            
-        </article>
-        <article id="test-fb-hmi-bannerformatter-5" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END </h3>
-            </header>
-            
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Alarme presente</li><li>1 alarme (parent seul)</li><li>Alarme parente VH0800</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-hmi-bannerformatter-6" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT </h3>
-            </header>
-            
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Alarme presente</li><li>1 alarme (parent seul)</li><li>Alarme parente codeur M1</li><li>Action operateur codeurs</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-hmi-bannerformatter-7" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-024 Priorite absolue AU sur defaut module E/S </h3>
-            </header>
-            
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>AU domine le defaut E/S</li></ul></details>
             
             
         </article>
@@ -3863,11 +3668,15 @@ TYPE ST_NetworkDiagHMI :
 STRUCT
     BusCanOpen          : ST_Diag_Device;  (* 📡 Diagnostics bus CANopen *)
     Joystick            : ST_Diag_Device;  (* 🕹️ Diagnostics esclave Joystick *)
+    CanError            : BOOL;           (* ⚠️ Voyant anomalie globale CANopen (IHM Visu) *)
+    CanErrorId          : WORD;           (* ❌ Code anomalie CANopen *)
 
     BusEthercat         : ST_Diag_Device;  (* 📡 Diagnostics bus EtherCAT *)
     EncoderM1           : ST_Diag_Device;  (* 🧲 Diagnostics esclave COD1 *)
     EncoderM2           : ST_Diag_Device;  (* 🧲 Diagnostics esclave COD2 *)
     VariateurM3         : ST_Diag_Device;  (* ↔️ Diagnostics esclave AC600 *)
+    EcatError           : BOOL;           (* ⚠️ Voyant anomalie globale EtherCAT (IHM Visu) *)
+    EcatErrorId         : WORD;           (* ❌ Code anomalie EtherCAT *)
 
     InputModules        : ST_InputModuleDiagHMI; (* 🩺 Diagnostic carte des 5 modules d&#x27;E/S physiques *)
 
@@ -3966,15 +3775,20 @@ END_TYPE
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_BypassNetwork :
 STRUCT
-    (* 📡 1. Communication &amp; Systèmes esclaves *)
+    (* 📡 1. Bus maîtres &amp; Modules d&#x27;E/S *)
+    BusCanOpen  : BOOL; (* 📡 Bypass diagnostic bus CANopen maître *)
+    BusEthercat : BOOL; (* 📡 Bypass diagnostic bus EtherCAT maître *)
+    InputModules: BOOL; (* 🩺 Bypass diagnostic des 5 modules d&#x27;E/S physiques *)
+
+    (* 🕹️ 2. Équipements esclaves *)
     Joystick    : BOOL; (* 🕹️ Bypass diagnostic esclave CANopen Joystick *)
     EncoderM1   : BOOL; (* 🧲 Bypass diagnostic esclave EtherCAT COD1 (M1 codeur) *)
     EncoderM2   : BOOL; (* 🧲 Bypass diagnostic esclave EtherCAT COD2 (M2 codeur) *)
     VariateurM3 : BOOL; (* ↔️ Bypass diagnostic esclave EtherCAT AC600 (M3 drive) *)
     IhmHeartbeat: BOOL := TRUE; (* 💓 Bypass du bit de vie IHM (défaut TRUE = sécurisé si pas d&#x27;IHM) *)
 
-    (* 🛡️ 2. Hiérarchie &amp; Restauration *)
-    Global      : BOOL; (* 🌐 Bypass Global : tous les esclaves réseau à la fois *)
+    (* 🛡️ 3. Hiérarchie &amp; Restauration *)
+    Global      : BOOL; (* 🌐 Bypass Global : tous les bus et esclaves réseau à la fois *)
     // Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
     Initialized : BOOL := FALSE; (* 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot *)
 END_STRUCT

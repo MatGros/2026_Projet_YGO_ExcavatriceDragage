@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-26 18:43:04</div>
+    <div class="exec-time">2026-08-27 13:01:01</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (8 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-1">TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-2">TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -&gt; pulse 1s puis confirmation</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-3">TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-4">TC-P01-006 canal colle bloque le reamement (echec auto-test)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-5">TC-P01-007 timeout confirmation contacteur -&gt; lockout 5s</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-6">TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-7">TC-P01-008 PowerCutOffRequest coupe A et B sans armer</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-1">TC-P05-010 Modes : selection et autorisation mode Maintenance N1</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            8/8 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
@@ -363,81 +363,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 5 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BUSY</code> jamais câblé en production</li><li>Pin <code>DONE</code> jamais câblé en production</li><li>Pin <code>ERROR</code> jamais câblé en production</li><li>Pin <code>ERRORID</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="TRUE" onclick="copyPinExpr(this)">TRUE</code></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="PRG_07_Supervision.FaultMachineReset_IHM" onclick="copyPinExpr(this)">PRG_07_Supervision.FaultMachineReset_IHM</code></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="GVL_IHM.Modes.Cmd.BtnEmergencyArming" onclick="copyPinExpr(this)">GVL_IHM.Modes.Cmd.BtnEmergencyArming</code></div>
-            <div class="pin-name">ARMREQUEST <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="PowerCutOffReq" onclick="copyPinExpr(this)">PowerCutOffReq</code></div>
-            <div class="pin-name">POWERCUTOFFREQUEST <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="GVL_IHM.Modes.Cmd.BtnEmergencyCutOff" onclick="copyPinExpr(this)">GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</code></div>
-            <div class="pin-name">BTNEMERGENCYCUTOFF <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI" onclick="copyPinExpr(this)">PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI</code></div>
-            <div class="pin-name">EMERGENCYCHAINCLOSED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-wired">
-            <div class="pin-expr"><code title="PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI" onclick="copyPinExpr(this)">PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</code></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
-        </div></div>
-            <div class="pin-block">FB_Safety_EmergencyManagement</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BUSY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DONE <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">ERROR <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">ERRORID <span class="pin-type">IEC_WORD</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">MAINTAINA_RQ <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_06_Outputs.st: PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;" onclick="copyPinExpr(this)">M_MAIN/PRG_06_Outputs.st: PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">MAINTAINB_RQ <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_06_Outputs.st: PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;" onclick="copyPinExpr(this)">M_MAIN/PRG_06_Outputs.st: PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">ARMPULSE_RQ <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_06_Outputs.st: EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;" onclick="copyPinExpr(this)">M_MAIN/PRG_06_Outputs.st: EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">STATE <span class="pin-type">ST_SAFETY_EMERGENCY_STATE</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_06_Outputs.st: EmergencyState := instSafetyEmergencyManagement.State;" onclick="copyPinExpr(this)">M_MAIN/PRG_06_Outputs.st: EmergencyState := instSafetyEmergencyManagement.State;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">DIAG <span class="pin-type">ST_SAFETY_EMERGENCY_DIAG</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_06_Outputs.st: EmergencyDiag := instSafetyEmergencyManagement.Diag;" onclick="copyPinExpr(this)">M_MAIN/PRG_06_Outputs.st: EmergencyDiag := instSafetyEmergencyManagement.Diag;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">ARMINGSEQSTEP <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_06_Outputs.st: ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;" onclick="copyPinExpr(this)">M_MAIN/PRG_06_Outputs.st: ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">REDUNDANCYTESTFAILED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_06_Outputs.st: RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;" onclick="copyPinExpr(this)">M_MAIN/PRG_06_Outputs.st: RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">EMERGENCYARMINGFAILED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_06_Outputs.st: EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;" onclick="copyPinExpr(this)">M_MAIN/PRG_06_Outputs.st: EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;</code></div>
-        </div><div class="pin-row pin-row-wired pin-row-out">
-            <div class="pin-name">EMERGENCYARMINGLOCKOUTACTIVE <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_06_Outputs.st: EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;" onclick="copyPinExpr(this)">M_MAIN/PRG_06_Outputs.st: EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;</code></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 3 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -546,87 +471,16 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 7 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-safety-emergencymanagement-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu </h3>
+                <h3>TC-P05-010 Modes : selection et autorisation mode Maintenance N1 </h3>
             </header>
-            <div class="comments"><p class='comment'>demarrage + regime etabli, sain</p><p class='comment'>front ArmRequest -&gt; TestA (step 1) : SEUL le canal A doit se couper</p><p class='comment'>200ms plus tard : la boucle reagit reellement a la coupure de A (preuve physique reelle)</p><p class='comment'>200ms plus tard : boucle refermee (A restaure) -&gt; passage a TestB (step 3)</p><p class='comment'>200ms plus tard : boucle reagit a la coupure de B</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (14)</span></summary><ul class="checks-list"><li>hors defaut, canal A maintenu</li><li>hors defaut, canal B maintenu</li><li>front doit lancer TestA</li><li>TestA : canal A seul doit se couper</li><li>TestA : canal B ne doit PAS etre affecte</li><li>TestA reussi (boucle a reagi) -&gt; RestoreA</li><li>pas de defaut si le canal reagit correctement au test</li><li>canal A restaure immediatement apres son test</li><li>RestoreA reussi -&gt; TestB</li><li>TestB : canal B seul doit se couper</li><li>TestB : canal A ne doit PAS etre affecte</li><li>TestB reussi -&gt; RestoreB</li><li>pas de defaut si le canal B reagit correctement au test</li><li>canal B restaure immediatement apres son test</li></ul></details>
             
             
-        </article>
-        <article id="test-fb-safety-emergencymanagement-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -&gt; pulse 1s puis confirmation </h3>
-            </header>
-            <div class="comments"><p class='comment'>demarrage + regime etabli, sain</p><p class='comment'>front ArmRequest -&gt; TestA</p><p class='comment'>TestA reussi (boucle reagit) -&gt; RestoreA</p><p class='comment'>RestoreA reussi -&gt; TestB</p><p class='comment'>TestB reussi (boucle reagit) -&gt; RestoreB</p><p class='comment'>RestoreB reussi -&gt; Pulse (step 5), impulsion 1s</p><p class='comment'>1s plus tard : pulse termine -&gt; Confirm (step 6)</p><p class='comment'>contacteur confirme engage -&gt; succes, retour IDLE</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (10)</span></summary><ul class="checks-list"><li>les 2 canaux valides -&gt; impulsion de reamement</li><li>pulse de reamement doit etre actif (TC-P01-003)</li><li>pulse de 1s termine -&gt; attente confirmation contacteur</li><li>pulse retombe apres 1s</li><li>sequence toujours en cours (attente confirmation)</li><li>confirmation contacteur -&gt; retour IDLE</li><li>contacteur engage confirme -&gt; Done</li><li>sequence terminee</li><li>succes -&gt; pas de lockout</li><li>reamement reussi -&gt; pas de defaut</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-safety-emergencymanagement-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste </h3>
-            </header>
-            <div class="comments"><p class='comment'>reproduit l etat &quot;canal colle&quot; de TC-P01-006 -- setup independant, propre a ce test</p><p class='comment'>Reset : doit acquitter l affichage sans redemarrage auto (TC-P01-004) -- +1 cycle</p><p class='comment'>Complete TC-P01-004 : sa colonne &quot;Comportement attendu&quot; precise &quot;Reset efface l affichage
-       (interlock reste sur Cause)&quot; -- assertion manquante jusqu ici. Le canal n a JAMAIS ete
-       re-teste physiquement a ce stade (aucun nouveau ArmRequest), donc le maintien de puissance
-       ne doit PAS etre restaure par le seul Reset (AF 3.4bis : interlock sur Cause brute,
-       jamais sur l Ack).</p><p class='comment'>nouvel essai : cause toujours presente (canal toujours colle) -&gt; doit re-alarmer (TC-P01-009) -- +1 cycle</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>precondition : canal colle doit avoir leve une erreur</li><li>Reset doit effacer l affichage du defaut</li><li>Reset seul ne relance jamais de sequence (pas de redemarrage auto)</li><li>TC-P01-004 : Reset seul ne doit PAS restaurer le maintien (interlock reste sur Cause, AF 3.4bis)</li><li>un nouveau front ArmRequest doit relancer TestA</li><li>cause persistante doit re-alarmer au nouvel essai, meme apres Reset</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-safety-emergencymanagement-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-006 canal colle bloque le reamement (echec auto-test) </h3>
-            </header>
-            <div class="comments"><p class='comment'>scans 1-2 : demarrage + regime etabli, sain</p><p class='comment'>front ArmRequest -&gt; ArmingSeqStep passe a 1 (TestA), boucle encore saine ce scan -- +1 cycle</p><p class='comment'>200ms plus tard : le canal A est cense etre coupe, mais la boucle reste fermee -&gt; collage</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>front ArmRequest doit lancer TestA (step 1)</li><li>canal colle doit lever une erreur (RedundancyTestFailed)</li><li>echec auto-test doit ramener la sequence a IDLE</li><li>un canal colle bloque aussi le maintien normal (interlock sur Cause brute)</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-safety-emergencymanagement-5" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-007 timeout confirmation contacteur -&gt; lockout 5s </h3>
-            </header>
-            <div class="comments"><p class='comment'>meme montee en sequence que TC-P01-003 : les 2 canaux valides, jusqu au pulse</p><p class='comment'>1s plus tard : pulse termine -&gt; Confirm (step 6), contacteur PAS engage</p><p class='comment'>2s plus tard (timeout confirmation) : contacteur toujours pas confirme -&gt; echec + lockout</p><p class='comment'>pendant le lockout : un nouveau front ArmRequest doit etre bloque</p><p class='comment'>5s apres le debut du lockout : le verrouillage doit se lever automatiquement</p><p class='comment'>preuve OPERATIONNELLE (pas juste le drapeau) : un nouveau front doit maintenant relancer
-       reellement la sequence -- +1 cycle pour que le retrait du lockout soit visible au scan
-       suivant avant de tenter le nouveau front (ordre de calcul : trigger avant re-evaluation
-       du lockout dans le meme scan, cf. Logic.st)</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (9)</span></summary><ul class="checks-list"><li>les 2 canaux valides -&gt; pulse</li><li>attente confirmation contacteur</li><li>timeout confirmation doit ramener la sequence a IDLE</li><li>timeout doit declencher le lockout (TC-P01-007)</li><li>timeout doit lever le defaut EmergencyArmingFailed</li><li>defaut doit etre visible sur Error</li><li>lockout actif doit bloquer toute nouvelle tentative de reamement</li><li>lockout 5s ecoule -&gt; leve automatiquement</li><li>apres le lockout, un nouveau front doit reellement relancer TestA (pas juste le drapeau qui retombe)</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-safety-emergencymanagement-6" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien </h3>
-            </header>
-            <div class="comments"><p class='comment'>Meme montee en sequence que TC-P01-003 jusqu au pulse (step 5)</p><p class='comment'>Operateur appuie sur la coupure d urgence IHM PENDANT l impulsion mecanique de reamement</p><p class='comment'>Coherence attendue : si la coupure d urgence IHM coupe le maintien de puissance, elle doit
-       aussi couper l impulsion mecanique de reamement en cours -- continuer a pulser le contacteur
-       de reamement pendant qu on demande sa coupure est incoherent (Cmd.ArmPulse_Cmd n est
-       conditionne par aucune des memes gardes que Cmd.MaintainA/B_Cmd dans
-       FB_Safety_EmergencyManagementLogic.st §7 -- ecart releve par l audit du 2026-08-22).</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary><ul class="checks-list"><li>les 2 canaux valides -&gt; pulse (step 5)</li><li>precondition : pulse actif</li><li>BtnEmergencyCutOff coupe bien le maintien canal A (comportement attendu, deja correct)</li><li>BtnEmergencyCutOff coupe bien le maintien canal B (comportement attendu, deja correct)</li><li>BtnEmergencyCutOff doit aussi couper le pulse de reamement en cours (coherence avec la coupure du maintien)</li></ul></details>
-            
-            
-        </article>
-        <article id="test-fb-safety-emergencymanagement-7" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-008 PowerCutOffRequest coupe A et B sans armer </h3>
-            </header>
-            <div class="comments"><p class='comment'>scan 1 : autotest demarrage (1 cycle, boucle saine, contacteur repos)</p><p class='comment'>scan 2 : regime etabli, maintien sain attendu -- +1 cycle automate (10ms)</p><p class='comment'>scan 3 : coupure demandee par un metier (Winch/Translation) -- +1 cycle automate</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>hors defaut, canal A doit etre maintenu</li><li>hors defaut, canal B doit etre maintenu</li><li>pas de sequence en cours</li><li>PowerCutOffRequest doit couper le canal A</li><li>PowerCutOffRequest doit couper le canal B</li><li>PowerCutOffRequest ne doit jamais declencher une sequence armement</li></ul></details>
             
             
         </article>
@@ -640,7 +494,7 @@
         <summary>Code source ST original (6)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\B_AU_SECURITE\ST_Safety_Emergency_InternalCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_InternalCmd.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ ST_Safety_Emergency_InternalCmd — Structure de commande interne
    ───────────────────────────────────────────────────────────────
@@ -659,7 +513,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\B_AU_SECURITE\ST_Safety_Emergency_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_State.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Safety_Emergency_State — État public de la chaîne d&#x27;arrêt d&#x27;urgence
    ───────────────────────────────────────────────────────────────
@@ -680,7 +534,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\B_AU_SECURITE\ST_Safety_Emergency_Diag.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_Diag.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
@@ -701,7 +555,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\B_AU_SECURITE\FB_Safety_EmergencyManagementLogic.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\FB_Safety_EmergencyManagementLogic.st</code></summary>
                 <pre>(* =======================================================================
    🛡️ FB_Safety_EmergencyManagementLogic — Décision &amp; Séquencement AU
    ───────────────────────────────────────────────────────────────
@@ -1033,7 +887,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\B_AU_SECURITE\FB_Safety_EmergencyManagementOutput.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\FB_Safety_EmergencyManagementOutput.st</code></summary>
                 <pre>(* =======================================================================
    🔒 FB_Safety_EmergencyManagementOutput — Projection Physique Fail-Safe
    ───────────────────────────────────────────────────────────────
@@ -1118,7 +972,7 @@ Diag.LockoutActive        := LockoutActive;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT1_PRG2\CODE\B_AU_SECURITE\FB_Safety_EmergencyManagement.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\FB_Safety_EmergencyManagement.st</code></summary>
                 <pre>(* =======================================================================
    🛡️ FB_Safety_EmergencyManagement — Composite &amp; Façade Publique
    ───────────────────────────────────────────────────────────────

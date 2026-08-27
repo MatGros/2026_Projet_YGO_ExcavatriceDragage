@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_diag_canopen.st",
+  "file": "test_fb_modes.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P12-001 CanOpen : surveillance bus et esclave",
+      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
       "passed": true
     }
   ],

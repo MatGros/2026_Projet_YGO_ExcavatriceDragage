@@ -1,0 +1,6 @@
+Error compiling source files:
+
+ST_AcquisitionInterPrg.st:15:31: error: Undefined type 'ST_ENCODERMEASUREMENTS' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  15 |     Encoders                : ST_EncoderMeasurements; // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
+     |                               ^
+
