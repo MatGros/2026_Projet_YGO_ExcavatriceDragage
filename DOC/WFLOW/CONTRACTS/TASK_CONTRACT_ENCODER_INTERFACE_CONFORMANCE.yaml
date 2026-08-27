@@ -1,0 +1,137 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — Mise en conformite d'interface : dossier codeur (FB_Encoder + facade)
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml
+#
+# ⚠️ NE PAS DEMARRER tant que les 2 preconditions ci-dessous ne sont pas levees.
+# ═══════════════════════════════════════════════════════════════════════════
+
+preconditions:                 # bloquantes — verifiees par l'orchestrateur avant delegation
+  - id: PRE1
+    statement: "Decision preset tranchee (A/B/C)."
+    source: "DOC/WFLOW/CONTRACTS/DECISION_ENCODER_PRESET_TRANSACTION.md — section Reponse remplie"
+  - id: PRE2
+    statement: "Chantier #3 livre : socle Fault:ST_Fault + FB_FaultCore documente (AF03 §3, CQS §2quinquies) et G315 reecrit sur la forme cible ST_Fault."
+    source: "commit sur main + G315 vert avec la nouvelle forme"
+
+contract:
+  task_id: LOT_E_ENCODER_INTERFACE_CONFORMANCE
+  criticality: C3
+  strategy: rebuild             # refonte d'interface publique multi-consommateurs
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Aligner la facade FB_Encoder sur les contrats d'interface cibles du projet
+    (contrat standard AF03 avec Fault:ST_Fault a causes nommees, frontiere HW
+    entree/sortie separee, reglages regroupes en Cfg NC-110) sans changer aucune
+    semantique de mesure, de homing ni de securite : seule la FORME de l'interface
+    et la tracabilite des causes de defaut changent.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_Encoder expose `Fault : ST_Fault` rempli par une instance FB_FaultCore alimentee par une liste de causes NOMMEES (ARRAY OF ST_FaultCause) ; plus aucune fusion par OR des ErrorId des sous-FB dans une sortie de statut."
+      verified_by: "grep -n 'ErrorId :=' CODE/E_CODEURS/FB_Encoder.st => aucune ligne avec plusieurs `OR` de sous-instances ; G315 vert sur la forme cible"
+    - id: AC2
+      statement: "La frontiere hardware est separee : entree `HwIn : ST_fbEncoder_HwIn` (RawPos, alarmes, etat esclave, PresetAck/Nak selon PRE1) et sortie `HwOut : ST_fbEncoder_HwOut` (ordres preset). Plus de DUT unique etiquete IN/OUT ni de copie partielle."
+      verified_by: "lecture interface FB_Encoder.st ; G120 : ST_fbEncoder_HwIn/HwOut conformes NC-110"
+    - id: AC3
+      statement: "Les reglages (cibles homing, bornes mecaniques, tolerance coherence, constantes mesure) sont regroupes dans `Cfg : ST_fbEncoder_Cfg` (champ `Initialized : BOOL := FALSE`). `Calib` reste separe en VAR_IN_OUT."
+      verified_by: "G380_check_config_persistence.py vert ; G120 : ST_fbEncoder_Cfg conforme"
+    - id: AC4
+      statement: "`_EncoderCfgPersist : ST_fbEncoder_Cfg` ajoute en FIN de GVL_PERSISTENT.st (jamais insere/deplace au milieu) + pont FB_CfgPersistBridge_fbEncoder_Cfg instancie en PRG_07_Supervision §2."
+      verified_by: "git diff CODE/GVL_PERSISTENT.st (ajout en fin seulement) ; G200 : pont non orphelin"
+    - id: AC5
+      statement: "Le gate de neutralisation (front NOT Enable, sortie anticipee) publie TOUTES les sorties (VAR_OUTPUT + champs HwOut / Measurement), reference maintenue depuis Calib (AF09 §4)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G127_check_neutralization_completeness.py . => FB_Encoder absent de la liste des incomplets"
+    - id: AC6
+      statement: "Aucune valeur de mesure, seuil, polarite, tempo ou logique homing / securite ne change : le diff se limite a la forme d'interface et au remplissage des causes."
+      verified_by: "revue git diff par l'orchestrateur ; tests CI E_CODEURS existants (TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS) au vert sans modification de leurs attendus de valeur"
+    - id: AC7
+      statement: "Ports morts tranches : FwdRevSpeedFeedbackOff / BrakeFeedback de FB_Encoder_Homing soit alimentes par la facade avec une precondition AF09 reelle, soit supprimes. PresetAck / PresetNak selon PRE1."
+      verified_by: "grep sur FB_Encoder_Homing => plus aucun VAR_INPUT non cable ; AF09 §11 mis a jour"
+    - id: AC8
+      statement: "Pour chaque fichier CODE/M_MAIN touche (PRG_02_Acquisition, PRG_07_Supervision) : le nom de fichier reste identique au nom de POU declare, et le suffixe de langage du fichier correspond au langage genere dans le bundle (aucun renommage, aucun changement de langage)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py ; python TOOLS/AGENT_WORKFLOW/scripts/G320_check_bundle_main_coverage.py => PASS"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/E_CODEURS/FB_Encoder.st
+      - CODE/E_CODEURS/FB_Encoder_Abs.st
+      - CODE/E_CODEURS/FB_Encoder_Homing.st
+      - CODE/E_CODEURS/ST_EncoderHw.st          # -> scission ST_fbEncoder_HwIn / ST_fbEncoder_HwOut
+      - CODE/E_CODEURS/ST_EncoderMeasurement.st
+      - CODE/E_CODEURS/ST_fbEncoder_Cfg.st      # nouveau
+      - CODE/E_CODEURS/ST_fbEncoder_HwIn.st     # nouveau
+      - CODE/E_CODEURS/ST_fbEncoder_HwOut.st    # nouveau
+      - CODE/J_SUPERVISION/_BRIDGES/FB_CfgPersistBridge_fbEncoder_Cfg.st   # nouveau
+      - CODE/GVL_PERSISTENT.st                  # ajout _EncoderCfgPersist EN FIN uniquement
+      - CODE/M_MAIN/PRG_02_Acquisition.st       # call-site instEncoderM1/M2 + cablage HwIn/HwOut/Cfg
+      - CODE/M_MAIN/PRG_07_Supervision.st       # instanciation pont §2
+      - CODE/L_SIMULATION/FB_Sim_Encoder.st     # miroir interface
+      - CODE/L_SIMULATION/FB_SimBench.st        # miroir interface
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+      - DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md
+      - TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS/**  # adaptation FORME des fixtures, pas des attendus de valeur
+    forbidden:
+      - PRJ_CODESYS/**                          # Device.export : jamais reference de controle
+      - DOC/STDS/NAMING_CONVENTION.md           # NC-110 deja ecrit, ne pas y retoucher
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md
+      - CODE/E_CODEURS/FB_Encoder_Scale.st      # logique conversion : intouchee
+      - CODE/E_CODEURS/FB_Encoder_Safety.st     # bornage/coherence : intouchee
+      - CODE/E_CODEURS/FB_EncoderReliability.st # gates fiabilite : intouches
+      - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
+
+  # ── 4. Contrat de conservation (strategy = rebuild) ───────────────────────
+  conservation:
+    must_survive:
+      - "Formule d'echelle CablePosM := (RawPos - HomingRefRaw) * CableM_PerRev / PointsPerRev (signee, conversion DINT avant soustraction)."
+      - "3 modes homing (nominal capteur haut / unitaire CfgHomingTarget / dynamique) tous gates par HomingPermit, cible bornee [-99;+99] m avant ecriture."
+      - "Coherence boot F09.03 : ecart RawPos vs Calib.LastKnownRawPos > tolerance -> HomingSuspect, leve uniquement par ConfirmCoherence (front, independant de Reset)."
+      - "EncoderFault := NOT Available OR Incoherent (SANS Homed) ; HomedAndReliable := Available AND Homed AND NOT Incoherent."
+      - "Retard d'un scan sur HomingPermit / HomingRefRaw (accepte, AF09 §8) — ne pas tenter de le corriger."
+      - "Reference ré-exposee depuis Calib quand Enable=FALSE (AF09 §4, deja corrige lot E0)."
+      - "Consommateurs actuels lisent les MEMES faits : PRG_04 (Homed, HomingSuspect, Speed_Mps, Measurement.HomingStatus.Busy), AF06 ST_EncoderMeasurements, FB_Safety_Winch."
+    dropped_on_purpose:
+      - "DUT unique ST_EncoderHw etiquete IN/OUT + copie partielle HwOut (remplace par HwIn/HwOut separes)."
+      - "Fusion OR des ErrorId des sous-FB dans Status (remplace par causes nommees)."
+      - "Selon PRE1 option B : sequence timeout preset + ports PresetAck/PresetNak + CodeSeqTriggerCmd."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage            # bloc "Auto-verification liaison" (G200)
+    - run_all_gates            # palier C complet + G120 + G127 + G315 + G380
+    - bundle                   # CODE_XML/CODE_Bundle.xml regenere
+    - git_diff_review          # diff lu ligne a ligne par l'orchestrateur (AC6)
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Toute incoherence de spec AF09, tout ecart de valeur/seuil constate, tout
+    consommateur non prevu au perimetre, toute tentation d'elargir a FB_Encoder_Scale
+    /Safety/Reliability : STOP et remonter a l'orchestrateur immediatement. La
+    mise en conformite de FORME ne doit jamais deriver en refactor de logique.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING                # bloque par preconditions PRE1 + PRE2
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    (rempli par l'agent en fin de travail)
+  evidence_submitted: []
+
+validation:
+  validated_by: "..."
+  validated_at: "..."
+  verdict: PENDING             # PENDING | ACCEPTED | REJECTED
+  notes: >
+    (visa orchestrateur apres lecture du git diff reel)
