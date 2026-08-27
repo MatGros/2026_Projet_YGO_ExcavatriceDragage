@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 21:29:59</div>
+    <div class="exec-time">2026-08-27 23:12:09</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (3 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-extractionsequence-1">TC-P04-020 Extraction : mise en service sequence extraction</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,12 +206,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            3/3 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 5 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 8 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -224,8 +224,32 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_Status.st</code></td>
+                <td><code>ST_Fault.st</code></td>
                 <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FaultCause.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Lifecycle.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_FaultCore.st</code></td>
+                <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -260,10 +284,10 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_ExtractionSequence</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 27 flux entrants · 14 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_ExtractionSequence</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 23 flux entrants · 11 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instFault <span style="color:var(--muted);font-weight:500;">(FB_FaultCore)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
@@ -271,7 +295,7 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">(10 constantes ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">(6 constantes ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.3);color:#f1f5f9;">Type Global</span></div>
                 </div>
             </summary>
@@ -299,29 +323,13 @@
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.BUSY</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.DISABLED</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.INIT</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.READY</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
             </div></div>
         </details></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_ExtractionSequence</span>
                 
-        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD AF03</span></div>
-        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">✅ Enable + Reset + Ready + Status (ST_Status complet)</div>
+        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(245,158,11,0.18);color:#fbbf24;border:1px solid #d97706;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD (Tolérance T137 Flat)</span></div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">⚠️ Signaux à plat (Reset/Error/Busy/Done) sans ST_Status</div>
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
@@ -330,10 +338,10 @@
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">9</b></div>
-                    <div>• Champs Out : <b style="color:#ffffff;">6</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">10</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">2</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">27 IN</b> / <b style="color:#ffffff;">14 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">23 IN</b> / <b style="color:#ffffff;">11 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -349,37 +357,25 @@
                 <div class="pin-name"><b>Ready</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Fault</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_Fault</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Status</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Status</span> <span style="font-size:11px;color:#a5b4fc;">(6 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Lifecycle</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Lifecycle</span> <span style="font-size:11px;color:#a5b4fc;">(2 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
                 <div style="margin-top:2px;">
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Busy</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Lifecycle</b>.Busy</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Lifecycle</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Done</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Error</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.ErrorId</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.State</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.StateAtError</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Lifecycle</b>.Done</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Lifecycle</span></div>
                 </div></div>
             </details>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
@@ -413,9 +409,102 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 27 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BOTTOMCONFIRMATIONCONSUMED</code> jamais câblé en production</li><li>Pin <code>BOTTOMPOSITIONCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BUCKETBUSY</code> jamais câblé en production</li><li>Pin <code>BUCKETCLOSEREQUEST</code> jamais câblé en production</li><li>Pin <code>BUCKETERROR</code> jamais câblé en production</li><li>Pin <code>BUCKETISCLOSED</code> jamais câblé en production</li><li>Pin <code>CONTROLASCENTDISTANCE_M</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>EXTRACTIONSTATE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>FORCEMINSPEEDSTEP</code> jamais câblé en production</li><li>Pin <code>LIFECYCLE</code> jamais câblé en production</li><li>Pin <code>M1MEASUREDSPEEDVALID</code> jamais câblé en production</li><li>Pin <code>M1POSITION_M</code> jamais câblé en production</li><li>Pin <code>M2MEASUREDSPEEDVALID</code> jamais câblé en production</li><li>Pin <code>M2POSITION_M</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>MOTIONDIRECTION</code> jamais câblé en production</li><li>Pin <code>MOTIONREQUESTACTIVE</code> jamais câblé en production</li><li>Pin <code>OPERATORACTION</code> jamais câblé en production</li><li>Pin <code>OPERATORACTIONID</code> jamais câblé en production</li><li>Pin <code>POSITIONSVALID</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>WINCHSYNCERROR</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MODE <span class="pin-type">IEC_E_MODE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MOTIONREQUESTACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MOTIONDIRECTION <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BOTTOMPOSITIONCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BUCKETISCLOSED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BUCKETBUSY <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BUCKETERROR <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">WINCHSYNCERROR <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1POSITION_M <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2POSITION_M <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1MEASUREDSPEEDVALID <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2MEASUREDSPEEDVALID <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POSITIONSVALID <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CONTROLASCENTDISTANCE_M <span class="pin-type">IEC_REAL</span></div>
+        </div></div>
+            <div class="pin-block">FB_ExtractionSequence</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">LIFECYCLE <span class="pin-type">ST_LIFECYCLE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">EXTRACTIONSTATE <span class="pin-type">IEC_E_EXTRACTIONSEQUENCESTATE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BUCKETCLOSEREQUEST <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">ASCENTPERMIT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">FORCEMINSPEEDSTEP <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BOTTOMCONFIRMATIONCONSUMED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">OPERATORACTIONID <span class="pin-type">IEC_WORD</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">OPERATORACTION <span class="pin-type">IECStringVar&lt;120&gt;</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
-        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 2 FB de la chaine, encapsulation propre (0 violation)</summary>
         
         <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
             <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
@@ -481,63 +570,98 @@
             <tbody>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FaultCore</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_ExtractionSequence</code></td>
-                <td>17</td><td>9</td>
-                <td>0</td><td>4</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>17</td><td>10</td>
+                <td>0</td><td>8</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (8 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-extractionsequence-0" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation standard</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Prete en service</p><p class='comment'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 3 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="212" viewBox="0 0 388 212" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="194" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="206" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="194" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="206" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="194" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="206" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">READY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">OPERATORACTIONID</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="219.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">0</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="273.5" y="148.0" width="21" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">512</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><rect x="331.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="340.0" y="157.0" class="wf-num-changed">0</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>READY</th><th>OPERATORACTIONID</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>512</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (28)</summary>
+        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>MOTIONREQUESTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOTIONDIRECTION</code></td><td>0</td></tr><tr><td><code>BOTTOMPOSITIONCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETISCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1POSITION_M</code></td><td>0</td></tr><tr><td><code>M2POSITION_M</code></td><td>0</td></tr><tr><td><code>M1MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTROLASCENTDISTANCE_M</code></td><td>2</td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIFECYCLE.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EXTRACTIONSTATE</code></td><td>0</td></tr><tr><td><code>BUCKETCLOSEREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ASCENTPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FORCEMINSPEEDSTEP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BOTTOMCONFIRMATIONCONSUMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTROLSTARTM1POSITION_M</code></td><td>0</td></tr><tr><td><code>CONTROLSTARTM2POSITION_M</code></td><td>0</td></tr><tr><td><code>ERRORCAUSEPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETERRORFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SYNCORSPEEDERRORFAULT</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-extractionsequence-0" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
-            </header>
-            
-            
-            
-            
-        </article>
         <article id="test-fb-extractionsequence-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
+                <h3>TC-P04-020 Extraction : mise en service sequence extraction </h3>
             </header>
+            <div class="comments"><p class='comment'>Demande de mouvement de fermeture</p><p class='comment'>Scan dans CLOSING_BUCKET : demande fermeture active</p><p class='comment'>Confirmation benne fermee : passe en remontee controlee</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>Sequence Extraction prete</li><li>Pret a fermer la benne</li><li>Passe en fermeture benne</li><li>Demande fermeture benne active</li><li>Sequence en cours -&gt; Busy</li><li>Permis montee actif en remontee controlee</li></ul></details>
             
             
-            
-            
-        </article>
-        <article id="test-fb-extractionsequence-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
-            </header>
-            
-            
-            
-            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (5 scans, 11 variables actives)</summary>
+            <div class="wf-scroll"><svg width="500" height="532" viewBox="0 0 500 532" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="514" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="526" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="514" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="526" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="514" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="526" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="514" class="wf-grid"/><text x="396.0" y="52" class="wf-time">30ms</text><text x="396.0" y="526" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="514" class="wf-grid"/><text x="452.0" y="52" class="wf-time">40ms</text><text x="452.0" y="526" class="wf-scan">#4</text><text x="182" y="86.0" class="wf-label">MOTIONREQUESTACTIVE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L368,68L424,68L480,68" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">MOTIONDIRECTION</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="219.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">0</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><rect x="275.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="284.0" y="117.0" class="wf-num-changed">1</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><text x="340.0" y="116.0" class="wf-num">1</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><text x="396.0" y="116.0" class="wf-num">1</text><line x1="424" y1="122.0" x2="480" y2="122.0" class="wf-num-line"/><text x="452.0" y="116.0" class="wf-num">1</text><text x="182" y="166.0" class="wf-label">BUCKETISCLOSED</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L312,174L368,174L368,174L368,148L424,148L480,148" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">LIFECYCLE.BUSY</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L312,214L312,214L312,188L368,188L424,188L480,188" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">EXTRACTIONSTATE</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><line x1="200" y1="242.0" x2="256" y2="242.0" class="wf-num-line"/><rect x="219.0" y="228.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="228.0" y="237.0" class="wf-num-changed">1</text><line x1="256" y1="242.0" x2="312" y2="242.0" class="wf-num-line"/><rect x="275.0" y="228.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="284.0" y="237.0" class="wf-num-changed">2</text><line x1="312" y1="242.0" x2="368" y2="242.0" class="wf-num-line"/><text x="340.0" y="236.0" class="wf-num">2</text><line x1="368" y1="242.0" x2="424" y2="242.0" class="wf-num-line"/><rect x="387.0" y="228.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="396.0" y="237.0" class="wf-num-changed">3</text><line x1="424" y1="242.0" x2="480" y2="242.0" class="wf-num-line"/><text x="452.0" y="236.0" class="wf-num">3</text><text x="182" y="286.0" class="wf-label">BUCKETCLOSEREQUEST</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><path d="M200,294L256,294L312,294L312,294L312,268L368,268L424,268L424,268L424,294L480,294" class="wf-line" stroke="#1d4ed8"/><text x="182" y="326.0" class="wf-label">ASCENTPERMIT</text><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><path d="M200,334L256,334L312,334L368,334L424,334L424,334L424,308L480,308" class="wf-line" stroke="#2563eb"/><text x="182" y="366.0" class="wf-label">FORCEMINSPEEDSTEP</text><circle cx="192" cy="362.0" r="4" fill="#059669"/><path d="M200,374L256,374L312,374L368,374L424,374L424,374L424,348L480,348" class="wf-line" stroke="#059669"/><text x="182" y="406.0" class="wf-label">BOTTOMCONFIRMATIONCONSUMED</text><circle cx="192" cy="402.0" r="4" fill="#0891b2"/><path d="M200,414L256,414L256,414L256,388L312,388L312,388L312,414L368,414L424,414L480,414" class="wf-line" stroke="#0891b2"/><text x="182" y="446.0" class="wf-label">OPERATORACTIONID</text><circle cx="192" cy="442.0" r="4" fill="#65a30d"/><line x1="200" y1="442.0" x2="256" y2="442.0" class="wf-num-line"/><rect x="219.0" y="428.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="437.0" class="wf-num-changed">0</text><line x1="256" y1="442.0" x2="312" y2="442.0" class="wf-num-line"/><rect x="273.5" y="428.0" width="21" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="437.0" class="wf-num-changed">513</text><line x1="312" y1="442.0" x2="368" y2="442.0" class="wf-num-line"/><rect x="329.5" y="428.0" width="21" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="340.0" y="437.0" class="wf-num-changed">514</text><line x1="368" y1="442.0" x2="424" y2="442.0" class="wf-num-line"/><text x="396.0" y="436.0" class="wf-num">514</text><line x1="424" y1="442.0" x2="480" y2="442.0" class="wf-num-line"/><rect x="441.5" y="428.0" width="21" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="452.0" y="437.0" class="wf-num-changed">515</text><text x="182" y="486.0" class="wf-label">SYNCORSPEEDERRORFAULT</text><circle cx="192" cy="482.0" r="4" fill="#dc2626"/><path d="M200,494L256,494L312,494L368,494L424,494L424,494L424,468L480,468" class="wf-line" stroke="#dc2626"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (5 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>MOTIONREQUESTACTIVE</th><th>MOTIONDIRECTION</th><th>BUCKETISCLOSED</th><th>LIFECYCLE.BUSY</th><th>EXTRACTIONSTATE</th><th>BUCKETCLOSEREQUEST</th><th>ASCENTPERMIT</th><th>FORCEMINSPEEDSTEP</th><th>BOTTOMCONFIRMATIONCONSUMED</th><th>OPERATORACTIONID</th><th>SYNCORSPEEDERRORFAULT</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>1</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>1</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>2</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>513</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td><span class="v-true">TRUE</span></td><td>1</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td>2</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>514</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>30 ms</td><td><span class="v-true">TRUE</span></td><td>1</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'>3</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>514</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>40 ms</td><td><span class="v-true">TRUE</span></td><td>1</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td>3</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>515</td><td class='changed'><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (20)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>BOTTOMPOSITIONCONFIRMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUCKETBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1POSITION_M</code></td><td>0</td></tr><tr><td><code>M2POSITION_M</code></td><td>0</td></tr><tr><td><code>M1MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTROLASCENTDISTANCE_M</code></td><td>2</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONTROLSTARTM1POSITION_M</code></td><td>0</td></tr><tr><td><code>CONTROLSTARTM2POSITION_M</code></td><td>0</td></tr><tr><td><code>ERRORCAUSEPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETERRORFAULT</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (5)</summary>
-        <ul><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Status.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li></ul>
+        <summary>Fichiers source compilés (8)</summary>
+        <ul><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (5)</summary>
+        <summary>Code source ST original (8)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
@@ -562,39 +686,163 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Status.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Fault.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_Status — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
-      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_Status (exception documentée).
+   🎯 Rôle : porter l&#x27;état défaut d&#x27;un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu&#x27;au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l&#x27;acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_Fault :
+STRUCT
+    Error     : BOOL;   (* &lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant *)
+    ErrorId   : WORD;    (* &lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune) *)
+    Latched   : BOOL;    (* &lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu&#x27;au front Reset *)
+    LatchedId : WORD;    (* &lt;-- [DIAG] ErrorId figé à l&#x27;apparition du défaut, effacé au Reset *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_FaultCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n&#x27;alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FaultCause :
+STRUCT
+    Active   : BOOL;    (* 1 = cause présente maintenant (interlock sur cette valeur) *)
+    Latching : BOOL;    (* 1 = cause à acquitter (arme Latched) ; 0 = live seulement *)
+    Texte    : STRING;  (* libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM) *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Lifecycle.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d&#x27;exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l&#x27;avancement d&#x27;une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    ======================================================================= *)
 
-TYPE ST_Status :
+TYPE ST_Lifecycle :
 STRUCT
-    (* ---- membres historiques (conservés) ---- *)
-    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
-    Done         : BOOL;    (* 1 = Action terminée avec succès *)
-    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
-    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
-    State        : E_State; (* État courant de la machine d&#x27;état *)
-    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
-    (* ---- membres ajoutés (forme cible enrichie) ---- *)
-    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
-    WarningId      : WORD;  (* Code warning courant (bitfield) *)
-    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
-    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
-    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
+    Busy : BOOL;   (* &lt;-- [STAT] 1 = action en cours *)
+    Done : BOOL;   (* &lt;-- [STAT] 1 = action terminée avec succès *)
 END_STRUCT
 END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FaultCore.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d&#x27;une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l&#x27;apparition d&#x27;une
+          cause `Active AND Latching`, conservé jusqu&#x27;au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d&#x27;effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FaultCore
+VAR_INPUT
+    Enable  : BOOL;                          // --&gt; [CMD] Autorisation générale du FB porteur
+    Reset   : BOOL;                          // --&gt; [CMD] Front d&#x27;acquittement (jamais conditionné, §9)
+    Causes  : ARRAY[0..15] OF ST_FaultCause; // --&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)
+END_VAR
+VAR_OUTPUT
+    Ready   : BOOL;                          // &lt;-- [STAT] FB porteur autorisé (= Enable)
+    Fault   : ST_Fault;                      // &lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)
+END_VAR
+VAR
+    ResetEdge : R_TRIG;                      // . [LOC] Front montant Reset
+    Latch     : ARRAY[0..15] OF BOOL;        // . [LOC] Bit laté par cause, jusqu&#x27;au Reset
+    i         : INT;                         // . [LOC] Index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Reset (front, toujours effectif)&quot;}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§2 Vue LIVE — Error / ErrorId&quot;}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region &quot;§3 Armement des latches (causes à acquitter)&quot;}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu&#x27;au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§4 Vue LATCHÉE — Latched / LatchedId&quot;}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+
+END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
@@ -672,10 +920,10 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; DEFECTUOSITES ===
-    Ready                       : BOOL;     // &lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_Status)
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0:fond ; bit1:ferme ; bit2:ctrl ; bit3:cfg.
-    Status                      : ST_Status; // &lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
+    Ready                       : BOOL;     // &lt;-- [STAT] FB pret a fonctionner
+    // 🧩 Statut transverse (forme cible ST_Fault + ST_Lifecycle)
+    Fault                       : ST_Fault;
+    Lifecycle                   : ST_Lifecycle;
     ExtractionState             : E_ExtractionSequenceState; // &lt;-- [STAT] Phase interne extraction
 
     // === ORDRES &amp; AUTORISATIONS ===
@@ -698,51 +946,78 @@ VAR
 
     // === VARIABLES LOCALES INTERNES ===
     ErrorCausePresent           : BOOL;     // . [LOC] Presence d&#x27;une cause de defaut parametrage
+    BucketErrorFault            : BOOL;     // . [LOC] Latch erreur benne
+    SyncOrSpeedErrorFault       : BOOL;     // . [LOC] Latch erreur synchro/vitesse
+
+    // === SOCLE DEFAUT ===
+    instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
+    instCauses                  : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 END_VAR
 
-{region &quot;§1 Gate desactivation&quot;}
-IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
-    BottomConfirmationConsumed := FALSE;
-    Status.State := E_State.DISABLED;
-    Status.StateAtError := E_State.DISABLED;
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0);
+
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
+    BucketErrorFault := FALSE;
+    SyncOrSpeedErrorFault := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-    OperatorActionId := 0; OperatorAction := &#x27;&#x27;;
+END_IF;
+
+instCauses[1].Active   := BucketErrorFault;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := &#x27;Defaut sous-systeme benne pendant fermeture&#x27;;
+
+instCauses[2].Active   := SyncOrSpeedErrorFault;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := &#x27;Defaut synchro ou capteurs treuils pendant remontee&#x27;;
+
+instCauses[3].Active   := ErrorCausePresent;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := &#x27;Parametrage distance de controle invalide&#x27;;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Ready := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    BucketCloseRequest := FALSE;
+    AscentPermit := FALSE;
+    ForceMinSpeedStep := FALSE;
+    BottomConfirmationConsumed := FALSE;
+    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    OperatorActionId := 0;
+    OperatorAction := &#x27;&#x27;;
     RETURN;
 END_IF;
 
-{endregion}
-
-{region &quot;§2 Preconditions reset et initialisation sorties&quot;}
-ResetEdge(CLK := Reset);
-ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0);
-IF ErrorCausePresent THEN
-    Status.ErrorId := Status.ErrorId OR 16#0008;
-END_IF;
-IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
-    Status.ErrorId := 16#0000;
-    Status.StateAtError := E_State.DISABLED;
-    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-END_IF;
-
-Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
-BottomConfirmationConsumed := FALSE;
-OperatorActionId := 0; OperatorAction := &#x27;&#x27;;
-
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region &quot;§3 Machine etat fermeture remontee&quot;}
-IF Status.ErrorId &lt;&gt; 16#0000 THEN
-    Status.State := E_State.READY;
+BucketCloseRequest := FALSE;
+AscentPermit := FALSE;
+ForceMinSpeedStep := FALSE;
+BottomConfirmationConsumed := FALSE;
+Lifecycle.Busy := FALSE;
+Lifecycle.Done := FALSE;
+
+IF Fault.Error THEN
     ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
     OperatorActionId := 16#0280;
     OperatorAction := &#x27;Vérifier la benne et les treuils puis réarmer avant de reprendre.&#x27;;
 ELSE
     CASE ExtractionState OF
         E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION:
-            Status.State := E_State.INIT;
             IF BottomPositionConfirmed THEN
                 ExtractionState := E_ExtractionSequenceState.READY_TO_CLOSE;
             ELSE
@@ -751,7 +1026,6 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.READY_TO_CLOSE:
-            Status.State := E_State.READY;
             Ready := TRUE;
             OperatorActionId := 16#0201;
             OperatorAction := &#x27;Demander la montée pour fermer la benne.&#x27;;
@@ -761,14 +1035,12 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.CLOSING_BUCKET:
-            Status.State := E_State.BUSY;
-            Status.Busy := TRUE;
+            Lifecycle.Busy := TRUE;
             BucketCloseRequest := MotionRequestActive AND (MotionDirection = 1);
             OperatorActionId := 16#0202;
             OperatorAction := &#x27;Maintenir la montée : fermeture de la benne en cours.&#x27;;
             IF BucketError THEN
-                Status.ErrorId := Status.ErrorId OR 16#0002;
-                Status.StateAtError := Status.State;
+                BucketErrorFault := TRUE;
             ELSIF BucketIsClosed AND NOT BucketBusy THEN
                 ControlStartM1Position_M := M1Position_M;
                 ControlStartM2Position_M := M2Position_M;
@@ -776,39 +1048,34 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.CONTROL_ASCENT:
-            Status.State := E_State.BUSY;
-            Status.Busy := TRUE;
+            Lifecycle.Busy := TRUE;
             AscentPermit := MotionRequestActive AND (MotionDirection = 1);
             ForceMinSpeedStep := TRUE;
             OperatorActionId := 16#0203;
             OperatorAction := &#x27;Maintenir la montée : contrôle charge au palier minimal.&#x27;;
             IF WinchSyncError OR NOT PositionsValid OR NOT M1MeasuredSpeedValid OR NOT M2MeasuredSpeedValid THEN
-                Status.ErrorId := Status.ErrorId OR 16#0004;
-                Status.StateAtError := Status.State;
+                SyncOrSpeedErrorFault := TRUE;
             ELSIF (M1Position_M &gt;= (ControlStartM1Position_M + ControlAscentDistance_M))
                AND (M2Position_M &gt;= (ControlStartM2Position_M + ControlAscentDistance_M)) THEN
                 ExtractionState := E_ExtractionSequenceState.NOMINAL_ASCENT;
             END_IF;
 
         E_ExtractionSequenceState.NOMINAL_ASCENT:
-            Status.State := E_State.BUSY;
-            Status.Busy := TRUE;
+            Lifecycle.Busy := TRUE;
             AscentPermit := MotionRequestActive AND (MotionDirection = 1);
             OperatorActionId := 16#0204;
             OperatorAction := &#x27;Maintenir la montée : extraction en cours.&#x27;;
             IF WinchSyncError OR NOT PositionsValid THEN
-                Status.ErrorId := Status.ErrorId OR 16#0004;
-                Status.StateAtError := Status.State;
+                SyncOrSpeedErrorFault := TRUE;
             END_IF;
 
         E_ExtractionSequenceState.ERROR_HOLD:
-            Status.State := E_State.READY;
+            ;
     END_CASE;
 END_IF;
-
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-
 {endregion}
+
+END_FUNCTION_BLOCK
 </pre>
             </details>
     </details>
@@ -817,17 +1084,11 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
         <pre>STruC++ Test Runner v1.0
 
 test_fb_extractionsequence.st
-         ASSERT_TRUE failed: FB.READY expected TRUE, got FALSE
-         at test_fb_extractionsequence.st:16
-         Message: Enable=TRUE -&gt; Ready=TRUE (nominal)
-  [FAIL] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
-         ASSERT_TRUE failed: FB.READY expected TRUE, got FALSE
-         at test_fb_extractionsequence.st:27
-         Message: Sequence Extraction prete
-  [FAIL] TC-P04-020 Extraction : mise en service sequence extraction
+  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  [PASS] TC-P04-020 Extraction : mise en service sequence extraction
 
 -----------------------------------------
-2 tests, 0 passed, 2 failed
+2 tests, 2 passed, 0 failed
 </pre>
     </details>
 </div>

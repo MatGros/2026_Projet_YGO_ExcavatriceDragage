@@ -54,9 +54,11 @@ FB_Joystick:
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
     - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
+    - CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st
     - CODE/D_JOYSTICK/FB_AxisScale.st
     - CODE/D_JOYSTICK/FB_Joystick.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/D_JOYSTICK/tests/test_fb_joystick.st
@@ -89,8 +91,10 @@ FB_Brake:
   domain: A_COMMUN
   sources:
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/A_COMMUN/FB_Brake.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_brake.st
 
@@ -139,7 +143,9 @@ FB_Modes:
   domain: F_MODES
   sources:
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/F_MODES/FB_Modes.st
@@ -148,6 +154,11 @@ FB_Modes:
 FB_Cycle:
   domain: G_CYCLE
   sources:
+    - CODE/A_COMMUN/_TYPES/E_State.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_WinchCmdDemand.st
@@ -160,7 +171,10 @@ FB_DiveSearch:
   domain: G_CYCLE
   sources:
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
     - CODE/G_CYCLE/FB_DiveSearch.st
@@ -170,7 +184,10 @@ FB_ExtractionSequence:
   domain: G_CYCLE
   sources:
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
     - CODE/G_CYCLE/FB_ExtractionSequence.st
@@ -181,8 +198,10 @@ FB_Winch:
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/A_COMMUN/FB_CycleTime.st
     - CODE/A_COMMUN/FB_Brake.st
     - CODE/F_MODES/E_Mode.st
@@ -196,13 +215,14 @@ FB_Winch:
     - CODE/H_TREUILS_BENNE/FB_Winch.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st
 
-
-
 FB_Bucket:
   domain: H_TREUILS_BENNE
   sources:
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketConfig.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketState.st
@@ -213,8 +233,10 @@ FB_Translation:
   domain: I_TRANSLATION
   sources:
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/A_COMMUN/FB_CycleTime.st
     - CODE/A_COMMUN/FB_Ramp.st
     - CODE/A_COMMUN/FB_Brake.st
@@ -230,9 +252,11 @@ FB_SimBench:
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/A_COMMUN/FB_CycleTime.st
     - CODE/A_COMMUN/FB_Ramp.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st
@@ -240,6 +264,12 @@ FB_SimBench:
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
     - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
+    - CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st
+    - CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st
+    - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
+    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
@@ -342,15 +372,20 @@ FB_Hmi_BannerFormatter:
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
     - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
+    - CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st
+    - CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
@@ -453,9 +488,11 @@ PRG_02_Acquisition:
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/A_COMMUN/FB_CycleTime.st
     - CODE/A_COMMUN/FB_Ramp.st
     - CODE/A_COMMUN/FB_Acquisition_Preflight.st
@@ -465,8 +502,13 @@ PRG_02_Acquisition:
     - CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st
     - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
+    - CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st
     - CODE/D_JOYSTICK/FB_AxisScale.st
     - CODE/D_JOYSTICK/FB_Joystick.st
+    - CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
     - CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
@@ -495,9 +537,11 @@ PRG_03_Modes_Cycle:
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/A_COMMUN/FB_CycleTime.st
     - CODE/A_COMMUN/FB_Ramp.st
     - CODE/A_COMMUN/FB_Acquisition_Preflight.st
@@ -524,15 +568,20 @@ PRG_04_Treuils_Benne:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/A_COMMUN/FB_CycleTime.st
     - CODE/A_COMMUN/FB_Ramp.st
     - CODE/A_COMMUN/FB_Acquisition_Preflight.st
     - CODE/A_COMMUN/FB_Filter.st
     - CODE/A_COMMUN/FB_Brake.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
+    - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
+    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
     - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
@@ -576,15 +625,20 @@ PRG_05_Translation:
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/A_COMMUN/FB_CycleTime.st
     - CODE/A_COMMUN/FB_Ramp.st
     - CODE/A_COMMUN/FB_Acquisition_Preflight.st
     - CODE/A_COMMUN/FB_Filter.st
     - CODE/A_COMMUN/FB_Brake.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
+    - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
+    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/F_MODES/E_Mode.st
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
     - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
@@ -608,9 +662,11 @@ PRG_06_Outputs:
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
     - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
@@ -638,9 +694,11 @@ PRG_07_Supervision:
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
@@ -686,9 +744,11 @@ MAIN_GLOBAL:
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/_TYPES/E_State.st
-    - CODE/A_COMMUN/_TYPES/ST_Status.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/A_COMMUN/FB_CycleTime.st
 
     - CODE/A_COMMUN/FB_Ramp.st
@@ -701,8 +761,13 @@ MAIN_GLOBAL:
     - CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st
     - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
+    - CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st
     - CODE/D_JOYSTICK/FB_AxisScale.st
     - CODE/D_JOYSTICK/FB_Joystick.st
+    - CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st
+    - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
     - CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st

@@ -71,8 +71,10 @@ VAR
     diagEcatDev           : ST_Diag_Device;
     calibM1               : ST_Encoder_Calib;
     calibM2               : ST_Encoder_Calib;
-    hwM1                  : ST_EncoderHw;
-    hwM2                  : ST_EncoderHw;
+    HwInM1                : ST_fbEncoder_HwIn;
+    HwInM2                : ST_fbEncoder_HwIn;
+    encoderCfg            : ST_fbEncoder_Cfg;
+    joyCfg                : ST_fbJoystick_Cfg;
     nxMem                 : INT := 5000;
     nyMem                 : INT := 5000;
     calibInit             : BOOL := FALSE;
@@ -80,6 +82,10 @@ END_VAR
 
 {region "Corps d'exécution PRG_02 encapsulé"}
 IF NOT calibInit THEN
+    joyCfg.NeutralHoldTime := T#50ms;
+    joyCfg.DeadmanArmHoldTime := T#50ms;
+    joyCfg.DeadmanArmGraceTime := T#3s;
+    joyCfg.DeadbandRaw := 300;
     calibM1.Homed := TRUE;
     calibM1.HomingRefRaw := 1000000;
     calibM1.LastKnownRawPos := 1008192;
@@ -119,51 +125,50 @@ instJoystick(
     RawX := JoyRawX,
     RawY := JoyRawY,
     RawButton := JoyBtnRaw,
-    NeutralHoldTime := T#50ms,
-    DeadmanArmHoldTime := T#50ms,
-    DeadmanArmGraceTime := T#3s,
-    DeadbandRaw := 300,
+    Cfg := joyCfg,
     NeutralXMem := nxMem,
     NeutralYMem := nyMem
 );
 
 
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
-Data.JoystickXNeutral     := instJoystick.AxisCmdX.AtNeutral;
-Data.JoystickYNeutral     := instJoystick.AxisCmdY.AtNeutral;
-Data.JoystickDirectionX   := instJoystick.DirectionX;
-Data.JoystickSpeedPctX    := instJoystick.AxisCmdX.SpeedTgt;
+Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
+Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
+Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
+Data.JoystickSpeedPctX    := ABS(instJoystick.AxisCmdX.SpeedTgt);
 
 
 // 3. Traitement Codeurs Treuils M1 / M2
-hwM1.RawPosIn := COD1_PosValue;
-hwM1.SlaveOperational := EcatOperational;
+HwInM1.RawPosIn := COD1_PosValue;
+HwInM1.SlaveOperational := EcatOperational;
 instEncoderM1(
     Enable := TRUE,
     Reset := BtnReset_IHM,
     HomingPermit := TRUE,
     TopPositionSensor := TRUE,
-    Hw := hwM1,
+    HwIn := HwInM1,
     PointsPerRev := 8192,
     CableM_PerRev := 2.0,
     BypassGlobal := FALSE,
+    Cfg := encoderCfg,
     Calib := calibM1
 );
 Data.Encoders.M1            := instEncoderM1.Measurement;
 Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
 Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
 
-hwM2.RawPosIn := COD2_PosValue;
-hwM2.SlaveOperational := EcatOperational;
+HwInM2.RawPosIn := COD2_PosValue;
+HwInM2.SlaveOperational := EcatOperational;
 instEncoderM2(
     Enable := TRUE,
     Reset := BtnReset_IHM,
     HomingPermit := TRUE,
     TopPositionSensor := TRUE,
-    Hw := hwM2,
+    HwIn := HwInM2,
     PointsPerRev := 8192,
     CableM_PerRev := 2.0,
     BypassGlobal := FALSE,
+    Cfg := encoderCfg,
     Calib := calibM2
 );
 

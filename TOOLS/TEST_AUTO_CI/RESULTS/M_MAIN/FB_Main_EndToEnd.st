@@ -96,8 +96,8 @@ BusWinch := prg04.Data;
 prg05(
     AcqData                 := BusAcq,
     ModesAuth               := BusModes,
-    WinchM1CablePosM        := BusAcq.CablePosM1,
-    WinchM2CablePosM        := BusAcq.CablePosM2,
+    WinchM1CablePosM        := BusAcq.Encoders.M1.CablePosM,
+    WinchM2CablePosM        := BusAcq.Encoders.M2.CablePosM,
     PowerContactorEngaged   := PowerContactorEngaged,
     EmergencyChainClosed    := EmergencyChainClosed,
     BrakeFeedbackOpen       := FALSE,

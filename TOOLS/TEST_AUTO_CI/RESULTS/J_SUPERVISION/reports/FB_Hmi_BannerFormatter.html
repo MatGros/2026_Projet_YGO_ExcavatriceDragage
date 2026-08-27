@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 12:59:55</div>
+    <div class="exec-time">2026-08-27 23:12:13</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (5 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-0">PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-1">PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-2">PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-3">PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-4">PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)</a></li></ul>
+        <summary>📋 Sommaire (8 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-1">TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-2">TC-P07-010 AntiFlickerText : affichage instantane force</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-3">TC-P07-020 RootCause : alarme fille visible quand materiel sain</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-4">TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-5">TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-6">TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-7">TC-P07-024 Priorite absolue AU sur defaut module E/S</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,12 +206,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/5 vérifications validées
+            8/8 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 106 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 111 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -232,7 +232,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_FbStatus.st</code></td>
+                <td><code>ST_Fault.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -240,7 +240,15 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_FbCause.st</code></td>
+                <td><code>ST_FaultCause.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Lifecycle.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -250,6 +258,14 @@
             <tr class="compil-row-pass">
                 <td><code>ST_ContactorCheck.st</code></td>
                 <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_FaultCore.st</code></td>
+                <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -296,7 +312,31 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_Joystick_AxisCmd.st</code></td>
+                <td><code>ST_fbJoystick_AxisCmd.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbJoystick_Cfg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_PresetConfirmMode.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbEncoder_Cfg.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -1173,9 +1213,174 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 51 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ALARMHOLDTIME</code> jamais câblé en production</li><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BANNER</code> jamais câblé en production</li><li>Pin <code>BOTHAXESCOUPLED</code> jamais câblé en production</li><li>Pin <code>BUCKETERRORID</code> jamais câblé en production</li><li>Pin <code>BUCKETISCLOSED</code> jamais câblé en production</li><li>Pin <code>BUCKETISOPEN</code> jamais câblé en production</li><li>Pin <code>BYPASSGLOBALACTIVE</code> jamais câblé en production</li><li>Pin <code>BYPASSSYNCACTIVE</code> jamais câblé en production</li><li>Pin <code>BYPASSTRANSLATION</code> jamais câblé en production</li><li>Pin <code>BYPASSWINCHM1ACTIVE</code> jamais câblé en production</li><li>Pin <code>BYPASSWINCHM2ACTIVE</code> jamais câblé en production</li><li>Pin <code>COUPLEDUSERREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>CURRENTMODE</code> jamais câblé en production</li><li>Pin <code>CYCLEAUTOBUSY</code> jamais câblé en production</li><li>Pin <code>CYCLEERRORID</code> jamais câblé en production</li><li>Pin <code>CYCLEREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>CYCLESTATESTR</code> jamais câblé en production</li><li>Pin <code>CYCLESTEP</code> jamais câblé en production</li><li>Pin <code>CYCLESTEPATERROR</code> jamais câblé en production</li><li>Pin <code>DEADMANARMED</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIVEACTIVE</code> jamais câblé en production</li><li>Pin <code>DIVEERRORID</code> jamais câblé en production</li><li>Pin <code>DIVESTATE</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMINGFAILED</code> jamais câblé en production</li><li>Pin <code>EMERGENCYCHAINCLOSED</code> jamais câblé en production</li><li>Pin <code>EMERGENCYERRORID</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>EXTRACTIONERRORID</code> jamais câblé en production</li><li>Pin <code>EXTRACTIONSTATE</code> jamais câblé en production</li><li>Pin <code>HOMINGACTIVE</code> jamais câblé en production</li><li>Pin <code>HOMINGSTEPM1</code> jamais câblé en production</li><li>Pin <code>HOMINGSTEPM2</code> jamais câblé en production</li><li>Pin <code>JOYSTICKATNEUTRAL</code> jamais câblé en production</li><li>Pin <code>LEGALLIMITREACHED</code> jamais câblé en production</li><li>Pin <code>M1LOGICREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>M2LOGICREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>NETWORK</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFFACTIVEANY</code> jamais câblé en production</li><li>Pin <code>REDUNDANCYTESTFAILED</code> jamais câblé en production</li><li>Pin <code>SAFESTOPACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMULATIONMODEACTIVE</code> jamais câblé en production</li><li>Pin <code>SYNCDEGRADEDACTIVE</code> jamais câblé en production</li><li>Pin <code>SYNCERRORID</code> jamais câblé en production</li><li>Pin <code>TOPLIMITREACHED</code> jamais câblé en production</li><li>Pin <code>TRANSLATIONSAFETY</code> jamais câblé en production</li><li>Pin <code>WINCHM1SAFETY</code> jamais câblé en production</li><li>Pin <code>WINCHM2SAFETY</code> jamais câblé en production</li><li>Pin <code>WINCHSELECTED</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SIMULATIONMODEACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CURRENTMODE <span class="pin-type">IEC_E_MODE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BOTHAXESCOUPLED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">WINCHSELECTED <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CYCLESTEP <span class="pin-type">IEC_E_CYCLESTEP</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CYCLESTATESTR <span class="pin-type">IECStringVar&lt;80&gt;</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CYCLEERRORID <span class="pin-type">IEC_WORD</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CYCLESTEPATERROR <span class="pin-type">IEC_E_CYCLESTEP</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DIVESTATE <span class="pin-type">IEC_E_DIVESEARCHSTATE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">EXTRACTIONSTATE <span class="pin-type">IEC_E_EXTRACTIONSEQUENCESTATE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMINGACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMINGSTEPM1 <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMINGSTEPM2 <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSGLOBALACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSWINCHM1ACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSWINCHM2ACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSTRANSLATION <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSSYNCACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SYNCDEGRADEDACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">LEGALLIMITREACHED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">EMERGENCYCHAINCLOSED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POWERCUTOFFACTIVEANY <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SAFESTOPACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DESCENDPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ASCENTPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BUCKETISOPEN <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BUCKETISCLOSED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DIVEACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TOPLIMITREACHED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">COUPLEDUSERREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1LOGICREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2LOGICREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CYCLEREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DEADMANARMED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">JOYSTICKATNEUTRAL <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CYCLEAUTOBUSY <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">WINCHM1SAFETY <span class="pin-type">ST_SAFETYWINCH</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">WINCHM2SAFETY <span class="pin-type">ST_SAFETYWINCH</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TRANSLATIONSAFETY <span class="pin-type">ST_SAFETYTRANSLATION</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BUCKETERRORID <span class="pin-type">IEC_WORD</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SYNCERRORID <span class="pin-type">IEC_WORD</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DIVEERRORID <span class="pin-type">IEC_WORD</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">EXTRACTIONERRORID <span class="pin-type">IEC_WORD</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">EMERGENCYERRORID <span class="pin-type">IEC_WORD</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">REDUNDANCYTESTFAILED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">EMERGENCYARMINGFAILED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ALARMHOLDTIME <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">NETWORK <span class="pin-type">ST_NETWORKDIAGHMI</span></div>
+        </div></div>
+            <div class="pin-block">FB_Hmi_BannerFormatter</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BANNER <span class="pin-type">ST_HMIBANNER</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
-        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 2 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 3 FB de la chaine, encapsulation propre (0 violation)</summary>
         
         <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
             <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
@@ -1241,6 +1446,13 @@
             <tbody>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FaultCore</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_AntiFlickerText</code></td>
                 <td>3</td><td>1</td>
                 <td>0</td><td>1</td>
@@ -1256,75 +1468,105 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-hmi-bannerformatter-0" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Demarrage boot</p><p class='comment'>Scan 2 : Formatage actif post-boot</p><p class='comment'>Scan 3 : Enable=FALSE -&gt; Re-neutralisation</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; texte vide</li><li>Enable=TRUE -&gt; non vide (nominal)</li><li>Coupure -&gt; retombe a texte vide</li></ul></details>
+            
+            
+        </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 7 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-hmi-bannerformatter-0" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires) </h3>
-            </header>
-            
-            
-            
-            
-        </article>
         <article id="test-fb-hmi-bannerformatter-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance) </h3>
+                <h3>TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM </h3>
             </header>
             
-            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>GlobalContextText non vide</li></ul></details>
             
             
         </article>
         <article id="test-fb-hmi-bannerformatter-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives) </h3>
+                <h3>TC-P07-010 AntiFlickerText : affichage instantane force </h3>
             </header>
             
-            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Texte instantane</li></ul></details>
             
             
         </article>
         <article id="test-fb-hmi-bannerformatter-3" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1 </h3>
+                <h3>TC-P07-020 RootCause : alarme fille visible quand materiel sain </h3>
             </header>
             
-            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Alarme presente</li><li>1 alarme au carrousel</li><li>Alarme fille correctement affichee</li><li>Tableau AlarmArray[0] correctement rempli</li></ul></details>
             
             
         </article>
         <article id="test-fb-hmi-bannerformatter-4" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale) </h3>
+                <h3>TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary><ul class="checks-list"><li>Alarme presente</li><li>1 alarme (parent seul)</li><li>Alarme parente affichee</li><li>AlarmArray[0] porte le parent</li><li>Consigne operateur cible la panne materielle</li></ul></details>
             
+            
+        </article>
+        <article id="test-fb-hmi-bannerformatter-5" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Alarme presente</li><li>1 alarme (parent seul)</li><li>Alarme parente VH0800</li></ul></details>
+            
+            
+        </article>
+        <article id="test-fb-hmi-bannerformatter-6" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Alarme presente</li><li>1 alarme (parent seul)</li><li>Alarme parente codeur M1</li><li>Action operateur codeurs</li></ul></details>
+            
+            
+        </article>
+        <article id="test-fb-hmi-bannerformatter-7" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P07-024 Priorite absolue AU sur defaut module E/S </h3>
+            </header>
+            
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>AU domine le defaut E/S</li></ul></details>
             
             
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (106)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/A_COMMUN/ST_FbCause.st</code></li><li><code>CODE/A_COMMUN/ST_ContactorCheck.st</code></li><li><code>CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st</code></li><li><code>CODE/B_AU_SECURITE/ST_Safety_Emergency_State.st</code></li><li><code>CODE/B_AU_SECURITE/ST_Safety_Emergency_Diag.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/D_JOYSTICK/ST_Joystick_AxisCmd.st</code></li><li><code>CODE/E_CODEURS/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/ST_EncoderMeasurement.st</code></li><li><code>CODE/E_CODEURS/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/ST_BucketConfig.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/ST_BucketState.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinchSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchBenneHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_BypassTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_ChainTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_PreflightHMI.st</code></li><li><code>CODE/J_SUPERVISION/FB_AntiFlickerText.st</code></li><li><code>CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st</code></li></ul>
+        <summary>Fichiers source compilés (111)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketConfig.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketState.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinchSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchBenneHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_BypassTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_ChainTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_PreflightHMI.st</code></li><li><code>CODE/J_SUPERVISION/FB_AntiFlickerText.st</code></li><li><code>CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (106)</summary>
+        <summary>Code source ST original (111)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -1349,7 +1591,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -1371,67 +1613,80 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Fault.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
-      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
-   ======================================================================= *)
-
-TYPE ST_FbStatus :
-STRUCT
-    (* ---- membres historiques (conservés) ---- *)
-    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
-    Done         : BOOL;    (* 1 = Action terminée avec succès *)
-    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
-    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
-    State        : E_State; (* État courant de la machine d&#x27;état *)
-    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
-    (* ---- membres ajoutés (forme cible enrichie) ---- *)
-    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
-    WarningId      : WORD;  (* Code warning courant (bitfield) *)
-    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
-    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
-    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
-END_STRUCT
-END_TYPE
-</pre>
-            </details>
-            <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
-                <pre>(* =======================================================================
-   🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : une cause de défaut/warning exprimée en CLAIR (BOOL + libellé),
-      sans bitfield ni masque. Le FB métier remplit une liste de causes
-      (ARRAY[0..15] OF ST_FbCause) ; le socle gère latch/reset/textes.
-   🧬 Contrat : remplacer l&#x27;ancien couple WORD bitfield + tableaux de textes
-      indexés par bit par une liste lisible (maintenance, « avec une liste »).
-   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur
-      l&#x27;acquittement. IsWarning distingue warning (auto) / fault (à acquitter).
+   🎯 Rôle : porter l&#x27;état défaut d&#x27;un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu&#x27;au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l&#x27;acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    ======================================================================= *)
 
-TYPE ST_FbCause :
+TYPE ST_Fault :
 STRUCT
-    Active     : BOOL;   (* 1 = cause présente (interlock sur la cause brute) *)
-    IsWarning  : BOOL;   (* 1 = warning auto-effacé ; 0 = défaut à acquitter *)
-    Texte      : STRING; (* libellé prêt IHM de la cause *)
+    Error     : BOOL;   (* &lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant *)
+    ErrorId   : WORD;    (* &lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune) *)
+    Latched   : BOOL;    (* &lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu&#x27;au front Reset *)
+    LatchedId : WORD;    (* &lt;-- [DIAG] ErrorId figé à l&#x27;apparition du défaut, effacé au Reset *)
 END_STRUCT
 END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_FaultCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n&#x27;alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FaultCause :
+STRUCT
+    Active   : BOOL;    (* 1 = cause présente maintenant (interlock sur cette valeur) *)
+    Latching : BOOL;    (* 1 = cause à acquitter (arme Latched) ; 0 = live seulement *)
+    Texte    : STRING;  (* libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM) *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Lifecycle.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d&#x27;exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l&#x27;avancement d&#x27;une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   ======================================================================= *)
+
+TYPE ST_Lifecycle :
+STRUCT
+    Busy : BOOL;   (* &lt;-- [STAT] 1 = action en cours *)
+    Done : BOOL;   (* &lt;-- [STAT] 1 = action terminée avec succès *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_ContactorCheck.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
@@ -1451,7 +1706,94 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_InternalCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FaultCore.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d&#x27;une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l&#x27;apparition d&#x27;une
+          cause `Active AND Latching`, conservé jusqu&#x27;au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d&#x27;effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FaultCore
+VAR_INPUT
+    Enable  : BOOL;                          // --&gt; [CMD] Autorisation générale du FB porteur
+    Reset   : BOOL;                          // --&gt; [CMD] Front d&#x27;acquittement (jamais conditionné, §9)
+    Causes  : ARRAY[0..15] OF ST_FaultCause; // --&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)
+END_VAR
+VAR_OUTPUT
+    Ready   : BOOL;                          // &lt;-- [STAT] FB porteur autorisé (= Enable)
+    Fault   : ST_Fault;                      // &lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)
+END_VAR
+VAR
+    ResetEdge : R_TRIG;                      // . [LOC] Front montant Reset
+    Latch     : ARRAY[0..15] OF BOOL;        // . [LOC] Bit laté par cause, jusqu&#x27;au Reset
+    i         : INT;                         // . [LOC] Index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Reset (front, toujours effectif)&quot;}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§2 Vue LIVE — Error / ErrorId&quot;}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region &quot;§3 Armement des latches (causes à acquitter)&quot;}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu&#x27;au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§4 Vue LATCHÉE — Latched / LatchedId&quot;}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\_TYPES\ST_Safety_Emergency_InternalCmd.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ ST_Safety_Emergency_InternalCmd — Structure de commande interne
    ───────────────────────────────────────────────────────────────
@@ -1470,7 +1812,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\_TYPES\ST_Safety_Emergency_State.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Safety_Emergency_State — État public de la chaîne d&#x27;arrêt d&#x27;urgence
    ───────────────────────────────────────────────────────────────
@@ -1491,7 +1833,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_Diag.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\_TYPES\ST_Safety_Emergency_Diag.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
@@ -1552,16 +1894,16 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_Joystick_AxisCmd.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_fbJoystick_AxisCmd.st</code></summary>
                 <pre>(* =======================================================================
-   🕹️ ST_Joystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
+   🕹️ ST_fbJoystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
    📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    ======================================================================= *)
 
-TYPE ST_Joystick_AxisCmd :
+TYPE ST_fbJoystick_AxisCmd :
 STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
@@ -1570,13 +1912,77 @@ STRUCT
     DirectionNegative   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     DirectionPositive   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     AtNeutral   : BOOL;   // --&gt; [CMD] TRUE si axes en zone morte (position centrale)
-    // Remplacé par bit qui donne la direction Direction   : INT;  // --&gt; [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)
+
+    // === MONITORING IHM (derive des bits ci-dessus, jamais lu en interlock) ===
+    Direction   : INT;   // &lt;-- [STAT] Sens -1=Rev / 0=Neutre / +1=Fwd (anim IHM fleche ; lu aussi logique treuils PRG_04)
+    Deflection  : INT;   // &lt;-- [STAT] Deflexion signee -100..+100 % (anim IHM jauge/barre)
 END_STRUCT
 END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_EncoderHw.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_fbJoystick_Cfg.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ ST_fbJoystick_Cfg — Réglages regroupés de FB_Joystick
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter en un bloc les 5 paramètres de conditionnement du geste
+      (zone morte, temporisations homme-mort, marge défaut capteur).
+      Passé à FB_Joystick via l&#x27;entrée `Cfg` — échange bloc IHM / persistant.
+   🧬 Pattern cfg : aligné sur ST_CycleCfg / ST_WinchCfg (préfixe ST_&lt;Domaine&gt;Cfg,
+      instance persistante dans GVL_PERSISTENT, pont FB_CfgPersistBridge_* à venir).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
+   ======================================================================= *)
+
+TYPE ST_fbJoystick_Cfg :
+STRUCT
+    DeadbandRaw          : INT  := 300;      // Zone morte en points ADC bruts (0..10000)
+    NeutralHoldTime      : TIME := T#100MS;  // Maintien continu au neutre avant désarmement homme-mort
+    DeadmanArmHoldTime   : TIME := T#100MS;  // Appui continu bouton requis pour armer le geste
+    DeadmanArmGraceTime  : TIME := T#3S;     // Délai de grâce post-armement avant désarmement neutre
+    RawOutOfRangeMargin  : INT  := 500;      // Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)
+    Initialized          : BOOL := FALSE;    // 🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\E_PresetConfirmMode.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_PresetConfirmMode — Mode de confirmation du preset codeur
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : sélectionner le fait public utilisé pour valider un preset.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE E_PresetConfirmMode :
+ENUM
+    READBACK_ONLY        := 0, // Confirmation par relecture de position
+    READBACK_AND_STATUSBIT := 1, // Relecture et bit d&#x27;état matériel
+    STATUSBIT_ONLY       := 2  // Bit d&#x27;état matériel uniquement
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_fbEncoder_Cfg.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ ST_fbEncoder_Cfg — Réglages technologiques publics de FB_Encoder
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
+   🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE ST_fbEncoder_Cfg :
+STRUCT
+    PresetConfirmMode : E_PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY; // Mode de confirmation preset, défaut relecture
+    Initialized       : BOOL := FALSE;                        // 🚦 TRUE après restauration du pont persistant
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_EncoderHw.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🔌 ST_EncoderHw — Frontière hardware codeur (IN/OUT)
    ───────────────────────────────────────────────────────────────
@@ -1604,7 +2010,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_EncoderMeasurement.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_EncoderMeasurement.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
@@ -1630,15 +2036,16 @@ STRUCT
     SpeedValid        : BOOL;         // TRUE si 6 echantillons valides sur au moins 50 ms
 
     // === STATUTS DES SOUS-FB &amp; REFERENCE ===
-    HomingStatus      : ST_FbStatus;  // Statut FB_Encoder_Homing (etat du referencement)
-    AbsStatus         : ST_FbStatus;  // Statut FB_Encoder_Abs (etat acquisition bus)
+    HomingFault       : ST_Fault;     // Défaut FB_Encoder_Homing (état du référencement)
+    HomingLifecycle   : ST_Lifecycle; // Cycle FB_Encoder_Homing (Busy/Done)
+    AbsFault          : ST_Fault;     // Défaut FB_Encoder_Abs (état acquisition bus)
     HomingRefRaw      : UDINT;        // Reference brute du dernier homing reussi (re-expose)
 END_STRUCT
 END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\ST_EncoderMeasurements.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_EncoderMeasurements.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
    ───────────────────────────────────────────────────────────────
@@ -1675,7 +2082,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_CycleStep.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\E_CycleStep.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_CycleStep — Étapes de la machine d&#x27;état du cycle automatique
    ───────────────────────────────────────────────────────────────
@@ -1704,7 +2111,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_DiveSearchState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\E_DiveSearchState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_DiveSearchState — Phases internes de recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
@@ -1725,7 +2132,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\E_ExtractionSequenceState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
    ───────────────────────────────────────────────────────────────
@@ -1746,7 +2153,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockReason.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\E_WinchFinalInterlockReason.st</code></summary>
                 <pre>(* =======================================================================
    🔒 E_WinchFinalInterlockReason — Raisons de blocage barrière finale
    ───────────────────────────────────────────────────────────────
@@ -1764,7 +2171,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\E_WinchFinalInterlockState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_WinchFinalInterlockState — États machine barrière finale treuil
    ───────────────────────────────────────────────────────────────
@@ -1785,7 +2192,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketConfig.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\_TYPES\ST_BucketConfig.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
@@ -1804,7 +2211,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\_TYPES\ST_BucketState.st</code></summary>
                 <pre>(* =======================================================================
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
@@ -1820,6 +2227,7 @@ STRUCT
     IsIntermediate  : BOOL;                                           // Position intermediaire (entre Ouvert et Ferme)
     LastPosM2Open   : REAL;                                           // Derniere position M2 memorisee ouvert (m)
     LastPosM2Close  : REAL;                                           // Derniere position M2 memorisee ferme (m)
+    ActiveOffsetValid : BOOL;                                         // Validite offset actif calcule a jour
     StateIncoherent : BOOL;                                           // Etat non sur (divergence boot/reel)
 END_STRUCT
 END_TYPE
@@ -3353,7 +3761,7 @@ END_TYPE
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_JoystickCmd :
 STRUCT
-    BtnCalibrate : BOOL; (* 🎯 Demande de recalage au neutre *)
+    Calibrate : BOOL; (* 🎯 Demande de recalage au neutre (front) *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -3363,14 +3771,16 @@ END_TYPE
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🕹️ ST_JoystickHMI — Données d&#x27;échange IHM pour le Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State , homogène avec ST_ModesHMI.
-   Pas de Cfg (les vrais réglages de calibration vivent dans GVL_PERSISTENT, pas ici) ni de
-   Bypass (concept absent de ce struct).
+   📄 Structuration en Cmd / State / Cfg , homogène avec ST_ModesHMI.
+   Cfg = réglages FB_Joystick éditables IHM (deadband, temporisations), pontés vers
+   GVL_PERSISTENT via FB_CfgPersistBridge_fbJoystick_Cfg. La calibration du neutre reste
+   dans GVL_PERSISTENT (bouton Calibrate). Pas de Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_JoystickHMI :
 STRUCT
     Cmd   : ST_JoystickCmd;
     State : ST_JoystickState;
+    Cfg   : ST_fbJoystick_Cfg;
 END_STRUCT
 END_TYPE
 </pre>
@@ -3385,8 +3795,8 @@ STRUCT
     RawX         : INT;        (* 🕹️ Axe X brut du joystick (0..10000) *)
     RawY         : INT;        (* 🕹️ Axe Y brut du joystick (0..10000) *)
     RawButton    : BOOL;       (* 🔘 Bouton homme-mort brut *)
-    AxisCmdX     : ST_Joystick_AxisCmd; (* ⚙️ Consigne d&#x27;axe X normalisée (sortie FB_Joystick) *)
-    AxisCmdY     : ST_Joystick_AxisCmd; (* ⚙️ Consigne d&#x27;axe Y normalisée (sortie FB_Joystick) *)
+    AxisCmdX     : ST_fbJoystick_AxisCmd; (* ⚙️ Consigne d&#x27;axe X normalisée (sortie FB_Joystick) *)
+    AxisCmdY     : ST_fbJoystick_AxisCmd; (* ⚙️ Consigne d&#x27;axe Y normalisée (sortie FB_Joystick) *)
     NeutralXAct  : INT;        (* 🎯 Neutre X calibré actuel (lecture seule) *)
     NeutralYAct  : INT;        (* 🎯 Neutre Y calibré actuel (lecture seule) *)
     DeadmanArmed : BOOL;       (* 🔫 Geste homme-mort armé (FB_Joystick.DeadmanArmed) *)
@@ -3895,6 +4305,9 @@ STRUCT
     (* 🩺 Diagnostic arrêt auto descente Kobold (pilotage normal) *)
     KoboldImmersionConfirmed : BOOL; (* Front Kobold confirmé dans la fenêtre d&#x27;immersion *)
     KoboldBottomTouchLatched : BOOL; (* Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend) *)
+
+    (* ⚙️ Configuration technologique codeur commune M1/M2 *)
+    EncoderCfg : ST_fbEncoder_Cfg; (* Réglage mode confirmation preset, ponté vers GVL_PERSISTENT *)
 
     (* 📐 Configuration des paramètres communs machine (au-dessus des bypass) *)
     Cfg : ST_CommunCfg;

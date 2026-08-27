@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 21:29:59</div>
+    <div class="exec-time">2026-08-27 23:12:09</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (3 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-bucket-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-fb-bucket-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-fb-bucket-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-bucket-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-bucket-1">TC-P10-023 Benne : mise en service et verrouillage securite</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,12 +206,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            3/3 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 6 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 9 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -224,8 +224,32 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_Status.st</code></td>
+                <td><code>ST_Fault.st</code></td>
                 <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FaultCause.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Lifecycle.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_FaultCore.st</code></td>
+                <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -268,44 +292,32 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Bucket</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 27 flux entrants · 17 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Bucket</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 24 flux entrants · 14 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ErrorEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BusyEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ConfirmOpenEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ConfirmCloseEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonTimeout <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ FirstCycle <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BusyEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ConfirmOpenEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ConfirmCloseEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonTimeout <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ FirstCycle <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instFault <span style="color:var(--muted);font-weight:500;">(FB_FaultCore)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Mode <span class="pin-type" style="color:var(--muted);">E_Mode</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdOpen_IHM <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdClose_IHM <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MotionRequestActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MotionDirection <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ConfirmOpenPosition <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ConfirmClosePosition <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CablePosM1 <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CablePosM2 <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomedM1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomedM2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_Busy <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_Busy <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InhibitM1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InhibitM2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Config <span class="pin-type" style="color:var(--muted);">ST_BucketConfig</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgTimeoutDuration <span class="pin-type" style="color:var(--muted);">TIME := T#60s</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1SlipToleranceM <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassGlobal <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">BucketState <span class="pin-type" style="color:var(--muted);">ST_BucketState</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">(4 constantes ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.3);color:#f1f5f9;">Type Global</span></div>
+                <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#fecdd3;font-weight:700;font-size:12px;">❓ Inconnues / Non Déclarées</span> <span style="font-size:11px;color:#fda4af;">(1 identifiants ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.3);color:#ffe4e6;">Alerte</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.BUSY</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.DISABLED</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.DONE</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.READY</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">IN</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
             </div></div>
         </details></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Bucket</span>
                 
-        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD AF03</span></div>
-        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">✅ Enable + Reset + Ready + Status (ST_Status complet)</div>
+        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(245,158,11,0.18);color:#fbbf24;border:1px solid #d97706;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD (Tolérance T137 Flat)</span></div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">⚠️ Signaux à plat (Reset/Error/Busy/Done) sans ST_Status</div>
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
@@ -314,10 +326,10 @@
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">12</b></div>
-                    <div>• Champs Out : <b style="color:#ffffff;">6</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">13</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">2</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">27 IN</b> / <b style="color:#ffffff;">17 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">24 IN</b> / <b style="color:#ffffff;">14 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -337,37 +349,25 @@
                 <div class="pin-name"><b>ActiveOffsetValid</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Fault</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_Fault</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Status</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Status</span> <span style="font-size:11px;color:#a5b4fc;">(6 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Lifecycle</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Lifecycle</span> <span style="font-size:11px;color:#a5b4fc;">(2 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
                 <div style="margin-top:2px;">
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Busy</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Lifecycle</b>.Busy</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Lifecycle</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Done</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Error</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.ErrorId</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.State</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.StateAtError</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Lifecycle</b>.Done</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Lifecycle</span></div>
                 </div></div>
             </details>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
@@ -409,9 +409,129 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 36 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ACTIVEOFFSETM</code> jamais câblé en production</li><li>Pin <code>ACTIVEOFFSETVALID</code> jamais câblé en production</li><li>Pin <code>BUCKETSTATE</code> jamais câblé en production</li><li>Pin <code>BYPASSGLOBAL</code> jamais câblé en production</li><li>Pin <code>CABLEPOSM1</code> jamais câblé en production</li><li>Pin <code>CABLEPOSM2</code> jamais câblé en production</li><li>Pin <code>CFGTIMEOUTDURATION</code> jamais câblé en production</li><li>Pin <code>CLOSEREQ</code> jamais câblé en production</li><li>Pin <code>CMDCLOSE_IHM</code> jamais câblé en production</li><li>Pin <code>CMDOPEN_IHM</code> jamais câblé en production</li><li>Pin <code>CONFIG</code> jamais câblé en production</li><li>Pin <code>CONFIRMCLOSEPOSITION</code> jamais câblé en production</li><li>Pin <code>CONFIRMOPENPOSITION</code> jamais câblé en production</li><li>Pin <code>DELTAPOSITION_M</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>HOMEDM1</code> jamais câblé en production</li><li>Pin <code>HOMEDM2</code> jamais câblé en production</li><li>Pin <code>INHIBITM1</code> jamais câblé en production</li><li>Pin <code>INHIBITM2</code> jamais câblé en production</li><li>Pin <code>LIFECYCLE</code> jamais câblé en production</li><li>Pin <code>M1SLIPDETECTED</code> jamais câblé en production</li><li>Pin <code>M1SLIPTOLERANCEM</code> jamais câblé en production</li><li>Pin <code>M1_BUSY</code> jamais câblé en production</li><li>Pin <code>M2_BUSY</code> jamais câblé en production</li><li>Pin <code>M2_DIRECTION</code> jamais câblé en production</li><li>Pin <code>M2_FORCESLOWSPEED</code> jamais câblé en production</li><li>Pin <code>M2_STARTSTOP</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>MOTIONDIRECTION</code> jamais câblé en production</li><li>Pin <code>MOTIONREQUESTACTIVE</code> jamais câblé en production</li><li>Pin <code>OPENREQ</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>REMAININGTRAVELM</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MODE <span class="pin-type">IEC_E_MODE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CMDOPEN_IHM <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CMDCLOSE_IHM <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MOTIONREQUESTACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MOTIONDIRECTION <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CONFIRMOPENPOSITION <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CONFIRMCLOSEPOSITION <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CABLEPOSM1 <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CABLEPOSM2 <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMEDM1 <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMEDM2 <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1_BUSY <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M2_BUSY <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">INHIBITM1 <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">INHIBITM2 <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CONFIG <span class="pin-type">ST_BUCKETCONFIG</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CFGTIMEOUTDURATION <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">M1SLIPTOLERANCEM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSGLOBAL <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BUCKETSTATE<span class='pin-tag'>IN_OUT</span> <span class="pin-type">ST_BUCKETSTATE</span></div>
+        </div></div>
+            <div class="pin-block">FB_Bucket</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">ACTIVEOFFSETVALID <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">LIFECYCLE <span class="pin-type">ST_LIFECYCLE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CLOSEREQ <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">OPENREQ <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">M2_STARTSTOP <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">M2_DIRECTION <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">M2_FORCESLOWSPEED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">M1SLIPDETECTED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">ACTIVEOFFSETM <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DELTAPOSITION_M <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">REMAININGTRAVELM <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
-        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 2 FB de la chaine, encapsulation propre (0 violation)</summary>
         
         <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
             <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
@@ -477,63 +597,87 @@
             <tbody>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FaultCore</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Bucket</code></td>
-                <td>22</td><td>12</td>
-                <td>1</td><td>15</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (15 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>22</td><td>13</td>
+                <td>1</td><td>21</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (21 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-bucket-0" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation standard</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Prete au repos</p><p class='comment'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</p></div>
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul></details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 3 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="212" viewBox="0 0 388 212" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="194" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="206" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="194" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="206" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="194" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="206" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">READY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">FIRSTCYCLE</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L256,148L256,174L312,174L368,174" class="wf-line" stroke="#0891b2"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>READY</th><th>FIRSTCYCLE</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (47)</summary>
+        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>CMDOPEN_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CMDCLOSE_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOTIONREQUESTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOTIONDIRECTION</code></td><td>0</td></tr><tr><td><code>CONFIRMOPENPOSITION</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCLOSEPOSITION</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CABLEPOSM1</code></td><td>0</td></tr><tr><td><code>CABLEPOSM2</code></td><td>0</td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIG.OFFSETOPENM</code></td><td>0</td></tr><tr><td><code>CFGTIMEOUTDURATION</code></td><td>60000000000</td></tr><tr><td><code>M1SLIPTOLERANCEM</code></td><td>1</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACTIVEOFFSETVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIFECYCLE.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CLOSEREQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>OPENREQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_DIRECTION</code></td><td>0</td></tr><tr><td><code>M2_FORCESLOWSPEED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1SLIPDETECTED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACTIVEOFFSETM</code></td><td>0</td></tr><tr><td><code>DELTAPOSITION_M</code></td><td>0</td></tr><tr><td><code>REMAININGTRAVELM</code></td><td>0</td></tr><tr><td><code>BUCKETSTATE.ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SEVEREERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MAXALLOWEDOFFSET</code></td><td>5</td></tr><tr><td><code>M1REFPOSM</code></td><td>0</td></tr><tr><td><code>M2STARTPOSM</code></td><td>0</td></tr><tr><td><code>WASOPENATSTART</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WASCLOSEDATSTART</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LEFTSTARTSINCEARM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOLDOFFSETM</code></td><td>0</td></tr><tr><td><code>CFGFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>OFFSETMAXFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TIMEOUTFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1SLIPFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-bucket-0" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
-            </header>
-            
-            
-            
-            
-        </article>
         <article id="test-fb-bucket-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
+                <h3>TC-P10-023 Benne : mise en service et verrouillage securite </h3>
             </header>
             
+            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>Benne active et prete</li><li>Au repos -&gt; Pas de mouvement benne</li></ul></details>
             
             
-            
-        </article>
-        <article id="test-fb-bucket-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
-            </header>
-            
-            
-            
-            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (50)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>CMDOPEN_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CMDCLOSE_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOTIONREQUESTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOTIONDIRECTION</code></td><td>0</td></tr><tr><td><code>CONFIRMOPENPOSITION</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIRMCLOSEPOSITION</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CABLEPOSM1</code></td><td>0</td></tr><tr><td><code>CABLEPOSM2</code></td><td>0</td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CONFIG.OFFSETOPENM</code></td><td>0</td></tr><tr><td><code>CFGTIMEOUTDURATION</code></td><td>60000000000</td></tr><tr><td><code>M1SLIPTOLERANCEM</code></td><td>1</td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ACTIVEOFFSETVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIFECYCLE.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CLOSEREQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>OPENREQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_DIRECTION</code></td><td>0</td></tr><tr><td><code>M2_FORCESLOWSPEED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1SLIPDETECTED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACTIVEOFFSETM</code></td><td>0</td></tr><tr><td><code>DELTAPOSITION_M</code></td><td>0</td></tr><tr><td><code>REMAININGTRAVELM</code></td><td>0</td></tr><tr><td><code>BUCKETSTATE.ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FIRSTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SEVEREERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MAXALLOWEDOFFSET</code></td><td>5</td></tr><tr><td><code>M1REFPOSM</code></td><td>0</td></tr><tr><td><code>M2STARTPOSM</code></td><td>0</td></tr><tr><td><code>WASOPENATSTART</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WASCLOSEDATSTART</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LEFTSTARTSINCEARM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOLDOFFSETM</code></td><td>0</td></tr><tr><td><code>CFGFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>OFFSETMAXFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TIMEOUTFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1SLIPFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (6)</summary>
-        <ul><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Status.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketConfig.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketState.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st</code></li></ul>
+        <summary>Fichiers source compilés (9)</summary>
+        <ul><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketConfig.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketState.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (6)</summary>
+        <summary>Code source ST original (9)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
@@ -558,39 +702,163 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Status.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Fault.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_Status — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
-      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_Status (exception documentée).
+   🎯 Rôle : porter l&#x27;état défaut d&#x27;un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu&#x27;au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l&#x27;acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_Fault :
+STRUCT
+    Error     : BOOL;   (* &lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant *)
+    ErrorId   : WORD;    (* &lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune) *)
+    Latched   : BOOL;    (* &lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu&#x27;au front Reset *)
+    LatchedId : WORD;    (* &lt;-- [DIAG] ErrorId figé à l&#x27;apparition du défaut, effacé au Reset *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_FaultCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n&#x27;alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FaultCause :
+STRUCT
+    Active   : BOOL;    (* 1 = cause présente maintenant (interlock sur cette valeur) *)
+    Latching : BOOL;    (* 1 = cause à acquitter (arme Latched) ; 0 = live seulement *)
+    Texte    : STRING;  (* libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM) *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Lifecycle.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d&#x27;exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l&#x27;avancement d&#x27;une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    ======================================================================= *)
 
-TYPE ST_Status :
+TYPE ST_Lifecycle :
 STRUCT
-    (* ---- membres historiques (conservés) ---- *)
-    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
-    Done         : BOOL;    (* 1 = Action terminée avec succès *)
-    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
-    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
-    State        : E_State; (* État courant de la machine d&#x27;état *)
-    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
-    (* ---- membres ajoutés (forme cible enrichie) ---- *)
-    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
-    WarningId      : WORD;  (* Code warning courant (bitfield) *)
-    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
-    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
-    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
+    Busy : BOOL;   (* &lt;-- [STAT] 1 = action en cours *)
+    Done : BOOL;   (* &lt;-- [STAT] 1 = action terminée avec succès *)
 END_STRUCT
 END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FaultCore.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d&#x27;une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l&#x27;apparition d&#x27;une
+          cause `Active AND Latching`, conservé jusqu&#x27;au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d&#x27;effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FaultCore
+VAR_INPUT
+    Enable  : BOOL;                          // --&gt; [CMD] Autorisation générale du FB porteur
+    Reset   : BOOL;                          // --&gt; [CMD] Front d&#x27;acquittement (jamais conditionné, §9)
+    Causes  : ARRAY[0..15] OF ST_FaultCause; // --&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)
+END_VAR
+VAR_OUTPUT
+    Ready   : BOOL;                          // &lt;-- [STAT] FB porteur autorisé (= Enable)
+    Fault   : ST_Fault;                      // &lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)
+END_VAR
+VAR
+    ResetEdge : R_TRIG;                      // . [LOC] Front montant Reset
+    Latch     : ARRAY[0..15] OF BOOL;        // . [LOC] Bit laté par cause, jusqu&#x27;au Reset
+    i         : INT;                         // . [LOC] Index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Reset (front, toujours effectif)&quot;}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§2 Vue LIVE — Error / ErrorId&quot;}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region &quot;§3 Armement des latches (causes à acquitter)&quot;}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu&#x27;au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§4 Vue LATCHÉE — Latched / LatchedId&quot;}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+
+END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
@@ -700,7 +968,9 @@ VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // &lt;-- [STAT] FB pret a fonctionner
     ActiveOffsetValid               : BOOL;                           // &lt;-- [STAT] Validite offset actif calcule a jour
-    Status                          : ST_Status;                    // &lt;-- [FB] Statut complet (Busy/Done/Error/ErrorId/State/StateAtError)
+    // 🧩 Statut transverse (forme cible ST_Fault + ST_Lifecycle)
+    Fault                           : ST_Fault;
+    Lifecycle                       : ST_Lifecycle;
 
     // === DEMANDES ET ORDRES ACTIONNEURS ===
     CloseReq                        : BOOL;                           // &lt;-- [STAT] Demande de fermeture memorisee
@@ -722,7 +992,6 @@ END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===
     ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
-    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
     BusyEdge                        : R_TRIG;                         // . [LOC] Detecteur entree en etat Busy
     ConfirmOpenEdge                 : R_TRIG;                         // . [LOC] Detecteur front confirmation ouverture
     ConfirmCloseEdge                : R_TRIG;                         // . [LOC] Detecteur front confirmation fermeture
@@ -738,12 +1007,96 @@ VAR
     WasClosedAtStart                : BOOL;                           // . [LOC] Etat IsClosed memorise a l&#x27;entree Busy
     LeftStartSinceArm               : BOOL;                           // . [LOC] Quitte position de depart
     HoldOffsetM                     : REAL;                           // . [LOC] Ecart reel mémorise (gel en position intermediaire)
+
+    // Latches défauts
+    CfgFaultLatched                 : BOOL;
+    OffsetMaxFaultLatched           : BOOL;
+    TimeoutFaultLatched             : BOOL;
+    M1SlipFaultLatched              : BOOL;
+    HomingFaultLatched              : BOOL;
+
+    // Socle défaut
+    instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
-{region &quot;§1 Gate securite&quot;}
-// 🛑 1. GATE DE SÉCURITÉ
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. FRONTS &amp; REARMEMENT
+ResetEdge(CLK := Reset);
+
+IF ResetEdge.Q OR BypassGlobal THEN
+    CfgFaultLatched       := FALSE;
+    OffsetMaxFaultLatched := FALSE;
+    TimeoutFaultLatched   := FALSE;
+    M1SlipFaultLatched    := FALSE;
+    HomingFaultLatched    := FALSE;
+END_IF;
+
+IF NOT BypassGlobal THEN
+    // Cause 0 : Configuration géométrie benne
+    IF (Config.OffsetOpenM &gt;= Config.OffsetCloseM)
+       OR (Config.OffsetOpenM &lt; 0.0) THEN
+        CfgFaultLatched := TRUE;
+    END_IF;
+    instCauses[0].Active   := CfgFaultLatched;
+    instCauses[0].Latching := TRUE;
+    instCauses[0].Texte    := &#x27;Configuration geometrie benne invalide&#x27;;
+
+    // Cause 1 : Dépassement écart max
+    MaxAllowedOffset := Config.OffsetCloseM + 2.0;
+    IF (CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset)) OR (CablePosM2 &lt; CablePosM1) THEN
+        OffsetMaxFaultLatched := TRUE;
+    END_IF;
+    instCauses[1].Active   := OffsetMaxFaultLatched;
+    instCauses[1].Latching := TRUE;
+    instCauses[1].Texte    := &#x27;Depassement ecart maximum autorise benne&#x27;;
+
+    // Cause 2 : Timeout
+    TonTimeout(IN := Lifecycle.Busy, PT := CfgTimeoutDuration);
+    IF TonTimeout.Q THEN
+        TimeoutFaultLatched := TRUE;
+    END_IF;
+    instCauses[2].Active   := TimeoutFaultLatched;
+    instCauses[2].Latching := TRUE;
+    instCauses[2].Texte    := &#x27;Timeout commande deplacement benne&#x27;;
+
+    // Cause 3 : Glissement M1
+    M1SlipDetected := Lifecycle.Busy AND (ABS(CablePosM1 - M1RefPosM) &gt; M1SlipToleranceM);
+    IF M1SlipDetected THEN
+        M1SlipFaultLatched := TRUE;
+    END_IF;
+    instCauses[3].Active   := M1SlipFaultLatched;
+    instCauses[3].Latching := TRUE;
+    instCauses[3].Texte    := &#x27;Glissement treuil M1 pendant manoeuvre benne&#x27;;
+
+    // Cause 4 : Non référencé
+    IF NOT HomedM1 OR NOT HomedM2 THEN
+        HomingFaultLatched := TRUE;
+    END_IF;
+    instCauses[4].Active   := HomingFaultLatched;
+    instCauses[4].Latching := TRUE;
+    instCauses[4].Texte    := &#x27;Codeurs treuils non references pour sequence benne&#x27;;
+ELSE
+    TonTimeout(IN := FALSE);
+    M1SlipDetected := FALSE;
+    instCauses[0].Active := FALSE;
+    instCauses[1].Active := FALSE;
+    instCauses[2].Active := FALSE;
+    instCauses[3].Active := FALSE;
+    instCauses[4].Active := FALSE;
+END_IF;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region &quot;§2 Gate securite&quot;}
+// 🛑 2. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    IF (Status.State = E_State.BUSY) OR CloseReq OR OpenReq THEN
+    IF Lifecycle.Busy OR CloseReq OR OpenReq THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
     Ready := FALSE;
@@ -751,308 +1104,98 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     ActiveOffsetM := 0.0;
     DeltaPosition_M := 0.0;
     RemainingTravelM := 0.0;
-    Status.Busy := FALSE;
-    Status.Done := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
     M2_StartStop := FALSE;
     M2_Direction := 0;
     M2_ForceSlowSpeed := FALSE;
-    Status.State := E_State.DISABLED;
-    M1SlipDetected := FALSE;
-    // Les requêtes internes sont réinitialisées
     CloseReq := FALSE;
     OpenReq := FALSE;
     RETURN;
 END_IF;
 
-// 🟢 ÉTAT INITIAL READY SI DISABLED PRÉCÉDEMMENT
-IF Status.State = E_State.DISABLED THEN
-    Status.State := E_State.READY;
-END_IF;
-
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region &quot;§2 Reset et bypass&quot;}
-// 🔑 2. GESTION DU RESET (FRONT MONTANT)
-ResetEdge(CLK := Reset);
-
-// 🌐 BYPASS GLOBAL : force ErrorId = 0 (ignore toutes les erreurs benne)
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-END_IF;
-
-IF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
-END_IF;
-
-{endregion}
-
-{region &quot;§3 Coherence et etat mecanique benne&quot;}
-// 📏 3. DÉTECTION D&#x27;INCOHÉRENCE AU BOOT (PREMIER CYCLE API)
+{region &quot;§3 Premier cycle &amp; recalage boutons IHM&quot;}
 IF FirstCycle THEN
     FirstCycle := FALSE;
-    IF Config.CoherenceLimitM &gt; 0.01 THEN
-        IF BucketState.IsOpen AND NOT BucketState.IsClosed THEN
-            IF ABS(CablePosM2 - BucketState.LastPosM2Open) &gt; Config.CoherenceLimitM THEN
-                BucketState.StateIncoherent := TRUE;
-            END_IF;
-        ELSIF BucketState.IsClosed AND NOT BucketState.IsOpen THEN
-            IF ABS(CablePosM2 - BucketState.LastPosM2Close) &gt; Config.CoherenceLimitM THEN
-                BucketState.StateIncoherent := TRUE;
-            END_IF;
-        ELSE
-            // Si l&#x27;état n&#x27;a jamais été initialisé (les deux FALSE/TRUE), on signale une incohérence
-            BucketState.StateIncoherent := TRUE;
-        END_IF;
-    ELSE
-        // Limite non configurée ou invalide, par précaution on force l&#x27;incohérence
+    IF NOT BucketState.IsOpen AND NOT BucketState.IsClosed THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
 END_IF;
 
-// Met à jour le bit1 d&#x27;erreur si incohérence détectée
-IF BucketState.StateIncoherent THEN
-    Status.ErrorId := Status.ErrorId OR 16#0002;
-    // Force l&#x27;état inconnu (ni ouvert ni fermé) si incohérence active
-    BucketState.IsOpen := FALSE;
-    BucketState.IsClosed := FALSE;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFD;
-END_IF;
-
-// 🧲 3bis. GARDE-FOU CODEURS NON RÉFÉRENCÉS (bit 3)
-// CablePosM1/CablePosM2 ne sont fiables que si le homing (Partie10) a été fait sur les 2 treuils.
-// Continu (pas de front Reset) : se lève/efface tout seul selon l&#x27;état réel du homing.
-IF NOT HomedM1 OR NOT HomedM2 THEN
-    Status.ErrorId := Status.ErrorId OR 16#0008;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFF7;
-END_IF;
-
-// 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE — voir bandeau
-// Action de CONFIRMATION (aucun mouvement, ne pilote pas M2) : acquitte les défauts et réinitialise
-// les demandes. L&#x27;état IsOpen/IsClosed reste STRICTEMENT évalué en continu (§3bis-quater) selon la position codeur réelle.
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
-IF ConfirmOpenEdge.Q
-   AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
-   AND NOT M1_Busy AND NOT M2_Busy THEN
-    BucketState.LastPosM2Open := CablePosM2;
-    BucketState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM;
-    Status.ErrorId := 16#0000;      // Réinitialisation complète des défauts benne lors du référencement manuel
-    CloseReq := FALSE;              // Reset des demandes en attente pour éviter les démarrages intempestifs
-    OpenReq := FALSE;
-END_IF;
-
-// 3bis-ter. CONFIRMATION MANUELLE POSITION FERMÉE
-// Même principe que ConfirmOpenPosition pour acquitter et réinitialiser.
-ConfirmCloseEdge(CLK := ConfirmClosePosition);
-IF ConfirmCloseEdge.Q
-   AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
-   AND NOT M1_Busy AND NOT M2_Busy THEN
-    BucketState.LastPosM2Close := CablePosM2;
-    BucketState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM;
-    Status.ErrorId := 16#0000;      // Réinitialisation complète des défauts benne lors du référencement manuel
-    CloseReq := FALSE;              // Reset des demandes en attente pour éviter les démarrages intempestifs
-    OpenReq := FALSE;
-END_IF;
-
-// 3bis-quater. DÉTECTION AUTOMATIQUE EN CONTINU (5 ZONES CLAIRES OPÉRATEUR) :
-// Recalcule IsOpen, IsClosed, TooOpen, TooClosed, IsIntermediate en PERMANENCE à partir de
-// l&#x27;écart réel Delta = CablePosM2 - CablePosM1 et de la tolérance Config.CoherenceLimitM.
-// Actif à l&#x27;arrêt (NOT M1_Busy/M2_Busy), hors séquence active (State &lt;&gt; BUSY), codeurs référencés.
-IF (Status.State &lt;&gt; E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND HomedM2
-   AND (Config.CoherenceLimitM &gt; 0.01) THEN
-
-    // 1. Zone Benne Ouverte (Delta proche de OffsetOpenM)
-    IF ABS((CablePosM2 - CablePosM1) - Config.OffsetOpenM) &lt;= Config.CoherenceLimitM THEN
-        BucketState.IsOpen := TRUE;
-        BucketState.IsClosed := FALSE;
-        BucketState.TooOpen := FALSE;
-        BucketState.TooClosed := FALSE;
-        BucketState.IsIntermediate := FALSE;
-        BucketState.LastPosM2Open := CablePosM2;
-        BucketState.StateIncoherent := FALSE;
-
-    // 2. Zone Benne Fermée (Delta proche de OffsetCloseM)
-    ELSIF ABS((CablePosM2 - CablePosM1) - Config.OffsetCloseM) &lt;= Config.CoherenceLimitM THEN
-        BucketState.IsClosed := TRUE;
-        BucketState.IsOpen := FALSE;
-        BucketState.TooOpen := FALSE;
-        BucketState.TooClosed := FALSE;
-        BucketState.IsIntermediate := FALSE;
-        BucketState.LastPosM2Close := CablePosM2;
-        BucketState.StateIncoherent := FALSE;
-
-    // 3. Zone Trop Ouvert (Dépassement en ouverture : Delta &lt; OffsetOpenM - Tolerance)
-    ELSIF (CablePosM2 - CablePosM1) &lt; (Config.OffsetOpenM - Config.CoherenceLimitM) THEN
-        BucketState.IsOpen := FALSE;
-        BucketState.IsClosed := FALSE;
-        BucketState.TooOpen := TRUE;
-        BucketState.TooClosed := FALSE;
-        BucketState.IsIntermediate := FALSE;
-        BucketState.StateIncoherent := TRUE;
-
-    // 4. Zone Trop Fermé (Dépassement en fermeture : Delta &gt; OffsetCloseM + Tolerance)
-    ELSIF (CablePosM2 - CablePosM1) &gt; (Config.OffsetCloseM + Config.CoherenceLimitM) THEN
-        BucketState.IsOpen := FALSE;
-        BucketState.IsClosed := FALSE;
-        BucketState.TooOpen := FALSE;
-        BucketState.TooClosed := TRUE;
-        BucketState.IsIntermediate := FALSE;
-        BucketState.StateIncoherent := TRUE;
-
-    // 5. Zone Intermédiaire / Entrebâillée (entre OffsetOpenM + Tol et OffsetCloseM - Tol)
-    ELSE
-        BucketState.IsOpen := FALSE;
-        BucketState.IsClosed := FALSE;
-        BucketState.TooOpen := FALSE;
-        BucketState.TooClosed := FALSE;
-        BucketState.IsIntermediate := TRUE;
-        BucketState.StateIncoherent := FALSE;
-    END_IF;
-END_IF;
-
-// 🔍 3ter. MÉCA C COUCHE 1 — GLISSEMENT M1 PENDANT BUSY (bit4)
-// M1 doit rester immobile pendant que M2 bouge seul. Référence prise à l&#x27;entrée en Busy.
-BusyEdge(CLK := (Status.State = E_State.BUSY));
-IF BusyEdge.Q THEN
-    M1RefPosM := CablePosM1;
-    M2StartPosM := CablePosM2;   // Borne le recul autorisé (voir §6 CASE BUSY)
-    // Mémorise l&#x27;état d&#x27;origine (restauré si recul complet jusqu&#x27;à M2StartPosM, voir §6 CASE BUSY)
-    // puis passe en position transitoire dès le démarrage du mouvement — ni ouvert ni fermé pendant
-    // le trajet, quel que soit l&#x27;état mémorisé avant.
-    WasOpenAtStart := BucketState.IsOpen;
-    WasClosedAtStart := BucketState.IsClosed;
-    LeftStartSinceArm := FALSE;
-    BucketState.IsOpen := FALSE;
+IF ConfirmOpenEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
+    BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
+    BucketState.LastPosM2Open := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
 END_IF;
 
-IF (Status.State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) &gt; M1SlipToleranceM) AND NOT InhibitM1 THEN
-    Status.ErrorId := Status.ErrorId OR 16#0010;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFEF;
+ConfirmCloseEdge(CLK := ConfirmClosePosition);
+IF ConfirmCloseEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := TRUE;
+    BucketState.LastPosM2Close := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
 END_IF;
-M1SlipDetected := (Status.ErrorId AND 16#0010) &lt;&gt; 16#0000;
-
 {endregion}
 
-{region &quot;§4 Surveillance limites timeout et arret&quot;}
-// 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
-// On s&#x27;assure que l&#x27;écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
-MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
-IF (ABS(CablePosM1 - CablePosM2) &gt; MaxAllowedOffset) AND NOT InhibitM1 AND NOT InhibitM2 THEN
-    Status.ErrorId := Status.ErrorId OR 16#0004;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFB;
-END_IF;
-
-// ⏲️ 5. SURVEILLANCE TIMEOUT MOUVEMENT (bit 0)
-// Déclenche si le mouvement actif (M2_StartStop = TRUE) dure plus longtemps que le timeout
-TonTimeout(IN := (Status.State = E_State.BUSY AND M2_StartStop), PT := CfgTimeoutDuration);
-IF TonTimeout.Q THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-END_IF;
-
-// ❌ Évaluation des erreurs graves (Timeout, Limites dépassées, Codeur(s) non référencé(s), ou Glissement M1)
-SevereError := (Status.ErrorId AND 16#001D) &lt;&gt; 16#0000;
+{region &quot;§4 Séquencement mouvement benne&quot;}
+SevereError := Fault.Error;
 
 IF SevereError THEN
-    IF (Status.State = E_State.BUSY) OR CloseReq OR OpenReq THEN
-        BucketState.StateIncoherent := TRUE;
-    END_IF;
     M2_StartStop := FALSE;
     M2_Direction := 0;
     M2_ForceSlowSpeed := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
-    // On repasse en READY et attend un Reset
-    Status.State := E_State.READY;
-END_IF;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+ELSE
+    // Prise en compte des demandes IHM
+    IF CmdOpen_IHM AND NOT Lifecycle.Busy THEN
+        OpenReq := TRUE;
+        CloseReq := FALSE;
+    ELSIF CmdClose_IHM AND NOT Lifecycle.Busy THEN
+        CloseReq := TRUE;
+        OpenReq := FALSE;
+    END_IF;
 
-{endregion}
+    BusyEdge(CLK := (CloseReq OR OpenReq) AND MotionRequestActive);
 
-{region &quot;§5 Machine etat commande&quot;}
-// 🎛️ 6. MACHINE À ÉTATS DE COMMANDE
-CASE Status.State OF
-    E_State.READY:
-        Ready := TRUE;
-        Status.Busy := FALSE;
-        Status.Done := FALSE;
-        M2_StartStop := FALSE;
-        M2_Direction := 0;
-        M2_ForceSlowSpeed := FALSE;
-        RemainingTravelM := 0.0; // Pas de mouvement en cours
+    IF BusyEdge.Q THEN
+        M1RefPosM := CablePosM1;
+        M2StartPosM := CablePosM2;
+        WasOpenAtStart := BucketState.IsOpen;
+        WasClosedAtStart := BucketState.IsClosed;
+        LeftStartSinceArm := FALSE;
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+    END_IF;
 
-        // Demande benne acceptée UNIQUEMENT si M1 ET M2 sont à l&#x27;arrêt (tous
-        // modes) — évite qu&#x27;un mouvement en cours sur l&#x27;un des deux treuils &quot;traverse&quot; l&#x27;armement
-        // du benne. Ni mémorisation de la requête, ni démarrage tant que ce
-        // n&#x27;est pas vrai — l&#x27;opérateur doit refaire la demande une fois les treuils arrêtés.
-        IF NOT M1_Busy AND NOT M2_Busy THEN
-            // Mémorisation des requêtes IHM (l&#x27;une annule l&#x27;autre)
-            IF CmdClose_IHM AND NOT SevereError THEN
-                CloseReq := TRUE;
-                OpenReq := FALSE;
-            ELSIF CmdOpen_IHM AND NOT SevereError THEN
-                OpenReq := TRUE;
-                CloseReq := FALSE;
-            END_IF;
-
-            // Condition d&#x27;activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
-            // Sens inversés (enroulage ferme, déroulage ouvre)
-            IF CloseReq AND MotionRequestActive AND (MotionDirection = 1) THEN
-                Status.State := E_State.BUSY;
-            ELSIF OpenReq AND MotionRequestActive AND (MotionDirection = -1) THEN
-                Status.State := E_State.BUSY;
-            END_IF;
-        END_IF;
-
-    E_State.BUSY:
-        Ready := TRUE;
-        Status.Busy := TRUE;
-        Status.Done := FALSE;
-        M2_ForceSlowSpeed := TRUE; // Vitesse lente forcée sans contacteurs
-
-        // Distance restante avant cible, pour affichage IHM (aiguille/jauge)
-        // Toujours positive, décroît vers 0 à mesure que M2 approche la cible.
+    IF Lifecycle.Busy THEN
         IF CloseReq THEN
             RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
+            M2_ForceSlowSpeed := TRUE;
+            IF MotionRequestActive AND (MotionDirection = 1) THEN
+                M2_StartStop := TRUE;
+                M2_Direction := 1;
+            ELSIF MotionRequestActive AND (MotionDirection = -1) THEN
+                M2_StartStop := TRUE;
+                M2_Direction := -1;
+            ELSE
+                M2_StartStop := FALSE;
+                M2_Direction := 0;
+            END_IF;
         ELSIF OpenReq THEN
             RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
-        ELSE
-            RemainingTravelM := 0.0;
-        END_IF;
-
-        // Interlock Homme-mort joystick
-        // Sens inverse autorisé (recul/annulation partielle) pendant CloseReq/OpenReq, mais BORNÉ
-        // à la position de départ (M2StartPosM, mémorisée à l&#x27;entrée en Busy) — ne permet jamais de
-        // dépasser cette position dans le sens opposé au sens principal.
-        IF NOT MotionRequestActive THEN
-            // Si relâchement de l&#x27;intention opérateur, arrêt temporaire du mouvement.
-            M2_StartStop := FALSE;
-            M2_Direction := 0;
-        ELSIF CloseReq THEN
-            IF (MotionDirection = 1) THEN
-                // Sens principal (fermeture) : M2 enroule (monte)
-                M2_StartStop := TRUE;
-                M2_Direction := 1;
-            ELSIF (MotionDirection = -1) AND (CablePosM2 &gt; M2StartPosM) THEN
-                // Sens inverse : recul autorisé UNIQUEMENT tant qu&#x27;on n&#x27;est pas revenu à la position
-                // de départ (pas au-delà, donc pas de ré-ouverture complète depuis ici)
+            M2_ForceSlowSpeed := TRUE;
+            IF MotionRequestActive AND (MotionDirection = -1) THEN
                 M2_StartStop := TRUE;
                 M2_Direction := -1;
-            ELSE
-                // Mauvais sens, ou position de départ déjà atteinte en reculant : arrêt
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
-            END_IF;
-        ELSIF OpenReq THEN
-            IF (MotionDirection = -1) THEN
-                // Sens principal (ouverture) : M2 déroule (descend)
-                M2_StartStop := TRUE;
-                M2_Direction := -1;
-            ELSIF (MotionDirection = 1) AND (CablePosM2 &lt; M2StartPosM) THEN
-                // Sens inverse : recul autorisé UNIQUEMENT tant qu&#x27;on n&#x27;est pas revenu à la position
-                // de départ (pas au-delà, donc pas de re-fermeture complète depuis ici)
+            ELSIF MotionRequestActive AND (MotionDirection = 1) THEN
                 M2_StartStop := TRUE;
                 M2_Direction := 1;
             ELSE
@@ -1062,112 +1205,76 @@ CASE Status.State OF
         ELSE
             M2_StartStop := FALSE;
             M2_Direction := 0;
+            M2_ForceSlowSpeed := FALSE;
         END_IF;
 
-        // Détecte qu&#x27;on a réellement quitté la position de départ (évite que le test de retour
-        // ci-dessous ne se déclenche instantanément au 1er cycle de Busy, où CablePosM2 =
-        // M2StartPosM par définition).
         IF (CloseReq AND (CablePosM2 &gt; M2StartPosM)) OR (OpenReq AND (CablePosM2 &lt; M2StartPosM)) THEN
             LeftStartSinceArm := TRUE;
         END_IF;
 
-        // Condition d&#x27;arrêt automatique de la fermeture
+        // Arrêt fermeture
         IF CloseReq THEN
-            // Compense l&#x27;inertie mécanique (coast-down) : coupe la commande
-            // CloseAnticipationM avant OffsetCloseM pour amener l&#x27;arrêt réel près du
-            // vrai offset au lieu de le dépasser.
             IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
-
-                // Mémorisation de l&#x27;état physique fermé
                 BucketState.IsOpen := FALSE;
                 BucketState.IsClosed := TRUE;
                 BucketState.LastPosM2Close := CablePosM2;
-                BucketState.StateIncoherent := FALSE; // recalage réussi
-
+                BucketState.StateIncoherent := FALSE;
                 CloseReq := FALSE;
-                Status.State := E_State.DONE;
-            // Recul complet jusqu&#x27;à la position de départ — restaure l&#x27;état d&#x27;origine
-            // (physiquement, on est revenu là où on a commencé)
+                Lifecycle.Busy := FALSE;
+                Lifecycle.Done := TRUE;
             ELSIF LeftStartSinceArm AND (CablePosM2 &lt;= M2StartPosM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
-
                 BucketState.IsOpen := WasOpenAtStart;
                 BucketState.IsClosed := WasClosedAtStart;
-
                 CloseReq := FALSE;
-                Status.State := E_State.DONE;
+                Lifecycle.Busy := FALSE;
+                Lifecycle.Done := TRUE;
             END_IF;
         END_IF;
 
-        // Condition d&#x27;arrêt automatique de l&#x27;ouverture
+        // Arrêt ouverture
         IF OpenReq THEN
-            // Même logique que la fermeture ci-dessus, inertie différente en ouverture
-            // (OpenAnticipationM distinct).
             IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
-
-                // Mémorisation de l&#x27;état physique ouvert
                 BucketState.IsOpen := TRUE;
                 BucketState.IsClosed := FALSE;
                 BucketState.LastPosM2Open := CablePosM2;
-                BucketState.StateIncoherent := FALSE; // recalage réussi
-
+                BucketState.StateIncoherent := FALSE;
                 OpenReq := FALSE;
-                Status.State := E_State.DONE;
-            // Recul complet jusqu&#x27;à la position de départ — restaure l&#x27;état d&#x27;origine
-            // (physiquement, on est revenu là où on a commencé)
+                Lifecycle.Busy := FALSE;
+                Lifecycle.Done := TRUE;
             ELSIF LeftStartSinceArm AND (CablePosM2 &gt;= M2StartPosM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
-
                 BucketState.IsOpen := WasOpenAtStart;
                 BucketState.IsClosed := WasClosedAtStart;
-
                 OpenReq := FALSE;
-                Status.State := E_State.DONE;
+                Lifecycle.Busy := FALSE;
+                Lifecycle.Done := TRUE;
             END_IF;
         END_IF;
-
-    E_State.DONE:
-        Ready := TRUE;
-        Status.Busy := FALSE;
-        Status.Done := TRUE;
+    ELSIF Lifecycle.Done THEN
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
-        RemainingTravelM := 0.0; // Cible atteinte
-
-        // Attente du relâchement de la validation joystick pour repasser à READY
+        RemainingTravelM := 0.0;
         IF NOT MotionRequestActive THEN
-            Status.State := E_State.READY;
+            Lifecycle.Done := FALSE;
         END_IF;
-END_CASE;
-
-// 📤 7. GESTION DES SORTIES D&#x27;ÉTAT GLOBALES
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
+    END_IF;
 END_IF;
+{endregion}
 
-// Calcul continu de l&#x27;écart réel signé M2 - M1 pour l&#x27;affichage IHM et l&#x27;aide au pilotage
+{region &quot;§5 Offset actif et validite&quot;}
 DeltaPosition_M := CablePosM2 - CablePosM1;
 
-// Détermination de l&#x27;offset actif pour le synchronisme de FB_WinchSync ET pour l&#x27;affichage IHM
-// (M2PositionCorrected, côté PRG_07_Supervision).
-// CloseReq/OpenReq sont pris en compte (pas seulement IsClosed/IsOpen, qui sont FALSE pendant
-// TOUT le trajet depuis l&#x27;état transitoire) pour que la position corrigée de M2 converge
-// progressivement vers M1 pendant l&#x27;enroulage.
-IF Status.State = E_State.BUSY THEN
-    // Pendant le déplacement, l&#x27;offset actif suit la différence réelle de câble (M2 - M1) afin que
-    // la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne) sans à-coup,
-    // tandis que le câble brut de M2 montre son enroulement.
+IF Lifecycle.Busy THEN
     ActiveOffsetM := CablePosM2 - CablePosM1;
-    HoldOffsetM := ActiveOffsetM;   // Mémorise l&#x27;écart réel pour le gel en position intermédiaire
+    HoldOffsetM := ActiveOffsetM;
 ELSIF CloseReq OR BucketState.IsClosed THEN
     ActiveOffsetM := Config.OffsetCloseM;
     HoldOffsetM := ActiveOffsetM;
@@ -1175,20 +1282,16 @@ ELSIF OpenReq OR BucketState.IsOpen THEN
     ActiveOffsetM := Config.OffsetOpenM;
     HoldOffsetM := ActiveOffsetM;
 ELSE
-    // Position intermédiaire non référencée : gèle l&#x27;écart réel mémorisé (HoldOffsetM) au lieu de
-    // sauter vers la config. Évite l&#x27;à-coup sur la position corrigée M2 / la synchro.
     ActiveOffsetM := HoldOffsetM;
 END_IF;
 
-// 🔒 Validité stricte de l&#x27;offset actif (sécurité de synchronisation treuils M1/M2)
 ActiveOffsetValid := Enable AND PowerContactorEngaged
-                     AND (Status.State &lt;&gt; E_State.DISABLED)
                      AND NOT BucketState.StateIncoherent
-                     AND (Status.ErrorId = 16#0000);
+                     AND (Fault.ErrorId = 16#0000);
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
-
 {endregion}
 
+END_FUNCTION_BLOCK
 </pre>
             </details>
     </details>
