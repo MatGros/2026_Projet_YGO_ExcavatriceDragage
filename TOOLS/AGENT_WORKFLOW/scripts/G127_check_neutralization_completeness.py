@@ -37,8 +37,11 @@ GATE_RE = re.compile(
     r"IF\s+NOT\s+Enable\b[^\n]*?THEN(?P<body>.*?)RETURN\s*;",
     re.DOTALL | re.IGNORECASE,
 )
-# Cible d'affectation LHS : `Nom` ou `Nom.champ` (avant `:=`)
-ASSIGN_LHS_RE = re.compile(r"^\s*([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*:=", re.MULTILINE)
+# Cible d'affectation LHS : `Nom` ou `Nom.champ` (avant `:=`).
+# Ancre sur debut de ligne OU apres `;` : plusieurs affectations sur une meme ligne
+# (`A := 0.0; B := FALSE;`) sont toutes prises en compte (REX T164-1 : G127 ratait la 2e+).
+# Un `:=` precede de `(` ou `,` (argument nomme d'appel FB) n'est PAS un LHS -> non capture.
+ASSIGN_LHS_RE = re.compile(r"(?:^|;)[ \t]*([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)[ \t]*:=", re.MULTILINE)
 
 
 def strip_comments(text: str) -> str:
