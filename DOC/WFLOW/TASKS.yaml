@@ -2059,11 +2059,11 @@ tasks:
   bloque_par: []
 - id: T164-3
   parent_id: T164
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: STANDARDS
   agent: CC-sub
-  date: '2026-08-27T14:53:00'
+  date: '2026-08-27T15:35:00'
   titre: Chantier #3 — socle ST_Fault universel (docs + G315)
   contexte: 'Intitulé complet : Acter dans les docs standards et l''outillage que la forme cible du contrat
     FB standard est Ready + Fault:ST_Fault (rempli par FB_FaultCore, causes nommées ARRAY OF ST_FaultCause)
@@ -2077,8 +2077,13 @@ tasks:
     Change le PASS/FAIL de G315 → revue orchestrateur obligatoire. Clé de voûte : débloque T164-4 et T164-5.
     Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-3_SOCLE_ST_FAULT.yaml (check_task_contract PASS).
     Partage : partie DOCS déléguée à un sous-agent natif CC ; partie OUTILLAGE (G315 + baseline + T136) =
-    orchestrateur CC uniquement, l''agent docs n''y touche pas (forbidden). Lancé en parallèle de T164-1
-    (aucun conflit de fichiers : T164-1 = CODE/*.st, T164-3 = docs + G315). bloque_par relâché.'
+    orchestrateur CC uniquement, l''agent docs n''y touche pas (forbidden). Lancé en parallèle de T164-1.
+    ✅ TERMINÉ 2026-08-27. Partie DOCS : commit b2a68763 (AF-03/CQS/AF-08/AF-09 + sous-fiche
+    FB_FaultCore_v1.0.md ; changement fail-safe IsWarning→Latching explicité 3×) — revue orchestrateur
+    ACCEPTED. Partie OUTILLAGE : commit b1cd9a05 — G315 réécrit (3 formes : cible Fault:ST_Fault,
+    legacy-status Status:ST_Status jusqu''à T164-5, hérité à plat T137 vide) + test 12 PASS. État repo :
+    2 forme cible (FB_Joystick + FB_FaultCore), 16 legacy-status, 0 à plat. G315/G330/G340 PASS.
+    PRE2 de T164-4 LEVÉE. Nettoyage refs commentaire ST_FbStatus (G330, LINTER_ST, TEST_AUTO_CI) = suivi T164-5.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-3_SOCLE_ST_FAULT.yaml
   objectifs:
   - AF_Partie-03 et CODE_QUALITY_STANDARDS décrivent Fault:ST_Fault comme forme cible du contrat standard
