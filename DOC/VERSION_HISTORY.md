@@ -4,6 +4,16 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `T164-5_MIGRATION_TRANSVERSE_FAULT_LIFECYCLE` — 2026-08-27 — éradication ST_Status & généralisation ST_Fault/ST_Lifecycle
+- **Standardisation transverse (17 FB)** : Remplacement intégral de la structure legacy `ST_Status` par le binôme AF03 `Fault : ST_Fault` (alimenté par `FB_FaultCore`) et `Lifecycle : ST_Lifecycle` (`Busy`/`Done` pour les briques séquentielles).
+- **Façades & Sous-FBs alignés** : Migration achevée sur `FB_Encoder_Abs`, `FB_Encoder_Homing`, `FB_Encoder_Safety`, `FB_Bucket`, `FB_DiveSearch`, `FB_ExtractionSequence`, `FB_Translation`, `FB_Winch`, `FB_WinchSync`, etc.
+- **Validation CI 100% PASS** : 27 suites de tests (168 composants) validées sans régression sous STruCpp/C++ (`RAPPORT_COMPILATION_GLOBAL.md`).
+
+### `T164-4_ENCODER_HW_SPLIT_PRESET_FAULTCORE` — 2026-08-27 — frontière HW codeur, persistance Cfg & façade FaultCore
+- **Frontière matérielle testable** : Découplage strict des flux d'entrées/sorties via `ST_fbEncoder_HwIn` (lecture seule EtherCAT) et `ST_fbEncoder_HwOut` (commandes PDO Rx). Neutralisation forcée de `HwOut` dès `Enable=FALSE` (prévention preset parasite).
+- **Configuration & Persistance** : Ajout de `ST_fbEncoder_Cfg` et `E_PresetConfirmMode` reliés au pont NVRAM `GVL_PERSISTENT._EncoderCfgPersist`.
+- **Façade `FB_Encoder`** : Intégration de `FB_FaultCore` avec diagnostic en clair (`instCauses[0..15]`), décorrélation stricte entre interlocks machine physiques et drapeaux de latching IHM.
+
 ### `T163_ROOT_CAUSE_MASKING_ET_BYPASS_GRANULAIRE` — 2026-08-27 — qualification E/S, masquage cascade & bypass granulaires
 - **`FB_Hmi_BannerFormatter`** : Root Cause Masking (11 alarmes parentes prioritaires masquant les alarmes filles/process), filtrage anti-bagotement (TOF 1.5s), inhibition boot (TON 4s) et exposition instantanée `AlarmArray[0..49]`.
 - **`FB_Diag_CanOpen` & `FB_Diag_Ethercat`** : Épuration des sorties scalaires à plat, publication exclusive de `Ready : BOOL` et des structures typées `ST_Diag_Device`. Découplage strict des bypass bus maîtres vs équipements esclaves.
