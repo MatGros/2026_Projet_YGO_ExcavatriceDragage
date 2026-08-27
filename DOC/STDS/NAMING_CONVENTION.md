@@ -126,6 +126,7 @@ Le nom doit permettre de comprendre ce que représente la donnée **sans connaî
 | <nobr><code>NC-080</code></nobr> | Repère matériel (M1/M2/M3) juste après le préfixe dans une GVL plate | Motif `<Préfixe><Repère><Fonction>` respecté | 👁️ MANUEL | §Repère juste après le préfixe |
 | <nobr><code>NC-090</code></nobr> | Une notion = un seul nom dans tout le projet (pas de synonyme parallèle) | Revue sémantique, pas mécanisable | 👁️ MANUEL | `CODE_QUALITY_STANDARDS.md §1` |
 | <nobr><code>NC-100</code></nobr> | Polarité positive des arbitrages `*Permit`/`*Allowed` : `TRUE` = autorisé, `FALSE` = bloqué | Tout signal d'arbitrage répond à « que signifie `TRUE` ? » = autorisation positive ; jamais d'`OR` d'autorisations | 👁️ MANUEL | §Polarité positive des arbitrages (T109) |
+| <nobr><code>NC-110</code></nobr> | DUT **propriété d'un seul FB** (produit en `VAR_OUTPUT` / échangé en `VAR_IN_OUT` par une seule instance) préfixé `ST_fb<NomFb>_<Rôle>` — `fb` minuscule collé + `_` après le nom du FB (2 indices visuels le distinguant d'un `ST_<Domaine>_<Rôle>` public et d'un `ST_*HMI`) | Tout DUT référencé dans l'interface d'exactement un `FB_*` porte le préfixe `ST_fb<NomFb>_` | 🤖 AUTO (`G120`) | §Structures de données (DUT) |
 
 ---
 
@@ -176,6 +177,35 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 - `ST_Safety_Emergency_InternalCmd` (Commande interne Logic → Output)
 - `ST_Safety_Emergency_HmiCmd` (Commandes IHM)
 - `ST_Safety_Emergency_HmiState` (Retours état IHM)
+
+#### DUT propriété d'un FB — `ST_fb<NomFb>_<Rôle>` (NC-110)
+
+Un DUT **produit ou échangé par une seule instance de FB** (sortie `VAR_OUTPUT`, bus `VAR_IN_OUT`,
+entrée de réglage `Cfg`) ne relève **pas** de la convention `ST_<Domaine>_<Rôle>` ci-dessus : il
+porte le préfixe **`ST_fb<NomFb>_<Rôle>`** — `fb` minuscule collé, puis le nom du FB propriétaire,
+puis `_`, puis le rôle.
+
+```text
+ST_fb<NomFb>_<Rôle>        (Rôle : Cfg, AxisCmd, State, HwIn, HwOut, …)
+```
+
+- **Pourquoi 2 indices visuels** (`fb` + `_` après le nom du FB) : au tri alphabétique et en Watch
+  CODESYS, `ST_fbJoystick_Cfg` se lit immédiatement comme « structure interne, producteur unique
+  `FB_Joystick` », là où `ST_Joystick_Cfg` se confondrait avec un DUT de domaine public et
+  `ST_JoystickHMI` avec un bus IHM.
+- **Producteur unique** (règle socle AF03 §2) : le nom porte le propriétaire — un consommateur qui
+  écrit dans un `ST_fb*_*` qu'il ne possède pas est un défaut de conception repérable au nom seul.
+- **Frontière IHM** : si la même structure est *aussi* embarquée dans le DUT d'échange IHM
+  (`ST_*HMI`), elle garde son nom `ST_fb<NomFb>_*` — c'est le FB qui en reste propriétaire, l'IHM
+  n'en est que lectrice (cf. `ST_JoystickHMI.State.AxisCmdX : ST_fbJoystick_AxisCmd`).
+
+**Exemples conformes** (appliqués sur `FB_Joystick`, 2026-08-27) :
+- `ST_fbJoystick_Cfg` (réglages regroupés, entrée `Cfg`)
+- `ST_fbJoystick_AxisCmd` (consigne axe, sortie `AxisCmdX`/`AxisCmdY`)
+
+**Migration** : les DUT existants au format `ST_<Fb>Cfg` / `ST_<Fb>_<Rôle>` (`ST_WinchCfg`,
+`ST_CycleCfg`, `ST_EncoderHw`, …) restent **valides** tant qu'un lot de renommage dédié n'est pas
+décidé — `NC-110` s'applique à **tout nouveau** DUT et à tout DUT touché par un refactor d'interface.
 
 ### Programmes (POU principaux) — architecture cible
 
@@ -563,6 +593,24 @@ Les variables déclarées dans la liste globale persistante (`GVL_PERSISTENT.st`
 - `_TranslationMaxFreq_Hz` (Hz)
 - `_WinchMaxStepDescent` (sans unité, correction linguistique de "Descente" en "Descent")
 
+### Réglages FB regroupés — `Cfg : ST_fb<Fb>_Cfg` + pont persistant
+
+Quand un FB porte plusieurs paramètres de conditionnement/tuning, ils sont **regroupés dans une
+seule entrée** `Cfg : ST_fb<Fb>_Cfg` (DUT `NC-110`), plutôt que N paramètres littéraux au
+call-site. Le pattern complet (gate `G380_check_config_persistence.py` ; historique
+`ARCHIVES/Doc/AUDITS/ConfigPersistence/AUDIT_ConfigPersistence_v1.2.md`) :
+
+| Élément | Nom | Rôle |
+|---|---|---|
+| DUT de réglage | `ST_fb<Fb>_Cfg` | Champs de config + `Initialized : BOOL := FALSE` (drapeau restauration boot) |
+| Miroir persistant | `GVL_PERSISTENT._<Domaine>CfgPersist : ST_fb<Fb>_Cfg` | **Ajouté en fin de liste** (mapping RETAIN positionnel — jamais insérer/déplacer au milieu) |
+| Pont IHM ↔ persistant | `FB_CfgPersistBridge_<...>` instancié en `PRG_07_Supervision` §2 | Boot : `Persist → Hmi` ; ensuite chaque scan `Hmi → Persist` |
+| Lecture métier | Le FB lit directement `GVL_PERSISTENT._<Domaine>CfgPersist` | Producteur unique = le pont ; le FB est lecteur |
+
+Référence : `FB_Joystick` (`Cfg : ST_fbJoystick_Cfg`, `_JoystickCfgPersist`,
+`FB_CfgPersistBridge_fbJoystick_Cfg`), 2026-08-27. `Calib`/mémoires RETAIN (valeurs apprises,
+pas de la config saisie) **restent séparées** en `VAR_IN_OUT`, hors du `Cfg`.
+
 ---
 
 ## Variables IHM (structures ST_*HMI) — Préfixes sémantiques (collés)
@@ -754,4 +802,5 @@ END_TYPE
 8. Instance = `<Mécanisme>[<Repère>]` (repère seulement si plusieurs instances du même mécanisme).
 9. Seuil logiciel = 4 maillons : Paramètre (`_M`) → Mesure → `XxxReached` (fait) → `XxxActive` (conséquence).
 10. Structures + Enums = organisation, pas typage du nom.
+11. DUT propriété d'un seul FB (`NC-110`) = `ST_fb<NomFb>_<Rôle>` — `fb` collé + `_` après le nom du FB. Réglages regroupés en `Cfg : ST_fb<Fb>_Cfg`.
 
