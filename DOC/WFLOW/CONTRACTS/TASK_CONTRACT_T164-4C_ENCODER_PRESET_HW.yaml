@@ -76,15 +76,19 @@ contract:
   models_allowed:
     - "omni/cc/claude-sonnet-5"
   alert_duty: "Tout changement de valeur, seuil, polarite, tempo, formule, consumer non prevu ou acces a interne de sous-FB impose STOP."
-status: PENDING
+status: VALIDATED
 execution:
-  executed_by: "..."
-  completed_at: "..."
-  status: PENDING
-  summary: "..."
-  evidence_submitted: []
+  executed_by: "AGY-01"
+  completed_at: "2026-08-27T21:00:00"
+  status: SUCCESS
+  summary: "Transaction preset atomique vérifiée (7/7 tests unitaires PASS), séparation HwIn/HwOut, levée du STOP sécurité sur InReferencingMode, G200 0 erreur, 22/22 gates PASS."
+  evidence_submitted:
+    - check_linkage: "PASS (0 erreur, 1235 instances vérifiées)"
+    - run_all_gates: "22/22 PASS"
+    - bundle: "CODE_XML/CODE_Bundle.xml frais et valide"
+    - git_diff_review: "Commit 55f2f72a validé et pushé"
 validation:
-  status: PENDING
-  validated_by: "..."
-  validated_at: "..."
-  notes: "Depend de T164-4A et T164-4B."
+  status: VALIDATED
+  validated_by: "HUMAN_SUPERVISOR"
+  validated_at: "2026-08-27T21:00:00"
+  notes: "Preuves conformes AC1-AC8, tests STruCpp 7/7 PASS, zero régression."
