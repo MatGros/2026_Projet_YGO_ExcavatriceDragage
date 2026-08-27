@@ -201,6 +201,15 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend)</xhtml>
               </documentation>
             </variable>
+            <variable name="EncoderCfg">
+              <type>
+                <derived name="ST_fbEncoder_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Configuration technologique codeur commune M1/M2
+Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
+              </documentation>
+            </variable>
             <variable name="Cfg">
               <type>
                 <derived name="ST_CommunCfg" />
@@ -1085,6 +1094,48 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
             <ObjectId>53f9b377-a390-54de-9b7c-d1db8711e403</ObjectId>
           </data>
         </addData>
+      </dataType>
+      <dataType name="ST_fbEncoder_Cfg">
+        <baseType>
+          <struct>
+            <variable name="PresetConfirmMode">
+              <type>
+                <derived name="E_PresetConfirmMode" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_PresetConfirmMode.READBACK_ONLY" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode de confirmation preset, défaut relecture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE après restauration du pont persistant</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b06fb1f4-e990-5b56-b842-84de93b5b40e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbEncoder_Cfg — Réglages technologiques publics de FB_Encoder
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
+   🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
       <dataType name="ST_CycleCfg">
         <baseType>
@@ -4436,6 +4487,50 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_PresetConfirmMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="READBACK_ONLY" value="0" />
+              <value name="READBACK_AND_STATUSBIT" value="1" />
+              <value name="STATUSBIT_ONLY" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>READBACK_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation par relecture de position</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READBACK_AND_STATUSBIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Relecture et bit d'état matériel</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STATUSBIT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit d'état matériel uniquement</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>57a2dfc8-cdc9-581a-8092-09f21d5e6939</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="E_CycleStep">
         <baseType>
           <enum>
@@ -5979,6 +6074,10 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <Object Name="ST_BypassBucket" ObjectId="77e7b77e-4a14-5220-93aa-7bb27ede6733" />
             </Folder>
           </Folder>
+        </Folder>
+        <Folder Name="E_CODEURS">
+          <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
+          <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
         </Folder>
         <Folder Name="D_JOYSTICK">
           <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />

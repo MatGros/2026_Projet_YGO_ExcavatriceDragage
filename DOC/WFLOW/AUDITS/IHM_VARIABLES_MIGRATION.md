@@ -253,3 +253,16 @@ _(Lot 2 sera complet une fois Cycle vérifié — reste ensuite la persistance g
 
 Cette section sera complétée à chaque nouveau lot committé — une seule table par domaine, jamais
 de réécriture des lots déjà ✅.
+
+## 🆕 Lot T164-4B — Configuration technologique codeur
+
+Nouveau chemin public commun M1/M2, sans migration des réglages métier des treuils :
+
+| Nouveau chemin | Rôle | Persistance |
+|---|---|---|
+| `GVL_IHM.Commun.EncoderCfg.PresetConfirmMode` | Sélecteur de confirmation du preset (`READBACK_ONLY=0`, `READBACK_AND_STATUSBIT=1`, `STATUSBIT_ONLY=2`) | `GVL_PERSISTENT._EncoderCfgPersist.PresetConfirmMode` |
+
+Le pont unique est `FB_CfgPersistBridge_fbEncoder_Cfg` dans `PRG_07_Supervision`.
+`Initialized` est un drapeau interne de restauration et n'est pas un réglage IHM.
+Les cibles `CfgHomingTarget_M` / `CfgTopSensorPos_M` restent sous
+`GVL_IHM.M1TreuilRetenue.Cfg` / `GVL_IHM.M2TreuilBenne.Cfg`.

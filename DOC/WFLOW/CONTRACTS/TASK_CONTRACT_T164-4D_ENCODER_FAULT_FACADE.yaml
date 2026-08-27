@@ -1,0 +1,81 @@
+# Contrat T164-4D — migration Fault de la seule facade FB_Encoder
+preconditions:
+  - id: PRE1
+    statement: "T164-4C est VALIDATED ; le pipeline preset/HwIn/HwOut est stabilise et ses tests sont verts."
+    source: "Contrat T164-4C"
+contract:
+  task_id: T164-4D_ENCODER_FAULT_FACADE
+  criticality: C3
+  strategy: rebuild
+  objective: >
+    Migrer uniquement la facade FB_Encoder de Status:ST_Status vers Fault:ST_Fault,
+    selon FB_Joystick et FB_FaultCore, sans migrer les sous-FB ni changer la logique
+    de mesure, homing, safety ou preset stabilisee au lot precedent.
+  acceptance:
+    - id: AC1
+      statement: "FB_Encoder expose Ready et Fault:ST_Fault ; Status:ST_Status de facade et sa fusion OR des ErrorId sous-FB sont absents."
+      verified_by: "G315 + rg Status CODE/E_CODEURS/FB_Encoder.st"
+    - id: AC2
+      statement: "instFault:FB_FaultCore et instCauses:ARRAY[0..15] OF ST_FaultCause restent encapsules dans FB_Encoder ; Fault est la seule source de verite de la facade."
+      verified_by: "lecture FB_Encoder.st, pattern FB_Joystick"
+    - id: AC3
+      statement: "Une table fermee, issue de T164-4A, trace pour chaque cause : source publique ou fait brut, semantique live/latched, Latching et condition de Reset. Aucun membre VAR interne de sous-FB ni Status.ErrorId deja latche sans regle explicite n'est lu."
+      verified_by: "revue table T164-4A + rg des acces instAbs/instHoming/instSafety"
+    - id: AC4
+      statement: "Le socle est appele une fois dans le chemin actif apres le pipeline et dans le gate avec Enable=FALSE pour Reset/latches ; aucune cause active ne prend un scan de retard. Les tests prouvent, pour chaque semantique, le retour live, le latch et son effacement seulement par Reset conscient."
+      verified_by: "revue ordre d'execution + tests Fault live/latched/reset"
+    - id: AC5
+      statement: "FB_Encoder_Abs, FB_Encoder_Homing et FB_Encoder_Safety gardent Status:ST_Status ; Measurement.AbsStatus et Measurement.HomingStatus restent ST_Status."
+      verified_by: "G315 + declarations typees"
+    - id: AC6
+      statement: "Un inventaire versionne avant code couvre tous les consommateurs de Status.State, Busy, Done, Error et ErrorId de facade, y compris IHM, docs et tests ; chaque consommateur est remappe ou justifie absent et aucun consommateur non remappe ne reste."
+      verified_by: "inventaire dans IHM_VARIABLES_MIGRATION.md + rg consommateurs avant/apres + G200 --report"
+    - id: AC7
+      statement: "PRG_02_Acquisition.st et PRG_07_Supervision.st : fichier est identique au nom de POU ; suffixe est identique au langage bundle (Structured Text)."
+      verified_by: "G310_check_code_structure.py et G320_check_bundle_main_coverage.py"
+  scope:
+    allowed:
+      - CODE/E_CODEURS/FB_Encoder.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+      - DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md
+      - TOOLS/TEST_AUTO_CI/TEST_AUTO_CI_UNITARY/E_CODEURS/test_unitaires.py
+      - TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS/**
+    forbidden:
+      - CODE/E_CODEURS/FB_Encoder_Abs.st
+      - CODE/E_CODEURS/FB_Encoder_Homing.st
+      - CODE/E_CODEURS/FB_Encoder_Safety.st
+      - CODE/E_CODEURS/FB_Encoder_Scale.st
+      - CODE/E_CODEURS/FB_EncoderReliability.st
+      - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
+      - PRJ_CODESYS/**
+      - DOC/WFLOW/TASKS.yaml
+  conservation:
+    must_survive:
+      - "Fault.Error reste une vue live des causes actives ; Fault.Latched respecte Latching et le Reset frontal."
+      - "EncoderFault et HomedAndReliable gardent leur semantique existante."
+      - "Aucune cause ne pilote une action machine par Fault.Latched ; les interlocks restent bases sur les faits bruts."
+    dropped_on_purpose:
+      - "Status:ST_Status de la seule facade FB_Encoder."
+      - "Fusion OR des ErrorId des sous-FB dans la facade."
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - git_diff_review
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: "Tout consumer facade Status non trace, toute lecture d'interne ou toute modification de sous-FB impose STOP."
+status: PENDING
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: "..."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: "Depend de T164-4C."

@@ -31,6 +31,7 @@ VAR
     instCfgPersistBridgeWinchM2        : FB_CfgPersistBridge_WinchCfg;            // * [INST] Pont persistance config treuil M2
     instCfgPersistBridgeTranslation    : FB_CfgPersistBridge_TranslationCfg;      // * [INST] Pont persistance config translation
     instCfgPersistBridgeJoystick       : FB_CfgPersistBridge_fbJoystick_Cfg;      // * [INST] Pont persistance config joystick
+    instCfgPersistBridgeEncoder        : FB_CfgPersistBridge_fbEncoder_Cfg;       // * [INST] Pont persistance config codeur commune M1/M2
     instDiagIhmHeartbeat   : FB_Diag_IhmHeartbeat;            // * [INST] Surveillance heartbeat IHM
     instPreflight          : FB_Acquisition_Preflight;        // * [INST] Preflight acquisition avant demarrage
     instHmiBannerFormatter : FB_Hmi_BannerFormatter;          // * [INST] Formatage bandeau IHM (alarmes/etats)
@@ -134,6 +135,11 @@ END_IF;
 
 instCfgPersistBridgeJoystick(Hmi := GVL_IHM.JOY1Joystick.Cfg, Persist := _JoystickCfgPersist);
 IF instCfgPersistBridgeJoystick.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeEncoder(Hmi := GVL_IHM.Commun.EncoderCfg, Persist := _EncoderCfgPersist);
+IF instCfgPersistBridgeEncoder.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 

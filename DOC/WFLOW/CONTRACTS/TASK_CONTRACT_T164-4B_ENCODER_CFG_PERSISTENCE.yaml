@@ -1,0 +1,82 @@
+# Contrat T164-4B — configuration et persistance encodeur apres decision T164-4A
+preconditions:
+  - id: PRE1
+    statement: "T164-4A est VALIDATED et DECISION_ENCODER_CFG_OWNERSHIP.md designe un proprietaire public Hmi et un Persist pour ST_fbEncoder_Cfg."
+    source: "DOC/WFLOW/CONTRACTS/DECISION_ENCODER_CFG_OWNERSHIP.md"
+contract:
+  task_id: T164-4B_ENCODER_CFG_PERSISTENCE
+  criticality: C3
+  strategy: patch
+  objective: >
+    Ajouter le seul reglage technologique codeur valide par T164-4A, sa persistance et
+    son proprietaire public, sans migrer les cibles homing M1/M2 ni rendre modifiables
+    les constantes mecaniques ou les bornes.
+  acceptance:
+    - id: AC1
+      statement: "ST_fbEncoder_Cfg contient exactement les champs approuves par T164-4A, dont Initialized et PresetConfirmMode avec READBACK_ONLY par defaut."
+      verified_by: "G120 + lecture du DUT"
+    - id: AC2
+      statement: "E_PresetConfirmMode porte READBACK_ONLY, READBACK_AND_STATUSBIT et STATUSBIT_ONLY avec valeurs stables 0, 1 et 2."
+      verified_by: "lecture E_PresetConfirmMode.st + test de structure"
+    - id: AC3
+      statement: "Le bridge relie une structure publique Hmi et _EncoderCfgPersist ; il restaure au boot par Initialized puis synchronise sans canal cache."
+      verified_by: "G200 --report et revue PRG_07 section persistance"
+    - id: AC4
+      statement: "CfgHomingTarget_M, CfgTopSensorPos_M, PointsPerRev, CableM_PerRev, PositionMinM et PositionMaxM conservent leur proprietaire et leur valeur existants."
+      verified_by: "git diff + lecture des call-sites PRG_02"
+    - id: AC5
+      statement: "Aucun comportement homing, preset, mesure ou safety ne change dans ce lot."
+      verified_by: "tests E_CODEURS existants inchanges + revue git diff"
+    - id: AC6
+      statement: "PRG_07_Supervision.st : fichier est identique au nom de POU ; suffixe est identique au langage bundle (Structured Text)."
+      verified_by: "G310_check_code_structure.py et G320_check_bundle_main_coverage.py"
+  scope:
+    allowed:
+      - CODE/E_CODEURS/E_PresetConfirmMode.st
+      - CODE/E_CODEURS/ST_fbEncoder_Cfg.st
+      - CODE/J_SUPERVISION/_BRIDGES/FB_CfgPersistBridge_fbEncoder_Cfg.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+      - DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md
+    forbidden:
+      - CODE/E_CODEURS/FB_Encoder_Abs.st
+      - CODE/E_CODEURS/FB_Encoder_Homing.st
+      - CODE/E_CODEURS/FB_Encoder_Scale.st
+      - CODE/E_CODEURS/FB_Encoder_Safety.st
+      - CODE/E_CODEURS/FB_EncoderReliability.st
+      - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - PRJ_CODESYS/**
+      - DOC/WFLOW/TASKS.yaml
+  conservation:
+    must_survive:
+      - "Cibles homing M1/M2 dans leurs ST_WinchCfg distincts."
+      - "Constantes et bornes mecaniques non exposees a l'IHM."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - git_diff_review
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: "Le seul proprietaire HMI est GVL_IHM.Commun.EncoderCfg via ST_CommunHMI.st ; toute seconde source, toute fusion M1/M2 ou tout champ mecanique supplementaire impose STOP."
+status: COMPLETED
+execution:
+  executed_by: "Codex 5.6 Luna"
+  completed_at: "2026-08-27T18:05:00"
+  status: COMPLETED
+  summary: "Configuration minimale, bridge persistant et owner HMI unique implementes."
+  evidence_submitted:
+    - "Bundle 188/188, 0 erreur ST"
+    - "G200 PASS"
+    - "G315 PASS"
+    - "G380 PASS"
+    - "G390 PASS apres regeneration"
+validation:
+  status: VALIDATED
+  validated_by: "Orchestrateur Codex"
+  validated_at: "2026-08-27T18:05:00"
+  notes: "Revue independante prise en compte : enum qualifie et precondition 4A formalisee."

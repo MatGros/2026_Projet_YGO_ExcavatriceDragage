@@ -50,6 +50,9 @@ STRUCT
     KoboldImmersionConfirmed : BOOL; (* Front Kobold confirmé dans la fenêtre d'immersion *)
     KoboldBottomTouchLatched : BOOL; (* Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend) *)
 
+    (* ⚙️ Configuration technologique codeur commune M1/M2 *)
+    EncoderCfg : ST_fbEncoder_Cfg; (* Réglage mode confirmation preset, ponté vers GVL_PERSISTENT *)
+
     (* 📐 Configuration des paramètres communs machine (au-dessus des bypass) *)
     Cfg : ST_CommunCfg;
 
