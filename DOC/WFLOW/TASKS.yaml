@@ -1988,18 +1988,18 @@ tasks:
     proposés dans DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md pour les 11 FB encore
     signalés par G127 (après correction du parseur). Chaque correctif = affectation(s) ajoutée(s) dans
     le gate IF NOT Enable, sans changement d''interface.'
-  description: 'Découpage : lot A = 4 FB C4 (FB_Safety_Winch, FB_Winch, FB_WinchOutputInterlock,
-    FB_Translation) — revue orchestrateur ligne à ligne obligatoire ; lot C = le reste (FB_Brake,
-    FB_Encoder_Abs, FB_Cycle, FB_Translation_PositionEstimator, FB_TranslationOutputInterlock,
-    FB_Sim_Joystick). FB_Bucket EXCLU de T164-1b — déplacé en T164-1c (changement d''interface,
-    sortie ActiveOffsetValid). Chaque lot : bundle + G200 + G127 (FB sorti des incomplets) +
-    commit séparé. L''orchestrateur applique/valide.'
-  contrat: ''
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1b_G127_FIXES.yaml (check PASS).
+    Découpage : lot A = 4 FB C4 (FB_Safety_Winch, FB_Winch, FB_WinchOutputInterlock, FB_Translation) —
+    revue orchestrateur ligne à ligne ; lot C = 5 FB non-C4 (FB_Brake, FB_Cycle,
+    FB_Translation_PositionEstimator, FB_TranslationOutputInterlock, FB_Sim_Joystick).
+    EXCLUS : FB_Bucket → T164-1c ; FB_Encoder_Abs → T164-4 (sa refonte d''interface recouvre son gate
+    incomplet, le corriger ici = double travail + conflit). 2 commits séparés (lot A / lot C).'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1b_G127_FIXES.yaml
   objectifs:
-  - 'Lot A (4 C4) — gate complété pour MecaADriftM/MecaBElapsedTime/MecaCDriftM, ContactorsCheck/DirectionChangePending/SpeedGuardLimited, ErrorId/Reason/RestartInhibit/StateAtError, TargetReached ; ces FB sortent des incomplets G127'
-  - 'Lot C (reste) — correctifs appliqués, chacun avec commentaire explicite AU gate (REX FB_Encoder : gel volontaire doit être visible au gate)'
+  - 'Lot A (4 C4) — gate complété pour MecaADriftM/MecaBElapsedTime/MecaCDriftM, ContactorsCheck/DirectionChangePending/SpeedGuardLimited, ErrorId/Reason/RestartInhibit/StateAtError, TargetReached ; ces 4 FB sortent des incomplets G127'
+  - 'Lot C (5 FB) — correctifs appliqués, chacun avec commentaire explicite AU gate (REX FB_Encoder : gel volontaire doit être visible au gate)'
   - "Chaque lot — aucun changement d'interface, G200 PASS, bundle régénéré, commit séparé validé par l'orchestrateur"
-  - 'À la fin (avec T164-1c) — G127 informatif ne signale plus que des OK-FIGE explicitement commentés'
+  - 'À la fin (avec T164-1c + FB_Encoder_Abs dans T164-4) — G127 informatif ne signale plus que des OK-FIGE explicitement commentés'
   bloque_par:
   - T164-1
 - id: T164-1c
@@ -2098,25 +2098,27 @@ tasks:
   criticite: C3
   domaine: CODEURS
   agent: ''
-  date: '2026-08-27T14:39:34'
+  date: '2026-08-27T15:45:00'
   titre: Mise en conformité interface FB_Encoder (E1+E2)
   contexte: 'Intitulé complet : Aligner la façade FB_Encoder sur les contrats cibles (Fault:ST_Fault à causes
     nommées, frontière HW entrée/sortie séparée ST_fbEncoder_HwIn/HwOut, réglages regroupés ST_fbEncoder_Cfg
     NC-110 + pont FB_CfgPersistBridge_fbEncoder_Cfg) SANS changer aucune sémantique de mesure/homing/sécurité.'
-  description: 'Contrat prêt : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml
-    (check_task_contract PASS, status PENDING, 8 AC testables). Délégable à un agent d''exécution, git diff
-    revu ligne à ligne par l''orchestrateur. Périmètre inclut FB_Sim_Encoder/FB_SimBench + tests CI E_CODEURS
-    + AF-09 + IHM_VARIABLES_MIGRATION. Ne PAS toucher FB_Encoder_Scale/Safety/Reliability/SpeedMeasure.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml
+    (check PASS, 9 AC). 🔓 DÉBLOQUÉ 2026-08-27 : PRE1 (décision preset E-D1) + PRE2 (T164-3, commits
+    b2a68763 + b1cd9a05) levées. Challenge orchestrateur : SEULE la façade FB_Encoder passe Fault:ST_Fault ;
+    les sous-FB (FB_Encoder_Abs/Homing/Safety) GARDENT Status:ST_Status → T164-5 ; Measurement.HomingStatus/
+    AbsStatus restent ST_Status (miroirs). FB_Encoder_Abs traité ICI (gate G127 + refonte HwIn/HwOut +
+    drop PresetAck/Nak), PAS en T164-1b. Ne PAS toucher FB_Encoder_Scale/Safety/Reliability/SpeedMeasure.
+    Délégable ; git diff revu ligne à ligne par l''orchestrateur.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml
   objectifs:
-  - FB_Encoder expose Fault:ST_Fault via FB_FaultCore + causes nommées (fin de la fusion OR des ErrorId sous-FB)
-  - Frontière HW séparée HwIn/HwOut ; réglages dans ST_fbEncoder_Cfg + _EncoderCfgPersist en fin de GVL_PERSISTENT
-  - Gate NOT Enable complet (G127 : FB_Encoder absent des incomplets) ; ports morts tranchés (PresetAck/Nak selon T164-2)
-  - Aucune valeur/seuil/polarité/tempo/logique modifiée — diff limité à la forme ; tests CI E_CODEURS verts
+  - Façade FB_Encoder expose Fault:ST_Fault via FB_FaultCore + causes nommées (fin de la fusion OR des ErrorId sous-FB)
+  - Sous-FB Abs/Homing/Safety gardent Status:ST_Status (T164-5) ; Measurement.HomingStatus/AbsStatus restent ST_Status
+  - Frontière HW séparée ST_fbEncoder_HwIn/HwOut ; réglages dans ST_fbEncoder_Cfg + _EncoderCfgPersist en FIN de GVL_PERSISTENT
+  - Confirmation preset par Cfg.PresetConfirmMode (READBACK_ONLY défaut) + entrée optionnelle PresetStatusBit ; PresetNak supprimé
+  - Gate NOT Enable complet pour FB_Encoder ET FB_Encoder_Abs (G127) ; aucune valeur/seuil/logique modifiée ; tests CI E_CODEURS verts
   - G200 PASS + palier C PASS + bundle régénéré + git diff revu par l'orchestrateur
-  bloque_par:
-  - T164-2
-  - T164-3
+  bloque_par: []
 - id: T164-5
   parent_id: T164
   statut: ⬜
@@ -2130,11 +2132,12 @@ tasks:
     FB_Winch, FB_WinchLoadEstimator, FB_WinchSync, FB_Safety_Translation, FB_Translation,
     FB_TranslationOutputInterlock, ST_EncoderMeasurement) vers Fault:ST_Fault + Lifecycle:ST_Lifecycle si
     machine d''état, avec FB_FaultCore et causes nommées.'
-  description: 'Naturellement parallélisable : 1 sous-lot par domaine (A_COMMUN / E_CODEURS / F_MODES /
-    G_CYCLE / H_TREUILS_BENNE / I_TRANSLATION), chacun avec son propre contrat, tous délégables en parallèle
-    UNE FOIS T164-3 et T164-4 terminés (pattern prouvé 2× : joystick + encodeur). Chaque lot = son G315 vert,
-    ses consommateurs remappés, sa doc AF métier à jour.'
-  contrat: ''
+  description: 'GABARIT de contrat prêt : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-5_MIGRATION_ST_FAULT_TEMPLATE.yaml
+    — à cloner par domaine (T164-5a..f : A_COMMUN / E_CODEURS / F_MODES / G_CYCLE / H_TREUILS_BENNE / I_TRANSLATION).
+    Contient la RÈGLE DE MAPPING DES CAUSES non négociable (ErrorId→Latching:=TRUE ; WarningId→Latching:=FALSE ;
+    ambigu→TRUE + alerte). Parallélisable une fois T164-4 VALIDATED. Chaque lot = son G315 vert, consommateurs
+    remappés, AF métier à jour, commit + revue orchestrateur.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-5_MIGRATION_ST_FAULT_TEMPLATE.yaml
   objectifs:
   - Chaque FB migré expose Fault:ST_Fault (+ Lifecycle si séquenceur) rempli par FB_FaultCore à causes nommées
   - Consommateurs de Status.* remappés sur Fault.*/Lifecycle.* sans changement de valeur ni de logique

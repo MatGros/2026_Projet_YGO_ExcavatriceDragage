@@ -1,0 +1,114 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T164-1b : Application des correctifs de neutralisation G127
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1b_G127_FIXES.yaml
+# Parent : T164 · Source : DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md
+#
+# CHALLENGE ORCHESTRATEUR :
+#  - FB_Bucket EXCLU -> T164-1c (changement d'interface, deja delegue).
+#  - FB_Encoder_Abs EXCLU de T164-1b -> traite dans T164-4 (qui refond deja son interface :
+#    drop PresetAck/PresetNak, split HwIn/HwOut). Le corriger ici puis le refondre = double
+#    travail + conflit de merge garanti.
+#  - Reste : lot A = 4 FB C4 (revue orchestrateur ligne a ligne), lot C = 5 FB non-C4.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T164-1b_G127_FIXES
+  criticality: C3
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Appliquer, tels que proposes dans l'audit AUDIT_G127_GATES_NEUTRALISATION_20260827.md,
+    les correctifs de neutralisation pour les 9 FB encore signales par G127 (hors FB_Bucket =
+    T164-1c, hors FB_Encoder_Abs = T164-4) : chaque sortie ecrite dans le corps mais absente
+    du gate NOT Enable recoit une affectation de neutralisation (valeur sure : 0 / FALSE /
+    depuis une source RETAIN) DANS le bloc du gate, avec un commentaire explicite. Aucun
+    changement d'interface, aucune modification de logique metier.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Lot A (C4) — les 4 FB FB_Safety_Winch, FB_Winch, FB_WinchOutputInterlock, FB_Translation ne figurent plus dans la sortie de G127 ; chaque sortie ajoutee au gate porte un commentaire de fin de ligne expliquant la valeur de neutralisation choisie."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G127_check_neutralization_completeness.py . => aucun de ces 4 FB dans la liste des incomplets ; lecture des 4 gates"
+    - id: AC2
+      statement: "Lot C (non-C4) — les 5 FB FB_Brake, FB_Cycle, FB_Translation_PositionEstimator, FB_TranslationOutputInterlock, FB_Sim_Joystick ne figurent plus dans la sortie de G127."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G127_check_neutralization_completeness.py . => aucun de ces 5 FB dans la liste des incomplets"
+    - id: AC3
+      statement: "Pour les sorties classees OK-FIGE dans l'audit (gel volontaire : latch de defaut, gel sur doute, persistance odometrique), une ligne de commentaire est ajoutee AU gate expliquant pourquoi la valeur est conservee (REX FB_Encoder : le gel volontaire doit etre visible au niveau du gate, pas seulement dans le bandeau d'en-tete)."
+      verified_by: "lecture des gates concernes (FB_Cycle CycleStepAtError/Error/ErrorId, FB_WinchOutputInterlock ErrorId/Reason/RestartInhibit/StateAtError, FB_Translation_PositionEstimator Initialized/PositionEstimatedM) : commentaire present"
+    - id: AC4
+      statement: "Aucune valeur, seuil, polarite, temporisation ou branche de logique metier n'est modifiee ; le diff de chaque FB se limite a des affectations ajoutees a l'interieur du bloc du gate de neutralisation (front NOT Enable, sortie anticipee) et a des commentaires."
+      verified_by: "revue git diff par l'orchestrateur : chaque hunk est soit dans le bloc du gate, soit un commentaire ; aucun hunk dans la logique metier"
+    - id: AC5
+      statement: "G200 PASS (0 erreur), palier C PASS, bundle PLCopenXML regenere ; les tests CI existants des domaines touches (H_TREUILS_BENNE, I_TRANSLATION, G_CYCLE, A_COMMUN, L_SIMULATION) restent au vert sans modification de leurs attendus."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report ; python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+    - id: AC6
+      statement: "Livraison en 2 commits separes : un pour le lot A (C4), un pour le lot C — pour que la revue orchestrateur des 4 FB C4 soit isolable."
+      verified_by: "git log : 2 commits, messages distincts lot A / lot C"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/A_COMMUN/FB_Brake.st
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
+      - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
+      - CODE/L_SIMULATION/FB_Sim_Joystick.st
+      - CODE_XML/**
+    forbidden:
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st        # -> T164-1c
+      - CODE/E_CODEURS/FB_Encoder_Abs.st               # -> T164-4
+      - PRJ_CODESYS/**
+      - DOC/WFLOW/TASKS.yaml
+      - "toute logique metier : seul le bloc du gate NOT Enable + des commentaires"
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Les sorties [ACT]/[SAFE] des 4 FB C4 (SafeStop, PowerCutOff, RelayFwd/Rev, Contactor*, BrakeCmd, RequestedDriveControlWord/FreqHz) : deja correctement neutralisees, NE PAS y toucher."
+      - "Les latches de defaut existants (Error/ErrorId qui survivent au gate volontairement, §9) : conserves, seulement commentes."
+      - "Toute la logique metier hors du bloc IF NOT Enable."
+    dropped_on_purpose:
+      - "La publication de valeurs [DIAG]/[STAT] perimees hors autorisation (remplacees par une valeur sure dans le gate)."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - g127_report              # les 9 FB sortis des incomplets (reste : FB_Bucket=T164-1c, FB_Encoder_Abs=T164-4)
+    - run_all_gates
+    - bundle
+    - git_diff_review
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si un correctif propose dans l'audit touche en realite une sortie [ACT]/[SAFE] (pas [DIAG]),
+    ou si la valeur sure a ecrire dans le gate n'est pas evidente (ex. faut-il 0.0 ou une valeur
+    RETAIN ?), STOP et remonter a l'orchestrateur avant d'ecrire ce FB. Ne jamais deduire une
+    valeur de neutralisation pour un FB C4 sans validation.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI (rempli par l'ORCHESTRATEUR)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    (rapport agent : FB traites, gates completes, preuves G127/G200)
+  evidence_submitted: []
+
+validation:
+  validated_by: "..."          # = orchestrateur (CC) — revue ligne a ligne des 4 FB C4
+  validated_at: "..."
+  verdict: PENDING
+  notes: >
+    (visa orchestrateur)
