@@ -6550,12 +6550,12 @@ Valeur brute axe X (0..10000)</xhtml>
       <dataType name="ST_JoystickCmd">
         <baseType>
           <struct>
-            <variable name="BtnCalibrate">
+            <variable name="Calibrate">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Demande de recalage au neutre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Demande de recalage au neutre (front)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -33244,7 +33244,7 @@ instJoystick(
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
     RawY                      := HwIn.Operator.JoyYRaw_ANA2,
     RawButton                 := HwIn.Operator.JoyBtnRaw,
-    Calibrate                 := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
+    Calibrate                 := GVL_IHM.JOY1Joystick.Cmd.Calibrate,
     Cfg                       := GVL_PERSISTENT._JoystickCfgPersist,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
