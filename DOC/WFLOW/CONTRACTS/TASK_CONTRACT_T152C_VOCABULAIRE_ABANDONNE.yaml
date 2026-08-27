@@ -26,7 +26,7 @@ contract:
       statement: "ST_TranslationCmd.st:14 — PRG_10_Outputs_LD → PRG_06_Outputs."
       verified_by: "Relecture de la ligne citée"
     - id: AC3
-      statement: "ST_Modes_Autorisations.st:6,8 — PRG_MODES_CFC (×2) → PRG_03_Modes_Cycle."
+      statement: "ST_fbModes_Autorisations.st:6,8 — PRG_MODES_CFC (×2) → PRG_03_Modes_Cycle."
       verified_by: "Relecture des lignes citées"
     - id: AC4
       statement: "ST_CommunHMI.st:22,42 — PRG_AUXILIARY_CFC → PRG_02_Acquisition, PRG_SUPERVISION_CFC → PRG_07_Supervision."
@@ -54,7 +54,7 @@ contract:
       - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st
       - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st
       - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
-      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
       - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st
     forbidden:
       - Toute modification de déclaration de champ, de type ou de logique — commentaires uniquement

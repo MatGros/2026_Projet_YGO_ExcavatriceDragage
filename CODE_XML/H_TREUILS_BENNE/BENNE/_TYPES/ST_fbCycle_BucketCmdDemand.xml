@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.151937" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.151937">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:37:02.540638" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:37:02.540638">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_BucketCmdDemand">
+      <dataType name="ST_fbCycle_BucketCmdDemand">
         <baseType>
           <struct>
             <variable name="Open">
@@ -54,12 +54,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e0ba9d9d-5f49-57f9-aa65-51128070b971</ObjectId>
+            <ObjectId>e16788cb-2d99-53eb-b97c-ee6cf1555f75</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🪣 ST_BucketCmdDemand — Demande de commande benne
+   🪣 ST_fbCycle_BucketCmdDemand — Demande de commande benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne de mouvement benne (Ouverture, Fermeture, Kobold)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -78,7 +78,7 @@
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
             <Folder Name="_TYPES">
-              <Object Name="ST_BucketCmdDemand" ObjectId="e0ba9d9d-5f49-57f9-aa65-51128070b971" />
+              <Object Name="ST_fbCycle_BucketCmdDemand" ObjectId="e16788cb-2d99-53eb-b97c-ee6cf1555f75" />
             </Folder>
           </Folder>
         </Folder>

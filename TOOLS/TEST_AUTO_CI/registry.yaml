@@ -147,7 +147,7 @@ FB_Modes:
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
     - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/F_MODES/FB_Modes.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/F_MODES/tests/test_fb_modes.st
 
@@ -161,9 +161,9 @@ FB_Cycle:
     - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
-    - CODE/H_TREUILS_BENNE/_TYPES/ST_WinchCmdDemand.st
-    - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
-    - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketCmdDemand.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st
+    - CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st
+    - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st
     - CODE/G_CYCLE/FB_Cycle.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cycle.st
 
@@ -327,7 +327,7 @@ FB_SimBench:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st
@@ -446,7 +446,7 @@ FB_Hmi_BannerFormatter:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st
@@ -521,7 +521,7 @@ PRG_02_Acquisition:
     - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
     - CODE/E_CODEURS/FB_Encoder.st
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
-    - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
+    - CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st
@@ -551,13 +551,13 @@ PRG_03_Modes_Cycle:
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
     - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
-    - CODE/H_TREUILS_BENNE/_TYPES/ST_WinchCmdDemand.st
-    - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketCmdDemand.st
-    - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st
+    - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st
+    - CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st
     - CODE/G_CYCLE/FB_DiveSearch.st
     - CODE/G_CYCLE/FB_ExtractionSequence.st
     - CODE/G_CYCLE/FB_Cycle.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st
   source_prg: CODE/M_MAIN/PRG_03_Modes_Cycle.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_03_modes_cycle.st
@@ -592,7 +592,7 @@ PRG_04_Treuils_Benne:
     - CODE/H_TREUILS_BENNE/_TYPES/ST_WinchLoadEstimateTable.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_Winch_SymmetryCfg.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_Winch_SymmetryData.st
-    - CODE/H_TREUILS_BENNE/_TYPES/ST_WinchCmdDemand.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st
     - CODE/H_TREUILS_BENNE/FB_SpeedStep.st
     - CODE/H_TREUILS_BENNE/FB_DriftGuard.st
     - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
@@ -605,7 +605,7 @@ PRG_04_Treuils_Benne:
     - CODE/H_TREUILS_BENNE/FB_Winch.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketConfig.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketState.st
-    - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketCmdDemand.st
+    - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st
     - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st
@@ -614,7 +614,7 @@ PRG_04_Treuils_Benne:
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
     - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st
   source_prg: CODE/M_MAIN/PRG_04_Treuils_Benne.st
@@ -641,7 +641,7 @@ PRG_05_Translation:
     - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
     - CODE/F_MODES/E_Mode.st
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
-    - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
+    - CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st
     - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
     - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
     - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
@@ -651,7 +651,7 @@ PRG_05_Translation:
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
     - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_05.st
   source_prg: CODE/M_MAIN/PRG_05_Translation.st
@@ -723,7 +723,7 @@ PRG_07_Supervision:
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
     - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
@@ -784,7 +784,7 @@ MAIN_GLOBAL:
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
     - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
-    - CODE/H_TREUILS_BENNE/_TYPES/ST_WinchCmdDemand.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_WinchSpeedConfig.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_WinchLoadEstimateTable.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_Winch_SymmetryCfg.st
@@ -800,7 +800,7 @@ MAIN_GLOBAL:
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketConfig.st
-    - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketCmdDemand.st
+    - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st
 
     - CODE/H_TREUILS_BENNE/FB_SpeedStep.st
     - CODE/H_TREUILS_BENNE/FB_DriftGuard.st
@@ -813,7 +813,7 @@ MAIN_GLOBAL:
     - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
     - CODE/H_TREUILS_BENNE/FB_Winch.st
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
-    - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
+    - CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st
     - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
     - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
     - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
@@ -836,7 +836,7 @@ MAIN_GLOBAL:
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
     - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st
     - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st

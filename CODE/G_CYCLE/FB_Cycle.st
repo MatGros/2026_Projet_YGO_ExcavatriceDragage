@@ -73,10 +73,10 @@ VAR_OUTPUT
     SpeedMismatchConfirmed  : BOOL;         // <-- [DIAG] Ecart vitesse confirme pendant timeout
 
     // === ORDRES ACTIONNEURS (COMMANDES STRUCTUREES) ===
-    WinchM1Cmd              : ST_WinchCmdDemand;        // <-- [ACT] Demande treuil M1
-    WinchM2Cmd              : ST_WinchCmdDemand;        // <-- [ACT] Demande treuil M2
-    TranslationCmd          : ST_TranslationCmdDemand;  // <-- [ACT] Demande translation M3
-    BucketCmd               : ST_BucketCmdDemand;       // <-- [ACT] Demande benne
+    WinchM1Cmd              : ST_fbCycle_WinchCmdDemand;        // <-- [ACT] Demande treuil M1
+    WinchM2Cmd              : ST_fbCycle_WinchCmdDemand;        // <-- [ACT] Demande treuil M2
+    TranslationCmd          : ST_fbCycle_TranslationCmdDemand;  // <-- [ACT] Demande translation M3
+    BucketCmd               : ST_fbCycle_BucketCmdDemand;       // <-- [ACT] Demande benne
 
     // === METADONNEES & SYNOPTIQUE ===
     CycleStep               : E_CycleStep;  // <-- [STAT] Etape active du Grafcet

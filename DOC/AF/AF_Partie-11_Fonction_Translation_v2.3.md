@@ -116,7 +116,7 @@ même dictionnaire que `GUIDE_EDITION_AF_v1.0.md §3quater`.
 
 - **POU cible unique** : `PRG_05_Translation` (ST pur). ⚠️ Le code actuel instancie encore le
   décodeur dans `PRG_02_Acquisition` ; migration C3 à planifier sans double producteur.
-- **Source des autorisations** : `ST_Modes_Autorisations` distribué par `PRG_03_Modes_Cycle`.
+- **Source des autorisations** : `ST_fbModes_Autorisations` distribué par `PRG_03_Modes_Cycle`.
 - **Image des sorties** : Transmise à `PRG_06_Outputs` pour la barrière finale matérielle.
 
 ---
@@ -165,7 +165,7 @@ Consommateurs : `FB_Translation_PositionEstimator` (odométrie + recalage), `FB_
 | AF01 | AU, coupure puissance |
 | AF02 | Architecture cible — `PRG_05_Translation` |
 | AF03 | Contrats FB mouvement |
-| AF05 | Modes — `ST_Modes_Autorisations` |
+| AF05 | Modes — `ST_fbModes_Autorisations` |
 | AF06 | E/S physiques translation |
 | AF13 | Simulation — `FB_Sim_Translation` |
 | AF14 | Troubleshooting — `TROUBLESHOOTING_Translation_M3_v1.0.md` |

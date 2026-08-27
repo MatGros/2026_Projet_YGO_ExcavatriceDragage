@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:27:20.946560" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:27:20.946560">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:37:02.471314" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:37:02.471314">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_Modes_Autorisations">
+      <dataType name="ST_fbModes_Autorisations">
         <baseType>
           <struct>
             <variable name="Mode">
@@ -86,12 +86,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>fd63c0a6-3caa-5a6f-9077-b79ee39469f5</ObjectId>
+            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎚️ ST_Modes_Autorisations — Bus d'autorisations du mode machine
+   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
                    DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
@@ -273,7 +273,7 @@
           </data>
         </addData>
       </dataType>
-      <dataType name="ST_BucketCmdDemand">
+      <dataType name="ST_fbCycle_BucketCmdDemand">
         <baseType>
           <struct>
             <variable name="Open">
@@ -304,19 +304,19 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e0ba9d9d-5f49-57f9-aa65-51128070b971</ObjectId>
+            <ObjectId>e16788cb-2d99-53eb-b97c-ee6cf1555f75</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🪣 ST_BucketCmdDemand — Demande de commande benne
+   🪣 ST_fbCycle_BucketCmdDemand — Demande de commande benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne de mouvement benne (Ouverture, Fermeture, Kobold)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_TranslationCmdDemand">
+      <dataType name="ST_fbCycle_TranslationCmdDemand">
         <baseType>
           <struct>
             <variable name="Start">
@@ -339,19 +339,19 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>0b5f8faa-764b-51e3-b87f-be2bae8212ac</ObjectId>
+            <ObjectId>e3302f93-57a8-5949-b90f-a1621e17cb50</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🎯 ST_TranslationCmdDemand — Demande de commande translation M3
+   🎯 ST_fbCycle_TranslationCmdDemand — Demande de commande translation M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des consignes de mouvement translation M3
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_WinchCmdDemand">
+      <dataType name="ST_fbCycle_WinchCmdDemand">
         <baseType>
           <struct>
             <variable name="StartStop">
@@ -382,12 +382,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e1cb8f0c-a5a5-5b87-b439-8e0b245904de</ObjectId>
+            <ObjectId>c006fffa-8ec1-5ea5-83e5-adad08ef4202</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_WinchCmdDemand — Structure de demande de commande treuil
+   🔌 ST_fbCycle_WinchCmdDemand — Structure de demande de commande treuil
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupement des consignes de mouvement treuil (StartStop, Direction, Vitesse)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -512,7 +512,7 @@
           <outputVars>
             <variable name="Auth">
               <type>
-                <derived name="ST_Modes_Autorisations" />
+                <derived name="ST_fbModes_Autorisations" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎚️ BUS D'AUTORISATIONS &amp; DEMANDES DE CYCLE ===
@@ -546,7 +546,7 @@
    ⚙️ Exécuté par la tâche PLC en position 3 (après PRG_02_Acquisition).
    📄 Docs : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
             DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
-   🎯 Rôle unique : Instancier FB_Modes, distribuer le bus ST_Modes_Autorisations,
+   🎯 Rôle unique : Instancier FB_Modes, distribuer le bus ST_fbModes_Autorisations,
       et instancier les 2 séquenceurs de cycle (maintenance + semi-auto).
    ⚠️ Retard d'un scan : FB_Cycle (rang 03) lit les feedbacks de PRG_04/05
       (rangs 04/05) du scan PRÉCÉDENT — documenté, cohérent avec la pratique
@@ -1021,7 +1021,7 @@ Auth := instModes.Auth;
             </variable>
             <variable name="WinchM1Cmd">
               <type>
-                <derived name="ST_WinchCmdDemand" />
+                <derived name="ST_fbCycle_WinchCmdDemand" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES ACTIONNEURS (COMMANDES STRUCTUREES) ===
@@ -1030,7 +1030,7 @@ Auth := instModes.Auth;
             </variable>
             <variable name="WinchM2Cmd">
               <type>
-                <derived name="ST_WinchCmdDemand" />
+                <derived name="ST_fbCycle_WinchCmdDemand" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande treuil M2</xhtml>
@@ -1038,7 +1038,7 @@ Auth := instModes.Auth;
             </variable>
             <variable name="TranslationCmd">
               <type>
-                <derived name="ST_TranslationCmdDemand" />
+                <derived name="ST_fbCycle_TranslationCmdDemand" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande translation M3</xhtml>
@@ -1046,7 +1046,7 @@ Auth := instModes.Auth;
             </variable>
             <variable name="BucketCmd">
               <type>
-                <derived name="ST_BucketCmdDemand" />
+                <derived name="ST_fbCycle_BucketCmdDemand" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande benne</xhtml>
@@ -1807,7 +1807,7 @@ END_IF;
             </variable>
             <variable name="Auth">
               <type>
-                <derived name="ST_Modes_Autorisations" />
+                <derived name="ST_fbModes_Autorisations" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS D'AUTORISATIONS ARBITREES ===
@@ -2192,22 +2192,22 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
             <Folder Name="3_CYCLE_ET_MODES">
-              <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
+              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
             </Folder>
           </Folder>
         </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
             <Folder Name="_TYPES">
-              <Object Name="ST_BucketCmdDemand" ObjectId="e0ba9d9d-5f49-57f9-aa65-51128070b971" />
+              <Object Name="ST_fbCycle_BucketCmdDemand" ObjectId="e16788cb-2d99-53eb-b97c-ee6cf1555f75" />
             </Folder>
           </Folder>
           <Folder Name="_TYPES">
-            <Object Name="ST_WinchCmdDemand" ObjectId="e1cb8f0c-a5a5-5b87-b439-8e0b245904de" />
+            <Object Name="ST_fbCycle_WinchCmdDemand" ObjectId="c006fffa-8ec1-5ea5-83e5-adad08ef4202" />
           </Folder>
         </Folder>
         <Folder Name="I_TRANSLATION">
-          <Object Name="ST_TranslationCmdDemand" ObjectId="0b5f8faa-764b-51e3-b87f-be2bae8212ac" />
+          <Object Name="ST_fbCycle_TranslationCmdDemand" ObjectId="e3302f93-57a8-5949-b90f-a1621e17cb50" />
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />

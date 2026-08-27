@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🎚️ ST_Modes_Autorisations — Bus d'autorisations du mode machine
+   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
                    DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
@@ -8,7 +8,7 @@
    🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
    ═══════════════════════════════════════════════════════════════ *)
 
-TYPE ST_Modes_Autorisations :
+TYPE ST_fbModes_Autorisations :
 STRUCT
     Mode                        : E_Mode;     // Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)
     SyncEnable                  : BOOL;       // Synchro M1/M2 (logique positive)

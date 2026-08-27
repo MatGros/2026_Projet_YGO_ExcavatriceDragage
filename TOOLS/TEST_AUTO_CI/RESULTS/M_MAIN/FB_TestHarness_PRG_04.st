@@ -12,7 +12,7 @@ VAR_INPUT
     AcqData                 : ST_AcquisitionInterPrg;
     
     // === 📥 Bus d'Entrée issus de PRG_03 (Modes) ===
-    ModesAuth               : ST_Modes_Autorisations;
+    ModesAuth               : ST_fbModes_Autorisations;
     
     // === 🛡️ Sécurités & Hardware Machine ===
     PowerContactorEngaged   : BOOL := TRUE;
