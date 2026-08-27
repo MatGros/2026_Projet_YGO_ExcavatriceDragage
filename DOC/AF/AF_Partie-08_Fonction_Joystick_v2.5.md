@@ -29,7 +29,8 @@
   Ne fait **pas** : arbitrage mode/sélecteur, limites machine, frein, `PowerCutOff`, pilotage Q
   physique — **ni** la décision de qui a le droit d'armer (`ArmingPermit` = entrée externe).
 - **Type de composant** : Producteur d'intention (pas un FB de mouvement).
-- **Contrat AF03** : `standard` (remonte défaut capteur/calibration/bus via `Status : ST_FbStatus`).
+- **Contrat AF03** : `standard` (remonte défaut capteur/calibration/bus via `Fault : ST_Fault`,
+  rempli par une instance `FB_FaultCore` — AF03 §3 / §4.1). Pas de `Lifecycle` (FB synchrone).
 
 ### Table des fonctions
 
@@ -157,9 +158,8 @@ L'intention de vitesse issue du manche (`SpeedTgt` 0.0 à 100.0 %) est unifiée 
 | `DeadmanArmed` | `BOOL` | Geste armé |
 | `AtNeutral` | `BOOL` | 2 axes en zone morte |
 | `ArmingPermitDenied` | `BOOL` | Warning : appui bouton pendant `ArmingPermit=FALSE` |
-| `Ready` / `Error` | `BOOL` | État standard (socle `FB_FbStatus`) |
-| `ErrorId` | `WORD` | Code défaut bitfield (socle `FB_FbStatus`) |
-| `Status` | `ST_FbStatus` | Statut complet (socle `FB_FbStatus`) |
+| `Ready` | `BOOL` | État standard (= `Enable` + bus OK + pas de défaut laté) |
+| `Fault` | `ST_Fault` | Brique défaut socle (vue live `Error`/`ErrorId` + vue latchée `Latched`/`LatchedId`), remplie par `instFault : FB_FaultCore` à partir de `instCauses : ARRAY[0..15] OF ST_FaultCause` |
 | `SpeedTgtX_Pct` / `SpeedTgtY_Pct` | `REAL` | Miroir maintenance `SpeedTgt` |
 | `DirectionX` / `DirectionY` | `INT` | Miroir maintenance direction |
 
@@ -286,7 +286,7 @@ y est un `BOOL` "au neutre", vs `INT` valeur réelle dans `ST_JoystickState`) �
 
 - **v2.4 → v2.5 (2026-08-26)** : décongestion du chapô — détail `FB_AxisScale` (ajouté en v2.4)
   déplacé vers une fiche dédiée [`FB_AxisScale_v1.0.md`](AF_Partie-08_Fonction_Joystick/FB_AxisScale_v1.0.md),
-  suivant le pattern chapô/sous-fiche déjà appliqué par AF03/`FB_FbStatus` et AF10/`FB_Bucket`. §4
+  suivant le pattern chapô/sous-fiche déjà appliqué par AF03/`FB_FaultCore` et AF10/`FB_Bucket`. §4
   ne garde qu'un résumé + pointeur.
 - **v2.3 → v2.4 (2026-08-26)** : `FB_AxisScale` n'avait jamais son interface documentée (seulement
   cité dans le pipeline §3 et la table des fonctions) — ajout d'une sous-section dédiée en §4
@@ -337,7 +337,7 @@ y est un `BOOL` "au neutre", vs `INT` valeur réelle dans `ST_JoystickState`) �
 | Doc | Lien |
 |---|---|
 | AF02 | Architecture programme, `PRG_02_Acquisition` |
-| AF03 | Contrat `standard`, socle `FB_FbStatus` |
+| AF03 | Contrat `standard`, socle `FB_FaultCore` (`Fault : ST_Fault`) |
 | AF06 | `HwIn.Operator` (brut/sim) |
 | AF07 | `ST_JoystickHMI` |
 | AF10 / AF11 | Consommateurs `AxisCmdY`/`AxisCmdX` + `DeadmanArmed` |

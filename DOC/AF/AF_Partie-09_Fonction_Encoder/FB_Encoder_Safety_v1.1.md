@@ -51,7 +51,7 @@ Décline `TC-P09-030` (chapô) :
 | Port | Type | Rôle |
 |---|---|---|
 | `Ready` | `BOOL` | FB prêt |
-| `Status` | `ST_FbStatus` | Statut (ErrorId bitfield, T137) |
+| `Status` | `ST_Status` | Statut (ErrorId bitfield, rempli à plat) — type legacy, cible `Fault : ST_Fault` via `FB_FaultCore` (AF03 §3), migration T164-5 |
 | `CablePosMSafe` | `REAL` | Position transmise (toujours réelle, non figée) |
 | `EncoderIncoherent` | `BOOL` | Incohérence ou hors bornes (`= Status.Error`) |
 

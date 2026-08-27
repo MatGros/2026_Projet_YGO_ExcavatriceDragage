@@ -65,7 +65,7 @@ Décline `TC-P09-020` (chapô) :
 | Port | Type | Rôle |
 |---|---|---|
 | `Ready` | `BOOL` | FB prêt |
-| `Status` | `ST_FbStatus` | Statut (State machine INIT/READY/BUSY, ErrorId bitfield) |
+| `Status` | `ST_Status` | Statut (State machine INIT/READY/BUSY, ErrorId bitfield) — type legacy, cible `Fault : ST_Fault` via `FB_FaultCore` (AF03 §3), migration T164-5 |
 | `PresetRequest` / `PresetValue` | `BOOL`/`UDINT` | Commande vers `FB_Encoder_Abs` |
 | `Homed` | `BOOL` | `Calib.Homed AND NOT Calib.HomingSuspect` |
 | `HomingSuspect` | `BOOL` | Incohérence boot à confirmer |
