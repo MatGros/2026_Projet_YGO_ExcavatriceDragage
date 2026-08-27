@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T19:46:45.768748" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T19:46:45.768748">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.413625" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.413625">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -184,52 +184,7 @@
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_WinchLoadEstimateTable">
-        <baseType>
-          <struct>
-            <variable name="IsConfigured">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validation explicite de la table</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LoadPctByStepAndSpeedBand">
-              <type>
-                <array>
-                  <dimension lower="1" upper="5" />
-                  <baseType>
-                    <array>
-                      <dimension lower="1" upper="5" />
-                      <baseType>
-                        <REAL />
-                      </baseType>
-                    </array>
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Matrice [palier][bande_vitesse] charge (%)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>3ce84c87-ca73-5af4-aa58-4b48adcd8dc4</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 ST_WinchLoadEstimateTable — Table empirique de charge estimée
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Matrice 5x5 d'estimation de charge (palier commandé x bande vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_WinchSpeedConfig">
+      <dataType name="ST_fbWinchLoadEstimator_SpeedCfg">
         <baseType>
           <struct>
             <variable name="MaxMeasuredSpeedMps">
@@ -265,14 +220,59 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e42720b7-697f-5cd2-bd03-5cc46c6f51bc</ObjectId>
+            <ObjectId>6a16b928-26ae-52c7-b420-4064d7e5d0dc</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_WinchSpeedConfig — Configuration des plages de vitesse linéaire
+   ⚙️ ST_fbWinchLoadEstimator_SpeedCfg — Configuration des plages de vitesse linéaire
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchLoadEstimator_Table">
+        <baseType>
+          <struct>
+            <variable name="IsConfigured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validation explicite de la table</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadPctByStepAndSpeedBand">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <array>
+                      <dimension lower="1" upper="5" />
+                      <baseType>
+                        <REAL />
+                      </baseType>
+                    </array>
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Matrice [palier][bande_vitesse] charge (%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ac09a372-08ec-5811-90f7-baec46ade641</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_fbWinchLoadEstimator_Table — Table empirique de charge estimée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Matrice 5x5 d'estimation de charge (palier commandé x bande vitesse)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
@@ -342,7 +342,7 @@
             </variable>
             <variable name="SpeedConfig">
               <type>
-                <derived name="ST_WinchSpeedConfig" />
+                <derived name="ST_fbWinchLoadEstimator_SpeedCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET TABLES ===
@@ -351,7 +351,7 @@
             </variable>
             <variable name="LoadTable">
               <type>
-                <derived name="ST_WinchLoadEstimateTable" />
+                <derived name="ST_fbWinchLoadEstimator_Table" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table empirique d'estimation 5x5</xhtml>
@@ -772,8 +772,8 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
         <Folder Name="H_TREUILS_BENNE">
           <Object Name="FB_WinchLoadEstimator" ObjectId="1ca57a3d-7abe-5417-80b9-b0b83cdad590" />
           <Folder Name="_TYPES">
-            <Object Name="ST_WinchLoadEstimateTable" ObjectId="3ce84c87-ca73-5af4-aa58-4b48adcd8dc4" />
-            <Object Name="ST_WinchSpeedConfig" ObjectId="e42720b7-697f-5cd2-bd03-5cc46c6f51bc" />
+            <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
+            <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
           </Folder>
         </Folder>
         <Folder Name="F_MODES">

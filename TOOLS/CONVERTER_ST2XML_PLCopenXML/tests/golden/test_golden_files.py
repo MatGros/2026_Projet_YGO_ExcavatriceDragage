@@ -73,8 +73,8 @@ def normalize(s: str, root_name: str = "") -> str:
     if not s:
         return s
     s = s.replace("WINCH", "TREUILS").replace("Winch", "Treuils").replace("winch", "treuils")
-    s = s.replace("ST_GrappinConfig", "ST_BucketConfig")
-    s = s.replace("ST_GrappinState", "ST_BucketState")
+    s = s.replace("ST_GrappinConfig", "ST_fbBucket_Config")
+    s = s.replace("ST_GrappinState", "ST_fbBucket_State")
     if root_name == "GVL_PERSISTENT":
         s = s.replace("GrappinConfig", "_BucketConfig")
         s = s.replace("GrappinState", "_BucketState")

@@ -22,8 +22,8 @@ VAR_INPUT
     MeasuredSpeedSignedMps          : REAL;                           // --> [HW] Vitesse signee (+: montee, -: descente) (m/s)
 
     // === REGLAGES ET TABLES ===
-    SpeedConfig                     : ST_WinchSpeedConfig;            // --> [CFG] Configuration des plages de vitesse
-    LoadTable                       : ST_WinchLoadEstimateTable;      // --> [CFG] Table empirique d'estimation 5x5
+    SpeedConfig                     : ST_fbWinchLoadEstimator_SpeedCfg;            // --> [CFG] Configuration des plages de vitesse
+    LoadTable                       : ST_fbWinchLoadEstimator_Table;      // --> [CFG] Table empirique d'estimation 5x5
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===

@@ -880,7 +880,7 @@
           <struct>
             <variable name="Config">
               <type>
-                <derived name="ST_BucketConfig" />
+                <derived name="ST_fbBucket_Config" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Offsets Open/Close/Coherence</xhtml>
@@ -993,71 +993,6 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_BucketConfig">
-        <baseType>
-          <struct>
-            <variable name="OffsetOpenM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OffsetCloseM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoherenceLimitM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CloseAnticipationM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OpenAnticipationM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1.3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00315f60-8cf4-50aa-8e85-badae3d657b1</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_BucketConfig — Configuration des offsets du benne
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_BucketHMI">
         <baseType>
           <struct>
@@ -1101,7 +1036,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
           <struct>
             <variable name="MechState">
               <type>
-                <derived name="ST_BucketState" />
+                <derived name="ST_fbBucket_State" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚥 État mécanique mémorisé (IsOpen, IsClosed...)</xhtml>
@@ -1278,97 +1213,6 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🚦 ST_BucketHMIState — États et diagnostics IHM de la benne (M2)
    ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_BucketState">
-        <baseType>
-          <struct>
-            <variable name="IsOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ouvert memorise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IsClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ferme memorise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TooOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement ouverture (Delta &lt; OffsetOpen - Tolerance)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TooClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement fermeture (Delta &gt; OffsetClose + Tolerance)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IsIntermediate">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position intermediaire (entre Ouvert et Ferme)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastPosM2Open">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ouvert (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastPosM2Close">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ferme (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveOffsetValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat non sur (divergence boot/reel)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a8523258-d2bb-591c-8a54-f00784419808</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🚦 ST_BucketState — État mémorisé et diagnostic du benne
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_BypassBucket">
@@ -10064,99 +9908,6 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_WinchLoadEstimateTable">
-        <baseType>
-          <struct>
-            <variable name="IsConfigured">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validation explicite de la table</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LoadPctByStepAndSpeedBand">
-              <type>
-                <array>
-                  <dimension lower="1" upper="5" />
-                  <baseType>
-                    <array>
-                      <dimension lower="1" upper="5" />
-                      <baseType>
-                        <REAL />
-                      </baseType>
-                    </array>
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Matrice [palier][bande_vitesse] charge (%)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>3ce84c87-ca73-5af4-aa58-4b48adcd8dc4</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 ST_WinchLoadEstimateTable — Table empirique de charge estimée
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Matrice 5x5 d'estimation de charge (palier commandé x bande vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_WinchSpeedConfig">
-        <baseType>
-          <struct>
-            <variable name="MaxMeasuredSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesuree de reference (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedBandMaxMps">
-              <type>
-                <array>
-                  <dimension lower="1" upper="5" />
-                  <baseType>
-                    <REAL />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafonds vitesse mesuree par palier (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedBandHysteresisMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hysteresis anti-battement classement vitesse (m/s)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e42720b7-697f-5cd2-bd03-5cc46c6f51bc</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_WinchSpeedConfig — Configuration des plages de vitesse linéaire
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_WinchState">
         <baseType>
           <struct>
@@ -10605,165 +10356,158 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
           </data>
         </addData>
       </dataType>
-      <dataType name="ST_Winch_SymmetryCfg">
+      <dataType name="ST_fbBucket_Config">
         <baseType>
           <struct>
-            <variable name="DeltaStartDelay_Ms">
+            <variable name="OffsetOpenM">
               <type>
-                <UDINT />
+                <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max tolere au demarrage (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeltaBrakeReleaseTime_Ms">
+            <variable name="OffsetCloseM">
               <type>
-                <UDINT />
+                <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps desserrage frein (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeltaBrakeApplyTime_Ms">
+            <variable name="CoherenceLimitM">
               <type>
-                <UDINT />
+                <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps serrage frein (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeltaStopDistance_Mm">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max distance d'arret (mm)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeltaStopTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="200" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps d'arret (ms)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MinimumCommandTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree minimale de commande pour qualification (ms)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MinimumSpeed_Mps">
+            <variable name="CloseAnticipationM">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.05" />
+                <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse minimale pour qualification (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OpenAnticipationM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cafdebf4-b7e5-5000-bdd0-033e76a6b7c7</ObjectId>
+            <ObjectId>b2af5901-62ea-5239-8b5e-fb6f7afb8a12</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚖️ ST_Winch_SymmetryCfg — Configuration des seuils de symétrie M1/M2
+   ⚙️ ST_fbBucket_Config — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
+   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_Winch_SymmetryData">
+      <dataType name="ST_fbBucket_State">
         <baseType>
           <struct>
-            <variable name="DeltaStartDelay_Ms">
+            <variable name="IsOpen">
               <type>
-                <UDINT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure au demarrage (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ouvert memorise</xhtml>
               </documentation>
             </variable>
-            <variable name="DeltaBrakeReleaseTime_Ms">
+            <variable name="IsClosed">
               <type>
-                <UDINT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps desserrage frein (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ferme memorise</xhtml>
               </documentation>
             </variable>
-            <variable name="DeltaBrakeApplyTime_Ms">
+            <variable name="TooOpen">
               <type>
-                <UDINT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps serrage frein (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement ouverture (Delta &lt; OffsetOpen - Tolerance)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeltaStopDistance_Mm">
+            <variable name="TooClosed">
               <type>
-                <UDINT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure distance d'arret (mm)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement fermeture (Delta &gt; OffsetClose + Tolerance)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeltaStopTime_Ms">
+            <variable name="IsIntermediate">
               <type>
-                <UDINT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps d'arret (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position intermediaire (entre Ouvert et Ferme)</xhtml>
               </documentation>
             </variable>
-            <variable name="MaxSyncDeviation_M">
+            <variable name="LastPosM2Open">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart maximal de synchronisme enregistre (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ouvert (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastPosM2Close">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ferme (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveOffsetValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat non sur (divergence boot/reel)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>f7635572-022c-5fdd-93e8-106b5d2eea3e</ObjectId>
+            <ObjectId>74e82ca6-a865-5827-ba17-53f56d8b0f29</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 ST_Winch_SymmetryData — Données mesurées de symétrie M1/M2
+   🚦 ST_fbBucket_State — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure des résultats de mesures et d'écarts du diagnostic symétrie
+   🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
@@ -11294,6 +11038,262 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
       Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
    🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
    ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchLoadEstimator_SpeedCfg">
+        <baseType>
+          <struct>
+            <variable name="MaxMeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesuree de reference (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandMaxMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafonds vitesse mesuree par palier (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandHysteresisMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hysteresis anti-battement classement vitesse (m/s)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6a16b928-26ae-52c7-b420-4064d7e5d0dc</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbWinchLoadEstimator_SpeedCfg — Configuration des plages de vitesse linéaire
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchLoadEstimator_Table">
+        <baseType>
+          <struct>
+            <variable name="IsConfigured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validation explicite de la table</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadPctByStepAndSpeedBand">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <array>
+                      <dimension lower="1" upper="5" />
+                      <baseType>
+                        <REAL />
+                      </baseType>
+                    </array>
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Matrice [palier][bande_vitesse] charge (%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ac09a372-08ec-5811-90f7-baec46ade641</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_fbWinchLoadEstimator_Table — Table empirique de charge estimée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Matrice 5x5 d'estimation de charge (palier commandé x bande vitesse)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinch_Symmetry_Cfg">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max tolere au demarrage (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaBrakeReleaseTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps desserrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps serrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopDistance_Mm">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max distance d'arret (mm)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="200" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps d'arret (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinimumCommandTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree minimale de commande pour qualification (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinimumSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.05" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse minimale pour qualification (m/s)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b3edf443-a7a8-5125-8877-3148f355844d</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚖️ ST_fbWinch_Symmetry_Cfg — Configuration des seuils de symétrie M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinch_Symmetry_Data">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure au demarrage (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaBrakeReleaseTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps desserrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps serrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopDistance_Mm">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure distance d'arret (mm)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps d'arret (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart maximal de synchronisme enregistre (m)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>30d10f2c-209a-59ac-ab89-aae03e9399fe</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_fbWinch_Symmetry_Data — Données mesurées de symétrie M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure des résultats de mesures et d'écarts du diagnostic symétrie
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -12258,7 +12258,7 @@ END_IF;
             </variable>
             <variable name="Config">
               <type>
-                <derived name="ST_BucketConfig" />
+                <derived name="ST_fbBucket_Config" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
@@ -12409,7 +12409,7 @@ END_IF;
           <inOutVars>
             <variable name="BucketState">
               <type>
-                <derived name="ST_BucketState" />
+                <derived name="ST_fbBucket_State" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURES DE DONNÉES PARTAGÉES ===
@@ -31336,7 +31336,7 @@ END_IF;
             </variable>
             <variable name="SpeedConfig">
               <type>
-                <derived name="ST_WinchSpeedConfig" />
+                <derived name="ST_fbWinchLoadEstimator_SpeedCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET TABLES ===
@@ -31345,7 +31345,7 @@ END_IF;
             </variable>
             <variable name="LoadTable">
               <type>
-                <derived name="ST_WinchLoadEstimateTable" />
+                <derived name="ST_fbWinchLoadEstimator_Table" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table empirique d'estimation 5x5</xhtml>
@@ -32760,7 +32760,7 @@ Ready := Enable AND NOT Fault.Latched;
             </variable>
             <variable name="Config">
               <type>
-                <derived name="ST_Winch_SymmetryCfg" />
+                <derived name="ST_fbWinch_Symmetry_Cfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION ===
@@ -32790,7 +32790,7 @@ Ready := Enable AND NOT Fault.Latched;
           <inOutVars>
             <variable name="Data">
               <type>
-                <derived name="ST_Winch_SymmetryData" />
+                <derived name="ST_fbWinch_Symmetry_Data" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURES DE DONNÉES PARTAGÉES ===
@@ -38356,17 +38356,17 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
             <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
             <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
             <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
-            <Object Name="ST_WinchLoadEstimateTable" ObjectId="3ce84c87-ca73-5af4-aa58-4b48adcd8dc4" />
-            <Object Name="ST_WinchSpeedConfig" ObjectId="e42720b7-697f-5cd2-bd03-5cc46c6f51bc" />
-            <Object Name="ST_Winch_SymmetryCfg" ObjectId="cafdebf4-b7e5-5000-bdd0-033e76a6b7c7" />
-            <Object Name="ST_Winch_SymmetryData" ObjectId="f7635572-022c-5fdd-93e8-106b5d2eea3e" />
             <Object Name="ST_fbCycle_WinchCmdDemand" ObjectId="c006fffa-8ec1-5ea5-83e5-adad08ef4202" />
+            <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
+            <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
+            <Object Name="ST_fbWinch_Symmetry_Cfg" ObjectId="b3edf443-a7a8-5125-8877-3148f355844d" />
+            <Object Name="ST_fbWinch_Symmetry_Data" ObjectId="30d10f2c-209a-59ac-ab89-aae03e9399fe" />
           </Folder>
           <Folder Name="BENNE">
             <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
             <Folder Name="_TYPES">
-              <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
-              <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
+              <Object Name="ST_fbBucket_Config" ObjectId="b2af5901-62ea-5239-8b5e-fb6f7afb8a12" />
+              <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />
               <Object Name="ST_fbCycle_BucketCmdDemand" ObjectId="e16788cb-2d99-53eb-b97c-ee6cf1555f75" />
             </Folder>
           </Folder>

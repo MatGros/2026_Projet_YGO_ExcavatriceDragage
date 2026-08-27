@@ -1,10 +1,10 @@
 (* =======================================================================
-   ⚙️ ST_BucketConfig — Configuration des offsets du benne
+   ⚙️ ST_fbBucket_Config — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
-TYPE ST_BucketConfig :
+TYPE ST_fbBucket_Config :
 STRUCT
     OffsetOpenM        : REAL;                                        // Ecart M1/M2 en metres benne ouvert (m)
     OffsetCloseM       : REAL;                                        // Ecart M1/M2 en metres benne ferme (m)

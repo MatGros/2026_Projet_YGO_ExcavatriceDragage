@@ -1,10 +1,10 @@
 (* =======================================================================
-   📊 ST_Winch_SymmetryData — Données mesurées de symétrie M1/M2
+   📊 ST_fbWinch_Symmetry_Data — Données mesurées de symétrie M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure des résultats de mesures et d'écarts du diagnostic symétrie
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
-TYPE ST_Winch_SymmetryData :
+TYPE ST_fbWinch_Symmetry_Data :
 STRUCT
     DeltaStartDelay_Ms       : UDINT;                                 // Ecart mesure au demarrage (ms)
     DeltaBrakeReleaseTime_Ms : UDINT;                                 // Ecart mesure temps desserrage frein (ms)

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.163117" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.163117">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.550297" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.550297">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_WinchLoadEstimateTable">
+      <dataType name="ST_fbWinchLoadEstimator_Table">
         <baseType>
           <struct>
             <variable name="IsConfigured">
@@ -56,12 +56,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>3ce84c87-ca73-5af4-aa58-4b48adcd8dc4</ObjectId>
+            <ObjectId>ac09a372-08ec-5811-90f7-baec46ade641</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 ST_WinchLoadEstimateTable — Table empirique de charge estimée
+   📊 ST_fbWinchLoadEstimator_Table — Table empirique de charge estimée
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Matrice 5x5 d'estimation de charge (palier commandé x bande vitesse)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -79,7 +79,7 @@
       <ProjectStructure>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="_TYPES">
-            <Object Name="ST_WinchLoadEstimateTable" ObjectId="3ce84c87-ca73-5af4-aa58-4b48adcd8dc4" />
+            <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
           </Folder>
         </Folder>
       </ProjectStructure>

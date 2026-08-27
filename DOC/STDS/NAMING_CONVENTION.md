@@ -546,7 +546,7 @@ existent souvent en paire, mais pas toujours 1:1 — un même "actif" peut agré
 "atteint"/conditions (ex. `FdcBucketOpenActive` dépend d'un seuil ET d'un `Enable` de config).
 
 **Paramètres/réglages (Config)** vs **Cibles & Commandes (`Tgt` / `Cmd` / `SP`)** : un paramètre change rarement (RETAIN,
-réglage banc/mise en service — `RampAccelRate`, `TopSensorPosition_M`, `Config : ST_BucketConfig`) ;
+réglage banc/mise en service — `RampAccelRate`, `TopSensorPosition_M`, `Config : ST_fbBucket_Config`) ;
 une consigne/cible est recalculée à chaque cycle par la logique (`SpeedTgt`, `CablePosTgt`, `SpeedCmd`).
 Les deux peuvent partager un suffixe d'unité (`_M`, `_Pct`) mais ne sont pas la même catégorie —
 un paramètre ne doit pas s'appeler `XxxTgt` ou `XxxCmd`, et une commande calculée ne doit pas ressembler à un

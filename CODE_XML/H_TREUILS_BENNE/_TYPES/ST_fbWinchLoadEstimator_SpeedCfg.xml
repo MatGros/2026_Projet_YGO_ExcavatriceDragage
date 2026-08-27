@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.164623" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.164623">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.551301" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.551301">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_WinchSpeedConfig">
+      <dataType name="ST_fbWinchLoadEstimator_SpeedCfg">
         <baseType>
           <struct>
             <variable name="MaxMeasuredSpeedMps">
@@ -59,12 +59,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e42720b7-697f-5cd2-bd03-5cc46c6f51bc</ObjectId>
+            <ObjectId>6a16b928-26ae-52c7-b420-4064d7e5d0dc</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_WinchSpeedConfig — Configuration des plages de vitesse linéaire
+   ⚙️ ST_fbWinchLoadEstimator_SpeedCfg — Configuration des plages de vitesse linéaire
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -82,7 +82,7 @@
       <ProjectStructure>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="_TYPES">
-            <Object Name="ST_WinchSpeedConfig" ObjectId="e42720b7-697f-5cd2-bd03-5cc46c6f51bc" />
+            <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
           </Folder>
         </Folder>
       </ProjectStructure>

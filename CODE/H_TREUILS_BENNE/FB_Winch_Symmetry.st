@@ -29,7 +29,7 @@ VAR_INPUT
     SyncDeviation_M                 : REAL;                           // --> [HW] Ecart instantane synchro (m)
 
     // === CONFIGURATION ===
-    Config                          : ST_Winch_SymmetryCfg;           // --> [CFG] Configuration des seuils de symetrie
+    Config                          : ST_fbWinch_Symmetry_Cfg;           // --> [CFG] Configuration des seuils de symetrie
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
@@ -38,7 +38,7 @@ VAR_OUTPUT
 END_VAR
 VAR_IN_OUT
     // === STRUCTURES DE DONNÉES PARTAGÉES ===
-    Data                            : ST_Winch_SymmetryData;          // <-> [BUS] Donnees de mesures de symetrie
+    Data                            : ST_fbWinch_Symmetry_Data;          // <-> [BUS] Donnees de mesures de symetrie
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===

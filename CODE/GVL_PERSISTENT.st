@@ -22,14 +22,14 @@ VAR_GLOBAL PERSISTENT RETAIN
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     ); // Table paliers commune (fusion M1/M2)
     // Caractérisation vitesse réelle ; valeurs initiales provisoires à mesurer.
-    _WinchSpeedConfig : ST_WinchSpeedConfig := (
+    _WinchSpeedConfig : ST_fbWinchLoadEstimator_SpeedCfg := (
         MaxMeasuredSpeedMps    := 2.0,
         SpeedBandMaxMps        := [0.4, 0.8, 1.2, 1.6, 2.0],
         SpeedBandHysteresisMps := 0.05
     );
-    _WinchLoadEstimateTable : ST_WinchLoadEstimateTable;
-    _WinchSymmetryCfgPersist : ST_Winch_SymmetryCfg; // Seuils initiaux à confirmer sur site
-    _WinchSymmetryDataPersist : ST_Winch_SymmetryData; // Dernières/max mesures de symétrie
+    _WinchLoadEstimateTable : ST_fbWinchLoadEstimator_Table;
+    _WinchSymmetryCfgPersist : ST_fbWinch_Symmetry_Cfg; // Seuils initiaux à confirmer sur site
+    _WinchSymmetryDataPersist : ST_fbWinch_Symmetry_Data; // Dernières/max mesures de symétrie
 
     // 📐 Configuration treuil M1 — positions et rampes :
     //   • CfgTopSensorPos_M : position que le homing inscrit au déclenchement du capteur haut.
@@ -71,7 +71,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         ),
         CfgTimeoutDuration := T#60s
     ); // 🌉 Pont FB_CfgPersistBridge_BucketCfg
-    _BucketState : ST_BucketState; // État mécanique mémorisé (ouvert/fermé)
+    _BucketState : ST_fbBucket_State; // État mécanique mémorisé (ouvert/fermé)
 
     // ↔️ TRANSLATION (M3)
     _TranslationMaxFreq_Hz          : REAL := 50.0; // Fréquence max absolue M3 (Hz) — source unique

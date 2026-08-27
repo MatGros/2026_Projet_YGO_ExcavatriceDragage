@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.161116" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.161116">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.419724" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.419724">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_Winch_SymmetryCfg">
+      <dataType name="ST_fbWinch_Symmetry_Cfg">
         <baseType>
           <struct>
             <variable name="DeltaStartDelay_Ms">
@@ -107,19 +107,19 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cafdebf4-b7e5-5000-bdd0-033e76a6b7c7</ObjectId>
+            <ObjectId>b3edf443-a7a8-5125-8877-3148f355844d</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚖️ ST_Winch_SymmetryCfg — Configuration des seuils de symétrie M1/M2
+   ⚖️ ST_fbWinch_Symmetry_Cfg — Configuration des seuils de symétrie M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_Winch_SymmetryData">
+      <dataType name="ST_fbWinch_Symmetry_Data">
         <baseType>
           <struct>
             <variable name="DeltaStartDelay_Ms">
@@ -174,12 +174,12 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>f7635572-022c-5fdd-93e8-106b5d2eea3e</ObjectId>
+            <ObjectId>30d10f2c-209a-59ac-ab89-aae03e9399fe</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 ST_Winch_SymmetryData — Données mesurées de symétrie M1/M2
+   📊 ST_fbWinch_Symmetry_Data — Données mesurées de symétrie M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure des résultats de mesures et d'écarts du diagnostic symétrie
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -308,7 +308,7 @@
             </variable>
             <variable name="Config">
               <type>
-                <derived name="ST_Winch_SymmetryCfg" />
+                <derived name="ST_fbWinch_Symmetry_Cfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION ===
@@ -338,7 +338,7 @@
           <inOutVars>
             <variable name="Data">
               <type>
-                <derived name="ST_Winch_SymmetryData" />
+                <derived name="ST_fbWinch_Symmetry_Data" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURES DE DONNÉES PARTAGÉES ===
@@ -726,8 +726,8 @@ TimeLast := TimeCurrent;
         <Folder Name="H_TREUILS_BENNE">
           <Object Name="FB_Winch_Symmetry" ObjectId="e8df262b-c45d-5348-8aea-652e2cf92204" />
           <Folder Name="_TYPES">
-            <Object Name="ST_Winch_SymmetryCfg" ObjectId="cafdebf4-b7e5-5000-bdd0-033e76a6b7c7" />
-            <Object Name="ST_Winch_SymmetryData" ObjectId="f7635572-022c-5fdd-93e8-106b5d2eea3e" />
+            <Object Name="ST_fbWinch_Symmetry_Cfg" ObjectId="b3edf443-a7a8-5125-8877-3148f355844d" />
+            <Object Name="ST_fbWinch_Symmetry_Data" ObjectId="30d10f2c-209a-59ac-ab89-aae03e9399fe" />
           </Folder>
         </Folder>
         <Folder Name="A_COMMUN">

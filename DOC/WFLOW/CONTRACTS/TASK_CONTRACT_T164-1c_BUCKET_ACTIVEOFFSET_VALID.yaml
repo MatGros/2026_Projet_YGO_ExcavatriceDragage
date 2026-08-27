@@ -33,10 +33,10 @@ contract:
       statement: "La logique de Meca E (FB_Safety_Winch, desync M1/M2) N'EST PAS modifiee : elle recoit ExpectedOtherWinchPosM calcule avec ActiveOffsetM ; comme le gate met ActiveOffsetM := 0.0, la comparaison devient stricte (M1 == M2) automatiquement, sans nouveau bypass ni nouvelle branche."
       verified_by: "git diff CODE/H_TREUILS_BENNE/FB_Safety_Winch.st => vide ; grep ExpectedOtherWinchPosM CODE/M_MAIN/PRG_04_Treuils_Benne.st => expression inchangee (M2.CablePosM - instBucket.ActiveOffsetM)"
     - id: AC4
-      statement: "PRG_04_Treuils_Benne publie instBucket.ActiveOffsetValid dans ST_BucketState (nouveau champ ActiveOffsetValid : BOOL) pour visibilite IHM / troubleshooting ; le nom de fichier PRG_04_Treuils_Benne reste identique au nom de POU et le suffixe de langage du fichier correspond au langage genere dans le bundle (aucun renommage, aucun changement de langage)."
-      verified_by: "lecture ST_BucketState.st : + ActiveOffsetValid : BOOL ; lecture PRG_04_Treuils_Benne.st : BucketState.ActiveOffsetValid := instBucket.ActiveOffsetValid ; python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py + G320_check_bundle_main_coverage.py => PASS"
+      statement: "PRG_04_Treuils_Benne publie instBucket.ActiveOffsetValid dans ST_fbBucket_State (nouveau champ ActiveOffsetValid : BOOL) pour visibilite IHM / troubleshooting ; le nom de fichier PRG_04_Treuils_Benne reste identique au nom de POU et le suffixe de langage du fichier correspond au langage genere dans le bundle (aucun renommage, aucun changement de langage)."
+      verified_by: "lecture ST_fbBucket_State.st : + ActiveOffsetValid : BOOL ; lecture PRG_04_Treuils_Benne.st : BucketState.ActiveOffsetValid := instBucket.ActiveOffsetValid ; python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py + G320_check_bundle_main_coverage.py => PASS"
     - id: AC5
-      statement: "AF_Partie-10 (chapo + fiche FB_Bucket) documente la nouvelle sortie ActiveOffsetValid et le comportement au gate (desactive donne ActiveOffsetM a 0.0, ActiveOffsetValid a FALSE, comparaison M1/M2 stricte). IHM_VARIABLES_MIGRATION.md recoit l'entree du nouveau sous-champ ST_BucketState.ActiveOffsetValid (chemin IHM inchange au niveau parent)."
+      statement: "AF_Partie-10 (chapo + fiche FB_Bucket) documente la nouvelle sortie ActiveOffsetValid et le comportement au gate (desactive donne ActiveOffsetM a 0.0, ActiveOffsetValid a FALSE, comparaison M1/M2 stricte). IHM_VARIABLES_MIGRATION.md recoit l'entree du nouveau sous-champ ST_fbBucket_State.ActiveOffsetValid (chemin IHM inchange au niveau parent)."
       verified_by: "grep ActiveOffsetValid DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md ; grep ActiveOffsetValid DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md ; G340_check_doc_links.py PASS"
     - id: AC6
       statement: "Aucune valeur, seuil, polarite ou tempo existant ne change ; aucun consommateur autre que l'ajout de publication BucketState n'est modifie ; le diff se limite a l'ajout de la sortie, sa neutralisation, sa publication et la doc."
@@ -46,7 +46,7 @@ contract:
   scope:
     allowed:
       - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
-      - CODE/H_TREUILS_BENNE/BENNE/ST_BucketState.st
+      - CODE/H_TREUILS_BENNE/BENNE/ST_fbBucket_State.st
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
       - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
       - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md

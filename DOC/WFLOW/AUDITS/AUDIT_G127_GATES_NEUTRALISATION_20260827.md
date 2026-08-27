@@ -290,7 +290,7 @@ END_IF;
 
 Source de la valeur sûre : `DeltaPosition_M` / `RemainingTravelM` → `0.0` (aucun mouvement / mesure en cours). `ActiveOffsetM` → repris de l'état benne au repos, miroir exact de la logique corps §7 hors `BUSY` (lignes 509-514) — évite d'injecter un offset de trajet périmé dans la synchro sécurité.
 Alternative plus simple, si validée contre `AF_Partie-10` : `ActiveOffsetM := 0.0;` seul (plus conservateur : produit un écart synchro visible plutôt qu'un masquage ; nuisance `SafeStop` possible si la benne est physiquement ouverte).
-Interface : **inchangée** — `BucketState : ST_BucketState` est `VAR_IN_OUT` (62), `Config : ST_BucketConfig` est `VAR_INPUT` (35), les 3 sorties déjà `VAR_OUTPUT` (56-58). Aucun nouveau `VAR`, aucun type modifié.
+Interface : **inchangée** — `BucketState : ST_fbBucket_State` est `VAR_IN_OUT` (62), `Config : ST_fbBucket_Config` est `VAR_INPUT` (35), les 3 sorties déjà `VAR_OUTPUT` (56-58). Aucun nouveau `VAR`, aucun type modifié.
 
 ---
 

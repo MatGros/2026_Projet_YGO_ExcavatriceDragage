@@ -574,35 +574,35 @@
         "snippet": "ActiveOffsetM := HoldOffsetM;"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_BucketConfig.st",
+        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_fbBucket_Config.st",
         "line": 9,
         "name": "OffsetOpenM",
         "unit": "M",
         "snippet": "OffsetOpenM        : REAL;                                        // Ecart M1/M2 en metres benne ouvert (m)"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_BucketConfig.st",
+        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_fbBucket_Config.st",
         "line": 10,
         "name": "OffsetCloseM",
         "unit": "M",
         "snippet": "OffsetCloseM       : REAL;                                        // Ecart M1/M2 en metres benne ferme (m)"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_BucketConfig.st",
+        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_fbBucket_Config.st",
         "line": 11,
         "name": "CoherenceLimitM",
         "unit": "M",
         "snippet": "CoherenceLimitM    : REAL;                                        // Seuil de detection d'incoherence au boot (m)"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_BucketConfig.st",
+        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_fbBucket_Config.st",
         "line": 12,
         "name": "CloseAnticipationM",
         "unit": "M",
         "snippet": "CloseAnticipationM : REAL := 1.0;                                 // Anticipation coupure commande fermeture (m)"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_BucketConfig.st",
+        "file": "CODE/H_TREUILS_BENNE/BENNE/ST_fbBucket_Config.st",
         "line": 13,
         "name": "OpenAnticipationM",
         "unit": "M",
@@ -868,21 +868,21 @@
         "snippet": "SpeedPct  : REAL;                                                 // Consigne vitesse (0.0 a 100.0 %)"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/ST_WinchSpeedConfig.st",
+        "file": "CODE/H_TREUILS_BENNE/ST_fbWinchLoadEstimator_SpeedCfg.st",
         "line": 9,
         "name": "MaxMeasuredSpeedMps",
         "unit": "Mps",
         "snippet": "MaxMeasuredSpeedMps    : REAL;                                    // Vitesse maximale mesuree de reference (m/s)"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/ST_WinchSpeedConfig.st",
+        "file": "CODE/H_TREUILS_BENNE/ST_fbWinchLoadEstimator_SpeedCfg.st",
         "line": 10,
         "name": "SpeedBandMaxMps",
         "unit": "Mps",
         "snippet": "SpeedBandMaxMps        : ARRAY[1..5] OF REAL;                    // Plafonds vitesse mesuree par palier (m/s)"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/ST_WinchSpeedConfig.st",
+        "file": "CODE/H_TREUILS_BENNE/ST_fbWinchLoadEstimator_SpeedCfg.st",
         "line": 11,
         "name": "SpeedBandHysteresisMps",
         "unit": "Mps",

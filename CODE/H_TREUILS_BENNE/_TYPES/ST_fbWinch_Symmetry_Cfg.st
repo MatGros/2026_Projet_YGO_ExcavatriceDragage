@@ -1,10 +1,10 @@
 (* =======================================================================
-   ⚖️ ST_Winch_SymmetryCfg — Configuration des seuils de symétrie M1/M2
+   ⚖️ ST_fbWinch_Symmetry_Cfg — Configuration des seuils de symétrie M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
-TYPE ST_Winch_SymmetryCfg :
+TYPE ST_fbWinch_Symmetry_Cfg :
 STRUCT
     DeltaStartDelay_Ms       : UDINT := 100;                          // Ecart max tolere au demarrage (ms)
     DeltaBrakeReleaseTime_Ms : UDINT := 100;                          // Ecart max temps desserrage frein (ms)

@@ -1,8 +1,8 @@
 SETUP
 VAR
     FB : FB_Bucket;
-    BucketState : ST_BucketState;
-    Config : ST_BucketConfig;
+    BucketState : ST_fbBucket_State;
+    Config : ST_fbBucket_Config;
 END_VAR
 END_SETUP
 

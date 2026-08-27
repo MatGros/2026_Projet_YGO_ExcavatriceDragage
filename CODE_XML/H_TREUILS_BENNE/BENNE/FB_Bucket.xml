@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:26:12.299553" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:26:12.299553">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.545783" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.545783">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -73,162 +73,6 @@
             <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
           </data>
         </addData>
-      </dataType>
-      <dataType name="ST_BucketConfig">
-        <baseType>
-          <struct>
-            <variable name="OffsetOpenM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OffsetCloseM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoherenceLimitM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CloseAnticipationM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OpenAnticipationM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1.3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00315f60-8cf4-50aa-8e85-badae3d657b1</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_BucketConfig — Configuration des offsets du benne
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_BucketState">
-        <baseType>
-          <struct>
-            <variable name="IsOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ouvert memorise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IsClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ferme memorise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TooOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement ouverture (Delta &lt; OffsetOpen - Tolerance)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TooClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement fermeture (Delta &gt; OffsetClose + Tolerance)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IsIntermediate">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position intermediaire (entre Ouvert et Ferme)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastPosM2Open">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ouvert (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastPosM2Close">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ferme (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveOffsetValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat non sur (divergence boot/reel)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a8523258-d2bb-591c-8a54-f00784419808</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🚦 ST_BucketState — État mémorisé et diagnostic du benne
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
       </dataType>
       <dataType name="ST_Fault">
         <baseType>
@@ -375,6 +219,162 @@
       ne la porte pas.
    🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbBucket_Config">
+        <baseType>
+          <struct>
+            <variable name="OffsetOpenM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OffsetCloseM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoherenceLimitM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CloseAnticipationM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OpenAnticipationM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b2af5901-62ea-5239-8b5e-fb6f7afb8a12</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbBucket_Config — Configuration des offsets du benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbBucket_State">
+        <baseType>
+          <struct>
+            <variable name="IsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ouvert memorise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ferme memorise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TooOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement ouverture (Delta &lt; OffsetOpen - Tolerance)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TooClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement fermeture (Delta &gt; OffsetClose + Tolerance)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position intermediaire (entre Ouvert et Ferme)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastPosM2Open">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ouvert (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastPosM2Close">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ferme (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveOffsetValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat non sur (divergence boot/reel)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>74e82ca6-a865-5827-ba17-53f56d8b0f29</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🚦 ST_fbBucket_State — État mémorisé et diagnostic du benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -531,7 +531,7 @@
             </variable>
             <variable name="Config">
               <type>
-                <derived name="ST_BucketConfig" />
+                <derived name="ST_fbBucket_Config" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
@@ -682,7 +682,7 @@
           <inOutVars>
             <variable name="BucketState">
               <type>
-                <derived name="ST_BucketState" />
+                <derived name="ST_fbBucket_State" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURES DE DONNÉES PARTAGÉES ===
@@ -1327,8 +1327,8 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
           <Folder Name="BENNE">
             <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
             <Folder Name="_TYPES">
-              <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
-              <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
+              <Object Name="ST_fbBucket_Config" ObjectId="b2af5901-62ea-5239-8b5e-fb6f7afb8a12" />
+              <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />
             </Folder>
           </Folder>
         </Folder>

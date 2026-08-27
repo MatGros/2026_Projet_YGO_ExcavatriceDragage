@@ -32,7 +32,7 @@ VAR_INPUT
     InhibitM2                       : BOOL;                           // --> [HW] Treuil M2 inhibe
 
     // === REGLAGES ET CONFIGURATION ===
-    Config                          : ST_BucketConfig;                // --> [CFG] Configuration parametres benne
+    Config                          : ST_fbBucket_Config;                // --> [CFG] Configuration parametres benne
     CfgTimeoutDuration              : TIME := T#60s;                  // --> [CFG] Timeout de mouvement configurable
     M1SlipToleranceM                : REAL := 1.0;                    // --> [CFG] Tolerance glissement M1 pendant Busy (m)
 
@@ -62,7 +62,7 @@ VAR_OUTPUT
 END_VAR
 VAR_IN_OUT
     // === STRUCTURES DE DONNÉES PARTAGÉES ===
-    BucketState                     : ST_BucketState;                 // <-> [BUS] Etat physique memorise du benne
+    BucketState                     : ST_fbBucket_State;                 // <-> [BUS] Etat physique memorise du benne
 END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===

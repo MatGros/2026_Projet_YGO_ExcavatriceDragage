@@ -1,10 +1,10 @@
 (* =======================================================================
-   🚦 ST_BucketState — État mémorisé et diagnostic du benne
+   🚦 ST_fbBucket_State — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
-TYPE ST_BucketState :
+TYPE ST_fbBucket_State :
 STRUCT
     IsOpen          : BOOL;                                           // Benne ouvert memorise
     IsClosed        : BOOL;                                           // Benne ferme memorise
