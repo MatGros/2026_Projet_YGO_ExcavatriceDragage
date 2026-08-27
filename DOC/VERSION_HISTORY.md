@@ -4,6 +4,10 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `T164-6_RENOMMAGE_DUT_NC110` — 2026-08-27 — 11 DUT propriétaires renommés ST_fb<Fb>_<Role>
+- **Renommage NC-110** : `ST_Modes_Autorisations`→`ST_fbModes_Autorisations`, `ST_{Bucket,Winch,Translation}CmdDemand`→`ST_fbCycle_*CmdDemand`, `ST_Bucket{Config,State}`→`ST_fbBucket_*`, `ST_WinchLoadEstimateTable`/`ST_WinchSpeedConfig`→`ST_fbWinchLoadEstimator_*`, `ST_Winch_Symmetry{cfg,Data}`→`ST_fbWinch_Symmetry_*`, `ST_EncoderMeasurement`→`ST_fbEncoder_Measurement` (`ST_EncoderMeasurements` pluriel préservé).
+- **Validation mécanique** : Bundle régénéré, G200 liaison PASS (0 erreur), **22/22 gates PASS**, **CI 27/27 suites (100%)**, G120 NC-110 : 15 conformes / 0 à migrer.
+
 ### `T164-5_MIGRATION_TRANSVERSE_FAULT_LIFECYCLE` — 2026-08-27 — éradication ST_Status & généralisation ST_Fault/ST_Lifecycle
 - **Standardisation transverse (17 FB)** : Remplacement intégral de la structure legacy `ST_Status` par le binôme AF03 `Fault : ST_Fault` (alimenté par `FB_FaultCore`) et `Lifecycle : ST_Lifecycle` (`Busy`/`Done` pour les briques séquentielles).
 - **Façades & Sous-FBs alignés** : Migration achevée sur `FB_Encoder_Abs`, `FB_Encoder_Homing`, `FB_Encoder_Safety`, `FB_Bucket`, `FB_DiveSearch`, `FB_ExtractionSequence`, `FB_Translation`, `FB_Winch`, `FB_WinchSync`, etc.

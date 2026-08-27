@@ -44,7 +44,7 @@ utilisateur 2026-08-23 -- pas de lien inter-outils, chaque outil porte sa propre
    supporte la forme virgule standard IEC -- meme forme geometrique, syntaxe equivalente.
    Verifie empiriquement, session 2026-08-23 : `ARRAY[1..5] OF ARRAY[1..5] OF REAL` echoue
    "Expected Identifier, found ARRAY", `ARRAY[1..5, 1..5] OF REAL` compile. Trouve sur
-   ST_WinchLoadEstimateTable.st (matrice 5x5). Applique en boucle pour gerer 3+ dimensions.)
+   ST_fbWinchLoadEstimator_Table.st (matrice 5x5). Applique en boucle pour gerer 3+ dimensions.)
 
 BINAIRE VENDORE : strucpp.exe v0.6.3 (mis a jour depuis v0.6.2, session 2026-08-23) -- le
 changelog GitHub n'est pas consulte, mais teste empiriquement AVANT/APRES sur les 4 limites

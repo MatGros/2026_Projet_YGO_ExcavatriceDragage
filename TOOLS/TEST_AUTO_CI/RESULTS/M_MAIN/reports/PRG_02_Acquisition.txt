@@ -1,29 +1,7 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_0_2dpg9d\strucpp-test-cjKYUu\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_02::operator()()':
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_0_2dpg9d\strucpp-test-cjKYUu\generated.cpp:13771:18: error: 'class strucpp::FB_JOYSTICK' has no member named 'NEUTRALHOLDTIME'; did you mean 'NEUTRALHOLDTIMER'?
-13771 |     INSTJOYSTICK.NEUTRALHOLDTIME = 50000000LL;
-      |                  ^~~~~~~~~~~~~~~
-      |                  NEUTRALHOLDTIMER
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_0_2dpg9d\strucpp-test-cjKYUu\generated.cpp:13772:18: error: 'class strucpp::FB_JOYSTICK' has no member named 'DEADMANARMHOLDTIME'; did you mean 'DEADMANARMTIMER'?
-13772 |     INSTJOYSTICK.DEADMANARMHOLDTIME = 50000000LL;
-      |                  ^~~~~~~~~~~~~~~~~~
-      |                  DEADMANARMTIMER
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_0_2dpg9d\strucpp-test-cjKYUu\generated.cpp:13773:18: error: 'class strucpp::FB_JOYSTICK' has no member named 'DEADMANARMGRACETIME'; did you mean 'DEADMANARMGRACETIMER'?
-13773 |     INSTJOYSTICK.DEADMANARMGRACETIME = 3000000000LL;
-      |                  ^~~~~~~~~~~~~~~~~~~
-      |                  DEADMANARMGRACETIMER
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_0_2dpg9d\strucpp-test-cjKYUu\generated.cpp:13774:18: error: 'class strucpp::FB_JOYSTICK' has no member named 'DEADBANDRAW'
-13774 |     INSTJOYSTICK.DEADBANDRAW = 300;
-      |                  ^~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_0_2dpg9d\strucpp-test-cjKYUu\generated.cpp:13784:44: error: 'class strucpp::FB_JOYSTICK' has no member named 'DIRECTIONX'
-13784 |     DATA.JOYSTICKDIRECTIONX = INSTJOYSTICK.DIRECTIONX;
-      |                                            ^~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_0_2dpg9d\strucpp-test-cjKYUu\generated.cpp:13792:19: error: 'class strucpp::FB_ENCODER' has no member named 'HW'; did you mean 'HWIN'?
-13792 |     INSTENCODERM1.HW = HWM1;
-      |                   ^~
-      |                   HWIN
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_02_Acquisition_0_2dpg9d\strucpp-test-cjKYUu\generated.cpp:13809:19: error: 'class strucpp::FB_ENCODER' has no member named 'HW'; did you mean 'HWIN'?
-13809 |     INSTENCODERM2.HW = HWM2;
-      |                   ^~
-      |                   HWIN
+STruC++ Test Runner v1.0
 
+test_prg_02_acquisition.st
+  [PASS] PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)
+
+-----------------------------------------
+1 test, 1 passed, 0 failed
