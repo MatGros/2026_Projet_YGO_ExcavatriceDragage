@@ -4,9 +4,9 @@
 > §4.1 — couvre le socle transverse du contrat `standard` (§3).
 > Rôle de **ce** document : le détail technique — interface complète, type `ST_FbCause`, décisions
 > (a)/(b)/(c), câblage minimal, catalogue de tests — que le chapô ne porte plus depuis la v2.3.
-> Source code : `CODE/A_COMMUN/FB_FbStatus.st`, `CODE/A_COMMUN/ST_FbStatus.st`,
-> `CODE/A_COMMUN/ST_FbCause.st` · consommateur confirmé : `CODE/D_JOYSTICK/FB_Joystick.st`
-> (`instFbStatus`).
+> Source code : `CODE/A_COMMUN/FB_FaultCore.st`, `CODE/A_COMMUN/ST_Status.st`,
+> `CODE/A_COMMUN/ST_FaultCause.st` · consommateur confirmé : `CODE/D_JOYSTICK/FB_Joystick.st`
+> (`instFault`).
 
 ## 🧭 Sommaire
 
@@ -145,5 +145,5 @@ Exemple réel équivalent : `CODE/D_JOYSTICK/FB_Joystick.st` (`instFbStatus`).
 | AF03 (chapô) | Contrat `light`/`standard`, périmètre du socle |
 | `DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies/§9` | Pattern Cause/Ack générique, interfaces socle |
 | AF08 (Joystick) | Consommateur confirmé (`instFbStatus`) |
-| Code | `CODE/A_COMMUN/FB_FbStatus.st`, `ST_FbStatus.st`, `ST_FbCause.st` |
+| Code | `CODE/A_COMMUN/FB_FaultCore.st`, `ST_Status.st`, `ST_FaultCause.st` |
 | Tests | `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st` |

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T18:22:55.311921" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T18:22:55.311921">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T12:14:00.014455" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T12:14:00.014455">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_FbCause">
+      <dataType name="ST_FaultCause">
         <baseType>
           <struct>
             <variable name="Active">
@@ -31,15 +31,15 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente (interlock sur la cause brute)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente maintenant (interlock sur cette valeur)</xhtml>
               </documentation>
             </variable>
-            <variable name="IsWarning">
+            <variable name="Latching">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = warning auto-effacé ; 0 = défaut à acquitter</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause à acquitter (arme Latched) ; 0 = live seulement</xhtml>
               </documentation>
             </variable>
             <variable name="Texte">
@@ -47,27 +47,28 @@
                 <derived name="STRING" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM de la cause</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e181848e-e3f7-5266-a2aa-b519fd91dabc</ObjectId>
+            <ObjectId>dafea4e6-0b73-5895-8c57-ef302142ebf7</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_FbCause — Cause élémentaire d'un FB standard (socle FB_FbStatus)
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : une cause de défaut/warning exprimée en CLAIR (BOOL + libellé),
-      sans bitfield ni masque. Le FB métier remplit une liste de causes
-      (ARRAY[0..15] OF ST_FbCause) ; le socle gère latch/reset/textes.
-   🧬 Contrat : remplacer l'ancien couple WORD bitfield + tableaux de textes
-      indexés par bit par une liste lisible (maintenance, « avec une liste »).
-   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur
-      l'acquittement. IsWarning distingue warning (auto) / fault (à acquitter).
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n'alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    =======================================================================</xhtml>
         </documentation>
@@ -82,7 +83,7 @@
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="A_COMMUN">
-          <Object Name="ST_FbCause" ObjectId="e181848e-e3f7-5266-a2aa-b519fd91dabc" />
+          <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
         </Folder>
       </ProjectStructure>
     </data>

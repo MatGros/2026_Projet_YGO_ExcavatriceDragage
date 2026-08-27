@@ -28,7 +28,7 @@ VAR_OUTPUT
     Ready                   : BOOL;               // <-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: "incoherence retour contacteur".
-    Status                  : ST_FbStatus;
+    Status                  : ST_Status;
 
     // === COMMANDES ET CONFIRMATIONS ===
     BrakeCmd                : BOOL;               // <-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)

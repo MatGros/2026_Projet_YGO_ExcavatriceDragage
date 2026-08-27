@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T22:31:41.735056" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T22:31:41.735056">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:52:58.860094" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:52:58.860094">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -456,6 +456,11 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_JoystickState" />
               </type>
             </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_fbJoystick_Cfg" />
+              </type>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -467,9 +472,10 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕹️ ST_JoystickHMI — Données d'échange IHM pour le Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State , homogène avec ST_ModesHMI.
-   Pas de Cfg (les vrais réglages de calibration vivent dans GVL_PERSISTENT, pas ici) ni de
-   Bypass (concept absent de ce struct).
+   📄 Structuration en Cmd / State / Cfg , homogène avec ST_ModesHMI.
+   Cfg = réglages FB_Joystick éditables IHM (deadband, temporisations), pontés vers
+   GVL_PERSISTENT via FB_CfgPersistBridge_fbJoystick_Cfg. La calibration du neutre reste
+   dans GVL_PERSISTENT (bouton Calibrate). Pas de Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -2099,7 +2105,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
             </variable>
             <variable name="AxisCmdX">
               <type>
-                <derived name="ST_Joystick_AxisCmd" />
+                <derived name="ST_fbJoystick_AxisCmd" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe X normalisée (sortie FB_Joystick)</xhtml>
@@ -2107,7 +2113,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
             </variable>
             <variable name="AxisCmdY">
               <type>
-                <derived name="ST_Joystick_AxisCmd" />
+                <derived name="ST_fbJoystick_AxisCmd" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe Y normalisée (sortie FB_Joystick)</xhtml>
@@ -2188,6 +2194,95 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🚦 ST_JoystickState — États et diagnostics IHM du Joystick
    ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbJoystick_Cfg">
+        <baseType>
+          <struct>
+            <variable name="DeadbandRaw">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="300" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Zone morte en points ADC bruts (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien continu au neutre avant désarmement homme-mort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui continu bouton requis pour armer le geste</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmGraceTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#3S" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai de grâce post-armement avant désarmement neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawOutOfRangeMargin">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="500" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>15265f47-4d56-5d85-af5c-415e86b1194e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbJoystick_Cfg — Réglages regroupés de FB_Joystick
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter en un bloc les 5 paramètres de conditionnement du geste
+      (zone morte, temporisations homme-mort, marge défaut capteur).
+      Passé à FB_Joystick via l'entrée `Cfg` — échange bloc IHM / persistant.
+   🧬 Pattern cfg : aligné sur ST_CycleCfg / ST_WinchCfg (préfixe ST_&lt;Domaine&gt;Cfg,
+      instance persistante dans GVL_PERSISTENT, pont FB_CfgPersistBridge_* à venir).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_Mode">
@@ -4598,7 +4693,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
           </data>
         </addData>
       </dataType>
-      <dataType name="ST_Joystick_AxisCmd">
+      <dataType name="ST_fbJoystick_AxisCmd">
         <baseType>
           <struct>
             <variable name="Enable">
@@ -4650,16 +4745,33 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE si axes en zone morte (position centrale)</xhtml>
               </documentation>
             </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MONITORING IHM (derive des bits ci-dessus, jamais lu en interlock) ===
+&lt;-- [STAT] Sens -1=Rev / 0=Neutre / +1=Fwd (anim IHM fleche ; lu aussi logique treuils PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Deflection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Deflexion signee -100..+100 % (anim IHM jauge/barre)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068</ObjectId>
+            <ObjectId>b6fd2799-de8b-52a1-87c0-15b96ff2b5f6</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
+   🕹️ ST_fbJoystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
    📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
@@ -6183,7 +6295,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied := NOT HwIn.
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M1_ThermalOk_DI;
 
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedTgt;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.Deflection;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM1.Cmd.BtnUp;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM1.Cmd.BtnDown;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM1SpeedTgt_Pct;
@@ -6255,7 +6367,7 @@ GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied := NOT HwIn.
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M2_ThermalOk_DI;
 
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedTgt;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.Deflection;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM2.Cmd.BtnUp;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM2.Cmd.BtnDown;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM2SpeedTgt_Pct;
@@ -6404,7 +6516,7 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied := NOT Tran
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx109_DriveThermalOk := Translation.State.DriveThermalOk;
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA := HwIn.Operator.JoyXRaw_ANA1;
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := GVL_IHM.JOY1Joystick.State.AxisCmdX.SpeedTgt;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := GVL_IHM.JOY1Joystick.State.AxisCmdX.Deflection;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnFwd := Translation.Cmd.BtnFwd;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnRev := Translation.Cmd.BtnRev;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition := Translation.Cmd.SelTarget;
@@ -6554,9 +6666,9 @@ GVL_Troubleshooting.Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMa
 GVL_Troubleshooting.Joystick.SelJoystickWinch := GVL_IHM.Modes.Cmd.SelJoystickWinch;
 GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
-GVL_Troubleshooting.Joystick.DeflectionX_Pct  := JoystickHMI.State.AxisCmdX.SpeedTgt;
-GVL_Troubleshooting.Joystick.DeflectionY_Pct  := JoystickHMI.State.AxisCmdY.SpeedTgt;
-// Direction exprimée en bits (ST_Joystick_AxisCmd) : conversion locale bits→INT (-1/0/+1),
+GVL_Troubleshooting.Joystick.DeflectionX_Pct  := JoystickHMI.State.AxisCmdX.Deflection;
+GVL_Troubleshooting.Joystick.DeflectionY_Pct  := JoystickHMI.State.AxisCmdY.Deflection;
+// Direction exprimée en bits (ST_fbJoystick_AxisCmd) : conversion locale bits→INT (-1/0/+1),
 // car ici on lit le struct (JoystickHMI.State.AxisCmdX/Y), pas le miroir FB DirectionX/Y.
 IF JoystickHMI.State.AxisCmdX.DirectionPositive THEN
     GVL_Troubleshooting.Joystick.DirectionX := 1;
@@ -6798,15 +6910,16 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
           <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
           <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
         </Folder>
+        <Folder Name="D_JOYSTICK">
+          <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
+          <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
+        </Folder>
         <Folder Name="F_MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="C_DIAG_RESEAUX">
           <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
           <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
-        </Folder>
-        <Folder Name="D_JOYSTICK">
-          <Object Name="ST_Joystick_AxisCmd" ObjectId="cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068" />
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />

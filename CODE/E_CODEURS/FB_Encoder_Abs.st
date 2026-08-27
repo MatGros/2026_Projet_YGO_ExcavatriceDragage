@@ -33,7 +33,7 @@ VAR_OUTPUT
     Ready               : BOOL;        // <-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: "Com", bit1: "Preset Timeout".
-    Status              : ST_FbStatus;
+    Status              : ST_Status;
 
     // === MESURES & DONNEES CODEUR ===
     RawPos              : UDINT;       // <-- [DIAG] Position brute gelee si non disponible

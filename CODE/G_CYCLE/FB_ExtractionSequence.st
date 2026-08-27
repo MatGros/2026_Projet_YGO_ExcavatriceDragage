@@ -32,10 +32,10 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
-    Ready                       : BOOL;     // <-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)
+    Ready                       : BOOL;     // <-- [STAT] FB pret a fonctionner (sortie libre, hors ST_Status)
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0:fond ; bit1:ferme ; bit2:ctrl ; bit3:cfg.
-    Status                      : ST_FbStatus; // <-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
+    Status                      : ST_Status; // <-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
     ExtractionState             : E_ExtractionSequenceState; // <-- [STAT] Phase interne extraction
 
     // === ORDRES & AUTORISATIONS ===

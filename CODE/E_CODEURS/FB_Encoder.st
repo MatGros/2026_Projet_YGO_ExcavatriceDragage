@@ -47,7 +47,7 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
     Ready                 : BOOL;        // <-- [STAT] FB pret a fonctionner
-    Status                : ST_FbStatus; // <-- [STAT] Statut transverse facade (synthese)
+    Status                : ST_Status; // <-- [STAT] Statut transverse facade (synthese)
 
     // === FRONTIERE HW SORTIE (testable) ===
     HwOut                 : ST_EncoderHw; // <-- [BUS] Sorties hardware codeur (preset...)

@@ -54,7 +54,7 @@ VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
     // ErrorId : <-- [DIAG] bitmask (bit0: ecart Warn, bit1: discordance contacteurs, bit2: ecart Fault)
-    Status                          : ST_FbStatus;                    // <-- [STAT] Statut FB groupe (Busy/Done/Error/State/StateAtError)
+    Status                          : ST_Status;                    // <-- [STAT] Statut FB groupe (Busy/Done/Error/State/StateAtError)
 
     // === MESURES ET DIAGNOSTICS DE SYNCHRO ===
     DeltaPosM                       : REAL;                           // <-- [DIAG] Ecart absolu position |M1 - M2| (m)

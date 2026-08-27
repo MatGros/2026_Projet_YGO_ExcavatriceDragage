@@ -1,12 +1,12 @@
 (* =======================================================================
-   🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
+   🕹️ ST_fbJoystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
    📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    ======================================================================= *)
 
-TYPE ST_Joystick_AxisCmd :
+TYPE ST_fbJoystick_AxisCmd :
 STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --> [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
@@ -15,6 +15,9 @@ STRUCT
     DirectionNegative   : BOOL;   // --> [CMD] Direction joystick ou intension de gestuelle
     DirectionPositive   : BOOL;   // --> [CMD] Direction joystick ou intension de gestuelle
     AtNeutral   : BOOL;   // --> [CMD] TRUE si axes en zone morte (position centrale)
-    // Remplacé par bit qui donne la direction Direction   : INT;  // --> [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)
+
+    // === MONITORING IHM (derive des bits ci-dessus, jamais lu en interlock) ===
+    Direction   : INT;   // <-- [STAT] Sens -1=Rev / 0=Neutre / +1=Fwd (anim IHM fleche ; lu aussi logique treuils PRG_04)
+    Deflection  : INT;   // <-- [STAT] Deflexion signee -100..+100 % (anim IHM jauge/barre)
 END_STRUCT
 END_TYPE

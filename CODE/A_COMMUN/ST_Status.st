@@ -1,19 +1,19 @@
 (* =======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier
+   🧩 ST_Status — Socle transverse de statut d'un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
       avec les textes prêts pour l'IHM (plus de conditions complexes
       côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
+      migre pas vers ST_Status (exception documentée).
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    ======================================================================= *)
 
-TYPE ST_FbStatus :
+TYPE ST_Status :
 STRUCT
     (* ---- membres historiques (conservés) ---- *)
     Busy         : BOOL;    (* 1 = Bloc en cours d'exécution *)

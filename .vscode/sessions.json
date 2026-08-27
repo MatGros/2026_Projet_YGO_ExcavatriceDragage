@@ -7,6 +7,15 @@
     "sessions": {
         "AI": [
             {
+                "name": "Task Manager",
+                "autoExecuteCommands": true,
+                "icon": "server",
+                "color": "terminal.ansiBrightMagenta",
+                "commands": [
+                    "cmd /c TOOLS\\TASK_MANAGER\\LANCER_TASK_MANAGER.bat"
+                ]
+            },
+            {
                 "name": "🚀 AGY Antigravity",
                 "autoExecuteCommands": true,
                 "icon": "rocket",

@@ -1,0 +1,67 @@
+contract:
+  task_id: TASK_MANAGER_CONCURRENCY_REPAIR
+  criticality: C2
+  strategy: patch
+  objective: >
+    Restaurer un catalogue TASKS.yaml exploitable et permettre aux humains et aux
+    agents de modifier des tâches distinctes sans écrasement ni action sur une tâche
+    verrouillée par un autre acteur.
+  acceptance:
+    - id: AC1
+      statement: "TASKS.yaml restauré depuis le commit 739a9bc8 est un YAML valide, contient 114 identifiants de tâche uniques et reste inférieur à 200 ko."
+      verified_by: "python -c de chargement yaml.safe_load, comptage des IDs et mesure de taille"
+    - id: AC2
+      statement: "Le serveur n'accepte que des connexions HTTP sur 127.0.0.1 et ne publie pas d'en-tête CORS permissif."
+      verified_by: "test d'intégration HTTP local et inspection des en-têtes de réponse"
+    - id: AC3
+      statement: "Une prise de verrou par A interdit la prise, la sauvegarde et la suppression par B jusqu'à libération par A ou RAZ globale confirmée."
+      verified_by: "tests automatisés API avec deux identités et codes HTTP de conflit/verrouillage"
+    - id: AC4
+      statement: "La sauvegarde d'une tâche avec une révision obsolète est refusée sans modifier TASKS.yaml."
+      verified_by: "test API de conflit comparant le hash de TASKS.yaml avant et après la requête périmée"
+    - id: AC5
+      statement: "L'IHM reste lisible sans débordement horizontal du document aux largeurs 320, 768, 1024 et 1440 px avec des titres et descriptions longs."
+      verified_by: "recette navigateur manuelle documentée avec captures aux quatre largeurs"
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_VIEWER.html
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_TASK_MANAGER_CONCURRENCY_REPAIR.yaml
+      - TOOLS/TASK_MANAGER/task_server.py
+      - TOOLS/TASK_MANAGER/task_lock.py
+      - TOOLS/TASK_MANAGER/test_task_manager.py
+      - LANCER_TASK_MANAGER.bat
+      - TOOLS/TASK_MANAGER/LANCER_TASK_MANAGER.bat
+    forbidden:
+      - CODE/
+      - PRJ_CODESYS/
+      - Device.export
+  conservation:
+    must_survive:
+      - "Les 114 tâches et leurs champs métier issus du commit 739a9bc8."
+      - "Les statuts métier existants restent distincts des verrous d'édition."
+      - "Une modification locale d'une tâche ne réécrit pas les données métier d'une autre tâche."
+    dropped_on_purpose: []
+  evidence_required:
+    - "validation YAML et unicité des IDs"
+    - "tests API de verrouillage, conflit et RAZ globale"
+    - "recette responsive aux quatre largeurs"
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute donnée post-commit non récupérable, toute ambiguïté de verrouillage ou toute
+    perte d'information détectée pendant la restauration est signalée avant écrasement.
+
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Restauration et refonte concurrente du Task Manager en cours."
+  evidence_submitted: []
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-08-27T00:00:00+02:00"
+  notes: "Validation explicite : localhost, pas d'expiration automatique, bouton humain de RAZ globale des flags."

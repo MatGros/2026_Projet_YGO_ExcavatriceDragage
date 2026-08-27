@@ -317,22 +317,18 @@ instJoystick(
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
     RawY                      := HwIn.Operator.JoyYRaw_ANA2,
     RawButton                 := HwIn.Operator.JoyBtnRaw,
-    BtnCalibrate              := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
-    DeadbandRaw               := _JoystickDeadbandRaw,
-    NeutralHoldTime           := T#100MS,
-    DeadmanArmHoldTime        := T#100MS,
-    DeadmanArmGraceTime       := T#3S,
-    RawOutOfRangeMargin       := 500,
+    Calibrate                 := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
+    Cfg                       := GVL_PERSISTENT._JoystickCfgPersist,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
 );
 
 // 📤 Publication des états et axes joystick
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
-Data.JoystickYNeutral     := (instJoystick.DirectionY = 0);
-Data.JoystickDirectionX   := instJoystick.DirectionX;
-Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedTgtX_Pct);
-Data.JoystickXNeutral     := (instJoystick.DirectionX = 0);
+Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
+Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
+Data.JoystickSpeedPctX    := ABS(instJoystick.AxisCmdX.SpeedTgt);
+Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
 {endregion}
 
 {region "§4 Codeurs et homing — M1/M2"}

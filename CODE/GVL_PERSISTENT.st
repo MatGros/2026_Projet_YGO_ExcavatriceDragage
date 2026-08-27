@@ -105,9 +105,11 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🕹️ JOYSTICK
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)
     _JoystickNeutralY : INT := 5000; // Point neutre axe Y (0..10000)
-    _JoystickDeadbandRaw : INT := 300; // Zone morte joystick, compte brut ADC (0..10000) — bruit neutre observé ±200 → réglage direct en compte brut, 300 (marge ~1.5x le bruit mesuré)
     _JoystickAccelRate_Pct : REAL := 50.0; // Accélération rampe (%/s)
     _JoystickDecelRate_Pct : REAL := 150.0; // Décélération rampe (%/s)
+    // Réglages regroupés FB_Joystick (entrée Cfg). Remplace l'ancien _JoystickDeadbandRaw.
+    // Pont persistant/IHM (FB_CfgPersistBridge_JoystickCfg) à câbler en Lot 2.
+    _JoystickCfgPersist : ST_fbJoystick_Cfg := (DeadbandRaw := 300); // reste des champs = defaults ST_fbJoystick_Cfg
 
     // 🔄 CYCLE (dragage semi-automatique)
     _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5); // 🌉 Pont FB_CfgPersistBridge_CycleCfg

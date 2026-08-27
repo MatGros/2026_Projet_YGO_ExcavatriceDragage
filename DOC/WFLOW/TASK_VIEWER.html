@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <title>📋 Task Viewer — Catalogue des Tâches</title>
     <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         :root {
             --bg: #1e1e2e;
             --card-bg: #282a36;
@@ -17,29 +22,30 @@
             --cyan: #8be9fd;
             --red: #ff5555;
         }
-        html {
-            scroll-behavior: smooth;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        html, body {
+            width: 100%;
+            min-height: 100vh;
             background-color: var(--bg);
             color: var(--text);
-            margin: 0;
-            padding: 20px;
-            overflow-y: scroll; /* Force une barre de défilement permanente pour éviter les sauts de largeur */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
         }
-
+        body {
+            padding: 14px;
+        }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--border);
-            padding-bottom: 12px;
-            margin-bottom: 16px;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        .title { font-size: 20px; font-weight: bold; color: var(--accent); }
-        .badge { padding: 3px 8px; border-radius: 6px; font-weight: bold; }
+        .title { font-size: 18px; font-weight: bold; color: var(--accent); }
+        .badge { padding: 3px 8px; border-radius: 6px; font-weight: bold; font-size: 12px; }
         .badge-done { background: rgba(80, 250, 123, 0.2); color: var(--green); }
         .badge-lock { background: rgba(255, 184, 108, 0.2); color: var(--orange); }
         .badge-wait { background: rgba(139, 233, 253, 0.2); color: var(--cyan); }
@@ -50,46 +56,53 @@
             50% { opacity: 0.4; transform: scale(1.2); }
             100% { opacity: 1; transform: scale(1); }
         }
-        .badge-open { background: rgba(139, 233, 253, 0.2); color: var(--cyan); }
         
-        .controls {
+        .controls-wrapper {
             display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+        .controls-row {
+            display: flex;
+            gap: 6px;
             flex-wrap: wrap;
             align-items: center;
+            width: 100%;
         }
         .search-box {
-            flex: 1;
-            min-width: 250px;
-            padding: 8px 12px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-        }
-        .search-box:focus { border-color: var(--accent); }
-        .sort-box {
-            padding: 8px 12px;
+            flex: 1 1 180px;
+            min-width: 140px;
+            padding: 6px 10px;
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 6px;
             color: #fff;
             font-size: 13px;
             outline: none;
-            cursor: pointer;
         }
-        .filter-btn {
-            padding: 6px 12px;
+        .search-box:focus { border-color: var(--accent); }
+        .sort-box {
+            padding: 6px 10px;
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 6px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+        .filter-btn {
+            padding: 5px 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 5px;
             color: var(--subtext);
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             transition: all 0.15s;
+            white-space: nowrap;
         }
         .filter-btn.active, .filter-btn:hover {
             background: var(--accent);
@@ -102,33 +115,36 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             overflow-x: auto;
+            width: 100%;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         table {
             width: 100%;
-            table-layout: fixed;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
             text-align: left;
+            min-width: 960px;
         }
         .col-title {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            white-space: normal;
+            word-break: break-word;
             font-weight: 500;
+            padding-right: 6px;
+            line-height: 1.35;
         }
         thead {
             background: #191a21;
             border-bottom: 2px solid var(--border);
         }
         th {
-            padding: 6px 8px;
+            padding: 6px 6px;
             font-weight: bold;
             color: var(--accent);
             white-space: nowrap;
             user-select: none;
             cursor: pointer;
             transition: color 0.15s;
+            font-size: 12px;
         }
         th:hover {
             color: var(--cyan);
@@ -299,6 +315,34 @@
             font-size: 12px;
             color: var(--subtext);
         }
+        /* Table lisible sur ecran large ; cartes empilees sur mobile. */
+        .table-container { overflow-x: auto; }
+        #task-table { table-layout: auto; }
+        #task-table th, #task-table td { overflow-wrap: anywhere; word-break: normal; }
+        #task-table th:nth-child(1) { width: 42px !important; }
+        #task-table th:nth-child(2), #task-table td:nth-child(2),
+        #task-table th:nth-child(3), #task-table td:nth-child(3) {
+            width: 1% !important;
+            white-space: nowrap;
+            padding-left: 3px;
+            padding-right: 3px;
+        }
+        #task-table th:nth-child(4), #task-table td:nth-child(4) { width: 1% !important; white-space: nowrap; }
+        #task-table th:nth-child(5) { width: 112px !important; }
+        #task-table th:nth-child(6) { width: 52px !important; }
+        #task-table th:nth-child(7) { width: 108px !important; }
+        @media (max-width: 760px) {
+            body { overflow-x: hidden; }
+            .header, .toolbar { flex-wrap: wrap; gap: 8px; }
+            .table-container { overflow: visible; }
+            #task-table { min-width: 0 !important; }
+            #task-table, #task-table tbody, #task-table tr, #task-table td { display: block; width: 100% !important; }
+            #task-table thead { display: none; }
+            #task-table tr { margin: 10px 0; border: 1px solid var(--border); border-radius: 8px; }
+            #task-table td { border: 0; padding: 7px 10px; }
+            #task-table td[data-label]::before { content: attr(data-label); display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; }
+            .modal-box { width: calc(100% - 24px) !important; max-width: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -307,61 +351,71 @@
         <div class="stats" id="stats"></div>
     </div>
     
-    <div class="controls">
-        <input type="text" id="search" class="search-box" placeholder="🔍 Rechercher (ID, Kobold, M3, Homed, Frein, AGY...)" oninput="filterTasks()">
-        <select id="sort-select" class="sort-box" onchange="setSort(this.value)">
-            <option value="id-desc" selected>🏷️ ID (Décroissant)</option>
-            <option value="id-asc">🏷️ ID (Croissant)</option>
-            <option value="date-desc">🕒 Date (Récentes en premier)</option>
-            <option value="date-asc">🕒 Date (Anciennes en premier)</option>
-            <option value="crit-desc">🚨 Criticité (C4 → C1)</option>
-        </select>
-        <button class="filter-btn active" onclick="setFilter('ALL', this)">Tous</button>
-        <button class="filter-btn" onclick="setFilter('🔒', this)">🔒 En cours</button>
-        <button class="filter-btn" onclick="setFilter('⬜', this)">⬜ À faire</button>
-        <button class="filter-btn" onclick="setFilter('⏳', this)">⏳ En attente</button>
-        <button class="filter-btn" onclick="setFilter('✅', this)">✅ Validés</button>
-        <button class="filter-btn" onclick="setFilter('❌', this)">❌ Annulés</button>
-        <button class="filter-btn" onclick="setDomain('SÉCURITÉ', this)">🛡️ Sécurité</button>
-        <button class="filter-btn" onclick="setDomain('CODEURS', this)">📏 Codeurs</button>
-        <button class="filter-btn" onclick="setDomain('TREUILS', this)">🏗️ Treuils</button>
-        <button class="filter-btn" onclick="setDomain('TRANSLATION', this)">🚋 Translation</button>
-        <button class="filter-btn" onclick="setDomain('CYCLE', this)">⚙️ Cycle</button>
-        
-        <button class="btn-action btn-save" onclick="openNewTaskModal()">➕ Nouvelle Tâche</button>
-        <button class="btn-action btn-cancel" onclick="reloadFromYamlFile()" title="Recharger directement depuis le fichier TASKS.yaml">🔄 Recharger TASKS.yaml</button>
-        <input type="file" id="yaml-file-input" accept=".yaml,.yml" style="display:none;" onchange="handleYamlFileSelect(event)">
-        
-        <div id="server-status-badge" style="display:inline-flex; align-items:center; gap:8px; background: rgba(80, 250, 123, 0.15); border: 1px solid #50fa7b; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #50fa7b; font-weight: bold;">
-            <span style="width:9px; height:9px; background:#50fa7b; border-radius:50%; box-shadow:0 0 8px #50fa7b; display:inline-block;"></span>
-            <span id="server-status-text">Mode Serveur Connecté ⚡ (Auto-Save Actif)</span>
+    <div class="controls-wrapper">
+        <!-- Ligne 1 : Recherche, Tri & Actions globales -->
+        <div class="controls-row">
+            <input type="text" id="search" class="search-box" placeholder="🔍 Rechercher (ID, Kobold, M3, Homed, Frein, AGY...)" oninput="filterTasks()">
+            <select id="sort-select" class="sort-box" onchange="setSort(this.value)">
+                <option value="id-desc" selected>🏷️ ID (Décroissant)</option>
+                <option value="id-asc">🏷️ ID (Croissant)</option>
+                <option value="date-desc">🕒 Date (Récentes)</option>
+                <option value="date-asc">🕒 Date (Anciennes)</option>
+                <option value="crit-desc">🚨 Criticité (C4 → C1)</option>
+            </select>
+            
+            <button class="btn-action btn-save" onclick="openNewTaskModal()">➕ Nouvelle Tâche</button>
+            <button class="btn-action" style="background:#ff5555; color:#fff;" onclick="window.unlockAllTasks()" title="Supprime tous les 🚩 d’édition ; les 🔒 de travail restent intacts">🚩 RAZ flags</button>
+            <button class="btn-action btn-cancel" onclick="reloadFromYamlFile()" title="Recharger depuis TASKS.yaml">🔄 Recharger</button>
+            <input type="file" id="yaml-file-input" accept=".yaml,.yml" style="display:none;" onchange="handleYamlFileSelect(event)">
+            
+            <div id="server-status-badge" style="display:inline-flex; align-items:center; gap:6px; background: rgba(80, 250, 123, 0.15); border: 1px solid #50fa7b; padding: 4px 8px; border-radius: 6px; font-size: 11px; color: #50fa7b; font-weight: bold; white-space:nowrap;">
+                <span style="width:8px; height:8px; background:#50fa7b; border-radius:50%; box-shadow:0 0 6px #50fa7b; display:inline-block;"></span>
+                <span id="server-status-text">Mode Serveur Actif ⚡</span>
+            </div>
+
+            <div id="sync-warning-badge" style="display:none; align-items:center; gap:6px; background: rgba(255, 85, 85, 0.15); border: 1px solid #ff5555; padding: 4px 8px; border-radius: 6px; font-size: 11px; color: #ff5555; font-weight: bold;">
+                <span style="width:8px; height:8px; background:#ff5555; border-radius:50%; box-shadow:0 0 8px #ff5555; animation: pulse 1.2s infinite; display:inline-block;"></span>
+                <span>Non synchronisé</span>
+            </div>
+
+            <button class="btn-action btn-primary" onclick="exportJsonYaml()" id="btn-export" style="display:none;">
+                <span>💾 Exporter TASKS.yaml</span>
+            </button>
         </div>
 
-        <div id="sync-warning-badge" style="display:none; align-items:center; gap:8px; background: rgba(255, 85, 85, 0.15); border: 1px solid #ff5555; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #ff5555; font-weight: bold;">
-            <span style="width:10px; height:10px; background:#ff5555; border-radius:50%; box-shadow:0 0 10px #ff5555; animation: pulse 1.2s infinite; display:inline-block;"></span>
-            <span>Non synchronisé</span>
+        <!-- Ligne 2 : Filtres de statuts et de domaines -->
+        <div class="controls-row" style="background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);">
+            <span style="font-size: 11px; font-weight: bold; color: var(--subtext); text-transform: uppercase;">Filtres :</span>
+            <button class="filter-btn active" onclick="setFilter('ALL', this)">Tous</button>
+            <button class="filter-btn" onclick="setFilter('WORK_LOCK', this)">🔒 Travail attribué</button>
+            <button class="filter-btn" onclick="setFilter('⬜', this)">⬜ À faire</button>
+            <button class="filter-btn" onclick="setFilter('⏳', this)">⏳ En attente</button>
+            <button class="filter-btn" onclick="setFilter('✅', this)">✅ Validés</button>
+            <button class="filter-btn" onclick="setFilter('❌', this)">❌ Annulés</button>
+            <span style="color: var(--border); font-size: 12px;">|</span>
+            <button class="filter-btn" onclick="setDomain('SÉCURITÉ', this)">🛡️ Sécurité</button>
+            <button class="filter-btn" onclick="setDomain('CODEURS', this)">📏 Codeurs</button>
+            <button class="filter-btn" onclick="setDomain('TREUILS', this)">🏗️ Treuils</button>
+            <button class="filter-btn" onclick="setDomain('TRANSLATION', this)">🚋 Translation</button>
+            <button class="filter-btn" onclick="setDomain('CYCLE', this)">⚙️ Cycle</button>
         </div>
-
-        <button class="btn-action btn-primary" onclick="exportJsonYaml()" id="btn-export" style="display:none;">
-            <span>💾 Exporter TASKS.yaml</span>
-        </button>
     </div>
 
 
     
     <div class="table-container">
-        <table>
+        <table id="task-table">
             <thead>
                 <tr>
-                    <th style="width: 38px; text-align: center;" onclick="sortBy('statut')" id="th-statut">État ↕</th>
-                    <th style="width: 88px;" onclick="sortBy('id')" id="th-id">ID ↕</th>
-                    <th style="width: 56px;" onclick="sortBy('parent_id')" id="th-parent_id">Parent ↕</th>
-                    <th style="width: 58px;" onclick="sortBy('agent')" id="th-agent">Agent ↕</th>
-                    <th style="width: 88px;" onclick="sortBy('date')" id="th-date">Date ↕</th>
-                    <th style="width: 36px; text-align: center;" onclick="sortBy('criticite')" id="th-criticite">Crit. ↕</th>
-                    <th style="width: 92px;" onclick="sortBy('domaine')" id="th-domaine">Domaine ↕</th>
-                    <th onclick="sortBy('titre')" id="th-titre">Titre (Cliquer pour trier ou déplier) ↕</th>
-                    <th style="width: 175px; text-align: center;">Actions ⚡</th>
+                    <th style="width: 32px; text-align: center;" onclick="sortBy('statut')" id="th-statut">État</th>
+                    <th style="width: 76px;" onclick="sortBy('id')" id="th-id">ID ↕</th>
+                    <th style="width: 48px;" onclick="sortBy('parent_id')" id="th-parent_id">Parent</th>
+                    <th style="width: 52px;" onclick="sortBy('agent')" id="th-agent">Agent</th>
+                    <th style="width: 78px;" onclick="sortBy('date')" id="th-date">Date ↕</th>
+                    <th style="width: 34px; text-align: center;" onclick="sortBy('criticite')" id="th-criticite">Crit.</th>
+                    <th style="width: 82px;" onclick="sortBy('domaine')" id="th-domaine">Domaine</th>
+                    <th onclick="sortBy('titre')" id="th-titre">Titre ↕</th>
+                    <th style="width: 110px; text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody id="table-body"></tbody>
@@ -387,7 +441,7 @@
                 <div class="form-group">
                     <label>État / Statut :</label>
                     <select id="edit-statut" class="form-control">
-                        <option value="🔒">🔒 En cours de dev</option>
+                        <option value="⏳">⏳ En cours de dev</option>
                         <option value="⬜">⬜ Libre / À faire</option>
                         <option value="🔍">🔍 Étude / Analyse</option>
                         <option value="⏳">⏳ En attente tests / MES</option>
@@ -448,11 +502,11 @@
             </div>
             <div class="modal-actions" style="justify-content: space-between;">
                 <div>
-                    <button class="btn-action" id="btn-modal-delete" style="background:#ff5555; color:#fff; display:none;" onclick="deleteFromModal()">🗑️ Supprimer</button>
+                    <button class="btn-action" id="btn-modal-delete" style="background:#ff5555; color:#fff; display:none;" onclick="window.deleteFromModal()">🗑️ Supprimer</button>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn-action btn-cancel" onclick="closeModal()">Annuler</button>
-                    <button class="btn-action btn-save" onclick="saveTaskModal()">💾 Enregistrer la Tâche</button>
+                    <button class="btn-action btn-cancel" onclick="window.closeModal()">Annuler</button>
+                    <button class="btn-action btn-save" onclick="window.saveTaskModal()">💾 Enregistrer la Tâche</button>
                 </div>
             </div>
         </div>
@@ -789,9 +843,9 @@
             let countDone = 0, countLock = 0, countOpen = 0, countCancel = 0;
             tasks.forEach(t => {
                 if (t.statut === '✅') countDone++;
-                else if (t.statut === '🔒' || t.statut === '🔍') countLock++;
                 else if (t.statut === '❌') countCancel++;
                 else countOpen++;
+                if (t.work_lock || t.statut === '🔒') countLock++;
             });
             
             document.getElementById('stats').innerHTML = `
@@ -803,7 +857,7 @@
             `;
 
             let filtered = tasks.filter(t => {
-                const matchStatus = currentStatus === 'ALL' || t.statut === currentStatus || (currentStatus === '🔒' && t.statut === '🔍');
+                const matchStatus = currentStatus === 'ALL' || t.statut === currentStatus || (currentStatus === 'WORK_LOCK' && (Boolean(t.work_lock) || t.statut === '🔒'));
                 const matchDomain = currentDomain === 'ALL' || t.domaine === currentDomain;
                 const matchText = (t.id + ' ' + (t.parent_id || '') + ' ' + t.titre + ' ' + t.description + ' ' + t.domaine + ' ' + (t.agent || '')).toLowerCase().includes(search);
                 return matchStatus && matchDomain && matchText;
@@ -841,14 +895,15 @@
                 return familyPalette[idx];
             }
 
-            // Calcul de l'âge de la tâche par rapport à aujourd'hui (2026-08-22)
+            // Calcul de l'âge de la tâche par rapport à aujourd'hui
             function getDateClass(dateStr) {
-                const now = new Date('2026-08-22T22:35:00');
+                if (!dateStr) return '';
+                const now = new Date();
                 const taskDate = new Date(dateStr);
                 const diffDays = Math.floor((now - taskDate) / (1000 * 60 * 60 * 24));
-                if (diffDays <= 4) return 'date-fresh';      // Récente (<= 4 jours) : Vert (#50fa7b)
-                if (diffDays <= 10) return 'date-warning';   // 5 à 10 jours : Jaune/Orange (#ffb86c)
-                return 'date-danger';                        // > 10 jours : Rouge (#ff5555)
+                if (diffDays <= 4 && diffDays >= 0) return 'date-fresh';   // Récente (<= 4 jours) : Vert (#50fa7b)
+                if (diffDays <= 10 && diffDays >= 0) return 'date-warning'; // 5 à 10 jours : Jaune/Orange (#ffb86c)
+                return 'date-danger';                                      // > 10 jours : Rouge (#ff5555)
             }
 
             function formatDate2Lines(dateStr) {
@@ -862,6 +917,8 @@
             filtered.forEach(t => {
                 const isExp = expandedId === t.id;
                 const famColor = getFamilyColor(t);
+                const hierarchyColor = t.statut === '✅' ? '#8a8a8a' : famColor;
+                const hierarchyBorder = t.statut === '✅' ? '#555555' : `${famColor}55`;
                 const dateCls = getDateClass(t.date);
                 const dateHtml = formatDate2Lines(t.date);
                 
@@ -871,44 +928,34 @@
                 tr.onclick = () => toggleDetail(t.id);
 
                 
-                const isLocked = (t.statut === '🔒' || t.statut === '🔍');
+                const isLocked = Boolean(t.work_lock) || t.statut === '🔒';
+                const isEditing = Boolean(t.edit_flag);
                 
-                // Badge d'état interactif et visuel
-                let statusBadge = '';
-                if (t.statut === '🔒') {
-                    statusBadge = `<span title="Tâche VERROUILLÉE par ${t.agent || 'un agent'}" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(255,85,85,0.25); border:1px solid #ff5555; border-radius:5px; font-size:13px; cursor:pointer;" onclick="unlockTask('${t.id}', event)">🔒</span>`;
-                } else if (t.statut === '🔍') {
-                    statusBadge = `<span title="En analyse / étude par ${t.agent || 'un agent'}" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(255,184,108,0.25); border:1px solid #ffb86c; border-radius:5px; font-size:13px;">🔍</span>`;
-                } else if (t.statut === '✅') {
-                    statusBadge = `<span title="Validée & Clôturée" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(80,250,123,0.2); border:1px solid #50fa7b; border-radius:5px; font-size:13px;">✅</span>`;
-                } else if (t.statut === '⏳') {
-                    statusBadge = `<span title="En attente essais terrain" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(241,250,140,0.2); border:1px solid #f1fa8c; border-radius:5px; font-size:13px;">⏳</span>`;
-                } else if (t.statut === '⏸️') {
-                    statusBadge = `<span title="Bloquée / Différée" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(189,147,249,0.2); border:1px solid #bd93f9; border-radius:5px; font-size:13px;">⏸️</span>`;
-                } else if (t.statut === '❌') {
-                    statusBadge = `<span title="Annulée" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(100,100,100,0.2); border:1px solid #666; border-radius:5px; font-size:13px;">❌</span>`;
-                } else {
-                    statusBadge = `<span title="Libre / À traiter (Cliquer pour verrouiller)" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:24px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.18); border-radius:5px; font-size:13px; cursor:pointer;" onclick="lockTask('${t.id}', event)">⬜</span>`;
+                // Statut visuel épuré : Drapeau 🚩 si prise en main, sinon emoji standard
+                let statusDisplay = '';
+                statusDisplay = `${t.statut === '🔒' ? '' : `<span style="font-size:13px;">${t.statut}</span>`}${isLocked ? `<span title="Travail attribué à ${t.work_lock?.actor || t.agent || 'un agent'}" style="margin-left:3px;">🔒</span>` : ''}${isEditing ? `<span title="Édition par ${t.edit_flag.actor}" style="margin-left:3px;">🚩</span>` : ''}`;
+
+                // Affichage propre de l'agent
+                let agentHtml = '<span style="color:#6272a4;">—</span>';
+                if (t.agent && t.agent !== '—') {
+                    agentHtml = `<span style="background:rgba(255,184,108,0.15); color:#ffb86c; border:1px solid #ffb86c44; padding:1px 5px; border-radius:3px; font-size:10px; font-weight:bold; font-family:monospace;">${t.agent}</span>`;
                 }
 
                 tr.innerHTML = `
-                    <td class="col-status" style="text-align:center;">${statusBadge}</td>
-                    <td><span style="background: rgba(255,255,255,0.06); color: ${famColor}; border: 1px solid ${famColor}55; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace; white-space: nowrap;">${t.id}</span></td>
-                    <td>${t.parent_id ? '<span class="parent-tag" style="background: rgba(255,255,255,0.06); color: ' + famColor + '; border: 1px dashed ' + famColor + '77;">↳ ' + t.parent_id + '</span>' : '<span style="color:#6272a4;">—</span>'}</td>
-                    <td class="col-agent">${t.agent && t.agent !== '—' ? t.agent : '—'}</td>
+                    <td class="col-status" style="text-align:center;">${statusDisplay}</td>
+                    <td><span style="background: rgba(255,255,255,0.06); color: ${hierarchyColor}; border: 1px solid ${hierarchyBorder}; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-family: monospace; white-space: nowrap;">${t.id}</span></td>
+                    <td>${t.parent_id ? '<span class="parent-tag" style="background: rgba(255,255,255,0.06); color: ' + hierarchyColor + '; border: 1px dashed ' + hierarchyBorder + ';">↳ ' + t.parent_id + '</span>' : '<span style="color:#8a8a8a;">—</span>'}</td>
+                    <td class="col-agent">${agentHtml}</td>
                     <td class="${dateCls}">${dateHtml}</td>
                     <td class="col-crit crit-${t.criticite}">${t.criticite}</td>
                     <td><span class="col-domain">${t.domaine}</span></td>
                     <td class="col-title">${t.titre}</td>
-                    <td style="text-align: center; white-space: nowrap;" onclick="event.stopPropagation();">
-                        <div style="display:inline-flex; gap:5px; align-items:center; justify-content:center;">
-                            ${isLocked ? 
-                                `<button class="btn-action" style="background:#50fa7b; color:#000; padding:3px 6px; font-size:11px; font-weight:bold; border-radius:4px;" title="Déverrouiller et libérer" onclick="unlockTask('${t.id}', event)">🔓</button>` : 
-                                `<button class="btn-action" style="background:rgba(255,255,255,0.08); color:#8be9fd; border:1px solid #8be9fd55; padding:3px 6px; font-size:11px; font-weight:bold; border-radius:4px;" title="Verrouiller cette tâche" onclick="lockTask('${t.id}', event)">🔒</button>`
-                            }
-                            <button class="btn-action" style="background:#ffb86c; color:#000; padding:3px 8px; font-size:11px; font-weight:bold; border-radius:4px;" title="Modifier la tâche" onclick="openEditModal('${t.id}', event)">✏️ Modif</button>
-                            <button class="btn-action" style="background:#bd93f9; color:#000; padding:3px 8px; font-size:11px; font-weight:bold; border-radius:4px;" title="Dupliquer la tâche" onclick="duplicateTask('${t.id}', event)">📋 Copie</button>
-                            <button class="btn-action" style="background:#ff5555; color:#fff; padding:3px 7px; font-size:11px; font-weight:bold; border-radius:4px;" title="Supprimer la tâche" onclick="deleteTask('${t.id}', false, event)">🗑️</button>
+                    <td style="text-align: center; white-space: nowrap; padding: 3px;" onclick="event.stopPropagation();">
+                        <div style="display:inline-flex; gap:3px; align-items:center; justify-content:center;">
+                            ${isEditing ? `<span style="background:#ffb86c; color:#000; padding:2px 5px; font-size:10px; font-weight:bold; border-radius:3px;" title="Édition temporaire en cours">🚩</span>` : ''}
+                            <button class="btn-action" style="background:#ffb86c; color:#000; padding:2px 6px; font-size:10px; font-weight:bold; border-radius:3px;" title="Modifier la tâche" onclick="window.openEditModal('${t.id}', event)">✏️</button>
+                            <button class="btn-action" style="background:#bd93f9; color:#000; padding:2px 6px; font-size:10px; font-weight:bold; border-radius:3px;" title="Dupliquer la tâche" onclick="duplicateTask('${t.id}', event)">📋</button>
+                            <button class="btn-action" style="background:#ff5555; color:#fff; padding:2px 6px; font-size:10px; font-weight:bold; border-radius:3px;" title="Supprimer la tâche" onclick="window.deleteTask('${t.id}', false, event)">🗑️</button>
                         </div>
                     </td>
                 `;
@@ -933,14 +980,10 @@
                     '<div class="detail-desc">' + t.description + '</div>' :
                     '<div style="font-size: 13px; color: var(--subtext); font-style: italic; margin-top: 2px;">Aucune description detaillee.</div>';
 
-                // Tag visuel du verrou
+                // Métadonnées en bas de détail
                 let lockStatusTag = '';
                 if (isLocked) {
-                    lockStatusTag = `<span style="background:rgba(255,85,85,0.2); border:1px solid #ff5555; color:#ff5555; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:12px;">🔒 VERROUILLÉE par <strong>${t.agent || 'inconnu'}</strong></span>`;
-                } else if (t.statut === '✅') {
-                    lockStatusTag = `<span style="background:rgba(80,250,123,0.2); border:1px solid #50fa7b; color:#50fa7b; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:12px;">✅ VALIDÉE & CLÔTURÉE</span>`;
-                } else {
-                    lockStatusTag = `<span style="background:rgba(80,250,123,0.15); border:1px solid #50fa7b; color:#50fa7b; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:12px;">🟢 LIBRE / DISPONIBLE</span>`;
+                    lockStatusTag = `<span style="background:rgba(98,114,164,0.2); border:1px solid #6272a4; color:#c9d1ff; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:12px;">🔒 TRAVAIL ATTRIBUÉ à <strong>${t.work_lock?.actor || t.agent || 'inconnu'}</strong></span>`;
                 }
 
                 trDetail.innerHTML = `
@@ -964,15 +1007,15 @@
                                 <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                                     ${lockStatusTag}
                                     <span>📄 Contrat : <strong>${t.contrat || 'Aucun'}</strong></span>
+                                    <span>🏷️ Statut : <strong>${t.statut}</strong></span>
+                                    <span>🔒 Agent : <strong>${t.agent || 'Non assigné'}</strong></span>
                                 </div>
                                 <div style="display:flex; gap:8px;">
-                                    ${isLocked ? 
-                                        `<button class="btn-action" style="background:#50fa7b; color:#000; padding:6px 12px; font-size:12px;" onclick="unlockTask('${t.id}', event)">🔓 Déverrouiller</button>` : 
-                                        `<button class="btn-action" style="background:rgba(255,255,255,0.1); color:#8be9fd; border:1px solid #8be9fd; padding:6px 12px; font-size:12px;" onclick="lockTask('${t.id}', event)">🔒 Verrouiller</button>`
-                                    }
-                                    <button class="btn-action" style="background:#ffb86c; color:#000; padding:6px 12px; font-size:12px;" onclick="openEditModal('${t.id}', event)">✏️ Modifier</button>
+                                    ${isLocked ? `<span style="background:#6272a4; color:#fff; padding:6px 12px; font-size:12px; border-radius:4px;">🔒 Travail attribué</span>` : ''}
+                                    ${isEditing ? `<span style="background:#ffb86c; color:#000; padding:6px 12px; font-size:12px; border-radius:4px;">🚩 Édition en cours</span>` : ''}
+                                    <button class="btn-action" style="background:#ffb86c; color:#000; padding:6px 12px; font-size:12px;" onclick="window.openEditModal('${t.id}', event)">✏️ Modifier</button>
                                     <button class="btn-action" style="background:#bd93f9; color:#000; padding:6px 12px; font-size:12px;" onclick="duplicateTask('${t.id}', event)">📋 Dupliquer</button>
-                                    <button class="btn-action" style="background:#ff5555; color:#fff; padding:6px 12px; font-size:12px;" onclick="deleteTask('${t.id}', false, event)">🗑️ Supprimer</button>
+                                    <button class="btn-action" style="background:#ff5555; color:#fff; padding:6px 12px; font-size:12px;" onclick="window.deleteTask('${t.id}', false, event)">🗑️ Supprimer</button>
                                 </div>
                             </div>
                         </div>
@@ -988,7 +1031,7 @@
             const t = tasks.find(item => item.id === taskId);
             if (!t) return;
 
-            if (t.statut === '🔒' && !force) {
+            if ((t.statut === '🚩' || t.statut === '🔒') && !force) {
                 if (!confirm(`⚠️ La tâche ${taskId} est actuellement VERROUILLÉE (🔒) par ${t.agent || 'un agent'}.\n\nVoulez-vous forcer son déverrouillage et sa suppression ?`)) {
                     return;
                 }
@@ -1064,6 +1107,55 @@
             }
         }
 
+                async function unlockAllTasks() {
+            const countLocked = tasks.filter(t => (t.statut === '🚩' || t.statut === '🔒') || t.statut === '🔍').length;
+            if (countLocked === 0) {
+                showToast("ℹ️ Aucune tâche n'est actuellement verrouillée !");
+                return;
+            }
+
+            if (!confirm(`⚠️ Attention : Vous allez lever tous les verrous (${countLocked} tâche(s) verrouillée(s)).\n\nConfirmez-vous la réinitialisation de toutes les tâches à l'état LIBRE (⬜) ?`)) {
+                return;
+            }
+
+            if (isServerMode) {
+                try {
+                    const res = await fetch('/api/tasks/unlock-all', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({})
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        tasks.forEach(t => {
+                            if ((t.statut === '🚩' || t.statut === '🔒') || t.statut === '🔍') {
+                                t.statut = '⬜';
+                                t.agent = '—';
+                            }
+                        });
+                        render();
+                        showToast(`🔓 ${data.unlocked_count} tâche(s) déverrouillée(s) et remises à ⬜ !`);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Erreur API unlock-all :', e);
+                }
+            }
+
+            // Fallback mode autonome
+            let count = 0;
+            tasks.forEach(t => {
+                if ((t.statut === '🚩' || t.statut === '🔒') || t.statut === '🔍') {
+                    t.statut = '⬜';
+                    t.agent = '—';
+                    count++;
+                }
+            });
+            persistTasks();
+            render();
+            showToast(`🔓 ${count} tâche(s) déverrouillée(s) !`);
+        }
+
         async function unlockTask(taskId, event) {
             if (event) event.stopPropagation();
 
@@ -1103,9 +1195,14 @@
 
         // --- Fonctions d'Édition / Création / Duplication ---
         let editingIndex = -1;
+        let originalStatusBeforeEdit = null;
+        let originalAgentBeforeEdit = null;
 
         function openNewTaskModal() {
             editingIndex = -1;
+            originalStatusBeforeEdit = null;
+            originalAgentBeforeEdit = null;
+
             document.getElementById('modal-heading').innerText = '➕ Création d\'une Nouvelle Tâche';
             document.getElementById('btn-modal-delete').style.display = 'none';
             
@@ -1131,22 +1228,48 @@
             document.getElementById('task-modal').style.display = 'flex';
         }
 
-        function openEditModal(taskId, event) {
+        async function openEditModal(taskId, event) {
             if (event) event.stopPropagation();
             const idx = tasks.findIndex(t => t.id === taskId);
             if (idx === -1) return;
             
-            editingIndex = idx;
             const t = tasks[idx];
+
+            // 1. PROTECTION : Vérifier si un autre agent travaille déjà dessus
+            if ((t.statut === '🚩' || t.statut === '🔒') && t.agent && t.agent !== 'HUM' && t.agent !== '—') {
+                alert(`🚫 Impossible de modifier cette tâche !\n\nElle est actuellement en cours de travail par l'agent : [${t.agent}].\n\nSi vous devez forcer la libération, utilisez d'abord le bouton Libérer 🔓.`);
+                return;
+            }
+
+            editingIndex = idx;
+            originalStatusBeforeEdit = t.statut;
+            originalAgentBeforeEdit = t.agent || '—';
+
+            // 2. POSER LE FLAG DE PRISE EN MAIN IMMÉDIAT (Édition active par HUMAIN)
+            if (isServerMode) {
+                try {
+                    await fetch('/api/task/lock', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: taskId, agent: 'HUM' })
+                    });
+                } catch (e) {
+                    console.warn('Erreur lock à l\'ouverture :', e);
+                }
+            }
+            t.statut = '🚩';
+            t.agent = 'HUM';
+            render();
+
             document.getElementById('modal-heading').innerText = '✏️ Modification de la Tâche ' + t.id;
             document.getElementById('btn-modal-delete').style.display = 'inline-block';
 
             document.getElementById('edit-id').value = t.id;
             document.getElementById('edit-parent').value = t.parent_id || '';
-            document.getElementById('edit-statut').value = t.statut;
+            document.getElementById('edit-statut').value = ((originalStatusBeforeEdit === '🚩' || originalStatusBeforeEdit === '🔒') ? '⬜' : originalStatusBeforeEdit);
             document.getElementById('edit-crit').value = t.criticite;
             document.getElementById('edit-domaine').value = t.domaine;
-            document.getElementById('edit-agent').value = t.agent || '—';
+            document.getElementById('edit-agent').value = (originalAgentBeforeEdit === 'HUM' ? '—' : originalAgentBeforeEdit);
             document.getElementById('edit-titre').value = t.titre;
             document.getElementById('edit-contexte').value = t.contexte || '';
             document.getElementById('edit-desc').value = t.description || '';
@@ -1159,12 +1282,10 @@
         function deleteFromModal() {
             if (editingIndex >= 0 && editingIndex < tasks.length) {
                 const targetId = tasks[editingIndex].id;
-                deleteTask(targetId);
+                deleteTask(targetId, true);
                 closeModal();
             }
         }
-
-
 
         function duplicateTask(taskId, event) {
             if (event) event.stopPropagation();
@@ -1172,9 +1293,11 @@
             if (!t) return;
 
             editingIndex = -1;
+            originalStatusBeforeEdit = null;
+            originalAgentBeforeEdit = null;
+
             document.getElementById('modal-heading').innerText = '📋 Duplication de ' + t.id;
 
-            // Suggérer sous-tâche ou nouvel ID
             const newId = t.id.includes('-') ? t.id + '-copy' : t.id + '-A';
             document.getElementById('edit-id').value = newId;
             document.getElementById('edit-parent').value = t.parent_id || t.id;
@@ -1191,8 +1314,35 @@
             document.getElementById('task-modal').style.display = 'flex';
         }
 
-        function closeModal() {
+        async function closeModal() {
             document.getElementById('task-modal').style.display = 'none';
+
+            // Si annulation d'une édition : libérer le flag temporaire posé à l'ouverture
+            if (editingIndex >= 0 && editingIndex < tasks.length) {
+                const t = tasks[editingIndex];
+                const prevStat = ((originalStatusBeforeEdit === '🚩' || originalStatusBeforeEdit === '🔒') ? '⬜' : originalStatusBeforeEdit) || '⬜';
+                const prevAg = (originalAgentBeforeEdit === 'HUM' ? '—' : originalAgentBeforeEdit) || '—';
+
+                t.statut = prevStat;
+                t.agent = prevAg;
+
+                if (isServerMode) {
+                    try {
+                        await fetch('/api/task/unlock', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: t.id })
+                        });
+                    } catch (e) {
+                        console.warn('Erreur unlock à la fermeture :', e);
+                    }
+                }
+                render();
+            }
+
+            editingIndex = -1;
+            originalStatusBeforeEdit = null;
+            originalAgentBeforeEdit = null;
         }
 
         async function saveTaskModal() {
@@ -1206,13 +1356,16 @@
             const objList = rawObj ? rawObj.split('\n').map(s => s.trim()).filter(s => s.length > 0) : [];
             const nowIso = new Date().toISOString().substring(0, 19);
 
+            const savedStatus = document.getElementById('edit-statut').value;
+            const savedAgent = document.getElementById('edit-agent').value.trim() || '—';
+
             const taskData = {
                 id: idVal,
                 parent_id: document.getElementById('edit-parent').value.trim(),
-                statut: document.getElementById('edit-statut').value,
+                statut: savedStatus,
                 criticite: document.getElementById('edit-crit').value,
                 domaine: document.getElementById('edit-domaine').value,
-                agent: document.getElementById('edit-agent').value.trim() || '—',
+                agent: savedAgent,
                 titre: document.getElementById('edit-titre').value.trim(),
                 contexte: document.getElementById('edit-contexte').value.trim(),
                 description: document.getElementById('edit-desc').value.trim(),
@@ -1231,15 +1384,17 @@
                         body: JSON.stringify(taskData)
                     });
                     if (res.ok) {
-                        const resJson = await res.json();
                         if (editingIndex >= 0) {
                             tasks[editingIndex] = taskData;
                         } else {
                             tasks.unshift(taskData);
                         }
-                        closeModal();
+                        editingIndex = -1;
+                        originalStatusBeforeEdit = null;
+                        originalAgentBeforeEdit = null;
+                        document.getElementById('task-modal').style.display = 'none';
                         render();
-                        showToast(`💾 Tâche ${idVal} sauvegardée et fusionnée avec succès !`);
+                        showToast(`💾 Tâche ${idVal} enregistrée et libérée avec succès !`);
                         return;
                     }
                 } catch (e) {
@@ -1254,10 +1409,12 @@
                 tasks.unshift(taskData);
             }
 
-            closeModal();
+            editingIndex = -1;
+            originalStatusBeforeEdit = null;
+            originalAgentBeforeEdit = null;
+            document.getElementById('task-modal').style.display = 'none';
             render();
             autoSaveTasks();
-
         }
 
         function generateYamlText() {
@@ -1399,6 +1556,8 @@
             const rowEl = document.getElementById('row-' + id);
             if (!detailEl || !rowEl) return;
 
+            // Evite que le navigateur recale la vue vers le haut quand la ligne detail disparait.
+            const scrollBeforeToggle = window.scrollY;
             const isShown = detailEl.classList.contains('show');
             
             document.querySelectorAll('.detail-row').forEach(el => el.classList.remove('show'));
@@ -1411,6 +1570,7 @@
             } else {
                 expandedId = null;
             }
+            requestAnimationFrame(() => window.scrollTo({ top: scrollBeforeToggle, left: window.scrollX, behavior: 'instant' }));
         }
 
 
@@ -1483,6 +1643,124 @@
         if (isServerMode) {
             setInterval(fetchFreshTasksSilently, 8000);
         }
+    </script>
+    <script>
+    /* API v2 : aucun fallback n'ecrit le YAML complet. Le verrou est distinct du statut. */
+    const TM_ACTOR = sessionStorage.getItem('task-manager-actor') || `HUM-${crypto.randomUUID()}`;
+    sessionStorage.setItem('task-manager-actor', TM_ACTOR);
+    let tmLockToken = null;
+    let tmRevision = null;
+    // Invariant IHM : aucune action qui rerend la table ne deplace la lecture.
+    const renderWithoutScrollJump = render;
+    render = function(...args) {
+        const top = window.scrollY;
+        const left = window.scrollX;
+        const result = renderWithoutScrollJump(...args);
+        requestAnimationFrame(() => window.scrollTo({top, left, behavior: 'instant'}));
+        return result;
+    };
+
+    async function tmPost(url, payload) {
+        const response = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+        return data;
+    }
+    window.unlockAllTasks = async function() {
+        if (!confirm('RAZ de TOUS les flags d’édition du projet ? Les statuts métier ne changeront pas.')) return;
+        try {
+            const data = await tmPost('/api/tasks/unlock-all', {actor: TM_ACTOR, confirm_all: true});
+            await fetchFreshTasksSilently();
+            showToast(`🔓 ${data.cleared} flag(s) d’édition supprimé(s).`);
+        } catch (error) { alert(`RAZ refusée : ${error.message}`); }
+    };
+    window.openEditModal = async function(taskId, event) {
+        if (event) event.stopPropagation();
+        const index = tasks.findIndex(t => t.id === taskId);
+        if (index < 0) return;
+        try {
+            const locked = await tmPost('/api/task/edit-flag/acquire', {id: taskId, actor: TM_ACTOR});
+            tmLockToken = locked.edit_flag.token;
+            tmRevision = tasks[index].revision;
+            editingIndex = index;
+            const t = tasks[index];
+            const scrollBeforeEdit = window.scrollY;
+            t.edit_flag = locked.edit_flag;
+            render();
+            requestAnimationFrame(() => window.scrollTo({ top: scrollBeforeEdit, left: window.scrollX, behavior: 'instant' }));
+            document.getElementById('modal-heading').innerText = `✏️ Modification de la Tâche ${t.id} — 🚩 Flag actif`;
+            document.getElementById('btn-modal-delete').style.display = 'inline-block';
+            document.getElementById('edit-id').value = t.id;
+            document.getElementById('edit-parent').value = t.parent_id || '';
+            document.getElementById('edit-statut').value = t.statut;
+            document.getElementById('edit-crit').value = t.criticite;
+            document.getElementById('edit-domaine').value = t.domaine;
+            document.getElementById('edit-agent').value = t.agent || '—';
+            document.getElementById('edit-titre').value = t.titre || '';
+            document.getElementById('edit-contexte').value = t.contexte || '';
+            document.getElementById('edit-desc').value = t.description || '';
+            document.getElementById('edit-obj').value = (t.objectifs || []).join('\n');
+            document.getElementById('edit-contrat').value = t.contrat || '';
+            document.getElementById('task-modal').style.display = 'flex';
+            await fetchFreshTasksSilently();
+        } catch (error) { alert(`🚫 Modification impossible : ${error.message}`); }
+    };
+    window.closeModal = async function() {
+        document.getElementById('task-modal').style.display = 'none';
+        if (editingIndex >= 0 && tmLockToken) {
+            const task = tasks[editingIndex];
+            try { await tmPost('/api/task/edit-flag/release', {id: task.id, actor: TM_ACTOR, token: tmLockToken}); } catch (_) {}
+        }
+        editingIndex = -1; tmLockToken = null; tmRevision = null; await fetchFreshTasksSilently();
+    };
+    window.saveTaskModal = async function() {
+        const id = document.getElementById('edit-id').value.trim();
+        if (!id) return alert('Identifiant obligatoire.');
+        const task = {
+            id, parent_id: document.getElementById('edit-parent').value.trim(),
+            statut: document.getElementById('edit-statut').value, criticite: document.getElementById('edit-crit').value,
+            domaine: document.getElementById('edit-domaine').value, agent: document.getElementById('edit-agent').value.trim() || '—',
+            titre: document.getElementById('edit-titre').value.trim(), contexte: document.getElementById('edit-contexte').value.trim(),
+            description: document.getElementById('edit-desc').value.trim(),
+            objectifs: document.getElementById('edit-obj').value.split('\n').map(v => v.trim()).filter(Boolean),
+            contrat: document.getElementById('edit-contrat').value.trim(), date: new Date().toISOString().substring(0, 19), bloque_par: []
+        };
+        try {
+            await tmPost('/api/task/save', {actor: TM_ACTOR, task, token: tmLockToken || '', expected_revision: tmRevision || ''});
+            document.getElementById('task-modal').style.display = 'none'; editingIndex = -1; tmLockToken = null; tmRevision = null;
+            await fetchFreshTasksSilently(); showToast(`💾 Tâche ${id} enregistrée.`);
+        } catch (error) { alert(`Sauvegarde refusée : ${error.message}`); }
+    };
+    window.deleteTask = async function(taskId, _force, event) {
+        if (event) event.stopPropagation();
+        if (!tmLockToken || editingIndex < 0 || tasks[editingIndex].id !== taskId) return alert('Ouvrez d’abord la tâche : un verrou personnel est requis.');
+        if (!confirm(`Supprimer définitivement ${taskId} ?`)) return;
+        try { await tmPost('/api/task/delete', {id: taskId, actor: TM_ACTOR, token: tmLockToken}); document.getElementById('task-modal').style.display = 'none'; editingIndex=-1; tmLockToken=null; await fetchFreshTasksSilently(); } catch(error) { alert(`Suppression refusée : ${error.message}`); }
+    };
+    window.deleteFromModal = function() {
+        if (editingIndex >= 0 && tasks[editingIndex]) window.deleteTask(tasks[editingIndex].id, false);
+    };
+    async function refreshServerHealth() {
+        const badge = document.getElementById('server-status-badge');
+        const text = document.getElementById('server-status-text');
+        if (!isServerMode) {
+            if (badge) { badge.style.background = 'rgba(255,85,85,.18)'; badge.style.borderColor = '#ff5555'; }
+            if (text) { text.textContent = '⛔ Page ouverte hors serveur — lance LANCER_TASK_MANAGER.bat'; text.style.color = '#ff5555'; }
+            return;
+        }
+        try {
+            const response = await fetch('/api/status', {cache: 'no-store'});
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const status = await response.json();
+            if (badge) { badge.style.background = 'rgba(80,250,123,.15)'; badge.style.borderColor = '#50fa7b'; }
+            if (text) { text.textContent = `Serveur connecté ⚡ ${status.host}:${status.port}`; text.style.color = '#50fa7b'; }
+        } catch (_) {
+            if (badge) { badge.style.background = 'rgba(255,85,85,.18)'; badge.style.borderColor = '#ff5555'; }
+            if (text) { text.textContent = '⛔ Serveur arrêté — lance LANCER_TASK_MANAGER.bat'; text.style.color = '#ff5555'; }
+        }
+    }
+    refreshServerHealth();
+    setInterval(refreshServerHealth, 3000);
     </script>
 </body>
 </html>

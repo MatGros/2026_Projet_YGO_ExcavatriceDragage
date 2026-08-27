@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.145379" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.145379">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:50:28.131927" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:50:28.131927">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -74,7 +74,85 @@
           </data>
         </addData>
       </dataType>
-      <dataType name="ST_FbStatus">
+      <dataType name="ST_Modes_Autorisations">
+        <baseType>
+          <struct>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickWinchSelectArbitrated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingApproachEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fd63c0a6-3caa-5a6f-9077-b79ee39469f5</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎚️ ST_Modes_Autorisations — Bus d'autorisations du mode machine
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
+      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Status">
         <baseType>
           <struct>
             <variable name="Busy">
@@ -171,102 +249,24 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>06c92900-1ebd-5fc9-b098-483d32a7b08a</ObjectId>
+            <ObjectId>537f3533-9d7c-5703-b6a3-978725c61956</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier
+   🧩 ST_Status — Socle transverse de statut d'un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
       avec les textes prêts pour l'IHM (plus de conditions complexes
       côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
+      migre pas vers ST_Status (exception documentée).
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_Modes_Autorisations">
-        <baseType>
-          <struct>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SyncEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InhibitM1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InhibitM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickWinchSelectArbitrated">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingApproachEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceM3TargetEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>fd63c0a6-3caa-5a6f-9077-b79ee39469f5</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎚️ ST_Modes_Autorisations — Bus d'autorisations du mode machine
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
-                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
-   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
-      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
-   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_State">
@@ -443,7 +443,7 @@
             </variable>
             <variable name="Status">
               <type>
-                <derived name="ST_FbStatus" />
+                <derived name="ST_Status" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
@@ -673,16 +673,16 @@ Status.Done := FALSE;
           <Object Name="FB_Modes" ObjectId="472bf31b-6364-520b-84dc-569fca7609c9" />
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
-        <Folder Name="A_COMMUN">
-          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
-          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
-        </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
             </Folder>
           </Folder>
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
+          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
       </ProjectStructure>
     </data>

@@ -82,7 +82,7 @@ VAR_OUTPUT
     // bit3: "Mou de câble" ; bit4: "Rotation phases" ; bit5: "Fin de course haut capteur" ;
     // bit6: "Limite max câble" ; bit7: "Méca A" ; bit8: "Méca B" ; bit9: "Méca C" ; bit10: "Thermique frein" ;
     // bit11: "Méca D" ; bit12/13: "Méca E écart synchro" ; bit14: "Sens opposé" ; bit15: "Absence mouvement".
-    Status                         : ST_FbStatus;
+    Status                         : ST_Status;
 
     // === SORTIES DE SÉCURITÉ ET AUTORISATIONS ===
     SafeStop                        : BOOL;                           // <-- [SAFE] Arret rapide 2 sens (Enable maintenu)

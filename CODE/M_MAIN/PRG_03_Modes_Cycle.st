@@ -58,7 +58,7 @@ instCycleSemiAuto(
     Reset                   := GVL_IHM.Cycle.Cmd.BtnReset,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := Auth.Mode,
-    CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutral,
+    CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY,
     DeadmanArmed            := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,

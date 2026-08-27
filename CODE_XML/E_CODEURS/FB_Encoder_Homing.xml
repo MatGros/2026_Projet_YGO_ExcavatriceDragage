@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.139186" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.139186">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:50:28.103727" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:50:28.103727">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -89,7 +89,7 @@ TRUE des qu'un referencement a reussi</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_FbStatus">
+      <dataType name="ST_Status">
         <baseType>
           <struct>
             <variable name="Busy">
@@ -186,22 +186,22 @@ TRUE des qu'un referencement a reussi</xhtml>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>06c92900-1ebd-5fc9-b098-483d32a7b08a</ObjectId>
+            <ObjectId>537f3533-9d7c-5703-b6a3-978725c61956</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier
+   🧩 ST_Status — Socle transverse de statut d'un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
       avec les textes prêts pour l'IHM (plus de conditions complexes
       côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
+      migre pas vers ST_Status (exception documentée).
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    =======================================================================</xhtml>
         </documentation>
@@ -476,7 +476,7 @@ TRUE des qu'un referencement a reussi</xhtml>
             </variable>
             <variable name="Status">
               <type>
-                <derived name="ST_FbStatus" />
+                <derived name="ST_Status" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
@@ -864,7 +864,7 @@ HomingRefRaw := Calib.HomingRefRaw;
           <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
         </Folder>
         <Folder Name="A_COMMUN">
-          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
+          <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
       </ProjectStructure>
