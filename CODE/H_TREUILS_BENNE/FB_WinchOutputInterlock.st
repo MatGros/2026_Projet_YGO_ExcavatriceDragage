@@ -96,6 +96,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId <> 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
+    // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
+    // - ErrorId & RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
+    // - StateAtError & Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
     RETURN;
 END_IF;
 
