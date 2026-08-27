@@ -5,6 +5,16 @@
 > **Commit HEAD analysé** : `739a9bc82306f39ab1f5ca0fdc7b4b4ca4f40279`  
 > **Statut** : ✅ **LIVRABLE FINAL FACTUEL RÉVISÉ (AC1 à AC8 validés sans réserve)**
 
+> ⏳ **Note de terminologie (snapshot figé — post-T164-3, 2026-08-27)** : ce document est un
+> **relevé statique daté**. Les tables ci-dessous citent `FB_FbStatus`, `ST_FbCause` et
+> `ST_FbStatus` tels qu'ils existaient au commit analysé. Depuis, socle défaut unifié (T164-3) :
+> `FB_FbStatus` / `ST_FbCause` **supprimés du code** (commit `51fccce6`) → remplacés par
+> `FB_FaultCore` / `ST_FaultCause` (`Latching`, plus `IsWarning`) ; `ST_FbStatus` **renommé**
+> `ST_Status` (`CODE/A_COMMUN/ST_Status.st`), forme legacy tolérée sur 17 FB jusqu'à T164-5.
+> Forme cible du contrat `standard` : `Fault : ST_Fault` (+ `Lifecycle : ST_Lifecycle` si machine
+> d'état). Référentiel à jour : `DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md` §3 / §4.1,
+> `DOC/AF/AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md`.
+
 ---
 
 ## 🔬 MÉTHODE & PÉRIMÈTRE DE L'AUDIT

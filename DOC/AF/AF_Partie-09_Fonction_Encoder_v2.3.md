@@ -30,9 +30,11 @@
   fiabilité, vitesse. Ne fait **pas** : décision de mouvement, pilotage frein/contacteur, calcul
   de `HomingPermit` (entrée externe, calculée par l'appelant).
 - **Type de composant** : Brique de mesure (façade composite de 7 sous-FB).
-- **Contrat AF03** : `standard` (remonte défaut bus/preset/homing/bornage via `Status : ST_FbStatus`
-  — rempli manuellement par masques de bits dans chaque sous-FB, **pas** via le socle `FB_FbStatus`
-  à `Causes[]` comme `FB_Joystick` — tolérance transitoire T137, AF03 §2).
+- **Contrat AF03** : `standard`. Forme cible = `Fault : ST_Fault` rempli via `FB_FaultCore`
+  (AF03 §3 / §4.1). État actuel du code : défaut bus/preset/homing/bornage remonté via
+  `Status : ST_Status` (struct de statut agrégé legacy), rempli à plat par masques de bits dans
+  chaque sous-FB — **forme legacy tolérée jusqu'à T164-5** (AF03 §3 point 4). Le repointage vers
+  `Fault : ST_Fault` est un pointeur de contrat ; la migration du code n'est pas portée ici.
 
 ### Table des fonctions
 
@@ -153,7 +155,7 @@ cyan acquisition, violet référencement, jaune calcul, rouge sécurité/fiabili
 | Port | Type | Rôle |
 |---|---|---|
 | `Ready` | `BOOL` | FB prêt |
-| `Status` | `ST_FbStatus` | Statut synthèse façade (agrège Abs/Safety/Homing) |
+| `Status` | `ST_Status` | Statut synthèse façade (agrège Abs/Safety/Homing) — type legacy, cible `Fault : ST_Fault` via `FB_FaultCore` (AF03 §3 / §4.1), migration T164-5 |
 | `HwOut` | `ST_EncoderHw` | Sorties hardware (preset vers PDO) |
 | `Measurement` | `ST_EncoderMeasurement` | Mesures + statuts (interface AF06) |
 | `Homed` | `BOOL` | Codeur référencé |

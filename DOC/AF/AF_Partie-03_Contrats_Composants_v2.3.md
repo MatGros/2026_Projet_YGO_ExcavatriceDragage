@@ -5,12 +5,12 @@
 ## 🎯 Rôle et périmètre
 
 - **Rôle** : définir les contrats publics des FB, des DUT internes et des pages CFC.
-- **Périmètre** : profils de composants, cycle de vie/états/défauts (socle `FB_FbStatus`),
+- **Périmètre** : profils de composants, cycle de vie/états/défauts (socle `FB_FaultCore`),
   contrats DUT, règles CFC/Ladder. Ne définit pas : la chaîne électrique AU et le réarmement
   (propriétaires de la Partie 01), l'architecture programme/ordonnancement (Partie 02).
 - **Type de composant** : Fondations méta — pas de FB unique porteur. Le socle transverse
-  `FB_FbStatus` (implémentation du contrat `standard`) a sa propre fiche détaillée depuis v2.3 :
-  [`FB_FbStatus_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FbStatus_v1.0.md).
+  `FB_FaultCore` (implémentation du contrat `standard`) a sa propre fiche détaillée :
+  [`FB_FaultCore_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md).
 
 ## 📑 Sommaire
 
@@ -39,10 +39,10 @@
 | <nobr><code>TC-P03-006</code></nobr> | Re-latch sur ré-apparition Cause | Nouveau front Cause ➔ `Ack=FALSE` | `💻 AUTO` | <small>§4</small> | `NV-I` |
 | <nobr><code>TC-P03-007</code></nobr> | Warning auto-effaçable vs Fault latché | Warning s'efface sans Reset, Fault exige Ack | `💻 AUTO` | <small>§4</small> | `NV-I` |
 
-> Catalogue `TC-P03-008` à `TC-P03-013` (détail `FB_FbStatus` — cumul de défauts, sélection texte
-> IHM, bornes de liste, faille T148...) **déplacé dans la fiche dédiée** depuis v2.3 — propriétaire
-> unique, pas dupliqué ici (`GUIDE_EDITION_AF_v1.0.md` §4) :
-> [`FB_FbStatus_v1.0.md` §2](AF_Partie-03_Contrats_Composants/FB_FbStatus_v1.0.md#2--points-de-validation-détail).
+> Catalogue `TC-P03-008` à `TC-P03-013` (détail `FB_FaultCore` — cumul de causes latchées, vue
+> live vs vue latchée, bornes de liste, faille T148...) **déplacé dans la fiche dédiée** —
+> propriétaire unique, pas dupliqué ici (`GUIDE_EDITION_AF_v1.0.md` §4) :
+> [`FB_FaultCore_v1.0.md` §2](AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md#2--points-de-validation-détail).
 
 ---
 
@@ -81,13 +81,23 @@ aucune sortie d'erreur. 🚫 Un bloc qui **remonte un défaut** (capteur, calibr
 
 **2. Contrat `standard`** (Composants métier, séquenceurs, organes, devices) — blocs qui **remontent
 un défaut** OU **pilotent un organe**. `VAR_INPUT` socle fixe 2 champs : `Enable : BOOL` +
-`Reset : BOOL` (front d'acquittement). `VAR_OUTPUT` : `Ready : BOOL` + `Status : ST_FbStatus`
-**seuls** — pas de champ `Error`/`ErrorId`/`Busy`/`Done` à plat en complément (rempli via le socle
-`FB_FbStatus`, détail complet : [`FB_FbStatus_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FbStatus_v1.0.md)).
+`Reset : BOOL` (front d'acquittement). `VAR_OUTPUT` socle :
+
+- `Ready : BOOL`.
+- `Fault : ST_Fault` — brique défaut (2 vues : live `Error`/`ErrorId` + latchée `Latched`/`LatchedId`),
+  **remplie par une instance `FB_FaultCore`** alimentée par une liste de causes nommées
+  `Causes : ARRAY[0..15] OF ST_FaultCause` (`Active` / `Latching` / `Texte`).
+- `Lifecycle : ST_Lifecycle` (`Busy` / `Done`) **en plus, uniquement** si le FB porte une machine
+  d'état à cycle (organe, séquenceur) — rempli par le FB lui-même, pas par `FB_FaultCore`. Un FB
+  synchrone (conditionneur, joystick) ne porte pas `Lifecycle`.
+
+Pas de champ `Error`/`ErrorId`/`Busy`/`Done` à plat en complément. Détail complet :
+[`FB_FaultCore_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md).
 
 > 🎯 **Le critère de classement est « remonte-t-il un défaut ? », pas « a-t-il une machine d'état ? ».**
 > Un device qui remonte un défaut capteur/calibration/bus (ex. `FB_Joystick`) est `standard`, même
-> sans machine d'état — `State`/`StateAtError` sont alors remplis par le socle (valeur `READY`).
+> sans machine d'état — il porte `Fault : ST_Fault` **sans** `Lifecycle`. Le socle `FB_FaultCore`
+> ne produit ni `State`, ni `Warning`, ni texte (dérivés côté IHM depuis `LatchedId`/`ErrorId`).
 
 ⚠️ **Limite de la vérification automatique** : `test_fb_interface_guard.py` vérifie que
 l'interface d'un FB **déjà classé** `light`/`standard` est complète pour son profil ; il ne
@@ -114,11 +124,17 @@ réarmement AU). Décision **au cas par cas**, par FB.
 toute commande de mouvement). Comparer ce cas à `FB_Joystick` ci-dessus : la différence n'est pas
 la présence d'un défaut à remonter, c'est **piloter ou non un actionneur physique**.
 
-**4. Tolérance transitoire T137** : les FB antérieurs exposent encore le défaut **à plat**
-(`Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError` en `VAR_OUTPUT`, sans `Warning`, sans
-textes) — accepté le temps de la migration, **uniquement** pour les FB existants. Tout FB
-**nouveau** porte `Status : ST_FbStatus` rempli via `FB_FbStatus`. Ce n'est **pas** une seconde
-forme de conformité permanente.
+**4. Formes legacy tolérées (décomptées, jamais permanentes)** — deux tolérances, aucune n'est une
+forme de conformité cible :
+
+| Forme legacy | Portée | Sortie de tolérance |
+|---|---|---|
+| Défaut **à plat** (`Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError` en `VAR_OUTPUT`, sans textes) | FB antérieurs au socle | migration T137 |
+| `Status : ST_Status` (struct de statut agrégé legacy) — **17 FB** encore concernés | FB déjà migrés vers l'ancien socle agrégé | migration **T164-5** |
+
+Tout FB **nouveau** porte `Fault : ST_Fault` rempli via `FB_FaultCore` (+ `Lifecycle : ST_Lifecycle`
+si machine d'état). Le guard `G315_check_fb_interface.py` reconnaît la forme cible et les formes
+legacy et publie leur décompte (mesure de l'avancement des migrations).
 
 ## 🛑 4 · Cycle de vie, états et défauts
 
@@ -136,34 +152,43 @@ StartStop       -> acceleration ou deceleration normale
 
 - `Reset` est traite sur front interne, et n'est **jamais conditionne** par un etat externe
   (cause corrigee au REX 2026-08 AU, ex-regle erronee "efface seulement si la cause a disparu").
-- Deux categories de defaut a distinguer des la conception d'un composant : **Warning** (auto-efface
-  avec la cause, aucun acquittement) et **Fault** (necessite un acquittement explicite, meme si la
-  cause a disparu ; reapparait si la cause revient apres acquittement). Pattern `Cause`/`Ack` et regle
-  complete : `DOC/STDS/CODE_QUALITY_STANDARDS.md §9`.
+- Deux comportements de defaut a distinguer des la conception d'un composant, portes **par cause**
+  via `ST_FaultCause.Latching` : `Latching=FALSE` → cause **live seulement** (visible dans
+  `Fault.Error`/`ErrorId`, retombe seule, aucun acquittement) ; `Latching=TRUE` → cause **latchee**
+  (arme `Fault.Latched`, necessite un front `Reset`, re-arme si la cause revient). Pattern
+  `Cause`/`Ack` et regle complete : `DOC/STDS/CODE_QUALITY_STANDARDS.md §9`.
+- ⚠️ **Changement de convention (T164-3)** : l'ancien socle classait en **Fault** toute cause sans
+  `IsWarning=TRUE` (fail-safe par defaut = latche). Le nouveau socle laisse une cause sans
+  `Latching=TRUE` en **live seulement** — elle reste visible (l'interlock se base sur la cause
+  brute, la securite n'est pas affaiblie) mais son caractere **acquittable** est desormais un
+  **choix explicite par cause**. Detail : [`FB_FaultCore_v1.0.md` §5](AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md#5--changement-de-convention-fail-safe-ex-iswarning--latching).
 - L'acquittement ne redemarre jamais un mouvement : une nouvelle demande explicite est requise.
-- `ErrorId` est un bitfield cumulatif. Chaque bit a une cause, un proprietaire et un texte IHM documentes.
-- `Error := (ErrorId <> 0)`.
-- `State` decrit la phase ; `StateAtError` fige la phase lors du defaut jusqu'a l'acquittement effectif.
+- `ErrorId`/`LatchedId` sont des bitfields cumulatifs. Chaque bit a une cause, un proprietaire et
+  un libelle IHM documentes. `Error := (ErrorId <> 0)`, `Latched := (LatchedId <> 0)`.
+- Un FB porteur avec sa **propre** machine d'etat capture son etat au defaut lui-meme
+  (`Lifecycle`/struct metier) — le socle `FB_FaultCore` ne produit pas de `State`/`StateAtError`.
 
-### 4.1 Socle `FB_FbStatus` — pointeur (détail déplacé en fiche dédiée v2.3)
+### 4.1 Socle `FB_FaultCore` — pointeur (détail en fiche dédiée)
 
 > 🧩 Implémentation concrète du pattern Cause/Ack décrit en §4. Un seul socle, réutilisé par
-> tout FB `standard` qui doit remplir `Status : ST_FbStatus` — code écrit une fois, comportement
+> tout FB `standard` qui doit remplir `Fault : ST_Fault` — code écrit une fois, comportement
 > identique partout (cf. §3 Profils de composants).
 
-**But** : remplir de façon standardisée la sortie `Status : ST_FbStatus` d'un FB métier —
-classification Fault (latché, à acquitter) vs Warning (auto-effacé), textes IHM prêts à
-afficher, sans que chaque FB métier ré-implémente sa propre logique d'acquittement.
+**But** : remplir de façon standardisée la sortie `Fault : ST_Fault` d'un FB métier — vue live
+(`Error`/`ErrorId`) + vue latchée (`Latched`/`LatchedId`), à partir d'une liste de causes en clair,
+sans que chaque FB métier ré-implémente sa propre logique de latch/acquittement. Pas de `State`,
+pas de `Warning`, pas de texte (dérivés côté IHM depuis `LatchedId`/`ErrorId`).
 
-**Où il se place** : instancié **dans** le FB métier qui expose `Status : ST_FbStatus` (pas un
-programme séparé). Consommateur actuel confirmé : `FB_Joystick` (`instFbStatus`,
+**Où il se place** : instancié **dans** le FB métier qui expose `Fault : ST_Fault` (pas un
+programme séparé). Consommateur actuel confirmé : `FB_Joystick` (`instFault` + `instCauses`,
 `CODE/D_JOYSTICK/FB_Joystick.st`). Forme cible destinée à se généraliser aux autres FB `standard`
 (cf. §3).
 
-📄 **Interface complète (IN/OUT, type `ST_FbCause`), décisions (a)/(b)/(c), câblage minimal
-copiable, limites T147/T148 et catalogue de tests** : voir
-[`FB_FbStatus_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FbStatus_v1.0.md) — ce chapô ne garde
-que le résumé ci-dessus, le détail vit désormais uniquement dans la fiche dédiée
+📄 **Interface complète (IN `Enable`/`Reset`/`Causes[0..15]`, OUT `Ready`/`Fault`), vue live vs
+latchée, changement de convention fail-safe, câblage minimal copiable, limites T147/T148 et
+catalogue de tests** : voir
+[`FB_FaultCore_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md) — ce chapô ne garde
+que le résumé ci-dessus, le détail vit uniquement dans la fiche dédiée
 (anti-duplication, `GUIDE_EDITION_AF_v1.0.md` §4).
 
 ## 🚌 5 · Contrats DUT internes
@@ -256,7 +281,8 @@ python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v
 
 | Version | Date | Changement |
 |---|---|---|
-| v2.3 | 2026-08-26 | Décongestion du chapô : détail complet de `FB_FbStatus` (interfaces, type `ST_FbCause`, décisions a/b/c, câblage minimal, <nobr><code>TC-P03-008</code></nobr> à `013`) déplacé vers une fiche dédiée [`FB_FbStatus_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FbStatus_v1.0.md), suivant le pattern chapô/sous-fiche déjà appliqué par AF10/`FB_Bucket`. §4.1 et §3 ne gardent qu'un résumé + pointeur. Précision ajoutée en §3 : le contrat `standard` porte `Ready`+`Status` **seuls**, sans mirror `Error`/`ErrorId` à plat en complément (écart constaté sur `FB_Joystick.st`, à corriger séparément). |
+| v2.4 | 2026-08-27 | **T164-3 — socle défaut unifié.** Forme cible du contrat `standard` : `VAR_OUTPUT` = `Ready : BOOL` + `Fault : ST_Fault` (2 vues : live `Error`/`ErrorId` + latchée `Latched`/`LatchedId`), rempli par une instance `FB_FaultCore` alimentée par `Causes : ARRAY[0..15] OF ST_FaultCause` (`Active`/`Latching`/`Texte`), `+ Lifecycle : ST_Lifecycle` si machine d'état à cycle. Remplace `Status : ST_FbStatus` / socle `FB_FbStatus` / type `ST_FbCause` (supprimés du code au commit `51fccce6`). §2, §3, §4, §4.1 réécrits ; sous-fiche renommée `FB_FaultCore_v1.0.md`. **Changement de convention fail-safe assumé** : cause non classée passait en Fault (`IsWarning` absent) → passe désormais en live seulement (`Latching` absent) — l'interlock reste sur la cause brute, mais l'acquittabilité devient un choix explicite par cause. Forme `Status : ST_Status` (ex-`ST_FbStatus`) tolérée sur 17 FB jusqu'à T164-5. |
+| v2.3 | 2026-08-26 | Décongestion du chapô : détail complet de `FB_FbStatus` (interfaces, type `ST_FbCause`, décisions a/b/c, câblage minimal, <nobr><code>TC-P03-008</code></nobr> à `013`) déplacé vers une fiche dédiée (aujourd'hui `FB_FaultCore_v1.0.md`, voir v2.4), suivant le pattern chapô/sous-fiche déjà appliqué par AF10/`FB_Bucket`. §4.1 et §3 ne gardent qu'un résumé + pointeur. Précision ajoutée en §3 : le contrat `standard` porte `Ready`+`Status` **seuls**, sans mirror `Error`/`ErrorId` à plat en complément (écart constaté sur `FB_Joystick.st`, à corriger séparément). |
 | v2.2 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lie, section `🎯 Rôle et périmètre` explicite, ajout Suivi historique et TBD, renumerotation complete des sections (chapô + réfs internes §N cascadées). Correctifs de fond (review sous-agent expert automatisme) : lien casse `AGENTS.md §1bis` corrige, exemple positif `FB_Winch` ajoute a cote du contre-exemple `FB_Joystick` (règle `PowerContactorEngaged`), limite du test automatique `light`/`standard` documentee (ne derive pas le critere semantique du corps du FB), cablage minimal `FB_FbStatus` ajoute (exemple ST copiable) |
 | v2.1 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
@@ -264,12 +290,13 @@ python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v
 
 | # | Question | Impact |
 |---|---|---|
-| 1 | T148 — `Reset` maintenu (niveau haut) sans nouveau front pendant que la cause disparaît : acquittement silencieux, sans confirmation au moment réel (<nobr><code>TC-P03-012</code></nobr>) | Comportement actuel prouvé, pas validé comme cible — décision à trancher (exiger un nouveau front strict ?) |
+| 1 | T148 — `Reset` maintenu (niveau haut) sans nouveau front pendant que la cause disparaît : acquittement silencieux (<nobr><code>TC-P03-012</code></nobr>) | **Non applicable au socle `FB_FaultCore`** : le clear des latches n'agit que sur le front `R_TRIG` (`ResetEdge.Q`) ; une cause réapparue `Active AND Latching` ré-arme son bit. Reste à vérifier sur les FB legacy non encore migrés. |
 
 ## 📚 10 · Documents liés
 
 - Partie 01 : AU, coupure puissance et rearmement.
 - Partie 02 : pages CFC, programmes et flux inter-domaines.
 - Parties 04 a 14 : contrats metier detailles et champs de leurs DUT.
-- [`FB_FbStatus_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FbStatus_v1.0.md) : fiche détaillée
-  du socle transverse `FB_FbStatus` (interfaces, décisions a/b/c, câblage, TC-008 à 013).
+- [`FB_FaultCore_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md) : fiche détaillée
+  du socle transverse `FB_FaultCore` (interface `Enable`/`Reset`/`Causes[0..15]` → `Ready`/`Fault`,
+  vue live vs latchée, changement de convention fail-safe, câblage, TC-008 à 013).

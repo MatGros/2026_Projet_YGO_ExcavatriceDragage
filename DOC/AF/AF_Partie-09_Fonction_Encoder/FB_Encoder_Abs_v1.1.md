@@ -56,7 +56,7 @@ Décline `TC-P09-010` (chapô) :
 | Port | Type | Rôle |
 |---|---|---|
 | `Ready` | `BOOL` | FB prêt |
-| `Status` | `ST_FbStatus` | Statut (Busy/Done/Error/ErrorId — rempli à plat, T137) |
+| `Status` | `ST_Status` | Statut (Busy/Done/Error/ErrorId — rempli à plat) — type legacy, cible `Fault : ST_Fault` via `FB_FaultCore` (AF03 §3), migration T164-5 |
 | `RawPos` | `UDINT` | Position brute (gelée si non disponible) |
 | `EncoderAvailable` | `BOOL` | Bus/esclave opérationnels |
 | `AngleRaw` | `UINT` | Angle sur un tour (`RawPos MOD PointsPerRev`) |

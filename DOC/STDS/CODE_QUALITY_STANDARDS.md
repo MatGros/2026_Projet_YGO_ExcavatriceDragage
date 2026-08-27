@@ -278,13 +278,17 @@ Destiné aux blocs qui **remontent un défaut** (acquittable ou non) ou pilotent
   - `Reset : BOOL;` (en `BOOL` nu : acquittement sur front).
 - **`VAR_OUTPUT`** :
   - `Ready : BOOL;` (en `BOOL` nu).
-  - `Status : ST_FbStatus;` — **forme cible**, remplie via le socle `FB_FbStatus` (§3bis).
+  - `Fault : ST_Fault;` — **forme cible**, remplie via une instance du socle `FB_FaultCore`
+    alimentée par une liste `Causes : ARRAY[0..15] OF ST_FaultCause` nommées (§3 / §3bis).
+  - `Lifecycle : ST_Lifecycle;` — **en plus, uniquement** si le FB porte une machine d'état à
+    cycle (organe, séquenceur). Rempli par le FB lui-même, pas par `FB_FaultCore`. Un FB synchrone
+    (conditionneur, joystick) ne le porte pas.
 
 > 🎯 **Un device qui remonte un défaut est `standard`, même sans machine d'état.**
 > Le critère de classement est **« remonte-t-il un défaut ? »**, pas « a-t-il une machine d'état ? ».
 > Ex. `FB_Joystick` (device d'acquisition) remonte un défaut capteur/calibration/bus → il est
-> `standard`. `State`/`StateAtError` sont alors remplis par le socle `FB_FbStatus` (valeur par
-> défaut `READY`), sans exiger de machine d'état côté FB métier.
+> `standard`. Il porte `Fault : ST_Fault` **sans** `Lifecycle`. Le socle `FB_FaultCore` ne produit
+> ni `State`, ni `Warning`, ni texte — dérivés côté IHM depuis `LatchedId`/`ErrorId`.
 
 > ⚠️ **`PowerContactorEngaged` n'est PAS un champ du socle `standard`.** Ce n'est pas un troisième
 > `VAR_INPUT` imposé par défaut — c'est une entrée **conditionnelle**, à ajouter **seulement** si
@@ -299,108 +303,118 @@ Destiné aux blocs qui **remontent un défaut** (acquittable ou non) ou pilotent
 > piloter aucun actionneur, forçait le reset du timer d'armement homme-mort pendant toute la
 > séquence de réarmement AU). Décision au cas par cas, par FB — jamais par copie du tableau.
 
-> ⏳ **Tolérance transitoire (levée à la clôture de T137)** — les FB antérieurs exposent encore
-> l'état/le défaut **à plat** (`Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError` déclarés
-> individuellement en `VAR_OUTPUT`, sans `Warning`, sans textes). Cette forme reste acceptée **le
-> temps de la migration T137** et **uniquement** pour les FB existants : tout FB **nouveau** porte
-> `Status : ST_FbStatus` (forme cible enrichie §3) rempli via `FB_FbStatus` (§3bis).
-> Ce n'est pas une seconde forme de conformité permanente — arbitrage du 2026-08-19.
-> Le guard `G315_check_fb_interface.py` reconnaît les deux formes et publie leur décompte, ce qui
-> mesure l'avancement de T137.
+> ⏳ **Formes legacy tolérées (décomptées, jamais permanentes)** — deux tolérances coexistent,
+> aucune n'est une forme de conformité cible :
+> 1. **Défaut à plat** (`Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError` déclarés
+>    individuellement en `VAR_OUTPUT`, sans textes) — FB antérieurs au socle, migration **T137**.
+> 2. **`Status : ST_Status`** (struct de statut agrégé legacy — `CODE/A_COMMUN/ST_Status.st`) —
+>    **17 FB** encore concernés, tolérés **jusqu'à T164-5** (migration vers `Fault : ST_Fault`).
+>
+> Tout FB **nouveau** porte `Fault : ST_Fault` rempli via `FB_FaultCore` (+ `Lifecycle : ST_Lifecycle`
+> si machine d'état) — §3 / §3bis. Le guard `G315_check_fb_interface.py` reconnaît la forme cible
+> et les formes legacy et publie leur décompte (mesure de l'avancement des migrations).
 
-### 3. Structure `ST_FbStatus` (Socle transverse de statut)
-La structure `ST_FbStatus` regroupe l'état, le défaut **et** le warning d'un FB `standard`, avec les
-**textes prêts pour l'IHM** (plus besoin de conditions complexes côté affichage). Évolution **additive**
-par rapport à la forme historique (les 6 membres d'origine sont **conservés** pour ne rien casser) :
+### 3. Structures socle `ST_Fault` / `ST_FaultCause` / `ST_Lifecycle`
+Le défaut d'un FB `standard` est porté par la brique **`ST_Fault`** (`CODE/A_COMMUN/ST_Fault.st`) —
+**deux vues**, applicable dans TOUS les cas (acquittable ou non), sans brique warning séparée :
+
 ```pascal
-TYPE ST_FbStatus :
+TYPE ST_Fault :
 STRUCT
-    // ---- membres historiques (conservés, tolérance transitoire T137) ----
-    Busy         : BOOL;         // 1 = Bloc en cours d'exécution
-    Done         : BOOL;         // 1 = Action terminée avec succès
-    Error        : BOOL;         // 1 = défaut à acquitter (laté jusqu'au Reset, ré-alarme si cause revient)
-    ErrorId      : WORD;         // code défaut courant (bitfield)
-    State        : E_State;      // état courant : DISABLED/INIT/READY/BUSY/DONE/STOPPING
-    StateAtError : E_State;      // état mémorisé au moment du défaut
-    // ---- membres ajoutés (forme cible enrichie, socle FB_FbStatus §3bis) ----
-    Warning        : BOOL;       // 1 = warning actif (auto-effacé, aucun acquittement)
-    WarningId      : WORD;       // code warning courant (bitfield)
-    WarningIdTxt   : STRING;     // texte généré depuis WarningId (prêt IHM)
-    ErrorIdTxt     : STRING;     // texte généré depuis ErrorId
-    ResetRequested : BOOL;       // 1 = un Reset est nécessaire / en cours (défaut à acquitter)
+    Error     : BOOL;   // vue LIVE : au moins une cause présente maintenant ; Error := (ErrorId <> 0)
+    ErrorId   : WORD;   // bitfield des causes présentes maintenant (0 si aucune) — retombe seul
+    Latched   : BOOL;   // vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset ; Latched := (LatchedId <> 0)
+    LatchedId : WORD;   // ErrorId figé à l'apparition d'une cause `Active AND Latching`, effacé au Reset
 END_STRUCT
 END_TYPE
 ```
-> 💡 Le mapping IHM lit `Status.ErrorIdTxt`/`Status.WarningIdTxt` directement (textes pré-calculés).
-> Le socle sélectionne par parcours de liste la première cause active (index le plus bas) ; si
-> **plusieurs** erreurs/warnings sont actifs, c'est l'IHM (côté affichage) qui peut choisir sa
-> stratégie d'affichage (ex. rotation) — le socle ne fait pas de rotation.
 
-### 3bis. `FB_FbStatus` — socle de remplissage standardisé (forme cible)
-Tout FB `standard` remplit son `Status : ST_FbStatus` **via** l'instance d'un socle unique `FB_FbStatus`
-(code et comportement standardisés, écrits une seule fois, réutilisés partout). Le bloc métier fournit
-sa **liste de causes** (`Causes : ARRAY[0..15] OF ST_FbCause`, type `ST_FbCause`) et le socle gère
-l'acquittement, la mémoire et la génération des textes.
+La cause élémentaire est **`ST_FaultCause`** (`CODE/A_COMMUN/ST_FaultCause.st`), exprimée EN CLAIR
+(pas de bitfield, pas de masque) :
 
 ```pascal
-TYPE ST_FbCause :           (* type NOUVEAU : cause élémentaire en clair *)
+TYPE ST_FaultCause :
 STRUCT
-    Active    : BOOL;      (* 1 = cause présente (interlock TOUJOURS sur la cause brute) *)
-    IsWarning : BOOL;      (* 1 = warning auto-effacé ; 0 = défaut à acquitter (fail-safe) *)
-    Texte     : STRING;    (* libellé IHM de la cause *)
+    Active   : BOOL;    // 1 = cause présente maintenant (interlock TOUJOURS sur cette valeur brute)
+    Latching : BOOL;    // 1 = cause à acquitter (arme Latched) ; 0 = live seulement (retombe seule)
+    Texte    : STRING;  // libellé prêt IHM (NON stocké dans ST_Fault, dérivé côté IHM)
 END_STRUCT
 END_TYPE
-
-FB_FbStatus
-  IN  Enable          : BOOL;    // autorisation générale (FALSE → sorties neutres, latch des défauts CONSERVÉ)
-  IN  Reset           : BOOL;    // front acquittement (jamais conditionné, §9)
-  IN  Causes          : ARRAY[0..15] OF ST_FbCause;  // liste des causes (Active/IsWarning/Texte)
-  OUT Status          : ST_FbStatus;   // mappé 1:1 sur la sortie `Status` du bloc métier
-  OUT Ready           : BOOL;    // en BOOL nu (contrat standard)
 ```
 
-**Règles de catégorisation (fail-safe)** :
-- Chaque cause (`Causes[i]`) est classée par **`IsWarning`** : `IsWarning=TRUE` → **Warning**
-  auto-effacé (ne lève jamais `Error`) ; `IsWarning=FALSE` (défaut) → **Fault** à acquitter (laté).
-- **Fail-safe** : toute cause **sans `IsWarning=TRUE`** (câblée à `FALSE` ou oubliée) est classée
-  **Fault** — retombe toujours côté acquittement = **sécurité maximale**.
-- Une cause est **exclusivement** warning **ou** fault — jamais les deux (un seul champ `IsWarning`
-  → pas d'incohérence possible).
-- ⚠️ **Exigence de sécurité à tester nommément** (pas seulement en conséquence incidente d'un autre
-  test) : une cause avec `IsWarning` câblé à `FALSE` (ou non renseigné) doit classer **tout**
-  défaut en Fault, jamais en Warning. Le nom du test doit porter l'exigence elle-même (ex.
-  `'cause sans IsWarning=TRUE : classée Fault (fail-safe)'`), pas la déduire d'un test générique
-  sur un autre sujet.
+L'avancement d'une action à cycle est porté **séparément** par **`ST_Lifecycle`**
+(`CODE/A_COMMUN/ST_Lifecycle.st`), **optionnelle** — un FB purement synchrone ne la porte pas :
 
-**Comportement** :
-- **Décision (a) — `ErrorId` réservé aux défauts** : un warning n'est **jamais** écrit dans
-  `ErrorId` (ni ne lève `Error`). Un warning va dans `WarningId`/`WarningIdTxt`. `Error :=
-  (ErrorId <> 0)` ne voit donc jamais de faux défaut.
-- **Décision (b) — latch conservé sur `Enable=FALSE`** : le latch d'un défaut non acquitté survit à
-  un cycle `Enable=FALSE` (il n'est effacé que par un `Reset`). Au ré-enable, toute cause encore
-  active se relathe naturellement. Résout l'ancienne limite **T147**.
-- **Décision (c) — `StateAtError` gelé** : capturé **au premier défaut**, puis **figé** jusqu'au
-  `Reset` (`StateAtErrorArmed`) — jamais réécrit par une cause ultérieure.
-- `Warning` : s'affiche et s'efface **seul** avec la cause (`Causes[i].Active AND IsWarning`).
-  Aucun `Reset` impliqué (§9). Purge son latch résiduel en cas de reclassement en warning.
-- `Error` : **laté** — reste `TRUE` même si la cause disparaît, jusqu'au front `Reset` ; ré-alarme
-  si la cause revient.
-- `Reset` : **toujours effectif, jamais conditionné** (§9).
-- `State`/`StateAtError` : remplis par le socle (valeur par défaut `READY`) — le FB métier n'a **pas**
-  besoin de machine d'état pour être `standard` (cf. §2, device qui remonte un défaut). Conséquence :
-  pour un FB **standard sans** machine d'état propre (ex. `FB_Joystick`), `StateAtError` vaut donc
-  **toujours** `READY` — c'est correct et attendu, pas un défaut. Un FB métier qui possède **sa propre**
-  machine d'état (ex. un séquenceur treuil) ne doit **pas** s'appuyer sur `StateAtError` du socle pour
-  capturer son propre état au moment du défaut : il doit gérer cette capture lui-même (comme le fait
-  déjà `FB_Modes.st`, qui ne passe pas par `FB_FbStatus`) — le socle écraserait sinon la valeur utile
-  avec `READY`.
-- `Busy`/`Done` : **non gérés par le socle** — `FB_FbStatus` ne pilote que Error/Warning/State/textes.
-  Le FB métier appelant reste responsable de renseigner `Status.Busy`/`Status.Done` selon son propre
-  cycle : un conditionneur synchrone (ex. `FB_Joystick`) les laisse à `FALSE` ; un organe à cycle
-  (ex. un treuil/séquenceur) les pilote lui-même après l'appel du socle.
-- **Sélection du texte IHM — parcours de liste** : `ErrorIdTxt`/`WarningIdTxt` sont générés en
-  parcourant la liste (`FOR` sur `Causes[i].Active` → `Causes[i].Texte`), première cause active
-  d'index le plus bas. **Plus aucun `WHILE`, ni masque, ni `SHR`** pour la sélection.
+```pascal
+TYPE ST_Lifecycle :
+STRUCT
+    Busy : BOOL;   // 1 = action en cours   — remplie par le FB porteur, jamais par FB_FaultCore
+    Done : BOOL;   // 1 = action terminée   — idem Busy
+END_STRUCT
+END_TYPE
+```
+
+> 💡 Texte IHM : **non stocké** dans `ST_Fault`. Le mapping IHM dérive le libellé depuis
+> `LatchedId`/`ErrorId` en s'appuyant sur le champ `Texte` de la `ST_FaultCause` correspondante.
+> Si **plusieurs** causes sont actives, l'IHM choisit sa stratégie d'affichage (ex. rotation) — le
+> socle ne fait pas de rotation.
+
+> 🗂️ **Legacy** : 17 FB portent encore `Status : ST_Status` (`CODE/A_COMMUN/ST_Status.st`, struct
+> agrégée `Busy`/`Done`/`Error`/`ErrorId`/`State`/`StateAtError`/`Warning`/textes). **Toléré
+> jusqu'à T164-5**, pas la forme cible. Ces FB compilent et passent `G315` sans modification.
+
+### 3bis. `FB_FaultCore` — socle de remplissage standardisé (forme cible)
+Tout FB `standard` remplit son `Fault : ST_Fault` **via** l'instance d'un socle unique `FB_FaultCore`
+(`CODE/A_COMMUN/FB_FaultCore.st` — code et comportement écrits une seule fois, réutilisés partout).
+Le bloc métier fournit sa **liste de causes en clair** (`Causes : ARRAY[0..15] OF ST_FaultCause`) et
+le socle produit les deux vues (live + latchée).
+
+```pascal
+FB_FaultCore
+  IN  Enable  : BOOL;                          // autorisation générale (FALSE → Ready=FALSE, vue LIVE non évaluée, latch CONSERVÉ)
+  IN  Reset   : BOOL;                          // front acquittement R_TRIG (jamais conditionné, §9 — agit même Enable=FALSE)
+  IN  Causes  : ARRAY[0..15] OF ST_FaultCause; // liste des causes (Active/Latching/Texte)
+  OUT Ready   : BOOL;                          // = Enable (contrat standard, BOOL nu)
+  OUT Fault   : ST_Fault;                      // mappé 1:1 sur la sortie `Fault` du bloc métier
+```
+
+**Règles de catégorisation (par cause, via `Latching`)** :
+- `Latching=TRUE` → la cause **arme la vue latchée** (`Fault.Latched`/`LatchedId`) : reste après la
+  disparition de la cause, exige un front `Reset`, **re-arme** si la cause revient (ré-alarme).
+- `Latching=FALSE` → la cause **n'alimente que la vue live** (`Fault.Error`/`ErrorId`) : visible tant
+  que `Active`, retombe seule, **aucun acquittement**.
+- 🚨 **Changement de convention fail-safe assumé (T164-3)** — à ne pas glisser en douce :
+
+| Socle | Champ de classement | Cause laissée à `FALSE` / non renseignée | Conséquence |
+|---|---|---|---|
+| **Ancien** (`ST_FbCause`, supprimé au commit `51fccce6`) | `IsWarning` | classée **Fault** (latchée, à acquitter) | fail-safe par défaut = latch |
+| **Nouveau** (`ST_FaultCause`) | `Latching` | **live seulement** (retombe seule) | la cause reste **visible**, mais **pas latchée** tant que `Latching=TRUE` n'est pas déclaré |
+
+  Le sens de sécurité est préservé **au niveau de la visibilité** : une cause `Active` non classée
+  reste toujours vue (`Fault.Error`) et **tout interlock se base sur cette cause brute**, jamais sur
+  le latch — le fail-safe d'interdiction de mouvement n'est pas affaibli. Ce qui **change** : le
+  caractère **acquittable** d'une cause est désormais un **choix explicite par cause**
+  (`Latching := TRUE`), plus la valeur par défaut. Point de revue **obligatoire** à la création
+  d'un FB `standard`.
+- ⚠️ **Exigence à tester nommément** : une cause `Active AND Latching` doit armer `Fault.Latched`
+  et y rester jusqu'au front `Reset`, même si `Active` retombe. Le nom du test porte l'exigence
+  (ex. `'cause Latching=TRUE : reste latchée après disparition, jusqu'au Reset'`).
+
+**Comportement** (miroir de `CODE/A_COMMUN/FB_FaultCore.st`) :
+- **Vue LIVE (`Error`/`ErrorId`)** : bitfield des `Causes[i].Active` maintenant. **Non évaluée si
+  `Enable=FALSE`** (`ErrorId=0`). `Error := (ErrorId <> 0)`.
+- **Armement du latch** : `Causes[i].Active AND Causes[i].Latching` arme le bit `i` ; le bit reste
+  jusqu'au front `Reset`. Réapparition ⇒ ré-armement. Non évalué si `Enable=FALSE`.
+- **Vue LATCHÉE (`Latched`/`LatchedId`)** : **toujours publiée**, y compris `Enable=FALSE` — un
+  défaut non acquitté ne disparaît pas sur bascule `Enable` OFF→ON sans `Reset`. Résout **T147**.
+- `Reset` : **toujours effectif, jamais conditionné** (§9) — front `R_TRIG`, agit même
+  `Enable=FALSE`. Un `Reset` maintenu sans nouveau front n'acquitte rien de plus (**T148 non
+  applicable** à cette brique).
+- **Hors périmètre du socle** : pas de `State`/`StateAtError`, pas de `Warning`/`WarningId`, pas de
+  génération de texte. Un FB avec sa **propre** machine d'état capture son état au défaut lui-même
+  (`Lifecycle`/struct métier) — comme `FB_Modes.st`, qui ne passe pas par `FB_FaultCore`.
+- `Busy`/`Done` (via `ST_Lifecycle`, si le FB en porte) : **non gérés par le socle** — renseignés
+  par le FB métier selon son propre cycle après l'appel de `FB_FaultCore`.
 
 ---
 
@@ -616,6 +630,15 @@ Deux catégories de défaut, **jamais mélangées dans la même variable** :
 |---|---|---|
 | <nobr>**Info / Warning**</nobr> | S'affiche et s'efface **seule** avec la cause. Jamais d'acquittement, aucun `Reset` impliqué. | <small><code>BypassOperatorComm actif</code></small> |
 | <nobr>**Fault (à acquitter)**</nobr> | Nécessite un geste opérateur conscient (`Reset`) pour être effacée, **même si la cause a disparu**. Si la cause **revient après acquittement**, l'alarme réapparaît et redemande un acquittement. | <small><code>EmergencyArmingFailed</code><br><code>SlackCableDetected</code></small> |
+
+> 🧩 **Dans un FB `standard`, cette distinction est portée par cause** via
+> `ST_FaultCause.Latching` (§3 / §3bis) : `Latching=FALSE` = comportement « Info / Warning » (vue
+> live seulement, retombe seule) ; `Latching=TRUE` = comportement « Fault à acquitter » (arme
+> `Fault.Latched`, exige un front `Reset`, re-arme si la cause revient). ⚠️ **Changement de
+> convention T164-3** : l'ancien socle classait en Fault toute cause sans `IsWarning=TRUE`
+> (fail-safe = latch par défaut) ; le nouveau laisse une cause sans `Latching=TRUE` en live
+> seulement — la cause reste **visible** (l'interlock se base sur la cause brute, jamais sur le
+> latch), mais son acquittabilité devient un **choix explicite par cause**.
 
 ### Le Reset n'est jamais conditionné
 
