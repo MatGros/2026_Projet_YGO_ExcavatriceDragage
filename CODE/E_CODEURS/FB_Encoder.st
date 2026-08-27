@@ -80,10 +80,20 @@ IF NOT Enable THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
     Status.State := E_State.DISABLED;
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
-    Measurement.CablePosM := 0.0; Measurement.EncoderIncoherent := FALSE;
+    Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
+    Measurement.HomingStatus.State := E_State.DISABLED; Measurement.HomingStatus.Error := FALSE; Measurement.HomingStatus.ErrorId := 16#0000;
+    Measurement.AbsStatus.State := E_State.DISABLED;    Measurement.AbsStatus.Error := FALSE;    Measurement.AbsStatus.ErrorId := 16#0000;
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
+    // Frontiere HW sortie : aucun ordre preset publie hors autorisation
+    // (sinon PRG_02_Acquisition relaie une valeur perimee au codeur absolu -> preset parasite, reference corrompue)
+    HwOut.PresetTriggerCmd := 0; HwOut.CodeSeqTriggerCmd := 0; HwOut.PresetValueOut := 0;
+    // Reference connue MAINTENUE depuis Calib (RETAIN) meme FB desactive (AF09 §4) :
+    // un FB desactive ne doit pas faire perdre la reference aux consommateurs aval (PRG_04, FB_Encoder_Scale).
+    Homed := Calib.Homed;
+    HomingSuspect := Calib.HomingSuspect;
+    Measurement.HomingRefRaw := Calib.HomingRefRaw;
     RETURN;
 END_IF;
 Ready := TRUE;
