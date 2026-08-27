@@ -121,6 +121,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 
     Status.State := E_State.DISABLED;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    TargetReached := FALSE; // 📊 Neutralisation : aucune cible atteinte garantie hors Enable
     RETURN;
 END_IF;
 

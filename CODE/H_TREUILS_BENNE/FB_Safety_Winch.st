@@ -151,6 +151,9 @@ IF NOT Enable THEN
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
+    MecaADriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive A valide hors Enable
+    MecaCDriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive C valide hors Enable
+    MecaBElapsedTime := T#0ms;     // ⏱️ Neutralisation : aucun temps écoulé Méca B valide hors Enable
     RETURN;
 END_IF;
 
