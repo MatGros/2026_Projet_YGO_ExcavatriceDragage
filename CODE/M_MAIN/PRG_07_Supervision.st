@@ -30,6 +30,7 @@ VAR
     instCfgPersistBridgeWinchM1        : FB_CfgPersistBridge_WinchCfg;            // * [INST] Pont persistance config treuil M1
     instCfgPersistBridgeWinchM2        : FB_CfgPersistBridge_WinchCfg;            // * [INST] Pont persistance config treuil M2
     instCfgPersistBridgeTranslation    : FB_CfgPersistBridge_TranslationCfg;      // * [INST] Pont persistance config translation
+    instCfgPersistBridgeJoystick       : FB_CfgPersistBridge_fbJoystick_Cfg;      // * [INST] Pont persistance config joystick
     instDiagIhmHeartbeat   : FB_Diag_IhmHeartbeat;            // * [INST] Surveillance heartbeat IHM
     instPreflight          : FB_Acquisition_Preflight;        // * [INST] Preflight acquisition avant demarrage
     instHmiBannerFormatter : FB_Hmi_BannerFormatter;          // * [INST] Formatage bandeau IHM (alarmes/etats)
@@ -128,6 +129,11 @@ END_IF;
 
 instCfgPersistBridgeTranslation(Hmi := GVL_IHM.TranslationM3.Cfg, Persist := _TranslationCfgPersist);
 IF instCfgPersistBridgeTranslation.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeJoystick(Hmi := GVL_IHM.JOY1Joystick.Cfg, Persist := _JoystickCfgPersist);
+IF instCfgPersistBridgeJoystick.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -365,14 +371,14 @@ GVL_IHM.JOY1Joystick.State.AxisCmdY := PRG_02_Acquisition.instJoystick.AxisCmdY;
 GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;
 GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;
 GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
-GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.instJoystick.AtNeutral;
+GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.instJoystick.AtNeutralXY;
 GVL_IHM.JOY1Joystick.State.Online := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online;
 GVL_IHM.JOY1Joystick.State.Operational := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational;
 // 🕹️ Le défaut fonctionnel du joystick (calibration bit0, capteur hors plage bit1, perte
 // bus bit2) vient du FB lui-même, pas du diagnostic bus. Le diagnostic CAN reste exposé
 // séparément (GVL_IHM.Network.CanError) — ici on remonte l'erreur du FB joystick.
-GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Error;
-GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instJoystick.ErrorId;
+GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Fault.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instJoystick.Fault.ErrorId;
 
 GVL_IHM.Network.BusCanOpen  := PRG_02_Acquisition.instDiagCanOpen.DeviceCanOpenMaster;
 GVL_IHM.Network.Joystick    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick;
@@ -418,8 +424,8 @@ GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.instCycleSemiAu
 GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
 GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
-GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.instJoystick.AtNeutral;
-GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.instJoystick.AtNeutral;
+GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY;
+GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY;
 
 instHmiBannerFormatter(
     Enable                := TRUE,
@@ -458,7 +464,7 @@ instHmiBannerFormatter(
     M2LogicRequestDirection     := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CycleRequestDirection       := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction,
     DeadmanArmed                := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
-    JoystickAtNeutral           := PRG_02_Acquisition.instJoystick.AtNeutral,
+    JoystickAtNeutral           := PRG_02_Acquisition.instJoystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
@@ -534,7 +540,7 @@ instTroubleshootingView(
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
     CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Status.Error,
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
-    JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
+    JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutralXY,
     HomedM1              := PRG_02_Acquisition.instEncoderM1.Homed,
     HomedM2              := PRG_02_Acquisition.instEncoderM2.Homed,
     CfgTopLimitM         := _CommunCfgPersist.CfgCableLimitAscent_M

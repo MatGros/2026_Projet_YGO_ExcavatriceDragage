@@ -55,7 +55,7 @@ VAR_OUTPUT
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // Code erreur bitmask.
-    Status                          : ST_FbStatus;
+    Status                          : ST_Status;
 
     // === ORDRES ACTIONNEURS (CONTACTEURS) ===
     RelayFwd                        : BOOL;                           // <-- [ACT] Ordre contacteur sens montee

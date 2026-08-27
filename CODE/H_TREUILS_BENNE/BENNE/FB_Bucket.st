@@ -42,7 +42,7 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
-    Status                          : ST_FbStatus;                    // <-- [FB] Statut complet (Busy/Done/Error/ErrorId/State/StateAtError)
+    Status                          : ST_Status;                    // <-- [FB] Statut complet (Busy/Done/Error/ErrorId/State/StateAtError)
 
     // === DEMANDES ET ORDRES ACTIONNEURS ===
     CloseReq                        : BOOL;                           // <-- [STAT] Demande de fermeture memorisee

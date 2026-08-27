@@ -48,7 +48,7 @@ VAR_OUTPUT
     Ready                  : BOOL;        // <-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5: preset, bit9: incoherence boot).
-    Status                 : ST_FbStatus;
+    Status                 : ST_Status;
 
     // === COMMANDES VERS FB_ENCODER_ABS ===
     PresetRequest          : BOOL;        // <-- [ACT]  Pulse demande d'ecriture preset SDO

@@ -32,7 +32,7 @@ VAR_OUTPUT
     Ready                   : BOOL;   // <-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: "Semi-Auto refusé (défaut codeur)".
-    Status                  : ST_FbStatus;
+    Status                  : ST_Status;
 
     // === BUS D'AUTORISATIONS ARBITREES ===
     Auth                    : ST_Modes_Autorisations; // <-- [STAT] Bus d'autorisations typees machine

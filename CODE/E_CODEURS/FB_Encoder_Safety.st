@@ -29,7 +29,7 @@ VAR_OUTPUT
     Ready                 : BOOL;        // <-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: "Bornes", bit1: "Boot suspect".
-    Status                : ST_FbStatus;
+    Status                : ST_Status;
 
     // === MESURES SURE & SECURITE ===
     CablePosMSafe         : REAL;        // <-- [DIAG] Position cable instantanee transmise (m)

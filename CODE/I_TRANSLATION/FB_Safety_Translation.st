@@ -48,10 +48,10 @@ VAR_INPUT
     BypassProcess         : BOOL := FALSE;   // --> [TST] Bypass groupé SafeStop seul (OperatorComm/DriveComm/PhaseRotation/ContactorFeedback)
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;   // <-- [STAT] FB prêt (sortie libre, hors ST_FbStatus)
+    Ready               : BOOL;   // <-- [STAT] FB prêt (sortie libre, hors ST_Status)
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide
-    Status              : ST_FbStatus;
+    Status              : ST_Status;
     SafeStop            : BOOL;        // <-- [ACT] Décélération rapide (PLC)
     PowerCutOff         : BOOL;        // <-- [ACT] Coup de poing / coupure puissance amont
     ErrorOperatorComm   : BOOL;        // <-- [DIAG] Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)

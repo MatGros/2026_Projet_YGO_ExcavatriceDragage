@@ -102,3 +102,8 @@ CODE_2026-08-03_avant_ee4d08b/
 /tmp/
 /.tmpsandbox/
 
+# Etat local et transitoire du Task Manager (verrous inter-agents).
+/DOC/WFLOW/TASK_LOCKS.json
+/DOC/WFLOW/.task_manager.write.lock
+/DOC/WFLOW/.task_manager.server*.lock
+

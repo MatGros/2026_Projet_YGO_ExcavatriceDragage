@@ -23,10 +23,10 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
-    Ready                        : BOOL;   // <-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)
+    Ready                        : BOOL;   // <-- [STAT] FB pret a fonctionner (sortie libre, hors ST_Status)
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: "timeout desserrage frein".
-    Status                       : ST_FbStatus;
+    Status                       : ST_Status;
     Reason                       : E_TranslationFinalInterlockReason;   // <-- [DIAG] Cause de blocage
 
     // === ORDRES ACTIONNEURS VALIDES ===

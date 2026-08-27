@@ -63,10 +63,10 @@ VAR_INPUT
     BrakeFeedbackTimeout          : TIME := T#300ms; // --> [CFG] Strictement sous watchdog final 500 ms
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;   // <-- [STAT] FB prêt (sortie libre, hors ST_FbStatus)
+    Ready               : BOOL;   // <-- [STAT] FB prêt (sortie libre, hors ST_Status)
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: "Défaut frein Translation" ; bit3: "Défaut variateur AC600" ; bit6: "Limite extrême".
-    Status              : ST_FbStatus;
+    Status              : ST_Status;
     TargetReached        : BOOL;       // <-- [STAT] Capteur position cible
     RequestedDriveControlWord : WORD; // <-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock
     RequestedDriveFreqHz      : REAL; // <-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock

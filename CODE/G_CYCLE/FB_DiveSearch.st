@@ -33,7 +33,7 @@ VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
     Ready                   : BOOL;         // <-- [STAT] FB pret a fonctionner
     // Status.ErrorId : bit0 precond, bit1 seq, bit2 cfg
-    Status                  : ST_FbStatus;  // <-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
+    Status                  : ST_Status;  // <-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
     DiveState               : E_DiveSearchState; // <-- [STAT] Phase interne de recherche fond
 
     // === PERMIS & AUTORISATIONS ===

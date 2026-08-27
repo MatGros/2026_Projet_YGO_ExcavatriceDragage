@@ -30,7 +30,7 @@ VAR_OUTPUT
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: "entrée/table invalide".
-    Status                          : ST_FbStatus;
+    Status                          : ST_Status;
 
     // === DIAGNOSTICS ET ESTIMATIONS ===
     SpeedBand                       : INT;                            // <-- [DIAG] Bande de vitesse courante (0..5)

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T19:59:58.712225" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T19:59:58.712225">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:38:09.622007" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:38:09.622007">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1555,7 +1555,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_FbStatus">
+      <dataType name="ST_Status">
         <baseType>
           <struct>
             <variable name="Busy">
@@ -1652,22 +1652,22 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>06c92900-1ebd-5fc9-b098-483d32a7b08a</ObjectId>
+            <ObjectId>537f3533-9d7c-5703-b6a3-978725c61956</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier
+   🧩 ST_Status — Socle transverse de statut d'un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
       avec les textes prêts pour l'IHM (plus de conditions complexes
       côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
+      migre pas vers ST_Status (exception documentée).
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    =======================================================================</xhtml>
         </documentation>
@@ -2764,8 +2764,8 @@ front descendant Kobold</xhtml>
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     // Direction déjà mise à l'échelle (-1/0/+1) par instJoystick (miroir DirectionY,
-    // dérivé des bits DirectionPositive/Negative du struct ST_Joystick_AxisCmd).
-    CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
+    // dérivé des bits DirectionPositive/Negative du struct ST_fbJoystick_AxisCmd).
+    CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
     CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
                                      AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
 
@@ -3043,7 +3043,7 @@ ELSE
     ELSE
         // Mode Joystick Maître
         IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
-            M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
+            M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
             M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
         ELSE
             M1LogicRequestDirection := 0;
@@ -3087,7 +3087,7 @@ ELSE
         ELSE
             // Mode Joystick Maître
             IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
-                M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
+                M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
                 M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
             ELSE
                 M2LogicRequestDirection := 0;
@@ -3228,7 +3228,7 @@ KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottom
 KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 
 // Levée du verrou au neutre du joystick/boutons ou si toggle désactivé
-IF PRG_02_Acquisition.instJoystick.AtNeutral OR NOT GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent THEN
+IF PRG_02_Acquisition.instJoystick.AtNeutralXY OR NOT GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent THEN
     KoboldImmersionConfirmed := FALSE;
     KoboldBottomTouchLatched := FALSE;
 END_IF;
@@ -3993,7 +3993,7 @@ Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
             </variable>
             <variable name="Status">
               <type>
-                <derived name="ST_FbStatus" />
+                <derived name="ST_Status" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [FB] Statut complet (Busy/Done/Error/ErrorId/State/StateAtError)</xhtml>
@@ -4815,7 +4815,7 @@ END_IF;
             </variable>
             <variable name="Status">
               <type>
-                <derived name="ST_FbStatus" />
+                <derived name="ST_Status" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Status.ErrorId : bit0 precond, bit1 seq, bit2 cfg
@@ -5208,12 +5208,12 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DEFECTUOSITES ===
-&lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)</xhtml>
+&lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_Status)</xhtml>
               </documentation>
             </variable>
             <variable name="Status">
               <type>
-                <derived name="ST_FbStatus" />
+                <derived name="ST_Status" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
@@ -6005,7 +6005,7 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
             </variable>
             <variable name="Status">
               <type>
-                <derived name="ST_FbStatus" />
+                <derived name="ST_Status" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
@@ -6903,7 +6903,7 @@ Status.Done := FALSE;
             </variable>
             <variable name="Status">
               <type>
-                <derived name="ST_FbStatus" />
+                <derived name="ST_Status" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
@@ -7697,7 +7697,7 @@ END_IF;
             </variable>
             <variable name="Status">
               <type>
-                <derived name="ST_FbStatus" />
+                <derived name="ST_Status" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">ErrorId : &lt;-- [DIAG] bitmask (bit0: ecart Warn, bit1: discordance contacteurs, bit2: ecart Fault)
@@ -9156,7 +9156,7 @@ END_IF;
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
-          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
+          <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.297399" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.297399">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:38:06.078621" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:38:06.078621">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -52,7 +52,7 @@
             </variable>
             <variable name="AxisCmdX">
               <type>
-                <derived name="ST_Joystick_AxisCmd" />
+                <derived name="ST_fbJoystick_AxisCmd" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe X normalisée (sortie FB_Joystick)</xhtml>
@@ -60,7 +60,7 @@
             </variable>
             <variable name="AxisCmdY">
               <type>
-                <derived name="ST_Joystick_AxisCmd" />
+                <derived name="ST_fbJoystick_AxisCmd" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe Y normalisée (sortie FB_Joystick)</xhtml>
@@ -143,7 +143,7 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_Joystick_AxisCmd">
+      <dataType name="ST_fbJoystick_AxisCmd">
         <baseType>
           <struct>
             <variable name="Enable">
@@ -195,16 +195,33 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE si axes en zone morte (position centrale)</xhtml>
               </documentation>
             </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MONITORING IHM (derive des bits ci-dessus, jamais lu en interlock) ===
+&lt;-- [STAT] Sens -1=Rev / 0=Neutre / +1=Fwd (anim IHM fleche ; lu aussi logique treuils PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Deflection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Deflexion signee -100..+100 % (anim IHM jauge/barre)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068</ObjectId>
+            <ObjectId>b6fd2799-de8b-52a1-87c0-15b96ff2b5f6</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
+   🕹️ ST_fbJoystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
    📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
@@ -229,7 +246,7 @@
           </Folder>
         </Folder>
         <Folder Name="D_JOYSTICK">
-          <Object Name="ST_Joystick_AxisCmd" ObjectId="cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068" />
+          <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
         </Folder>
       </ProjectStructure>
     </data>
