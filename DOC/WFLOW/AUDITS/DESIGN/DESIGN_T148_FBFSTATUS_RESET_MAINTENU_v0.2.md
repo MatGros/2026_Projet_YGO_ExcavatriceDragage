@@ -60,6 +60,6 @@ Scan N+1 : Reset MAINTENU (ResetEdge.Q=FALSE) + cause DISPARUE → §2 ne fait r
 | Doc | Lien |
 |---|---|
 | Tâche | T148 (et T147 — même famille, déjà corrigé) |
-| FB | `CODE/A_COMMUN/FB_FbStatus.st` (§2/§3/§5) |
+| FB | `FB_FbStatus` _(supprimé 2026-08-27)_ (§2/§3/§5 — historique) |
 | Test | `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st` (TC-P03-012) |
 | Revue experte | revue T148 (2026-08-24) — faille non reproductible |

@@ -231,6 +231,21 @@ comme M1/M2.
 
 ---
 
+## ✅ Lot 2f — Joystick refactor FB (Cfg IHM + renommages)
+
+Groupe **conservé** `GVL_IHM.JOY1Joystick`. Split `Cmd`/`State`/**`Cfg`** (nouveau bloc).
+
+| Ancien chemin | Nouveau chemin |
+|---|---|
+| `GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate` | `GVL_IHM.JOY1Joystick.Cmd.Calibrate` |
+| _(nouveau)_ | `GVL_IHM.JOY1Joystick.Cfg.DeadbandRaw` / `.NeutralHoldTime` / `.DeadmanArmHoldTime` / `.DeadmanArmGraceTime` / `.RawOutOfRangeMargin` — bloc éditable IHM, ponté vers `GVL_PERSISTENT._JoystickCfgPersist` via `FB_CfgPersistBridge_fbJoystick_Cfg` |
+
+**Sous-champs ajoutés** dans `GVL_IHM.JOY1Joystick.State.AxisCmdX/Y` (pas de rebinding, chemins parents inchangés) :
+`.Direction` (INT -1/0/+1, anim flèche) et `.Deflection` (INT -100..+100 %, anim jauge).
+Type interne renommé `ST_Joystick_AxisCmd` → `ST_fbJoystick_AxisCmd` (transparent IHM).
+
+---
+
 ## 🔜 Lots à venir (pas encore de document de tâche)
 
 _(Lot 2 sera complet une fois Cycle vérifié — reste ensuite la persistance généralisée, Lot 3.)_

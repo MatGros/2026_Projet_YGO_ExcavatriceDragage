@@ -1796,12 +1796,12 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
       <dataType name="ST_JoystickCmd">
         <baseType>
           <struct>
-            <variable name="BtnCalibrate">
+            <variable name="Calibrate">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Demande de recalage au neutre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Demande de recalage au neutre (front)</xhtml>
               </documentation>
             </variable>
           </struct>

@@ -3,6 +3,6 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_JoystickCmd :
 STRUCT
-    BtnCalibrate : BOOL; (* 🎯 Demande de recalage au neutre *)
+    Calibrate : BOOL; (* 🎯 Demande de recalage au neutre (front) *)
 END_STRUCT
 END_TYPE

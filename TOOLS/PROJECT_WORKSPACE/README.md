@@ -11,6 +11,17 @@ L’extension VS Code **Terminals Manager** est le mécanisme recommandé pour o
 
 Extension : `fabiospampinato.vscode-terminals`
 
+## Task Manager au demarrage
+
+La session Terminal Keeper `AI` ouvre aussi un terminal `Task Manager` au demarrage de VS Code.
+Il lance `TOOLS/TASK_MANAGER/LANCER_TASK_MANAGER.bat`, qui :
+
+- arrete une instance precedente qui ecoute sur le port reserve `8081` ;
+- demarre l'unique serveur Task Manager ;
+- ouvre le navigateur externe sur `http://127.0.0.1:8081/TASK_VIEWER.html`.
+
+Le port `8081` est exclusivement reserve au Task Manager.
+
 > Pour un lancement automatique à l’ouverture du workspace, ce projet contient également une configuration de session dans `.vscode/sessions.json` compatible avec l’extension **Terminal Keeper** de Nguyen Ngoc Long.
 
 ## 🎯 Rôle

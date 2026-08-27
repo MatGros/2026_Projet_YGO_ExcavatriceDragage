@@ -317,7 +317,7 @@ instJoystick(
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
     RawY                      := HwIn.Operator.JoyYRaw_ANA2,
     RawButton                 := HwIn.Operator.JoyBtnRaw,
-    Calibrate                 := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
+    Calibrate                 := GVL_IHM.JOY1Joystick.Cmd.Calibrate,
     Cfg                       := GVL_PERSISTENT._JoystickCfgPersist,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY

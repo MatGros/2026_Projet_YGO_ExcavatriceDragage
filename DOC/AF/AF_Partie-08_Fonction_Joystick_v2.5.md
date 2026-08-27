@@ -42,7 +42,7 @@
 | `F08.03` | Armer homme-mort | Maintien bouton `DeadmanArmHoldTime` (100ms) **ET** `ArmingPermit=TRUE` | `FB_Joystick` | 🔴 C4 | <nobr><code>TC-P08-020</code></nobr> | ✅ | `NV-I` |
 | `F08.04` | Désarmer homme-mort | `ArmingPermit=FALSE` (immédiat) **ou** neutre tenu `NeutralHoldTime` après grâce `DeadmanArmGraceTime` (3s) | `FB_Joystick` | 🔴 C4 | <nobr><code>TC-P08-020</code></nobr> | ✅ | `NV-I` |
 | `F08.05` | Détecter défaut capteur | `RawX`/`RawY` hors `[0;10000]` ± marge 500 → `SpeedTgt=0` 2 axes + Warning | `FB_Joystick` | 🟠 C3 | <nobr><code>TC-P08-030</code></nobr> | ✅ | `NV-I` |
-| `F08.06` | Calibrer neutre | Front `BtnCalibrate` en zone `[2000;8000]` → mémorise neutre persistant, sinon Fault | `FB_Joystick` | 🔵 C2 | <nobr><code>TC-P08-040</code></nobr> | ⚠️ SITE non exécuté | `NV` |
+| `F08.06` | Calibrer neutre | Front `Calibrate` en zone `[2000;8000]` → mémorise neutre persistant, sinon Fault | `FB_Joystick` | 🔵 C2 | <nobr><code>TC-P08-040</code></nobr> | ⚠️ SITE non exécuté | `NV` |
 | `F08.07` | Interdire mouvement sans armement | Consommateur combine `AxisCmd*.StartStop AND DeadmanArmed` avant tout ordre translation ; **partiel** sur treuils (voir §Intégration) | `PRG_04`/`PRG_05` (câblage), vérifié par `gate` `G375` | 🔴 C4 | <nobr><code>TC-P08-050</code></nobr> | ⚠️ partiel (treuils) | `NV` |
 | `F08.08` | Signaler armement refusé | `ArmingPermitDenied := RawButton AND NOT ArmingPermit` (warning IHM) | `FB_Joystick` | ⚪ C1 | <nobr><code>TC-P08-060</code></nobr> | ⚠️ non testé | `NV` |
 
@@ -141,7 +141,7 @@ L'intention de vitesse issue du manche (`SpeedTgt` 0.0 à 100.0 %) est unifiée 
 | `BusCanOpenOP` / `JoystickOP` | `ST_Diag_Device` | Présence nœud CAN / device esclave | `FB_Diag_CanOpen` |
 | `RawX` / `RawY` | `INT` | Axe brut (0..10000) | `HwIn.Operator` |
 | `RawButton` | `BOOL` | Bouton homme-mort brut | `HwIn.Operator` |
-| `BtnCalibrate` | `BOOL` | Demande recalage neutre | `GVL_IHM.JOY1Joystick.Cmd` |
+| `Calibrate` | `BOOL` | Demande recalage neutre | `GVL_IHM.JOY1Joystick.Cmd` |
 | `DeadbandRaw` | `INT` | Zone morte ADC (déf. 300) | `GVL_PERSISTENT` |
 | `NeutralHoldTime` / `DeadmanArmHoldTime` / `DeadmanArmGraceTime` | `TIME` | Temporisations (100ms/100ms/3s) | constantes d'appel |
 | `RawOutOfRangeMargin` | `INT` | Marge défaut capteur (déf. 500) | constante d'appel |
@@ -231,7 +231,7 @@ la grâce (F08.04, autre voie).
 
 | Mécanisme | Détection | Effet |
 |---|---|---|
-| Calibration (front `BtnCalibrate`) | Hors `[2000;8000]` | Fault bit0, à acquitter (Reset + axes en zone) |
+| Calibration (front `Calibrate`) | Hors `[2000;8000]` | Fault bit0, à acquitter (Reset + axes en zone) |
 | Défaut capteur (continu) | Hors `[0;10000]` ± marge 500 | `SpeedTgt=0` sur les 2 axes, Warning bit1 auto-effacé |
 | Perte bus CAN (`BusCanOpenOP`/`JoystickOP` non opérationnel) | Continu | Gate complet (§Interface), Warning bit2 auto-effacé |
 
@@ -261,14 +261,14 @@ sans effet sur le gate ci-dessus.
 
 ## 8 · 🖥️ IHM, Configuration & Dépannage
 
-`ST_JoystickHMI` = `Cmd` (`BtnCalibrate`) + `State` (Raw, AxisCmd, neutres, `DeadmanArmed`,
+`ST_JoystickHMI` = `Cmd` (`Calibrate`) + `State` (Raw, AxisCmd, neutres, `DeadmanArmed`,
 `AtNeutral`, Online/Operational, Error/ErrorId). Pas de sous-struct `Cfg` dans `ST_JoystickHMI` —
 mais des réglages existent bien, pas tous au même niveau de maturité :
 
 | Réglage | Persistant ? | Réglable depuis un écran IHM ? |
 |---|---|---|
 | `DeadbandRaw` (`_JoystickDeadbandRaw`) | ✅ `GVL_PERSISTENT`, `RETAIN` | ❌ force CODESYS direct uniquement |
-| `NeutralXMem`/`NeutralYMem` | ✅ `GVL_PERSISTENT`, `RETAIN` | ✅ via `BtnCalibrate` (F08.06) |
+| `NeutralXMem`/`NeutralYMem` | ✅ `GVL_PERSISTENT`, `RETAIN` | ✅ via `Calibrate` (F08.06) |
 | `RawOutOfRangeMargin` | ❌ constante en dur (`PRG_02_Acquisition.st:314` = `500`) | ❌ |
 
 `Bypass` : **existe**, mais pas porté par ce FB — `FB_Diag_CanOpen.NetworkBypassActive`/
@@ -328,7 +328,7 @@ y est un `BOOL` "au neutre", vs `INT` valeur réelle dans `ST_JoystickState`) �
   Treuils/Translation, bug ou voulu ? Arbitrage humain requis avant de modifier `PRG_04`.
 - Filtre par défaut et double rampe Joystick↔FB mouvement : non tranché, pas d'autorisation de
   coder (risque interférence rampe si réintroduite côté joystick).
-- Présence bouton `BtnCalibrate` sur écran HMI réel : non vérifiée terrain.
+- Présence bouton `Calibrate` sur écran HMI réel : non vérifiée terrain.
 
 ---
 

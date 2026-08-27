@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:28:23.582159" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:28:23.582159">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T14:09:10.461140" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T14:09:10.461140">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2058,7 +2058,7 @@ instJoystick(
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
     RawY                      := HwIn.Operator.JoyYRaw_ANA2,
     RawButton                 := HwIn.Operator.JoyBtnRaw,
-    Calibrate                 := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
+    Calibrate                 := GVL_IHM.JOY1Joystick.Cmd.Calibrate,
     Cfg                       := GVL_PERSISTENT._JoystickCfgPersist,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
