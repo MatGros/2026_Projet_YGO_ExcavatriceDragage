@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 13:01:15</div>
+    <div class="exec-time">2026-08-27 21:29:59</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (8 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-winch-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-1">TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-2">TC-P07-010 AntiFlickerText : affichage instantane force</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-3">TC-P07-020 RootCause : alarme fille visible quand materiel sain</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-4">TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-5">TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-6">TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-7">TC-P07-024 Priorite absolue AU sur defaut module E/S</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-winch-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            8/8 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -232,7 +232,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_FbStatus.st</code></td>
+                <td><code>ST_Status.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -394,7 +394,7 @@
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Winch</span>
                 
         <div style="margin: 8px 0 4px 0;"><span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD AF03</span></div>
-        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">✅ Enable + Reset + Ready + Status (ST_FbStatus complet)</div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">✅ Enable + Reset + Ready + Status (ST_Status complet)</div>
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
@@ -425,34 +425,34 @@
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Status</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_FbStatus</span> <span style="font-size:11px;color:#a5b4fc;">(6 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Status</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Status</span> <span style="font-size:11px;color:#a5b4fc;">(6 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
                 <div style="margin-top:2px;">
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Busy</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Done</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Error</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.ErrorId</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.State</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.StateAtError</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div></div>
             </details>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
@@ -668,31 +668,31 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-winch-0" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation initiale</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Premier scan d initialisation</p><p class='comment'>Scan 2 : Regime nominal etabli -&gt; Ready=TRUE</p><p class='comment'>Scan 3 : Enable=FALSE -&gt; Coupure nette et re-neutralisation</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE etabli -&gt; Ready=TRUE (nominal)</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li></ul></details>
-            
-            
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 7 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
+        <article id="test-fb-winch-0" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
+            </header>
+            
+            
+            
+            
+        </article>
         <article id="test-fb-winch-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM </h3>
+                <h3>PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
             </header>
             
             
@@ -702,57 +702,7 @@
         <article id="test-fb-winch-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-010 AntiFlickerText : affichage instantane force </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-winch-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-020 RootCause : alarme fille visible quand materiel sain </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-winch-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-winch-5" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-winch-6" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-winch-7" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P07-024 Priorite absolue AU sur defaut module E/S </h3>
+                <h3>PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
             </header>
             
             
@@ -763,7 +713,7 @@
     </details>
     <details>
         <summary>Fichiers source compilés (15)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/A_COMMUN/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/H_TREUILS_BENNE/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li></ul>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Status.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li></ul>
     </details>
     <details>
         <summary>Code source ST original (15)</summary>
@@ -796,7 +746,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -818,23 +768,23 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Status.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Status — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
       avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
       côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
+      migre pas vers ST_Status (exception documentée).
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    ======================================================================= *)
 
-TYPE ST_FbStatus :
+TYPE ST_Status :
 STRUCT
     (* ---- membres historiques (conservés) ---- *)
     Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
@@ -854,7 +804,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_ContactorCheck.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
@@ -966,7 +916,7 @@ VAR_OUTPUT
     Ready                   : BOOL;               // &lt;-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: &quot;incoherence retour contacteur&quot;.
-    Status                  : ST_FbStatus;
+    Status                  : ST_Status;
 
     // === COMMANDES ET CONFIRMATIONS ===
     BrakeCmd                : BOOL;               // &lt;-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)
@@ -993,6 +943,10 @@ IF NOT Enable THEN
     BrakeCmd := FALSE;
     Status.State := E_State.DISABLED;
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    ContactorCheck.Command := FALSE;          // 📊 Neutralisation : miroir de BrakeCmd := FALSE
+    ContactorCheck.Feedback := ContactorFeedback; // 📊 Neutralisation : miroir entrée physique
+    // 🔒 ContactorCheck.StuckClosed / StuckOpen et Status.ErrorId conservés (latch défaut, acquittement requis)
+    BrakeCommandOpenConfirmed := FALSE;       // 🛡️ Fail-Safe : frein commandé fermé hors Enable
     RETURN;
 END_IF;
 
@@ -1104,7 +1058,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\ST_SpeedStepTable.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\ST_SpeedStepTable.st</code></summary>
                 <pre>(* =======================================================================
    🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
    ───────────────────────────────────────────────────────────────
@@ -1150,7 +1104,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockReason.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\E_WinchFinalInterlockReason.st</code></summary>
                 <pre>(* =======================================================================
    🔒 E_WinchFinalInterlockReason — Raisons de blocage barrière finale
    ───────────────────────────────────────────────────────────────
@@ -1168,7 +1122,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\E_WinchFinalInterlockState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_WinchFinalInterlockState — États machine barrière finale treuil
    ───────────────────────────────────────────────────────────────
@@ -1594,6 +1548,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId &lt;&gt; 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
+    // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
+    // - ErrorId &amp; RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d&#x27;Enable, acquittement conscient requis)
+    // - StateAtError &amp; Reason : snapshot d&#x27;état et cause de blocage préservés pour diagnostic IHM
     RETURN;
 END_IF;
 
@@ -1832,7 +1789,7 @@ VAR_OUTPUT
     // bit3: &quot;Mou de câble&quot; ; bit4: &quot;Rotation phases&quot; ; bit5: &quot;Fin de course haut capteur&quot; ;
     // bit6: &quot;Limite max câble&quot; ; bit7: &quot;Méca A&quot; ; bit8: &quot;Méca B&quot; ; bit9: &quot;Méca C&quot; ; bit10: &quot;Thermique frein&quot; ;
     // bit11: &quot;Méca D&quot; ; bit12/13: &quot;Méca E écart synchro&quot; ; bit14: &quot;Sens opposé&quot; ; bit15: &quot;Absence mouvement&quot;.
-    Status                         : ST_FbStatus;
+    Status                         : ST_Status;
 
     // === SORTIES DE SÉCURITÉ ET AUTORISATIONS ===
     SafeStop                        : BOOL;                           // &lt;-- [SAFE] Arret rapide 2 sens (Enable maintenu)
@@ -1901,6 +1858,9 @@ IF NOT Enable THEN
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
+    MecaADriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive A valide hors Enable
+    MecaCDriftM := 0.0;           // 📊 Neutralisation : aucune mesure de dérive C valide hors Enable
+    MecaBElapsedTime := T#0ms;     // ⏱️ Neutralisation : aucun temps écoulé Méca B valide hors Enable
     RETURN;
 END_IF;
 
@@ -2289,7 +2249,7 @@ VAR_OUTPUT
     Ready                           : BOOL;                           // &lt;-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // Code erreur bitmask.
-    Status                          : ST_FbStatus;
+    Status                          : ST_Status;
 
     // === ORDRES ACTIONNEURS (CONTACTEURS) ===
     RelayFwd                        : BOOL;                           // &lt;-- [ACT] Ordre contacteur sens montee
@@ -2351,6 +2311,12 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     Status.Error := FALSE;
     Status.ErrorId := 16#0000;
+    ContactorsCheck.Command := FALSE;     // 📊 Neutralisation : aucun contacteur commandé hors Enable
+    ContactorsCheck.Feedback := FALSE;    // 📊 Neutralisation : retour contacteur non surveillé hors Enable
+    ContactorsCheck.StuckClosed := FALSE; // 📊 Neutralisation : détection collage contacteur inactive hors Enable
+    ContactorsCheck.StuckOpen := FALSE;   // 📊 Neutralisation : détection ouverture contacteur inactive hors Enable
+    DirectionChangePending := FALSE;      // 📊 Neutralisation : aucun changement de sens en cours hors Enable
+    SpeedGuardLimited := FALSE;           // 📊 Neutralisation : aucune limitation garde-fou hors Enable
     RETURN;
 END_IF;
 

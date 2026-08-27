@@ -32,10 +32,10 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
-    Ready                       : BOOL;     // <-- [STAT] FB pret a fonctionner (sortie libre, hors ST_Status)
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0:fond ; bit1:ferme ; bit2:ctrl ; bit3:cfg.
-    Status                      : ST_Status; // <-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
+    Ready                       : BOOL;     // <-- [STAT] FB pret a fonctionner
+    // 🧩 Statut transverse (forme cible ST_Fault + ST_Lifecycle)
+    Fault                       : ST_Fault;
+    Lifecycle                   : ST_Lifecycle;
     ExtractionState             : E_ExtractionSequenceState; // <-- [STAT] Phase interne extraction
 
     // === ORDRES & AUTORISATIONS ===
@@ -58,51 +58,78 @@ VAR
 
     // === VARIABLES LOCALES INTERNES ===
     ErrorCausePresent           : BOOL;     // . [LOC] Presence d'une cause de defaut parametrage
+    BucketErrorFault            : BOOL;     // . [LOC] Latch erreur benne
+    SyncOrSpeedErrorFault       : BOOL;     // . [LOC] Latch erreur synchro/vitesse
+
+    // === SOCLE DEFAUT ===
+    instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
+    instCauses                  : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 END_VAR
 
-{region "§1 Gate desactivation"}
-IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
-    BottomConfirmationConsumed := FALSE;
-    Status.State := E_State.DISABLED;
-    Status.StateAtError := E_State.DISABLED;
+// === IMPLEMENTATION ===
+
+{region "§1 Causes & Socle Défaut (évalué en continu)"}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+ErrorCausePresent := (ControlAscentDistance_M <= 0.0);
+
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
+    BucketErrorFault := FALSE;
+    SyncOrSpeedErrorFault := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-    OperatorActionId := 0; OperatorAction := '';
+END_IF;
+
+instCauses[1].Active   := BucketErrorFault;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := 'Defaut sous-systeme benne pendant fermeture';
+
+instCauses[2].Active   := SyncOrSpeedErrorFault;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := 'Defaut synchro ou capteurs treuils pendant remontee';
+
+instCauses[3].Active   := ErrorCausePresent;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := 'Parametrage distance de controle invalide';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Ready := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    BucketCloseRequest := FALSE;
+    AscentPermit := FALSE;
+    ForceMinSpeedStep := FALSE;
+    BottomConfirmationConsumed := FALSE;
+    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    OperatorActionId := 0;
+    OperatorAction := '';
     RETURN;
 END_IF;
 
-{endregion}
-
-{region "§2 Preconditions reset et initialisation sorties"}
-ResetEdge(CLK := Reset);
-ErrorCausePresent := (ControlAscentDistance_M <= 0.0);
-IF ErrorCausePresent THEN
-    Status.ErrorId := Status.ErrorId OR 16#0008;
-END_IF;
-IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
-    Status.ErrorId := 16#0000;
-    Status.StateAtError := E_State.DISABLED;
-    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-END_IF;
-
-Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
-BottomConfirmationConsumed := FALSE;
-OperatorActionId := 0; OperatorAction := '';
-
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region "§3 Machine etat fermeture remontee"}
-IF Status.ErrorId <> 16#0000 THEN
-    Status.State := E_State.READY;
+BucketCloseRequest := FALSE;
+AscentPermit := FALSE;
+ForceMinSpeedStep := FALSE;
+BottomConfirmationConsumed := FALSE;
+Lifecycle.Busy := FALSE;
+Lifecycle.Done := FALSE;
+
+IF Fault.Error THEN
     ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
     OperatorActionId := 16#0280;
     OperatorAction := 'Vérifier la benne et les treuils puis réarmer avant de reprendre.';
 ELSE
     CASE ExtractionState OF
         E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION:
-            Status.State := E_State.INIT;
             IF BottomPositionConfirmed THEN
                 ExtractionState := E_ExtractionSequenceState.READY_TO_CLOSE;
             ELSE
@@ -111,7 +138,6 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.READY_TO_CLOSE:
-            Status.State := E_State.READY;
             Ready := TRUE;
             OperatorActionId := 16#0201;
             OperatorAction := 'Demander la montée pour fermer la benne.';
@@ -121,14 +147,12 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.CLOSING_BUCKET:
-            Status.State := E_State.BUSY;
-            Status.Busy := TRUE;
+            Lifecycle.Busy := TRUE;
             BucketCloseRequest := MotionRequestActive AND (MotionDirection = 1);
             OperatorActionId := 16#0202;
             OperatorAction := 'Maintenir la montée : fermeture de la benne en cours.';
             IF BucketError THEN
-                Status.ErrorId := Status.ErrorId OR 16#0002;
-                Status.StateAtError := Status.State;
+                BucketErrorFault := TRUE;
             ELSIF BucketIsClosed AND NOT BucketBusy THEN
                 ControlStartM1Position_M := M1Position_M;
                 ControlStartM2Position_M := M2Position_M;
@@ -136,36 +160,31 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.CONTROL_ASCENT:
-            Status.State := E_State.BUSY;
-            Status.Busy := TRUE;
+            Lifecycle.Busy := TRUE;
             AscentPermit := MotionRequestActive AND (MotionDirection = 1);
             ForceMinSpeedStep := TRUE;
             OperatorActionId := 16#0203;
             OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
             IF WinchSyncError OR NOT PositionsValid OR NOT M1MeasuredSpeedValid OR NOT M2MeasuredSpeedValid THEN
-                Status.ErrorId := Status.ErrorId OR 16#0004;
-                Status.StateAtError := Status.State;
+                SyncOrSpeedErrorFault := TRUE;
             ELSIF (M1Position_M >= (ControlStartM1Position_M + ControlAscentDistance_M))
                AND (M2Position_M >= (ControlStartM2Position_M + ControlAscentDistance_M)) THEN
                 ExtractionState := E_ExtractionSequenceState.NOMINAL_ASCENT;
             END_IF;
 
         E_ExtractionSequenceState.NOMINAL_ASCENT:
-            Status.State := E_State.BUSY;
-            Status.Busy := TRUE;
+            Lifecycle.Busy := TRUE;
             AscentPermit := MotionRequestActive AND (MotionDirection = 1);
             OperatorActionId := 16#0204;
             OperatorAction := 'Maintenir la montée : extraction en cours.';
             IF WinchSyncError OR NOT PositionsValid THEN
-                Status.ErrorId := Status.ErrorId OR 16#0004;
-                Status.StateAtError := Status.State;
+                SyncOrSpeedErrorFault := TRUE;
             END_IF;
 
         E_ExtractionSequenceState.ERROR_HOLD:
-            Status.State := E_State.READY;
+            ;
     END_CASE;
 END_IF;
-
-Status.Error := (Status.ErrorId <> 16#0000);
-
 {endregion}
+
+END_FUNCTION_BLOCK

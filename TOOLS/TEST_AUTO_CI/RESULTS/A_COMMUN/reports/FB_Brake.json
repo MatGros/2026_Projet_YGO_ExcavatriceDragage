@@ -1,19 +1,35 @@
 {
   "version": 1,
-  "file": "test_fb_modes.st",
+  "file": "test_fb_cycle.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
+      "name": "TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 6,
+    "passed": 6,
     "failed": 0
   }
 }

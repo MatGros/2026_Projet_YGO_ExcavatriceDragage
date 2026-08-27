@@ -45,9 +45,10 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
     Ready                  : BOOL;        // <-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5: preset, bit9: incoherence boot).
-    Status                 : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                  : ST_Fault;
+    // 🧩 Cycle de vie (forme cible ST_Lifecycle)
+    Lifecycle              : ST_Lifecycle;
 
     // === COMMANDES VERS FB_ENCODER_ABS ===
     PresetRequest          : BOOL;        // <-- [ACT]  Pulse demande d'ecriture preset SDO
@@ -66,7 +67,6 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONT ===
     ResetEdge              : R_TRIG;      // . [LOC] Detecteur front montant Reset
-    ErrorEdge              : R_TRIG;      // . [LOC] Detecteur front montant Error
     HomeEdge               : R_TRIG;      // . [LOC] Detecteur front montant Home
     ConfirmCoherenceEdge   : R_TRIG;      // . [LOC] Detecteur front montant BtnConfirmCoherence
     TopSensorEdge          : R_TRIG;      // . [LOC] Detecteur front montant TopPositionSensor
@@ -74,7 +74,6 @@ VAR
 
     // === ETATS & DRAPEAUX INTERNES ===
     InitDone               : BOOL;        // . [LOC] Controle incoherence boot effectue
-    ArretConfirme          : BOOL;        // . [LOC] Condition d'arret moteur confirmee
     HomingModeOk           : BOOL;        // . [LOC] Mode de fonctionnement valide pour homing
     NominalHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing nominal
     UnitaryHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing unitaire
@@ -82,6 +81,12 @@ VAR
     HomingTrigger          : BOOL;        // . [LOC] Synthese declenchement homing
     PresetVerificationActive : BOOL;      // . [LOC] Verification preset en attente
     PresetConfirmed        : BOOL;        // . [LOC] Resultat du mode de confirmation selectionne
+
+    // === DRAPEAUX DEFAUTS INTERNES ===
+    HomingModeError        : BOOL;        // . [LOC] Latch erreur mode
+    TargetOutOfRangeError  : BOOL;        // . [LOC] Latch cible hors limites
+    PresetFailError        : BOOL;        // . [LOC] Latch échec preset
+    BootIncoherentError    : BOOL;        // . [LOC] Latch incohérence boot
 
     // === VARIABLES DE CALCUL ===
     TargetPoints           : DINT;        // . [LOC] Ecart cible converti en points
@@ -91,8 +96,12 @@ VAR
     CandidateRawDiff       : DINT;        // . [LOC] Ecart brut de la mesure candidate
     CandidateCablePosM     : REAL;        // . [LOC] Position candidate calculee avant commit
     ReadbackOk             : BOOL;        // . [LOC] Mesure candidate dans la tolerance
-    StatusBitOk             : BOOL;       // . [LOC] Etat du bit optionnel de confirmation
-    PresetVerifyTimer       : TON;        // . [LOC] Temporisation historique de verification 500ms
+    StatusBitOk            : BOOL;        // . [LOC] Etat du bit optionnel de confirmation
+    PresetVerifyTimer      : TON;         // . [LOC] Temporisation historique de verification 500ms
+
+    // === SOCLE DEFAUT (FB_FaultCore) ===
+    instFault              : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses             : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
 VAR CONSTANT
@@ -103,87 +112,102 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
 
-{region "§1 Gate neutralisation"}
-// 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
+{region "§1 Causes & Socle Défaut (évalué en continu)"}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+HomeEdge(CLK := Home);
+ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
+
+// Effacement des latches d'erreur sur Reset conscient
+IF ResetEdge.Q THEN
+    PresetConfirmationFailed := FALSE;
+    HomingModeError := FALSE;
+    TargetOutOfRangeError := FALSE;
+    PresetFailError := FALSE;
+END_IF;
+
+// Levée de doute incohérence boot (BtnConfirmCoherence)
+IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
+    Calib.HomingSuspect := FALSE;
+    BootIncoherentError := FALSE;
+END_IF;
+
+// Configuration des causes nommées
+instCauses[0].Active   := HomingModeError;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Homing non autorise dans ce mode';
+
+instCauses[1].Active   := TargetOutOfRangeError;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := 'Cible de homing hors plage';
+
+instCauses[2].Active   := PresetFailError;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := 'Echec confirmation transaction preset';
+
+instCauses[3].Active   := BootIncoherentError;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := 'Incoherence position codeur au demarrage';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-// PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
 IF NOT Enable THEN
     PresetRequest := FALSE;
     PresetValue := 0;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    InitDone := FALSE;   // Force un nouveau contrôle §3.7 à la prochaine activation
+    Ready := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    InitDone := FALSE;   // Force un nouveau contrôle à la prochaine activation
     PresetVerificationActive := FALSE;
     PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
     Homed := Calib.Homed;
     HomingSuspect := Calib.HomingSuspect;
     HomingRefRaw := Calib.HomingRefRaw;
-    // PresetConfirmationFailed est un diagnostic latch : il est gele hors Enable
-    // et n'est ni valide ni efface par la desactivation (AC3).
+    // PresetConfirmationFailed est un diagnostic latch : il est gelé hors Enable
     RETURN;
 END_IF;
 
-Ready := TRUE;
-
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region "§2 Fronts et coherence demarrage"}
-// 🔑 2. FRONTS
-ResetEdge(CLK := Reset);
-HomeEdge(CLK := Home);
-ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
-
-// 🔍 3. COHÉRENCE AU REDÉMARRAGE (§3.7) — une fois par session Enable, dès que le codeur répond
+{region "§3 Cohérence au redémarrage"}
+// 🔍 3. COHÉRENCE AU REDÉMARRAGE — une fois par session Enable, dès que le codeur répond
 IF NOT InitDone THEN
-    Status.State := E_State.INIT;
     IF EncoderAvailable THEN
         RawDiffRestart := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Calib.LastKnownRawPos);
         IF Calib.Homed AND (ABS(RawDiffRestart) > UDINT_TO_DINT(Calib.RestartCoherenceTolerancePts)) THEN
             Calib.HomingSuspect := TRUE;
-            Status.ErrorId := Status.ErrorId OR 16#0200;   // bit9 : incohérence codeur au redémarrage
+            BootIncoherentError := TRUE;
         END_IF;
         InitDone := TRUE;
     END_IF;
-ELSE
-    IF Status.State = E_State.INIT THEN Status.State := E_State.READY; END_IF;
 END_IF;
-
 {endregion}
 
-{region "§3 Confirmation coherence et demande homing"}
-// ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
-IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
-    Calib.HomingSuspect := FALSE;
-    Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
-END_IF;
-
+{region "§4 Demande et déclenchement homing"}
+// ⚙️ 4. DEMANDE & DÉCLENCHEMENT HOMING
 PresetRequest := FALSE;
 PresetValue := 0;
 TopSensorEdge(CLK := TopPositionSensor);
 DynamicTargetEdge(CLK := UseDynamicTarget);
 
-// Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
-// chaque scan, jamais latchées, aucun Reset requis pour les effacer.
-Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
-
 HomingModeOk := HomingPermit;
 
 IF HomeEdge.Q AND NOT HomingModeOk THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : homing non autorise
+    HomingModeError := TRUE;
 END_IF;
 
-// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
-// (FB_Safety_Winch) coupe déjà la montée indépendamment dès que TopPositionSensor est actif ;
-// attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
-// Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
-// quand Home est pressé.
 NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget
                          AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
 
-// Unitaire : cible libre (CfgHomingTargetM), déclenchée par la demande (front).
 UnitaryHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND HomeEdge.Q;
 
-// Dynamique (benne) : HomingModeOk vérifié ici en défense.
 DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
 HomingTrigger := (NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger)
@@ -198,30 +222,22 @@ IF HomingTrigger THEN
         TargetPositionM := CfgHomingTargetM;
     END_IF;
 
-    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
-    // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
-    // physique documentée [-99;+99] m avant d'être gravée dans la référence codeur.
+    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) [-99;+99] m
     IF (TargetPositionM < -99.0) OR (TargetPositionM > 99.0) THEN
-        Status.ErrorId := Status.ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
+        TargetOutOfRangeError := TRUE;
     ELSE
         TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
         PendingHomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
         PresetValue := RawPos;
         PresetRequest := TRUE;
         PresetVerificationActive := TRUE;
-        Status.Done := FALSE;
-        // Le suivi transactionnel reste interne : ne pas publier BUSY, car ce
-        // statut est consomme par PRG_04 comme mode de referencement securite.
-
-        // Demande preset vers FB_Encoder_Abs ; la relecture mesuree est la seule
-        // confirmation en READBACK_ONLY (mesure relue conforme a la cible).
+        Lifecycle.Done := FALSE;
     END_IF;
 END_IF;
-
 {endregion}
 
-{region "§4 Suivi SDO reset et sorties etat"}
-// ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
+{region "§5 Suivi de transaction preset"}
+// ⏳ 5. SUIVI DE LA TRANSACTION PRESET
 PresetVerifyTimer(IN := PresetVerificationActive, PT := CST_PresetVerifyTime);
 IF PresetVerificationActive AND PresetVerifyTimer.Q THEN
     CandidateRawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PendingHomingRefRaw);
@@ -250,42 +266,28 @@ IF PresetVerificationActive AND PresetVerifyTimer.Q THEN
         Calib.HomingSuspect := FALSE;
         Calib.LastKnownRawPos := RawPos;
         PresetConfirmationFailed := FALSE;
-        Status.ErrorId := Status.ErrorId AND 16#FFDF;
-        Status.Done := TRUE;
+        PresetFailError := FALSE;
+        Lifecycle.Done := TRUE;
     ELSE
         Calib.HomingSuspect := TRUE;
         PresetConfirmationFailed := TRUE;
-        Status.ErrorId := Status.ErrorId OR 16#0020;
-        Status.Done := FALSE;
+        PresetFailError := TRUE;
+        Lifecycle.Done := FALSE;
     END_IF;
 
     PresetVerificationActive := FALSE;
     PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
-    Status.State := E_State.READY;
 END_IF;
+{endregion}
 
-// 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
-// à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
-IF ResetEdge.Q THEN
-    PresetConfirmationFailed := FALSE;
-    Status.ErrorId := Status.ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
-END_IF;
-
-// 📤 8. SORTIES ÉTAT
-Status.Error := (Status.ErrorId <> 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-// Mise à jour continue du point brut valide connu (hors séquence de homing elle-même)
-IF EncoderAvailable AND (Status.State <> E_State.BUSY) THEN
+{region "§6 Sorties état & calibration"}
+// 📤 6. SORTIES ÉTAT & CALIBRATION
+IF EncoderAvailable AND NOT PresetVerificationActive THEN
     Calib.LastKnownRawPos := RawPos;
 END_IF;
 
-Status.Busy := (Status.State = E_State.BUSY);
-Homed := Calib.Homed AND NOT Calib.HomingSuspect; // Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
+Lifecycle.Busy := PresetVerificationActive;
+Homed := Calib.Homed AND NOT Calib.HomingSuspect;
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
-
 {endregion}

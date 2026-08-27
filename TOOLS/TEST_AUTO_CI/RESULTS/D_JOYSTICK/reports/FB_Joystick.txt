@@ -1,17 +1,14 @@
-STruC++ Test Runner v1.0
+Error compiling source files:
 
-test_fb_joystick.st
-  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
-  [PASS] TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)
-  [PASS] TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant
-  [PASS] TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle
-  [PASS] TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace
-  [PASS] TC-P08-005 Changement de mode desarme le geste, nouvel appui exige
-  [PASS] TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu
-  [PASS] TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)
-  [PASS] TC-P08-011 Fin de cycle benne desarme le geste par defaut
-  [PASS] TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE
-  [PASS] TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes
+FB_Joystick.st:40:33: error: Undefined type 'ST_FBJOYSTICK_CFG' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  40 |     Cfg                       : ST_fbJoystick_Cfg; // --> [CFG]  Réglages groupés (deadband, temporisations, marge ADC)
+     |                                 ^
 
------------------------------------------
-11 tests, 11 passed, 0 failed
+FB_Joystick.st:45:33: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  45 |     Fault                     : ST_Fault;   // <-- [DIAG] Brique defaut socle (live + latche), remplie par FB_FaultCore
+     |                                 ^
+
+FB_Joystick.st:75:33: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  75 |     instFault                 : FB_FaultCore;        // * [INST] Socle de defaut (liste de causes -> ST_Fault)
+     |                                 ^
+

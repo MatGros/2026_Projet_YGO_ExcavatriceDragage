@@ -1,0 +1,18 @@
+Error compiling source files:
+
+FB_Bucket.st:47:39: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_BUCKET'
+  47 |     Fault                           : ST_Fault;
+     |                                       ^
+
+FB_Bucket.st:48:39: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_BUCKET'
+  48 |     Lifecycle                       : ST_Lifecycle;
+     |                                       ^
+
+FB_Bucket.st:94:39: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_BUCKET'
+  94 |     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
+     |                                       ^
+
+FB_Bucket.st:95:5: error: Undefined type 'ST_FAULTCAUSE' in FUNCTION_BLOCK 'FB_BUCKET'
+  95 |     instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
+     |     ^
+

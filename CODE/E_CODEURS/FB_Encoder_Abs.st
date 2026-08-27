@@ -31,9 +31,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
     Ready               : BOOL;        // <-- [STAT] FB pret a fonctionner
-    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-    // ErrorId bit0: "Com", bit1: "Preset Timeout".
-    Status              : ST_Status;
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault               : ST_Fault;
 
     // === MESURES & DONNEES CODEUR ===
     RawPos              : UDINT;       // <-- [DIAG] Position brute gelee si non disponible
@@ -49,7 +48,6 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONT ===
     ResetEdge           : R_TRIG;      // . [LOC] Detecteur front montant Reset
-    ErrorEdge           : R_TRIG;      // . [LOC] Detecteur front montant Error
     PresetReqEdge       : R_TRIG;      // . [LOC] Detecteur front montant PresetRequest
 
     // === TEMPORISATEURS INTERNES ===
@@ -60,16 +58,44 @@ VAR
     PresetSeqStep       : INT;         // . [LOC] Etape sequence preset (0:IDLE, 1:PULSE/WAIT)
     RawDiff             : DINT;        // . [LOC] Ecart signe entre RawPos et PresetValueOut
     PresetCompleted     : BOOL;        // . [LOC] Fait de fin de maintien preset (un scan)
+    PresetTimeoutError  : BOOL;        // . [LOC] Latch interne timeout séquence preset
+
+    // === SOCLE DEFAUT (FB_FaultCore) ===
+    instFault           : FB_FaultCore;                   // * [INST] Socle défaut transverse
+    instCauses          : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
 
-{region "§1 Gate"}
-// 🛑 1. GATE
+{region "§1 Causes & Socle Défaut (évalué en continu)"}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🔍 2. DIAGNOSTIC BUS / ALARME (Cause 0 : live)
+instCauses[0].Active   := (AlarmsIn <> 0) OR NOT SlaveOperational;
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := 'Defaut communication EtherCAT codeur absolu';
+
+// ⏱️ 3. TIMEOUT PRESET (Cause 1 : latched)
+IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
+    PresetTimeoutError := FALSE;
+END_IF;
+instCauses[1].Active   := PresetTimeoutError;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := 'Timeout sequence preset SDO codeur';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+
+EncoderAvailable := NOT instCauses[0].Active;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Ready := FALSE;
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetCompleted := FALSE;
@@ -80,27 +106,11 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region "§2 Reset front"}
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-{endregion}
-
-{region "§3 Diagnostic bus et alarme"}
-// 🔍 3. DIAGNOSTIC BUS / ALARME
-IF (AlarmsIn <> 0) OR NOT SlaveOperational THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
-END_IF;
-EncoderAvailable := (Status.ErrorId AND 16#0001) = 0;
-{endregion}
-
-{region "§4 Lecture position"}
-// 📥 4. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
+{region "§3 Lecture position"}
+// 📥 3. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
 // Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
 // global ici pour ne pas geler aussi la séquence preset/l'état — seule la lecture est gelée).
 IF EncoderAvailable THEN
@@ -110,8 +120,8 @@ IF EncoderAvailable THEN
 END_IF;
 {endregion}
 
-{region "§5 Séquence preset"}
-// 🔧 5. SÉQUENCE PRESET (écriture bus)
+{region "§4 Séquence preset"}
+// 🔧 4. SÉQUENCE PRESET (écriture bus)
 // PresetTriggerCmd := 2 déclenche le référencement à PresetValue (valeur de commande, pas un
 // masque de bits). CodeSeqTriggerCmd : rôle non identifié — laissé à 0, PAS piloté tant que sa
 // fonction n'est pas confirmée. Ne jamais lui donner une valeur arbitraire.
@@ -140,25 +150,10 @@ CASE PresetSeqStep OF
             END_IF;
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
-            Status.ErrorId := Status.ErrorId OR 16#0002;
+            PresetTimeoutError := TRUE;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
             PresetTimerVisual(IN := FALSE, PT := T#500MS);
         END_IF;
 END_CASE;
-IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFD;
-END_IF;
-{endregion}
-
-{region "§6 Error et StateAtError"}
-// 🧾 6. ERROR / STATEATERROR
-Status.Error := (Status.ErrorId <> 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-Status.Busy := (PresetSeqStep <> 0);
-Status.Done := PresetCompleted;
 {endregion}

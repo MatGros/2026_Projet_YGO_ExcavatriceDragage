@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 13:00:00</div>
+    <div class="exec-time">2026-08-27 21:29:59</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (5 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-0">PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-1">PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-2">PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-3">PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-4">PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,12 +206,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/5 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 23 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 22 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -232,7 +232,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_FbStatus.st</code></td>
+                <td><code>ST_Status.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -240,7 +240,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_FbCause.st</code></td>
+                <td><code>ST_FaultCause.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -273,14 +273,6 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>FB_Acquisition_Preflight.st</code></td>
-                <td>FB</td>
-                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
-                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
-                <td><span class="badge badge-pass">PASS</span></td>
-                <td>Aucune erreur</td>
-            </tr>
-            <tr class="compil-row-pass">
-                <td><code>FB_FbStatus.st</code></td>
                 <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -518,7 +510,7 @@
     
     
     <details class="encaps-details" >
-        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 10 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 9 FB de la chaine, encapsulation propre (0 violation)</summary>
         
         <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
             <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
@@ -605,13 +597,6 @@
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
-                <td><code>FB_FbStatus</code></td>
-                <td>3</td><td>2</td>
-                <td>0</td><td>4</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
-            </tr>
-            <tr class="encaps-row-pass">
-                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Filter</code></td>
                 <td>3</td><td>1</td>
                 <td>0</td><td>2</td>
@@ -663,67 +648,47 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-03-modes-cycle-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires) </h3>
+                <h3>PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>Auth.Mode: MAINT_N1 arbitre</li><li>Auth.SyncEnable vrai en N1 par defaut</li><li>Auth.InhibitM1 faux en N1</li><li>Auth.InhibitM2 faux en N1</li><li>Auth.JoystickWinchSelectArbitrated = 1 (M1) en N1</li><li>Auth.HomingApproachEnable faux en N1 (N2 only)</li><li>Auth.MaintenanceM3TargetEnable vrai (N1 + bit)</li></ul></details>
+            
             
             
         </article>
         <article id="test-prg-03-modes-cycle-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance) </h3>
+                <h3>PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>Auth.Mode MAINT_N2 arbitre</li><li>Auth.InhibitM1 actif en N2 (demande M1)</li><li>Auth.InhibitM2 inactif (exclusion mutuelle)</li><li>Auth.HomingApproachEnable vrai en N2</li><li>Auth.MaintenanceM3TargetEnable vrai en N2 + bit</li><li>Auth.JoystickWinchSelectArbitrated M2 en N2</li></ul></details>
+            
             
             
         </article>
         <article id="test-prg-03-modes-cycle-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives) </h3>
+                <h3>PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>Exactement une inhibition devenue active</li><li>Exclusion mutuelle : les 2 inhibitions jamais simultanees</li></ul></details>
             
-            
-        </article>
-        <article id="test-prg-03-modes-cycle-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1 </h3>
-            </header>
-            
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Auth.Mode degrade MAINT_N1 (refus Semi-Auto sur defaut codeur)</li></ul></details>
-            
-            
-        </article>
-        <article id="test-prg-03-modes-cycle-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale) </h3>
-            </header>
-            
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Auth.Mode SEMI_AUTO arbitre</li><li>Sequenceur a l etape X0_PREPARATION</li><li>Sequenceur non Busy initialement</li><li>Sequenceur sans erreur</li></ul></details>
             
             
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (23)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/A_COMMUN/ST_FbCause.st</code></li><li><code>CODE/A_COMMUN/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_FbStatus.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li><li><code>CODE/G_CYCLE/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/ST_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/ST_BucketCmdDemand.st</code></li><li><code>CODE/I_TRANSLATION/ST_TranslationCmdDemand.st</code></li><li><code>CODE/G_CYCLE/FB_DiveSearch.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li><li><code>CODE/G_CYCLE/FB_Cycle.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st</code></li></ul>
+        <summary>Fichiers source compilés (22)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Status.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_BucketCmdDemand.st</code></li><li><code>CODE/I_TRANSLATION/ST_TranslationCmdDemand.st</code></li><li><code>CODE/G_CYCLE/FB_DiveSearch.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li><li><code>CODE/G_CYCLE/FB_Cycle.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (23)</summary>
+        <summary>Code source ST original (22)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -748,7 +713,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -770,23 +735,23 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Status.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Status — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
       avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
       côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
+      migre pas vers ST_Status (exception documentée).
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    ======================================================================= *)
 
-TYPE ST_FbStatus :
+TYPE ST_Status :
 STRUCT
     (* ---- membres historiques (conservés) ---- *)
     Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
@@ -806,31 +771,32 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_FaultCause.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : une cause de défaut/warning exprimée en CLAIR (BOOL + libellé),
-      sans bitfield ni masque. Le FB métier remplit une liste de causes
-      (ARRAY[0..15] OF ST_FbCause) ; le socle gère latch/reset/textes.
-   🧬 Contrat : remplacer l&#x27;ancien couple WORD bitfield + tableaux de textes
-      indexés par bit par une liste lisible (maintenance, « avec une liste »).
-   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur
-      l&#x27;acquittement. IsWarning distingue warning (auto) / fault (à acquitter).
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n&#x27;alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    ======================================================================= *)
 
-TYPE ST_FbCause :
+TYPE ST_FaultCause :
 STRUCT
-    Active     : BOOL;   (* 1 = cause présente (interlock sur la cause brute) *)
-    IsWarning  : BOOL;   (* 1 = warning auto-effacé ; 0 = défaut à acquitter *)
-    Texte      : STRING; (* libellé prêt IHM de la cause *)
+    Active   : BOOL;    (* 1 = cause présente maintenant (interlock sur cette valeur) *)
+    Latching : BOOL;    (* 1 = cause à acquitter (arme Latched) ; 0 = live seulement *)
+    Texte    : STRING;  (* libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM) *)
 END_STRUCT
 END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_ContactorCheck.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
@@ -1056,147 +1022,6 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; RequestPending := 
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
-                <pre>(* =======================================================================
-   🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : remplit de façon standardisée `Status : ST_FbStatus`
-      à partir d&#x27;une LISTE de causes claires (ARRAY[0..15] OF ST_FbCause).
-      Plus de bitfield WORD en entrée, plus de masque, plus de tableau de
-      textes indexé par bit — le FB métier exprime ses défauts en clair.
-   🧬 Contrat : tout FB `standard` expose `Status : ST_FbStatus`
-      rempli via UNE instance de ce socle → même comportement partout.
-   🔒 Sécurité :
-      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur l&#x27;acquittement.
-      - Reset TOUJOURS effectif (std §9), jamais conditionné.
-      - IsWarning=1 → warning AUTO-EFFACÉ (ne lève jamais Error) ; IsWarning=0 → fault à acquitter (laté).
-      - une cause fault réapparue se re-lathe automatiquement (ré-alarme).
-      - une cause reclassée warning purge son latch résiduel (pas de défaut fantôme).
-      - StateAtError : capture UNIQUE au premier défaut, gelé jusqu&#x27;au Reset.
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
-   ======================================================================= *)
-
-FUNCTION_BLOCK FB_FbStatus
-VAR_INPUT
-    // === PERMIS &amp; ACQUITTEMENT ===
-    Enable          : BOOL;    // --&gt; [CMD] Autorisation générale FB
-    Reset           : BOOL;    // --&gt; [CMD] Front acquittement défaut (jamais conditionné, §9)
-
-    // --- CAUSES (producteur = bloc métier, en clair) ---
-    Causes          : ARRAY[0..15] OF ST_FbCause;  // --&gt; [HW] Liste des causes (Active/IsWarning/Texte)
-END_VAR
-VAR_OUTPUT
-    // --- ÉTAT &amp; SYNOPTIQUE (forme cible) ---
-    Ready           : BOOL;    // &lt;-- [STAT] FB prêt (Enable)
-    Status          : ST_FbStatus; // &lt;-- [STAT] Statut complet (mappé 1:1 sur la sortie du bloc)
-END_VAR
-VAR
-    // --- SOUS-INSTANCES &amp; MEMOIRES ---
-    ResetEdge         : R_TRIG;              // * [INST] Front Reset
-    Latch             : ARRAY[0..15] OF BOOL;// . [LOC] Défaut laté par cause (jusqu&#x27;au Reset)
-    StateAtErrorArmed : BOOL;                // . [LOC] Flag : StateAtError capturé UNE fois
-    i                 : INT;                 // . [LOC] index de parcours de la liste
-END_VAR
-
-{region &quot;§1 Gate neutralisation&quot;}
-// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr.
-//    ⚠️ Les latches de défaut sont CONSERVÉS (décision utilisateur) : un défaut
-//    non acquitté ne doit pas être effacé silencieusement par une bascule Enable
-//    OFF→ON sans Reset (jamais de redémarrage auto après défaut). Au ré-enable,
-//    §3 relatche naturellement toute cause encore active ; un défaut laté persistant
-//    redevient visible jusqu&#x27;au Reset.
-Ready := Enable;
-IF NOT Enable THEN
-    Status.Busy := FALSE; Status.Done := FALSE;
-    Status.Error := FALSE; Status.ErrorId := 0;
-    Status.Warning := FALSE; Status.WarningId := 0;
-    Status.State := E_State.DISABLED; Status.StateAtError := E_State.DISABLED;
-    Status.ResetRequested := FALSE;
-    Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
-    RETURN;
-END_IF;
-Status.State := E_State.READY;
-{endregion}
-
-{region &quot;=== §2 Reset (front, toujours effectif) ===&quot;}
-// 2. Front Reset : TOUJOURS effectif, jamais conditionné (std §9).
-ResetEdge(CLK := Reset);
-IF ResetEdge.Q THEN
-    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
-    StateAtErrorArmed := FALSE;
-END_IF;
-{endregion}
-
-{region &quot;=== §3 Classification + latch par cause ===&quot;}
-// 3. Parcours de la LISTE (source de vérité = cause brute Active).
-//    - IsWarning=TRUE  → warning : auto-effacé + purge d&#x27;un latch résiduel (reclassement, sans défaut fantôme).
-//    - IsWarning=FALSE → fault : laté dès qu&#x27;Active ; conservé après disparition ; re-laté s&#x27;il revient.
-FOR i := 0 TO 15 DO
-    IF Causes[i].IsWarning THEN
-        Latch[i] := FALSE;
-    ELSE
-        IF Causes[i].Active THEN Latch[i] := TRUE; END_IF;
-    END_IF;
-END_FOR;
-{endregion}
-
-{region &quot;=== §4 StateAtError — capture au premier défaut ===&quot;}
-// 4. État mémorisé au moment de l&#x27;apparition du défaut (gelé jusqu&#x27;au Reset).
-IF NOT StateAtErrorArmed THEN
-    FOR i := 0 TO 15 DO
-        IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
-            Status.StateAtError := Status.State;   // State déjà READY (§1)
-            StateAtErrorArmed := TRUE;
-            EXIT;
-        END_IF;
-    END_FOR;
-END_IF;
-{endregion}
-
-{region &quot;=== §5 Sorties Error / Warning / ResetRequested ===&quot;}
-// 5. Sorties : ErrorId réservé aux DÉFAUTS (à acquitter) ; les warnings sont
-//    séparés dans WarningId. Un warning ne lève JAMAIS Error ni ne pollue ErrorId
-//    (décision utilisateur : un IHM qui lit ErrorId ne voit pas de faux défaut).
-Status.ErrorId := 0; Status.WarningId := 0;
-Status.Error := FALSE; Status.Warning := FALSE; Status.ResetRequested := FALSE;
-FOR i := 0 TO 15 DO
-    // Défaut laté OU actif
-    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
-        Status.ErrorId := Status.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
-        Status.Error := TRUE;
-        Status.ResetRequested := TRUE;
-    END_IF;
-    // Warning auto-effacé : uniquement dans WarningId (séparé de ErrorId)
-    IF Causes[i].Active AND Causes[i].IsWarning THEN
-        Status.WarningId := Status.WarningId OR SHL(WORD#1, INT_TO_DWORD(i));
-        Status.Warning := TRUE;
-    END_IF;
-END_FOR;
-{endregion}
-
-{region &quot;=== §6 Textes IHM — parcours de liste ===&quot;}
-// 6. Sélection du texte par parcours de la LISTE (première cause active, index le plus bas).
-//    Plus de WHILE ni de masque. Hypothèse : `Causes[i].Texte` reste renseigné par l&#x27;appelant.
-Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
-FOR i := 0 TO 15 DO
-    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
-        Status.ErrorIdTxt := Causes[i].Texte; EXIT;
-    END_IF;
-END_FOR;
-FOR i := 0 TO 15 DO
-    IF Causes[i].Active AND Causes[i].IsWarning THEN
-        Status.WarningIdTxt := Causes[i].Texte; EXIT;
-    END_IF;
-END_FOR;
-{endregion}
-
-// Busy/Done : pilotés par le FB MÉTIER (cycle propre), pas par le socle.
-// Un conditionneur synchrone (joystick) les laisse à FALSE ; un organe à cycle les pilote lui-même.
-
-END_FUNCTION_BLOCK
-</pre>
-            </details>
-            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Filter.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ FB_Filter — Filtre passe-bas premier ordre (PT1 numérique)
@@ -1287,7 +1112,7 @@ VAR_OUTPUT
     Ready                   : BOOL;   // &lt;-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: &quot;Semi-Auto refusé (défaut codeur)&quot;.
-    Status                  : ST_FbStatus;
+    Status                  : ST_Status;
 
     // === BUS D&#x27;AUTORISATIONS ARBITREES ===
     Auth                    : ST_Modes_Autorisations; // &lt;-- [STAT] Bus d&#x27;autorisations typees machine
@@ -1447,7 +1272,7 @@ END_FUNCTION_BLOCK
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_CycleStep.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\E_CycleStep.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_CycleStep — Étapes de la machine d&#x27;état du cycle automatique
    ───────────────────────────────────────────────────────────────
@@ -1476,7 +1301,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_DiveSearchState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\E_DiveSearchState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_DiveSearchState — Phases internes de recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
@@ -1497,7 +1322,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\E_ExtractionSequenceState.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
    ───────────────────────────────────────────────────────────────
@@ -1518,7 +1343,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\ST_WinchCmdDemand.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\ST_WinchCmdDemand.st</code></summary>
                 <pre>(* =======================================================================
    🔌 ST_WinchCmdDemand — Structure de demande de commande treuil
    ───────────────────────────────────────────────────────────────
@@ -1534,7 +1359,7 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketCmdDemand.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\_TYPES\ST_BucketCmdDemand.st</code></summary>
                 <pre>(* =======================================================================
    🪣 ST_BucketCmdDemand — Demande de commande benne
    ───────────────────────────────────────────────────────────────
@@ -1602,7 +1427,7 @@ VAR_OUTPUT
     // === ETATS IEC &amp; DEFECTUOSITES ===
     Ready                   : BOOL;         // &lt;-- [STAT] FB pret a fonctionner
     // Status.ErrorId : bit0 precond, bit1 seq, bit2 cfg
-    Status                  : ST_FbStatus;  // &lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
+    Status                  : ST_Status;  // &lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
     DiveState               : E_DiveSearchState; // &lt;-- [STAT] Phase interne de recherche fond
 
     // === PERMIS &amp; AUTORISATIONS ===
@@ -1780,10 +1605,10 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; DEFECTUOSITES ===
-    Ready                       : BOOL;     // &lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)
+    Ready                       : BOOL;     // &lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_Status)
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0:fond ; bit1:ferme ; bit2:ctrl ; bit3:cfg.
-    Status                      : ST_FbStatus; // &lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
+    Status                      : ST_Status; // &lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
     ExtractionState             : E_ExtractionSequenceState; // &lt;-- [STAT] Phase interne extraction
 
     // === ORDRES &amp; AUTORISATIONS ===
@@ -2067,6 +1892,13 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready                := FALSE;
     Busy                 := FALSE;
     Done                 := FALSE;
+    SpeedMismatchTimer(IN := FALSE, PT := SpeedMismatchTimeout);
+    SpeedMismatchMps := 0.0;             // 📊 Neutralisation : aucun calcul d&#x27;écart vitesse hors Enable
+    SpeedMismatchActive := FALSE;        // 📊 Neutralisation : surveillance désynchro inactive hors Enable
+    SpeedMismatchConfirmed := FALSE;     // 📊 Neutralisation : confirmation désynchro inactive hors Enable
+    // 🔒 Sorties de diagnostic et latches de défaut VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
+    // - Error &amp; ErrorId : latch défaut cycle préservé (effacé uniquement sur front Reset conscient)
+    // - CycleStepAtError : étape du cycle au moment du défaut préservée pour diagnostic IHM
     RETURN;
 END_IF;
 {endregion}

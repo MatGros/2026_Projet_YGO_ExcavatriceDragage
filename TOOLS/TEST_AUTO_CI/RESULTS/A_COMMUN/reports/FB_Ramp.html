@@ -193,7 +193,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 17:37:24</div>
+    <div class="exec-time">2026-08-27 21:49:45</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (4 tests)</summary>
@@ -394,6 +394,25 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>pas 1 : 0 -&gt; 5.0 (50%/s * 0.1s), s eloigne de zero donc AccelRate</li><li>pas 2 : 5.0 -&gt; 10.0, meme taux tant que la cible n est pas atteinte</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 1 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="132" viewBox="0 0 332 132" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="114" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="126" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="114" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="126" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">CURRENT</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="219.0" y="68.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><rect x="275.0" y="68.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="284.0" y="77.0" class="wf-num-changed">10</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>CURRENT</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>5</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'>10</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (6)</summary>
+        <table class="static-table"><tbody><tr><td><code>TARGET</code></td><td>100</td></tr><tr><td><code>ACCELRATE</code></td><td>50</td></tr><tr><td><code>DECELRATE</code></td><td>200</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.1</td></tr><tr><td><code>STEPX</code></td><td>5</td></tr><tr><td><code>TARGETLIMITED</code></td><td>100</td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         <article id="test-fb-ramp-1" class="test-card test-card-pass">
             <header>
@@ -404,6 +423,25 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>montee : AccelRate (50%/s)</li><li>montee : toujours AccelRate, cible pas encore atteinte</li><li>retour vers zero : DecelRate (10%/s), pas de 1.0 seulement -- pas AccelRate</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 4 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="252" viewBox="0 0 388 252" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="234" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="246" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="234" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="246" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="234" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="246" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">TARGET</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="219.0" y="68.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">40</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><text x="284.0" y="76.0" class="wf-num">40</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="331.0" y="68.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">0</text><text x="182" y="126.0" class="wf-label">CURRENT</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="219.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">5</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><rect x="275.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="284.0" y="117.0" class="wf-num-changed">10</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><rect x="331.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="340.0" y="117.0" class="wf-num-changed">9</text><text x="182" y="166.0" class="wf-label">STEPX</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="219.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">5</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><text x="284.0" y="156.0" class="wf-num">5</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><rect x="331.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="340.0" y="157.0" class="wf-num-changed">1</text><text x="182" y="206.0" class="wf-label">TARGETLIMITED</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="219.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">40</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><text x="284.0" y="196.0" class="wf-num">40</text><line x1="312" y1="202.0" x2="368" y2="202.0" class="wf-num-line"/><rect x="331.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="340.0" y="197.0" class="wf-num-changed">0</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>TARGET</th><th>CURRENT</th><th>STEPX</th><th>TARGETLIMITED</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>40</td><td>5</td><td>5</td><td>40</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td>40</td><td class='changed'>10</td><td>5</td><td>40</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'>0</td><td class='changed'>9</td><td class='changed'>1</td><td class='changed'>0</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (3)</summary>
+        <table class="static-table"><tbody><tr><td><code>ACCELRATE</code></td><td>50</td></tr><tr><td><code>DECELRATE</code></td><td>10</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.1</td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         <article id="test-fb-ramp-2" class="test-card test-card-pass">
             <header>
@@ -414,6 +452,25 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>le pas (5.0) depasserait la cible (3.0) : clampe exactement dessus, pas de depassement</li><li>cible deja atteinte : reste stable, aucune oscillation autour de la cible</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 0 variables actives)</summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (7)</summary>
+        <table class="static-table"><tbody><tr><td><code>TARGET</code></td><td>3</td></tr><tr><td><code>ACCELRATE</code></td><td>50</td></tr><tr><td><code>DECELRATE</code></td><td>200</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.1</td></tr><tr><td><code>CURRENT</code></td><td>3</td></tr><tr><td><code>STEPX</code></td><td>5</td></tr><tr><td><code>TARGETLIMITED</code></td><td>3</td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         <article id="test-fb-ramp-3" class="test-card test-card-pass">
             <header>
@@ -425,6 +482,14 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Target hors plage (500) et grand pas (1000%/s) : Current ne depasse jamais +100</li></ul></details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (7)</summary>
+            <table class="static-table"><tbody><tr><td><code>TARGET</code></td><td>500</td></tr><tr><td><code>ACCELRATE</code></td><td>1000</td></tr><tr><td><code>DECELRATE</code></td><td>1000</td></tr><tr><td><code>CYCLETIMES</code></td><td>1</td></tr><tr><td><code>CURRENT</code></td><td>100</td></tr><tr><td><code>STEPX</code></td><td>1000</td></tr><tr><td><code>TARGETLIMITED</code></td><td>100</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         </div>
     </details>

@@ -1,11 +1,34 @@
-STruC++ Test Runner v1.0
+Error compiling source files:
 
-test_prg_03_modes_cycle.st
-  [PASS] PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)
-  [PASS] PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)
-  [PASS] PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)
-  [PASS] PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -> MAINT_N1
-  [PASS] PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)
+FB_Modes.st:34:31: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_MODES'
+  34 |     Fault                   : ST_Fault;
+     |                               ^
 
------------------------------------------
-5 tests, 5 passed, 0 failed
+FB_Modes.st:45:31: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_MODES'
+  45 |     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
+     |                               ^
+
+FB_DiveSearch.st:36:31: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_DIVESEARCH'
+  36 |     Fault                   : ST_Fault;
+     |                               ^
+
+FB_DiveSearch.st:37:31: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_DIVESEARCH'
+  37 |     Lifecycle               : ST_Lifecycle;
+     |                               ^
+
+FB_DiveSearch.st:61:31: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_DIVESEARCH'
+  61 |     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
+     |                               ^
+
+FB_ExtractionSequence.st:37:35: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
+  37 |     Fault                       : ST_Fault;
+     |                                   ^
+
+FB_ExtractionSequence.st:38:35: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
+  38 |     Lifecycle                   : ST_Lifecycle;
+     |                                   ^
+
+FB_ExtractionSequence.st:65:35: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
+  65 |     instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
+     |                                   ^
+

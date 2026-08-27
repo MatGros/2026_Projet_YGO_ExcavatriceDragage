@@ -1,31 +1,23 @@
 {
   "version": 1,
-  "file": "test_prg_03_modes_cycle.st",
+  "file": "test_prg_06_outputs.st",
   "results": [
     {
-      "name": "PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)",
+      "name": "PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale",
       "passed": true
     },
     {
-      "name": "PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)",
+      "name": "PRG_06_Outputs : Transmission Ordre M2 en Marche Normale",
       "passed": true
     },
     {
-      "name": "PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)",
-      "passed": true
-    },
-    {
-      "name": "PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -> MAINT_N1",
-      "passed": true
-    },
-    {
-      "name": "PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)",
+      "name": "PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1",
       "passed": true
     }
   ],
   "summary": {
-    "total": 5,
-    "passed": 5,
+    "total": 3,
+    "passed": 3,
     "failed": 0
   }
 }

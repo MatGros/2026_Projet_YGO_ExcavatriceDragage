@@ -193,11 +193,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 13:01:11</div>
+    <div class="exec-time">2026-08-27 21:29:46</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-modes-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-modes-1">TC-P05-010 Modes : selection et autorisation mode Maintenance N1</a></li></ul>
+        <summary>📋 Sommaire (6 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-modes-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-modes-1">TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape</a></li><li class="toc-item toc-pass"><a href="#test-fb-modes-2">TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start</a></li><li class="toc-item toc-pass"><a href="#test-fb-modes-3">TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape</a></li><li class="toc-item toc-pass"><a href="#test-fb-modes-4">TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle</a></li><li class="toc-item toc-pass"><a href="#test-fb-modes-5">TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +206,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            6/6 vérifications validées
         </div>
     </div>
     
@@ -224,7 +224,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_FbStatus.st</code></td>
+                <td><code>ST_Status.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -301,7 +301,7 @@
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Modes</span>
                 
         <div style="margin: 8px 0 4px 0;"><span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD AF03</span></div>
-        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">✅ Enable + Reset + Ready + Status (ST_FbStatus complet)</div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">✅ Enable + Reset + Ready + Status (ST_Status complet)</div>
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
@@ -332,34 +332,34 @@
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Status</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_FbStatus</span> <span style="font-size:11px;color:#a5b4fc;">(6 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Status</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Status</span> <span style="font-size:11px;color:#a5b4fc;">(6 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
                 <div style="margin-top:2px;">
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Busy</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Done</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Error</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.ErrorId</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.State</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.StateAtError</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Status</span></div>
                 </div></div>
             </details>
             <details style="margin:4px 0;">
@@ -402,60 +402,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 14 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>AUTH</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>ENCODERFAULTPRESENT</code> jamais câblé en production</li><li>Pin <code>INHIBITM1REQUEST</code> jamais câblé en production</li><li>Pin <code>INHIBITM2REQUEST</code> jamais câblé en production</li><li>Pin <code>JOYSTICKWINCHSELECTREQUEST</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SELHOMINGAPPROACHENABLE</code> jamais câblé en production</li><li>Pin <code>SELMAINTENANCEZONEACCESS</code> jamais câblé en production</li><li>Pin <code>SELMODE</code> jamais câblé en production</li><li>Pin <code>SELSYNCENABLE</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SELMODE <span class="pin-type">IEC_E_MODE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SELSYNCENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">INHIBITM1REQUEST <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">INHIBITM2REQUEST <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SELHOMINGAPPROACHENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">JOYSTICKWINCHSELECTREQUEST <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SELMAINTENANCEZONEACCESS <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENCODERFAULTPRESENT <span class="pin-type">IEC_BOOL</span></div>
-        </div></div>
-            <div class="pin-block">FB_Modes</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STATUS <span class="pin-type">ST_FBSTATUS</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">AUTH <span class="pin-type">ST_MODES_AUTORISATIONS</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -545,62 +491,75 @@
             <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=FALSE -&gt; Mode force DISABLE</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Mode selectionne MAINT_N1</li><li>Coupure -&gt; Ready retombe a FALSE</li><li>Coupure -&gt; Mode retombe a DISABLE</li></ul></details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (3 scans, 3 variables actives)</summary>
-            <div class="wf-scroll"><svg width="388" height="212" viewBox="0 0 388 212" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="194" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="206" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="194" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="206" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="194" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="206" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">READY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">AUTH.MODE</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="219.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">0</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="275.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">1</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><rect x="331.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="340.0" y="157.0" class="wf-num-changed">0</text></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (3 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>READY</th><th>AUTH.MODE</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>1</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (13)</summary>
-        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELMODE</code></td><td>1</td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYSTICKWINCHSELECTREQUEST</code></td><td>0</td></tr><tr><td><code>SELMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PREVINHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PREVINHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-modes-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P05-010 Modes : selection et autorisation mode Maintenance N1 </h3>
+                <h3>TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>FB Modes pret</li><li>Mode MAINT_N1 valide</li></ul></details>
             
             
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (16)</summary>
-            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELMODE</code></td><td>1</td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYSTICKWINCHSELECTREQUEST</code></td><td>0</td></tr><tr><td><code>SELMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>1</td></tr><tr><td><code>PREVINHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PREVINHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-        </details>
-    </div>
+            
+        </article>
+        <article id="test-fb-modes-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-modes-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-modes-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-modes-5" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC </h3>
+            </header>
+            
+            
+            
+            
         </article>
         </div>
     </details>
     <details>
         <summary>Fichiers source compilés (5)</summary>
-        <ul><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li></ul>
+        <ul><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Status.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li></ul>
     </details>
     <details>
         <summary>Code source ST original (5)</summary>
         
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
@@ -622,23 +581,23 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Status.st</code></summary>
                 <pre>(* =======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   🧩 ST_Status — Socle transverse de statut d&#x27;un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
       avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
       côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_FbStatus (exception documentée).
+      migre pas vers ST_Status (exception documentée).
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    ======================================================================= *)
 
-TYPE ST_FbStatus :
+TYPE ST_Status :
 STRUCT
     (* ---- membres historiques (conservés) ---- *)
     Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
@@ -735,7 +694,7 @@ VAR_OUTPUT
     Ready                   : BOOL;   // &lt;-- [STAT] FB pret a fonctionner
     // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
     // ErrorId bit0: &quot;Semi-Auto refusé (défaut codeur)&quot;.
-    Status                  : ST_FbStatus;
+    Status                  : ST_Status;
 
     // === BUS D&#x27;AUTORISATIONS ARBITREES ===
     Auth                    : ST_Modes_Autorisations; // &lt;-- [STAT] Bus d&#x27;autorisations typees machine

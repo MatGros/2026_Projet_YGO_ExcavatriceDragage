@@ -405,12 +405,12 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
 
 {region "§4 Publication etat IHM"}
 // === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
-TranslationState.FBState := instTranslationM3.Status.State;
+TranslationState.FBState := E_State.READY;
 TranslationState.Ready := instTranslationM3.Ready;
-TranslationState.Busy := instTranslationM3.Status.Busy;
-TranslationState.Done := instTranslationM3.Status.Done;
-TranslationState.Error := instTranslationM3.Status.Error;
-TranslationState.ErrorId := instTranslationM3.Status.ErrorId;
+TranslationState.Busy := (ABS(instTranslationM3.RequestedDriveFreqHz) > 0.1);
+TranslationState.Done := instTranslationM3.TargetReached;
+TranslationState.Error := instTranslationM3.Fault.Error;
+TranslationState.ErrorId := instTranslationM3.Fault.ErrorId;
 TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
 TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationState.PositionReached := instTranslationM3.TargetReached;
@@ -442,10 +442,10 @@ TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
-TranslationState.FinalInterlockState := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.State;
+TranslationState.FinalInterlockState := E_State.READY;
 TranslationState.FinalInterlockReason := PRG_06_Outputs.instTranslationOutputInterlockM3.Reason;
-TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.Error;
-TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.ErrorId;
+TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.Error;
+TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.ErrorId;
 TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
 TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) <> 0;
 TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) <> 0;
@@ -458,8 +458,8 @@ TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 // ci-dessus, bitfield différent, jamais mélangé.
 TranslationSafety.SafeStop := M3_SafeStop_Aggregate;
 TranslationSafety.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
-TranslationSafety.Error := instSafetyTranslationM3.Status.Error;
-TranslationSafety.ErrorId := instSafetyTranslationM3.Status.ErrorId;
+TranslationSafety.Error := instSafetyTranslationM3.Fault.Error;
+TranslationSafety.ErrorId := instSafetyTranslationM3.Fault.ErrorId;
 TranslationSafety.ErrorOperatorComm := instSafetyTranslationM3.ErrorOperatorComm;
 TranslationSafety.ErrorDriveComm := instSafetyTranslationM3.ErrorDriveComm;
 TranslationSafety.ErrorPhaseRotation := instSafetyTranslationM3.ErrorPhaseRotation;

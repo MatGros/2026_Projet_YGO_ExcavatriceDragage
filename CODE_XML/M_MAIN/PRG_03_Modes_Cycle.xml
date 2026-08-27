@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T13:07:46.190732" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T13:07:46.190732">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:27:20.946560" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:27:20.946560">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -394,32 +394,15 @@
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_Status">
+      <dataType name="ST_Fault">
         <baseType>
           <struct>
-            <variable name="Busy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres historiques (conservés) ----
-1 = Bloc en cours d'exécution</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
-              </documentation>
-            </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut à acquitter (laté jusqu'au Reset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -427,154 +410,99 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune)</xhtml>
               </documentation>
             </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Warning">
+            <variable name="Latched">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres ajoutés (forme cible enrichie) ----
-1 = warning actif (auto-effacé, aucun acquittement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="WarningId">
+            <variable name="LatchedId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code warning courant (bitfield)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis WarningId (prêt IHM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis ErrorId</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetRequested">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = un Reset est nécessaire / en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ErrorId figé à l'apparition du défaut, effacé au Reset</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>537f3533-9d7c-5703-b6a3-978725c61956</ObjectId>
+            <ObjectId>ffe904a3-501c-5aac-bc38-202f178a61f2</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_Status — Socle transverse de statut d'un FB métier
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
-      avec les textes prêts pour l'IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_Status (exception documentée).
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   🎯 Rôle : porter l'état défaut d'un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu'au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l'acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="E_State">
+      <dataType name="ST_FaultCause">
         <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="INIT" value="1" />
-              <value name="READY" value="2" />
-              <value name="BUSY" value="3" />
-              <value name="DONE" value="4" />
-              <value name="STOPPING" value="5" />
-            </values>
-          </enum>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente maintenant (interlock sur cette valeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latching">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause à acquitter (arme Latched) ; 0 = live seulement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Texte">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
         </baseType>
         <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BUSY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>DONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STOPPING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
+            <ObjectId>dafea4e6-0b73-5895-8c57-ef302142ebf7</ObjectId>
           </data>
         </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n'alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
     </dataTypes>
     <pous>
@@ -671,7 +599,7 @@ instCycleSemiAuto(
     KoboldContactFond       := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     LimitLegalReached       := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
-    WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Status.Error,
+    WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Fault.Error,
     WinchSyncDeltaM         := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM,
     M1_CablePosM            := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     M2_CablePosM            := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
@@ -683,10 +611,10 @@ instCycleSemiAuto(
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.M3_AtMaintenanceStable,
-    Translation_Busy        := PRG_05_Translation.instTranslationM3.Status.Busy,
-    Translation_Done        := PRG_05_Translation.instTranslationM3.Status.Done,
-    Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Status.Busy,
-    Benne_Done              := PRG_04_Treuils_Benne.instBucket.Status.Done,
+    Translation_Busy        := (ABS(PRG_05_Translation.instTranslationM3.RequestedDriveFreqHz) &gt; 0.1),
+    Translation_Done        := PRG_05_Translation.instTranslationM3.TargetReached,
+    Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Lifecycle.Busy,
+    Benne_Done              := PRG_04_Treuils_Benne.instBucket.Lifecycle.Done,
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
@@ -1869,13 +1797,12 @@ END_IF;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Status">
+            <variable name="Fault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-ErrorId bit0: "Semi-Auto refusé (défaut codeur)".</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault)</xhtml>
               </documentation>
             </variable>
             <variable name="Auth">
@@ -1898,12 +1825,34 @@ ErrorId bit0: "Semi-Auto refusé (défaut codeur)".</xhtml>
 * [INST] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorEdge">
+            <variable name="SemiAutoRefusedFault">
               <type>
-                <derived name="R_TRIG" />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant Error</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GESTION DES DEFAUTS ===
+. [LOC] Latch refus semi-auto</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle défaut transverse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
               </documentation>
             </variable>
             <variable name="PrevInhibitM1">
@@ -1942,8 +1891,29 @@ ErrorId bit0: "Semi-Auto refusé (défaut codeur)".</xhtml>
 
 // === IMPLEMENTATION ===
 
-{region "§1 Gate neutralisation"}
-// 1. GATE — neutralisation si désactivé ou AU non armé
+{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    SemiAutoRefusedFault := FALSE;
+END_IF;
+
+// Refus semi-auto si défaut codeur
+IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
+    SemiAutoRefusedFault := TRUE;
+END_IF;
+
+instCauses[0].Active   := SemiAutoRefusedFault;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Mode Semi-Auto refuse car defaut codeur present';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE — neutralisation si désactivé ou AU non armé
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.Mode := E_Mode.DISABLE;
     Auth.SyncEnable := TRUE;
@@ -1952,112 +1922,73 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.HomingApproachEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
     Auth.MaintenanceM3TargetEnable := FALSE;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     PrevInhibitM1 := FALSE;
     PrevInhibitM2 := FALSE;
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
-
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region "§2 Reset et arbitrage mode"}
-// 2. RESET FRONT (bit0 = défaut codeur)
-ResetEdge(CLK := Reset);
-IF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
-END_IF;
-
-// 3. GARDE-FOU — refus SEMI_AUTO si défaut codeur
-IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;  // bit0 : défaut codeur
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;
-END_IF;
-
-// 4. ARBITRAGE DU MODE
-// MAINT_N2 accepté directement (authentification côté IHM).
+{region "§3 Arbitrage du mode"}
+// ⚙️ 3. ARBITRAGE DU MODE
 IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
     Auth.Mode := E_Mode.MAINT_N1;
 ELSE
     Auth.Mode := SelMode;
 END_IF;
-
 {endregion}
 
-{region "§3 Calcul autorisations machine"}
-// 5. SYNC ENABLE — actionnable en MAINT_N1 ou MAINT_N2
+{region "§4 Calcul autorisations machine"}
+// 4. SYNC ENABLE — actionnable en MAINT_N1 ou MAINT_N2
 // FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
 Auth.SyncEnable := NOT ((Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
 
-// 5bis. EXCLUSION MUTUELLE INHIBITIONS + RESET SYNC ENABLE
-// Inhibition M1/M2 mutuellement exclusives (soit l'un, soit l'autre, jamais les deux).
-// Si les deux demandés simultanément : on garde celle déjà active, sinon on rejette les deux.
-// Reset SelSyncEnable si une inhibition devient active (synchro incompatible avec inhibit).
-// Mémorisation états précédents pour détection front montant.
-
-// Détection fronts montants inhibitions
+// 4bis. EXCLUSION MUTUELLE INHIBITIONS + RESET SYNC ENABLE
 IF InhibitM1Request AND NOT PrevInhibitM1 THEN
-    // Front montant M1
     IF PrevInhibitM2 THEN
-        // M2 déjà actif → rejette M1
         Auth.InhibitM1 := FALSE;
     ELSE
-        // M2 inactif → active M1, désactive M2
         Auth.InhibitM1 := TRUE;
         Auth.InhibitM2 := FALSE;
-        // Synchro incompatible avec inhibition → reset case IHM
         SelSyncEnable := FALSE;
     END_IF;
 ELSIF InhibitM2Request AND NOT PrevInhibitM2 THEN
-    // Front montant M2
     IF PrevInhibitM1 THEN
-        // M1 déjà actif → rejette M2
         Auth.InhibitM2 := FALSE;
     ELSE
-        // M1 inactif → active M2, désactive M1
         Auth.InhibitM2 := TRUE;
         Auth.InhibitM1 := FALSE;
         SelSyncEnable := FALSE;
     END_IF;
 ELSE
-    // Pas de front montant → maintenir états actuels
-    // Mais si les deux demandes sont TRUE sans front (cas synchrone sans transition)
     IF InhibitM1Request AND InhibitM2Request THEN
-        // Les deux demandées simultanément sans transition : repli sécurité
         Auth.InhibitM1 := FALSE;
         Auth.InhibitM2 := FALSE;
     END_IF;
 END_IF;
 
-// Mise à jour mémoires pour prochaine détection front
 PrevInhibitM1 := InhibitM1Request;
 PrevInhibitM2 := InhibitM2Request;
 
-// 5bis-bis. Sortie inhibitions effectives (calculées ci-dessus)
 Auth.InhibitM1 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM1;
 Auth.InhibitM2 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM2;
 
-// 5ter. AUTORISATION ARRÊT HAUT (HomingApproach)
-// Uniquement actionnable en MAINT_N2.
+// 4ter. AUTORISATION ARRÊT HAUT (HomingApproach)
 Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
 
-// 5quater. SÉLECTEUR JOYSTICK TREUIL
-// M1 seul ou M2 seul autorisé en MAINT_N1 et MAINT_N2. Forcé à Couplé (=0) sinon.
+// 4quater. SÉLECTEUR JOYSTICK TREUIL
 IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
     Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
 ELSE
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
 END_IF;
 
-// 5quinquies. CIBLE TRANSLATION MAINTENANCE
-// MAINT_N2 ou MAINT_N1 + bit IHM dédié (SelMaintenanceZoneAccess) exigé EN PLUS
+// 4quinquies. CIBLE TRANSLATION MAINTENANCE
 Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;
 
-// GATE — désactivation inhibitions/sync si mode change (sortie N1/N2)
+// Re-vérification sécurité si sortie MAINT
 IF (Auth.Mode &lt;&gt; E_Mode.MAINT_N2) AND (Auth.Mode &lt;&gt; E_Mode.MAINT_N1) THEN
     Auth.InhibitM1 := FALSE;
     Auth.InhibitM2 := FALSE;
@@ -2065,20 +1996,6 @@ IF (Auth.Mode &lt;&gt; E_Mode.MAINT_N2) AND (Auth.Mode &lt;&gt; E_Mode.MAINT_N1)
     Auth.MaintenanceM3TargetEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;
 END_IF;
-
-{endregion}
-
-{region "§4 Etats et defauts"}
-// 6. SORTIES ÉTAT
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-Status.Busy := FALSE;
-Status.Done := FALSE;
-
 {endregion}
 </xhtml>
           </ST>
@@ -2086,6 +2003,168 @@ Status.Done := FALSE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>472bf31b-6364-520b-84dc-569fca7609c9</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_FaultCore" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation générale du FB porteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement (jamais conditionné, §9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Causes">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB porteur autorisé (= Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latch">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bit laté par cause, jusqu'au Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="i">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de parcours de la liste</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d'une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l'apparition d'une
+          cause `Active AND Latching`, conservé jusqu'au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d'effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Reset (front, toujours effectif)"}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region "§2 Vue LIVE — Error / ErrorId"}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region "§3 Armement des latches (causes à acquitter)"}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu'au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region "§4 Vue LATCHÉE — Latched / LatchedId"}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>182a55ac-4f1f-5204-b2e2-869f3904964e</ObjectId>
           </data>
         </addData>
       </pou>
@@ -2131,9 +2210,10 @@ Status.Done := FALSE;
           <Object Name="ST_TranslationCmdDemand" ObjectId="0b5f8faa-764b-51e3-b87f-be2bae8212ac" />
         </Folder>
         <Folder Name="A_COMMUN">
+          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
           <Folder Name="_TYPES">
-            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
-            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
           </Folder>
         </Folder>
       </ProjectStructure>

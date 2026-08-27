@@ -1,7 +1,90 @@
-STruC++ Test Runner v1.0
+Error compiling source files:
 
-test_prg_02_acquisition.st
-  [PASS] PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)
+FB_Joystick.st:40:33: error: Undefined type 'ST_FBJOYSTICK_CFG' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  40 |     Cfg                       : ST_fbJoystick_Cfg; // --> [CFG]  Réglages groupés (deadband, temporisations, marge ADC)
+     |                                 ^
 
------------------------------------------
-1 test, 1 passed, 0 failed
+FB_Joystick.st:45:33: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  45 |     Fault                     : ST_Fault;   // <-- [DIAG] Brique defaut socle (live + latche), remplie par FB_FaultCore
+     |                                 ^
+
+FB_Joystick.st:75:33: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  75 |     instFault                 : FB_FaultCore;        // * [INST] Socle de defaut (liste de causes -> ST_Fault)
+     |                                 ^
+
+FB_Encoder_Abs.st:35:27: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_ENCODER_ABS'
+  35 |     Fault               : ST_Fault;
+     |                           ^
+
+FB_Encoder_Abs.st:64:27: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_ENCODER_ABS'
+  64 |     instFault           : FB_FaultCore;                   // * [INST] Socle défaut transverse
+     |                           ^
+
+FB_Encoder_Homing.st:35:30: error: Undefined type 'ST_FBENCODER_CFG' in FUNCTION_BLOCK 'FB_ENCODER_HOMING'
+  35 |     Cfg                    : ST_fbEncoder_Cfg; // --> [CFG] Mode de confirmation preset
+     |                              ^
+
+FB_Encoder_Homing.st:49:30: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_ENCODER_HOMING'
+  49 |     Fault                  : ST_Fault;
+     |                              ^
+
+FB_Encoder_Homing.st:51:30: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_ENCODER_HOMING'
+  51 |     Lifecycle              : ST_Lifecycle;
+     |                              ^
+
+FB_Encoder_Homing.st:103:30: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_ENCODER_HOMING'
+ 103 |     instFault              : FB_FaultCore;                   // * [INST] Socle défaut transverse
+     |                              ^
+
+FB_Encoder_Safety.st:31:29: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_ENCODER_SAFETY'
+  31 |     Fault                 : ST_Fault;
+     |                             ^
+
+FB_Encoder_Safety.st:42:29: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_ENCODER_SAFETY'
+  42 |     instFault             : FB_FaultCore;                   // * [INST] Socle défaut transverse
+     |                             ^
+
+FB_Encoder.st:39:29: error: Undefined type 'ST_FBENCODER_HWIN' in FUNCTION_BLOCK 'FB_ENCODER'
+  39 |     HwIn                  : ST_fbEncoder_HwIn; // --> [HW] Retours hardware codeur
+     |                             ^
+
+FB_Encoder.st:46:29: error: Undefined type 'ST_FBENCODER_CFG' in FUNCTION_BLOCK 'FB_ENCODER'
+  46 |     Cfg                   : ST_fbEncoder_Cfg; // --> [CFG] Mode de confirmation preset
+     |                             ^
+
+FB_Encoder.st:54:29: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_ENCODER'
+  54 |     Fault                 : ST_Fault;    // <-- [DIAG] Brique defaut socle (live + latchee), remplie par FB_FaultCore
+     |                             ^
+
+FB_Encoder.st:57:29: error: Undefined type 'ST_FBENCODER_HWOUT' in FUNCTION_BLOCK 'FB_ENCODER'
+  57 |     HwOut                 : ST_fbEncoder_HwOut; // <-- [ACT] Ordres hardware codeur (preset)
+     |                             ^
+
+FB_Encoder.st:77:22: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_ENCODER'
+  77 |     instFault      : FB_FaultCore;            // * [INST] Socle de defaut (liste de causes -> ST_Fault)
+     |                      ^
+
+ST_EncoderMeasurement.st:26:25: error: Undefined type 'ST_FAULT' in STRUCT 'ST_ENCODERMEASUREMENT'
+  26 |     HomingFault       : ST_Fault;     // Défaut FB_Encoder_Homing (état du référencement)
+     |                         ^
+
+ST_EncoderMeasurement.st:27:25: error: Undefined type 'ST_LIFECYCLE' in STRUCT 'ST_ENCODERMEASUREMENT'
+  27 |     HomingLifecycle   : ST_Lifecycle; // Cycle FB_Encoder_Homing (Busy/Done)
+     |                         ^
+
+ST_EncoderMeasurement.st:28:25: error: Undefined type 'ST_FAULT' in STRUCT 'ST_ENCODERMEASUREMENT'
+  28 |     AbsFault          : ST_Fault;     // Défaut FB_Encoder_Abs (état acquisition bus)
+     |                         ^
+
+FB_Encoder_Homing.st:253:9: error: Undeclared variable 'E_PRESETCONFIRMMODE'
+ 253 |         E_PresetConfirmMode.READBACK_ONLY:
+     |         ^
+
+FB_Encoder_Homing.st:255:9: error: Undeclared variable 'E_PRESETCONFIRMMODE'
+ 255 |         E_PresetConfirmMode.READBACK_AND_STATUSBIT:
+     |         ^
+
+FB_Encoder_Homing.st:257:9: error: Undeclared variable 'E_PRESETCONFIRMMODE'
+ 257 |         E_PresetConfirmMode.STATUSBIT_ONLY:
+     |         ^
+

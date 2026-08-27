@@ -1,0 +1,14 @@
+Error compiling source files:
+
+FB_Brake.st:30:31: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_BRAKE'
+  30 |     Fault                   : ST_Fault;
+     |                               ^
+
+FB_Brake.st:49:31: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_BRAKE'
+  49 |     instFault               : FB_FaultCore;       // * [INST] Socle de défaut
+     |                               ^
+
+FB_Brake.st:50:5: error: Undefined type 'ST_FAULTCAUSE' in FUNCTION_BLOCK 'FB_BRAKE'
+  50 |     instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+     |     ^
+

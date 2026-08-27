@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T20:07:59.368499" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T20:07:59.368499">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:38:36.012761" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:38:36.012761">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -774,32 +774,15 @@
           </data>
         </addData>
       </dataType>
-      <dataType name="ST_Status">
+      <dataType name="ST_Fault">
         <baseType>
           <struct>
-            <variable name="Busy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres historiques (conservés) ----
-1 = Bloc en cours d'exécution</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
-              </documentation>
-            </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut à acquitter (laté jusqu'au Reset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -807,87 +790,97 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune)</xhtml>
               </documentation>
             </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Warning">
+            <variable name="Latched">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres ajoutés (forme cible enrichie) ----
-1 = warning actif (auto-effacé, aucun acquittement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="WarningId">
+            <variable name="LatchedId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code warning courant (bitfield)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis WarningId (prêt IHM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis ErrorId</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetRequested">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = un Reset est nécessaire / en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ErrorId figé à l'apparition du défaut, effacé au Reset</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>537f3533-9d7c-5703-b6a3-978725c61956</ObjectId>
+            <ObjectId>ffe904a3-501c-5aac-bc38-202f178a61f2</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_Status — Socle transverse de statut d'un FB métier
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
-      avec les textes prêts pour l'IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_Status (exception documentée).
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   🎯 Rôle : porter l'état défaut d'un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu'au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l'acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_FaultCause">
+        <baseType>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente maintenant (interlock sur cette valeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latching">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause à acquitter (arme Latched) ; 0 = live seulement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Texte">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>dafea4e6-0b73-5895-8c57-ef302142ebf7</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n'alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1582,12 +1575,12 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
 
 {region "§4 Publication etat IHM"}
 // === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
-TranslationState.FBState := instTranslationM3.Status.State;
+TranslationState.FBState := E_State.READY;
 TranslationState.Ready := instTranslationM3.Ready;
-TranslationState.Busy := instTranslationM3.Status.Busy;
-TranslationState.Done := instTranslationM3.Status.Done;
-TranslationState.Error := instTranslationM3.Status.Error;
-TranslationState.ErrorId := instTranslationM3.Status.ErrorId;
+TranslationState.Busy := (ABS(instTranslationM3.RequestedDriveFreqHz) &gt; 0.1);
+TranslationState.Done := instTranslationM3.TargetReached;
+TranslationState.Error := instTranslationM3.Fault.Error;
+TranslationState.ErrorId := instTranslationM3.Fault.ErrorId;
 TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
 TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationState.PositionReached := instTranslationM3.TargetReached;
@@ -1619,10 +1612,10 @@ TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
-TranslationState.FinalInterlockState := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.State;
+TranslationState.FinalInterlockState := E_State.READY;
 TranslationState.FinalInterlockReason := PRG_06_Outputs.instTranslationOutputInterlockM3.Reason;
-TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.Error;
-TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.ErrorId;
+TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.Error;
+TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.ErrorId;
 TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
 TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) &lt;&gt; 0;
 TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) &lt;&gt; 0;
@@ -1635,8 +1628,8 @@ TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 // ci-dessus, bitfield différent, jamais mélangé.
 TranslationSafety.SafeStop := M3_SafeStop_Aggregate;
 TranslationSafety.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
-TranslationSafety.Error := instSafetyTranslationM3.Status.Error;
-TranslationSafety.ErrorId := instSafetyTranslationM3.Status.ErrorId;
+TranslationSafety.Error := instSafetyTranslationM3.Fault.Error;
+TranslationSafety.ErrorId := instSafetyTranslationM3.Fault.ErrorId;
 TranslationSafety.ErrorOperatorComm := instSafetyTranslationM3.ErrorOperatorComm;
 TranslationSafety.ErrorDriveComm := instSafetyTranslationM3.ErrorDriveComm;
 TranslationSafety.ErrorPhaseRotation := instSafetyTranslationM3.ErrorPhaseRotation;
@@ -1953,13 +1946,12 @@ Data.TranslationSafety                := TranslationSafety;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt (sortie libre, hors ST_Status)</xhtml>
               </documentation>
             </variable>
-            <variable name="Status">
+            <variable name="Fault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault)</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -2052,14 +2044,6 @@ ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM a
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Erreur</xhtml>
-              </documentation>
-            </variable>
             <variable name="TonMecaB">
               <type>
                 <derived name="TON" />
@@ -2135,6 +2119,69 @@ ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM a
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Inhibition 3s au boot + effacement auto coms</xhtml>
               </documentation>
             </variable>
+            <variable name="PhaseRotationFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Latches défauts
+. [LOC] Latch rotation phase</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeThermalFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch thermique frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MecaBFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch Méca B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MecaAFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch Méca A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorIncoherentFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch mot capteurs incohérent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Socle défaut
+* [INST] Socle défaut transverse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -2156,12 +2203,133 @@ ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM a
 
 // === IMPLEMENTATION ===
 
-{region "§1 Gate neutralisation"}
-// 🛑 1. GATE — neutralisation si désactivé
+{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+IF ResetEdge.Q OR BypassGlobal THEN
+    PhaseRotationFault    := FALSE;
+    BrakeThermalFault     := FALSE;
+    MecaBFault            := FALSE;
+    MecaAFault            := FALSE;
+    SensorIncoherentFault := FALSE;
+END_IF;
+
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    PhaseRotationFault    := FALSE;
+    BrakeThermalFault     := FALSE;
+    MecaBFault            := FALSE;
+    MecaAFault            := FALSE;
+    SensorIncoherentFault := FALSE;
+END_IF;
+
+IF NOT BypassGlobal THEN
+    TonStartupWarmup(IN := Enable, PT := T#3s);
+
+    // Cause 0 : Perte com opérateur (live)
+    IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
+        instCauses[0].Active := (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk);
+    ELSE
+        instCauses[0].Active := FALSE;
+    END_IF;
+    instCauses[0].Latching := FALSE;
+    instCauses[0].Texte    := 'Perte communication operateur translation';
+
+    // Cause 1 : Perte EtherCAT drive (live)
+    IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassDriveComm) THEN
+        instCauses[1].Active := (NOT DriveOnline OR NOT DriveOperational);
+    ELSE
+        instCauses[1].Active := FALSE;
+    END_IF;
+    instCauses[1].Latching := FALSE;
+    instCauses[1].Texte    := 'Perte communication EtherCAT variateur M3';
+
+    // Cause 2 : Rotation de phase (latched)
+    IF NOT (BypassProcess OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN
+        PhaseRotationFault := TRUE;
+    END_IF;
+    instCauses[2].Active   := PhaseRotationFault;
+    instCauses[2].Latching := TRUE;
+    instCauses[2].Texte    := 'Defaut rotation de phases';
+
+    // Cause 3 : Thermique frein (latched)
+    IF NOT (BypassSafety OR BypassBrakeThermal) AND BrakeThermalFeedback THEN
+        BrakeThermalFault := TRUE;
+    END_IF;
+    instCauses[3].Active   := BrakeThermalFault;
+    instCauses[3].Latching := TRUE;
+    instCauses[3].Texte    := 'Surchauffe thermique frein translation';
+
+    // Cause 4 : Méca B (latched)
+    IF NOT (BypassSafety OR BypassMecaB) THEN
+        IF NOT HeartbeatIhmOk THEN
+            UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
+        ELSIF (Direction = 0) AND NOT BrakeCmd THEN
+            UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
+        ELSE
+            UncommandedActiveB := FALSE;
+        END_IF;
+        TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
+        IF TonMecaB.Q THEN MecaBFault := TRUE; END_IF;
+    ELSE
+        TonMecaB(IN := FALSE);
+    END_IF;
+    instCauses[4].Active   := MecaBFault;
+    instCauses[4].Latching := TRUE;
+    instCauses[4].Texte    := 'Absence confirmation arret translation (Meca B)';
+
+    // Cause 5 : Méca A (latched)
+    IF NOT (BypassSafety OR BypassMecaA) THEN
+        IF (Direction = 0) AND NOT BrakeCmd THEN
+            UncommandedActiveA := ABS(DriveActualFreqHz) &gt; 0.5;
+        ELSE
+            UncommandedActiveA := FALSE;
+        END_IF;
+        TonMecaA(IN := UncommandedActiveA, PT := T#1S);
+        IF TonMecaA.Q THEN MecaAFault := TRUE; END_IF;
+    ELSE
+        TonMecaA(IN := FALSE);
+    END_IF;
+    instCauses[5].Active   := MecaAFault;
+    instCauses[5].Latching := TRUE;
+    instCauses[5].Texte    := 'Mouvement non commande translation (Meca A)';
+
+    // Cause 6 : Limite extrême escalade (live)
+    IF NOT (BypassSafety OR BypassLimitSwitch) THEN
+        OverrunCondition := (LimitSwitchFwd AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchRev AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
+        TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
+        instCauses[6].Active := TonLimitSwitchOverrun.Q;
+    ELSE
+        TonLimitSwitchOverrun(IN := FALSE);
+        instCauses[6].Active := FALSE;
+    END_IF;
+    instCauses[6].Latching := FALSE;
+    instCauses[6].Texte    := 'Depassement limite extreme translation';
+
+    // Cause 7 : Mot capteurs incohérent (latched)
+    IF NOT (BypassSafety OR BypassSensorIncoherent) AND SensorWordIncoherent THEN
+        SensorIncoherentFault := TRUE;
+    END_IF;
+    instCauses[7].Active   := SensorIncoherentFault;
+    instCauses[7].Latching := TRUE;
+    instCauses[7].Texte    := 'Incoherence combinaison capteurs translation';
+
+ELSE
+    TonMecaB(IN := FALSE);
+    TonMecaA(IN := FALSE);
+    TonLimitSwitchOverrun(IN := FALSE);
+END_IF;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
 IF NOT Enable THEN
-    // 🛡️ Status.ErrorId conservé : la cause du dernier défaut reste visible IHM.
-    // Status.Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
-    Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
     SafeStop := FALSE;
     PowerCutOff := FALSE;
     ErrorOperatorComm := FALSE;
@@ -2176,180 +2344,28 @@ IF NOT Enable THEN
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
-    Status.State := E_State.DISABLED;
-    Status.Busy := FALSE; Status.Done := FALSE; Ready := FALSE;
+    Ready := FALSE;
     RETURN;
 END_IF;
 
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region "§1bis Initialisation et bypass global"}
-Ready := TRUE;
-ResetEdge(CLK := Reset);
+{region "§3 Sorties sécurités et drapeaux IHM"}
+// 📤 3. SORTIES SÉCURITÉ &amp; DRAPEAUX
+SafeStop := Fault.Error OR NOT PowerContactorEngaged;
 
-// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
-IF NOT FirstScanDone THEN
-    FirstScanDone := TRUE;
-    Status.ErrorId := 16#0000;
-    RETURN;
-END_IF;
+// PowerCutOff actif si bits 3..7 actifs (causes physiques)
+PowerCutOff := (Fault.ErrorId AND 16#00F8) &lt;&gt; 16#0000;
 
-// 🌐 BYPASS GLOBAL : si actif → force Status.ErrorId = 0 et saute toutes les vérifications
-// (les bits d'erreur resteraient coincés si on ne les nettoie pas)
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-    TonMecaB(IN := FALSE);
-    TonMecaA(IN := FALSE);
-END_IF;
-
-{endregion}
-
-{region "§2 Diagnostics et protections translation"}
-// ⚠️ ResetEdge doit être traité même si bypass actif, pour que le reset IHM fonctionne.
-// On ne l'exécute que si on n'est PAS en bypass global (sinon ErrorId déjà à 0).
-IF NOT BypassGlobal THEN
-    // ⏱️ Temporisation 3s de mise en route des bus de terrain au boot (EtherCAT / CANopen / Modbus IHM)
-    TonStartupWarmup(IN := Enable, PT := T#3s);
-
-    // 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
-    IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
-        IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
-            Status.ErrorId := Status.ErrorId OR 16#0001;
-        ELSE
-            Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Effacement auto si la com repasse saine *)
-        END_IF;
-    ELSIF NOT TonStartupWarmup.Q THEN
-        Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Inhibition pendant l'initialisation boot *)
-    END_IF;
-    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFE; END_IF;
-
-    // 🔍 2bis. PERTE ETHERCAT VARIATEUR M3 (bit1)
-    IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassDriveComm) THEN
-        IF (NOT DriveOnline OR NOT DriveOperational) THEN
-            Status.ErrorId := Status.ErrorId OR 16#0002;
-        ELSE
-            Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Effacement auto si l'EtherCAT variateur M3 repasse sain *)
-        END_IF;
-    ELSIF NOT TonStartupWarmup.Q THEN
-        Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Inhibition pendant l'initialisation boot *)
-    END_IF;
-    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFD; END_IF;
-
-    // 🔍 3. MAUVAISE ROTATION DE PHASE (bit2)
-    IF NOT (BypassProcess OR BypassPhaseRotation) THEN
-        IF NOT PhaseRotationOk THEN
-            Status.ErrorId := Status.ErrorId OR 16#0004;
-        END_IF;
-    END_IF;
-    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFB; END_IF;
-
-    // 🔍 3ter. THERMIQUE FREIN COMMUN M1/M2/M3 (bit3)
-    IF NOT (BypassSafety OR BypassBrakeThermal) THEN
-        IF BrakeThermalFeedback THEN
-            Status.ErrorId := Status.ErrorId OR 16#0008;
-        END_IF;
-    END_IF;
-    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFF7; END_IF;
-
-    // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
-    IF NOT (BypassSafety OR BypassMecaB) THEN
-        IF NOT HeartbeatIhmOk THEN
-            UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
-        ELSIF (Direction = 0) AND NOT BrakeCmd THEN
-            UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
-        ELSE
-            UncommandedActiveB := FALSE;
-        END_IF;
-        TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
-        IF TonMecaB.Q THEN Status.ErrorId := Status.ErrorId OR 16#0010; END_IF;
-    ELSE
-        TonMecaB(IN := FALSE);
-    END_IF;
-    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFEF; END_IF;
-
-    // 🔍 3quinquies. MOUVEMENT NON COMMANDÉ (Méca A — bit5)
-    IF NOT (BypassSafety OR BypassMecaA) THEN
-        IF (Direction = 0) AND NOT BrakeCmd THEN
-            UncommandedActiveA := ABS(DriveActualFreqHz) &gt; 0.5;
-        ELSE
-            UncommandedActiveA := FALSE;
-        END_IF;
-        TonMecaA(IN := UncommandedActiveA, PT := T#1S);
-        IF TonMecaA.Q THEN Status.ErrorId := Status.ErrorId OR 16#0020; END_IF;
-    ELSE
-        TonMecaA(IN := FALSE);
-    END_IF;
-    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFDF; END_IF;
-
-    // 🔍 3sexies. SURVEILLANCE ESCALADE FIN DE COURSE (bit6)
-    IF (BypassSafety OR BypassLimitSwitch) THEN
-        // Nettoie le bit 6 résiduel (posé avant activation du bypass)
-        Status.ErrorId := Status.ErrorId AND 16#FFBF;
-        TonLimitSwitchOverrun(IN := FALSE);
-    ELSE
-        // 🧱 L'erreur 64 (escalade / poussée anormale en butée) ne s'active QUE SI :
-        // 1. On est sur le capteur Trémie (LimitSwitchFwd) ET qu'on continue d'insister en Marche Avant (Direction = 1) avec vitesse/commande variateur active.
-        // 2. OU qu'on est sur le capteur Maintenance (LimitSwitchRev) ET qu'on continue d'insister en Marche Arrière (Direction = -1) avec vitesse/commande variateur active.
-        OverrunCondition := (LimitSwitchFwd AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
-                         OR (LimitSwitchRev AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
-
-        TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
-
-        IF TonLimitSwitchOverrun.Q THEN
-            Status.ErrorId := Status.ErrorId OR 16#0040; // Défaut escalade confirmé (coupure puissance amont)
-        ELSE
-            // Si la poussée dans le mauvais sens cesse (ou si on repart en arrière), le défaut s'auto-efface
-            Status.ErrorId := Status.ErrorId AND 16#FFBF;
-        END_IF;
-    END_IF;
-
-    // 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
-    IF (BypassSafety OR BypassSensorIncoherent) THEN
-        // Nettoye le bit 7 résiduel
-        Status.ErrorId := Status.ErrorId AND 16#FF7F;
-    ELSE
-        IF SensorWordIncoherent THEN
-            Status.ErrorId := Status.ErrorId OR 16#0080;
-        END_IF;
-    END_IF;
-    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FF7F; END_IF;
-
-END_IF; // fin IF NOT BypassGlobal
-
-{endregion}
-
-{region "§4 Arbitrage sorties et etat"}
-// 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-SafeStop := Status.Error OR NOT PowerContactorEngaged;
-
-// PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
-// mouvement non commandé (bit5), dépassement de fin de course (bit6),
-// ou incohérence mot capteurs position (bit7)
-PowerCutOff := (Status.ErrorId AND 16#00F8) &lt;&gt; 16#0000;
-
-// Décapsulage du bitfield Status.ErrorId pour l'IHM
-ErrorOperatorComm   := (Status.ErrorId AND 16#0001) &lt;&gt; 16#0000;
-ErrorDriveComm      := (Status.ErrorId AND 16#0002) &lt;&gt; 16#0000;
-ErrorPhaseRotation  := (Status.ErrorId AND 16#0004) &lt;&gt; 16#0000;
-ErrorBrakeThermal   := (Status.ErrorId AND 16#0008) &lt;&gt; 16#0000;
-ErrorMecaB          := (Status.ErrorId AND 16#0010) &lt;&gt; 16#0000;
-ErrorMecaA          := (Status.ErrorId AND 16#0020) &lt;&gt; 16#0000;
-ErrorLimitSwitch    := (Status.ErrorId AND 16#0040) &lt;&gt; 16#0000;
-ErrorSensorIncoherent := (Status.ErrorId AND 16#0080) &lt;&gt; 16#0000;
-
-Status.Busy := FALSE;
-Status.Done := FALSE;
-
-// 🚦 5. STATE MACHINE (phase diagnostic)
-Status.State := E_State.READY;
-
-
+ErrorOperatorComm     := instCauses[0].Active;
+ErrorDriveComm        := instCauses[1].Active;
+ErrorPhaseRotation    := instCauses[2].Active;
+ErrorBrakeThermal     := instCauses[3].Active;
+ErrorMecaB            := instCauses[4].Active;
+ErrorMecaA            := instCauses[5].Active;
+ErrorLimitSwitch      := instCauses[6].Active;
+ErrorSensorIncoherent := instCauses[7].Active;
 {endregion}
 </xhtml>
           </ST>
@@ -2440,9 +2456,7 @@ Status.State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
-(même principe que PV→Trémie, généralisé — voir §4bis dans le corps ST)
---&gt; [HW] Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownSensorMaintenance">
@@ -2458,7 +2472,7 @@ Status.State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P2 — ralentissement avant P1 (Direction=-1, arrêt propre pour travail)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P2 — ralentissement avant P1 (Direction=-1)</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchFwd">
@@ -2482,7 +2496,7 @@ Status.State := E_State.READY;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Spécifique ETHERCAT (image process EtherCAT, rafraîchie par EtherCatTask 4ms)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Spécifique ETHERCAT
 --&gt; [HW] Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
               </documentation>
             </variable>
@@ -2522,12 +2536,6 @@ Status.State := E_State.READY;
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compense le câblage moteur (U/V inversés) — UNIQUEMENT sur le mot de commande variateur
-en sortie (§5bis). Direction/CommandedDirection reste partout ailleurs le sens SÉMANTIQUE
-réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
-(LimitSwitchFwd/Rev, SlowdownSensorXxx) quel que soit le câblage.</xhtml>
-              </documentation>
             </variable>
             <variable name="CfgRampAccelRate">
               <type>
@@ -2537,7 +2545,7 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages rampe (RETAIN)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages rampe
 --&gt; [CFG] %/s — accélération</xhtml>
               </documentation>
             </variable>
@@ -2582,8 +2590,8 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages ETHERCAT uniquement (RETAIN)
---&gt; [CFG] Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages ETHERCAT
+--&gt; [CFG] Vitesse réduite d'approche Trémie en Hz</xhtml>
               </documentation>
             </variable>
             <variable name="ApproachSpeedMaintenanceHz">
@@ -2594,7 +2602,7 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche Maintenance en Hz (piloté par SlowdownSensorMaintenance)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche Maintenance en Hz</xhtml>
               </documentation>
             </variable>
             <variable name="ApproachSpeedP1Hz">
@@ -2605,7 +2613,7 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche P1 en Hz (piloté par SlowdownSensorP1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche P1 en Hz</xhtml>
               </documentation>
             </variable>
             <variable name="DriveFreqScaleMaxHz">
@@ -2616,7 +2624,7 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <simpleValue value="60" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Échelle 0..100 % → MaxHz</xhtml>
               </documentation>
             </variable>
             <variable name="CaptorDebounce">
@@ -2685,13 +2693,12 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt (sortie libre, hors ST_Status)</xhtml>
               </documentation>
             </variable>
-            <variable name="Status">
+            <variable name="Fault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-ErrorId bit0: "Défaut frein Translation" ; bit3: "Défaut variateur AC600" ; bit6: "Limite extrême".</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault)</xhtml>
               </documentation>
             </variable>
             <variable name="TargetReached">
@@ -2776,14 +2783,6 @@ ErrorId bit0: "Défaut frein Translation" ; bit3: "Défaut variateur AC600" ; bi
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Erreur</xhtml>
-              </documentation>
-            </variable>
             <variable name="DirectionChangeDelay">
               <type>
                 <derived name="TON" />
@@ -2813,7 +2812,7 @@ ErrorId bit0: "Défaut frein Translation" ; bit3: "Défaut variateur AC600" ; bi
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CommandedDirection compensé câblage (InvertDriveDirection) — UNIQUEMENT pour le mot de commande variateur, jamais pour l'appariement capteur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CommandedDirection compensé câblage</xhtml>
               </documentation>
             </variable>
             <variable name="RampTargetPct">
@@ -2876,12 +2875,35 @@ ErrorId bit0: "Défaut frein Translation" ; bit3: "Défaut variateur AC600" ; bi
               <type>
                 <derived name="TON" />
               </type>
+            </variable>
+            <variable name="DriveFaultLatching">
+              <type>
+                <BOOL />
+              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde-fou watchdog : DriveActualFreqHz est un passthrough EtherCAT sans contrôle de fraîcheur.
-Si la communication variateur se fige sur une dernière valeur ≥1.0 Hz, plus rien ne referme
-le frein tant que ce garde-fou n'existe pas — même si SafeStop a déjà ramené la rampe théorique
-à 0. Force le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise
-DriveActualFreqHz.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défauts
+. [LOC] Latch défaut variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle défaut transverse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -2906,266 +2928,180 @@ DriveActualFreqHz.</xhtml>
 
 // === IMPLEMENTATION ===
 
-{region "§1 Gate et initialisation"}
-// 🛑 1. GATE (Enable / PowerContactorEngaged) — neutralisation totale, sorties sûres
-IF NOT Enable OR NOT PowerContactorEngaged THEN
-    RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
-
-    Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
-          DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
-          DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
-    BrakeReleaseRequest := Brake.BrakeCmd;
-    BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
-    BrakeContactorCheck := Brake.ContactorCheck;
-
-    CommandedDirection := 0;
-    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    SpeedRamp(Target := 0.0, AccelRate := CfgRampAccelRate, DecelRate := CfgRampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
-
-    ArrivalLock := FALSE;
-
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    TargetReached := FALSE; // 📊 Neutralisation : aucune cible atteinte garantie hors Enable
-    RETURN;
-END_IF;
-
-// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
-IF NOT FirstScanDone THEN
-    FirstScanDone := TRUE;
-    Status.ErrorId := 16#0000;
-    RETURN;
-END_IF;
-
-{endregion}
-
-{region "§2 Acquisition commandes et position cible"}
-Ready := TRUE;
-CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms
-
-// 🔑 2. RESET FRONT
+{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
+// 🔑 1. RESET FRONT
 ResetEdge(CLK := Reset);
 
-// 📡 3. CAPTEUR POSITION CIBLE (debounce)
-CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
-TargetReached := CaptorDebounceTon.Q;
+IF ResetEdge.Q THEN
+    DriveFaultLatching := FALSE;
+END_IF;
 
+IF DriveStatusWord.4 THEN
+    DriveFaultLatching := TRUE;
+END_IF;
+
+instCauses[0].Active   := Brake.Fault.Error;
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := 'Defaut sequence ou retour frein translation';
+
+instCauses[3].Active   := DriveFaultLatching;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := 'Defaut variateur translation AC600';
+
+IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev)) THEN
+    instCauses[6].Active := TRUE;
+ELSE
+    instCauses[6].Active := FALSE;
+END_IF;
+instCauses[6].Latching := FALSE;
+instCauses[6].Texte    := 'Limite extreme translation atteinte';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
 {endregion}
 
-{region "§4 Consigne vitesse ralentissement verrou arrivee"}
-// ⚙️ 4. CORE — arbitrage rampe : Enable &gt; SafeStop &gt; StartStop
-// DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de sens est en attente —
-// sans cela, la cible suit la magnitude joystick en continu et ne croise jamais le seuil
-// d'arrêt (0.1%) qui autorise l'interlock §5 à basculer CommandedDirection. Une inversion
-// plus rapide que la décélération réelle bloquerait indéfiniment le mouvement dans l'ancien sens.
-DirectionChangePending := (Direction &lt;&gt; CommandedDirection) AND (CommandedDirection &lt;&gt; 0);
-
-RampTargetPct := 0.0;
-IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
-    // Si butée fin de course extrême atteinte dans le sens de marche demandé, consigne forcée à 0
-    // 🌐 BypassLimitSwitch = TRUE → ignore cette protection
-    IF NOT BypassLimitSwitch AND ((Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev)) THEN
-        RampTargetPct := 0.0;
-    ELSE
-        RampTargetPct := ABS(SpeedTgt_Pct);
-        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedTgt_Pct &gt; 0.0), la consigne est au moins égale à 1.0 Hz
-        IF RampTargetPct &gt; 0.0 THEN
-            RampTargetPct := MAX(RampTargetPct, (1.0 / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
-        END_IF;
-    END_IF;
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
+IF NOT Enable THEN
+    SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
+    Brake(Enable := FALSE);
+    RequestedDriveControlWord := 0;
+    RequestedDriveFreqHz := 0.0;
+    BrakeReleaseRequest := FALSE;
+    BrakeCommandOpenConfirmed := FALSE;
+    BrakeContactorCheck.Command := FALSE;
+    BrakeContactorCheck.Feedback := BrakeFeedback;
+    CommandedDirection := 0;
+    DirectionChangePending := FALSE;
+    ArrivalLock := FALSE;
+    TargetReached := FALSE;
+    DirectionChangeDelay(IN := FALSE);
+    CaptorDebounceTon(IN := FALSE);
+    TonBrakeRealFreqTimeout(IN := FALSE);
+    Ready := FALSE;
+    RETURN;
 END_IF;
 
-// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur)
-// Chaque capteur "un cran avant" la cible finale déclenche SA propre vitesse réduite, dans SON
-// sens de marche uniquement — le ralentissement ne se déclenche qu'à l'approche de sa cible :
-//   PV       + Direction=1  → approche Trémie
-//   P1       + Direction=-1 → approche Maintenance
-//   P2       + Direction=-1 → approche P1 (arrêt propre pour travail)
-IF (Direction = 1) AND SlowdownSensorTremie THEN
-    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedTremieHz / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
-END_IF;
-IF (Direction = -1) AND SlowdownSensorMaintenance THEN
-    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedMaintenanceHz / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
-END_IF;
-IF (Direction = -1) AND SlowdownSensorP1 THEN
-    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedP1Hz / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
+Ready := Enable AND NOT Fault.Latched;
+{endregion}
+
+{region "§3 Premier scan et temps de cycle"}
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    CommandedDirection := Direction;
 END_IF;
 
-// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1, Maintenance, Fdc extrêmes)
-// Dès qu'on touche un capteur d'arrêt (TargetReached, débounce 100ms) OU un fin de course dur
-// (LimitSwitchFwd/Rev, §5bis — immédiat, non débounce, mais toute activation même brève arme le
-// même verrou), le sens d'arrivée (DirectionAtArrival) est MÉMORISÉ et BLOQUÉ. Toute activation,
-// même un instant, arme DirectionAtArrival comme un TargetReached — un Fdc qui s'ouvre quelques ms
-// pendant le freinage ne doit pas laisser la rampe (encore haute en interne) revenir en sortie.
-ArrivalEdge(CLK := TargetReached
-                 OR (LimitSwitchFwd AND (CommandedDirection = 1))
-                 OR (LimitSwitchRev AND (CommandedDirection = -1)));
+CycleTimeCalc();
+{endregion}
+
+{region "§4 Arrivée sur cible et interlock direction"}
+CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
+TargetReached := CaptorDebounceTon.Q;
+ArrivalEdge(CLK := TargetReached);
+
 IF ArrivalEdge.Q THEN
+    ArrivalLock := TRUE;
     DirectionAtArrival := CommandedDirection;
 END_IF;
 
-// Un retour au neutre, même SOUTENU (&gt;100ms), ne doit JAMAIS lever le verrou — seul un vrai
-// changement de sens (dégagement volontaire, sans ambiguïté) le fait. Sinon, un neutre 100ms+
-// puis un réappui dans le MÊME sens (le capteur/Fdc restant au niveau haut en continu,
-// TargetReached ne montre plus de front) contournerait le verrou et M3 repartirait vers la butée.
-// On doit repartir dans l'AUTRE sens, jamais juste relâcher-réappuyer pareil. Instantané, jamais
-// retardé (le dégagement doit rester rapide).
-IF (Direction = DirectionAtArrival * (-1)) OR ResetEdge.Q OR (NOT TargetReached AND NOT LimitSwitchFwd AND NOT LimitSwitchRev) THEN
-    DirectionAtArrival := 0;
+IF ArrivalLock AND (Direction &lt;&gt; 0) AND (Direction &lt;&gt; DirectionAtArrival) THEN
+    ArrivalLock := FALSE;
 END_IF;
 
-// Bloque la consigne à 0 tant que l'ordre demande d'insister dans le sens d'arrivée verrouillé
-ArrivalLock := (DirectionAtArrival &lt;&gt; 0) AND (Direction = DirectionAtArrival);
-IF ArrivalLock THEN
+DirectionChangeDelay(
+    IN := (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) AND (ABS(SpeedRamp.Current) &lt;= 0.1) AND (ABS(DriveActualFreqHz) &lt;= 0.5),
+    PT := DirectionInterlockDelay
+);
+
+IF (CommandedDirection = 0) AND (Direction &lt;&gt; 0) THEN
+    CommandedDirection := Direction;
+    DirectionChangePending := FALSE;
+ELSIF DirectionChangeDelay.Q THEN
+    CommandedDirection := Direction;
+    DirectionChangePending := FALSE;
+ELSIF (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) THEN
+    DirectionChangePending := TRUE;
+ELSE
+    DirectionChangePending := FALSE;
+END_IF;
+
+IF Direction = 0 THEN
+    CommandedDirection := 0;
+    DirectionChangePending := FALSE;
+END_IF;
+{endregion}
+
+{region "§5 Consigne et rampe de vitesse"}
+IF DirectionChangePending OR (Direction = 0) OR ArrivalLock OR SafeStop OR NOT StartStop THEN
     RampTargetPct := 0.0;
-END_IF;
-
-SpeedRamp(Target := RampTargetPct,
-          AccelRate := CfgRampAccelRate,
-          DecelRate := SEL(SafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
-          CycleTimeS := CycleTimeCalc.CycleTimeS);
-
-{endregion}
-
-{region "§5 Interlock changement sens"}
-// 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (vitesse confirmée nulle)
-IF Direction &lt;&gt; CommandedDirection THEN
-    IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
-        CommandedDirection := Direction;
-        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    ELSIF ABS(SpeedRamp.Current) &lt; 0.1 THEN
-        DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
-        IF DirectionChangeDelay.Q THEN
-            CommandedDirection := Direction;
-            DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-        END_IF;
-    ELSE
-        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    END_IF;
 ELSE
-    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
 END_IF;
 
+SpeedRamp(
+    Target := RampTargetPct,
+    AccelRate := CfgRampAccelRate,
+    DecelRate := SEL(SafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
+    CycleTimeS := CycleTimeCalc.CycleTimeS
+);
 {endregion}
 
-{region "§5bis Commande variateur et protections fin course"}
-// 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
-// OU que la fréquence réelle mesurée du variateur M3 est &gt;= 1.0 Hz.
-// Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
-// Borné par un garde-fou 2s — DriveActualFreqHz n'a aucun contrôle de fraîcheur EtherCAT ; si la
-// communication se fige sur une valeur ≥1.0 Hz (perte réseau en mouvement), rien d'autre en aval
-// ne referme le frein (FB_TranslationOutputInterlock ignore volontairement SafeStop par
-// conception). Le garde-fou force la fermeture du frein 2s après la fin de la rampe THÉORIQUE, quoi
-// que dise la mesure réelle — combine attente réelle (évite un serrage sur arbre encore tournant)
-// et certitude de fermeture (n'attend jamais indéfiniment).
-TonBrakeRealFreqTimeout(IN := NOT ((CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1)), PT := T#2s);
-MovementRequested := ((CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1))
-                     OR (ABS(DriveActualFreqHz) &gt;= 1.0 AND NOT TonBrakeRealFreqTimeout.Q);
+{region "§6 Commande variateur et frein"}
+TonBrakeRealFreqTimeout(
+    IN := (RampTargetPct &lt;= 0.1) AND (ABS(SpeedRamp.Current) &lt;= 0.1),
+    PT := T#2S
+);
 
-// 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
-RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
+MovementRequested := (ABS(SpeedRamp.Current) &gt; 0.1)
+                  OR ((ABS(DriveActualFreqHz) &gt; 0.5) AND NOT TonBrakeRealFreqTimeout.Q);
 
-// Compensation câblage moteur appliquée ICI SEULEMENT, sur le mot de commande —
-// CommandedDirection (sécurité/capteurs juste au-dessus, §4/§4bis/§4ter) reste le sens réel.
-PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection, CommandedDirection * (-1));
+Brake(
+    Enable := Enable,
+    Reset := Reset,
+    MovementRequested := MovementRequested,
+    ContactorFeedback := BrakeFeedback,
+    BypassContactorCheck := BypassContactorCheck,
+    DelayContactClose := BrakeDelayContactClose,
+    DelayMagnetise := BrakeDelayMagnetise,
+    DelayMotorDecel := BrakeDelayMotorDecel,
+    FeedbackTimeout := BrakeFeedbackTimeout
+);
 
-// Pilotage nominal Given Command 1 (0x3101) :
-// 0: None, 1: Forward, 2: Reverse, 7: Reset
-IF Reset THEN
-    RequestedDriveControlWord := 7; // Reset défaut variateur
-ELSIF Status.Error THEN
-    RequestedDriveControlWord := 0; // Arrêt sur défaut
-ELSIF MovementRequested THEN
-    IF PhysicalDriveDirection = 1 THEN
-        RequestedDriveControlWord := 1; // Marche avant
-    ELSIF PhysicalDriveDirection = -1 THEN
-        RequestedDriveControlWord := 2; // Marche arrière
-    ELSE
-        RequestedDriveControlWord := 0;
-    END_IF;
-ELSE
-    RequestedDriveControlWord := 0;
-END_IF;
-
-// Sécurité : si Fdc extrême atteint dans le sens de marche, coupure commande immédiate (sans rampe ni couple)
-// 🌐 BypassLimitSwitch = TRUE → ignore cette protection (test/mise en service)
-IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev)) THEN
-    RequestedDriveControlWord := 0;
-    RequestedDriveFreqHz := 0.0;
-    SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
-END_IF;
-
-{endregion}
-
-{region "§6 Commande frein"}
-// 🛑 6. FREIN (composé, réutilisé tel quel)
-Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
-      ContactorFeedback := BrakeFeedback,
-      DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
-      DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout,
-      BypassContactorCheck := BypassContactorCheck);
 BrakeReleaseRequest := Brake.BrakeCmd;
 BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
 BrakeContactorCheck := Brake.ContactorCheck;
 
-// 🛡️ FB_Translation ne décide plus la frontière finale : il expose uniquement
-// ses demandes métier. SafeStop est déjà appliqué dans la rampe rapide §4 : tant que
-// la vitesse ne vaut pas zéro, la demande et le desserrage suivent la décélération.
-// FB_TranslationOutputInterlock ne doit jamais transformer SafeStop en coupure sèche.
-
-{endregion}
-
-{region "§7 Diagnostic etat et repli defaut"}
-// 🧾 7. ERRORID (bitfield, cumul)
-IF Brake.Status.Error THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;
-END_IF;
-
-// Défaut variateur (bit3) : lu via EtherCAT (DriveStatusWord.4)
-IF DriveStatusWord.4 THEN
-    Status.ErrorId := Status.ErrorId OR 16#0008;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFF7;
-END_IF;
-
-// 🚧 Défaut fin de course extrême (bit6) — si bypassé, on NETTOIE le bit résiduel
-IF BypassLimitSwitch THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
+IF InvertDriveDirection THEN
+    PhysicalDriveDirection := -CommandedDirection;
 ELSE
-    // Activé UNIQUEMENT en cas de tentative d'avancer vers la butée active (libéré si dégagement en sens inverse)
-    IF (CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev) THEN
-        Status.ErrorId := Status.ErrorId OR 16#0040;
-    ELSE
-        Status.ErrorId := Status.ErrorId AND 16#FFBF;
-    END_IF;
+    PhysicalDriveDirection := CommandedDirection;
 END_IF;
 
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-// 🚦 8. STATE MACHINE (phase)
-IF (NOT StartStop OR SafeStop) AND ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    Status.State := E_State.STOPPING;
-ELSIF ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    Status.State := E_State.BUSY;
+IF (PhysicalDriveDirection = 1) AND Brake.BrakeCmd THEN
+    RequestedDriveControlWord := 1; // FWD
+ELSIF (PhysicalDriveDirection = -1) AND Brake.BrakeCmd THEN
+    RequestedDriveControlWord := 2; // REV
 ELSE
-    Status.State := E_State.READY;
+    RequestedDriveControlWord := 0;
 END_IF;
 
-Status.Busy := (Status.State = E_State.BUSY) OR (Status.State = E_State.STOPPING);
-Status.Done := FALSE;
+RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * DriveFreqScaleMaxHz;
 
-// 🛡️ 9. SORTIE SÛRE SUR DÉFAUT
-IF Status.Error THEN
-    RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
+// Ralentissements d'approche
+IF (CommandedDirection = 1) AND SlowdownSensorTremie THEN
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedTremieHz);
+ELSIF (CommandedDirection = -1) AND SlowdownSensorMaintenance THEN
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedMaintenanceHz);
+ELSIF (CommandedDirection = -1) AND SlowdownSensorP1 THEN
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedP1Hz);
+END_IF;
+
+IF Fault.Error THEN
+    RequestedDriveControlWord := 0;
+    RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
-
 {endregion}
 </xhtml>
           </ST>
@@ -3893,6 +3829,168 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
           </data>
         </addData>
       </pou>
+      <pou name="FB_FaultCore" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation générale du FB porteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement (jamais conditionné, §9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Causes">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB porteur autorisé (= Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latch">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bit laté par cause, jusqu'au Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="i">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de parcours de la liste</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d'une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l'apparition d'une
+          cause `Active AND Latching`, conservé jusqu'au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d'effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Reset (front, toujours effectif)"}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region "§2 Vue LIVE — Error / ErrorId"}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region "§3 Armement des latches (causes à acquitter)"}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu'au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region "§4 Vue LATCHÉE — Latched / LatchedId"}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>182a55ac-4f1f-5204-b2e2-869f3904964e</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Brake" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -3994,13 +4092,12 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Status">
+            <variable name="Fault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-ErrorId bit0: "incoherence retour contacteur".</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCmd">
@@ -4039,14 +4136,6 @@ ErrorId bit0: "incoherence retour contacteur".</xhtml>
 . [LOC]  Detecteur front acquittement</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Detecteur front apparition defaut</xhtml>
-              </documentation>
-            </variable>
             <variable name="BypassEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -4080,6 +4169,36 @@ ErrorId bit0: "incoherence retour contacteur".</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Timeout de coherence commande/retour</xhtml>
               </documentation>
             </variable>
+            <variable name="ContactorIncoherentError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GESTION DES DEFAUTS ===
+. [LOC]  Défaut mémorisé incohérence contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle de défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -4096,28 +4215,43 @@ ErrorId bit0: "incoherence retour contacteur".</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§1 Gate"}
-// 🛑 1. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
+// === IMPLEMENTATION ===
+
+{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+BypassEdge(CLK := BypassContactorCheck);
+
+// Surveillance et verrouillage incohérence contacteur (Cause 0)
+IF ResetEdge.Q OR BypassContactorCheck THEN
+    ContactorIncoherentError := FALSE;
+    ContactorCheck.StuckClosed := FALSE;
+    ContactorCheck.StuckOpen   := FALSE;
+END_IF;
+
+instCauses[0].Active   := ContactorIncoherentError;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Incoherence retour contacteur frein';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
 IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Ready := FALSE;
     ContactorCheck.Command := FALSE;          // 📊 Neutralisation : miroir de BrakeCmd := FALSE
     ContactorCheck.Feedback := ContactorFeedback; // 📊 Neutralisation : miroir entrée physique
-    // 🔒 ContactorCheck.StuckClosed / StuckOpen et Status.ErrorId conservés (latch défaut, acquittement requis)
     BrakeCommandOpenConfirmed := FALSE;       // 🛡️ Fail-Safe : frein commandé fermé hors Enable
     RETURN;
 END_IF;
 
-Ready := TRUE;
-{endregion}
-
-{region "§2 Reset et fronts"}
-// 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
-ResetEdge(CLK := Reset);
-BypassEdge(CLK := BypassContactorCheck);
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region "§3 Séquence temporisée"}
@@ -4127,21 +4261,15 @@ IF MovementRequested THEN
     TonMagnetise(IN := TRUE, PT := DelayMagnetise + DelayContactClose);
     IF TonMagnetise.Q THEN
         BrakeCmd := TRUE;              // ✅ Contacteur + magnétisation acquis → relâche
-        Status.State := E_State.DONE;
     ELSE
         BrakeCmd := FALSE;             // ⏳ Encore collé pendant la magnétisation
-        Status.State := E_State.BUSY;
     END_IF;
 ELSE
     // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
-    Status.State := E_State.READY;
 END_IF;
-
-Status.Busy := (Status.State = E_State.BUSY);
-Status.Done := (Status.State = E_State.DONE);
 {endregion}
 
 {region "§4 Double vérification contacteur"}
@@ -4150,48 +4278,25 @@ ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
 // ContactorFeedback est dans le MÊME sens que BrakeCmd (TRUE = relâché = frein ouvert).
-// En marche saine les deux sont ÉGAUX → c'est leur DIFFÉRENCE qui signale l'incohérence
-// (contacteur collé). Le test compare donc `&lt;&gt;`.
 TonFeedback(IN := (BrakeCmd &lt;&gt; ContactorFeedback), PT := FeedbackTimeout);
 IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
-        ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);            // relâche commandée (BrakeCmd=TRUE), frein reste serré (ContactorFeedback=FALSE)
-        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);             // serrage commandé (BrakeCmd=FALSE), frein reste ouvert (ContactorFeedback=TRUE)
-        Status.ErrorId := Status.ErrorId OR 16#0001;
-    ELSIF ResetEdge.Q THEN
-        ContactorCheck.StuckClosed := FALSE;
-        ContactorCheck.StuckOpen   := FALSE;
-        Status.ErrorId := Status.ErrorId AND 16#FFFE;
+        ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);
+        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);
+        ContactorIncoherentError   := TRUE;
     END_IF;
-ELSE
-    ContactorCheck.StuckClosed := FALSE;
-    ContactorCheck.StuckOpen   := FALSE;
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
-    IF BypassEdge.Q THEN
-        Status.StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
-    END_IF;
-END_IF;
-
-{endregion}
-
-{region "§5 Arbitrage error"}
-// 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
 END_IF;
 {endregion}
 
-{region "§6 Sortie sûre"}
-// 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
-IF Status.Error THEN
+{region "§5 Sortie sûre"}
+// 🛡️ 5. SORTIE SÛRE SUR DÉFAUT
+IF Fault.Error THEN
     BrakeCmd := FALSE;
 END_IF;
 {endregion}
 
-{region "§7 Confirmation ouverture"}
-// 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback, ou image de BrakeCmd si BypassContactorCheck=TRUE)
+{region "§6 Confirmation ouverture"}
+// 📤 6. CONFIRMATION OUVERTURE FREIN
 IF BypassContactorCheck THEN
     BrakeCommandOpenConfirmed := BrakeCmd;
 ELSE
@@ -4471,14 +4576,16 @@ Current := LIMIT(-100.0, Current, 100.0);
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
-          <Folder Name="_TYPES">
-            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
-            <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
-            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
-          </Folder>
+          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
+            <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
+            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

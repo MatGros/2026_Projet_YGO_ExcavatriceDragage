@@ -1,37 +1,34 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_04::operator()()':
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18239:43: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM1'
-18239 |     INSTSAFETYWINCHM1.CABLEPOSM = ACQDATA.CABLEPOSM1;
-      |                                           ^~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18242:50: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SPEED_MPS'
-18242 |     INSTSAFETYWINCHM1.MEASUREDSPEEDMPS = ACQDATA.M1_SPEED_MPS;
-      |                                                  ^~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18243:56: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SIGNEDSPEED_MPS'
-18243 |     INSTSAFETYWINCHM1.MEASUREDSPEEDSIGNEDMPS = ACQDATA.M1_SIGNEDSPEED_MPS;
-      |                                                        ^~~~~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18244:52: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M1_SPEEDVALID'
-18244 |     INSTSAFETYWINCHM1.MEASUREDSPEEDVALID = ACQDATA.M1_SPEEDVALID;
-      |                                                    ^~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18267:43: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM2'
-18267 |     INSTSAFETYWINCHM2.CABLEPOSM = ACQDATA.CABLEPOSM2;
-      |                                           ^~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18270:50: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M2_SPEED_MPS'
-18270 |     INSTSAFETYWINCHM2.MEASUREDSPEEDMPS = ACQDATA.M2_SPEED_MPS;
-      |                                                  ^~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18271:56: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M2_SIGNEDSPEED_MPS'
-18271 |     INSTSAFETYWINCHM2.MEASUREDSPEEDSIGNEDMPS = ACQDATA.M2_SIGNEDSPEED_MPS;
-      |                                                        ^~~~~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18272:52: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'M2_SPEEDVALID'
-18272 |     INSTSAFETYWINCHM2.MEASUREDSPEEDVALID = ACQDATA.M2_SPEEDVALID;
-      |                                                    ^~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18303:37: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM1'
-18303 |     INSTWINCHM1.CABLEPOSM = ACQDATA.CABLEPOSM1;
-      |                                     ^~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp: In member function 'void strucpp::FB_MAIN_ENDTOEND::operator()()':
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18375:37: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM1'
-18375 |     PRG05.WINCHM1CABLEPOSM = BUSACQ.CABLEPOSM1;
-      |                                     ^~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\strucpp-test-UATHwh\generated.cpp:18376:37: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'CABLEPOSM2'
-18376 |     PRG05.WINCHM2CABLEPOSM = BUSACQ.CABLEPOSM2;
-      |                                     ^~~~~~~~~~
+Error compiling source files:
+
+FB_Safety_Winch.st:343:18: error: Expected `Assign`, found `.`.
+ 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
+     |                  ^
+
+FB_Safety_Winch.st:343:30: error: Expected `Semicolon`, found `TO`.
+ 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
+     |                              ^
+
+FB_Safety_Winch.st:343:44: error: Expected `END_IF`, found `END_FOR`.
+ 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
+     |                                            ^
+
+FB_Safety_Winch.st:344:1: error: Expected `END_FUNCTION_BLOCK`, found `END_IF`.
+ 344 | END_IF;
+     | ^
+
+FB_Safety_Translation.st:208:18: error: Expected `Assign`, found `.`.
+ 208 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR; // No-op
+     |                  ^
+
+FB_Safety_Translation.st:208:30: error: Expected `Semicolon`, found `TO`.
+ 208 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR; // No-op
+     |                              ^
+
+FB_Safety_Translation.st:208:44: error: Expected `END_IF`, found `END_FOR`.
+ 208 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR; // No-op
+     |                                            ^
+
+FB_Safety_Translation.st:209:1: error: Expected `END_FUNCTION_BLOCK`, found `END_IF`.
+ 209 | END_IF;
+     | ^
 

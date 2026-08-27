@@ -1,0 +1,18 @@
+Error compiling source files:
+
+FB_ExtractionSequence.st:37:35: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
+  37 |     Fault                       : ST_Fault;
+     |                                   ^
+
+FB_ExtractionSequence.st:38:35: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
+  38 |     Lifecycle                   : ST_Lifecycle;
+     |                                   ^
+
+FB_ExtractionSequence.st:65:35: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
+  65 |     instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
+     |                                   ^
+
+FB_ExtractionSequence.st:66:5: error: Undefined type 'ST_FAULTCAUSE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
+  66 |     instCauses                  : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+     |     ^
+

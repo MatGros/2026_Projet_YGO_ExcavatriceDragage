@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T18:15:59.280524" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T18:15:59.280524">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:27:16.905056" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:27:16.905056">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -455,21 +455,29 @@ Vitesse absolue sur fenetre glissante (m/s)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingStatus">
+            <variable name="HomingFault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUTS DES SOUS-FB &amp; REFERENCE ===
-Statut FB_Encoder_Homing (etat du referencement)</xhtml>
+Défaut FB_Encoder_Homing (état du référencement)</xhtml>
               </documentation>
             </variable>
-            <variable name="AbsStatus">
+            <variable name="HomingLifecycle">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Lifecycle" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut FB_Encoder_Abs (etat acquisition bus)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle FB_Encoder_Homing (Busy/Done)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbsFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut FB_Encoder_Abs (état acquisition bus)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRefRaw">
@@ -1423,7 +1431,7 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
           </data>
         </addData>
       </dataType>
-      <dataType name="ST_Status">
+      <dataType name="ST_Lifecycle">
         <baseType>
           <struct>
             <variable name="Busy">
@@ -1431,8 +1439,7 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres historiques (conservés) ----
-1 = Bloc en cours d'exécution</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action en cours</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -1440,102 +1447,24 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut à acquitter (laté jusqu'au Reset)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Warning">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres ajoutés (forme cible enrichie) ----
-1 = warning actif (auto-effacé, aucun acquittement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code warning courant (bitfield)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis WarningId (prêt IHM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorIdTxt">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis ErrorId</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetRequested">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = un Reset est nécessaire / en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action terminée avec succès</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>537f3533-9d7c-5703-b6a3-978725c61956</ObjectId>
+            <ObjectId>b6983c9c-4d76-5d4e-899b-e996cbf34849</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_Status — Socle transverse de statut d'un FB métier
+   🧩 ST_Lifecycle — Brique socle cycle d'exécution
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
-      avec les textes prêts pour l'IHM (plus de conditions complexes
-      côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
-   🧬 Forme cible : les FB standard exposent `Status : ST_Status`
-      rempli via le socle `FB_FbStatus` (même comportement partout).
-   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
-      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
-      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
-      migre pas vers ST_Status (exception documentée).
+   🎯 Rôle : porter l'avancement d'une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    =======================================================================</xhtml>
         </documentation>
@@ -1581,71 +1510,6 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>57a2dfc8-cdc9-581a-8092-09f21d5e6939</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_State">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="INIT" value="1" />
-              <value name="READY" value="2" />
-              <value name="BUSY" value="3" />
-              <value name="DONE" value="4" />
-              <value name="STOPPING" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BUSY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>DONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STOPPING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -2222,7 +2086,7 @@ M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-    AND NOT PRG_04_Treuils_Benne.instWinchM1.Status.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Status.Busy;
+    AND NOT (PRG_04_Treuils_Benne.instWinchM1.StepNumber &gt; 0) AND NOT (PRG_04_Treuils_Benne.instWinchM2.StepNumber &gt; 0);
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
     M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
@@ -3298,8 +3162,9 @@ IF NOT Enable THEN
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
-    Measurement.HomingStatus.State := E_State.DISABLED; Measurement.HomingStatus.Error := FALSE; Measurement.HomingStatus.ErrorId := 16#0000;
-    Measurement.AbsStatus.State := E_State.DISABLED;    Measurement.AbsStatus.Error := FALSE;    Measurement.AbsStatus.ErrorId := 16#0000;
+    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 16#0000;
+    Measurement.HomingLifecycle.Busy := FALSE; Measurement.HomingLifecycle.Done := FALSE;
+    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 16#0000;
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
     // Frontiere HW sortie : aucun ordre preset publie hors autorisation
@@ -3407,8 +3272,9 @@ Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
 Measurement.SpeedValid        := instSpeed.Valid;
-Measurement.HomingStatus      := instHoming.Status;
-Measurement.AbsStatus         := instAbs.Status;
+Measurement.HomingFault        := instHoming.Fault;
+Measurement.HomingLifecycle    := instHoming.Lifecycle;
+Measurement.AbsFault           := instAbs.Fault;
 Measurement.HomingRefRaw      := instHoming.HomingRefRaw;
 
 // Frontiere HW sortie (preset)
@@ -5040,13 +4906,12 @@ HomedAndReliable := EncoderAvailable AND Homed AND (NOT EncoderIncoherent);
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Status">
+            <variable name="Fault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-ErrorId bit0: "Com", bit1: "Preset Timeout".</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault)</xhtml>
               </documentation>
             </variable>
             <variable name="RawPos">
@@ -5118,14 +4983,6 @@ ErrorId bit0: "Com", bit1: "Preset Timeout".</xhtml>
 . [LOC] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
-              </documentation>
-            </variable>
             <variable name="PresetReqEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -5176,6 +5033,36 @@ ErrorId bit0: "Com", bit1: "Preset Timeout".</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fait de fin de maintien preset (un scan)</xhtml>
               </documentation>
             </variable>
+            <variable name="PresetTimeoutError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch interne timeout séquence preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOCLE DEFAUT (FB_FaultCore) ===
+* [INST] Socle défaut transverse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -5195,12 +5082,35 @@ ErrorId bit0: "Com", bit1: "Preset Timeout".</xhtml>
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
 
-{region "§1 Gate"}
-// 🛑 1. GATE
+{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🔍 2. DIAGNOSTIC BUS / ALARME (Cause 0 : live)
+instCauses[0].Active   := (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational;
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := 'Defaut communication EtherCAT codeur absolu';
+
+// ⏱️ 3. TIMEOUT PRESET (Cause 1 : latched)
+IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
+    PresetTimeoutError := FALSE;
+END_IF;
+instCauses[1].Active   := PresetTimeoutError;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := 'Timeout sequence preset SDO codeur';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+
+EncoderAvailable := NOT instCauses[0].Active;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Ready := FALSE;
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetCompleted := FALSE;
@@ -5211,27 +5121,11 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region "§2 Reset front"}
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-{endregion}
-
-{region "§3 Diagnostic bus et alarme"}
-// 🔍 3. DIAGNOSTIC BUS / ALARME
-IF (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
-END_IF;
-EncoderAvailable := (Status.ErrorId AND 16#0001) = 0;
-{endregion}
-
-{region "§4 Lecture position"}
-// 📥 4. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
+{region "§3 Lecture position"}
+// 📥 3. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
 // Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
 // global ici pour ne pas geler aussi la séquence preset/l'état — seule la lecture est gelée).
 IF EncoderAvailable THEN
@@ -5241,8 +5135,8 @@ IF EncoderAvailable THEN
 END_IF;
 {endregion}
 
-{region "§5 Séquence preset"}
-// 🔧 5. SÉQUENCE PRESET (écriture bus)
+{region "§4 Séquence preset"}
+// 🔧 4. SÉQUENCE PRESET (écriture bus)
 // PresetTriggerCmd := 2 déclenche le référencement à PresetValue (valeur de commande, pas un
 // masque de bits). CodeSeqTriggerCmd : rôle non identifié — laissé à 0, PAS piloté tant que sa
 // fonction n'est pas confirmée. Ne jamais lui donner une valeur arbitraire.
@@ -5271,27 +5165,12 @@ CASE PresetSeqStep OF
             END_IF;
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
-            Status.ErrorId := Status.ErrorId OR 16#0002;
+            PresetTimeoutError := TRUE;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
             PresetTimerVisual(IN := FALSE, PT := T#500MS);
         END_IF;
 END_CASE;
-IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFD;
-END_IF;
-{endregion}
-
-{region "§6 Error et StateAtError"}
-// 🧾 6. ERROR / STATEATERROR
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-Status.Busy := (PresetSeqStep &lt;&gt; 0);
-Status.Done := PresetCompleted;
 {endregion}
 </xhtml>
           </ST>
@@ -5488,13 +5367,20 @@ Status.Done := PresetCompleted;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Status">
+            <variable name="Fault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5: preset, bit9: incoherence boot).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Lifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Cycle de vie (forme cible ST_Lifecycle)</xhtml>
               </documentation>
             </variable>
             <variable name="PresetRequest">
@@ -5569,14 +5455,6 @@ ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5
 . [LOC] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
-              </documentation>
-            </variable>
             <variable name="HomeEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -5616,14 +5494,6 @@ ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS &amp; DRAPEAUX INTERNES ===
 . [LOC] Controle incoherence boot effectue</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArretConfirme">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition d'arret moteur confirmee</xhtml>
               </documentation>
             </variable>
             <variable name="HomingModeOk">
@@ -5680,6 +5550,39 @@ ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Resultat du mode de confirmation selectionne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingModeError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DRAPEAUX DEFAUTS INTERNES ===
+. [LOC] Latch erreur mode</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetOutOfRangeError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch cible hors limites</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetFailError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch échec preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BootIncoherentError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch incohérence boot</xhtml>
               </documentation>
             </variable>
             <variable name="TargetPoints">
@@ -5755,6 +5658,28 @@ ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation historique de verification 500ms</xhtml>
               </documentation>
             </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOCLE DEFAUT (FB_FaultCore) ===
+* [INST] Socle défaut transverse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_HomingVerifyToleranceM">
               <type>
                 <REAL />
@@ -5797,87 +5722,102 @@ Tolerance mesure cible (m)</xhtml>
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
 
-{region "§1 Gate neutralisation"}
-// 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
+{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+HomeEdge(CLK := Home);
+ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
+
+// Effacement des latches d'erreur sur Reset conscient
+IF ResetEdge.Q THEN
+    PresetConfirmationFailed := FALSE;
+    HomingModeError := FALSE;
+    TargetOutOfRangeError := FALSE;
+    PresetFailError := FALSE;
+END_IF;
+
+// Levée de doute incohérence boot (BtnConfirmCoherence)
+IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
+    Calib.HomingSuspect := FALSE;
+    BootIncoherentError := FALSE;
+END_IF;
+
+// Configuration des causes nommées
+instCauses[0].Active   := HomingModeError;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Homing non autorise dans ce mode';
+
+instCauses[1].Active   := TargetOutOfRangeError;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := 'Cible de homing hors plage';
+
+instCauses[2].Active   := PresetFailError;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := 'Echec confirmation transaction preset';
+
+instCauses[3].Active   := BootIncoherentError;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := 'Incoherence position codeur au demarrage';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-// PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
 IF NOT Enable THEN
     PresetRequest := FALSE;
     PresetValue := 0;
-    Status.State := E_State.DISABLED;
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    InitDone := FALSE;   // Force un nouveau contrôle §3.7 à la prochaine activation
+    Ready := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    InitDone := FALSE;   // Force un nouveau contrôle à la prochaine activation
     PresetVerificationActive := FALSE;
     PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
     Homed := Calib.Homed;
     HomingSuspect := Calib.HomingSuspect;
     HomingRefRaw := Calib.HomingRefRaw;
-    // PresetConfirmationFailed est un diagnostic latch : il est gele hors Enable
-    // et n'est ni valide ni efface par la desactivation (AC3).
+    // PresetConfirmationFailed est un diagnostic latch : il est gelé hors Enable
     RETURN;
 END_IF;
 
-Ready := TRUE;
-
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region "§2 Fronts et coherence demarrage"}
-// 🔑 2. FRONTS
-ResetEdge(CLK := Reset);
-HomeEdge(CLK := Home);
-ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
-
-// 🔍 3. COHÉRENCE AU REDÉMARRAGE (§3.7) — une fois par session Enable, dès que le codeur répond
+{region "§3 Cohérence au redémarrage"}
+// 🔍 3. COHÉRENCE AU REDÉMARRAGE — une fois par session Enable, dès que le codeur répond
 IF NOT InitDone THEN
-    Status.State := E_State.INIT;
     IF EncoderAvailable THEN
         RawDiffRestart := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Calib.LastKnownRawPos);
         IF Calib.Homed AND (ABS(RawDiffRestart) &gt; UDINT_TO_DINT(Calib.RestartCoherenceTolerancePts)) THEN
             Calib.HomingSuspect := TRUE;
-            Status.ErrorId := Status.ErrorId OR 16#0200;   // bit9 : incohérence codeur au redémarrage
+            BootIncoherentError := TRUE;
         END_IF;
         InitDone := TRUE;
     END_IF;
-ELSE
-    IF Status.State = E_State.INIT THEN Status.State := E_State.READY; END_IF;
 END_IF;
-
 {endregion}
 
-{region "§3 Confirmation coherence et demande homing"}
-// ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
-IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
-    Calib.HomingSuspect := FALSE;
-    Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
-END_IF;
-
+{region "§4 Demande et déclenchement homing"}
+// ⚙️ 4. DEMANDE &amp; DÉCLENCHEMENT HOMING
 PresetRequest := FALSE;
 PresetValue := 0;
 TopSensorEdge(CLK := TopPositionSensor);
 DynamicTargetEdge(CLK := UseDynamicTarget);
 
-// Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
-// chaque scan, jamais latchées, aucun Reset requis pour les effacer.
-Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
-
 HomingModeOk := HomingPermit;
 
 IF HomeEdge.Q AND NOT HomingModeOk THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : homing non autorise
+    HomingModeError := TRUE;
 END_IF;
 
-// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
-// (FB_Safety_Winch) coupe déjà la montée indépendamment dès que TopPositionSensor est actif ;
-// attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
-// Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
-// quand Home est pressé.
 NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget
                          AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
 
-// Unitaire : cible libre (CfgHomingTargetM), déclenchée par la demande (front).
 UnitaryHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND HomeEdge.Q;
 
-// Dynamique (benne) : HomingModeOk vérifié ici en défense.
 DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
 HomingTrigger := (NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger)
@@ -5892,30 +5832,22 @@ IF HomingTrigger THEN
         TargetPositionM := CfgHomingTargetM;
     END_IF;
 
-    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
-    // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
-    // physique documentée [-99;+99] m avant d'être gravée dans la référence codeur.
+    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) [-99;+99] m
     IF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
-        Status.ErrorId := Status.ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
+        TargetOutOfRangeError := TRUE;
     ELSE
         TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
         PendingHomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
         PresetValue := RawPos;
         PresetRequest := TRUE;
         PresetVerificationActive := TRUE;
-        Status.Done := FALSE;
-        // Le suivi transactionnel reste interne : ne pas publier BUSY, car ce
-        // statut est consomme par PRG_04 comme mode de referencement securite.
-
-        // Demande preset vers FB_Encoder_Abs ; la relecture mesuree est la seule
-        // confirmation en READBACK_ONLY (mesure relue conforme a la cible).
+        Lifecycle.Done := FALSE;
     END_IF;
 END_IF;
-
 {endregion}
 
-{region "§4 Suivi SDO reset et sorties etat"}
-// ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
+{region "§5 Suivi de transaction preset"}
+// ⏳ 5. SUIVI DE LA TRANSACTION PRESET
 PresetVerifyTimer(IN := PresetVerificationActive, PT := CST_PresetVerifyTime);
 IF PresetVerificationActive AND PresetVerifyTimer.Q THEN
     CandidateRawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PendingHomingRefRaw);
@@ -5944,44 +5876,30 @@ IF PresetVerificationActive AND PresetVerifyTimer.Q THEN
         Calib.HomingSuspect := FALSE;
         Calib.LastKnownRawPos := RawPos;
         PresetConfirmationFailed := FALSE;
-        Status.ErrorId := Status.ErrorId AND 16#FFDF;
-        Status.Done := TRUE;
+        PresetFailError := FALSE;
+        Lifecycle.Done := TRUE;
     ELSE
         Calib.HomingSuspect := TRUE;
         PresetConfirmationFailed := TRUE;
-        Status.ErrorId := Status.ErrorId OR 16#0020;
-        Status.Done := FALSE;
+        PresetFailError := TRUE;
+        Lifecycle.Done := FALSE;
     END_IF;
 
     PresetVerificationActive := FALSE;
     PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
-    Status.State := E_State.READY;
 END_IF;
+{endregion}
 
-// 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
-// à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
-IF ResetEdge.Q THEN
-    PresetConfirmationFailed := FALSE;
-    Status.ErrorId := Status.ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
-END_IF;
-
-// 📤 8. SORTIES ÉTAT
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-// Mise à jour continue du point brut valide connu (hors séquence de homing elle-même)
-IF EncoderAvailable AND (Status.State &lt;&gt; E_State.BUSY) THEN
+{region "§6 Sorties état &amp; calibration"}
+// 📤 6. SORTIES ÉTAT &amp; CALIBRATION
+IF EncoderAvailable AND NOT PresetVerificationActive THEN
     Calib.LastKnownRawPos := RawPos;
 END_IF;
 
-Status.Busy := (Status.State = E_State.BUSY);
-Homed := Calib.Homed AND NOT Calib.HomingSuspect; // Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
+Lifecycle.Busy := PresetVerificationActive;
+Homed := Calib.Homed AND NOT Calib.HomingSuspect;
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
-
 {endregion}
 </xhtml>
           </ST>
@@ -6075,13 +5993,12 @@ HomingRefRaw := Calib.HomingRefRaw;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Status">
+            <variable name="Fault">
               <type>
-                <derived name="ST_Status" />
+                <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-ErrorId bit0: "Bornes", bit1: "Boot suspect".</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault)</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosMSafe">
@@ -6112,12 +6029,26 @@ ErrorId bit0: "Bornes", bit1: "Boot suspect".</xhtml>
 . [LOC] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorEdge">
+            <variable name="instFault">
               <type>
-                <derived name="R_TRIG" />
+                <derived name="FB_FaultCore" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOCLE DEFAUT (FB_FaultCore) ===
+* [INST] Socle défaut transverse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -6136,68 +6067,42 @@ ErrorId bit0: "Bornes", bit1: "Boot suspect".</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§1 Gate"}
-// 🛑 1. GATE
+// === IMPLEMENTATION ===
+
+{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🔍 2. SURVEILLANCE BORNAGE &amp; INCOHÉRENCE BOOT
+instCauses[0].Active   := NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM));
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := 'Depassement bornes physiques absolues cable';
+
+instCauses[1].Active   := NOT BypassGlobal AND HomingSuspect;
+instCauses[1].Latching := FALSE;
+instCauses[1].Texte    := 'Incoherence position au redemarrage';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
 IF NOT Enable THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    Status.State := E_State.DISABLED;
+    Ready := FALSE;
     CablePosMSafe := CablePosM;
     EncoderIncoherent := FALSE;
     RETURN;
 END_IF;
 
-Ready := TRUE;
-Status.State := E_State.READY;
+Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region "§2 Reset front"}
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-{endregion}
-
-{region "§3 Bypass global"}
-// 🌐 3. BYPASS GLOBAL
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-END_IF;
-{endregion}
-
-{region "§4 Surveillance bornage"}
-// 🔍 4. SURVEILLANCE BORNAGE PHYSIQUE ABSOLU (bit0)
-IF NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM)) THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSE
-    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
-END_IF;
-{endregion}
-
-{region "§5 Relais incohérence redémarrage"}
-// 🔍 5. RELAIS INCOHÉRENCE REDÉMARRAGE (bit1)
-IF NOT BypassGlobal THEN
-    IF HomingSuspect THEN
-        Status.ErrorId := Status.ErrorId OR 16#0002;
-    ELSE
-        Status.ErrorId := Status.ErrorId AND 16#FFFD;
-    END_IF;
-END_IF;
-{endregion}
-
-{region "§6 Transmission mesure"}
-// 📏 6. TRANSMISSION DE LA MESURE (Toujours réelle, non figée)
+{region "§3 Transmission mesure et sécurité"}
+// 📏 3. TRANSMISSION DE LA MESURE &amp; SÉCURITÉ
 CablePosMSafe := CablePosM;
-{endregion}
-
-{region "§7 Sorties état et sécurité"}
-// 📤 7. SORTIES ÉTAT &amp; SÉCURITÉ
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
-END_IF;
-
-EncoderIncoherent := Status.Error;
-Status.Busy := FALSE;
-Status.Done := FALSE;
+EncoderIncoherent := Fault.Error;
 {endregion}
 </xhtml>
           </ST>
@@ -8373,8 +8278,7 @@ TimeLast := TimeCurrent;
           <Folder Name="_TYPES">
             <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
             <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
-            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
-            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
           </Folder>
         </Folder>
       </ProjectStructure>

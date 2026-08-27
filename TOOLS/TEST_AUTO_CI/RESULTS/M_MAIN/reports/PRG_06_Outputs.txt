@@ -1,0 +1,10 @@
+Error compiling source files:
+
+FB_TranslationOutputInterlock.st:28:36: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_TRANSLATIONOUTPUTINTERLOCK'
+  28 |     Fault                        : ST_Fault;
+     |                                    ^
+
+FB_TranslationOutputInterlock.st:57:36: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_TRANSLATIONOUTPUTINTERLOCK'
+  57 |     instFault                    : FB_FaultCore;                  // * [INST] Socle défaut transverse
+     |                                    ^
+
