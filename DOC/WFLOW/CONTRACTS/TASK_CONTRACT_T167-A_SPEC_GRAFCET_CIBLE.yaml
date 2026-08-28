@@ -4,25 +4,30 @@
 
 contract:
   task_id: T167-A
-  criticality: C4
+  criticality: C3
   strategy: patch
 
   objective: >
     Spécifier formellement le Grafcet cible unifié de dragage (Plongée, Recherche Fond, Extraction,
     Coordination fermeture/montée), documenter les règles de sécurité (vitesse max de descente,
-    gestion du bypass Kobold, absence de réarmement automatique), et définir la matrice des erreurs
-    StepAtFault pour FB_DiveSearch et FB_ExtractionSequence avec visa humain explicite.
+    gestion du bypass Kobold sans saut aveugle, absence de réarmement automatique), et définir
+    la matrice des erreurs DiveStateAtError / ExtractionStateAtError et des arrêts.
+    L'Option 2 de validation fond automatique par tension de câble est formellement exclue du scope
+    (nécessite une étude ISO 13849 dédiée).
 
   acceptance:
     - id: AC1
-      statement: "Le document de spécification formalise exhaustivement chaque étape (0..N), conditions de transition, actions associées, timeouts d'étape et conditions d'arrêt d'urgence/SafeStop."
+      statement: "Le document de spécification formalise chaque étape (0..N) : conditions de transition, actions associées, timeouts d'étape et conditions d'arrêt d'urgence/SafeStop sans réarmement automatique."
       verified_by: "Revue du document de cadrage technique T167-A"
     - id: AC2
-      statement: "La gestion du bypass Kobold est explicitée sous forme de 3 options formelles soumises à visa humain avant codage."
-      verified_by: "Présence de la section 'Options Bypass Kobold' avec recommandation et visa requis"
+      statement: "La gestion du bypass Kobold est documentée sur la base des Options 1 et 3 (Bypass manuel restreint en Palier 1 sous intention maintenue), l'Option 2 automatique étant marquée hors scope."
+      verified_by: "Vérification formelle de la section Bypass Kobold"
     - id: AC3
-      statement: "Les types ENUM E_DiveSearchState et E_ExtractionSequenceState ainsi que les champs de diagnostic StateAtError/StepAtFault sont formellement figés sans régression sur le bus Data."
+      statement: "Les types ENUM E_DiveSearchState et E_ExtractionSequenceState ainsi que les champs DiveStateAtError et ExtractionStateAtError sont formellement figés."
       verified_by: "Vérification de cohérence avec AF_Partie-03 et AF_Partie-04"
+    - id: AC4
+      statement: "L'orchestrateur lit et valide le document de spécification avant passage à la phase d'implémentation."
+      verified_by: "Visa formel de l'orchestrateur"
 
   scope:
     allowed:
@@ -38,8 +43,10 @@ contract:
       - "Séquence de recherche fond : détection eau -> détection fond -> confirmation"
       - "Séquence d'extraction : fermeture synchronisée -> décollage matière -> montée contrôlée"
       - "Plafonnement au Palier 1 pendant l'extraction initiale"
+      - "Bypass manuel historique comme circuit d'urgence/dégagement"
     dropped_on_purpose:
-      - "Sauts d'étapes aveugles en cas d'incohérence capteur sans levée d'alarme"
+      - "Sauts d'étapes aveugles en cas d'incohérence capteur"
+      - "Validation fond automatique sans capteur (Option 2)"
 
   evidence_required:
     - check_linkage

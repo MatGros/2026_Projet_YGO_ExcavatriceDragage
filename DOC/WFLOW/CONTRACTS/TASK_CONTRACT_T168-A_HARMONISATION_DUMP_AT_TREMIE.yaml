@@ -1,29 +1,71 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+
 contract:
-  task_id: T168-A_HARMONISATION_DUMP_AT_TREMIE
-  criticality: C4
+  task_id: T168-A
+  criticality: C3
   strategy: patch
+
   objective: >
-    Harmoniser l'assistance de vidage trémie (DumpAtTremie) sur le modèle
-    strict Décision PRG_03 / Muscle PRG_04 & PRG_05.
-    Déplacer les conditions d'armement et de déclenchement dans PRG_03,
-    et raccorder PRG_04 pour l'ouverture benne et le blocage physique de descente treuil à la trémie.
+    Harmoniser l'assistance de vidage trémie (DumpAtTremie) sur le modèle Décision/Muscle :
+    déplacer les ~15 lignes d'armement logique et de conditions de déclenchement dans PRG_03,
+    et raccorder PRG_04 pour l'application mécanique de l'ouverture benne et le maintien
+    du verrouillage physique de descente treuil à la trémie.
+
   acceptance:
     - id: AC1
       statement: "PRG_03 est l'unique décideur de l'armement DumpAtTremie (modes MAINT_N1/N2, détection trémie M3_AtTremieStable)."
       verified_by: "Revue ST PRG_03."
     - id: AC2
-      statement: "PRG_04 applique l'ouverture benne via ReqProgram.ReqBucket et verrouille la descente treuil."
+      statement: "PRG_04 applique l'ouverture benne via ReqProgram.ReqBucket et conserve le verrouillage physique de descente treuil."
       verified_by: "Revue ST PRG_04 et G200 Linkage."
+    - id: AC3
+      statement: "L'orchestrateur lit et valide le git diff réel (zéro régression sur la sécurité trémie)."
+      verified_by: "Visa formel de l'orchestrateur"
+
   scope:
     allowed:
-      - CODE/M_MAIN/*.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-A_HARMONISATION_DUMP_AT_TREMIE.yaml
     forbidden:
-      - PRJ_CODESYS/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
   conservation:
     must_survive:
       - "Comportement de sécurité à la trémie (interdiction descente treuil en zone de déversement)."
+      - "Ouverture benne commandée uniquement sous intention opérateur confirmée."
+    dropped_on_purpose:
+      - "None"
+
   evidence_required:
     - check_linkage
     - run_all_gates
-status: READY_FOR_EXECUTION
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "antigravity"
+
+  alert_duty: >
+    Toute anomalie sur l'interlock trémie ou le signal de présence M3 doit être
+    immédiatement signalée.
+
+status: PENDING
+
+execution:
+  executed_by: "À déléguer"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

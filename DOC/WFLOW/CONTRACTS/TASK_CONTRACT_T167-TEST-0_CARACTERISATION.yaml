@@ -6,34 +6,41 @@ contract:
   task_id: T167-TEST-0
   criticality: C3
   strategy: patch
+  pinned_baseline_commit: "2763f8fc"
 
   objective: >
     Développer une suite de tests unitaires et de caractérisation (Python CI / STruCpp)
-    capturant l'ensemble des comportements nominaux, dégradés et de sécurité ACTUELS
-    de FB_DiveSearch et FB_ExtractionSequence avant toute modification de code ST,
-    afin de servir d'oracle de non-régression inviolable.
+    capturant l'ensemble des comportements nominaux, dégradés, propagation des codes de défauts (Fault.ErrorId),
+    permis de descente (DescendPermitDiveBucketOpen) et commandes contacteur Kobold
+    de FB_DiveSearch et FB_ExtractionSequence épinglés sur le commit de référence historique 2763f8fc,
+    afin de servir d'oracle de non-régression inviolable avant toute refonte.
 
   acceptance:
     - id: AC1
-      statement: "Création du fichier de test de caractérisation couvrant la recherche fond nominale, la perte de capteur, le timeout et la neutralisation."
-      verified_by: "Exécution des tests unitaires Python sous TOOLS/TEST_AUTO_CI/"
+      statement: "Le harnais de test caractérise la baseline 2763f8fc : recherche fond nominale, perte de signal Kobold, détection de fond par seuil de câble, et propagation sans corruption du code de défaut ErrorId."
+      verified_by: "Exécution des tests unitaires sous TOOLS/TEST_AUTO_CI/"
     - id: AC2
-      statement: "Création du fichier de test de caractérisation couvrant la séquence d'extraction complète (fermeture, décollage, forçage vitesse, tolérance matière)."
-      verified_by: "Exécution des tests unitaires Python sous TOOLS/TEST_AUTO_CI/"
+      statement: "Le harnais de test caractérise la séquence d'extraction baseline 2763f8fc : fermeture sous intention, décollage matière, forçage vitesse minimale (Palier 1) et tolérance matière."
+      verified_by: "Exécution des tests unitaires sous TOOLS/TEST_AUTO_CI/"
     - id: AC3
-      statement: "100% des tests de caractérisation passent au vert sur le code actuel."
+      statement: "100% des tests de caractérisation passent au vert sur la baseline et servent d'oracle bloquant."
       verified_by: "Rapport d'exécution CI"
+    - id: AC4
+      statement: "L'orchestrateur vérifie et valide le git diff réel du harnais de test."
+      verified_by: "Visa formel de l'orchestrateur"
 
   scope:
     allowed:
       - TOOLS/TEST_AUTO_CI/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-TEST-0_CARACTERISATION.yaml
     forbidden:
       - CODE/*.st
-      - DOC/*.md
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
 
   conservation:
     must_survive:
       - "Comportement séquentiel exact du cycle existant"
+      - "Propagation stricte et non ambiguë des codes d'erreur"
     dropped_on_purpose:
       - "None"
 
@@ -46,8 +53,8 @@ contract:
     - "antigravity"
 
   alert_duty: >
-    Tout comportement anormal détecté dans le code actuel lors de l'écriture des tests
-    doit être consigné et signalé comme cas test pour la phase de refonte.
+    Tout comportement anormal détecté dans le code baseline lors de l'écriture des tests
+    doit être consigné comme oracle pour la phase de refonte.
 
 status: PENDING
 
