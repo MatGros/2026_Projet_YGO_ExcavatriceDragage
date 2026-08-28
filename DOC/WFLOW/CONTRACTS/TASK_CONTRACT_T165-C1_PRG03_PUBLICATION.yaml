@@ -1,0 +1,76 @@
+preconditions:
+  - id: PRE1
+    statement: "T165-A et T165-C0 sont validées ; FB_Cycle expose réellement Fault, Lifecycle, étape fautive et attente opérateur au profil AF-03."
+    source: "Contrats T165-A/T165-C0 et interface CODE/G_CYCLE/FB_Cycle.st vérifiée"
+contract:
+  task_id: T165-C1_PRG03_PUBLICATION
+  criticality: C4
+  strategy: rebuild
+  objective: >
+    Créer le bus public PRG_03 Data(Auth, ReqProgram, SequenceState) et publier
+    les sorties existantes du mode/cycle sans exposer l'instance ni transférer de safety.
+  acceptance:
+    - id: AC1
+      statement: "Data contient Auth, ReqProgram et SequenceState avec producteur unique PRG_03, types et neutralisation explicites."
+      verified_by: "Tests de publication et inventaire des affectations."
+    - id: AC2
+      statement: "ReqProgram ne contient que des Req/Tgt de programme et aucune variable SafeStop, PowerCutOff, Permit safety, Cmd physique ou Act."
+      verified_by: "Revue des DUT et contrôle de nommage NC-050/NC-100/NC-110."
+    - id: AC3
+      statement: "SequenceState expose lifecycle, défaut, étape et attente opérateur sans rendre instCycleSemiAuto public."
+      verified_by: "Tests de mapping des états et snapshot étape au défaut selon décision validée."
+    - id: AC4
+      statement: "L'ordre Modes→Auth→Cycle applique la décision D-05 ; si elle n'est pas visée, la tâche reste BLOCK sans édition."
+      verified_by: "Test changement de mode scan par scan et visa T165-A."
+    - id: AC5
+      statement: "Le nom de fichier est identique au nom de POU et le suffixe est identique au langage généré dans le bundle."
+      verified_by: "G310 et G320 sur bundle frais."
+    - id: AC6
+      statement: "Aucun GRAFCET, seuil, tempo, polarité, DiveSearch, Extraction ou consommateur aval n'est modifié dans C1."
+      verified_by: "git diff limité au scope allowed et sorties cycle comparées au checkpoint CP0."
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCycleInterPrg.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramRequest.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_OperatorAxis.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_03_modes_cycle.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/PRG_03_Modes_Cycle.*
+      - TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/T165_C1/**
+      - DOC/AF/AF_Partie-02_Architecture_Programme/AF_Fiche_PRG_03_Modes_Cycle_v1.0.md
+    forbidden:
+      - CODE/G_CYCLE/**
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/**
+      - Device.export
+  conservation:
+    must_survive:
+      - "Modes, priorités, inhibitions et demandes cycle existants hors décision D-05 explicitement validée."
+      - "Toutes les sorties cycle sont recopiées sans recalcul dans le nouveau bus."
+      - "DiveSearch/Extraction restent à leur emplacement actuel dans ce lot."
+      - "Aucune safety ni commande physique ne migre vers PRG_03."
+    dropped_on_purpose: []
+  evidence_required:
+    - publication_tests
+    - mode_scan_tests
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - git_diff_review
+  models_allowed:
+    - "gpt-5.6-luna"
+  alert_duty: "Absence de visa D-05, besoin de modifier FB_Cycle ou ambiguïté Req/Tgt impose STOP."
+status: PENDING
+execution: {executed_by: "", completed_at: "", status: PENDING, summary: "", evidence_submitted: []}
+validation: {status: PENDING, validated_by: "", validated_at: "", notes: ""}

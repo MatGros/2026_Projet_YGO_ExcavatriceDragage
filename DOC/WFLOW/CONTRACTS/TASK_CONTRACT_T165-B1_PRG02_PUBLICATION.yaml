@@ -1,0 +1,62 @@
+contract:
+  task_id: T165-B1_PRG02_PUBLICATION
+  criticality: C4
+  strategy: patch
+  objective: >
+    Compléter le bus public PRG_02 avec les gestes, états codeurs et diagnostics déjà
+    produits, sans changer aucun consommateur ni comportement machine.
+  acceptance:
+    - id: AC1
+      statement: "Data publie AxisX/Y, deadman, neutralité XY, neutres calibrés X/Y, refus d'armement, Ready/Fault et diagnostics réseau sans second calcul."
+      verified_by: "Tests d'égalité scan par scan entre sorties FB productrices et champs Data."
+    - id: AC2
+      statement: "Data.EncoderM1/M2 publie Measurement, Ready, Fault, Homed, HomingSuspect, EncoderFault, HomedAndReliable, PresetConfirmationFailed et HwOut depuis les sorties FB_Encoder existantes."
+      verified_by: "Tests d'égalité et inventaire des affectations producteur unique."
+    - id: AC3
+      statement: "Aucun consommateur PRG_03/04/05/07, seuil, tempo, polarité ou sécurité n'est modifié dans B1."
+      verified_by: "git diff limité au scope allowed et comparaison comportement de référence."
+    - id: AC4
+      statement: "Le nom de fichier est identique au nom de POU et le suffixe est identique au langage généré dans le bundle."
+      verified_by: "G310 et G320 sur bundle frais."
+    - id: AC5
+      statement: "ArmingPermit reste explicitement signalé BLOCK s'il est toujours câblé TRUE ; le lot n'annonce pas une validation safety."
+      verified_by: "rg ArmingPermit et rapport d'exécution."
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_02_acquisition.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/PRG_02_Acquisition.*
+      - TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/T165_B1/**
+      - DOC/AF/AF_Partie-02_Architecture_Programme/AF_Fiche_PRG_02_Acquisition_v1.0.md
+    forbidden:
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/**
+      - Device.export
+  conservation:
+    must_survive:
+      - "Aiguillage HwReal/HwSim vers HwIn et toutes les valeurs/tempos/polarités existantes."
+      - "Comportement joystick, codeur, homing, simulation et diagnostics avant publication."
+      - "Aucun consommateur changé à ce checkpoint."
+    dropped_on_purpose: []
+  evidence_required:
+    - unit_tests_publication
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - git_diff_review
+  models_allowed:
+    - "gpt-5.6-luna"
+  alert_duty: "Tout besoin de modifier un consommateur, une safety ou une sémantique impose STOP et retour orchestrateur."
+status: PENDING
+execution: {executed_by: "", completed_at: "", status: PENDING, summary: "", evidence_submitted: []}
+validation: {status: PENDING, validated_by: "", validated_at: "", notes: ""}

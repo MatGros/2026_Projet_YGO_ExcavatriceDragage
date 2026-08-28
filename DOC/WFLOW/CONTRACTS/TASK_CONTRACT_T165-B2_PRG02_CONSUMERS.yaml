@@ -1,0 +1,65 @@
+contract:
+  task_id: T165-B2_PRG02_CONSUMERS
+  criticality: C4
+  strategy: rebuild
+  objective: >
+    Remapper tous les consommateurs vers PRG_02.Data/HwIn publics puis supprimer les
+    accès inter-POU à PRG_02.inst*, sans changer l'arbitrage ou la sécurité métier.
+  acceptance:
+    - id: AC1
+      statement: "PRG_03/04/05/07 ne contiennent plus aucune référence à PRG_02_Acquisition.inst*."
+      verified_by: "rg ciblé retourne zéro ; inventaire R02-01..R02-07 clos."
+    - id: AC2
+      statement: "PRG_04/05 ne lisent jamais HwReal/HwSim pour une décision métier ; ils utilisent HwIn/Data."
+      verified_by: "rg et revue des call-sites safety/mouvement."
+    - id: AC3
+      statement: "Les sorties manuelles M1/M2/M3, neutre, deadman, défaut bus et simulation restent identiques avant/après remappage."
+      verified_by: "TM-01..TM-08 exécutés et comparés au checkpoint CP0."
+    - id: AC4
+      statement: "Le remappage ne change ni seuil, tempo, polarité, GRAFCET, interlock, rampe ni logique de défaut."
+      verified_by: "diff sémantique et revue indépendante ; toute correction fonctionnelle est une tâche fix+guard séparée."
+    - id: AC5
+      statement: "Pour chaque PRG modifié, le nom de fichier est identique au nom de POU et le suffixe est identique au langage généré dans le bundle."
+      verified_by: "G310 et G320 sur bundle frais."
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/**
+      - TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/T165_B2/**
+      - DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md
+    forbidden:
+      - CODE/G_CYCLE/**
+      - CODE/H_TREUILS_BENNE/FB_Safety_*.st
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/**
+      - Device.export
+  conservation:
+    must_survive:
+      - "Comportement manuel M1/M2/M3 et benne observé au checkpoint CP0."
+      - "Toutes les safety et interlocks PRG_04/05 restent souverains et inchangés."
+      - "Diagnostics IHM et troubleshooting conservent types, valeurs et polarités."
+      - "Retards N-1 existants sont conservés et nommés, pas déplacés silencieusement."
+    dropped_on_purpose:
+      - "Accès inter-POU à PRG_02.inst* après preuve de chemin public équivalent."
+      - "Scalaires joystick legacy après preuve zéro consommateur, uniquement si inclus par avenant de scope."
+  evidence_required:
+    - conservation_tests
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - st2c_strucpp
+    - git_diff_review
+  models_allowed:
+    - "gpt-5.6-luna"
+  alert_duty: "Toute différence fonctionnelle ou variable sans équivalent public impose STOP ; ne pas corriger en passant ArmingPermit, EncoderFault, X11 ou Kobold."
+status: PENDING
+execution: {executed_by: "", completed_at: "", status: PENDING, summary: "", evidence_submitted: []}
+validation: {status: PENDING, validated_by: "", validated_at: "", notes: ""}
