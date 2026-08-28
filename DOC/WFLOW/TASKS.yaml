@@ -2799,14 +2799,14 @@ tasks:
   - T169
 - id: T171
   parent_id: null
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: TEST_AUTO_CI
   agent: ORCHESTRATEUR
-  date: '2026-08-28T17:56:00+02:00'
+  date: '2026-08-28T23:55:00+02:00'
   titre: Animation Visuelle Pilotée par le Code Compilé FB_Cycle
   contexte: Raccordement de l'animation Canvas à la trace d'exécution scan-par-scan du binaire compilé STruCpp.
-  description: Famille T171 — Éradication de la simulation JS fictive et pilotage cinématique 100% basé sur le code ST IEC compilé.
+  description: Famille T171 — Éradication de la simulation JS fictive et pilotage cinématique 100% basé sur le code ST IEC compilé. Clôturé 2026-08-28 : A (harnais 6/6 + négatifs 3/3 + trace validée), B (garde-fou PASS + chaîne SHA), CR (audit Ollama CONFORME). Visa P5 + commit en attente de validation humaine.
   contrat: ''
   objectifs:
   - Développer le harnais de simulation dynamique de cycle complet
@@ -2816,14 +2816,14 @@ tasks:
   - T170
 - id: T171-A
   parent_id: T171
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: TEST_AUTO_CI
   agent: ORCHESTRATEUR
-  date: '2026-08-28T17:56:00+02:00'
+  date: '2026-08-28T22:40:00+02:00'
   titre: Harnais ST de simulation dynamique & génération de trace scan-par-scan
   contexte: Exécution de FB_Cycle compilé sur un cycle complet X0..X13 étendant test_fb_cycle.st.
-  description: Création du test ST dynamique produisant trace_semi_auto_cycle.json selon le Grafcet AF-04.
+  description: Création du test ST dynamique produisant trace_semi_auto_cycle.json selon le Grafcet AF-04. Validation mécanique 2026-08-28 — harnais complet 6/6 PASS (run_cycle_tests.py), négatifs 3/3 (défauts F1/F2/F6 prouvés sur CODE/ original), trace 15 scans validée AC1 (ordre strict X0→X13) + AC2 (SampleCount front unique, sorties par scan, provenances étiquetées).
   contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE.yaml'
   objectifs:
   - Traversée séquentielle ordonnée X0 à X13 sous stimuli réalistes
@@ -2831,14 +2831,14 @@ tasks:
   - T171
 - id: T171-B
   parent_id: T171
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: TEST_AUTO_CI
   agent: ORCHESTRATEUR
-  date: '2026-08-28T17:56:00+02:00'
+  date: '2026-08-28T22:40:00+02:00'
   titre: Raccordement de l'animation Canvas sur les sorties du code compilé
   contexte: Éradication du moteur JS fictif dans FICHE_SEMI_AUTO_ANIMATION.html et consommation de la trace JSON compilée.
-  description: Adaptation du visualiseur interactif Canvas avec scrub par scan, window.__traceScan et lecture temps-réel.
+  description: Adaptation du visualiseur interactif Canvas avec scrub par scan, window.__traceScan et lecture temps-réel. Validation 2026-08-28 — garde-fou PASS (pur lecteur, 0 logique métier JS), chaîne SHA complète HTML == trace JSON == WORKING_COPY/FB_Cycle.st, contrôles utilisateur intégrés (banner ANIMATION NON FIABLE si homing absent, treuil 8.5 m sur capteur top en X1, gravier benne X6-X10, glyphe GRAFCET, POSITION NON LOCALISÉE si 0 ou ≥2 Translation_At_*).
   contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE.yaml'
   objectifs:
   - Animer la cinématique machine d'après les consignes réelles du binaire compilé
@@ -2846,17 +2846,51 @@ tasks:
   - T171-A
 - id: T171-CR
   parent_id: T171
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: REVIEW
   agent: OLLAMA
-  date: '2026-08-28T17:56:00+02:00'
+  date: '2026-08-28T23:55:00+02:00'
   titre: Audit & Challenge Externe par Sous-Agent Ollama (qwen3.8:27b)
   contexte: Revue indépendante de la chaîne d'exécution binaire -> trace -> affichage.
-  description: Certification de zéro logique métier en JS et conformité avec les sorties de FB_Cycle.st.
+  description: Certification de zéro logique métier en JS et conformité avec les sorties de FB_Cycle.st. Verdict CONFORME (2026-08-28) — pur lecteur, aucun finding MAJOR/BLOCK, tous INFO/MINOR. Rapport : DOC/WFLOW/AUDIT_T171-CR_ANIMATION_TRACE_20260828.md. 3 itérations techniques nécessaires (timeout/num_predict/num_ctx) — REX 20260828.
   contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml'
   objectifs:
   - Certifier l'authenticité de l'animation d'après le code compilé
   bloque_par:
   - T171-B
+- id: T172
+  parent_id: null
+  statut: ⏳
+  criticite: C3
+  domaine: CYCLE
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T23:10:00+02:00'
+  titre: Rebouclage X13 -> X2 (homing conservé, pas d'attente StartCycle)
+  contexte: À la fin du cycle (X13), la machine est à la trémie, homing déjà réalisé. Retour direct à X2_WORK_POS_SELECT (sélection position de travail) au lieu de X0_PREPARATION, sans attendre StartCycle.
+  description: Changement de spec AF_Partie-04 + FB_Cycle.st — le rebouclage de fin de cycle enchaîne vers la sélection de position de travail (X2) au lieu de réinitialiser le graphe (X0). Décision utilisateur 2026-08-28. Validation humaine obligatoire avant toute modif CODE/.
+  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-A_REBOUCLAGE_X13_X2.yaml'
+  objectifs:
+  - Retour X13 -> X2_WORK_POS_SELECT sans attente StartCycle
+  - Homing conservé (pas de re-homing X0/X1)
+  - Mise à jour spec AF_Partie-04 + trace + animation
+  bloque_par:
+  - T171
+- id: T173
+  parent_id: null
+  statut: ⏳
+  criticite: C3
+  domaine: TEST_AUTO_CI
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T23:30:00+02:00'
+  titre: Banc de test web interactif FB_Cycle (pilotage manuel des transitions)
+  contexte: L'animation est un lecteur de trace (playback scripté) — l'utilisateur veut TESTER le programme en pilotant lui-même les transitions (joystick, armement, capteurs) contre le binaire compilé.
+  description: Banc web interactif — le binaire FB_Cycle compilé (STruCpp/g++) tourne côté serveur, l'utilisateur injecte les stimuli via une UI web, les sorties (CycleStep, WinchM1Cmd/M2Cmd, TranslationCmd, BucketCmd, Fault) sont affichées. Zéro logique métier en JS (le JS n'envoie que des entrées et affiche des sorties). Décision utilisateur 2026-08-28. Construit 2026-08-28 (moteur + serveur + UI, garde-fou PASS, /scan testé X0->X1) — en attente de validation utilisateur.
+  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-A_BANC_WEB_INTERACTIF.yaml'
+  objectifs:
+  - Piloter manuellement les transitions (joystick, armement, capteurs, StartCycle, Reset)
+  - Afficher les sorties du binaire compilé à chaque scan
+  - Zéro logique métier en JS (le binaire décide)
+  bloque_par:
+  - T171
 
