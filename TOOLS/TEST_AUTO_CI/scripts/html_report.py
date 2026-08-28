@@ -103,8 +103,8 @@ def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_n
     scan_notes = scan_notes or {}
     has_notes = any(bool(scan_notes.get(s["scan"])) for s in scans)
 
-    note_th = "<th style='min-width:180px;'>💬 Étape / Contexte</th>" if has_notes else ""
-    header = "".join(f"<th>{_html.escape(f)}</th>" for f in field_names)
+    note_th = "<th style='min-width:180px;' title='Double-cliquez pour replier cette colonne'>💬 Étape / Contexte</th>" if has_notes else ""
+    header = "".join(f"<th title='Double-cliquez pour replier cette colonne'>{_html.escape(f)}</th>" for f in field_names)
     rows = []
     prev = None
     for s in scans:
@@ -131,7 +131,7 @@ def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_n
                      f"{''.join(cells)}</tr>")
         prev = s["fields"]
     return f"""<div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th>{note_th}{header}</tr></thead>
+        <thead><tr><th title="Double-cliquez pour replier">Scan</th><th title="Double-cliquez pour replier">Temps</th>{note_th}{header}</tr></thead>
         <tbody>{"".join(rows)}</tbody>
     </table></div>"""
 
@@ -831,7 +831,39 @@ _CSS = """
     .chrono-scroll::-webkit-scrollbar-thumb:hover, .wf-scroll::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
     .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; }
     .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; }
-    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; }
+    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; cursor: pointer; user-select: none; transition: max-width 0.2s, min-width 0.2s, padding 0.2s; }
+    .chrono-table th:hover { color: var(--accent); }
+    .chrono-table th.col-collapsed,
+    .chrono-table td.col-collapsed {
+        max-width: 24px !important;
+        min-width: 24px !important;
+        width: 24px !important;
+        padding: 4px 1px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        opacity: 0.35 !important;
+        background: rgba(0, 0, 0, 0.25) !important;
+        color: transparent !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+        font-size: 0 !important;
+        position: relative;
+    }
+    .chrono-table th.col-collapsed {
+        cursor: pointer;
+        opacity: 0.75 !important;
+        background: rgba(129, 140, 248, 0.18) !important;
+    }
+    .chrono-table th.col-collapsed:hover {
+        opacity: 1 !important;
+        background: rgba(129, 140, 248, 0.38) !important;
+    }
+    .chrono-table th.col-collapsed::after {
+        content: "⋮";
+        font-size: 12px;
+        color: var(--accent);
+        display: block;
+        text-align: center;
+    }
     .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
     .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
     [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
@@ -963,6 +995,36 @@ function updateThemeBtn(theme) {
         }
     } catch (e) {}
 })();
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Double-clic sur un en-tete de colonne pour la replier / deplier
+    document.addEventListener('dblclick', function(e) {
+        var th = e.target.closest('.chrono-table th');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        var isCollapsed = th.classList.toggle('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.toggle('col-collapsed', isCollapsed);
+        });
+    });
+
+    // Clic simple sur colonne repliee pour la reouvrir
+    document.addEventListener('click', function(e) {
+        var th = e.target.closest('.chrono-table th.col-collapsed');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        th.classList.remove('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.remove('col-collapsed');
+        });
+    });
+});
 """
 
 
