@@ -41,11 +41,15 @@
     {
       "name": "TC-P09-018 Fault live : incoherence mesure (Cause 1)",
       "passed": true
+    },
+    {
+      "name": "TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 10,
-    "passed": 10,
+    "total": 11,
+    "passed": 11,
     "failed": 0
   }
 }

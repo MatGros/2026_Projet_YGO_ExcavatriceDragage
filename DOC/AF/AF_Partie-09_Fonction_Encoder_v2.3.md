@@ -71,7 +71,7 @@
 | <nobr><code>TC-P09-020</code></nobr> | **Homing & cohérence** | 3 modes homing bornent la cible `[-99;+99]m` avant écriture ; écart au boot > tolérance → `HomingSuspect`, levé par confirmation explicite | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Homing</code></small> | `NV` |
 | <nobr><code>TC-P09-030</code></nobr> | **Échelle & bornage** | Conversion signée exacte ; hors bornes ou suspect → `EncoderIncoherent=TRUE` | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Scale</code><br><code>FB_Encoder_Safety</code></small> | `NV` |
 | <nobr><code>TC-P09-040</code></nobr> | **Fiabilité** | `EncoderFault` ne dépend pas de `Homed` (non-référencé ≠ incohérent) ; `HomedAndReliable` exige les 3 conditions | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_EncoderReliability</code></small> | `NV` |
-| <nobr><code>TC-P09-050</code></nobr> | **Vitesse** | `Valid=TRUE` seulement après 6 échantillons couvrant ≥50ms ; purge sur perte de validité amont | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_SpeedMeasure</code></small> | `NV` |
+| <nobr><code>TC-P09-050</code></nobr> | **Vitesse & dynamique** | `Valid=TRUE` après 6 échantillons (≥50ms) ; absorption des perturbations mécaniques câble & vibrations ; purge sur perte validité amont | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_SpeedMeasure</code></small> | `V-I` |
 | <nobr><code>TC-P09-060</code></nobr> | ⛔ **RETIRÉ (v2.2)** — testait `FB_Encoder_SpeedMonitor`, FB legacy jamais instancié, retiré du code (voir §10). ID non réattribué (immutabilité `CODE_QUALITY_STANDARDS.md §0`). | — | — | — | `NV` |
 
 ---
