@@ -314,7 +314,13 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.Lifecycle.Busy         := instDiveSearch.Lifecycle.Busy OR instExtractionSequence.Lifecycle.Busy;
     Data.SequenceState.Lifecycle.Done         := instDiveSearch.Lifecycle.Done OR instExtractionSequence.Lifecycle.Done;
     Data.SequenceState.Fault.Error            := instDiveSearch.Fault.Error OR instExtractionSequence.Fault.Error;
-    Data.SequenceState.Fault.ErrorId          := instDiveSearch.Fault.ErrorId OR instExtractionSequence.Fault.ErrorId;
+    IF instDiveSearch.Fault.Error THEN
+        Data.SequenceState.Fault.ErrorId      := instDiveSearch.Fault.ErrorId;
+    ELSIF instExtractionSequence.Fault.Error THEN
+        Data.SequenceState.Fault.ErrorId      := instExtractionSequence.Fault.ErrorId;
+    ELSE
+        Data.SequenceState.Fault.ErrorId      := 0;
+    END_IF;
     Data.SequenceState.Fault.Latched          := instDiveSearch.Fault.Latched OR instExtractionSequence.Fault.Latched;
     Data.SequenceState.Step                   := E_CycleStep.X0_PREPARATION;
     Data.SequenceState.StepStr                := 'ASSIST_MODE';
