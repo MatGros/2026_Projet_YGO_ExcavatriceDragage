@@ -37,6 +37,9 @@ VAR
     BottomPositionConfirmed       : BOOL;   // . [LOC] Synthèse fond touché (Kobold OR Manuel OR Bypass)
     BypassKoboldBottomTouched     : BOOL;   // . [LOC] Détection fond sur front Kobold en mode bypass
     BypassKoboldFallEdge          : F_TRIG; // . [LOC] Détecteur front descendant Kobold sous bypass
+    DumpAtTremieActive            : BOOL;   // . [LOC] Option vidage à la trémie activée IHM
+    DumpAtTremieAssistActive      : BOOL;   // . [LOC] Assistance vidage trémie active
+    DumpAtTremieBucketOpenArmed   : BOOL;   // . [LOC] Armement ouverture benne à la trémie
 END_VAR
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE & INTENTION OPÉRATEUR ===
@@ -289,7 +292,17 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
 
     // Requêtes benne et assistants
-    Data.ReqProgram.ReqBucket.ReqOpen                     := FALSE;
+    DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
+    DumpAtTremieAssistActive := DumpAtTremieActive;
+    DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
+
+    GVL_IHM.DredgingAssist.State.DumpAtTremieArmed             := DumpAtTremieActive;
+    GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
+    GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
+    GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed   := DumpAtTremieBucketOpenArmed;
+    GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked     := DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
+
+    Data.ReqProgram.ReqBucket.ReqOpen                     := DumpAtTremieBucketOpenArmed;
     Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionSequence.BucketCloseRequest;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.KoboldMeasureEnable
                                                             OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence

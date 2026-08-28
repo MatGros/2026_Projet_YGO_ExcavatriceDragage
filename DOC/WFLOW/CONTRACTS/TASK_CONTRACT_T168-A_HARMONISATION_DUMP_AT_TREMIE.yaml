@@ -55,17 +55,25 @@ contract:
     Toute anomalie sur l'interlock trémie ou le signal de présence M3 doit être
     immédiatement signalée.
 
-status: PENDING
+status: VALIDATED
 
 execution:
-  executed_by: "À déléguer"
-  completed_at: ""
-  status: PENDING
-  summary: ""
-  evidence_submitted: []
+  executed_by: "Antigravity + Ollama (deepseek-v4-flash:cloud)"
+  completed_at: "2026-08-28T17:23:00+02:00"
+  status: SUCCESS
+  summary: >
+    Harmonisation de DumpAtTremie validée :
+    - Décision centralisée dans PRG_03 (modes MAINT_N1/N2, présence M3_AtTremieStable).
+    - Publication de la demande d'ouverture benne via Data.ReqProgram.ReqBucket.ReqOpen.
+    - Consommation par PRG_04 pour CmdOpen_IHM de FB_Bucket avec maintien strict de l'interlock descente treuil.
+    - Bundle régénéré, G200 0 erreur et 22/22 Gates vertes.
+  evidence_submitted:
+    - "G200 Linkage: PASS (0 erreur)"
+    - "Run all gates: 22/22 PASS"
+    - "CODE_XML/CODE_Bundle.xml"
 
 validation:
-  status: PENDING
-  validated_by: ""
-  validated_at: ""
-  notes: ""
+  status: VALIDATED
+  validated_by: "Orchestrateur Antigravity"
+  validated_at: "2026-08-28T17:23:00+02:00"
+  notes: "Harmonisation conforme au modèle Décision/Muscle sans régression sur la sécurité physique."
