@@ -138,19 +138,37 @@ contract:
 # ═══════════════════════════════════════════════════════════════════════════
 # 🚦 SUIVI
 # ═══════════════════════════════════════════════════════════════════════════
-status: PENDING
+status: VALIDATED
 
 execution:
-  executed_by: "..."
-  completed_at: "..."
-  status: PENDING
+  executed_by: "Sous-agent Claude Code (general-purpose) — implémentation ; livré dans le commit 5c9dca9c par l'humain"
+  completed_at: "2026-08-29T00:54:48+02:00"
+  status: COMPLETED
   summary: >
-    (a remplir par l'agent executant)
-  evidence_submitted: []
+    Branche SEMI_AUTO de PRG_03_Modes_Cycle.st : ajout des 17 feuilles Data.SequenceState.*
+    manquantes (DiveReady/Busy/Done/Error/ErrorId, ExtractionReady/Busy/Done/Error/ErrorId,
+    DumpAtTremieArmed/AssistActive/AtTremie/BucketOpenArmed/DescentLocked, BypassDiveActive,
+    BypassKoboldBottomTouched), valeurs neutres FALSE/0 identiques verbatim à la branche ELSE.
+    Nouveau gate G346_check_mode_branch_completeness.py (parse les 3 branches de mode, ERREUR si
+    une feuille est écrite dans >=1 branche mais pas toutes), câblé dans run_all_gates.py palier C.
+    Aucun FB modifié. AC5 confirmé : FB_Cycle X10/X11 n'émettent aucune commande de descente treuil.
+  evidence_submitted:
+    - "G200 linkage: PASS (0 erreur)"
+    - "run_all_gates --palier C: 17/17 PASS (G346 inclus)"
+    - "G346: pré-fix FAIL (17 erreurs = les 17 feuilles), post-fix PASS (0)"
+    - "CI TEST_AUTO_CI: FB_Cycle 7/7, FB_DiveSearch 8/8, FB_ExtractionSequence 8/8 (verdicts inchangés)"
+    - "Commit livrable: 5c9dca9c"
 
 validation:
-  status: PENDING
-  validated_by: "..."
-  validated_at: "..."
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — relecture du git diff réel de 5c9dca9c + 3 revues indépendantes (omniroute auto/best-reasoning x2, codex/gpt-5.6-terra-medium)"
+  validated_at: "2026-08-29T01:30:00+02:00"
   notes: >
-    (visa orchestrateur apres relecture du git diff reel)
+    AC1..AC6 satisfaits. Diff strictement additif, limité à la branche SEMI_AUTO, valeurs
+    identiques à ELSE. G346 prouve mécaniquement la complétude (17 erreurs sur le code pré-fix,
+    exactement les 17 feuilles du contrat ; 0 sur le code corrigé) et garde le drift en CI.
+    AC5 ancré : la prohibition de descente à la trémie en SEMI_AUTO est portée par le Grafcet
+    FB_Cycle (X10 translation pure, X11 Direction:=1 + déflexion bas -> BucketCmd.Open), pas par
+    DumpAtTremieDescentLocked -> mise à FALSE en SEMI_AUTO sans trou de sécurité. 3e revue
+    indépendante sur le diff : PASS, 0 BLOCK / 0 MAJOR. Non-régression CI confirmée (aucun FB touché).
+    Reste séparé : micro-lot T168-D (OperatorActionId UINT->WORD).

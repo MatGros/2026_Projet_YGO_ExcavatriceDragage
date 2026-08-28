@@ -2430,12 +2430,13 @@ tasks:
   - T168
 - id: T168-B
   parent_id: T168
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: SUPERVISION
   agent: CC
   date: '2026-08-28T16:38:00+02:00'
-  updated_at: '2026-08-28T21:15:00+02:00'
+  updated_at: '2026-08-29T01:30:00+02:00'
+  completed_at: '2026-08-29T01:30:00+02:00'
   titre: Intégration du diagnostic unifié dans PRG_07_Supervision (+ StepAtFault assistants)
   contexte: 'Projection exclusive vers GVL_IHM.DredgingAssist.State. Complété après T167-B/C : DiveStepAtFault / ExtractionStepAtFault
     (etape figee au defaut, l''etat vivant ExtractionState/DiveState valant ERROR_HOLD apres faute) desormais projetes jusqu''a
@@ -2463,6 +2464,23 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-CR_REVIEW_DIAGNOSTIC.yaml
   objectifs:
   - Audit de l'isolation des données
+  bloque_par:
+  - T168-B
+- id: T168-C
+  parent_id: T168
+  statut: ✅
+  criticite: C3
+  domaine: MODES_CYCLE
+  agent: ORCHESTRATEUR
+  date: '2026-08-29T01:30:00+02:00'
+  completed_at: '2026-08-29T01:30:00+02:00'
+  titre: Reset déterministe des états assistants dans la branche SEMI_AUTO de PRG_03
+  contexte: 'Audit T168-B + 3 revues indépendantes convergentes : la branche SEMI_AUTO de PRG_03 n''assignait pas 17 feuilles Data.SequenceState.* (Dive* / Extraction* / DumpAtTremie* / Bypass*). DumpAtTremieDescentLocked restait TRUE au passage MAINT->SEMI_AUTO et PRG_04:631 verrouillait la descente treuil pendant le cycle automatique (régression du commit 7e65e566).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-C_RESET_ASSISTANTS_SEMI_AUTO.yaml. fix : 17 resets ajoutés en fin de branche SEMI_AUTO, valeurs neutres identiques à la branche ELSE. guard : nouveau gate G346_check_mode_branch_completeness.py (câblé run_all_gates palier C). Preuves : G200 PASS 0 err, palier C 17/17, G346 pré-fix FAIL 17 / post-fix PASS, CI cycle inchangée. Livré dans le commit 5c9dca9c.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-C_RESET_ASSISTANTS_SEMI_AUTO.yaml
+  objectifs:
+  - Réinitialiser les 17 feuilles d'état assistant manquantes dans la branche SEMI_AUTO
+  - Garde-fou mécanique anti-oubli inter-branches de mode (gate G346)
   bloque_par:
   - T168-B
 - id: T169
