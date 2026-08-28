@@ -7,9 +7,8 @@
 
 ## 🎯 Rôle et périmètre
 
-- **Rôle** : mouvement treuils M1 (Retenue) / M2 (Benne), safety métier, synchro, benne, barrière finale.
-- **Périmètre** : ce chapô reste au niveau machine + intégration programme + TBD apprentissage
-  vitesse (§7.3) — il ne recopie pas les interfaces/`TC-` des 9 fiches FB dédiées (§2).
+- **Rôle** : pilotage physique et sécurité des treuils M1 (Retenue) / M2 (Benne), synchronisation étagée, commande mécanique benne et barrière finale.
+- **Périmètre & Architecture** : `PRG_04_Treuils_Benne` est l'organe d'exécution physique. Il n'instancie plus `FB_DiveSearch` ni `FB_ExtractionSequence` (centralisés dans `PRG_03_Modes_Cycle`). Il **arbitre et applique** les requêtes benne et Kobold reçues de `PRG_03.Data.ReqProgram.ReqBucket`, sous le contrôle souverain de ses sécurités d'axe (`FB_Safety_Winch`).
 - **Type de composant** : `FB_Winch` (×2), `FB_Safety_Winch` (×2), `FB_WinchSync`, `FB_Bucket`,
   `FB_WinchOutputInterlock` (×2) et 4 briques diagnostic — Fonction métier.
 

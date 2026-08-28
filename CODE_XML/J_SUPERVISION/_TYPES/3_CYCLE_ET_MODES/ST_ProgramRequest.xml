@@ -101,6 +101,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande activation mesure/contacteur Kobold</xhtml>
               </documentation>
             </variable>
+            <variable name="DescendPermitDiveBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de descente conditionnée benne ouverte (DiveSearch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceMinSpeedStep">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Forçage vitesse minimale (palier de contrôle extraction)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

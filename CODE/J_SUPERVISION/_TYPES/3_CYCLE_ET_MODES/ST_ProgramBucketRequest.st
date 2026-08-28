@@ -6,8 +6,10 @@
    ======================================================================= *)
 TYPE ST_ProgramBucketRequest :
 STRUCT
-    ReqOpen                : BOOL; // Demande ouverture benne
-    ReqClose               : BOOL; // Demande fermeture benne
-    ReqKoboldMeasureEnable : BOOL; // Demande activation mesure/contacteur Kobold
+    ReqOpen                     : BOOL; // Demande ouverture benne
+    ReqClose                    : BOOL; // Demande fermeture benne
+    ReqKoboldMeasureEnable      : BOOL; // Demande activation mesure/contacteur Kobold
+    DescendPermitDiveBucketOpen : BOOL; // Autorisation de descente conditionnée benne ouverte (DiveSearch)
+    ForceMinSpeedStep           : BOOL; // Forçage vitesse minimale (palier de contrôle extraction)
 END_STRUCT
 END_TYPE

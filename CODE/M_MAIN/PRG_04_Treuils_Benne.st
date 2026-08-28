@@ -24,8 +24,6 @@ VAR
     instSafetyWinchM2 : FB_Safety_Winch;
     instWinchM1   : FB_Winch;
     instWinchM2   : FB_Winch;
-    instDiveSearch : FB_DiveSearch;
-    instExtractionSequence : FB_ExtractionSequence;
 
     // === 📊 STRUCTS INTERNES (publiés via Data) ===
     WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // . [LOC] Demande finale et interlocks treuil M1
@@ -186,109 +184,11 @@ IF NOT (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycl
 END_IF;
 ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
 
-// Front DESCENDANT Kobold pendant une descente couplée = fond touché, directement (voir bandeau §1).
-// Mêmes conditions de garde que la confirmation manuelle ci-dessus (MAINT_N1/N2, sous tension,
-// pas de défaut, benne fermée -- réutilise le bloc de clear commun juste au-dessus).
-BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
-IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
-   AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
-   AND BypassKoboldFallEdge.Q THEN
-    BypassKoboldBottomTouched := TRUE;
-END_IF;
-GVL_IHM.DredgingAssist.State.BypassDiveActive          := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
-GVL_IHM.DredgingAssist.State.BypassKoboldBottomTouched := BypassKoboldBottomTouched;
-
-instDiveSearch(
-    Enable := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-              AND GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch,
-    Reset := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode := PRG_03_Modes_Cycle.Data.Auth.Mode,
-    MotionRequestActive := CoupledUserRequestActive,
-    MotionDirection := CoupledUserRequestDirection,
-    BucketIsOpen := _BucketState.IsOpen,
-    KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
-    M1Position_M := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
-    M2Position_M := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
-    PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
-                       AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
-    DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
-    ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
-    ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
-    // Même toggle que le bypass bottom-confirmation -- saute WAIT_PRECONDITIONS entièrement.
-    BypassPreconditions := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
-);
-
-// Publication IHM — consommée ensuite par FB_TroubleshootingView (debug).
-GVL_IHM.DredgingAssist.State.DiveReady            := instDiveSearch.Ready;
-GVL_IHM.DredgingAssist.State.DiveBusy             := instDiveSearch.Lifecycle.Busy;
-GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Lifecycle.Done;
-GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Fault.Error;
-GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.Fault.ErrorId;
-GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
-// BottomPositionConfirmed = OR des trois : détection Kobold
-// (instDiveSearch), confirmation manuelle (TglBucketAtBottomConfirmed) et bypass.
-BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed OR BypassKoboldBottomTouched;
-GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := BottomPositionConfirmed;
-
-instExtractionSequence(
-    Enable := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-              AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
-    Reset := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode := PRG_03_Modes_Cycle.Data.Auth.Mode,
-    MotionRequestActive := CoupledUserRequestActive,
-    MotionDirection := CoupledUserRequestDirection,
-    BottomPositionConfirmed := BottomPositionConfirmed,
-    BucketIsClosed := _BucketState.IsClosed,
-    BucketBusy := instBucket.Lifecycle.Busy,
-    BucketError := instBucket.Fault.Error,
-    WinchSyncError := instWinchSync.Fault.Error,
-    M1Position_M := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
-    M2Position_M := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
-    M1MeasuredSpeedValid := PRG_02_Acquisition.Data.Encoders.M1.SpeedValid,
-    M2MeasuredSpeedValid := PRG_02_Acquisition.Data.Encoders.M2.SpeedValid,
-    PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
-                       AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
-    ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M
-);
-IF instExtractionSequence.BottomConfirmationConsumed THEN
-    GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
-END_IF;
-
-// Publication IHM (voir DiveSearch ci-dessus).
-GVL_IHM.DredgingAssist.State.ExtractionReady   := instExtractionSequence.Ready;
-GVL_IHM.DredgingAssist.State.ExtractionBusy    := instExtractionSequence.Lifecycle.Busy;
-GVL_IHM.DredgingAssist.State.ExtractionDone    := instExtractionSequence.Lifecycle.Done;
-GVL_IHM.DredgingAssist.State.ExtractionError   := instExtractionSequence.Fault.Error;
-GVL_IHM.DredgingAssist.State.ExtractionErrorId := instExtractionSequence.Fault.ErrorId;
-GVL_IHM.DredgingAssist.State.ExtractionState   := instExtractionSequence.ExtractionState;
-
-// une seule consigne opérateur conduite à la fois (doc §OperatorActionId) —
-// arbitrage fait ici : DiveSearch prioritaire si Busy, sinon ExtractionSequence si Busy,
-// sinon la dernière connue reste affichée à titre informatif.
-IF instDiveSearch.Lifecycle.Busy THEN
-    GVL_IHM.DredgingAssist.State.OperatorActionId := instDiveSearch.OperatorActionId;
-    GVL_IHM.DredgingAssist.State.OperatorAction   := instDiveSearch.OperatorAction;
-ELSIF instExtractionSequence.Lifecycle.Busy THEN
-    GVL_IHM.DredgingAssist.State.OperatorActionId := instExtractionSequence.OperatorActionId;
-    GVL_IHM.DredgingAssist.State.OperatorAction   := instExtractionSequence.OperatorAction;
-ELSE
-    GVL_IHM.DredgingAssist.State.OperatorActionId := 0;
-    GVL_IHM.DredgingAssist.State.OperatorAction   := '';
-END_IF;
+// Récupération de l'état fond synthétisé par PRG_03
+BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
 
 // Règle absolue en pilotage couplé (both) normal --
-// descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée. Réutilise
-// CoupledUserRequestActive/CoupledUserRequestDirection (§1) : déjà "mouvement couplé
-// demandé" dans les 2 modes (joystick Select=0 exclut le pilotage unitaire M1/M2 seul,
-// BtnWinchBothUp/Down exclut les boutons IHM individuels M1/M2). Jamais actif en SEMI_AUTO
-// (mêmes conditions que le reste de ce §).
-// coupe-circuit d'urgence (machine bloquée en butée
-// M2_LimitShift). GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing (défaut FALSE) : si FALSE,
-// ces 2 flags restent FALSE en permanence -- CmdOpen_IHM/CmdClose_IHM ne sont plus jamais armés
-// par le mouvement couplé joystick, instBucket.Busy ne peut plus être déclenché QUE par action
-// manuelle benne/DumpAtTremie/ExtractionSequence.
+// descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
 CoupledDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
     AND (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.SEMI_AUTO)
     AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
@@ -298,10 +198,8 @@ CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequen
     AND CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)
     AND NOT _BucketState.IsClosed;
 
-IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO : fermeture benne pilotée par le séquenceur de cycle.
-    CmdBucketCloseArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
-ELSIF instExtractionSequence.BucketCloseRequest THEN
+// Arbitrage de fermeture benne (CmdBucketCloseArbitrated)
+IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose THEN
     CmdBucketCloseArbitrated := TRUE;
 ELSIF CoupledAscentBucketCloseArmed THEN
     CmdBucketCloseArbitrated := TRUE;
@@ -309,20 +207,8 @@ ELSE
     CmdBucketCloseArbitrated := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
 END_IF;
 
-// urgence : instDiveSearch.KoboldMeasureEnable
-// n'est TRUE que dans SEARCHING_IMMERSION/SEARCHING_BOTTOM, atteignables uniquement après
-// WAIT_PRECONDITIONS (DiveStartMin_M/ImmersionUpper_M/ImmersionLower_M). Avec le bypass
-// (TglBypassDiveSearchSequence), le contacteur doit être piloté
-// INDÉPENDAMMENT de ces préconditions dès qu'on descend réellement.
-IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO : contacteur Kobold piloté par le séquenceur de cycle.
-    KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
-ELSE
-    KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable
-        OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
-            AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1));
-END_IF;
-
+// Arbitrage contacteur Kobold (KoboldContactorCmdArbitrated)
+KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 
 {endregion}
 
@@ -640,10 +526,8 @@ IF KoboldAutoStopFallEdge.Q AND KoboldImmersionConfirmed THEN
     KoboldImmersionConfirmed := FALSE;
 END_IF;
 
-// Autorisation directe et explicite, gardée par instDiveSearch.Enable (mode Dive réellement actif)
-// -- indépendante du timing interne DescendPermit. Bloque uniquement si benne PAS confirmée ouverte.
-DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequestActive
-    AND (CoupledUserRequestDirection = -1) AND NOT _BucketState.IsOpen);
+// Autorisation directe et explicite issue de PRG_03 (DiveSearch / Cycle)
+DescendPermitDiveBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen;
 
 // Le bypass arrête aussi la descente instantanément, même doctrine que le mécanisme
 // KoboldBottomTouchLatched.

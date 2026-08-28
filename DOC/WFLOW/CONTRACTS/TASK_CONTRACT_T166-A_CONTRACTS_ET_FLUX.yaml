@@ -1,0 +1,45 @@
+contract:
+  task_id: T166-A_CONTRACTS_ET_FLUX
+  criticality: C4
+  strategy: patch
+  objective: >
+    Enrichir les structures d'échange inter-PRG, finaliser les publications
+    PRG_04.Data et PRG_05.Data, et éliminer 100% des fuites d'encapsulation vers
+    les instances internes de PRG_04 (instWinchSync, instBucket, etc.).
+  acceptance:
+    - id: AC1
+      statement: "PRG_04_Treuils_Benne et PRG_05_Translation publient sur leur bus Data tous les états nécessaires."
+      verified_by: "Revue des fichiers ST et G200_check_linkage."
+    - id: AC2
+      statement: "PRG_07_Supervision ne lit plus aucune instance interne privée de PRG_04 (instWinchSync remappé)."
+      verified_by: "Recherche statique et G200 Linkage."
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/*.st
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/*.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/*.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+    forbidden:
+      - PRJ_CODESYS/**
+      - Device.export
+  conservation:
+    must_survive:
+      - "Sémantique des variables publiques et comportement de supervision existant."
+    dropped_on_purpose:
+      - "Accès directs inter-PRG aux instances internes."
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+status: COMPLETED
+execution:
+  executed_by: "AGY-01"
+  completed_at: "2026-08-28T16:20:00+02:00"
+  status: COMPLETED
+  summary: "Enrichissement des DUT ST_WinchInterPrg, ST_TranslationInterPrg, remappage PRG_07 vers Data.WinchSyncError/Delta, et publication complète."
+validation:
+  status: VALIDATED
+  validated_by: "Orchestrateur"
+  validated_at: "2026-08-28T16:25:00+02:00"
+  notes: "G200 PASS, 22/22 gates PASS."
