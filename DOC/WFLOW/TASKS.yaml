@@ -2614,7 +2614,7 @@ tasks:
   - T166-DOC
 - id: T167
   parent_id: null
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: MODES_CYCLE
   agent: ORCHESTRATEUR
@@ -2631,7 +2631,7 @@ tasks:
   - T166
 - id: T167-A
   parent_id: T167
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: SPECIFICATION
   agent: OLLAMA
@@ -2646,7 +2646,7 @@ tasks:
   - T167
 - id: T167-B
   parent_id: T167
-  statut: ⬜
+  statut: ✅
   criticite: C4
   domaine: MODES_CYCLE
   agent: AGY-01
@@ -2662,7 +2662,7 @@ tasks:
   - T167-A
 - id: T167-C
   parent_id: T167
-  statut: ⬜
+  statut: ✅
   criticite: C4
   domaine: MODES_CYCLE
   agent: AGY-01
@@ -2677,24 +2677,24 @@ tasks:
   - T167-B
 - id: T167-CR
   parent_id: T167
-  statut: ⬜
+  statut: ✅
   criticite: C4
   domaine: REVIEW
   agent: OLLAMA
   date: '2026-08-28T16:38:00+02:00'
-  titre: Revue indépendante Ollama du code ST Dive/Extraction
-  contexte: Audit de conformité des nouvelles briques.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-CR_REVIEW_CYCLES.yaml.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-CR_REVIEW_CYCLES.yaml
+  titre: Revue de Code & Certification Indépendante T167
+  contexte: Revue indépendante par sous-agent local Ollama.
+  description: Certification des briques FB_DiveSearch et FB_ExtractionSequence.
+  contrat: ''
   objectifs:
-  - Audit indépendant read-only
+  - Valider l'absence de régression et la conformité aux standards
   bloque_par:
   - T167-C
 - id: T168
   parent_id: null
-  statut: ⬜
+  statut: ✅
   criticite: C3
-  domaine: MODES_CYCLE
+  domaine: SUPERVISION
   agent: ORCHESTRATEUR
   date: '2026-08-28T16:38:00+02:00'
   titre: Harmonisation DumpAtTremie & Diagnostic Troubleshooting
@@ -2706,9 +2706,55 @@ tasks:
   - Connecter le diagnostic dans PRG_07
   bloque_par:
   - T167-CR
+- id: T168-A
+  parent_id: T168
+  statut: ✅
+  criticite: C3
+  domaine: MODES_CYCLE
+  agent: AGY-01
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Centralisation de la décision DumpAtTremie dans PRG_03
+  contexte: Déplacement de la machine d'état de vidage trémie.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-A_HARMONISATION_DUMP_AT_TREMIE.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-A_HARMONISATION_DUMP_AT_TREMIE.yaml
+  objectifs:
+  - PRG_03 décide et publie via ReqBucket.ReqOpen
+  - PRG_04 consomme et applique
+  bloque_par:
+  - T168
+- id: T168-B
+  parent_id: T168
+  statut: ✅
+  criticite: C3
+  domaine: SUPERVISION
+  agent: AGY-01
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Intégration du diagnostic unifié dans PRG_07_Supervision
+  contexte: Projection exclusive vers GVL_IHM.DredgingAssist.State.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml
+  objectifs:
+  - Éliminer 100% des écritures directes dans PRG_03 et PRG_04
+  bloque_par:
+  - T168-A
+- id: T168-CR
+  parent_id: T168
+  statut: ✅
+  criticite: C3
+  domaine: REVIEW
+  agent: OLLAMA
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Revue indépendante Ollama du diagnostic et trémie
+  contexte: Audit de cohérence des données supervisions.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-CR_REVIEW_DIAGNOSTIC.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-CR_REVIEW_DIAGNOSTIC.yaml
+  objectifs:
+  - Audit de l'isolation des données
+  bloque_par:
+  - T168-B
 - id: T169
   parent_id: null
-  statut: ⬜
+  statut: ✅
   criticite: C4
   domaine: TEST_AUTO_CI
   agent: ORCHESTRATEUR
@@ -2716,11 +2762,26 @@ tasks:
   titre: Qualification Automatisée des Scénarios de Dragage (CI)
   contexte: Écriture et exécution de la suite de tests automatisés STruCpp / ST2C.
   description: Famille T169 — Validation des scénarios nominaux, limites et dégradés en simulation CI.
-  contrat: ''
+  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml'
   objectifs:
   - 100% des tests unitaires de cycle verts en CI
   bloque_par:
   - T168
+- id: T169-A
+  parent_id: T169
+  statut: ✅
+  criticite: C4
+  domaine: TEST_AUTO_CI
+  agent: AGY-01
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Harnais de tests CI et validation des scénarios
+  contexte: Intégration des tests dans le pipeline.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml
+  objectifs:
+  - Couverture 100% des use-cases critiques
+  bloque_par:
+  - T169
 - id: T170
   parent_id: null
   statut: ✅
