@@ -67,7 +67,7 @@
     <div class="joy-label" id="joyLabel">Neutre (relâché)</div>
 
     <div class="btn-row">
-      <button class="btn btn-primary" id="btnDead" onpointerdown="dead(true)" onpointerup="dead(false)" onpointerleave="dead(false)">🖐️ Homme-mort (maintenir)</button>
+      <button class="btn btn-primary" id="btnDead" onclick="dead()">🖐️ Homme-mort (clic pour armer / désarmer)</button>
     </div>
     <div class="row" style="margin-top:8px;"><label>Auto-scan</label><input type="checkbox" id="autoScan"></div>
     <div class="row"><label>Vitesse simulée (m/s)</label><input type="number" id="simSpeed" value="0.5" step="0.1" style="width:70px"></div>
@@ -202,7 +202,12 @@ function updateJoy(e) {
   document.getElementById('joyLabel').textContent = dir + (Math.abs(joyY) > 0.2 ? ' · intensité ' + (Math.abs(joyY)*100).toFixed(0) + '%' : '');
 }
 function resetJoy() { joyY = 0; joyX = 0; document.getElementById('joyKnob').style.left='57px'; document.getElementById('joyKnob').style.top='57px'; document.getElementById('joyLabel').textContent='Neutre (relâché)'; }
-function dead(on) { deadman = on; document.getElementById('btnDead').className = 'btn ' + (on ? 'btn-active' : 'btn-primary'); }
+function dead() {
+  deadman = !deadman;
+  const b = document.getElementById('btnDead');
+  b.className = 'btn ' + (deadman ? 'btn-active' : 'btn-primary');
+  b.textContent = deadman ? '🖐️ Homme-mort ARMÉ (re-clic pour désarmer)' : '🖐️ Homme-mort (clic pour armer / désarmer)';
+}
 
 // --- Collecte stimuli ---
 function collectStimuli() {
