@@ -5300,6 +5300,11 @@ seule source de confirmation).</xhtml>
                 <derived name="E_DiveSearchState" />
               </type>
             </variable>
+            <variable name="DiveStepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+            </variable>
             <variable name="BottomTouchConfirmed">
               <type>
                 <BOOL />
@@ -8902,6 +8907,14 @@ Assistance plongée prête</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne de recherche fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveStepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne mémorisée au défaut plongée</xhtml>
               </documentation>
             </variable>
             <variable name="BottomTouchConfirmed">
@@ -16918,6 +16931,39 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Borne basse fenetre d'immersion (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="CableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="7.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation (m), plafond de course immersion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalDepthMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-35" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite legale basse autorisee (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#10ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Base de temps d'integration (periode MainTask)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassPreconditions">
               <type>
                 <BOOL />
@@ -16959,6 +17005,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase interne de recherche fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etape active mémorisée lors du défaut</xhtml>
               </documentation>
             </variable>
             <variable name="DescendPermit">
@@ -17022,6 +17076,14 @@ END_IF;
 . [LOC] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant apparition defaut</xhtml>
+              </documentation>
+            </variable>
             <variable name="KoboldRiseEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -17036,6 +17098,70 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front sortie eau / fond (1-&gt;0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionCourse_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCUL DYNAMIQUE RUNTIME DES TIMEOUTS ===
+. [LOC] Course credible max recherche immersion (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomCourse_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Course credible max recherche fond (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalculatedImmersionTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond anti-blocage immersion calcule au runtime</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalculatedBottomTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond anti-blocage fond calcule au runtime</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionTimerAcc">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACCUMULATEURS DE TEMPS ANTI-POMPAGE ===
+. [LOC] Temps cumule recherche immersion sous mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomTimerAcc">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps cumule recherche fond sous mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etape au scan precedent (maintien survivant au gate)</xhtml>
               </documentation>
             </variable>
             <variable name="ImmersionConfirmed">
@@ -17071,6 +17197,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch tentative descente en Palier 5 sous Kobold</xhtml>
               </documentation>
             </variable>
+            <variable name="TimeoutImmersionFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch timeout recherche immersion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutBottomFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch timeout recherche fond</xhtml>
+              </documentation>
+            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
@@ -17091,6 +17233,51 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DiveSpeedMin_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES DERIVATION TIMEOUT ANTI-BLOCAGE ===
+Vitesse Palier 1 mini sous charge/mou (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_TimeoutMarginFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Facteur de marge de securite sur la course theorique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_TimeoutMinCourse_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher de course pour le calcul (evite timeout degenere)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_SecToMs">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conversion secondes -&gt; millisecondes</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -17118,14 +17305,45 @@ KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 
 ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M &lt; ImmersionUpper_M)
-                  OR (ImmersionUpper_M &lt;= ImmersionLower_M));
+                  OR (ImmersionUpper_M &lt;= ImmersionLower_M)
+                  OR (ImmersionLower_M &lt;= LimitLegalDepthMin_M)
+                  OR (CableLimitAscent_M &lt;= ImmersionLower_M));
+
+// ⏱️ Plafonds anti-blocage calcules au runtime : course credible max / vitesse Palier 1 mini x marge.
+// Course immersion = du plafond haut d'exploitation a la borne basse d'immersion (depart de plongee
+// possible n'importe ou entre DiveStartMin_M et CableLimitAscent_M -&gt; on prend la borne la plus large).
+ImmersionCourse_M   := MAX(CST_TimeoutMinCourse_M, CableLimitAscent_M - ImmersionLower_M);
+BottomCourse_M      := MAX(CST_TimeoutMinCourse_M, ImmersionLower_M - LimitLegalDepthMin_M);
+CalculatedImmersionTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
+    ImmersionCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
+CalculatedBottomTimeout    := UDINT_TO_TIME(REAL_TO_UDINT(
+    BottomCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
+
+// ⏱️ Intégrateurs de temps de mouvement effectif (D1 anti-pompage)
+IF (DiveState = E_DiveSearchState.SEARCHING_IMMERSION) AND MotionRequestActive AND (MotionDirection = -1) THEN
+    ImmersionTimerAcc := ImmersionTimerAcc + CycleTime;
+    IF ImmersionTimerAcc &gt;= CalculatedImmersionTimeout THEN
+        TimeoutImmersionFault := TRUE;
+    END_IF;
+END_IF;
+
+IF (DiveState = E_DiveSearchState.SEARCHING_BOTTOM) AND MotionRequestActive AND (MotionDirection = -1) THEN
+    BottomTimerAcc := BottomTimerAcc + CycleTime;
+    IF BottomTimerAcc &gt;= CalculatedBottomTimeout THEN
+        TimeoutBottomFault := TRUE;
+    END_IF;
+END_IF;
 
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
-    SeqErrorFault := FALSE;
+    SeqErrorFault         := FALSE;
     Palier5ForbiddenFault := FALSE;
-    ImmersionConfirmed := FALSE;
-    BottomTouchConfirmed := FALSE;
-    DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    TimeoutImmersionFault := FALSE;
+    TimeoutBottomFault    := FALSE;
+    ImmersionTimerAcc     := T#0ms;
+    BottomTimerAcc        := T#0ms;
+    ImmersionConfirmed    := FALSE;
+    BottomTouchConfirmed  := FALSE;
+    DiveState             := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 
 instCauses[0].Active   := SeqErrorFault;
@@ -17140,9 +17358,25 @@ instCauses[3].Active   := Palier5ForbiddenFault;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Mesure Kobold impossible : vitesse trop elevee (Palier 5 interdit)';
 
+instCauses[4].Active   := TimeoutImmersionFault;
+instCauses[4].Latching := TRUE;
+instCauses[4].Texte    := 'Depassement tempo recherche immersion Kobold';
+
+instCauses[5].Active   := TimeoutBottomFault;
+instCauses[5].Latching := TRUE;
+instCauses[5].Texte    := 'Depassement tempo recherche fond Kobold';
+
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
+
+// 📸 Capture ordonnée de StepAtFault sur front montant de défaut (D2)
+ErrorEdge(CLK := Fault.Error);
+IF ErrorEdge.Q THEN
+    StepAtFault := PrevState;
+ELSIF ResetEdge.Q THEN
+    StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
+END_IF;
 {endregion}
 
 {region "§2 Gate neutralisation"}
@@ -17156,9 +17390,13 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     KoboldContactorCmd := FALSE;
     BottomTouchConfirmed := FALSE;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
     OperatorActionId := 0;
     OperatorAction := '';
     ImmersionConfirmed := FALSE;
+    ImmersionTimerAcc := T#0ms;
+    BottomTimerAcc := T#0ms;
+    PrevState := E_DiveSearchState.WAIT_PRECONDITIONS;
     RETURN;
 END_IF;
 
@@ -17196,6 +17434,7 @@ ELSE
             OperatorActionId := 16#0101;
             OperatorAction := 'Demander une descente pour rechercher le fond.';
             IF MotionRequestActive AND (MotionDirection = -1) THEN
+                ImmersionTimerAcc := T#0ms; // ⏱️ RAZ à l'entrée exacte de SEARCHING_IMMERSION
                 DiveState := E_DiveSearchState.SEARCHING_IMMERSION;
             END_IF;
 
@@ -17216,6 +17455,7 @@ ELSE
                 IF (M1Position_M &lt;= ImmersionUpper_M) AND (M1Position_M &gt;= ImmersionLower_M)
                    AND (M2Position_M &lt;= ImmersionUpper_M) AND (M2Position_M &gt;= ImmersionLower_M) THEN
                     ImmersionConfirmed := TRUE;
+                    BottomTimerAcc := T#0ms; // ⏱️ RAZ à l'entrée exacte de SEARCHING_BOTTOM
                     DiveState := E_DiveSearchState.SEARCHING_BOTTOM;
                 ELSE
                     SeqErrorFault := TRUE;
@@ -17254,6 +17494,9 @@ ELSE
             KoboldContactorCmd := FALSE;
     END_CASE;
 END_IF;
+
+// 💾 Mémorisation de l'étape précédente en toute fin de scan
+PrevState := DiveState;
 {endregion}
 </xhtml>
           </ST>
@@ -35370,6 +35613,9 @@ instDiveSearch(
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
+    CableLimitAscent_M := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M,
+    LimitLegalDepthMin_M := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M,
+    CycleTime := T#10ms,
     BypassPreconditions := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
 );
 
@@ -35589,6 +35835,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.DiveError                  := instDiveSearch.Fault.Error;
     Data.SequenceState.DiveErrorId                := instDiveSearch.Fault.ErrorId;
     Data.SequenceState.DiveState                  := instDiveSearch.DiveState;
+    Data.SequenceState.DiveStepAtFault             := instDiveSearch.StepAtFault;
     Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
     Data.SequenceState.ExtractionReady             := instExtractionSequence.Ready;
     Data.SequenceState.ExtractionBusy              := instExtractionSequence.Lifecycle.Busy;
@@ -39115,6 +39362,7 @@ GVL_IHM.DredgingAssist.State.DiveDone                   := PRG_03_Modes_Cycle.Da
 GVL_IHM.DredgingAssist.State.DiveError                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveError;
 GVL_IHM.DredgingAssist.State.DiveErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.DiveErrorId;
 GVL_IHM.DredgingAssist.State.DiveState                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveState;
+GVL_IHM.DredgingAssist.State.DiveStepAtFault            := PRG_03_Modes_Cycle.Data.SequenceState.DiveStepAtFault;
 GVL_IHM.DredgingAssist.State.BottomTouchConfirmed       := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
 GVL_IHM.DredgingAssist.State.ExtractionReady             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionReady;
 GVL_IHM.DredgingAssist.State.ExtractionBusy              := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionBusy;

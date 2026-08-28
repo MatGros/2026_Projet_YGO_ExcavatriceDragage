@@ -17,11 +17,23 @@
     {
       "name": "TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant",
       "passed": true
+    },
+    {
+      "name": "TC-P04-013 : Depassement tempo recherche immersion Kobold -> ERROR_HOLD et capture StepAtFault",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-014 : Depassement tempo recherche fond Kobold -> ERROR_HOLD et capture StepAtFault",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seulement sur front Reset",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 4,
-    "passed": 4,
+    "total": 7,
+    "passed": 7,
     "failed": 0
   }
 }

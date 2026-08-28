@@ -79,6 +79,52 @@
   4. **Palier de contrôle ($2.0$ m)** : Vitesse minimale bridée (`ForceMinSpeedStep := TRUE`).
   5. **Remontée nominale** : Libération de la vitesse nominale jusqu'au seuil haut d'égouttage.
 
+### ⏱️ 3bis · Dérivation physique des temporisations de garde & Matrice d'état sûr
+
+#### 1. Dérivations cinématiques unifiées (Base vitesse la plus lente : Palier 1 mini)
+Toutes les temporisations de garde constituent un **plafond anti-blocage** (surveillance de progression réelle). Elles sont calculées sur la base de la vitesse la plus lente crédible ($V_{P1\_mini} = 0.15\text{ m/s}$ sous charge/mou) et d'un facteur de marge de sécurité $\ge 1.5$ :
+
+1. **Recherche immersion (`CalculatedImmersionTimeout`)** :
+   - Course max : du plafond haut d'exploitation (`CableLimitAscent_M`, sourcé dans `GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M`) jusqu'à la borne basse d'immersion (`ImmersionLower_M`) $\Rightarrow \Delta H = \text{CableLimitAscent\_M} - \text{ImmersionLower\_M}$. La descente peut démarrer n'importe où entre `DiveStartMin_M` et `CableLimitAscent_M` : on retient la borne la plus large pour ne jamais sous-dimensionner le plafond.
+   - **Calcul dynamique en RUNTIME** (facteurs en `VAR CONSTANT` : `CST_DiveSpeedMin_Mps = 0.15`, `CST_TimeoutMarginFactor = 1.5`, plancher de course `CST_TimeoutMinCourse_M = 1.0`) :
+     $$\Delta T_{imm} = \frac{\max(1.0, \text{CableLimitAscent\_M} - \text{ImmersionLower\_M})}{V_{P1\_mini}} \times 1.5$$
+     *(Pour les valeurs par défaut $7.5\text{ m} - (-0.5\text{ m}) = 8.0\text{ m} \Rightarrow \Delta T_{imm} = 80.0\text{ s}$)*.
+2. **Recherche fond (`CalculatedBottomTimeout`)** :
+   - Course max sous l'eau : De la borne basse d'immersion (`ImmersionLower_M`) jusqu'à la limite légale autorisée (`LimitLegalDepthMin_M`, sourcée dans `GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M`) $\Rightarrow \Delta H = \text{ImmersionLower\_M} - \text{LimitLegalDepthMin\_M}$.
+   - **Calcul dynamique en RUNTIME** (mêmes `VAR CONSTANT` que la recherche immersion) :
+     $$\Delta T_{fond} = \frac{\max(1.0, \text{ImmersionLower\_M} - \text{LimitLegalDepthMin\_M})}{V_{P1\_mini}} \times 1.5$$
+     *(Pour les valeurs de référence $-0.5\text{ m} - (-35.0\text{ m}) = 34.5\text{ m} \Rightarrow \Delta T_{fond} = 345.0\text{ s}$)*.
+   - 🛡️ **Garde de sécurité** : Si l'exploitant modifie la profondeur légale admissible sur le site, le plafond de temporisation s'ajuste automatiquement sans nécessiter de modification logicielle.
+3. **Fermeture benne (`CfgBucketCloseTimeout`)** :
+   - Formule : $\text{CfgBucketCloseTimeout} \ge 2.5 \times \text{FB\_Bucket.CfgTimeoutDuration}$ (où $\text{CfgTimeoutDuration} = 6.0\text{ s}$ est le watchdog mécanique interne).
+   - Dérivation : $\Delta T_{close} = 6.0\text{ s} \times 2.5 = 15.0\text{ s} \Rightarrow$ **Seuil figé : `T#15s`** (évite la course entre les deux watchdogs).
+4. **Contrôle remontée lente (`ControlAscentTimeout`)** :
+   - **Calcul dynamique en RUNTIME** car la distance $\text{ControlAscentDistance\_M}$ ($d_{ctrl}$) est paramétrable par l'opérateur sur l'IHM (ex: 1.0 m à 5.0 m) :
+     $$\Delta T_{ctrl} = \frac{\text{ControlAscentDistance\_M}}{V_{P1\_mini}} \times 2.0 = \frac{d_{ctrl}}{0.15} \times 2.0$$
+     *(Exemple pour $d_{ctrl} = 2.0\text{ m} \Rightarrow \Delta T = 26.6\text{ s} \approx \text{T\#27s}$)*.
+
+#### 2. Matrice d'état sûr post-Timeout par étape
+
+| Étape en défaut | Condition de timeout | État interne | Comportement physique & Action de repli sûre |
+|---|---|---|---|
+| `SEARCHING_IMMERSION` | Immersion non détectée après `CalculatedImmersionTimeout` | `ERROR_HOLD` | `DescendPermit := FALSE`, coupure contacteur Kobold (`KoboldContactorCmd := FALSE`), `Ready := FALSE`. `FB_DiveSearch` cesse d'imposer `DescendPermit` ; la remontée de dégagement reste disponible via le pilotage treuil normal. |
+| `SEARCHING_BOTTOM` | Fond non détecté après `CalculatedBottomTimeout` | `ERROR_HOLD` | `DescendPermit := FALSE`, coupure contacteur Kobold anti-chauffe, `Ready := FALSE`. Descente bloquée, remontée disponible via pilotage treuil normal. |
+| `CLOSING_BUCKET` | Benne non fermée après `CfgBucketCloseTimeout` | `ERROR_HOLD` | `BucketCloseRequest := FALSE`, `AscentPermit := FALSE`, `Lifecycle.Busy := FALSE`. Arrêt des consignes benne/treuils, dégagement opérateur requis. |
+| `CONTROL_ASCENT` | Décollage non achevé après `ControlAscentTimeout` | `ERROR_HOLD` | `AscentPermit := FALSE`, `ForceMinSpeedStep := FALSE`, `Lifecycle.Busy := FALSE`. Arrêt sécurisé des consignes automatiques, maintien sous frein. |
+
+#### 3. Arbitrage et Gel formel du Bypass Séquence Kobold (`BypassPreconditions`)
+- **Contexte terrain & REX** : En exploitation sur plan d'eau boueux ou en cas de capteur Kobold défaillant, l'opérateur de carrière doit pouvoir poursuivre l'extraction en mode manuel/dégradé sous sa responsabilité visuelle directe sans être bloqué par l'automate.
+- **Décision de conception arrêtée (Option 1 - Gel documenté)** :
+  1. Le bypass `TglBypassDiveSearchSequence` court-circuite la qualification préalable de position et de capteur pour autoriser la descente.
+  2. **Garde-fou inviolable** : L'interdiction du Palier 5 sous l'eau (`Palier5ForbiddenFault := TRUE` si `CurrentSpeedStep > 4`) et la coupure contacteur restent **strictement actives même sous bypass**.
+  3. Ce mécanisme est gelé tel quel dans le code : aucun saut brutal n'est toléré au-delà du déverrouillage de la précondition.
+
+#### 4. Mécanique interne d'acquisition & Capture d'étape (D1 / D2)
+- **Anti-pompage homme-mort (D1)** : L'intégration temporelle s'effectue via un accumulateur de temps de mouvement effectif (`ImmersionTimerAcc`/`BottomTimerAcc += CycleTime`), le cumul n'avançant que sous descente réellement demandée (`MotionRequestActive AND MotionDirection = -1`). `CycleTime` est la période de tâche `MainTask` passée en `VAR_INPUT` (`T#10ms`, valeur câblée dans `PRG_03_Modes_Cycle`). Le cumul est réarmé à zéro dans la transition d'entrée d'étape et sur front montant de `Reset`.
+- **Défaut latché survivant au cycle `Enable`** : les latches timeout (`TimeoutImmersionFault`/`TimeoutBottomFault`, `Latching:=TRUE`) ne sont **pas** effacés à `Enable=FALSE` — seul un front `Reset` conscient les acquitte. Si `Enable` repasse à `TRUE` avec un défaut déjà latché, `Fault.Latched` reste actif (pas de front `Fault.Error` → `StepAtFault` conserve la valeur figée au premier déclenchement, ou `WAIT_PRECONDITIONS` si le gate a été traversé entre-temps).
+- **Capture ordonnée `StepAtFault` (D2)** : Mémorisation de `PrevState := State` en fin de scan. À l'instant du latch d'erreur (front montant `Fault.Error`), `StepAtFault := PrevState` est figé **avant** le basculement vers `ERROR_HOLD`.
+
+
 ---
 
 ## 🔄 4 · Cycle semi-auto (grafcet)

@@ -28,6 +28,9 @@ VAR_INPUT
     DiveStartMin_M          : REAL;         // --> [CFG] Seuil position min pour debut plongee (m)
     ImmersionUpper_M        : REAL;         // --> [CFG] Borne haute fenetre d'immersion (m)
     ImmersionLower_M        : REAL;         // --> [CFG] Borne basse fenetre d'immersion (m)
+    CableLimitAscent_M      : REAL := 7.5;  // --> [CFG] Limite haute d'exploitation (m), plafond de course immersion
+    LimitLegalDepthMin_M    : REAL := -35.0;// --> [CFG] Limite legale basse autorisee (m)
+    CycleTime               : TIME := T#10ms;// --> [CFG] Base de temps d'integration (periode MainTask)
     BypassPreconditions     : BOOL := FALSE;// --> [TST] Bypass preconditions et seuils (mode test)
 END_VAR
 VAR_OUTPUT
@@ -37,6 +40,7 @@ VAR_OUTPUT
     Fault                   : ST_Fault;
     Lifecycle               : ST_Lifecycle;
     DiveState               : E_DiveSearchState; // <-- [STAT] Phase interne de recherche fond
+    StepAtFault             : E_DiveSearchState; // <-- [DIAG] Etape active mémorisée lors du défaut
 
     // === PERMIS & AUTORISATIONS ===
     DescendPermit           : BOOL;         // <-- [ACT] Autorisation de descente assistee
@@ -51,18 +55,39 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONTS ===
     ResetEdge               : R_TRIG;       // . [LOC] Detecteur front montant Reset
+    ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant apparition defaut
     KoboldRiseEdge          : R_TRIG;       // . [LOC] Detecteur front entrant eau (0->1)
     KoboldFallEdge          : F_TRIG;       // . [LOC] Detecteur front sortie eau / fond (1->0)
+
+    // === CALCUL DYNAMIQUE RUNTIME DES TIMEOUTS ===
+    ImmersionCourse_M          : REAL;      // . [LOC] Course credible max recherche immersion (m)
+    BottomCourse_M             : REAL;      // . [LOC] Course credible max recherche fond (m)
+    CalculatedImmersionTimeout : TIME;      // . [LOC] Plafond anti-blocage immersion calcule au runtime
+    CalculatedBottomTimeout    : TIME;      // . [LOC] Plafond anti-blocage fond calcule au runtime
+
+    // === ACCUMULATEURS DE TEMPS ANTI-POMPAGE ===
+    ImmersionTimerAcc       : TIME := T#0ms;// . [LOC] Temps cumule recherche immersion sous mouvement
+    BottomTimerAcc          : TIME := T#0ms;// . [LOC] Temps cumule recherche fond sous mouvement
+    PrevState               : E_DiveSearchState; // . [LOC] Etape au scan precedent (maintien survivant au gate)
 
     // === VARIABLES LOCALES INTERNES ===
     ImmersionConfirmed      : BOOL;         // . [LOC] Immersion dans la fenetre d'eau validee
     ErrorCausePresent       : BOOL;         // . [LOC] Presence d'une cause de defaut parametrage
     SeqErrorFault           : BOOL;         // . [LOC] Latch erreur séquence immersion
     Palier5ForbiddenFault   : BOOL;         // . [LOC] Latch tentative descente en Palier 5 sous Kobold
+    TimeoutImmersionFault   : BOOL;         // . [LOC] Latch timeout recherche immersion
+    TimeoutBottomFault      : BOOL;         // . [LOC] Latch timeout recherche fond
 
     // === SOCLE DEFAUT ===
     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
     instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+END_VAR
+VAR CONSTANT
+    // === CONSTANTES DERIVATION TIMEOUT ANTI-BLOCAGE ===
+    CST_DiveSpeedMin_Mps    : REAL := 0.15;   // Vitesse Palier 1 mini sous charge/mou (m/s)
+    CST_TimeoutMarginFactor : REAL := 1.5;    // Facteur de marge de securite sur la course theorique
+    CST_TimeoutMinCourse_M  : REAL := 1.0;    // Plancher de course pour le calcul (evite timeout degenere)
+    CST_SecToMs             : REAL := 1000.0; // Conversion secondes -> millisecondes
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -74,14 +99,45 @@ KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 
 ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M < ImmersionUpper_M)
-                  OR (ImmersionUpper_M <= ImmersionLower_M));
+                  OR (ImmersionUpper_M <= ImmersionLower_M)
+                  OR (ImmersionLower_M <= LimitLegalDepthMin_M)
+                  OR (CableLimitAscent_M <= ImmersionLower_M));
+
+// ⏱️ Plafonds anti-blocage calcules au runtime : course credible max / vitesse Palier 1 mini x marge.
+// Course immersion = du plafond haut d'exploitation a la borne basse d'immersion (depart de plongee
+// possible n'importe ou entre DiveStartMin_M et CableLimitAscent_M -> on prend la borne la plus large).
+ImmersionCourse_M   := MAX(CST_TimeoutMinCourse_M, CableLimitAscent_M - ImmersionLower_M);
+BottomCourse_M      := MAX(CST_TimeoutMinCourse_M, ImmersionLower_M - LimitLegalDepthMin_M);
+CalculatedImmersionTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
+    ImmersionCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
+CalculatedBottomTimeout    := UDINT_TO_TIME(REAL_TO_UDINT(
+    BottomCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
+
+// ⏱️ Intégrateurs de temps de mouvement effectif (D1 anti-pompage)
+IF (DiveState = E_DiveSearchState.SEARCHING_IMMERSION) AND MotionRequestActive AND (MotionDirection = -1) THEN
+    ImmersionTimerAcc := ImmersionTimerAcc + CycleTime;
+    IF ImmersionTimerAcc >= CalculatedImmersionTimeout THEN
+        TimeoutImmersionFault := TRUE;
+    END_IF;
+END_IF;
+
+IF (DiveState = E_DiveSearchState.SEARCHING_BOTTOM) AND MotionRequestActive AND (MotionDirection = -1) THEN
+    BottomTimerAcc := BottomTimerAcc + CycleTime;
+    IF BottomTimerAcc >= CalculatedBottomTimeout THEN
+        TimeoutBottomFault := TRUE;
+    END_IF;
+END_IF;
 
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
-    SeqErrorFault := FALSE;
+    SeqErrorFault         := FALSE;
     Palier5ForbiddenFault := FALSE;
-    ImmersionConfirmed := FALSE;
-    BottomTouchConfirmed := FALSE;
-    DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    TimeoutImmersionFault := FALSE;
+    TimeoutBottomFault    := FALSE;
+    ImmersionTimerAcc     := T#0ms;
+    BottomTimerAcc        := T#0ms;
+    ImmersionConfirmed    := FALSE;
+    BottomTouchConfirmed  := FALSE;
+    DiveState             := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 
 instCauses[0].Active   := SeqErrorFault;
@@ -96,9 +152,25 @@ instCauses[3].Active   := Palier5ForbiddenFault;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Mesure Kobold impossible : vitesse trop elevee (Palier 5 interdit)';
 
+instCauses[4].Active   := TimeoutImmersionFault;
+instCauses[4].Latching := TRUE;
+instCauses[4].Texte    := 'Depassement tempo recherche immersion Kobold';
+
+instCauses[5].Active   := TimeoutBottomFault;
+instCauses[5].Latching := TRUE;
+instCauses[5].Texte    := 'Depassement tempo recherche fond Kobold';
+
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
+
+// 📸 Capture ordonnée de StepAtFault sur front montant de défaut (D2)
+ErrorEdge(CLK := Fault.Error);
+IF ErrorEdge.Q THEN
+    StepAtFault := PrevState;
+ELSIF ResetEdge.Q THEN
+    StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
+END_IF;
 {endregion}
 
 {region "§2 Gate neutralisation"}
@@ -112,9 +184,13 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     KoboldContactorCmd := FALSE;
     BottomTouchConfirmed := FALSE;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
     OperatorActionId := 0;
     OperatorAction := '';
     ImmersionConfirmed := FALSE;
+    ImmersionTimerAcc := T#0ms;
+    BottomTimerAcc := T#0ms;
+    PrevState := E_DiveSearchState.WAIT_PRECONDITIONS;
     RETURN;
 END_IF;
 
@@ -152,6 +228,7 @@ ELSE
             OperatorActionId := 16#0101;
             OperatorAction := 'Demander une descente pour rechercher le fond.';
             IF MotionRequestActive AND (MotionDirection = -1) THEN
+                ImmersionTimerAcc := T#0ms; // ⏱️ RAZ à l'entrée exacte de SEARCHING_IMMERSION
                 DiveState := E_DiveSearchState.SEARCHING_IMMERSION;
             END_IF;
 
@@ -172,6 +249,7 @@ ELSE
                 IF (M1Position_M <= ImmersionUpper_M) AND (M1Position_M >= ImmersionLower_M)
                    AND (M2Position_M <= ImmersionUpper_M) AND (M2Position_M >= ImmersionLower_M) THEN
                     ImmersionConfirmed := TRUE;
+                    BottomTimerAcc := T#0ms; // ⏱️ RAZ à l'entrée exacte de SEARCHING_BOTTOM
                     DiveState := E_DiveSearchState.SEARCHING_BOTTOM;
                 ELSE
                     SeqErrorFault := TRUE;
@@ -210,6 +288,9 @@ ELSE
             KoboldContactorCmd := FALSE;
     END_CASE;
 END_IF;
+
+// 💾 Mémorisation de l'étape précédente en toute fin de scan
+PrevState := DiveState;
 {endregion}
 
 END_FUNCTION_BLOCK

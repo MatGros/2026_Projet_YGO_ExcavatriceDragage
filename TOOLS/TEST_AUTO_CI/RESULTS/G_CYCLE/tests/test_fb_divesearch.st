@@ -104,6 +104,151 @@ TEST 'TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut b
        CurrentSpeedStep := 5);
     ASSERT_TRUE(FB.Fault.Error, 'Defaut Palier 5 interdit');
     ASSERT_EQ(FB.DiveState, E_DiveSearchState.ERROR_HOLD, 'Verrouille en ERROR_HOLD');
+    ASSERT_EQ(FB.StepAtFault, E_DiveSearchState.SEARCHING_IMMERSION, 'StepAtFault mémorise SEARCHING_IMMERSION');
     ASSERT_FALSE(FB.KoboldContactorCmd, 'Contacteur coupe sur defaut');
 END_TEST
+
+TEST 'TC-P04-013 : Depassement tempo recherche immersion Kobold -> ERROR_HOLD et capture StepAtFault'
+    // 1. Initialisation -> SEARCHING_IMMERSION. Course plancher (CableLimitAscent_M=0.15 -> MAX(1.0,..)=1.0m),
+    //    timeout dynamique = 1.0/0.15*1.5 = 10s ; CycleTime=4s -> depassement au 3e scan d'accumulation.
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    ASSERT_EQ(FB.DiveState, E_DiveSearchState.SEARCHING_IMMERSION, 'En recherche immersion');
+
+    // 2. Avance du temps : 5 scans de 4s = 20s (> 10s timeout)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+
+    ASSERT_TRUE(FB.Fault.Error, 'Defaut timeout immersion declenche');
+    ASSERT_EQ(FB.DiveState, E_DiveSearchState.ERROR_HOLD, 'Verrouille en ERROR_HOLD');
+    ASSERT_EQ(FB.StepAtFault, E_DiveSearchState.SEARCHING_IMMERSION, 'StepAtFault memorise SEARCHING_IMMERSION');
+    ASSERT_FALSE(FB.DescendPermit, 'Permis descente coupe');
+    ASSERT_FALSE(FB.KoboldContactorCmd, 'Contacteur Kobold coupe');
+END_TEST
+
+TEST 'TC-P04-014 : Depassement tempo recherche fond Kobold -> ERROR_HOLD et capture StepAtFault'
+    // 1. Mise en condition SEARCHING_BOTTOM (immersion validee). Course fond plancher
+    //    (ImmersionLower 5.0 - LimitLegalDepthMin 4.996 = 0.004 -> MAX(1.0,..)=1.0m), timeout = 10s ; CycleTime=4s.
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BucketIsOpen := TRUE, PositionsValid := TRUE, KoboldImmersed := FALSE,
+       M1Position_M := 20.0, M2Position_M := 20.0, CurrentSpeedStep := 4,
+       DiveStartMin_M := 15.0, ImmersionUpper_M := 10.0, ImmersionLower_M := 5.0,
+       LimitLegalDepthMin_M := 4.996, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BucketIsOpen := TRUE, PositionsValid := TRUE, KoboldImmersed := FALSE,
+       M1Position_M := 12.0, M2Position_M := 12.0, CurrentSpeedStep := 4,
+       MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 15.0, ImmersionUpper_M := 10.0, ImmersionLower_M := 5.0,
+       LimitLegalDepthMin_M := 4.996, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BucketIsOpen := TRUE, PositionsValid := TRUE, KoboldImmersed := TRUE,
+       M1Position_M := 8.0, M2Position_M := 8.0, CurrentSpeedStep := 4,
+       MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 15.0, ImmersionUpper_M := 10.0, ImmersionLower_M := 5.0,
+       LimitLegalDepthMin_M := 4.996, CycleTime := T#4s);
+    ASSERT_EQ(FB.DiveState, E_DiveSearchState.SEARCHING_BOTTOM, 'Passe en recherche fond');
+
+    // 2. Avance du temps : 5 scans de 4s = 20s (> 10s timeout)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BucketIsOpen := TRUE, PositionsValid := TRUE, KoboldImmersed := TRUE,
+       M1Position_M := 7.0, M2Position_M := 7.0, CurrentSpeedStep := 4,
+       MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 15.0, ImmersionUpper_M := 10.0, ImmersionLower_M := 5.0,
+       LimitLegalDepthMin_M := 4.996, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BucketIsOpen := TRUE, PositionsValid := TRUE, KoboldImmersed := TRUE,
+       M1Position_M := 6.5, M2Position_M := 6.5, CurrentSpeedStep := 4,
+       MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 15.0, ImmersionUpper_M := 10.0, ImmersionLower_M := 5.0,
+       LimitLegalDepthMin_M := 4.996, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BucketIsOpen := TRUE, PositionsValid := TRUE, KoboldImmersed := TRUE,
+       M1Position_M := 6.0, M2Position_M := 6.0, CurrentSpeedStep := 4,
+       MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 15.0, ImmersionUpper_M := 10.0, ImmersionLower_M := 5.0,
+       LimitLegalDepthMin_M := 4.996, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BucketIsOpen := TRUE, PositionsValid := TRUE, KoboldImmersed := TRUE,
+       M1Position_M := 5.5, M2Position_M := 5.5, CurrentSpeedStep := 4,
+       MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 15.0, ImmersionUpper_M := 10.0, ImmersionLower_M := 5.0,
+       LimitLegalDepthMin_M := 4.996, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BucketIsOpen := TRUE, PositionsValid := TRUE, KoboldImmersed := TRUE,
+       M1Position_M := 5.2, M2Position_M := 5.2, CurrentSpeedStep := 4,
+       MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 15.0, ImmersionUpper_M := 10.0, ImmersionLower_M := 5.0,
+       LimitLegalDepthMin_M := 4.996, CycleTime := T#4s);
+
+    ASSERT_TRUE(FB.Fault.Error, 'Defaut timeout fond declenche');
+    ASSERT_EQ(FB.DiveState, E_DiveSearchState.ERROR_HOLD, 'Verrouille en ERROR_HOLD');
+    ASSERT_EQ(FB.StepAtFault, E_DiveSearchState.SEARCHING_BOTTOM, 'StepAtFault memorise SEARCHING_BOTTOM');
+    ASSERT_FALSE(FB.DescendPermit, 'Permis descente coupe');
+    ASSERT_FALSE(FB.KoboldContactorCmd, 'Contacteur coupe anti-chauffe');
+END_TEST
+
+TEST 'TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seulement sur front Reset'
+    // 1. Declenche un timeout immersion -> latch arme
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BypassPreconditions := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       DiveStartMin_M := 0.005, ImmersionUpper_M := 0.0, ImmersionLower_M := 0.0,
+       CableLimitAscent_M := 0.15, CycleTime := T#4s);
+    ASSERT_TRUE(FB.Fault.Latched, 'Latch timeout immersion arme');
+
+    // 2. Enable OFF : neutralisation, mais latch conserve
+    FB(Enable := FALSE, Reset := FALSE, PowerContactorEngaged := TRUE);
+    ASSERT_TRUE(FB.Fault.Latched, 'Latch conserve sous Enable=FALSE (pas de redemarrage auto)');
+
+    // 3. Enable ON sans Reset : defaut toujours latche
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       MotionRequestActive := FALSE);
+    ASSERT_TRUE(FB.Fault.Latched, 'Latch toujours actif sur retour Enable=TRUE sans acquittement');
+
+    // 4. Front Reset (conditions de garde reunies) : acquittement effectif
+    FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
+       KoboldImmersed := FALSE, MotionRequestActive := FALSE);
+    ASSERT_FALSE(FB.Fault.Latched, 'Front Reset acquitte le latch timeout');
+END_TEST
+
+
 

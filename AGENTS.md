@@ -232,6 +232,7 @@ Afin d'éviter toute perte de travail et d'avoir un point de retour immédiat :
    `test(scope): validation CI 100% PASS et mise a jour des rapports`.
 
 ⚠️ **Aucun commit sans validation humaine explicite** — pour tout agent, sans exception.
+⛔ **AUCUN PUSH DIRECT SUR MAIN SANS RELECTURE DE DIFF ET ACCORD EXPLICITE** : L'agent ne doit JAMAIS pousser sur `origin/main` sans avoir fait relire le `git diff` réel à l'humain/l'orchestrateur et sans confirmation explicite (« tu peux push » / « push »).
 
 🚨 **Premier réflexe avant commit/push** : si un fichier que tu n'as **pas** modifié apparaît dans
 le diff, ou s'il y a une **suppression**, ou un fichier qui ne devrait pas être là → **STOP et
