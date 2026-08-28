@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banc de test interactif FB_Cycle (T173) — pilotage joystick</title>
+<style>
+  :root { --bg:#0b0f19; --card:#151d30; --panel:#0d1322; --border:#233354; --accent:#38bdf8; --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444; --text:#f8fafc; --dim:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Tahoma,sans-serif; }
+  body { background:var(--bg); color:var(--text); padding:16px; }
+  h1 { font-size:1.1rem; margin-bottom:4px; }
+  .sub { color:var(--dim); font-size:0.78rem; margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns: 1fr 400px; grid-template-areas:"outputs commands"; gap:14px; min-width:0; }
+  .grid > .card:first-child { grid-area: commands; }  /* carte commandes -> droite */
+  .grid > .card:nth-child(2) { grid-area: outputs; }  /* carte sorties -> gauche */
+  @media (max-width: 1200px) {
+    .grid { grid-template-columns: 1fr; grid-template-areas:"commands" "outputs"; }
+  }
+  .scene-wrap { min-width:0; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px; }
+  .card h2 { font-size:0.85rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:10px; }
+  .row { display:flex; align-items:center; gap:8px; margin-bottom:7px; font-size:0.8rem; }
+  .row label { flex:1; color:var(--dim); }
+  .row input[type=checkbox] { width:16px; height:16px; }
+  .row select, .row input[type=number] { background:#1e293b; color:#fff; border:1px solid #334155; border-radius:4px; padding:3px 6px; }
+  .btn { background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 14px; border-radius:5px; cursor:pointer; font-size:0.85rem; }
+  .btn:hover { background:#334155; }
+  .btn-primary { background:#0284c7; border-color:#38bdf8; }
+  .btn-danger { background:#7f1d1d; border-color:#ef4444; }
+  .btn-active { background:#b45309; border-color:#f59e0b; }
+  .btn-row { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  /* Joystick */
+  .joy { width:170px; height:170px; margin:0 auto; position:relative; background:radial-gradient(circle, #1e293b 0%, #0f172a 100%); border:1px solid var(--border); border-radius:50%; touch-action:none; user-select:none; -webkit-user-select:none; }
+  .joy-wrap { position:relative; width:170px; height:170px; margin:0 auto; }
+  .joy-knob { width:56px; height:56px; background:#334155; border:2px solid var(--accent); border-radius:50%; position:absolute; top:57px; left:57px; box-shadow:0 2px 8px rgba(0,0,0,.5); pointer-events:none; }
+  .joy-arrow { position:absolute; color:var(--dim); font-size:1.2rem; user-select:none; -webkit-user-select:none; pointer-events:none; }
+  .joy-label { text-align:center; color:var(--dim); font-size:0.7rem; margin-top:4px; }
+  .out { font-size:0.8rem; }
+  .out .step { font-size:1.05rem; font-weight:700; color:var(--accent); margin-bottom:8px; }
+  .out .op { color:var(--warn); margin-bottom:10px; }
+  .out table { width:100%; border-collapse:collapse; }
+  .out td { padding:4px 6px; border-bottom:1px solid #1f293d; }
+  .out td:first-child { color:var(--dim); }
+  .out td:last-child { font-weight:600; text-align:right; }
+  .on { color:var(--ok); } .off { color:var(--dim); } .warn { color:var(--warn); } .err { color:var(--danger); }
+  .note { font-size:0.7rem; color:var(--dim); margin-top:10px; }
+  .posbar { width:100%; height:14px; background:#0f172a; border:1px solid var(--border); border-radius:3px; position:relative; margin:6px 0; }
+  .posbar .marker { position:absolute; top:-2px; bottom:-2px; width:3px; background:var(--warn); }
+  .posbar .bucket { position:absolute; top:-3px; width:10px; height:20px; background:var(--accent); border-radius:2px; }
+  .posbar .scale { display:flex; justify-content:space-between; font-size:0.6rem; color:var(--dim); }
+  /* Provenance & bandeau hors-ligne (REX audit 2026-08-28) */
+  .prov-bin { color: var(--ok); }    /* 🟢 sortie binaire */
+  .prov-sim { color: #eab308; }      /* 🟡 monde simulé JS */
+  .prov-inj { color: var(--warn); }  /* 🟠 injection manuelle */
+  .prov-nosim { color: var(--danger); } /* 🔴 non simulé */
+  .banner-offline { background:#7f1d1d; border:1px solid #ef4444; color:#fff; padding:8px 14px; border-radius:6px; font-size:0.78rem; font-weight:600; margin-bottom:12px; }
+  .legend-prov { display:flex; gap:14px; flex-wrap:wrap; font-size:0.72rem; color:var(--dim); margin-bottom:10px; }
+  .badge-sha { background:#0c4a6e; color:#7dd3fc; border:1px solid #38bdf8; padding:2px 8px; border-radius:12px; font-size:0.66rem; font-family:monospace; }
+  /* Schéma de flux ENTRÉES -> FB_Cycle -> SORTIES (lisible, 3 blocs alignés) */
+  .flow { display:flex; align-items:stretch; gap:6px; margin-bottom:12px; }
+  .flow-box { flex:1; background:var(--bg-panel); border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:0.78rem; min-width:0; }
+  .flow-box .flow-title { font-weight:700; }
+  .flow-box .flow-sub { color:var(--dim); font-size:0.7rem; margin-top:3px; line-height:1.5; }
+  .flow-arrow { display:flex; align-items:center; color:var(--accent); font-size:1.4rem; padding:0 4px; }
+  @media (max-width:900px) { .flow { flex-direction:column; } .flow-arrow { transform:rotate(90deg); justify-content:center; } }
+
+
+</style>
+</head>
+<body>
+<h1>🧪 Banc interactif de décision FB_Cycle <span class="badge-sha" id="shaBadge">source ?</span></h1>
+<div class="banner-offline">🔴 BANC LOGICIEL HORS-LIGNE — aucune commande machine réelle — chaîne PRG_02 / PRG_04 / PRG_05 / PRG_06 et interlocks NON EXÉCUTÉS. Seul le séquenceur FB_Cycle est compilé.</div>
+<div class="legend-prov">
+  <span><span class="prov-bin">🟢</span> Sortie du binaire FB_Cycle</span>
+  <span><span class="prov-sim">🟡</span> Monde simulé JS</span>
+  <span><span class="prov-inj">🟠</span> Injection manuelle</span>
+  <span><span class="prov-nosim">🔴</span> Non simulé / non vérifié</span>
+</div>
+<div class="sub">Pousse le joystick + homme-mort → le <b>binaire FB_Cycle compilé</b> décide → la position simulée évolue → les transitions se déclenchent quand TU atteins les conditions. Zéro logique métier en JS.</div>
+
+<div class="flow">
+  <div class="flow-box">
+    <div class="flow-title prov-inj">🟠 ENTRÉES du séquenceur</div>
+    <div class="flow-sub">ce qui ENTRE dans FB_Cycle : mode, Enable, positions M1/M2, capteurs, StartCycle/Reset, homme-mort, CycleMotionPermit…</div>
+  </div>
+  <div class="flow-arrow">➜</div>
+  <div class="flow-box" style="border-color:var(--accent);">
+    <div class="flow-title" style="color:var(--accent);">FB_Cycle</div>
+    <div class="flow-sub">séquenceur compilé — étape courante X_x</div>
+  </div>
+  <div class="flow-arrow">➜</div>
+  <div class="flow-box">
+    <div class="flow-title prov-bin">🟢 SORTIES de l'étape</div>
+    <div class="flow-sub">CycleStep + OperatorAction + demandes WinchM1/M2, Translation, Benne + état Fault/Lifecycle</div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h2>🟠 ENTRÉES du séquenceur — ce qui entre dans FB_Cycle</h2>
+    <div class="joy-wrap">
+      <div class="joy" id="joy">
+        <div class="joy-knob" id="joyKnob"></div>
+      </div>
+      <div class="joy-arrow" style="top:-24px;left:50%;transform:translateX(-50%);">▲</div>
+      <div class="joy-arrow" style="bottom:-24px;left:50%;transform:translateX(-50%);">▼</div>
+      <div class="joy-arrow" style="top:50%;left:-16px;transform:translateY(-50%);">◀</div>
+      <div class="joy-arrow" style="top:50%;right:-16px;transform:translateY(-50%);">▶</div>
+    </div>
+    <div class="joy-label" id="joyLabel">Neutre (relâché)</div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btnDead" onclick="dead()">🖐️ Homme-mort (clic pour armer / désarmer)</button>
+    </div>
+    <div class="row" style="margin-top:8px;"><label>Auto-scan</label><input type="checkbox" id="autoScan" onchange="toggleAuto(this)"></div>
+    <div class="row"><label>Vitesse simulée (m/s)</label><input type="number" id="simSpeed" value="0.5" step="0.1" style="width:70px"></div>
+
+    <h2 style="margin-top:14px;">🟠 Commandes & autorisations entrantes</h2>
+    <div class="row"><label>Mode</label>
+      <select id="MODE"><option value="SEMI_AUTO">SEMI_AUTO</option><option value="MAINT_N1">MAINT_N1</option><option value="MAINT_N2">MAINT_N2</option><option value="DISABLE">DISABLE</option></select></div>
+    <div class="row"><label>Enable</label><input type="checkbox" id="ENABLE" checked></div>
+    <div class="row"><label>PowerContactorEngaged</label><input type="checkbox" id="POWERCONTACTORENGAGED" checked></div>
+    <div class="row"><label>CycleMotionPermit</label><input type="checkbox" id="CYCLEMOTIONPERMIT" checked></div>
+    <div class="row"><label>HeartbeatIhmOk</label><input type="checkbox" id="HEARTBEATIHMOK" checked></div>
+    <div class="row"><label>StartCycle (front)</label><input type="checkbox" id="STARTCYCLE"></div>
+    <div class="row"><label>AbortCycle</label><input type="checkbox" id="ABORTCYCLE"></div>
+    <div class="row"><label>Reset (front, acquittement)</label><input type="checkbox" id="RESET"></div>
+    <div class="row"><label>SelTarget</label><input type="number" id="SELTARGET" value="3" style="width:70px"></div>
+
+    <h2 style="margin-top:14px;">🟠 Capteurs entrants (auto depuis position, ou manuel)</h2>
+    <div class="row"><label>Translation P1</label><input type="checkbox" id="TRANSLATION_AT_P1" checked></div>
+    <div class="row"><label>Translation Trémie</label><input type="checkbox" id="TRANSLATION_AT_TREMIE"></div>
+    <div class="row"><label>Translation Maintenance</label><input type="checkbox" id="TRANSLATION_AT_MAINTENANCE"></div>
+    <div class="row"><label>Translation Done</label><input type="checkbox" id="TRANSLATION_DONE" checked></div>
+    <div class="row"><label>Benne Done</label><input type="checkbox" id="BENNE_DONE" checked></div>
+    <div class="row"><label>Benne IsOpen</label><input type="checkbox" id="BENNE_ISOPEN"></div>
+    <div class="row"><label>Benne IsClosed</label><input type="checkbox" id="BENNE_ISCLOSED" checked></div>
+    <div class="row"><label>Benne ~Fermée</label><input type="checkbox" id="BENNE_ISROUGHLYCLOSED" checked></div>
+    <div class="row"><label>HomedM1</label><input type="checkbox" id="HOMEDM1" checked></div>
+    <div class="row"><label>HomedM2</label><input type="checkbox" id="HOMEDM2" checked></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="scanOnce()">▶️ Scan (1 pas)</button>
+      <button class="btn btn-danger" onclick="resetEngine()">↺ Reset moteur</button>
+    </div>
+    <div class="note">Top Haut (≥ +8.5m) et Kobold Fond (≤ -9.5m) se dérivent de la position câble.</div>
+  </div>
+
+  <div class="card out">
+    <h2>🟢 SORTIES du séquenceur FB_Cycle — ce qui sort de l'étape</h2>
+
+    <div id="out" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:10px;">
+      <div class="step">—</div>
+      <div class="op">—</div>
+      <table>
+        <tr><td>🟢 Demande treuil M1 (FB_Cycle)</td><td class="prov-bin" id="oM1">—</td></tr>
+        <tr><td>🟢 Demande treuil M2 (FB_Cycle)</td><td class="prov-bin" id="oM2">—</td></tr>
+        <tr><td>🟢 Demande translation M3 (FB_Cycle)</td><td class="prov-bin" id="oTrans">—</td></tr>
+        <tr><td>🟢 Demande benne (ouvre/ferme)</td><td class="prov-bin" id="oBucket">—</td></tr>
+        <tr><td>🟢 Demande contacteur Kobold</td><td class="prov-bin" id="oKobold">—</td></tr>
+        <tr><td>🟢 Défaut</td><td class="prov-nosim" id="oFault">—</td></tr>
+        <tr><td>🟢 Cycle de vie (Busy/Done)</td><td class="prov-bin" id="oLife">—</td></tr>
+        <tr><td>🟢 Prélèvements (RETAIN)</td><td class="prov-bin" id="oSample">—</td></tr>
+        <tr><td>🟢 Attente opérateur</td><td class="prov-bin" id="oWait">—</td></tr>
+      </table>
+      <details style="margin-top:6px;font-size:0.72rem;color:var(--dim);">
+        <summary style="cursor:pointer;color:var(--warn);">⚠️ Rappel hors-ligne — NON simulé (déplier)</summary>
+        Ces « Demande » sont des sorties du séquenceur FB_Cycle — PAS des sorties physiques. Les interlocks et la chaîne PRG_04/05/06 ne sont pas simulés (🔴).
+      </details>
+      <div class="note" id="oRaw" style="white-space:pre-wrap; font-size:0.62rem; margin-top:8px;"></div>
+    </div>
+
+    <!-- Scène machine SVG live (le monde que tu conduis au joystick) -->
+    <div style="background:#030712;border-radius:6px;border:1px solid #1f2937;margin-bottom:10px;">
+      <svg id="svgb" width="100%" height="360" viewBox="0 0 500 360">
+        <rect x="0" y="0" width="500" height="360" fill="#090d16"/>
+        <!-- échelle altimétrie -->
+        <line x1="18" y1="58" x2="18" y2="350" stroke="#475569" stroke-width="1.5"/>
+        <text x="2" y="62" fill="#f59e0b" font-size="8" font-weight="bold">+8.5m</text>
+        <text x="2" y="204" fill="#38bdf8" font-size="8" font-weight="bold">0m</text>
+        <text x="1" y="354" fill="#ef4444" font-size="8" font-weight="bold">-10.5m</text>
+        <!-- eau (surface à y=180 = 0m) -->
+        <rect x="40" y="180" width="460" height="180" fill="rgba(14,165,233,0.35)"/>
+        <line x1="40" y1="180" x2="500" y2="180" stroke="#38bdf8" stroke-dasharray="6,4"/>
+        <text x="452" y="174" fill="#38bdf8" font-size="9" font-weight="bold">Eau 0m</text>
+        <!-- fond carrière -->
+        <path d="M 40,215 Q 200,320 350,350 L 500,362 L 40,362 Z" fill="#1c1917" stroke="#44403c" stroke-width="1.5"/>
+        <text x="430" y="330" fill="#a8a29e" font-size="8">Fond</text>
+        <!-- rail pont -->
+        <line x1="20" y1="46" x2="480" y2="46" stroke="#94a3b8" stroke-width="5"/>
+        <!-- pont M3 -->
+        <g id="benchGantry" transform="translate(55,36)">
+          <rect x="-42" y="0" width="84" height="20" rx="4" fill="#0369a1" stroke="#38bdf8" stroke-width="1.5"/>
+          <text x="0" y="13" fill="#fff" font-size="7" font-weight="bold" text-anchor="middle">PONT M3</text>
+        </g>
+        <!-- cable + benne -->
+        <path id="benchCable" d="M 55,56 L 55,210" stroke="#f59e0b" stroke-width="2" fill="none"/>
+        <g id="benchBucket" transform="translate(55,210)">
+          <rect x="-15" y="-12" width="30" height="12" rx="2" fill="#334155" stroke="#64748b"/>
+          <g id="benchGravel" opacity="0">
+            <path d="M -11,0 L 11,0 L 8,14 L -8,14 Z" fill="#8a9a76" stroke="#6b7b5a"/>
+            <circle cx="-5" cy="4" r="2" fill="#a3b193"/><circle cx="3" cy="6" r="2.4" fill="#9aa98a"/><circle cx="7" cy="3" r="1.8" fill="#b5c2a4"/>
+          </g>
+          <path id="benchJawL" d="M -15,0 C -23,8 -21,24 0,26 C -8,17 -11,9 -15,0 Z" fill="#b45309" stroke="#d97706"/>
+          <path id="benchJawR" d="M 15,0 C 23,8 21,24 0,26 C 8,17 11,9 15,0 Z" fill="#d97706" stroke="#b45309"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="posbar" id="posBar">
+      <div class="marker" style="left:2%;"></div>
+      <div class="marker" style="left:98%;"></div>
+      <div class="bucket" id="posBucket"></div>
+    </div>
+    <div class="scale"><span>🟡 -10.5m</span><span id="posVal">7.0 m</span><span>+8.5m</span></div>
+    <div class="note">🟡 Position câble = simulation JS du monde (pas de la chaîne réelle). 🟠 Pont M3 / ouverture benne = selon tes cases cochées (injection manuelle).</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// BANC DE TEST — JS d'envoi/affichage + SIMULATION DE L'ENVIRONNEMENT PHYSIQUE.
+// Le binaire compilé décide (transitions, actionneurs). Le JS ne simule que le
+// MONDE (position treuil qui évolue selon l'intention joystick), jamais la logique
+// du FB. (Certifié par guard_animation_no_business_logic.py --no-freshness.)
+// ═══════════════════════════════════════════════════════════════════════
+const STEP_NAMES = {0:'X0_PREPARATION',1:'X1_HOMING',2:'X2_WORK_POS_SELECT',3:'X3_OPEN_BUCKET',4:'X4_DESCEND_OPEN',5:'X5_BOTTOM_CONFIRMED',6:'X6_CLOSE_BUCKET',7:'X7_CTRL_ASCENT',8:'X8_ASCENT_LOADED',9:'X9_DRAIN_PAUSE',10:'X10_TRANSLATE_DUMP',11:'X11_OPEN_DUMP',13:'X13_DONE_SYNC',14:'STABILIZING'};
+
+// État de simulation de l'environnement (positions treuil)
+let simM1 = 7.0, simM2 = 7.0;
+let joyY = 0, joyX = 0;        // -1..1 intention opérateur (Y: >0 = montée, <0 = descente)
+let deadman = false;
+let autoTimer = null;
+let lastStep = 0;              // dernière étape décidée par le binaire (pour l'homing auto)
+
+// --- Joystick (pointer events) ---
+const joyEl = document.getElementById('joy');
+joyEl.addEventListener('pointerdown', e => { joyEl.setPointerCapture(e.pointerId); updateJoy(e); });
+joyEl.addEventListener('pointermove', e => { if (joyEl.hasPointerCapture(e.pointerId)) updateJoy(e); });
+joyEl.addEventListener('pointerup', () => resetJoy());
+joyEl.addEventListener('pointercancel', () => resetJoy());
+function updateJoy(e) {
+  const r = joyEl.getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  // Y : pousser le joystick en HAUT = monter (intention -1 en coordonnée écran)
+  joyY = Math.max(-1, Math.min(1, (cy - e.clientY) / (r.height/2)));
+  joyX = Math.max(-1, Math.min(1, (e.clientX - cx) / (r.width/2)));
+  const k = document.getElementById('joyKnob');
+  k.style.left = (57 + joyX*40) + 'px';
+  k.style.top = (57 - joyY*40) + 'px';
+  const dir = joyY > 0.2 ? 'MONTÉE' : (joyY < -0.2 ? 'DESCENTE' : 'Neutre');
+  document.getElementById('joyLabel').textContent = dir + (Math.abs(joyY) > 0.2 ? ' · intensité ' + (Math.abs(joyY)*100).toFixed(0) + '%' : '');
+}
+function resetJoy() { joyY = 0; joyX = 0; document.getElementById('joyKnob').style.left='57px'; document.getElementById('joyKnob').style.top='57px'; document.getElementById('joyLabel').textContent='Neutre (relâché)'; }
+function dead() {
+  deadman = !deadman;
+  const b = document.getElementById('btnDead');
+  b.className = 'btn ' + (deadman ? 'btn-active' : 'btn-primary');
+  b.textContent = deadman ? '🖐️ Homme-mort ARMÉ (re-clic pour désarmer)' : '🖐️ Homme-mort (clic pour armer / désarmer)';
+}
+
+// --- Collecte stimuli ---
+function collectStimuli() {
+  const s = {};
+  const bools = ['ENABLE','POWERCONTACTORENGAGED','CYCLEMOTIONPERMIT','HEARTBEATIHMOK','STARTCYCLE','ABORTCYCLE','RESET','TRANSLATION_AT_P1','TRANSLATION_AT_TREMIE','TRANSLATION_AT_MAINTENANCE','TRANSLATION_DONE','BENNE_DONE','BENNE_ISOPEN','BENNE_ISCLOSED','BENNE_ISROUGHLYCLOSED'];
+  bools.forEach(id => { const el = document.getElementById(id); if (el) s[id] = el.checked ? 1 : 0; });
+
+  // Homing auto (🟡 monde simulé = FB_Encoder_Homing) : pendant X1, si le câble atteint le
+  // capteur top, le codeur devient référencé → HomedM1/HomedM2=1 → le séquenceur quitte X1.
+  const elM1 = document.getElementById('HOMEDM1'), elM2 = document.getElementById('HOMEDM2');
+  let hM1 = elM1.checked, hM2 = elM2.checked;
+  if (lastStep === 1 && simM1 >= 8.5 - 0.05 && simM2 >= 8.5 - 0.05) {
+    hM1 = hM2 = true;
+    if (!elM1.checked) elM1.checked = true;
+    if (!elM2.checked) elM2.checked = true;
+  }
+  s.HOMEDM1 = hM1 ? 1 : 0;
+  s.HOMEDM2 = hM2 ? 1 : 0;
+
+  s.MODE = document.getElementById('MODE').value;
+  s.SELTARGET = parseInt(document.getElementById('SELTARGET').value || '0', 10);
+  // Capteurs dérivés de la position (simulation environnement)
+  s.DEADMANARMED = deadman ? 1 : 0;
+  s.TOPPOSITIONSENSOR = simM1 >= 8.5 ? 1 : 0;
+  s.KOBOLDCONTACTFOND = simM1 <= -9.5 ? 1 : 0;
+  s.M1_CABLEPOSM = +simM1.toFixed(2);
+  s.M2_CABLEPOSM = +simM2.toFixed(2);
+  return s;
+}
+
+// --- Scan + simulation physique ---
+async function doScan() {
+  const speed = parseFloat(document.getElementById('simSpeed').value || '0.5');
+  const stimuli = collectStimuli();
+  const res = await fetch('/scan', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({stimuli}) });
+  const data = await res.json();
+  if (!data.ok) { document.getElementById('oRaw').textContent = 'ERREUR: ' + (data.error||''); return; }
+  lastStep = parseInt(data.outputs.CYCLESTEP, 10);
+  render(data.outputs);
+
+  // Monde simulé (🟡) : la benne s'ouvre/se ferme quand FB la commande ET l'opérateur tient le joystick.
+  // (ex. X3 : BucketCmd.Open=1, OperatorAction "maintenir le joystick : ouverture complète de la benne")
+  const opActive = deadman && (Math.abs(joyY) > 0.2 || Math.abs(joyX) > 0.2);
+  if (opActive && data.outputs['BUCKETCMD.OPEN']==='1') {
+    const cb = document.getElementById('BENNE_ISOPEN'); if (cb) cb.checked = true;
+    const cb2 = document.getElementById('BENNE_ISCLOSED'); if (cb2) cb2.checked = false;
+  }
+  if (opActive && data.outputs['BUCKETCMD.CLOSE']==='1') {
+    const cb2 = document.getElementById('BENNE_ISCLOSED'); if (cb2) cb2.checked = true;
+    const cb = document.getElementById('BENNE_ISOPEN'); if (cb) cb.checked = false;
+  }
+
+  // Simulation physique : le treuil bouge si le FB le commande ET l'opérateur est d'accord
+  // (intention joystick même sens + homme-mort). C'est la réponse du MONDE, pas du FB.
+  const cmdStart = data.outputs['WINCHM1CMD.STARTSTOP'] === '1';
+  const cmdDir = parseInt(data.outputs['WINCHM1CMD.DIRECTION'] || '0', 10);
+  const agree = (joyY > 0.2 && cmdDir === 1) || (joyY < -0.2 && cmdDir === -1);
+  if (cmdStart && agree && deadman) {
+    simM1 = Math.max(-10.5, Math.min(8.5, simM1 + cmdDir * speed * 0.2));
+    simM2 = Math.max(-10.5, Math.min(8.5, simM2 + cmdDir * speed * 0.2));
+  }
+  updatePosBar();
+}
+
+async function scanOnce() { await doScan(); }
+
+function toggleAuto(el) {
+  if (el.checked) { autoTimer = setInterval(doScan, 200); }
+  else { if (autoTimer) clearInterval(autoTimer); autoTimer = null; }
+}
+
+async function resetEngine() {
+  simM1 = 7.0; simM2 = 7.0; lastStep = 0;
+  // Codeurs remis non référencés (pour re-tester l'homing)
+  const e1 = document.getElementById('HOMEDM1'), e2 = document.getElementById('HOMEDM2');
+  if (e1) e1.checked = false;
+  if (e2) e2.checked = false;
+  updatePosBar(); updateScene({CYCLESTEP: '0'});
+  await fetch('/reset', { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+  document.getElementById('oRaw').textContent = 'Moteur réinitialisé.';
+}
+
+function updatePosBar() {
+  // -10.5 -> 8.5 m, map 2%..98%
+  const pct = 2 + ((simM1 + 10.5) / 19.0) * 96;
+  document.getElementById('posBucket').style.left = Math.max(2, Math.min(98, pct)) + '%';
+  document.getElementById('posVal').textContent = simM1.toFixed(1) + ' m';
+}
+
+// Scène SVG : position = monde simulé JS (🟡), pont/benne = cases cochées injection manuelle (🟠),
+// gravier = étape du binaire (🟢). Le moteur n'émet pas TRANSLATION_AT_*/BENNE_ISOPEN : on lit
+// donc les contrôles (source réelle de ce qui est injecté au FB).
+function updateScene(o) {
+  // Pont M3 : cases cochées (injection manuelle 🟠)
+  const p1 = document.getElementById('TRANSLATION_AT_P1').checked;
+  const tr = document.getElementById('TRANSLATION_AT_TREMIE').checked;
+  const mt = document.getElementById('TRANSLATION_AT_MAINTENANCE').checked;
+  const n = (p1?1:0)+(tr?1:0)+(mt?1:0);
+  let gx = 200; // non localisé
+  if (n === 1) gx = p1 ? 330 : (tr ? 55 : 455);
+  document.getElementById('benchGantry').setAttribute('transform', 'translate(' + gx + ', 36)');
+  // Benne verticale d'après simM1 (le monde simulé 🟡) : m -10.5 -> px 350, +8.5 -> px 58
+  const bucky = 58 + (8.5 - simM1) / 19.0 * 292;
+  document.getElementById('benchBucket').setAttribute('transform', 'translate(' + gx + ', ' + bucky.toFixed(1) + ')');
+  document.getElementById('benchCable').setAttribute('d', 'M ' + gx + ',56 L ' + gx + ',' + (bucky - 12).toFixed(1));
+  // Benne ouverte : case cochée (injection manuelle 🟠)
+  const a = document.getElementById('BENNE_ISOPEN').checked ? 45 : 0;
+  document.getElementById('benchJawL').setAttribute('transform', 'rotate(' + a + ', -8, 0)');
+  document.getElementById('benchJawR').setAttribute('transform', 'rotate(' + (-a) + ', 8, 0)');
+  // Gravier chargé (étape 6..10, dérivé du binaire 🟢)
+  const step = parseInt(o.CYCLESTEP, 10);
+  document.getElementById('benchGravel').setAttribute('opacity', (step >= 6 && step <= 10) ? '1' : '0');
+}
+
+function fmtAct(ss, dir, spd) {
+  const on = ss === '1';
+  const d = dir === '1' ? '▲ montée' : (dir === '-1' ? '▼ descente' : '—');
+  return (on ? '<span class="on">🟢 MARCHE</span>' : '<span class="off">⚪ ARRÊT</span>') + ' · ' + d + (spd && spd !== '0' ? ' · ' + spd + '%' : '');
+}
+
+function render(o) {
+  const step = parseInt(o.CYCLESTEP, 10);
+  document.getElementById('out').querySelector('.step').innerHTML = '🟢 Étape <b>' + (STEP_NAMES[step] || 'X'+step) + '</b> — sortie du séquenceur';
+  document.getElementById('out').querySelector('.op').innerHTML = '🖐️ ' + (o.OPERATORACTION || '—');
+  document.getElementById('oM1').innerHTML = fmtAct(o['WINCHM1CMD.STARTSTOP'], o['WINCHM1CMD.DIRECTION'], o['WINCHM1CMD.SPEEDPCT']);
+  document.getElementById('oM2').innerHTML = fmtAct(o['WINCHM2CMD.STARTSTOP'], o['WINCHM2CMD.DIRECTION'], o['WINCHM2CMD.SPEEDPCT']);
+  document.getElementById('oTrans').innerHTML = fmtAct(o['TRANSLATIONCMD.START'], o['TRANSLATIONCMD.TARGET'], null);
+  const bOpen = o['BUCKETCMD.OPEN']==='1', bClose = o['BUCKETCMD.CLOSE']==='1';
+  document.getElementById('oBucket').innerHTML = (bOpen?'<span class="on">🟢 OUVERTURE</span>':'') + (bClose?'<span class="on">🟢 FERMETURE</span>':'') + ((!bOpen&&!bClose)?'<span class="off">⚪ neutre</span>':'');
+  document.getElementById('oKobold').innerHTML = o['BUCKETCMD.KOBOLDCONTACTORCMD']==='1' ? '<span class="on">🟢 demandé</span>' : '<span class="off">⚪ non demandé</span>';
+  const fault = o['FAULT.ERROR']==='1';
+  document.getElementById('oFault').innerHTML = fault ? '<span class="err">⚠️ DÉFAUT (id ' + o['FAULT.ERRORID'] + ')</span>' : '<span class="off">aucun</span>';
+  document.getElementById('oLife').innerHTML = (o['LIFECYCLE.BUSY']==='1'?'Busy ':'') + (o['LIFECYCLE.DONE']==='1'?'Done':'');
+  document.getElementById('oSample').innerHTML = o.SAMPLECOUNT;
+  document.getElementById('oWait').innerHTML = o.WAITINGFOROPERATOR==='1' ? '<span class="warn">⏸ attente opérateur</span>' : '<span class="off">non</span>';
+  document.getElementById('oRaw').textContent = JSON.stringify(o, null, 1);
+  updateScene(o);
+}
+updatePosBar();
+updateScene({CYCLESTEP: '0'});   // scène initiale synchronisée (benn à 7.0m, pas vide)
+
+// Traçabilité : affiche la source exacte que le binaire exécute (SHA du ST WORKING_COPY)
+(async function loadBuildMeta() {
+  try {
+    const r = await fetch('/meta');
+    const m = await r.json();
+    const el = document.getElementById('shaBadge');
+    const sha = (m && m.source_sha256) ? m.source_sha256.slice(0, 12) : '?';
+    el.textContent = 'FB_Cycle WORKING_COPY · ' + sha + (m.build_time ? ' · ' + m.build_time : '');
+  } catch (e) { /* serveur sans /meta */ }
+})();
+</script>
+</body>
+</html>

@@ -1,2 +1,8 @@
 # Ignorer uniquement les archives horodatées (les derniers rapports actifs restent versionnés dans Git)
 RESULTS/*/reports/archive/
+# Artefacts de build jetables (T173 banc interactif) - jamais versionner
+.tmp_*/
+engine/*.exe
+engine/build_manifest.json
+engine/_*.log
+
