@@ -41,12 +41,38 @@ devient locale et lisible, sans dépendre du raisonnement sur le ré-feed de `FB
 
 ---
 
-## 2. FB_ExtractionSequence — revue Ollama indisponible
+## 2. FB_ExtractionSequence — revue Ollama `deepseek-v4-flash` (2026-08-28, prompt court §3)
 
-Le serveur `deepseek-v4-flash:cloud` a **timeout 3 fois** (2026-08-28) — revue indépendante formelle
-**non aboutie**, à rejouer.
+> Rapport brut archivé : `DOC/WFLOW/T167-CR_ollama_FB_ExtractionSequence.md`.
+> (Endpoint `http://127.0.0.1:11434` relancé ; le prompt complet 21 Ko dépasse le timeout 180 s du
+> runner — revue faite sur l'extrait §1-§3.)
 
-**Revue orchestrateur substituée** :
+**Verdict Ollama : MAJEUR.**
+
+### MAJEUR #1 — « Reset → `WAIT_BOTTOM_CONFIRMATION` sans confirmation fond *fraîche* »
+> Après défaut en `CONTROL_ASCENT`, si `BottomPositionConfirmed` reste TRUE (capteur collé),
+> la séquence repart `WAIT_BOTTOM → READY_TO_CLOSE` sur **niveau** (pas front) → reprise possible.
+
+**Statut orchestrateur : observation valable, mais PRÉ-EXISTANTE — hors scope T167-C.**
+La transition `WAIT_BOTTOM_CONFIRMATION → READY_TO_CLOSE` sur niveau est dans le code baseline,
+**inchangée** par T167-C (qui n'ajoute que les timeouts + StepAtFault). Effet réel : la benne est
+déjà fermée après `CLOSING_BUCKET` → fast-forward vers `CONTROL_ASCENT` → reprise de l'ascension
+(aucune descente commandée, aucune réouverture benne). Recovery discutable, pas dangereux en l'état.
+→ **Candidat durcissement** (sémantique de reprise à définir en spec) — voir §4.
+
+### Mineurs / Info — non-défauts (vérifiés orchestrateur)
+- « division par zéro si `CST_MinSpeed_Mps = 0` » : `VAR CONSTANT := 0.15`, littéral compile-time,
+  non configurable — impossible.
+- « `MotionDirection = 1` : si fermeture = descente, accu jamais incrémenté » : `+1 = montée`
+  (la benne se ferme en tirant vers le **haut**), même direction que l'entrée `CLOSING_BUCKET`. Cohérent.
+- « `PrevState` MAJ fin de scan ? » : présent (hors extrait fourni).
+- « gate ne coupe que 3 sorties, et treuils/freins ? » : FB **séquenceur**, pas muscle — produit des
+  permis/demandes ; coupure treuil/frein = chaîne PRG_04 (`SafeStop`/`EffectivePermit`) + barrière PRG_06.
+  Gate complet pour son périmètre.
+
+**Décision : CERTIFIÉ pour le périmètre T167-C.** Le MAJEUR est pré-existant → item de durcissement §4.
+
+### Revue orchestrateur (complémentaire) :
 - Revue deepseek en phase dev : PASS avec 3 réserves → **toutes traitées** (contrôle runtime
   ordre des watchdogs via `BucketMoveTimeout`, garde `CycleTime<=T#0ms`, `StepAtFault` reset conditionné).
 - L'écart MAJEUR #1 de la revue DiveSearch a la **même prémisse** ici (même socle `FB_FaultCore`
@@ -56,8 +82,7 @@ Le serveur `deepseek-v4-flash:cloud` a **timeout 3 fois** (2026-08-28) — revue
 - **Preuve** : `TC-P04-024` étendu — Enable OFF→ON sans Reset : `Fault.Latched=TRUE`,
   `ExtractionState=ERROR_HOLD`, `AscentPermit=FALSE`. ✅
 
-**Décision : CERTIFIÉ SOUS RÉSERVE** — rejouer la revue Ollama indépendante quand le serveur
-répond, avant clôture T170.
+**Décision : CERTIFIÉ pour le périmètre T167-C** (le MAJEUR Ollama est pré-existant, hors scope).
 
 ---
 
@@ -69,4 +94,13 @@ répond, avant clôture T170.
 | `FB_ExtractionSequence` STruCpp | **6/6 PASS** |
 | Non-régression | FB_Cycle 7/7, PRG_03 5/5, PRG_07 3/3 |
 | `G200_check_linkage` | PASS (0 erreur) |
-| `run_all_gates --palier C` | **16/16 PASS** |
+| `run_all_gates` (tout) | **PASS** |
+
+---
+
+## 4. Items de durcissement identifiés (hors scope T167 — tâches dédiées)
+
+| # | Brique | Constat | Décision |
+|---|---|---|---|
+| D1 | `FB_ExtractionSequence` | `WAIT_BOTTOM_CONFIRMATION → READY_TO_CLOSE` sur **niveau** de `BottomPositionConfirmed`, pas sur front frais. Après un Reset post-défaut avec capteur fond encore actif, la séquence peut reprendre sans nouvelle confirmation de pose au fond. | Nouvelle tâche : définir en spec (`AF-04`) la **sémantique de reprise** voulue (reprise d'ascension vs redémarrage depuis le fond), puis gate correspondant. Pré-existant baseline, aucune régression T167-C. |
+| D2 | `FB_DiveSearch` | `SEARCHING_BOTTOM` : arrêt de descente par **timeout seul**, pas de garde de position basse directe dans le FB (limite légale appliquée en aval par `PRG_04.BottomLimitM`). | Durcissement optionnel : passer `LimitLegalDepthMin_M` en garde d'arrêt directe dans le FB. Faible priorité. |
