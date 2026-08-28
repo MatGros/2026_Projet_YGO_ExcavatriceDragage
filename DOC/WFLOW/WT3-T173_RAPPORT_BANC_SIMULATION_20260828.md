@@ -156,7 +156,7 @@ Le `.bat` : (1) trouve Python (fallbacks), (2) compile le moteur **si absent**,
   trace scan-par-scan `trace_semi_auto_cycle.json` (15 scans) + animation pur lecteur
   (garde-fou PASS) + audit indépendant Ollama **CONFORME**.
 - **T172 (proposé, non appliqué)** : rebouclage `X13 → X2` (homing conservé, pas d'attente
-  StartCycle) — diff `PROPOSAL_T172_X13_X2_20260828.md`, **en attente de visa**.
+  StartCycle) — diff `PROPOSAL_WT3-T172_X13_X2_20260828.md`, **en attente de visa**.
 - **REX** `REX_Harnais_StruCpp_InOut_Trace_20260828.md` : codegen STruCpp = `VAR_IN_OUT`
   copy-in seul ; 3 causes de troncature Ollama (timeout/`num_predict`/`num_ctx`).
 
