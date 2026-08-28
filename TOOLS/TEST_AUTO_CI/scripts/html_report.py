@@ -370,11 +370,8 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
         info = checks_by_test.get(name, {"checks": [], "comments": [], "scan_notes": {}})
 
         checks_html = "".join(f"<li>{_html.escape(c)}</li>" for c in info["checks"])
-        comments_html = "".join(f"<p class='comment'>{_html.escape(c)}</p>" for c in info["comments"])
         chrono_html = _render_chronogram(name, trace_entries or [], cycle_time_ms, field_types, passed_r, scan_notes=info.get("scan_notes"))
 
-        # Détection si c'est un test d'interface/socle standard (TC-P03-*)
-        # Exception : pour FB_FbStatus, l'AF03 est son AF métier propre, ses TC-P03 vont donc dans la section principale.
         is_p03_fb = (fb_name == "FB_FbStatus")
         is_contract_test = not is_p03_fb and name.upper().startswith("TC-P03-")
         contract_tag = '<span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span>' if is_contract_test else ''
@@ -384,14 +381,31 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
 
         card_classes = f"test-card test-card-{'pass' if passed_r else 'fail'}" + (" test-card-contract" if is_contract_test else "")
 
+        scenario_drawer_html = ""
+        if info["comments"]:
+            steps_items = "".join(f"<li>{_html.escape(c)}</li>" for c in info["comments"])
+            scenario_drawer_html = f"""
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé ({len(info["comments"])})</span></summary>
+                <ul class="scenario-list">{steps_items}</ul>
+            </details>"""
+
+        checks_drawer_html = ""
+        if info["checks"]:
+            checks_drawer_html = f"""
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié ({len(info["checks"])})</span></summary>
+                <ul class="checks-list">{checks_html}</ul>
+            </details>"""
+
         rendered_card = f"""
         <article id="{anchor}" class="{card_classes}">
             <header>
                 {_badge(passed_r)}
                 <h3>{_html.escape(name)} {contract_tag}</h3>
             </header>
-            {f'<div class="comments">{comments_html}</div>' if comments_html else ''}
-            {f'<details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié ({len(info["checks"])})</span></summary><ul class="checks-list">{checks_html}</ul></details>' if checks_html else ''}
+            {scenario_drawer_html}
+            {checks_drawer_html}
             {_failure_block(r.get('failure'))}
             {chrono_html}
         </article>"""
@@ -791,10 +805,11 @@ _CSS = """
     .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
         color: var(--muted); font-weight: 600; outline: none; user-select: none; }
     .checks-summary:hover { color: var(--text); }
-    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
-    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
     .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
     .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .scenario-list li { font-size: 12.5px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
