@@ -133,6 +133,24 @@
   <div class="card out">
     <h2>🟢 SORTIES du séquenceur FB_Cycle — ce qui sort de l'étape</h2>
 
+    <div id="out" style="background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:10px;">
+      <div class="step">—</div>
+      <div class="op">—</div>
+      <table>
+        <tr><td>🟢 Demande treuil M1 (FB_Cycle)</td><td class="prov-bin" id="oM1">—</td></tr>
+        <tr><td>🟢 Demande treuil M2 (FB_Cycle)</td><td class="prov-bin" id="oM2">—</td></tr>
+        <tr><td>🟢 Demande translation M3 (FB_Cycle)</td><td class="prov-bin" id="oTrans">—</td></tr>
+        <tr><td>🟢 Demande benne (ouvre/ferme)</td><td class="prov-bin" id="oBucket">—</td></tr>
+        <tr><td>🟢 Demande contacteur Kobold</td><td class="prov-bin" id="oKobold">—</td></tr>
+        <tr><td>🟢 Défaut</td><td class="prov-nosim" id="oFault">—</td></tr>
+        <tr><td>🟢 Cycle de vie (Busy/Done)</td><td class="prov-bin" id="oLife">—</td></tr>
+        <tr><td>🟢 Prélèvements (RETAIN)</td><td class="prov-bin" id="oSample">—</td></tr>
+        <tr><td>🟢 Attente opérateur</td><td class="prov-bin" id="oWait">—</td></tr>
+      </table>
+      <div class="note">⚠️ Ces « Demande » sont des sorties du séquenceur FB_Cycle — PAS des sorties physiques. Les interlocks et la chaîne PRG_04/05/06 ne sont pas simulés (🔴).</div>
+      <div class="note" id="oRaw" style="white-space:pre-wrap; font-size:0.62rem; margin-top:8px;"></div>
+    </div>
+
     <!-- Scène machine SVG live (le monde que tu conduis au joystick) -->
     <div style="background:#030712;border-radius:6px;border:1px solid #1f2937;margin-bottom:10px;">
       <svg id="svgb" width="100%" height="360" viewBox="0 0 500 360">
@@ -177,24 +195,6 @@
     </div>
     <div class="scale"><span>🟡 -10.5m</span><span id="posVal">7.0 m</span><span>+8.5m</span></div>
     <div class="note">🟡 Position câble = simulation JS du monde (pas de la chaîne réelle). 🟠 Pont M3 / ouverture benne = selon tes cases cochées (injection manuelle).</div>
-
-    <div id="out" style="margin-top:8px;">
-      <div class="step">—</div>
-      <div class="op">—</div>
-      <table>
-        <tr><td>🟢 Demande treuil M1 (FB_Cycle)</td><td class="prov-bin" id="oM1">—</td></tr>
-        <tr><td>🟢 Demande treuil M2 (FB_Cycle)</td><td class="prov-bin" id="oM2">—</td></tr>
-        <tr><td>🟢 Demande translation M3 (FB_Cycle)</td><td class="prov-bin" id="oTrans">—</td></tr>
-        <tr><td>🟢 Demande benne (ouvre/ferme)</td><td class="prov-bin" id="oBucket">—</td></tr>
-        <tr><td>🟢 Demande contacteur Kobold</td><td class="prov-bin" id="oKobold">—</td></tr>
-        <tr><td>🟢 Défaut</td><td class="prov-nosim" id="oFault">—</td></tr>
-        <tr><td>🟢 Cycle de vie (Busy/Done)</td><td class="prov-bin" id="oLife">—</td></tr>
-        <tr><td>🟢 Prélèvements (RETAIN)</td><td class="prov-bin" id="oSample">—</td></tr>
-        <tr><td>🟢 Attente opérateur</td><td class="prov-bin" id="oWait">—</td></tr>
-      </table>
-      <div class="note">⚠️ Ces « Demande » sont des sorties du séquenceur FB_Cycle — PAS des sorties physiques. Les interlocks et la chaîne PRG_04/05/06 ne sont pas simulés (🔴).</div>
-      <div class="note" id="oRaw" style="white-space:pre-wrap; font-size:0.62rem; margin-top:8px;"></div>
-    </div>
   </div>
 </div>
 
