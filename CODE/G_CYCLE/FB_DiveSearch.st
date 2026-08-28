@@ -77,6 +77,8 @@ VAR
     Palier5ForbiddenFault   : BOOL;         // . [LOC] Latch tentative descente en Palier 5 sous Kobold
     TimeoutImmersionFault   : BOOL;         // . [LOC] Latch timeout recherche immersion
     TimeoutBottomFault      : BOOL;         // . [LOC] Latch timeout recherche fond
+    DescentActive           : BOOL;         // . [LOC] Descente reellement demandee et sans cause de coupure immediate
+    StepAtFaultCaptured     : BOOL;         // . [LOC] StepAtFault deja fige pour l'episode de defaut courant
 
     // === SOCLE DEFAUT ===
     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
@@ -87,6 +89,7 @@ VAR CONSTANT
     CST_DiveSpeedMin_Mps    : REAL := 0.15;   // Vitesse Palier 1 mini sous charge/mou (m/s)
     CST_TimeoutMarginFactor : REAL := 1.5;    // Facteur de marge de securite sur la course theorique
     CST_TimeoutMinCourse_M  : REAL := 1.0;    // Plancher de course pour le calcul (evite timeout degenere)
+    CST_TimeoutMaxCourse_M  : REAL := 200.0;  // Plafond de course : borne le calcul avant REAL_TO_UDINT (anti-overflow)
     CST_SecToMs             : REAL := 1000.0; // Conversion secondes -> millisecondes
 END_VAR
 
@@ -108,8 +111,10 @@ ErrorCausePresent := (CycleTime <= T#0ms)
 // ⏱️ Plafonds anti-blocage calcules au runtime : course credible max / vitesse Palier 1 mini x marge.
 // Course immersion = du plafond haut d'exploitation a la borne basse d'immersion (depart de plongee
 // possible n'importe ou entre DiveStartMin_M et CableLimitAscent_M -> on prend la borne la plus large).
-ImmersionCourse_M   := MAX(CST_TimeoutMinCourse_M, CableLimitAscent_M - ImmersionLower_M);
-BottomCourse_M      := MAX(CST_TimeoutMinCourse_M, ImmersionLower_M - LimitLegalDepthMin_M);
+// Course bornee [plancher .. plafond] avant conversion REAL->UDINT->TIME : une valeur IHM
+// aberrante ne peut pas provoquer d'overflow silencieux sur le timeout de garde (CQS §6).
+ImmersionCourse_M   := LIMIT(CST_TimeoutMinCourse_M, CableLimitAscent_M - ImmersionLower_M, CST_TimeoutMaxCourse_M);
+BottomCourse_M      := LIMIT(CST_TimeoutMinCourse_M, ImmersionLower_M - LimitLegalDepthMin_M, CST_TimeoutMaxCourse_M);
 CalculatedImmersionTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
     ImmersionCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
 CalculatedBottomTimeout    := UDINT_TO_TIME(REAL_TO_UDINT(
@@ -139,6 +144,7 @@ IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRe
     BottomTimerAcc        := T#0ms;
     ImmersionConfirmed    := FALSE;
     BottomTouchConfirmed  := FALSE;
+    StepAtFaultCaptured   := FALSE;
     DiveState             := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 
@@ -166,10 +172,13 @@ instCauses[5].Texte    := 'Depassement tempo recherche fond Kobold';
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
 
-// 📸 Capture ordonnée de StepAtFault sur front montant de défaut (D2)
+// 📸 Capture ordonnée de StepAtFault (D2). Les défauts levés dans le CASE se figent au site du
+// latch (voir §3) ; ce bloc ne couvre que les défauts détectés en §1 (timeouts, paramétrage),
+// où DiveState/PrevState sont encore l'étape réelle. StepAtFaultCaptured évite l'écrasement.
 ErrorEdge(CLK := Fault.Error);
-IF ErrorEdge.Q THEN
+IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
     StepAtFault := PrevState;
+    StepAtFaultCaptured := TRUE;
 ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
     StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
@@ -186,7 +195,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     KoboldContactorCmd := FALSE;
     BottomTouchConfirmed := FALSE;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
-    StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
+    // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
+    // lisible pour l'IHM/diagnostic apres un cycle Enable OFF->ON ; seul un front Reset l'efface.
     OperatorActionId := 0;
     OperatorAction := '';
     ImmersionConfirmed := FALSE;
@@ -205,6 +215,14 @@ KoboldMeasureEnable := FALSE;
 KoboldContactorCmd := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
+
+// Descente reellement demandee ET sans cause de coupure immediate : anti-chauffe contacteur Kobold
+// (H1 : jamais alimente hors descente active), coupure meme-scan sur Palier 5 interdit et incoherence
+// sequence (H2), et double garde sur le mode maintenance (H5, en plus du gate Enable de PRG_03).
+DescentActive := MotionRequestActive AND (MotionDirection = -1)
+             AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
+             AND NOT (CurrentSpeedStep > 4)
+             AND NOT SeqErrorFault;
 
 // Garde-fou non-redemarrage auto : un defaut latche non acquitte verrouille la machine
 // d'etat en ERROR_HOLD, meme si la vue live Fault.Error retombe (cause disparue).
@@ -238,13 +256,17 @@ ELSE
 
         E_DiveSearchState.SEARCHING_IMMERSION:
             Lifecycle.Busy := TRUE;
-            DescendPermit := MotionRequestActive AND (MotionDirection = -1);
-            KoboldMeasureEnable := TRUE;
-            KoboldContactorCmd := TRUE; // Alimentation contacteur Kobold activée à la volée
+            DescendPermit := DescentActive;
+            KoboldMeasureEnable := DescentActive;
+            KoboldContactorCmd := DescentActive; // Alimentation contacteur uniquement sous descente active (anti-chauffe)
             OperatorActionId := 16#0102;
             OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
 
             // 🛑 Interdiction du Palier 5 pendant la détection Kobold
+            IF (CurrentSpeedStep > 4) AND NOT StepAtFaultCaptured THEN
+                StepAtFault := DiveState;          // fige l'etape reelle avant tout basculement
+                StepAtFaultCaptured := TRUE;
+            END_IF;
             IF CurrentSpeedStep > 4 THEN
                 Palier5ForbiddenFault := TRUE;
             END_IF;
@@ -256,21 +278,33 @@ ELSE
                     BottomTimerAcc := T#0ms; // ⏱️ RAZ à l'entrée exacte de SEARCHING_BOTTOM
                     DiveState := E_DiveSearchState.SEARCHING_BOTTOM;
                 ELSE
+                    IF NOT StepAtFaultCaptured THEN
+                        StepAtFault := DiveState;
+                        StepAtFaultCaptured := TRUE;
+                    END_IF;
                     SeqErrorFault := TRUE;
                 END_IF;
             ELSIF (M1Position_M < ImmersionLower_M) OR (M2Position_M < ImmersionLower_M) THEN
+                IF NOT StepAtFaultCaptured THEN
+                    StepAtFault := DiveState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
                 SeqErrorFault := TRUE;
             END_IF;
 
         E_DiveSearchState.SEARCHING_BOTTOM:
             Lifecycle.Busy := TRUE;
-            DescendPermit := MotionRequestActive AND (MotionDirection = -1);
-            KoboldMeasureEnable := TRUE;
-            KoboldContactorCmd := TRUE; // Alimentation maintenue pendant la descente
+            DescendPermit := DescentActive;
+            KoboldMeasureEnable := DescentActive;
+            KoboldContactorCmd := DescentActive; // Alimentation uniquement sous descente active (anti-chauffe)
             OperatorActionId := 16#0103;
             OperatorAction := 'Maintenir la descente : immersion validée, recherche du fond.';
 
             // 🛑 Interdiction du Palier 5 pendant la détection Kobold
+            IF (CurrentSpeedStep > 4) AND NOT StepAtFaultCaptured THEN
+                StepAtFault := DiveState;
+                StepAtFaultCaptured := TRUE;
+            END_IF;
             IF CurrentSpeedStep > 4 THEN
                 Palier5ForbiddenFault := TRUE;
             END_IF;
