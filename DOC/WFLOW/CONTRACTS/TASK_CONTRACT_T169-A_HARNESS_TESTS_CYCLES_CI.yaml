@@ -1,0 +1,30 @@
+contract:
+  task_id: T169-A_HARNESS_TESTS_CYCLES_CI
+  criticality: C4
+  strategy: patch
+  objective: >
+    Développer la suite complète de tests unitaires et scénarios réels automatisés
+    en C/C++ (STruCpp / ST2C) pour les cycles et assistants de PRG_03 :
+    - Scénario 1 : Plongée nominale, immersion Kobold, détection fond, relevage contacteur.
+    - Scénario 2 : Fermeture benne, décollage en vitesse contrôlée, passage en montée pleine vitesse.
+    - Scénario 3 : Arrêt homme-mort au milieu d'une étape, maintien étape, non-redémarrage sans réarmement.
+    - Scénario 4 : Perte signal Kobold ou fond non atteint (timeout étape).
+    - Scénario 5 : Changement de mode ou coupure de puissance en cours de mouvement.
+  acceptance:
+    - id: AC1
+      statement: "100% des tests de scénarios de cycle s'exécutent en CI sans échec."
+      verified_by: "Rapport d'exécution des tests automatisés."
+    - id: AC2
+      statement: "Preuve formelle du respect de la sécurité machine (0 mouvement résiduel hors permis)."
+      verified_by: "Matrice de traçabilité des tests."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/**
+    forbidden:
+      - PRJ_CODESYS/**
+  conservation:
+    must_survive:
+      - "Compatibilité avec la chaîne CI existante (run_all_gates / pytest)."
+  evidence_required:
+    - test_suite_pass
+status: READY_FOR_EXECUTION

@@ -1,0 +1,26 @@
+contract:
+  task_id: T170-A_AUDIT_RELEASE_ET_CLOTURE
+  criticality: C4
+  strategy: patch
+  objective: >
+    Mener l'audit final de release, mettre à jour le bilan de conception
+    (AUDIT_Coherence_Documentaire), archiver les contrats et valider le gel
+    du lot des cycles (T166 à T170).
+  acceptance:
+    - id: AC1
+      statement: "100% des contrats T166 à T170 sont validés et archivés."
+      verified_by: "Vérification catalogue TASKS.yaml."
+    - id: AC2
+      statement: "La suite de 22 gates mécaniques et tous les tests CI sont 100% PASS."
+      verified_by: "Rapport d'exécution final."
+  scope:
+    allowed:
+      - DOC/**
+      - TOOLS/**
+  conservation:
+    must_survive:
+      - "Intégrité globale du référentiel projet."
+  evidence_required:
+    - run_all_gates
+    - check_linkage
+status: READY_FOR_EXECUTION

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:45:19.020035" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:45:19.020035">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:48:14.633844" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:48:14.633844">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2256,7 +2256,7 @@ instSimBench(
     // commande brute (sinon il outrepasse butées/limites). Même principe que les treuils M1/M2
     // (alimentés par la sortie PRG_06). Gate direction + vitesse = demande réelle (rampe/arrêt).
     M3_Direction             := SEL(PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord &lt;&gt; 0,
-                                    PRG_05_Translation.M3_Direction_Active, 0),
+                                    PRG_05_Translation.Data.TranslationState.ActiveDirection, 0),
     M3_SpeedCmd_Pct          := LIMIT(0.0,
                                       PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
@@ -2415,7 +2415,7 @@ M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-    AND NOT (PRG_04_Treuils_Benne.instWinchM1.StepNumber &gt; 0) AND NOT (PRG_04_Treuils_Benne.instWinchM2.StepNumber &gt; 0);
+    AND NOT (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber &gt; 0) AND NOT (PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber &gt; 0);
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
     M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN

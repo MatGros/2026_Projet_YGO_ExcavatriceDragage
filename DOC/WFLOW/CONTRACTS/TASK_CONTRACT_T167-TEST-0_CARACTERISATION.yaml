@@ -1,0 +1,65 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T167-TEST-0
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Développer une suite de tests unitaires et de caractérisation (Python CI / STruCpp)
+    capturant l'ensemble des comportements nominaux, dégradés et de sécurité ACTUELS
+    de FB_DiveSearch et FB_ExtractionSequence avant toute modification de code ST,
+    afin de servir d'oracle de non-régression inviolable.
+
+  acceptance:
+    - id: AC1
+      statement: "Création du fichier de test de caractérisation couvrant la recherche fond nominale, la perte de capteur, le timeout et la neutralisation."
+      verified_by: "Exécution des tests unitaires Python sous TOOLS/TEST_AUTO_CI/"
+    - id: AC2
+      statement: "Création du fichier de test de caractérisation couvrant la séquence d'extraction complète (fermeture, décollage, forçage vitesse, tolérance matière)."
+      verified_by: "Exécution des tests unitaires Python sous TOOLS/TEST_AUTO_CI/"
+    - id: AC3
+      statement: "100% des tests de caractérisation passent au vert sur le code actuel."
+      verified_by: "Rapport d'exécution CI"
+
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/
+    forbidden:
+      - CODE/*.st
+      - DOC/*.md
+
+  conservation:
+    must_survive:
+      - "Comportement séquentiel exact du cycle existant"
+    dropped_on_purpose:
+      - "None"
+
+  evidence_required:
+    - run_all_gates
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "antigravity"
+
+  alert_duty: >
+    Tout comportement anormal détecté dans le code actuel lors de l'écriture des tests
+    doit être consigné et signalé comme cas test pour la phase de refonte.
+
+status: PENDING
+
+execution:
+  executed_by: "À déléguer"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

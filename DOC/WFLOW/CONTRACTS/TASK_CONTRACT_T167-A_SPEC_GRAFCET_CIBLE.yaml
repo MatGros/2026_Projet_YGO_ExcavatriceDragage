@@ -1,0 +1,71 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T167-A
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Spécifier formellement le Grafcet cible unifié de dragage (Plongée, Recherche Fond, Extraction,
+    Coordination fermeture/montée), documenter les règles de sécurité (vitesse max de descente,
+    gestion du bypass Kobold, absence de réarmement automatique), et définir la matrice des erreurs
+    StepAtFault pour FB_DiveSearch et FB_ExtractionSequence avec visa humain explicite.
+
+  acceptance:
+    - id: AC1
+      statement: "Le document de spécification formalise exhaustivement chaque étape (0..N), conditions de transition, actions associées, timeouts d'étape et conditions d'arrêt d'urgence/SafeStop."
+      verified_by: "Revue du document de cadrage technique T167-A"
+    - id: AC2
+      statement: "La gestion du bypass Kobold est explicitée sous forme de 3 options formelles soumises à visa humain avant codage."
+      verified_by: "Présence de la section 'Options Bypass Kobold' avec recommandation et visa requis"
+    - id: AC3
+      statement: "Les types ENUM E_DiveSearchState et E_ExtractionSequenceState ainsi que les champs de diagnostic StateAtError/StepAtFault sont formellement figés sans régression sur le bus Data."
+      verified_by: "Vérification de cohérence avec AF_Partie-03 et AF_Partie-04"
+
+  scope:
+    allowed:
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+      - DOC/WFLOW/FEUILLE_DE_ROUTE_GLOBALE_CYCLES_T167_T170.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-A_SPEC_GRAFCET_CIBLE.yaml
+    forbidden:
+      - CODE/*.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Séquence de recherche fond : détection eau -> détection fond -> confirmation"
+      - "Séquence d'extraction : fermeture synchronisée -> décollage matière -> montée contrôlée"
+      - "Plafonnement au Palier 1 pendant l'extraction initiale"
+    dropped_on_purpose:
+      - "Sauts d'étapes aveugles en cas d'incohérence capteur sans levée d'alarme"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "antigravity"
+    - "ollama:deepseek-v4-flash:cloud"
+
+  alert_duty: >
+    Toute divergence entre le fonctionnement actuel de l'automate et les besoins physiques
+    de la machine de dragage doit être immédiatement notifiée à l'opérateur.
+
+status: PENDING
+
+execution:
+  executed_by: "À déléguer (Ollama / Antigravity)"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
