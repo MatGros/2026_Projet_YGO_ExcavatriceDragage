@@ -122,6 +122,16 @@ def _serve(handler):
                 self.send_header("Content-Length", str(len(html)))
                 self.end_headers()
                 self.wfile.write(html)
+            elif self.path == "/meta":
+                # Traçabilité : source ST exacte compilée dans le moteur
+                meta = {}
+                manifest = ENGINE.parent / "build_manifest.json"
+                if manifest.exists():
+                    try:
+                        meta = json.loads(manifest.read_text(encoding="utf-8"))
+                    except Exception:
+                        meta = {}
+                _send_json(self, 200, meta)
             else:
                 self.send_response(404)
                 self.end_headers()

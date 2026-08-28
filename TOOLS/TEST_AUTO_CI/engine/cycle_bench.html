@@ -48,15 +48,40 @@
   .posbar .marker { position:absolute; top:-2px; bottom:-2px; width:3px; background:var(--warn); }
   .posbar .bucket { position:absolute; top:-3px; width:10px; height:20px; background:var(--accent); border-radius:2px; }
   .posbar .scale { display:flex; justify-content:space-between; font-size:0.6rem; color:var(--dim); }
+  /* Provenance & bandeau hors-ligne (REX audit 2026-08-28) */
+  .prov-bin { color: var(--ok); }    /* 🟢 sortie binaire */
+  .prov-sim { color: #eab308; }      /* 🟡 monde simulé JS */
+  .prov-inj { color: var(--warn); }  /* 🟠 injection manuelle */
+  .prov-nosim { color: var(--danger); } /* 🔴 non simulé */
+  .banner-offline { background:#7f1d1d; border:1px solid #ef4444; color:#fff; padding:8px 14px; border-radius:6px; font-size:0.78rem; font-weight:600; margin-bottom:12px; }
+  .legend-prov { display:flex; gap:14px; flex-wrap:wrap; font-size:0.72rem; color:var(--dim); margin-bottom:10px; }
+  .badge-sha { background:#0c4a6e; color:#7dd3fc; border:1px solid #38bdf8; padding:2px 8px; border-radius:12px; font-size:0.66rem; font-family:monospace; }
+
 </style>
 </head>
 <body>
-<h1>🧪 Banc de test interactif — FB_Cycle (pilotage joystick)</h1>
-<div class="sub">Pousse le joystick + homme-mort → le <b>binaire compilé</b> décide → la position évolue → les transitions se déclenchent quand TU atteins les conditions. Zéro logique métier en JS.</div>
+<h1>🧪 Banc interactif de décision FB_Cycle <span class="badge-sha" id="shaBadge">source ?</span></h1>
+<div class="banner-offline">🔴 BANC LOGICIEL HORS-LIGNE — aucune commande machine réelle — chaîne PRG_02 / PRG_04 / PRG_05 / PRG_06 et interlocks NON EXÉCUTÉS. Seul le séquenceur FB_Cycle est compilé.</div>
+<div class="legend-prov">
+  <span><span class="prov-bin">🟢</span> Sortie du binaire FB_Cycle</span>
+  <span><span class="prov-sim">🟡</span> Monde simulé JS</span>
+  <span><span class="prov-inj">🟠</span> Injection manuelle</span>
+  <span><span class="prov-nosim">🔴</span> Non simulé / non vérifié</span>
+</div>
+<div class="sub">Pousse le joystick + homme-mort → le <b>binaire FB_Cycle compilé</b> décide → la position simulée évolue → les transitions se déclenchent quand TU atteins les conditions. Zéro logique métier en JS.</div>
+
+<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;padding:9px 12px;margin-bottom:12px;font-size:0.8rem;color:var(--text-dim);text-align:center;line-height:1.6;">
+  <span class="prov-inj">🟠 ENTRÉES du séquenceur</span>
+  (mode, Enable, positions M1/M2, capteurs, StartCycle/Reset, homme-mort, CycleMotionPermit…)
+  &nbsp;➜&nbsp; <b style="color:var(--accent);">FB_Cycle</b>
+  <span style="font-size:0.7rem;">(séquenceur compilé = étape courante X_x)</span> &nbsp;➜&nbsp;
+  <span class="prov-bin">🟢 SORTIES de l'étape</span>
+  (CycleStep + OperatorAction + demandes WinchM1/M2, Translation, Benne + état Fault/Lifecycle)
+</div>
 
 <div class="grid">
   <div class="card">
-    <h2>🕹️ Joystick (intention opérateur)</h2>
+    <h2>🟠 ENTRÉES du séquenceur — ce qui entre dans FB_Cycle</h2>
     <div class="joy" id="joy">
       <div class="joy-y" style="top:0;">▲</div>
       <div class="joy-y" style="top:60%;">▼</div>
@@ -69,10 +94,10 @@
     <div class="btn-row">
       <button class="btn btn-primary" id="btnDead" onclick="dead()">🖐️ Homme-mort (clic pour armer / désarmer)</button>
     </div>
-    <div class="row" style="margin-top:8px;"><label>Auto-scan</label><input type="checkbox" id="autoScan"></div>
+    <div class="row" style="margin-top:8px;"><label>Auto-scan</label><input type="checkbox" id="autoScan" onchange="toggleAuto(this)"></div>
     <div class="row"><label>Vitesse simulée (m/s)</label><input type="number" id="simSpeed" value="0.5" step="0.1" style="width:70px"></div>
 
-    <h2 style="margin-top:14px;">🎛️ Autres stimuli</h2>
+    <h2 style="margin-top:14px;">🟠 Commandes & autorisations entrantes</h2>
     <div class="row"><label>Mode</label>
       <select id="MODE"><option value="SEMI_AUTO">SEMI_AUTO</option><option value="MAINT_N1">MAINT_N1</option><option value="MAINT_N2">MAINT_N2</option><option value="DISABLE">DISABLE</option></select></div>
     <div class="row"><label>Enable</label><input type="checkbox" id="ENABLE" checked></div>
@@ -81,9 +106,10 @@
     <div class="row"><label>HeartbeatIhmOk</label><input type="checkbox" id="HEARTBEATIHMOK" checked></div>
     <div class="row"><label>StartCycle (front)</label><input type="checkbox" id="STARTCYCLE"></div>
     <div class="row"><label>AbortCycle</label><input type="checkbox" id="ABORTCYCLE"></div>
+    <div class="row"><label>Reset (front, acquittement)</label><input type="checkbox" id="RESET"></div>
     <div class="row"><label>SelTarget</label><input type="number" id="SELTARGET" value="3" style="width:70px"></div>
 
-    <h2 style="margin-top:14px;">📡 Capteurs (auto depuis position, ou manuel)</h2>
+    <h2 style="margin-top:14px;">🟠 Capteurs entrants (auto depuis position, ou manuel)</h2>
     <div class="row"><label>Translation P1</label><input type="checkbox" id="TRANSLATION_AT_P1" checked></div>
     <div class="row"><label>Translation Trémie</label><input type="checkbox" id="TRANSLATION_AT_TREMIE"></div>
     <div class="row"><label>Translation Maintenance</label><input type="checkbox" id="TRANSLATION_AT_MAINTENANCE"></div>
@@ -103,7 +129,7 @@
   </div>
 
   <div class="card out">
-    <h2>📤 Sorties du binaire + simulation position</h2>
+    <h2>🟢 SORTIES de l'étape — ce qui sort de FB_Cycle</h2>
 
     <!-- Scène machine SVG live (le monde que tu conduis au joystick) -->
     <div style="background:#030712;border-radius:6px;border:1px solid #1f2937;margin-bottom:10px;">
@@ -147,22 +173,24 @@
       <div class="marker" style="left:98%;"></div>
       <div class="bucket" id="posBucket"></div>
     </div>
-    <div class="scale"><span>-10.5m</span><span id="posVal">7.0 m</span><span>+8.5m</span></div>
+    <div class="scale"><span>🟡 -10.5m</span><span id="posVal">7.0 m</span><span>+8.5m</span></div>
+    <div class="note">🟡 Position câble = simulation JS du monde (pas de la chaîne réelle). 🟠 Pont M3 / ouverture benne = selon tes cases cochées (injection manuelle).</div>
 
     <div id="out" style="margin-top:8px;">
       <div class="step">—</div>
       <div class="op">—</div>
       <table>
-        <tr><td>Treuil M1</td><td id="oM1">—</td></tr>
-        <tr><td>Treuil M2</td><td id="oM2">—</td></tr>
-        <tr><td>Translation M3</td><td id="oTrans">—</td></tr>
-        <tr><td>Benne</td><td id="oBucket">—</td></tr>
-        <tr><td>Kobold contacteur</td><td id="oKobold">—</td></tr>
-        <tr><td>Fault</td><td id="oFault">—</td></tr>
-        <tr><td>Lifecycle</td><td id="oLife">—</td></tr>
-        <tr><td>SampleCount</td><td id="oSample">—</td></tr>
-        <tr><td>Attente opérateur</td><td id="oWait">—</td></tr>
+        <tr><td>🟢 Demande treuil M1 (FB_Cycle)</td><td class="prov-bin" id="oM1">—</td></tr>
+        <tr><td>🟢 Demande treuil M2 (FB_Cycle)</td><td class="prov-bin" id="oM2">—</td></tr>
+        <tr><td>🟢 Demande translation M3 (FB_Cycle)</td><td class="prov-bin" id="oTrans">—</td></tr>
+        <tr><td>🟢 Demande benne (ouvre/ferme)</td><td class="prov-bin" id="oBucket">—</td></tr>
+        <tr><td>🟢 Demande contacteur Kobold</td><td class="prov-bin" id="oKobold">—</td></tr>
+        <tr><td>🟢 Défaut</td><td class="prov-nosim" id="oFault">—</td></tr>
+        <tr><td>🟢 Cycle de vie (Busy/Done)</td><td class="prov-bin" id="oLife">—</td></tr>
+        <tr><td>🟢 Prélèvements (RETAIN)</td><td class="prov-bin" id="oSample">—</td></tr>
+        <tr><td>🟢 Attente opérateur</td><td class="prov-bin" id="oWait">—</td></tr>
       </table>
+      <div class="note">⚠️ Ces « Demande » sont des sorties du séquenceur FB_Cycle — PAS des sorties physiques. Les interlocks et la chaîne PRG_04/05/06 ne sont pas simulés (🔴).</div>
       <div class="note" id="oRaw" style="white-space:pre-wrap; font-size:0.62rem; margin-top:8px;"></div>
     </div>
   </div>
@@ -212,7 +240,7 @@ function dead() {
 // --- Collecte stimuli ---
 function collectStimuli() {
   const s = {};
-  const bools = ['ENABLE','POWERCONTACTORENGAGED','CYCLEMOTIONPERMIT','HEARTBEATIHMOK','STARTCYCLE','ABORTCYCLE','TRANSLATION_AT_P1','TRANSLATION_AT_TREMIE','TRANSLATION_AT_MAINTENANCE','TRANSLATION_DONE','BENNE_DONE','BENNE_ISOPEN','BENNE_ISCLOSED','BENNE_ISROUGHLYCLOSED','HOMEDM1','HOMEDM2'];
+  const bools = ['ENABLE','POWERCONTACTORENGAGED','CYCLEMOTIONPERMIT','HEARTBEATIHMOK','STARTCYCLE','ABORTCYCLE','RESET','TRANSLATION_AT_P1','TRANSLATION_AT_TREMIE','TRANSLATION_AT_MAINTENANCE','TRANSLATION_DONE','BENNE_DONE','BENNE_ISOPEN','BENNE_ISCLOSED','BENNE_ISROUGHLYCLOSED','HOMEDM1','HOMEDM2'];
   bools.forEach(id => { const el = document.getElementById(id); if (el) s[id] = el.checked ? 1 : 0; });
   s.MODE = document.getElementById('MODE').value;
   s.SELTARGET = parseInt(document.getElementById('SELTARGET').value || '0', 10);
@@ -265,23 +293,27 @@ function updatePosBar() {
   document.getElementById('posVal').textContent = simM1.toFixed(1) + ' m';
 }
 
-// Scène machine SVG : dérivée du MONDE (position simulée + capteurs) et des sorties binaire.
+// Scène SVG : position = monde simulé JS (🟡), pont/benne = cases cochées injection manuelle (🟠),
+// gravier = étape du binaire (🟢). Le moteur n'émet pas TRANSLATION_AT_*/BENNE_ISOPEN : on lit
+// donc les contrôles (source réelle de ce qui est injecté au FB).
 function updateScene(o) {
-  // Pont M3 horizontal (capteurs translation fournis par le binaire)
-  const p1 = o['TRANSLATION_AT_P1']==='1', tr = o['TRANSLATION_AT_TREMIE']==='1', mt = o['TRANSLATION_AT_MAINTENANCE']==='1';
+  // Pont M3 : cases cochées (injection manuelle 🟠)
+  const p1 = document.getElementById('TRANSLATION_AT_P1').checked;
+  const tr = document.getElementById('TRANSLATION_AT_TREMIE').checked;
+  const mt = document.getElementById('TRANSLATION_AT_MAINTENANCE').checked;
   const n = (p1?1:0)+(tr?1:0)+(mt?1:0);
   let gx = 200; // non localisé
   if (n === 1) gx = p1 ? 330 : (tr ? 55 : 455);
   document.getElementById('benchGantry').setAttribute('transform', 'translate(' + gx + ', 36)');
-  // Benne verticale d'après simM1 (le monde) : m -10.5 -> px 350, +8.5 -> px 58
+  // Benne verticale d'après simM1 (le monde simulé 🟡) : m -10.5 -> px 350, +8.5 -> px 58
   const bucky = 58 + (8.5 - simM1) / 19.0 * 292;
   document.getElementById('benchBucket').setAttribute('transform', 'translate(' + gx + ', ' + bucky.toFixed(1) + ')');
   document.getElementById('benchCable').setAttribute('d', 'M ' + gx + ',56 L ' + gx + ',' + (bucky - 12).toFixed(1));
-  // Benne ouverte
-  const a = o['BENNE_ISOPEN']==='1' ? 45 : 0;
+  // Benne ouverte : case cochée (injection manuelle 🟠)
+  const a = document.getElementById('BENNE_ISOPEN').checked ? 45 : 0;
   document.getElementById('benchJawL').setAttribute('transform', 'rotate(' + a + ', -8, 0)');
   document.getElementById('benchJawR').setAttribute('transform', 'rotate(' + (-a) + ', 8, 0)');
-  // Gravier chargé (étape 6..10, dérivé du binaire)
+  // Gravier chargé (étape 6..10, dérivé du binaire 🟢)
   const step = parseInt(o.CYCLESTEP, 10);
   document.getElementById('benchGravel').setAttribute('opacity', (step >= 6 && step <= 10) ? '1' : '0');
 }
@@ -294,14 +326,14 @@ function fmtAct(ss, dir, spd) {
 
 function render(o) {
   const step = parseInt(o.CYCLESTEP, 10);
-  document.getElementById('out').querySelector('.step').innerHTML = '🔄 Étape : <b>' + (STEP_NAMES[step] || 'X'+step) + '</b>';
+  document.getElementById('out').querySelector('.step').innerHTML = '🟢 Sortie séquenceur — étape <b>' + (STEP_NAMES[step] || 'X'+step) + '</b>';
   document.getElementById('out').querySelector('.op').innerHTML = '🖐️ ' + (o.OPERATORACTION || '—');
   document.getElementById('oM1').innerHTML = fmtAct(o['WINCHM1CMD.STARTSTOP'], o['WINCHM1CMD.DIRECTION'], o['WINCHM1CMD.SPEEDPCT']);
   document.getElementById('oM2').innerHTML = fmtAct(o['WINCHM2CMD.STARTSTOP'], o['WINCHM2CMD.DIRECTION'], o['WINCHM2CMD.SPEEDPCT']);
   document.getElementById('oTrans').innerHTML = fmtAct(o['TRANSLATIONCMD.START'], o['TRANSLATIONCMD.TARGET'], null);
   const bOpen = o['BUCKETCMD.OPEN']==='1', bClose = o['BUCKETCMD.CLOSE']==='1';
   document.getElementById('oBucket').innerHTML = (bOpen?'<span class="on">🟢 OUVERTURE</span>':'') + (bClose?'<span class="on">🟢 FERMETURE</span>':'') + ((!bOpen&&!bClose)?'<span class="off">⚪ neutre</span>':'');
-  document.getElementById('oKobold').innerHTML = o['BUCKETCMD.KOBOLDCONTACTORCMD']==='1' ? '<span class="on">🟢 ON</span>' : '<span class="off">⚪ OFF</span>';
+  document.getElementById('oKobold').innerHTML = o['BUCKETCMD.KOBOLDCONTACTORCMD']==='1' ? '<span class="on">🟢 demandé</span>' : '<span class="off">⚪ non demandé</span>';
   const fault = o['FAULT.ERROR']==='1';
   document.getElementById('oFault').innerHTML = fault ? '<span class="err">⚠️ DÉFAUT (id ' + o['FAULT.ERRORID'] + ')</span>' : '<span class="off">aucun</span>';
   document.getElementById('oLife').innerHTML = (o['LIFECYCLE.BUSY']==='1'?'Busy ':'') + (o['LIFECYCLE.DONE']==='1'?'Done':'');
@@ -311,6 +343,18 @@ function render(o) {
   updateScene(o);
 }
 updatePosBar();
+updateScene({CYCLESTEP: '0'});   // scène initiale synchronisée (benn à 7.0m, pas vide)
+
+// Traçabilité : affiche la source exacte que le binaire exécute (SHA du ST WORKING_COPY)
+(async function loadBuildMeta() {
+  try {
+    const r = await fetch('/meta');
+    const m = await r.json();
+    const el = document.getElementById('shaBadge');
+    const sha = (m && m.source_sha256) ? m.source_sha256.slice(0, 12) : '?';
+    el.textContent = 'FB_Cycle WORKING_COPY · ' + sha + (m.build_time ? ' · ' + m.build_time : '');
+  } catch (e) { /* serveur sans /meta */ }
+})();
 </script>
 </body>
 </html>
