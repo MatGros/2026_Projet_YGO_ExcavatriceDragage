@@ -1,0 +1,48 @@
+contract:
+  task_id: T165-BR_REVIEW_PRG02
+  criticality: C4
+  strategy: patch
+  objective: >
+    Auditer en lecture seule les lots PRG_02 B1/B2 sur le diff réel et démontrer
+    conservation manuelle, encapsulation, polarités et consommation uniforme des faits qualifiés.
+  acceptance:
+    - id: AC1
+      statement: "Le reviewer rend PASS/MAJOR/BLOCK par critère avec fichier:ligne et preuve, sans modifier aucun fichier."
+      verified_by: "Rapport indépendant signé et git status identique avant/après revue."
+    - id: AC2
+      statement: "Tous les accès externes PRG_02.inst* et lectures métier HwReal/HwSim sont absents."
+      verified_by: "Recherches statiques rejouées indépendamment."
+    - id: AC3
+      statement: "La matrice TM-01..TM-08, notamment deadman et incohérence codeur, est vérifiée sans conclure safety si ArmingPermit reste TRUE."
+      verified_by: "Résultats tests + analyse des call-sites safety."
+    - id: AC4
+      statement: "Producteur unique, types, unités, polarités et invalidité de chaque nouveau champ correspondent au contrat v1.0."
+      verified_by: "Table de mapping source→champ→consommateur."
+  scope:
+    allowed:
+      - CODE/**/*.st
+      - DOC/AF/**/*.md
+      - DOC/STDS/*.md
+      - DOC/WFLOW/CONTRACTS/*T165*
+      - TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/T165_*/**
+    forbidden:
+      - PRJ_CODESYS/**
+      - Device.export
+      - DOC/WFLOW/TASKS.yaml
+  conservation:
+    must_survive:
+      - "Revue strictement READ-ONLY ; aucune correction, commit ou push."
+    dropped_on_purpose: []
+  evidence_required:
+    - independent_report
+    - static_searches
+    - conservation_matrix
+    - check_linkage
+    - run_all_gates
+  models_allowed:
+    - "gpt-5.6-luna"
+  alert_duty: "Un doute deadman, codeur, frein, safety, polarité ou redémarrage vaut BLOCK, jamais PASS conditionnel."
+status: PENDING
+execution: {executed_by: "", completed_at: "", status: PENDING, summary: "", evidence_submitted: []}
+validation: {status: PENDING, validated_by: "", validated_at: "", notes: ""}
+

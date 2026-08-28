@@ -296,8 +296,9 @@ tasks:
   agent: AGY-01
   date: '2026-08-28T09:47:00'
   titre: Tolérance de calibration TopSensorPositionM à fixer sur site
-  contexte: 'Position capteur physique et cible homing'
-  description: 'Figé par défaut à 8.5m dans GVL_PERSISTENT._WinchM1/M2CfgPersist.CfgTopSensorPos_M (ajustable sur site dans NVRAM si besoin entre 8.0m et 8.5m).'
+  contexte: Position capteur physique et cible homing
+  description: Figé par défaut à 8.5m dans GVL_PERSISTENT._WinchM1/M2CfgPersist.CfgTopSensorPos_M (ajustable sur site dans
+    NVRAM si besoin entre 8.0m et 8.5m).
   contrat: ''
   objectifs: []
   bloque_par: []
@@ -472,7 +473,8 @@ tasks:
   date: '2026-08-28T09:47:00'
   titre: Validation CODESYS/terrain mesure vitesse 50 ms (FB_Encoder_Speed...)
   contexte: 'Intitulé complet : Validation CODESYS/terrain mesure vitesse 50 ms (FB_Encoder_SpeedMeasure)'
-  description: 'Validé par qualification CI (10/10 PASS sous STruCpp) et antériorité v0.5.25 (mesure fenêtre glissante 50ms éprouvée pour 1 à 2 m/s lors des déplacements treuils).'
+  description: Validé par qualification CI (10/10 PASS sous STruCpp) et antériorité v0.5.25 (mesure fenêtre glissante 50ms
+    éprouvée pour 1 à 2 m/s lors des déplacements treuils).
   contrat: ''
   objectifs: []
   bloque_par: []
@@ -539,7 +541,8 @@ tasks:
   date: '2026-08-28T09:47:00'
   titre: Valider sur site cote capteur haut 8.0 m et limite 7.5 m au pr...
   contexte: 'Intitulé complet : Valider sur site cote capteur haut 8.0 m et limite 7.5 m au premier homing'
-  description: 'Figé à 8.5m pour le capteur physique et 7.5m pour la limite logicielle haute CfgCableLimitAscent_M dans GVL_PERSISTENT (validé utilisateur 2026-08-28, ajustable sur place).'
+  description: Figé à 8.5m pour le capteur physique et 7.5m pour la limite logicielle haute CfgCableLimitAscent_M dans GVL_PERSISTENT
+    (validé utilisateur 2026-08-28, ajustable sur place).
   contrat: ''
   objectifs: []
   bloque_par: []
@@ -912,37 +915,43 @@ tasks:
   bloque_par: []
 - id: T130
   parent_id: ''
-  statut: ''
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: DSH-02
-  titre: Standardiser le décodage d'intention joystick en amont (→ {Dir...
-  contexte: 'Intitulé complet : Standardiser le décodage d''intention joystick en amont (→ {Direction, Palier} arbitré), consommé
-    par le cycle et les FB mouvement ; relâchement = arrêt instantané universel'
-  description: 'Session 2026-08-19 — FB_Cycle réinvente Direction := 1/SpeedPct := 10 au lieu de consommer AxisCmdY (AF P08
-    §6) ; le décodage doit vivre avant le cycle, pas dedans. **Décisions actées (2026-08-19)** : FB_IntentionDecoder instancié
-    dans PRG_02_Acquisition ; ST_WinchCmdDemand.SpeedPct → Palier : INT (Option B). **Phase étude/planification — zéro code**.
-    ⚠️ **Architecture révisée le 2026-08-19 (soir)** : 2 blocs (FB_GestureIntention → FB_ActionIntention_Winch/_Translation),
-    préfixe **Req*** et non Act* (collision NAMING_CONVENTION.md:160) — voir DOC/WFLOW/AUDITS/REVUE_CRITIQUE_DESIGN_INTENTION_ARCHITECTURE_v0.1.md
-    (11 décisions actées). 🔴 **Faire T136 d''abord** (contrats d''interface socle), sinon les FB neufs naissent non conformes'
-  objectifs: []
-  contrat: ''
-  date: '2026-08-27T12:49:56'
-  bloque_par: []
-- id: T131
-  parent_id: ''
-  statut: ⬜
+  statut: ⏸️
   criticite: C4
   domaine: SÉCURITÉ
   agent: —
-  date: '2026-08-19T12:00:00'
+  titre: Standardiser le décodage d'intention joystick en amont (→ {Dir...
+  contexte: 'Intitulé complet : Standardiser le décodage d''intention joystick en amont (→ {Direction, Palier} arbitré), consommé
+    par le cycle et les FB mouvement ; relâchement = arrêt instantané universel'
+  description: '⏸️ SUPERSEDÉE par T165-A/B1/B2 : le design à deux FB d''intention ne correspond plus à la frontière retenue.
+    PRG_02 publie directement les sorties qualifiées de FB_Joystick dans Data ; PRG_04/05 restent propriétaires de l''arbitrage
+    métier. Historique conservé : Session 2026-08-19 — FB_Cycle réinvente Direction := 1/SpeedPct := 10 au lieu de consommer
+    AxisCmdY (AF P08 §6) ; le décodage doit vivre avant le cycle, pas dedans. **Décisions actées (2026-08-19)** : FB_IntentionDecoder
+    instancié dans PRG_02_Acquisition ; ST_WinchCmdDemand.SpeedPct → Palier : INT (Option B). **Phase étude/planification
+    — zéro code**. ⚠️ **Architecture révisée le 2026-08-19 (soir)** : 2 blocs (FB_GestureIntention → FB_ActionIntention_Winch/_Translation),
+    préfixe **Req*** et non Act* (collision NAMING_CONVENTION.md:160) — voir DOC/WFLOW/AUDITS/REVUE_CRITIQUE_DESIGN_INTENTION_ARCHITECTURE_v0.1.md
+    (11 décisions actées). 🔴 **Faire T136 d''abord** (contrats d''interface socle), sinon les FB neufs naissent non conformes'
+  objectifs:
+  - Conserver l'historique de design ; ne pas déléguer T130
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T130.yaml
+  date: '2026-08-28T11:51:18+02:00'
+  bloque_par:
+  - T165-A
+- id: T131
+  parent_id: ''
+  statut: ⏸️
+  criticite: C4
+  domaine: SÉCURITÉ
+  agent: —
+  date: '2026-08-28T11:51:18+02:00'
   titre: Vitesse par paliers (1-5) dans le cycle au lieu de %
   contexte: 'Intitulé complet : Vitesse par paliers (1-5) dans le cycle au lieu de % : ST_WinchCmdDemand + FB_Cycle + PRG_04'
-  description: Session 2026-08-19 — ST_WinchCmdDemand.SpeedPct (REAL %) → FB_SpeedStep ; le cycle hardcode 10/50/20/70% ;
-    doit exprimer un palier 1-5 (AF P10 §6) — **partie intégrante de T130** (le palier est une sortie du décodage d'intention)
-  contrat: ''
+  description: '⏸️ Décision D-03 de T165-A : conserver temporairement le % tant que le choix humain n''est pas visé. Historique
+    : ST_WinchCmdDemand.SpeedPct (REAL %) → FB_SpeedStep ; le cycle hardcode 10/50/20/70% ; l''éventuel palier 1-5 est une
+    évolution fonctionnelle séparée, pas un ride-along du remappage inter-PRG.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
   objectifs: []
-  bloque_par: []
+  bloque_par:
+  - T165-A
 - id: T132
   parent_id: ''
   statut: ⏳
@@ -987,19 +996,22 @@ tasks:
   bloque_par: []
 - id: T135
   parent_id: ''
-  statut: ''
+  statut: ⏸️
   criticite: C4
   domaine: SÉCURITÉ
-  agent: DSH-02
+  agent: —
   titre: Refactor intention dans le reste du programme (PRG_04, PRG_05,...
   contexte: 'Intitulé complet : Refactor intention dans le reste du programme (PRG_04, PRG_05, FB_Winch, FB_Translation) :
     consommer FB_IntentionDecoder au lieu de re-décoder Direction/SpeedPct en interne'
-  description: Session 2026-08-19 — **séparé de T130** (test cycle d'abord) ; Direction := 1/SpeedPct ne doivent plus apparaître
-    dans les PRG ; travailler avec des bits d'information travaillés (AF P08 §6)
-  objectifs: []
-  contrat: ''
-  date: '2026-08-27T12:45:51'
-  bloque_par: []
+  description: '⏸️ SUPERSEDÉE par T165-B2/C2 : les consommateurs migrent vers les bus publics PRG_02.Data et PRG_03.Data,
+    sans FB_IntentionDecoder et sans modification métier opportuniste. Historique : Direction/SpeedPct ne doivent pas être
+    redécodés depuis le brut dans les PRG ; consommer les faits qualifiés AF‑08.'
+  objectifs:
+  - Conserver l'historique ; ne pas déléguer T135
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml
+  date: '2026-08-28T11:51:18+02:00'
+  bloque_par:
+  - T165-A
 - id: T136
   parent_id: ''
   statut: ✅
@@ -1924,26 +1936,25 @@ tasks:
   bloque_par: []
 - id: T164
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C3
   domaine: STANDARDS
   agent: CC
-  date: '2026-08-27T14:39:34'
   titre: Robustesse d'interface — campagne post-refactor joystick
-  contexte: 'Intitulé complet : Généraliser au reste du projet les standards d''interface éprouvés sur FB_Joystick
-    (2026-08-27) et corriger la classe de bugs révélée (gate NOT Enable incomplet, causes de défaut fusionnées).
-    Parent de 6 sous-tâches séquencées 1∥2 → 3 → 4 → 5 → 6. Règle d''ordre : sécurité d''abord (T164-1/T164-2),
-    figer la fondation (T164-3), construire dessus (T164-4/T164-5), cosmétique en dernier (T164-6). Jamais migrer
-    du code vers un contrat pas finalisé.'
-  description: 'Standards #1/#2/#4/#5 déjà livrés (commit 8b49f98a : NC-110, patterns Cfg/en-têtes/projections,
-    gate G120). E0 hotfix FB_Encoder + guard G127 livrés (commit 0b0a2785). Reste #3 (socle ST_Fault universel)
-    comme clé de voûte, puis mise en conformité encodeur, puis migration des 17 FB legacy ST_Status. Partage de
-    travail possible : voir champ objectifs de chaque sous-tâche (colonne agent = acteur pressenti).'
-  contrat: ''
+  contexte: 'Intitulé complet : Généraliser au reste du projet les standards d''interface éprouvés sur FB_Joystick (2026-08-27)
+    et corriger la classe de bugs révélée (gate NOT Enable incomplet, causes de défaut fusionnées). Parent de 6 sous-tâches
+    séquencées 1∥2 → 3 → 4 → 5 → 6. Règle d''ordre : sécurité d''abord (T164-1/T164-2), figer la fondation (T164-3), construire
+    dessus (T164-4/T164-5), cosmétique en dernier (T164-6). Jamais migrer du code vers un contrat pas finalisé.'
+  description: 'Standards #1/#2/#4/#5 déjà livrés (commit 8b49f98a : NC-110, patterns Cfg/en-têtes/projections, gate G120).
+    E0 hotfix FB_Encoder + guard G127 livrés (commit 0b0a2785). Reste #3 (socle ST_Fault universel) comme clé de voûte, puis
+    mise en conformité encodeur, puis migration des 17 FB legacy ST_Status. Partage de travail possible : voir champ objectifs
+    de chaque sous-tâche (colonne agent = acteur pressenti).'
   objectifs:
   - Clôturer T164-1 à T164-6 dans l'ordre de séquence ; vérifier enfants ouverts avant clôture parent
   - Chaque sous-tâche ≥ C2 a son contrat DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-x_*.yaml (check_task_contract PASS)
   - Aucune migration de code vers un contrat non finalisé (T164-4/T164-5 bloqués par T164-3)
+  contrat: ''
+  date: '2026-08-28T10:20:27'
   bloque_par: []
 - id: T164-1
   parent_id: T164
@@ -1953,28 +1964,28 @@ tasks:
   agent: CC-sub
   date: '2026-08-27T15:05:00'
   titre: Audit des 16 gates NOT Enable incomplets (G127)
-  contexte: 'Intitulé complet : Auditer les 16 FB signalés par G127 (gate IF NOT Enable ... RETURN qui ne
-    republie pas toutes ses sorties), dont 4 C4 (FB_Safety_Winch, FB_WinchOutputInterlock, FB_Winch, FB_Translation).
-    Pour chaque sortie manquante : classer bug réel (valeur périmée publiée hors autorisation) vs légitime
-    (alimentée autrement dans le gate, ou volontairement figée). Produire une liste de correctifs isolés type E0.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1_AUDIT_G127.yaml (check_task_contract PASS).
-    Délégué à un sous-agent CC en lecture seule (audit, zéro modif code) 2026-08-27. Livrable unique :
-    DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md. Les correctifs (surtout C4) sont revus et
-    appliqués par l''orchestrateur (CC), pas par l''agent. Parallélisable avec T164-2. Réf méthode : commit 0b0a2785.'
+  contexte: 'Intitulé complet : Auditer les 16 FB signalés par G127 (gate IF NOT Enable ... RETURN qui ne republie pas toutes
+    ses sorties), dont 4 C4 (FB_Safety_Winch, FB_WinchOutputInterlock, FB_Winch, FB_Translation). Pour chaque sortie manquante
+    : classer bug réel (valeur périmée publiée hors autorisation) vs légitime (alimentée autrement dans le gate, ou volontairement
+    figée). Produire une liste de correctifs isolés type E0.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1_AUDIT_G127.yaml (check_task_contract PASS). Délégué à un
+    sous-agent CC en lecture seule (audit, zéro modif code) 2026-08-27. Livrable unique : DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md.
+    Les correctifs (surtout C4) sont revus et appliqués par l''orchestrateur (CC), pas par l''agent. Parallélisable avec T164-2.
+    Réf méthode : commit 0b0a2785.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1_AUDIT_G127.yaml
   objectifs:
-  - Pour chacun des 16 FB : lister les sorties écrites dans le corps mais absentes du gate NOT Enable
-  - Classer chaque sortie : BUG (publie une valeur périmée hors Enable) | OK (alimentée autrement / figée volontaire)
+  - Pour chacun des 16 FB: lister les sorties écrites dans le corps mais absentes du gate NOT Enable
+  - Classer chaque sortie: BUG (publie une valeur périmée hors Enable) | OK (alimentée autrement / figée volontaire)
   - Proposer pour chaque BUG un correctif isolé (diff minimal, sans changement d'interface) + preuve G127
   - Prioriser les 4 FB C4 ; livrer un fichier d'audit DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md
   - Aucune modification de CODE/ par l'agent d'audit — correctifs appliqués séparément après revue
-  resultat: '✅ VALIDÉ orchestrateur (CC) 2026-08-27. Audit DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md
-    (443 l.). Spot-check A/B/C concordant. Bilan sur 58 sorties : 21 BUG confirmés, 24 OK-ALIM = faux positifs
-    parseur G127 (ne découpait pas A:=x; B:=y; sur une ligne), 13 OK-FIGE justifiés. → G127 corrigé (split sur ;)
-    16→11 incomplets + test regression test_g127_neutralization.py (4 PASS). Sur les 21 BUG : tous [DIAG]/[STAT]
-    sauf 1 — FB_Bucket.ActiveOffsetM (tag [DIAG] mais câblé PRG_04:701/757 vers FB_Safety_Winch Méca E →
-    SafeStop/PowerCutOff, valeur périmée = offset benne fantôme masquant un désync M1/M2). Les sorties [ACT/SAFE]
-    des 4 FB C4 sont toutes correctement neutralisées. Application des correctifs → T164-1b.'
+  resultat: '✅ VALIDÉ orchestrateur (CC) 2026-08-27. Audit DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md (443
+    l.). Spot-check A/B/C concordant. Bilan sur 58 sorties : 21 BUG confirmés, 24 OK-ALIM = faux positifs parseur G127 (ne
+    découpait pas A:=x; B:=y; sur une ligne), 13 OK-FIGE justifiés. → G127 corrigé (split sur ;) 16→11 incomplets + test regression
+    test_g127_neutralization.py (4 PASS). Sur les 21 BUG : tous [DIAG]/[STAT] sauf 1 — FB_Bucket.ActiveOffsetM (tag [DIAG]
+    mais câblé PRG_04:701/757 vers FB_Safety_Winch Méca E → SafeStop/PowerCutOff, valeur périmée = offset benne fantôme masquant
+    un désync M1/M2). Les sorties [ACT/SAFE] des 4 FB C4 sont toutes correctement neutralisées. Application des correctifs
+    → T164-1b.'
   bloque_par: []
 - id: T164-1b
   parent_id: T164
@@ -1984,22 +1995,22 @@ tasks:
   agent: AGY-01
   date: '2026-08-27T21:30:00'
   titre: Application des 21 correctifs G127 (issus de l'audit T164-1)
-  contexte: 'Intitulé complet : Appliquer, par lots isolés type E0, les correctifs de neutralisation
-    proposés dans DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md pour les 11 FB encore
-    signalés par G127 (après correction du parseur). Chaque correctif = affectation(s) ajoutée(s) dans
+  contexte: 'Intitulé complet : Appliquer, par lots isolés type E0, les correctifs de neutralisation proposés dans DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md
+    pour les 11 FB encore signalés par G127 (après correction du parseur). Chaque correctif = affectation(s) ajoutée(s) dans
     le gate IF NOT Enable, sans changement d''interface.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1b_G127_FIXES.yaml (check PASS).
-    Découpage : lot A = 4 FB C4 (FB_Safety_Winch, FB_Winch, FB_WinchOutputInterlock, FB_Translation) —
-    revue orchestrateur ligne à ligne ; lot C = 5 FB non-C4 (FB_Brake, FB_Cycle,
-    FB_Translation_PositionEstimator, FB_TranslationOutputInterlock, FB_Sim_Joystick).
-    EXCLUS : FB_Bucket → T164-1c ; FB_Encoder_Abs → T164-4 (sa refonte d''interface recouvre son gate
-    incomplet, le corriger ici = double travail + conflit). 2 commits séparés (lot A / lot C).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1b_G127_FIXES.yaml (check PASS). Découpage : lot A = 4 FB
+    C4 (FB_Safety_Winch, FB_Winch, FB_WinchOutputInterlock, FB_Translation) — revue orchestrateur ligne à ligne ; lot C =
+    5 FB non-C4 (FB_Brake, FB_Cycle, FB_Translation_PositionEstimator, FB_TranslationOutputInterlock, FB_Sim_Joystick). EXCLUS
+    : FB_Bucket → T164-1c ; FB_Encoder_Abs → T164-4 (sa refonte d''interface recouvre son gate incomplet, le corriger ici
+    = double travail + conflit). 2 commits séparés (lot A / lot C).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1b_G127_FIXES.yaml
   objectifs:
-  - 'Lot A (4 C4) — gate complété pour MecaADriftM/MecaBElapsedTime/MecaCDriftM, ContactorsCheck/DirectionChangePending/SpeedGuardLimited, ErrorId/Reason/RestartInhibit/StateAtError, TargetReached ; ces 4 FB sortent des incomplets G127'
-  - 'Lot C (5 FB) — correctifs appliqués, chacun avec commentaire explicite AU gate (REX FB_Encoder : gel volontaire doit être visible au gate)'
-  - "Chaque lot — aucun changement d'interface, G200 PASS, bundle régénéré, commit séparé validé par l'orchestrateur"
-  - 'À la fin (avec T164-1c + FB_Encoder_Abs dans T164-4) — G127 informatif ne signale plus que des OK-FIGE explicitement commentés'
+  - Lot A (4 C4) — gate complété pour MecaADriftM/MecaBElapsedTime/MecaCDriftM, ContactorsCheck/DirectionChangePending/SpeedGuardLimited,
+    ErrorId/Reason/RestartInhibit/StateAtError, TargetReached ; ces 4 FB sortent des incomplets G127
+  - 'Lot C (5 FB) — correctifs appliqués, chacun avec commentaire explicite AU gate (REX FB_Encoder : gel volontaire doit
+    être visible au gate)'
+  - Chaque lot — aucun changement d'interface, G200 PASS, bundle régénéré, commit séparé validé par l'orchestrateur
+  - À la fin (avec T164-1c + FB_Encoder_Abs dans T164-4) — G127 informatif ne signale plus que des OK-FIGE explicitement commentés
   bloque_par:
   - T164-1
 - id: T164-1c
@@ -2010,25 +2021,25 @@ tasks:
   agent: AGY-01
   date: '2026-08-27T21:30:00'
   titre: FB_Bucket — gate complet + sortie ActiveOffsetValid (audit T164-1 §2)
-  contexte: 'Intitulé complet : FB_Bucket désactivé (InhibitM2) laisse fuiter un ActiveOffsetM périmé
-    (offset benne fantôme → PRG_04:701/757 → FB_Safety_Winch Méca E → SafeStop/PowerCutOff, masquage
-    possible d''un désync M1/M2 réel — alerte §2 de l''audit T164-1). Décision utilisateur 2026-08-27 :
-    gate publie ActiveOffsetM := 0.0 (comparaison M1/M2 stricte, benne ouverte = 0 décalage) + nouvelle
-    sortie ActiveOffsetValid : BOOL := FALSE, affichée IHM/troubleshooting. Même logique que FB_Encoder
-    désactivé qui lève EncoderFault (E0, commit 0b0a2785).'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1c_BUCKET_ACTIVEOFFSET_VALID.yaml
-    (check_task_contract PASS). Délégable à un agent d''exécution (git diff revu par l''orchestrateur).
-    Changement d''interface léger : + ActiveOffsetValid dans FB_Bucket + ST_BucketState + publication
-    PRG_04. Méca E / FB_Safety_Winch NE sont PAS touchés (la comparaison stricte résulte du seul
-    ActiveOffsetM := 0.0 au gate). Périmètre : FB_Bucket.st, ST_BucketState.st, PRG_04_Treuils_Benne.st,
-    AF-10 (chapô + fiche FB_Bucket), IHM_VARIABLES_MIGRATION.md.'
+  contexte: 'Intitulé complet : FB_Bucket désactivé (InhibitM2) laisse fuiter un ActiveOffsetM périmé (offset benne fantôme
+    → PRG_04:701/757 → FB_Safety_Winch Méca E → SafeStop/PowerCutOff, masquage possible d''un désync M1/M2 réel — alerte §2
+    de l''audit T164-1). Décision utilisateur 2026-08-27 : gate publie ActiveOffsetM := 0.0 (comparaison M1/M2 stricte, benne
+    ouverte = 0 décalage) + nouvelle sortie ActiveOffsetValid : BOOL := FALSE, affichée IHM/troubleshooting. Même logique
+    que FB_Encoder désactivé qui lève EncoderFault (E0, commit 0b0a2785).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1c_BUCKET_ACTIVEOFFSET_VALID.yaml (check_task_contract PASS).
+    Délégable à un agent d''exécution (git diff revu par l''orchestrateur). Changement d''interface léger : + ActiveOffsetValid
+    dans FB_Bucket + ST_BucketState + publication PRG_04. Méca E / FB_Safety_Winch NE sont PAS touchés (la comparaison stricte
+    résulte du seul ActiveOffsetM := 0.0 au gate). Périmètre : FB_Bucket.st, ST_BucketState.st, PRG_04_Treuils_Benne.st, AF-10
+    (chapô + fiche FB_Bucket), IHM_VARIABLES_MIGRATION.md.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1c_BUCKET_ACTIVEOFFSET_VALID.yaml
   objectifs:
   - 'FB_Bucket : + VAR_OUTPUT ActiveOffsetValid : BOOL (TRUE si offset à jour, FALSE dans le gate NOT Enable)'
-  - 'Gate NOT Enable : ActiveOffsetM := 0.0, ActiveOffsetValid := FALSE, DeltaPosition_M := 0.0, RemainingTravelM := 0.0 → FB_Bucket sort des incomplets G127'
+  - 'Gate NOT Enable : ActiveOffsetM := 0.0, ActiveOffsetValid := FALSE, DeltaPosition_M := 0.0, RemainingTravelM := 0.0 →
+    FB_Bucket sort des incomplets G127'
   - 'FB_Safety_Winch et FB_WinchSync : zéro modification ; la comparaison M1/M2 stricte vient du seul offset 0.0'
-  - 'PRG_04 publie instBucket.ActiveOffsetValid dans ST_BucketState (nouveau champ) ; nom fichier = nom POU, suffixe = langage bundle inchangés'
-  - 'AF-10 + IHM_VARIABLES_MIGRATION.md à jour ; G200 PASS, G340 PASS, bundle régénéré, diff revu par l''orchestrateur'
+  - PRG_04 publie instBucket.ActiveOffsetValid dans ST_BucketState (nouveau champ) ; nom fichier = nom POU, suffixe = langage
+    bundle inchangés
+  - AF-10 + IHM_VARIABLES_MIGRATION.md à jour ; G200 PASS, G340 PASS, bundle régénéré, diff revu par l'orchestrateur
   bloque_par:
   - T164-1
 - id: T164-2
@@ -2039,23 +2050,23 @@ tasks:
   agent: HUM
   date: '2026-08-27T14:43:00'
   titre: Décision E-D1 — preset codeur transaction ou echo
-  contexte: 'Intitulé complet : Trancher si le preset SDO/PDO vers le codeur absolu EtherCAT est une vraie
-    transaction dont le succès (PresetAck) conditionne Calib.Homed, ou un aller optionnel sans retour fiable.
-    Décideur = humain avec connaissance du matériel réel, pas un agent.'
-  description: 'DÉCIDÉ 2026-08-27 (utilisateur) = variante C : preset = transaction RÉELLE. Confirmation par
-    sélecteur Cfg.PresetConfirmMode (E_PresetConfirmMode) : READBACK_ONLY (défaut, ABS(CablePosM − cible) ≤
-    CST_HomingVerifyToleranceM défaut 0.010 m après N cycles) | READBACK_AND_STATUSBIT | STATUSBIT_ONLY.
-    Entrée optionnelle PresetStatusBit:BOOL (bit du mot d''état codeur, à définir site) prévue dès maintenant,
-    laissée FALSE. PresetNak supprimé ; PresetAck (pulse) remplacé par PresetStatusBit. Bascule site =
-    câbler le bit + changer Cfg, aucun autre code. Détail : DECISION_ENCODER_PRESET_TRANSACTION.md.
-    Précondition PRE1 de T164-4 levée.'
+  contexte: 'Intitulé complet : Trancher si le preset SDO/PDO vers le codeur absolu EtherCAT est une vraie transaction dont
+    le succès (PresetAck) conditionne Calib.Homed, ou un aller optionnel sans retour fiable. Décideur = humain avec connaissance
+    du matériel réel, pas un agent.'
+  description: 'DÉCIDÉ 2026-08-27 (utilisateur) = variante C : preset = transaction RÉELLE. Confirmation par sélecteur Cfg.PresetConfirmMode
+    (E_PresetConfirmMode) : READBACK_ONLY (défaut, ABS(CablePosM − cible) ≤ CST_HomingVerifyToleranceM défaut 0.010 m après
+    N cycles) | READBACK_AND_STATUSBIT | STATUSBIT_ONLY. Entrée optionnelle PresetStatusBit:BOOL (bit du mot d''état codeur,
+    à définir site) prévue dès maintenant, laissée FALSE. PresetNak supprimé ; PresetAck (pulse) remplacé par PresetStatusBit.
+    Bascule site = câbler le bit + changer Cfg, aucun autre code. Détail : DECISION_ENCODER_PRESET_TRANSACTION.md. Précondition
+    PRE1 de T164-4 levée.'
   contrat: DOC/WFLOW/CONTRACTS/DECISION_ENCODER_PRESET_TRANSACTION.md
   objectifs:
   - 'DÉCISION : preset = transaction réelle, Homed conditionné au succès selon Cfg.PresetConfirmMode'
   - 'CONFIRMATION : 3 modes (relecture mesure / bit mot d''état / les deux), défaut READBACK_ONLY sans matériel'
   - 'ENTRÉE PRÉVUE : PresetStatusBit:BOOL dans ST_fbEncoder_HwIn, laissée FALSE jusqu''au câblage site'
-  - 'PresetNak supprimé, PresetAck remplacé par PresetStatusBit ; repris dans le périmètre T164-4'
-  - 'NOUVEAUX : E_PresetConfirmMode, Cfg.PresetConfirmMode, CST_HomingVerifyToleranceM (0.010 m), bit ErrorId « preset non confirmé »'
+  - PresetNak supprimé, PresetAck remplacé par PresetStatusBit ; repris dans le périmètre T164-4
+  - 'NOUVEAUX : E_PresetConfirmMode, Cfg.PresetConfirmMode, CST_HomingVerifyToleranceM (0.010 m), bit ErrorId « preset non
+    confirmé »'
   bloque_par: []
 - id: T164-3
   parent_id: T164
@@ -2064,26 +2075,23 @@ tasks:
   domaine: STANDARDS
   agent: CC-sub
   date: '2026-08-27T15:35:00'
-  titre: Chantier #3 — socle ST_Fault universel (docs + G315)
-  contexte: 'Intitulé complet : Acter dans les docs standards et l''outillage que la forme cible du contrat
-    FB standard est Ready + Fault:ST_Fault (rempli par FB_FaultCore, causes nommées ARRAY OF ST_FaultCause)
-    + Lifecycle:ST_Lifecycle si machine d''état — remplaçant ST_FbStatus/FB_FbStatus/ST_FbCause (supprimés
-    code, restés dans les docs/gate). Décision d''archi prise : ST_Fault universel, FB_Joystick = pilote,
-    les 17 FB ST_Status = legacy tracé migré plus tard (T164-5).'
-  description: 'ZÉRO CODE/*.st touché. Périmètre : AF_Partie-03 §2/§3/§3bis/§4.1 ; CODE_QUALITY_STANDARDS
-    §2quinquies/§3/§3bis/§9 ; sous-fiche AF_Partie-03_Contrats_Composants/FB_FbStatus_v1.0.md → FB_FaultCore_v1.0.md ;
-    G315_check_fb_interface.py (forme cible Status:ST_FbStatus → Fault:ST_Fault) + baseline +
-    TASK_CONTRACT_STANDARD_INTERFACES_FB.yaml ; balayage terminologique FB_FbStatus/ST_FbCause résiduels.
-    Change le PASS/FAIL de G315 → revue orchestrateur obligatoire. Clé de voûte : débloque T164-4 et T164-5.
-    Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-3_SOCLE_ST_FAULT.yaml (check_task_contract PASS).
-    Partage : partie DOCS déléguée à un sous-agent natif CC ; partie OUTILLAGE (G315 + baseline + T136) =
-    orchestrateur CC uniquement, l''agent docs n''y touche pas (forbidden). Lancé en parallèle de T164-1.
-    ✅ TERMINÉ 2026-08-27. Partie DOCS : commit b2a68763 (AF-03/CQS/AF-08/AF-09 + sous-fiche
-    FB_FaultCore_v1.0.md ; changement fail-safe IsWarning→Latching explicité 3×) — revue orchestrateur
-    ACCEPTED. Partie OUTILLAGE : commit b1cd9a05 — G315 réécrit (3 formes : cible Fault:ST_Fault,
-    legacy-status Status:ST_Status jusqu''à T164-5, hérité à plat T137 vide) + test 12 PASS. État repo :
-    2 forme cible (FB_Joystick + FB_FaultCore), 16 legacy-status, 0 à plat. G315/G330/G340 PASS.
-    PRE2 de T164-4 LEVÉE. Nettoyage refs commentaire ST_FbStatus (G330, LINTER_ST, TEST_AUTO_CI) = suivi T164-5.'
+  titre: Chantier
+  contexte: 'Intitulé complet : Acter dans les docs standards et l''outillage que la forme cible du contrat FB standard est
+    Ready + Fault:ST_Fault (rempli par FB_FaultCore, causes nommées ARRAY OF ST_FaultCause) + Lifecycle:ST_Lifecycle si machine
+    d''état — remplaçant ST_FbStatus/FB_FbStatus/ST_FbCause (supprimés code, restés dans les docs/gate). Décision d''archi
+    prise : ST_Fault universel, FB_Joystick = pilote, les 17 FB ST_Status = legacy tracé migré plus tard (T164-5).'
+  description: 'ZÉRO CODE/*.st touché. Périmètre : AF_Partie-03 §2/§3/§3bis/§4.1 ; CODE_QUALITY_STANDARDS §2quinquies/§3/§3bis/§9
+    ; sous-fiche AF_Partie-03_Contrats_Composants/FB_FbStatus_v1.0.md → FB_FaultCore_v1.0.md ; G315_check_fb_interface.py
+    (forme cible Status:ST_FbStatus → Fault:ST_Fault) + baseline + TASK_CONTRACT_STANDARD_INTERFACES_FB.yaml ; balayage terminologique
+    FB_FbStatus/ST_FbCause résiduels. Change le PASS/FAIL de G315 → revue orchestrateur obligatoire. Clé de voûte : débloque
+    T164-4 et T164-5. Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-3_SOCLE_ST_FAULT.yaml (check_task_contract PASS). Partage
+    : partie DOCS déléguée à un sous-agent natif CC ; partie OUTILLAGE (G315 + baseline + T136) = orchestrateur CC uniquement,
+    l''agent docs n''y touche pas (forbidden). Lancé en parallèle de T164-1. ✅ TERMINÉ 2026-08-27. Partie DOCS : commit b2a68763
+    (AF-03/CQS/AF-08/AF-09 + sous-fiche FB_FaultCore_v1.0.md ; changement fail-safe IsWarning→Latching explicité 3×) — revue
+    orchestrateur ACCEPTED. Partie OUTILLAGE : commit b1cd9a05 — G315 réécrit (3 formes : cible Fault:ST_Fault, legacy-status
+    Status:ST_Status jusqu''à T164-5, hérité à plat T137 vide) + test 12 PASS. État repo : 2 forme cible (FB_Joystick + FB_FaultCore),
+    16 legacy-status, 0 à plat. G315/G330/G340 PASS. PRE2 de T164-4 LEVÉE. Nettoyage refs commentaire ST_FbStatus (G330, LINTER_ST,
+    TEST_AUTO_CI) = suivi T164-5.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-3_SOCLE_ST_FAULT.yaml
   objectifs:
   - AF_Partie-03 et CODE_QUALITY_STANDARDS décrivent Fault:ST_Fault comme forme cible du contrat standard
@@ -2100,13 +2108,11 @@ tasks:
   agent: AGY-01
   date: '2026-08-27T21:20:00'
   titre: Programme de mise en conformité interface FB_Encoder — découpé 4A→4D
-  contexte: 'Ancienne tâche C3 scindée afin de séparer les décisions d''architecture, la persistance, la
-    transaction preset/HW et la migration Fault. Aucune sous-tâche ne doit modifier une décision relevant
-    d''une dépendance non validée.'
-  description: 'NE PAS déléguer T164-4 directement : elle est remplacée par T164-4A, T164-4B, T164-4C et
-    T164-4D. Le contrat initial TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml est conservé comme historique
-    de cadrage, non comme autorisation d''implémentation. Chaque sous-tâche possède son contrat propre et une
-    revue orchestrateur obligatoire.'
+  contexte: Ancienne tâche C3 scindée afin de séparer les décisions d'architecture, la persistance, la transaction preset/HW
+    et la migration Fault. Aucune sous-tâche ne doit modifier une décision relevant d'une dépendance non validée.
+  description: 'NE PAS déléguer T164-4 directement : elle est remplacée par T164-4A, T164-4B, T164-4C et T164-4D. Le contrat
+    initial TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml est conservé comme historique de cadrage, non comme autorisation
+    d''implémentation. Chaque sous-tâche possède son contrat propre et une revue orchestrateur obligatoire.'
   contrat: ''
   objectifs:
   - T164-4A fixe explicitement les propriétaires de configuration, les invariants et le contrat d''exécution
@@ -2122,11 +2128,11 @@ tasks:
   agent: CODEX
   date: '2026-08-27T18:00:00'
   titre: Cadrage d'architecture Encoder — propriétaires, invariants et contrat d'exécution
-  contexte: 'Décision documentaire préalable : lever les ambiguïtés de configuration M1/M2, HMI/persistance,
-    gate G127 et sources publiques des causes avant toute modification ST.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4A_ENCODER_ARCHITECTURE.yaml. Livrable
-    documentaire terminé et revu ; décision d''exécution autonome accordée par l''utilisateur le 2026-08-27.
-    Les confirmations physiques/IHM restantes sont tracées dans QUESTIONS_T164-4.md.'
+  contexte: 'Décision documentaire préalable : lever les ambiguïtés de configuration M1/M2, HMI/persistance, gate G127 et
+    sources publiques des causes avant toute modification ST.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4A_ENCODER_ARCHITECTURE.yaml. Livrable documentaire terminé
+    et revu ; décision d''exécution autonome accordée par l''utilisateur le 2026-08-27. Les confirmations physiques/IHM restantes
+    sont tracées dans QUESTIONS_T164-4.md.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4A_ENCODER_ARCHITECTURE.yaml
   objectifs:
   - Définir un propriétaire public de configuration sans fusionner les réglages M1/M2
@@ -2141,10 +2147,9 @@ tasks:
   agent: CODEX
   date: '2026-08-27T18:05:00'
   titre: Configuration et persistance Encoder — type, bridge et restauration
-  contexte: 'Implémentation strictement postérieure à la décision 4A ; n''embarque aucune transaction preset
-    ni migration Fault.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4B_ENCODER_CFG_PERSISTENCE.yaml. Propriétaire
-    HMI concret : GVL_IHM.Commun.EncoderCfg via ST_CommunHMI ; revu après génération bundle fraîche.'
+  contexte: Implémentation strictement postérieure à la décision 4A ; n'embarque aucune transaction preset ni migration Fault.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4B_ENCODER_CFG_PERSISTENCE.yaml. Propriétaire HMI concret
+    : GVL_IHM.Commun.EncoderCfg via ST_CommunHMI ; revu après génération bundle fraîche.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4B_ENCODER_CFG_PERSISTENCE.yaml
   objectifs:
   - Créer le type de configuration minimal et le bridge de persistance à propriétaire unique
@@ -2159,10 +2164,10 @@ tasks:
   agent: AGY-01
   date: '2026-08-27T21:00:00'
   titre: Transaction preset Encoder et frontière matériel HwIn/HwOut
-  contexte: 'Refonte fonctionnelle limitée à la transaction preset fermée, au split HW, aux call-sites et à
-    la simulation ; la façade conserve encore Status:ST_Status.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4C_ENCODER_PRESET_HW.yaml. Ne démarre
-    qu''après les visas 4A et 4B ; aucun changement de seuil, polarité, tempo ou logique sécurité/homing.'
+  contexte: Refonte fonctionnelle limitée à la transaction preset fermée, au split HW, aux call-sites et à la simulation ;
+    la façade conserve encore Status:ST_Status.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4C_ENCODER_PRESET_HW.yaml. Ne démarre qu''après les visas
+    4A et 4B ; aucun changement de seuil, polarité, tempo ou logique sécurité/homing.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4C_ENCODER_PRESET_HW.yaml
   objectifs:
   - Implémenter PresetConfirmMode/PresetStatusBit et la confirmation par relecture sans ports fantômes
@@ -2179,10 +2184,10 @@ tasks:
   agent: AGY-01
   date: '2026-08-27T21:20:00'
   titre: Façade FB_Encoder — migration FaultCore et compatibilité des consommateurs
-  contexte: 'Migration finale de la seule façade vers Fault:ST_Fault après stabilisation de la transaction
-    et de ses sources publiques.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4D_ENCODER_FAULT_FACADE.yaml. Sous-FB
-    Abs/Homing/Safety et Measurement.HomingStatus/AbsStatus restent Status:ST_Status jusqu''à T164-5.'
+  contexte: Migration finale de la seule façade vers Fault:ST_Fault après stabilisation de la transaction et de ses sources
+    publiques.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4D_ENCODER_FAULT_FACADE.yaml. Sous-FB Abs/Homing/Safety et
+    Measurement.HomingStatus/AbsStatus restent Status:ST_Status jusqu''à T164-5.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4D_ENCODER_FAULT_FACADE.yaml
   objectifs:
   - Remplacer uniquement Status de façade par Fault:ST_Fault via FB_FaultCore et causes justifiées
@@ -2198,16 +2203,14 @@ tasks:
   agent: AGY-01
   date: '2026-08-27T23:00:00'
   titre: Migration des 17 FB legacy Status:ST_Status vers Fault:ST_Fault
-  contexte: 'Intitulé complet : Migrer un par un (un domaine par lot) les 17 FB portant encore Status:ST_Status
-    (FB_Brake, FB_Encoder_*, FB_Modes, FB_DiveSearch, FB_ExtractionSequence, FB_Bucket, FB_Safety_Winch,
-    FB_Winch, FB_WinchLoadEstimator, FB_WinchSync, FB_Safety_Translation, FB_Translation,
-    FB_TranslationOutputInterlock, ST_EncoderMeasurement) vers Fault:ST_Fault + Lifecycle:ST_Lifecycle si
-    machine d''état, avec FB_FaultCore et causes nommées.'
-  description: 'GABARIT de contrat prêt : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-5_MIGRATION_ST_FAULT_TEMPLATE.yaml
-    — à cloner par domaine (T164-5a..f : A_COMMUN / E_CODEURS / F_MODES / G_CYCLE / H_TREUILS_BENNE / I_TRANSLATION).
-    Contient la RÈGLE DE MAPPING DES CAUSES non négociable (ErrorId→Latching:=TRUE ; WarningId→Latching:=FALSE ;
-    ambigu→TRUE + alerte). Parallélisable une fois T164-4 VALIDATED. Chaque lot = son G315 vert, consommateurs
-    remappés, AF métier à jour, commit + revue orchestrateur.'
+  contexte: 'Intitulé complet : Migrer un par un (un domaine par lot) les 17 FB portant encore Status:ST_Status (FB_Brake,
+    FB_Encoder_*, FB_Modes, FB_DiveSearch, FB_ExtractionSequence, FB_Bucket, FB_Safety_Winch, FB_Winch, FB_WinchLoadEstimator,
+    FB_WinchSync, FB_Safety_Translation, FB_Translation, FB_TranslationOutputInterlock, ST_EncoderMeasurement) vers Fault:ST_Fault
+    + Lifecycle:ST_Lifecycle si machine d''état, avec FB_FaultCore et causes nommées.'
+  description: 'GABARIT de contrat prêt : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-5_MIGRATION_ST_FAULT_TEMPLATE.yaml — à cloner
+    par domaine (T164-5a..f : A_COMMUN / E_CODEURS / F_MODES / G_CYCLE / H_TREUILS_BENNE / I_TRANSLATION). Contient la RÈGLE
+    DE MAPPING DES CAUSES non négociable (ErrorId→Latching:=TRUE ; WarningId→Latching:=FALSE ; ambigu→TRUE + alerte). Parallélisable
+    une fois T164-4 VALIDATED. Chaque lot = son G315 vert, consommateurs remappés, AF métier à jour, commit + revue orchestrateur.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-5_MIGRATION_ST_FAULT_TEMPLATE.yaml
   objectifs:
   - Chaque FB migré expose Fault:ST_Fault (+ Lifecycle si séquenceur) rempli par FB_FaultCore à causes nommées
@@ -2225,21 +2228,175 @@ tasks:
   agent: DSH
   date: '2026-08-27T21:52:46'
   titre: Lots nommage (G120 12 DUT + champs encodeur + GVL_Simulation)
-  contexte: 'Intitulé complet : Renommages cosmétiques différés — 12 DUT signalés par G120 (ST_EncoderHw,
-    ST_BucketConfig, ST_*CmdDemand, ST_Winch_Symmetry*, …) vers ST_fb<Fb>_<Rôle> ; champs encodeur
-    CablePosM → CablePosition_M et HomingAtTargetM → CmdHoming… (NC-030/NC-050) ; GVL_Simulation.'
-  description: '✅ CLÔTURÉ 2026-08-27 (lot dédié NC-110) : 11 DUT propriétaires renommés vers ST_fb<Fb>_<Role>
-    (ST_fbModes_Autorisations, ST_fbCycle_{Bucket,Winch,Translation}CmdDemand, ST_fbBucket_{Config,State},
-    ST_fbWinchLoadEstimator_{Table,SpeedCfg}, ST_fbWinch_Symmetry_{Cfg,Data}, ST_fbEncoder_Measurement),
-    ST_EncoderMeasurements pluriel préservé. Bundle régénéré, G200 PASS (0 erreur), 22 gates PASS,
-    CI 27/27 suites (100%), G120 : 15 DUT conformes / 0 à migrer. — Règle d''origine : DERNIER, ou jamais. Blast radius élevé (consommateurs + tags IHM + troubleshooting + snapshots
-    CSV + fixtures CI), valeur sécurité nulle. Règle : ne renommer que les champs qui bougent déjà pour une
-    autre raison (ride-along d''un déplacement fait en T164-4/T164-5). Sinon lot dédié explicite, jamais au fil de l''eau.'
+  contexte: 'Intitulé complet : Renommages cosmétiques différés — 12 DUT signalés par G120 (ST_EncoderHw, ST_BucketConfig,
+    ST_*CmdDemand, ST_Winch_Symmetry*, …) vers ST_fb<Fb>_<Rôle> ; champs encodeur CablePosM → CablePosition_M et HomingAtTargetM
+    → CmdHoming… (NC-030/NC-050) ; GVL_Simulation.'
+  description: '✅ CLÔTURÉ 2026-08-27 (lot dédié NC-110) : 11 DUT propriétaires renommés vers ST_fb<Fb>_<Role> (ST_fbModes_Autorisations,
+    ST_fbCycle_{Bucket,Winch,Translation}CmdDemand, ST_fbBucket_{Config,State}, ST_fbWinchLoadEstimator_{Table,SpeedCfg},
+    ST_fbWinch_Symmetry_{Cfg,Data}, ST_fbEncoder_Measurement), ST_EncoderMeasurements pluriel préservé. Bundle régénéré, G200
+    PASS (0 erreur), 22 gates PASS, CI 27/27 suites (100%), G120 : 15 DUT conformes / 0 à migrer. — Règle d''origine : DERNIER,
+    ou jamais. Blast radius élevé (consommateurs + tags IHM + troubleshooting + snapshots CSV + fixtures CI), valeur sécurité
+    nulle. Règle : ne renommer que les champs qui bougent déjà pour une autre raison (ride-along d''un déplacement fait en
+    T164-4/T164-5). Sinon lot dédié explicite, jamais au fil de l''eau.'
   contrat: ''
   objectifs:
   - Aucun renommage au fil de l'eau ; chaque renommage a son entrée IHM_VARIABLES_MIGRATION.md (ancien→nouveau)
-  - Bundle + IHM/SCADA reparamétrés simultanément ; G120 : 0 DUT à migrer restant après le lot
+  - Bundle + IHM/SCADA reparamétrés simultanément ; G120: 0 DUT à migrer restant après le lot
   - Priorité basse — ne démarre que si T164-1 à T164-5 sont clôturés ou explicitement mis en attente
   bloque_par:
   - T164-4
   - T164-5
+- id: T165
+  parent_id: ''
+  statut: ⏸️
+  criticite: C4
+  domaine: ''
+  agent: —
+  titre: Figer les contrats de flux PRG_02 et PRG_03 avant refactor des mouvements
+  contexte: 'Refactor CODESYS sécurité réelle : PRG_02 publie les faits qualifiés ; PRG_03 publie Auth et demandes programme
+    ; PRG_04/05 gardent arbitrage métier et safety.'
+  description: 'Parent des lots T165-A → B1 → B2 → BR → C0 → C1 → C2 → CR. Ligne d''arrêt après PRG_03 : aucune réécriture
+    PRG_04/05, aucun déplacement DiveSearch/Extraction, aucun correctif GRAFCET dans cette famille. Audit : DOC/WFLOW/AUDITS/AUDIT_ARCHITECTURE_FLUX_PRG02_PRG03_20260828.md.'
+  objectifs:
+  - Figer deux frontières publiques structurées, avec producteurs uniques et fraîcheur explicite
+  - Supprimer les accès inter-POU aux instances internes par checkpoints conservatifs
+  - Faire contrôler chaque programme par un reviewer indépendant read-only
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165_FLUX_PRG02_PRG03.yaml
+  date: '2026-08-28T10:20:02'
+  bloque_par: []
+- id: T165-A
+  parent_id: T165
+  statut: ⏸️
+  criticite: C4
+  domaine: ''
+  agent: —
+  titre: Audit et visa architecture PRG_02/PRG_03
+  contexte: Cadrage documentaire, contrats inter-PRG, registre de conservation, test design et décisions humaines.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml. Deux audits indépendants
+    read-only intégrés. BLOCK tant que D-01..D-09 ne sont pas visées ou explicitement reportées par l''humain.'
+  objectifs:
+  - Valider responsabilités, structures proposées et anti-débordement
+  - Trancher ArmingPermit/deadman/Auth/vitesse/Dive-Extraction/Kobold/défaut codeur
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
+  date: '2026-08-28T10:19:44'
+  bloque_par: []
+- id: T165-B1
+  parent_id: T165
+  statut: ⏸️
+  criticite: C4
+  domaine: ACQUISITION
+  agent: —
+  date: '2026-08-28T11:51:18+02:00'
+  titre: PRG_02 — compléter la publication Data sans changer les consommateurs
+  contexte: 'Checkpoint producteur : joystick X/Y complet, états codeur et diagnostics réseau déjà calculés.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml. Ne touche ni PRG_03/04/05/07,
+    ni safety, ni ArmingPermit.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml
+  objectifs:
+  - Publier les faits existants dans des sous-DUT structurés sans second calcul
+  - Prouver égalité scan par scan et producteur unique
+  bloque_par:
+  - T165-A
+- id: T165-B2
+  parent_id: T165
+  statut: ⏸️
+  criticite: C4
+  domaine: ACQUISITION
+  agent: —
+  date: '2026-08-28T11:51:18+02:00'
+  titre: PRG_02 — migrer tous les consommateurs vers Data/HwIn
+  contexte: Remappage conservatif PRG_03/04/05/07 ; aucun changement de logique métier.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml. STOP sur toute variable sans équivalent
+    public ou différence comportementale.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml
+  objectifs:
+  - Obtenir zéro accès externe à PRG_02.inst*
+  - Conserver manuel, simulation, diagnostics, codeurs et safety à l'identique
+  bloque_par:
+  - T165-B1
+- id: T165-BR
+  parent_id: T165
+  statut: ⏸️
+  criticite: C4
+  domaine: REVIEW
+  agent: —
+  date: '2026-08-28T11:51:18+02:00'
+  titre: Revue indépendante read-only des lots PRG_02
+  contexte: Contrôle du diff réel, des consommateurs, de la matrice manuelle et des faits safety qualifiés.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml. Le reviewer ne corrige rien et rend
+    BLOCK sur tout doute deadman/codeur/frein/polarité.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml
+  objectifs:
+  - Vérifier indépendamment B1/B2 et les preuves CP0→CP2
+  - Refuser tout PASS conditionnel sur un invariant safety
+  bloque_par:
+  - T165-B2
+- id: T165-C0
+  parent_id: T165
+  statut: ⏸️
+  criticite: C4
+  domaine: REVIEW
+  agent: —
+  date: '2026-08-28T11:51:18+02:00'
+  titre: Réconcilier l'interface réelle FB_Cycle avec T164-5
+  contexte: 'Audit read-only préalable : le catalogue annonce T164-5 terminé mais FB_Cycle expose encore Busy/Done/Error/ErrorId
+    à plat.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml. Vérifier le profil AF‑03,
+    les producteurs de SequenceState et préparer le contrat G_CYCLE manquant ; aucune correction par le reviewer.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml
+  objectifs:
+  - Empêcher PRG_03 de fabriquer Fault/Lifecycle/OperatorActionId localement
+  - Réconcilier preuve code et statut catalogue avant C1
+  bloque_par:
+  - T165-BR
+- id: T165-C1
+  parent_id: T165
+  statut: ⏸️
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: —
+  date: '2026-08-28T11:51:18+02:00'
+  titre: PRG_03 — publier Data(Auth, ReqProgram, SequenceState)
+  contexte: Checkpoint producteur PRG_03 ; aucune migration des consommateurs ni modification GRAFCET.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml. La décision Auth courant/N-1 doit
+    être visée ; DiveSearch/Extraction restent en place.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml
+  objectifs:
+  - Créer un bus public minimal et lisible sans safety ni sortie physique
+  - Publier les demandes/états existants sans recalcul métier
+  bloque_par:
+  - T165-C0
+- id: T165-C2
+  parent_id: T165
+  statut: ⏸️
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: —
+  date: '2026-08-28T11:51:18+02:00'
+  titre: PRG_03 — migrer consommateurs et rendre le cycle privé
+  contexte: Remappage PRG_02/04/05/07 vers PRG_03.Data et retours aval publics N-1.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml. Aucun correctif X1/X11/Kobold, aucune
+    modification safety, vitesse ou séquence en ride-along.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml
+  objectifs:
+  - Obtenir zéro accès à instCycleSemiAuto et aux internals PRG_04/05
+  - Conserver demandes, modes, diagnostics et retards N-1 explicités
+  bloque_par:
+  - T165-C1
+- id: T165-CR
+  parent_id: T165
+  statut: ⏸️
+  criticite: C4
+  domaine: REVIEW
+  agent: —
+  date: '2026-08-28T11:51:18+02:00'
+  titre: Revue indépendante read-only des lots PRG_03
+  contexte: Contrôle architecture, ordre de scan, chaîne Req→Tgt→Cmd→Act, conservation et diagnostic opérateur.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml. Verdict basé sur diff réel, tests et
+    code, jamais sur le rapport de l''exécutant seul.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml
+  objectifs:
+  - Vérifier indépendamment C1/C2 et les preuves CP4→CP5
+  - Confirmer que PRG_04/05 restent souverains pour arbitrage métier et safety
+  bloque_par:
+  - T165-C2

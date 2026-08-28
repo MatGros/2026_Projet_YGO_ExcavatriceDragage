@@ -1,0 +1,52 @@
+contract:
+  task_id: T165_FLUX_PRG02_PRG03
+  criticality: C4
+  strategy: rebuild
+  objective: >
+    Conduire par checkpoints le gel et la migration des frontières publiques PRG_02
+    et PRG_03, avec conservation machine et revues indépendantes avant tout refactor aval.
+  acceptance:
+    - id: AC1
+      statement: "T165-A, B1, B2, BR, C0, C1, C2 et CR sont exécutées dans cet ordre et chacune satisfait son contrat avant déblocage de la suivante."
+      verified_by: "Statuts TASKS, validations des contrats enfants et registre CP0..CP6."
+    - id: AC2
+      statement: "Après B2, tous les consommateurs utilisent exclusivement PRG_02.Data/HwIn publics et le manuel M1/M2/M3 est conservé."
+      verified_by: "Contrat B2 validé puis rapport BR approuvé."
+    - id: AC3
+      statement: "Après C2, tous les consommateurs utilisent exclusivement PRG_03.Data public et PRG_04/05 restent propriétaires de l'arbitrage métier et des safety."
+      verified_by: "Contrat C2 validé puis rapport CR approuvé."
+    - id: AC4
+      statement: "Aucun déplacement DiveSearch/Extraction, correctif GRAFCET ou modification safety n'est réalisé dans T165 sans nouvelle tâche fix+guard et visa humain."
+      verified_by: "Diffs cumulés, scopes enfants et registre des anomalies."
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-*.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165_FLUX_PRG02_PRG03.yaml
+      - DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG02_QUALIFIED_DATA_v1.0.md
+      - DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+      - DOC/WFLOW/CONTRACTS/REGISTRE_ACTIONS_T165_FLUX_PRG02_PRG03.md
+      - DOC/WFLOW/CONTRACTS/TEST_DESIGN_T165_FLUX_PRG02_PRG03.md
+      - DOC/WFLOW/AUDITS/AUDIT_ARCHITECTURE_FLUX_PRG02_PRG03_20260828.md
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/**
+      - PRJ_CODESYS/**
+      - Device.export
+  conservation:
+    must_survive:
+      - "Chaque lot enfant conserve explicitement le comportement machine du checkpoint précédent."
+      - "Les frontières safety et les producteurs uniques restent inchangés hors décisions humaines visées."
+      - "Aucun enfant n'élargit son scope sur la base du contrat parent."
+    dropped_on_purpose:
+      - "Accès inter-POU aux instances privées, uniquement après preuve de chemin public équivalent."
+  evidence_required:
+    - child_contracts_validated
+    - checkpoint_register
+    - independent_reviews
+    - final_linkage_and_gates
+  models_allowed:
+    - "gpt-5.6-luna"
+  alert_duty: "Le contrat parent n'autorise aucune édition CODE ; chaque exécution exige le contrat enfant et son visa."
+status: PENDING
+execution: {executed_by: "", completed_at: "", status: PENDING, summary: "", evidence_submitted: []}
+validation: {status: PENDING, validated_by: "", validated_at: "", notes: ""}
