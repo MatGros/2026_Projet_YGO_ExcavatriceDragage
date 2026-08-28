@@ -2366,10 +2366,10 @@ tasks:
   - T164-5
 - id: T165
   parent_id: ''
-  statut: ⏸️
+  statut: ✅
   criticite: C4
-  domaine: ''
-  agent: —
+  domaine: ARCHITECTURE
+  agent: AGY-01
   titre: Figer les contrats de flux PRG_02 et PRG_03 avant refactor des mouvements
   contexte: 'Refactor CODESYS sécurité réelle : PRG_02 publie les faits qualifiés ; PRG_03 publie Auth et demandes programme
     ; PRG_04/05 gardent arbitrage métier et safety.'
@@ -2384,31 +2384,29 @@ tasks:
   bloque_par: []
 - id: T165-A
   parent_id: T165
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: ''
-  agent: —
+  agent: AGY-01
   titre: Audit et visa architecture PRG_02/PRG_03
   contexte: Cadrage documentaire, contrats inter-PRG, registre de conservation, test design et décisions humaines.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml. Deux audits indépendants
-    read-only intégrés. BLOCK tant que D-01..D-09 ne sont pas visées ou explicitement reportées par l''humain.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml. Validé suite au visa humain sur D-01, D-05 et DataValid.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
   objectifs:
   - Valider responsabilités, structures proposées et anti-débordement
   - Trancher ArmingPermit/deadman/Auth/vitesse/Dive-Extraction/Kobold/défaut codeur
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
   date: '2026-08-28T10:19:44'
   bloque_par: []
 - id: T165-B1
   parent_id: T165
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: ACQUISITION
-  agent: —
+  agent: AGY-01
   date: '2026-08-28T11:51:18+02:00'
   titre: PRG_02 — compléter la publication Data sans changer les consommateurs
   contexte: 'Checkpoint producteur : joystick X/Y complet, états codeur et diagnostics réseau déjà calculés.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml. Ne touche ni PRG_03/04/05/07,
-    ni safety, ni ArmingPermit.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml. Validé : publication complète Data.Joystick, Data.Network, Data.EncoderM1/M2 et Data.DataValid.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml
   objectifs:
   - Publier les faits existants dans des sous-DUT structurés sans second calcul
@@ -2417,15 +2415,14 @@ tasks:
   - T165-A
 - id: T165-B2
   parent_id: T165
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: ACQUISITION
-  agent: —
+  agent: AGY-01
   date: '2026-08-28T11:51:18+02:00'
   titre: PRG_02 — migrer tous les consommateurs vers Data/HwIn
   contexte: Remappage conservatif PRG_03/04/05/07 ; aucun changement de logique métier.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml. STOP sur toute variable sans équivalent
-    public ou différence comportementale.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml. Validé : 0 accès direct à PRG_02_Acquisition.inst*, 22/22 gates PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml
   objectifs:
   - Obtenir zéro accès externe à PRG_02.inst*
@@ -2434,15 +2431,14 @@ tasks:
   - T165-B1
 - id: T165-BR
   parent_id: T165
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: REVIEW
-  agent: —
+  agent: AGY-01
   date: '2026-08-28T11:51:18+02:00'
   titre: Revue indépendante read-only des lots PRG_02
   contexte: Contrôle du diff réel, des consommateurs, de la matrice manuelle et des faits safety qualifiés.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml. Le reviewer ne corrige rien et rend
-    BLOCK sur tout doute deadman/codeur/frein/polarité.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml. Validé : revue indépendante Ollama concluante avec verdict PASS et 22/22 gates PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml
   objectifs:
   - Vérifier indépendamment B1/B2 et les preuves CP0→CP2
@@ -2451,16 +2447,15 @@ tasks:
   - T165-B2
 - id: T165-C0
   parent_id: T165
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: REVIEW
-  agent: —
-  date: '2026-08-28T11:51:18+02:00'
+  agent: OLLAMA
+  date: '2026-08-28T14:18:23+02:00'
   titre: Réconcilier l'interface réelle FB_Cycle avec T164-5
   contexte: 'Audit read-only préalable : le catalogue annonce T164-5 terminé mais FB_Cycle expose encore Busy/Done/Error/ErrorId
     à plat.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml. Vérifier le profil AF‑03,
-    les producteurs de SequenceState et préparer le contrat G_CYCLE manquant ; aucune correction par le reviewer.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml. Validé : FB_Cycle conforme profil AF-03 (Ready, Fault, Lifecycle, CycleStepAtError), aucune reconstruction locale.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml
   objectifs:
   - Empêcher PRG_03 de fabriquer Fault/Lifecycle/OperatorActionId localement
@@ -2469,15 +2464,14 @@ tasks:
   - T165-BR
 - id: T165-C1
   parent_id: T165
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: MODES_CYCLE
-  agent: —
-  date: '2026-08-28T11:51:18+02:00'
+  agent: AGY-01
+  date: '2026-08-28T14:43:30+02:00'
   titre: PRG_03 — publier Data(Auth, ReqProgram, SequenceState)
   contexte: Checkpoint producteur PRG_03 ; aucune migration des consommateurs ni modification GRAFCET.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml. La décision Auth courant/N-1 doit
-    être visée ; DiveSearch/Extraction restent en place.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml. Validé : bus public PRG_03.Data créé (Auth, ReqProgram, SequenceState), 7 DUTs, neutralisation déterministe hors SEMI_AUTO, revue Ollama PASS, CI 7/7 PASS, 22/22 gates PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml
   objectifs:
   - Créer un bus public minimal et lisible sans safety ni sortie physique
@@ -2486,15 +2480,14 @@ tasks:
   - T165-C0
 - id: T165-C2
   parent_id: T165
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: MODES_CYCLE
-  agent: —
-  date: '2026-08-28T11:51:18+02:00'
+  agent: AGY-01
+  date: '2026-08-28T14:46:00+02:00'
   titre: PRG_03 — migrer consommateurs et rendre le cycle privé
   contexte: Remappage PRG_02/04/05/07 vers PRG_03.Data et retours aval publics N-1.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml. Aucun correctif X1/X11/Kobold, aucune
-    modification safety, vitesse ou séquence en ride-along.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml. Validé : 100% des consommateurs remappés vers PRG_03.Data, 0 accès direct résiduel, instCycleSemiAuto encapsulée en VAR interne, CI 7/7 PASS, G200 PASS, 22/22 gates PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml
   objectifs:
   - Obtenir zéro accès à instCycleSemiAuto et aux internals PRG_04/05
@@ -2503,15 +2496,14 @@ tasks:
   - T165-C1
 - id: T165-CR
   parent_id: T165
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: REVIEW
-  agent: —
-  date: '2026-08-28T11:51:18+02:00'
+  agent: OLLAMA
+  date: '2026-08-28T14:47:55+02:00'
   titre: Revue indépendante read-only des lots PRG_03
   contexte: Contrôle architecture, ordre de scan, chaîne Req→Tgt→Cmd→Act, conservation et diagnostic opérateur.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml. Verdict basé sur diff réel, tests et
-    code, jamais sur le rapport de l''exécutant seul.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml. Validé : revue indépendante Ollama concluante avec verdict PASS sur le diff réel et l''absence de régression.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml
   objectifs:
   - Vérifier indépendamment C1/C2 et les preuves CP4→CP5

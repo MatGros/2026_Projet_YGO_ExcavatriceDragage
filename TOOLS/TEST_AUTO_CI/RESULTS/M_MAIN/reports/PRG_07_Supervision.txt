@@ -1,14 +1,10 @@
 Error compiling source files:
 
-ST_EncoderMeasurement.st:26:25: error: Undefined type 'ST_FAULT' in STRUCT 'ST_ENCODERMEASUREMENT'
-  26 |     HomingFault       : ST_Fault;     // Défaut FB_Encoder_Homing (état du référencement)
-     |                         ^
+ST_AcquisitionJoystickQualified.st:12:27: error: Undefined type 'ST_FBJOYSTICK_AXISCMD' in STRUCT 'ST_ACQUISITIONJOYSTICKQUALIFIED'
+  12 |     AxisX               : ST_fbJoystick_AxisCmd; // 📊 Commande et direction qualifiée axe X
+     |                           ^
 
-ST_EncoderMeasurement.st:27:25: error: Undefined type 'ST_LIFECYCLE' in STRUCT 'ST_ENCODERMEASUREMENT'
-  27 |     HomingLifecycle   : ST_Lifecycle; // Cycle FB_Encoder_Homing (Busy/Done)
-     |                         ^
-
-ST_EncoderMeasurement.st:28:25: error: Undefined type 'ST_FAULT' in STRUCT 'ST_ENCODERMEASUREMENT'
-  28 |     AbsFault          : ST_Fault;     // Défaut FB_Encoder_Abs (état acquisition bus)
-     |                         ^
+ST_AcquisitionJoystickQualified.st:13:27: error: Undefined type 'ST_FBJOYSTICK_AXISCMD' in STRUCT 'ST_ACQUISITIONJOYSTICKQUALIFIED'
+  13 |     AxisY               : ST_fbJoystick_AxisCmd; // 📊 Commande et direction qualifiée axe Y
+     |                           ^
 

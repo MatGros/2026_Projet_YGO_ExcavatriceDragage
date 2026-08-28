@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:27:13.243963" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:27:13.243963">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:44:48.022526" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:44:48.022526">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2802,11 +2802,11 @@ front descendant Kobold</xhtml>
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    // Direction déjà mise à l'échelle (-1/0/+1) par instJoystick (miroir DirectionY,
+    // Direction déjà mise à l'échelle (-1/0/+1) par le joystick (miroir DirectionY,
     // dérivé des bits DirectionPositive/Negative du struct ST_fbJoystick_AxisCmd).
-    CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+    CoupledUserRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
     CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
-                                     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
+                                     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0);
 
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
@@ -2824,7 +2824,7 @@ END_IF;
 // à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.
 DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
 DumpAtTremieAssistActive := DumpAtTremieActive
-    AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2);
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_AtTremieStable;
@@ -2832,7 +2832,7 @@ GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_A
 // Confirmation manuelle "fond touché" effacée hors conditions de garde (MAINT_N1/N2,
 // sous tension, pas de défaut, pas de descente couplée) — la confirmation se fait
 // précisément PENDANT que la benne est encore ouverte (avant que l'extraction ne la ferme).
-IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+IF NOT (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
    OR (CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)) THEN
@@ -2854,11 +2854,11 @@ GVL_IHM.DredgingAssist.State.BypassDiveActive          := GVL_IHM.DredgingAssist
 GVL_IHM.DredgingAssist.State.BypassKoboldBottomTouched := BypassKoboldBottomTouched;
 
 instDiveSearch(
-    Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+    Enable := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode := PRG_03_Modes_Cycle.Data.Auth.Mode,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection := CoupledUserRequestDirection,
     BucketIsOpen := _BucketState.IsOpen,
@@ -2887,11 +2887,11 @@ BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPo
 GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := BottomPositionConfirmed;
 
 instExtractionSequence(
-    Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+    Enable := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode := PRG_03_Modes_Cycle.Data.Auth.Mode,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection := CoupledUserRequestDirection,
     BottomPositionConfirmed := BottomPositionConfirmed,
@@ -2945,17 +2945,17 @@ END_IF;
 // par le mouvement couplé joystick, instBucket.Busy ne peut plus être déclenché QUE par action
 // manuelle benne/DumpAtTremie/ExtractionSequence.
 CoupledDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
-    AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
     AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
     AND NOT _BucketState.IsOpen;
 CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
-    AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
     AND CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)
     AND NOT _BucketState.IsClosed;
 
-IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Pont SEMI_AUTO : fermeture benne pilotée par le séquenceur de cycle.
-    CmdBucketCloseArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Close;
+    CmdBucketCloseArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
 ELSIF instExtractionSequence.BucketCloseRequest THEN
     CmdBucketCloseArbitrated := TRUE;
 ELSIF CoupledAscentBucketCloseArmed THEN
@@ -2969,9 +2969,9 @@ END_IF;
 // WAIT_PRECONDITIONS (DiveStartMin_M/ImmersionUpper_M/ImmersionLower_M). Avec le bypass
 // (TglBypassDiveSearchSequence), le contacteur doit être piloté
 // INDÉPENDAMMENT de ces préconditions dès qu'on descend réellement.
-IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Pont SEMI_AUTO : contacteur Kobold piloté par le séquenceur de cycle.
-    KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
+    KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 ELSE
     KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable
         OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
@@ -2993,19 +2993,19 @@ DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.M
 GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed := DumpAtTremieBucketOpenArmed;
 
 instBucket(
-    Enable              := NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable              := NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR DumpAtTremieBucketOpenArmed OR CoupledDiveBucketOpenArmed
-                           OR (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Open),
+                           OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen),
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection     := CoupledUserRequestDirection,
     CablePosM1          := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     CablePosM2          := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
-    HomedM1             := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomedM2             := PRG_02_Acquisition.instEncoderM2.Homed,
+    HomedM1             := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
     M2_Busy             := (instWinchM2.StepNumber &gt; 0),
     ConfirmOpenPosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
@@ -3013,8 +3013,8 @@ instBucket(
     Config              := _BucketCfgPersist.Config,
     CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
-    InhibitM1           := PRG_03_Modes_Cycle.Auth.InhibitM1,
-    InhibitM2           := PRG_03_Modes_Cycle.Auth.InhibitM2,
+    InhibitM1           := PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
+    InhibitM2           := PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
 
@@ -3032,7 +3032,7 @@ BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDire
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
 // au §5bis (lag d'un cycle automate nominal, sécurisé en amont par la lecture directe de M2_TensionedCable_DI).
-SlackCableAscentStep1 := NOT PRG_03_Modes_Cycle.Auth.SyncEnable AND (
+SlackCableAscentStep1 := NOT PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND (
     ((instSafetyWinchM1.Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
     ((instSafetyWinchM2.Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
     (NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI)
@@ -3060,12 +3060,12 @@ END_IF;
 {region "§3 Arbitrage consignes M1/M2"}
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
-IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
     // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
-    M1LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
-    M1LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
-    M1LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
+    M1LogicRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDirection;
+    M1LogicRequestStartStop := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqStartStop;
+    M1LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.SpeedTgtPct;
 ELSE
     IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Mode Boutons IHM
@@ -3081,9 +3081,9 @@ ELSE
         END_IF;
     ELSE
         // Mode Joystick Maître
-        IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
-            M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
-            M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
+        IF (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 1) THEN
+            M1LogicRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
+            M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.Data.Joystick.AxisY.SpeedTgt);
         ELSE
             M1LogicRequestDirection := 0;
             M1LogicRequestSpeedCmd_Pct  := 0.0;
@@ -3105,11 +3105,11 @@ IF instBucket.Lifecycle.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestDirection := instBucket.M2_Direction;
     M2LogicRequestSpeedCmd_Pct  := 15.0;
 ELSE
-    IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+    IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
         // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
-        M2LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
-        M2LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
-        M2LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+        M2LogicRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqDirection;
+        M2LogicRequestStartStop := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqStartStop;
+        M2LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.SpeedTgtPct;
     ELSE
         IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
             // Mode Boutons IHM
@@ -3125,9 +3125,9 @@ ELSE
             END_IF;
         ELSE
             // Mode Joystick Maître
-            IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
-                M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
-                M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
+            IF (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2) THEN
+                M2LogicRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
+                M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.Data.Joystick.AxisY.SpeedTgt);
             ELSE
                 M2LogicRequestDirection := 0;
                 M2LogicRequestSpeedCmd_Pct  := 0.0;
@@ -3181,15 +3181,15 @@ END_IF;
 // === 🔄 §4 SYNCHRONISATION M1 / M2 ===
 
 instWinchSync(
-    Enable          := PRG_03_Modes_Cycle.Auth.SyncEnable AND NOT instBucket.Lifecycle.Busy
-                        AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable          := PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND NOT instBucket.Lifecycle.Busy
+                        AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
-    Mode            := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode            := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CablePosM1      := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     CablePosM2      := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     HomedAndReliableM1 := PRG_02_Acquisition.Data.M1_HomedAndReliable,
     HomedAndReliableM2 := PRG_02_Acquisition.Data.M2_HomedAndReliable,
-    SyncEnable      := PRG_03_Modes_Cycle.Auth.SyncEnable,
+    SyncEnable      := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
     CfgSyncToleranceM  := _SyncCfgPersist.CfgSyncTolerance_M,
     CfgSyncCriticalToleranceM := _SyncCfgPersist.CfgSyncCriticalTolerance_M,
     ActiveOffsetM   := instBucket.ActiveOffsetM,
@@ -3267,7 +3267,7 @@ KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottom
 KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 
 // Levée du verrou au neutre du joystick/boutons ou si toggle désactivé
-IF PRG_02_Acquisition.instJoystick.AtNeutralXY OR NOT GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent THEN
+IF PRG_02_Acquisition.Data.Joystick.AtNeutralXY OR NOT GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent THEN
     KoboldImmersionConfirmed := FALSE;
     KoboldBottomTouchLatched := FALSE;
 END_IF;
@@ -3307,7 +3307,7 @@ DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequest
 // mémorisé, jogging libre) -- bornes directes ouvert/fermé (mêmes offsets que FB_Bucket,
 // relatifs à la position réelle de M1) + palier 1 (voir instWinchM2 §6 plus bas).
 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
-    AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2);
+    AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2);
 
 ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
 // Ce chemin (pilotage
@@ -3316,7 +3316,7 @@ ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTo
 ProcessPermitM2_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &lt;= (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
-M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
+M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
                       (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _CommunCfgPersist.CfgCableLimitAscent_M);
@@ -3325,29 +3325,29 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
 // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
 instSafetyWinchM1(
-    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                 := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
-    SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
-    JoystickOnline         := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
+    Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
+    JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
+    JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
-    EncoderAvailable       := PRG_02_Acquisition.instEncoderM1.Measurement.EncoderAvailable,
+    EncoderAvailable       := PRG_02_Acquisition.Data.EncoderM1.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy,
+    InReferencingMode      := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M1LogicRequestDirection,
     MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
-    Homed                  := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomingSuspect          := PRG_02_Acquisition.instEncoderM1.HomingSuspect,
+    Homed                  := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomingSuspect          := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
@@ -3355,7 +3355,7 @@ instSafetyWinchM1(
     BenneHoldStillActive   := instBucket.Lifecycle.Busy,
     ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.Encoders.M2.CablePosM - instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Lifecycle.Busy,
-    OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM2,
+    OtherWinchInhibited    := PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.Encoders.M1.SignedSpeed_Mps,
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M1.SpeedValid,
@@ -3381,29 +3381,29 @@ instSafetyWinchM1(
 );
 
 instSafetyWinchM2(
-    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                 := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
-    SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
-    JoystickOnline         := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
+    Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
+    JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
+    JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
-    EncoderAvailable       := PRG_02_Acquisition.instEncoderM2.Measurement.EncoderAvailable,
+    EncoderAvailable       := PRG_02_Acquisition.Data.EncoderM2.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Busy,
+    InReferencingMode      := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M2LogicRequestDirection,
     MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
-    Homed                  := PRG_02_Acquisition.instEncoderM2.Homed,
-    HomingSuspect          := PRG_02_Acquisition.instEncoderM2.HomingSuspect,
+    Homed                  := PRG_02_Acquisition.Data.EncoderM2.Homed,
+    HomingSuspect          := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
@@ -3411,7 +3411,7 @@ instSafetyWinchM2(
     BenneHoldStillActive   := FALSE,
     ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.Encoders.M1.CablePosM + instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Lifecycle.Busy,
-    OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM1,
+    OtherWinchInhibited    := PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.Encoders.M2.SignedSpeed_Mps,
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M2.SpeedValid,
@@ -3474,10 +3474,10 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinch
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 &amp; M2) ===
 
 instWinchM1(
-    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := EffectivePermitM1_Descend,
@@ -3491,11 +3491,11 @@ instWinchM1(
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
-    HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
+    HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback,
-    Homed                   := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomingSuspect           := PRG_02_Acquisition.instEncoderM1.HomingSuspect,
+    Homed                   := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomingSuspect           := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
@@ -3505,10 +3505,10 @@ instWinchM1(
 );
 
 instWinchM2(
-    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := EffectivePermitM2_Descend,
@@ -3527,11 +3527,11 @@ instWinchM2(
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
-    HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
+    HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback,
-    Homed                   := PRG_02_Acquisition.instEncoderM2.Homed,
-    HomingSuspect           := PRG_02_Acquisition.instEncoderM2.HomingSuspect,
+    Homed                   := PRG_02_Acquisition.Data.EncoderM2.Homed,
+    HomingSuspect           := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
@@ -3618,24 +3618,24 @@ WinchM1State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM1.Re
 WinchM1State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
 WinchM1State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.RestartDelayElapsed;
 WinchM1State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.StepDelayElapsed;
-WinchM1State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM1.Measurement.RawPos;
+WinchM1State.Encoder.RawPos := PRG_02_Acquisition.Data.EncoderM1.Measurement.RawPos;
 WinchM1State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
 WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
-WinchM1State.Encoder.SlaveOperational := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational;
-WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM1.HwOut.PresetTriggerCmd;
-WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM1.HwOut.PresetValueOut;
-WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderM1.Measurement.AbsFault.Error;
-WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM1.Measurement.AbsFault.ErrorId;
-WinchM1State.Encoder.Homed := PRG_02_Acquisition.instEncoderM1.Homed;
-WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy;
-WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Done;
-WinchM1State.Encoder.HomingError := PRG_02_Acquisition.instEncoderM1.Measurement.HomingFault.Error;
-WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.instEncoderM1.Measurement.HomingFault.ErrorId;
+WinchM1State.Encoder.SlaveOperational := PRG_02_Acquisition.Data.Network.EncoderM1.Operational;
+WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.Data.EncoderM1.HwOut.PresetTriggerCmd;
+WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.Data.EncoderM1.HwOut.PresetValueOut;
+WinchM1State.Encoder.Error := PRG_02_Acquisition.Data.EncoderM1.Measurement.AbsFault.Error;
+WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.Data.EncoderM1.Measurement.AbsFault.ErrorId;
+WinchM1State.Encoder.Homed := PRG_02_Acquisition.Data.EncoderM1.Homed;
+WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy;
+WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Done;
+WinchM1State.Encoder.HomingError := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingFault.Error;
+WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingFault.ErrorId;
 WinchM1State.Encoder.HomingState := E_State.READY;
 WinchM1State.Encoder.HomingStateAtError := E_State.DISABLED;
-WinchM1State.Encoder.HomingSuspect := PRG_02_Acquisition.instEncoderM1.HomingSuspect;
-WinchM1State.Encoder.HomingRefRaw := PRG_02_Acquisition.instEncoderM1.Measurement.HomingRefRaw;
-WinchM1State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
+WinchM1State.Encoder.HomingSuspect := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect;
+WinchM1State.Encoder.HomingRefRaw := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingRefRaw;
+WinchM1State.InhibitActive := PRG_03_Modes_Cycle.Data.Auth.InhibitM1;
 WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
 WinchM1State.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
 WinchM1State.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
@@ -3675,24 +3675,24 @@ WinchM2State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM2.Re
 WinchM2State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
 WinchM2State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.RestartDelayElapsed;
 WinchM2State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.StepDelayElapsed;
-WinchM2State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM2.Measurement.RawPos;
+WinchM2State.Encoder.RawPos := PRG_02_Acquisition.Data.EncoderM2.Measurement.RawPos;
 WinchM2State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
 WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
-WinchM2State.Encoder.SlaveOperational := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2.Operational;
-WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM2.HwOut.PresetTriggerCmd;
-WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM2.HwOut.PresetValueOut;
-WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderM2.Measurement.AbsFault.Error;
-WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM2.Measurement.AbsFault.ErrorId;
-WinchM2State.Encoder.Homed := PRG_02_Acquisition.instEncoderM2.Homed;
-WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Busy;
-WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Done;
-WinchM2State.Encoder.HomingError := PRG_02_Acquisition.instEncoderM2.Measurement.HomingFault.Error;
-WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.instEncoderM2.Measurement.HomingFault.ErrorId;
+WinchM2State.Encoder.SlaveOperational := PRG_02_Acquisition.Data.Network.EncoderM2.Operational;
+WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.Data.EncoderM2.HwOut.PresetTriggerCmd;
+WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.Data.EncoderM2.HwOut.PresetValueOut;
+WinchM2State.Encoder.Error := PRG_02_Acquisition.Data.EncoderM2.Measurement.AbsFault.Error;
+WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.Data.EncoderM2.Measurement.AbsFault.ErrorId;
+WinchM2State.Encoder.Homed := PRG_02_Acquisition.Data.EncoderM2.Homed;
+WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy;
+WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Done;
+WinchM2State.Encoder.HomingError := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingFault.Error;
+WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingFault.ErrorId;
 WinchM2State.Encoder.HomingState := E_State.READY;
 WinchM2State.Encoder.HomingStateAtError := E_State.DISABLED;
-WinchM2State.Encoder.HomingSuspect := PRG_02_Acquisition.instEncoderM2.HomingSuspect;
-WinchM2State.Encoder.HomingRefRaw := PRG_02_Acquisition.instEncoderM2.Measurement.HomingRefRaw;
-WinchM2State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
+WinchM2State.Encoder.HomingSuspect := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect;
+WinchM2State.Encoder.HomingRefRaw := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingRefRaw;
+WinchM2State.InhibitActive := PRG_03_Modes_Cycle.Data.Auth.InhibitM2;
 WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
 WinchM2State.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
 WinchM2State.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
@@ -3702,13 +3702,13 @@ WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
 
 // ⛔️ Limite haute atteinte (fait public) — miroir de la butée logicielle de AscentPermit
 // (Homed, hors homing, non suspect, position &gt;= limite). Fait pur "Reached", sans bypass.
-CableLimitAscentM1Reached := PRG_02_Acquisition.instEncoderM1.Homed
-    AND NOT PRG_02_Acquisition.instEncoderM1.HomingSuspect
-    AND NOT PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy
+CableLimitAscentM1Reached := PRG_02_Acquisition.Data.EncoderM1.Homed
+    AND NOT PRG_02_Acquisition.Data.EncoderM1.HomingSuspect
+    AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
     AND (PRG_02_Acquisition.Data.Encoders.M1.CablePosM &gt;= _CommunCfgPersist.CfgCableLimitAscent_M);
-CableLimitAscentM2Reached := PRG_02_Acquisition.instEncoderM2.Homed
-    AND NOT PRG_02_Acquisition.instEncoderM2.HomingSuspect
-    AND NOT PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Busy
+CableLimitAscentM2Reached := PRG_02_Acquisition.Data.EncoderM2.Homed
+    AND NOT PRG_02_Acquisition.Data.EncoderM2.HomingSuspect
+    AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
     AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &gt;= (_CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift));
 
 WinchM1Safety.CableLimitAscent := CableLimitAscentM1Reached;

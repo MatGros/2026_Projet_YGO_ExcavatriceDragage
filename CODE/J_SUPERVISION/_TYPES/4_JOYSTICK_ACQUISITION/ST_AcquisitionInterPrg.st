@@ -11,29 +11,38 @@
 
 TYPE ST_AcquisitionInterPrg :
 STRUCT
-    // === 🧲 Mesures codeurs M1/M2 (struct frontiere AF-06 §3ter) ===
-    Encoders                : ST_EncoderMeasurements; // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
+    // === 🛡️ Drapeau de vie & validité globale des données ===
+    DataValid                    : BOOL; // 🟢 TRUE = PRG_02 a complété son scan et les données sont fraîches et qualifiées
 
-    // === 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_fbEncoder_Measurement) ===
-    M1_EncoderFault          : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
-    M2_EncoderFault          : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
-    M1_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
-    M2_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
+    // === 📦 Structures qualifiées du bus ===
+    Joystick                     : ST_AcquisitionJoystickQualified;    // 🕹️ Données et commandes joystick qualifiées
+    Network                      : ST_AcquisitionNetworkDiagnostics;  // 🔌 Diagnostics réseaux CANopen et EtherCAT
+    EncoderM1                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M1 (Retenue)
+    EncoderM2                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M2 (Benne)
 
-    // === 🕹️ États joystick qualifiés ===
-    JoystickDeadmanArmed    : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
-    JoystickYNeutral        : BOOL; // 🟢 Axe Y joystick au neutre
-    JoystickDirectionX      : INT;  // 🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
-    JoystickSpeedPctX       : REAL; // 📈 Magnitude deviation axe X en % (0..100)
-    JoystickXNeutral        : BOOL; // 🟢 Axe X joystick au neutre
+    // === 🧲 Mesures codeurs M1/M2 (compatibilité de transition) ===
+    Encoders                     : ST_EncoderMeasurements;             // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
+
+    // === 🛡️ Gates fiabilité codeurs (compatibilité de transition) ===
+    M1_EncoderFault              : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
+    M2_EncoderFault              : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
+    M1_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
+    M2_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
+
+    // === 🕹️ États joystick qualifiés (compatibilité de transition) ===
+    JoystickDeadmanArmed         : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
+    JoystickYNeutral             : BOOL; // 🟢 Axe Y joystick au neutre
+    JoystickDirectionX           : INT;  // 🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
+    JoystickSpeedPctX            : REAL; // 📈 Magnitude deviation axe X en % (0..100)
+    JoystickXNeutral             : BOOL; // 🟢 Axe X joystick au neutre
 
     // === 🩺 Diagnostics modules E/S ===
-    LocalDigitalIoOk         : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
-    Vh0800EndOk              : BOOL; // 🟢 Module VH_0800END OK (DI8)
-    Vh0808EtpOk              : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
-    Vh0008ErOk               : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
-    Vh0008Er1Ok              : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
-    InputModuleFault         : BOOL; // ❌ Defaut sur au moins un module E/S
+    LocalDigitalIoOk             : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
+    Vh0800EndOk                  : BOOL; // 🟢 Module VH_0800END OK (DI8)
+    Vh0808EtpOk                  : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
+    Vh0008ErOk                   : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
+    Vh0008Er1Ok                  : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
+    InputModuleFault             : BOOL; // ❌ Defaut sur au moins un module E/S
 
     // === 🧪 Simulation & variateur M3 filtré ===
     WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T11:10:17.718047" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T11:10:17.718047">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:41:01.780394" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:41:01.780394">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -46,19 +46,19 @@
               <EnumValue>
                 <Name>MAIN_CYCLE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle principal automatique de dragage X0..X13</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle semi-automatique principal (FB_Cycle)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>DIVE_SEARCH</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sous-séquence de plongée / recherche de fond</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Recherche de fond Kobold (réservé future migration)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>EXTRACTION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sous-séquence d'extraction et fermeture</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquence d'extraction (réservé future migration)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -83,9 +83,11 @@
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="G_CYCLE">
+        <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="E_ProgramSequence" ObjectId="e8e8ebc2-bfbe-517a-8c98-48abc432cba8" />
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="E_ProgramSequence" ObjectId="e8e8ebc2-bfbe-517a-8c98-48abc432cba8" />
+            </Folder>
           </Folder>
         </Folder>
       </ProjectStructure>

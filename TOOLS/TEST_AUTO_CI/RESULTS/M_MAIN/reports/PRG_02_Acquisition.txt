@@ -1,7 +1,18 @@
-STruC++ Test Runner v1.0
+Error compiling source files:
 
-test_prg_02_acquisition.st
-  [PASS] PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)
+ST_AcquisitionInterPrg.st:18:36: error: Undefined type 'ST_ACQUISITIONJOYSTICKQUALIFIED' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  18 |     Joystick                     : ST_AcquisitionJoystickQualified;    // 🕹️ Données et commandes joystick qualifiées
+     |                                    ^
 
------------------------------------------
-1 test, 1 passed, 0 failed
+ST_AcquisitionInterPrg.st:19:36: error: Undefined type 'ST_ACQUISITIONNETWORKDIAGNOSTICS' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  19 |     Network                      : ST_AcquisitionNetworkDiagnostics;  // 🔌 Diagnostics réseaux CANopen et EtherCAT
+     |                                    ^
+
+ST_AcquisitionInterPrg.st:20:36: error: Undefined type 'ST_ACQUISITIONENCODERQUALIFIED' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  20 |     EncoderM1                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M1 (Retenue)
+     |                                    ^
+
+ST_AcquisitionInterPrg.st:21:36: error: Undefined type 'ST_ACQUISITIONENCODERQUALIFIED' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  21 |     EncoderM2                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M2 (Benne)
+     |                                    ^
+

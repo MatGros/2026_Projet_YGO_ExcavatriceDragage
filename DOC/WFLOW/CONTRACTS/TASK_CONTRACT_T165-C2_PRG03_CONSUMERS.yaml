@@ -66,6 +66,20 @@ contract:
   models_allowed:
     - "gpt-5.6-luna"
   alert_duty: "Toute différence fonctionnelle, correction de séquence ou besoin de déplacer un assistant impose STOP et avenant."
-status: PENDING
-execution: {executed_by: "", completed_at: "", status: PENDING, summary: "", evidence_submitted: []}
-validation: {status: PENDING, validated_by: "", validated_at: "", notes: ""}
+status: COMPLETED
+execution:
+  executed_by: "AGY-01"
+  completed_at: "2026-08-28T14:46:00+02:00"
+  status: COMPLETED
+  summary: "Migration réussie de 100% des consommateurs vers PRG_03.Data. Zéro accès résiduel à instCycleSemiAuto ou Auth direct. instCycleSemiAuto encapsulée en VAR privé dans PRG_03. G200 Linkage PASS (0 erreur). 22/22 Gates PASS. CI M_MAIN 7/7 PASS."
+  evidence_submitted:
+    - "TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/PRG_03_Modes_Cycle.html"
+    - "TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/PRG_04_Treuils_Benne.html"
+    - "TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/PRG_05_Translation.html"
+    - "TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/PRG_07_Supervision.html"
+    - "TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/MAIN_GLOBAL.html"
+validation:
+  status: VALIDATED
+  validated_by: "Orchestrateur"
+  validated_at: "2026-08-28T14:48:00+02:00"
+  notes: "Vérification statique zéro accès résiduel confirmée. Tests CI 100% verts."

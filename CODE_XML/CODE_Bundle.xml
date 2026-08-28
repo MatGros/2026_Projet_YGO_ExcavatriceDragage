@@ -508,19 +508,19 @@
               <EnumValue>
                 <Name>MAIN_CYCLE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle principal automatique de dragage X0..X13</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle semi-automatique principal (FB_Cycle)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>DIVE_SEARCH</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sous-séquence de plongée / recherche de fond</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Recherche de fond Kobold (réservé future migration)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>EXTRACTION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sous-séquence d'extraction et fermeture</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquence d'extraction (réservé future migration)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -732,15 +732,150 @@
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_AcquisitionEncoderQualified">
+        <baseType>
+          <struct>
+            <variable name="Measurement">
+              <type>
+                <derived name="ST_fbEncoder_Measurement" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mesure métrique (CablePosM, SpeedMps, etc.)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Façade codeur prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Diagnostic défaut codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Codeur référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Référencement suspect</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Défaut fiabilité (indisponible ou incohérent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Référencé ET fiable (sans incohérence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetConfirmationFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Échec confirmation preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwOut">
+              <type>
+                <derived name="ST_fbEncoder_HwOut" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Commandes hardware de preset (lecture seule)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>bc4dc502-575b-5c03-a159-0fc9e08c35c2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧲 ST_AcquisitionEncoderQualified — Façade codeur qualifiée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les mesures métriques, statuts de référencement,
+      défauts et signaux hardware produits par FB_Encoder dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.EncoderM1 / Data.EncoderM2).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_AcquisitionInterPrg">
         <baseType>
           <struct>
+            <variable name="DataValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Drapeau de vie &amp; validité globale des données ===
+🟢 TRUE = PRG_02 a complété son scan et les données sont fraîches et qualifiées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_AcquisitionJoystickQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📦 Structures qualifiées du bus ===
+🕹️ Données et commandes joystick qualifiées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Network">
+              <type>
+                <derived name="ST_AcquisitionNetworkDiagnostics" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Diagnostics réseaux CANopen et EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1">
+              <type>
+                <derived name="ST_AcquisitionEncoderQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Façade codeur qualifiée M1 (Retenue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2">
+              <type>
+                <derived name="ST_AcquisitionEncoderQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Façade codeur qualifiée M2 (Benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Encoders">
               <type>
                 <derived name="ST_EncoderMeasurements" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 Mesures codeurs M1/M2 (struct frontiere AF-06 §3ter) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 Mesures codeurs M1/M2 (compatibilité de transition) ===
 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)</xhtml>
               </documentation>
             </variable>
@@ -749,7 +884,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_fbEncoder_Measurement) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilité codeurs (compatibilité de transition) ===
 ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)</xhtml>
               </documentation>
             </variable>
@@ -782,7 +917,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🕹️ États joystick qualifiés ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🕹️ États joystick qualifiés (compatibilité de transition) ===
 🔒 Homme-mort joystick arme (1=Arme)</xhtml>
               </documentation>
             </variable>
@@ -909,6 +1044,168 @@
    📤 Producteur unique : PRG_02_Acquisition (VAR_OUTPUT Data : ST_AcquisitionInterPrg).
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_AcquisitionJoystickQualified">
+        <baseType>
+          <struct>
+            <variable name="AxisX">
+              <type>
+                <derived name="ST_fbJoystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande et direction qualifiée axe X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisY">
+              <type>
+                <derived name="ST_fbJoystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande et direction qualifiée axe Y</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Homme-mort armé et valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AtNeutralXY">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Les deux axes X et Y sont au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingPermitDenied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Tentative d'armement sans permission</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Façade joystick prête et opérationnelle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Diagnostic défaut joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Valeur ADC neutre calibré X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralYAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Valeur ADC neutre calibré Y</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e915927d-33f8-504a-9060-48dca13140d7</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕹️ ST_AcquisitionJoystickQualified — Données joystick qualifiées
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes d'axes, statut homme-mort et diagnostics
+      produits par FB_Joystick dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Joystick).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_AcquisitionNetworkDiagnostics">
+        <baseType>
+          <struct>
+            <variable name="CanOpenMaster">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Diagnostic maître CANopen</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Diagnostic esclave Joystick MCB560</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EthercatMaster">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Diagnostic maître EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostic esclave Codeur M1 (COD1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostic esclave Codeur M2 (COD2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveM3">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic esclave Variateur M3 (AC600)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>0c2483c3-e64e-5f3f-bfcc-41828a26d24e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔌 ST_AcquisitionNetworkDiagnostics — Diagnostics réseaux qualifiés
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les états opérationnels et diagnostics des bus CANopen
+      et EtherCAT produits par PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Network).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -6768,6 +7065,49 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_ModesCycleInterPrg">
+        <baseType>
+          <struct>
+            <variable name="Auth">
+              <type>
+                <derived name="ST_fbModes_Autorisations" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bus d'autorisations machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqProgram">
+              <type>
+                <derived name="ST_ProgramRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demandes programme vers PRG_04 / PRG_05</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SequenceState">
+              <type>
+                <derived name="ST_SequencePublicState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État public de la séquence</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c66e2ea9-61f6-5705-86e7-b9f19e28d4f1</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📦 ST_ModesCycleInterPrg — Bus public d'autorisations et demandes de cycle
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de données globale publiée par PRG_03_Modes_Cycle
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_ModesHMI">
         <baseType>
           <struct>
@@ -7372,6 +7712,178 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
             <ObjectId>92d0a9ce-c2c2-58b4-a581-46eda63b86d7</ObjectId>
           </data>
         </addData>
+      </dataType>
+      <dataType name="ST_ProgramBucketRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqKoboldMeasureEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande activation mesure/contacteur Kobold</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪣 ST_ProgramBucketRequest — Demande de mouvement benne par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de manœuvre benne et mesure Kobold
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_ProgramRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqWinchM1">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqWinchM2">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqTranslation">
+              <type>
+                <derived name="ST_ProgramTranslationRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqBucket">
+              <type>
+                <derived name="ST_ProgramBucketRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme benne</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a28c1dba-faf7-5919-ab72-3a069b551a0d</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📋 ST_ProgramRequest — Ensemble des demandes de mouvements du programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes formulées vers PRG_04 (Treuils/Benne) et PRG_05 (Translation)
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_ProgramTranslationRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqStart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de démarrage mouvement translation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionTgt">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible de position demandée (1=Trémie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>478a938b-bb21-5d74-8556-79842696e566</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🎯 ST_ProgramTranslationRequest — Demande de mouvement translation par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de translation M3 formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_ProgramWinchRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqStartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arrêt demandé par le programme (TRUE=Marche)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedTgtPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne de vitesse cible demandée (0.0 à 100.0 %)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>edbf7141-2109-5344-bf49-1cd29f4686cd</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_ProgramWinchRequest — Demande de mouvement treuil par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
       <dataType name="ST_SafetyChecklist">
         <baseType>
@@ -8141,6 +8653,161 @@ TRUE = Défaut sécurité actif</xhtml>
    🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
    🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
    📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SequencePublicState">
+        <baseType>
+          <struct>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquenceur disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Lifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle de vie IEC 61131-3 (Busy, Done)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut transverse (Error, ErrorId)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SequenceId">
+              <type>
+                <derived name="E_ProgramSequence" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant séquence active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape active du Grafcet</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFault">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape mémorisée au défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorActionId">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant action opérateur requise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorAction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Message explicatif pour l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExpectedAxis">
+              <type>
+                <derived name="E_OperatorAxis" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Organe joystick/bouton attendu</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExpectedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens attendu (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WaitingForOperator">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">En attente action opérateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WaitingForProcess">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">En attente condition procédé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de mouvement active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepStr">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Libellé en clair de l'étape</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart absolu vitesse M1/M2 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil vitesse dépassé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant timeout</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b0390064-912d-5ff4-8765-d2f9a7be3f8e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_SequencePublicState — État public et synoptique de la séquence
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Expose l'état, l'étape, le cycle de vie et les attentes opérateur du séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -33748,7 +34415,7 @@ PreviousQualified := Qualified;
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §2
    🎯 Rôle unique : Produire les images HwReal/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
-      et publier les retours.
+      et publier les retours qualifiés sur le bus Data.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -33905,6 +34572,14 @@ instDiagEthercat(
     EncoderM1BypassActive    := GVL_IHM.Network.Bypass.EncoderM1,
     EncoderM2BypassActive    := GVL_IHM.Network.Bypass.EncoderM2
 );
+
+// 📤 Publication du sous-bus diagnostics réseaux
+Data.Network.CanOpenMaster   := instDiagCanOpen.DeviceCanOpenMaster;
+Data.Network.Joystick        := instDiagCanOpen.DeviceJoystick;
+Data.Network.EthercatMaster  := instDiagEthercat.DeviceEthercatMaster;
+Data.Network.EncoderM1       := instDiagEthercat.DeviceEncoderM1;
+Data.Network.EncoderM2       := instDiagEthercat.DeviceEncoderM2;
+Data.Network.DriveM3         := instDiagEthercat.DeviceVariateur;
 {endregion}
 
 {region "§2 Simulation et aiguillage — HwIn"}
@@ -34019,7 +34694,18 @@ instJoystick(
     NeutralYMem               := _JoystickNeutralY
 );
 
-// 📤 Publication des états et axes joystick
+// 📤 Publication du sous-bus joystick qualifié
+Data.Joystick.AxisX              := instJoystick.AxisCmdX;
+Data.Joystick.AxisY              := instJoystick.AxisCmdY;
+Data.Joystick.DeadmanArmed       := instJoystick.DeadmanArmed;
+Data.Joystick.AtNeutralXY        := instJoystick.AtNeutralXY;
+Data.Joystick.ArmingPermitDenied := instJoystick.ArmingPermitDenied;
+Data.Joystick.Ready              := instJoystick.Ready;
+Data.Joystick.Fault              := instJoystick.Fault;
+Data.Joystick.NeutralXAct        := instJoystick.NeutralXAct;
+Data.Joystick.NeutralYAct        := instJoystick.NeutralYAct;
+
+// 📤 Publication des états et axes joystick (compatibilité de transition)
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
 Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
 Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
@@ -34042,8 +34728,8 @@ HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2),
+    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2),
     HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
@@ -34059,6 +34745,19 @@ instEncoderM1(
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     Calib                 := _CalibM1
 );
+
+// 📤 Publication de la façade codeur M1 qualifiée
+Data.EncoderM1.Measurement              := instEncoderM1.Measurement;
+Data.EncoderM1.Ready                    := instEncoderM1.Ready;
+Data.EncoderM1.Fault                    := instEncoderM1.Fault;
+Data.EncoderM1.Homed                    := instEncoderM1.Homed;
+Data.EncoderM1.HomingSuspect            := instEncoderM1.HomingSuspect;
+Data.EncoderM1.EncoderFault             := instEncoderM1.EncoderFault;
+Data.EncoderM1.HomedAndReliable         := instEncoderM1.HomedAndReliable;
+Data.EncoderM1.PresetConfirmationFailed := instEncoderM1.PresetConfirmationFailed;
+Data.EncoderM1.HwOut                    := instEncoderM1.HwOut;
+
+// Compatibilité de transition
 Data.Encoders.M1           := instEncoderM1.Measurement;
 Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
 Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
@@ -34073,7 +34772,7 @@ COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
 M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
-    AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
     AND NOT (PRG_04_Treuils_Benne.instWinchM1.StepNumber &gt; 0) AND NOT (PRG_04_Treuils_Benne.instWinchM2.StepNumber &gt; 0);
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
     M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
@@ -34090,8 +34789,8 @@ HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1),
+    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1),
     HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR M2BucketRefRequested,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
@@ -34107,6 +34806,19 @@ instEncoderM2(
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global,
     Calib                 := _CalibM2
 );
+
+// 📤 Publication de la façade codeur M2 qualifiée
+Data.EncoderM2.Measurement              := instEncoderM2.Measurement;
+Data.EncoderM2.Ready                    := instEncoderM2.Ready;
+Data.EncoderM2.Fault                    := instEncoderM2.Fault;
+Data.EncoderM2.Homed                    := instEncoderM2.Homed;
+Data.EncoderM2.HomingSuspect            := instEncoderM2.HomingSuspect;
+Data.EncoderM2.EncoderFault             := instEncoderM2.EncoderFault;
+Data.EncoderM2.HomedAndReliable         := instEncoderM2.HomedAndReliable;
+Data.EncoderM2.PresetConfirmationFailed := instEncoderM2.PresetConfirmationFailed;
+Data.EncoderM2.HwOut                    := instEncoderM2.HwOut;
+
+// Compatibilité de transition
 Data.Encoders.M2           := instEncoderM2.Measurement;
 Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
 Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
@@ -34122,6 +34834,14 @@ COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;
 Data.M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
 Data.M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
 {endregion}
+
+{region "§6 Qualification globale du bus Data"}
+// === 🛡️ §6 QUALIFICATION GLOBALE DU BUS DATA ===
+// DataValid = TRUE uniquement si les modules E/S physiques et les bus réseaux sont opérationnels.
+Data.DataValid := NOT Data.InputModuleFault 
+                  AND instDiagCanOpen.Ready 
+                  AND instDiagEthercat.Ready;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -34135,21 +34855,13 @@ Data.M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
         <interface>
           <inputVars />
           <outputVars>
-            <variable name="Auth">
+            <variable name="Data">
               <type>
-                <derived name="ST_fbModes_Autorisations" />
+                <derived name="ST_ModesCycleInterPrg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎚️ BUS D'AUTORISATIONS &amp; DEMANDES DE CYCLE ===
-&lt;-- [STAT] Bus d'autorisations machine (producteur unique)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instCycleSemiAuto">
-              <type>
-                <derived name="FB_Cycle" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">*   [INST] Sequenceur de cycle semi-automatique public</xhtml>
+&lt;-- [BUS] Structure publique unique du programme de modes et cycle</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -34161,6 +34873,14 @@ Data.M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧩 SOUS-INSTANCES FB INTERNES ===
 * [INST] Arbitrage des modes machine et calcul autorisations</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCycleSemiAuto">
+              <type>
+                <derived name="FB_Cycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Séquenceur de cycle semi-automatique (privé)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -34209,11 +34929,11 @@ instModes(
 //    - HomingRequest := bouton homing IHM (BtnHome M1 OU M2)
 
 instCycleSemiAuto(
-    Enable                  := (Auth.Mode = E_Mode.SEMI_AUTO),
+    Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
     Reset                   := GVL_IHM.Cycle.Cmd.BtnReset,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := Auth.Mode,
-    CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY,
+    Mode                    := instModes.Auth.Mode,
+    CycleMotionPermit       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     DeadmanArmed            := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
@@ -34243,17 +34963,101 @@ instCycleSemiAuto(
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
-    HomedM1                 := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomedM2                 := PRG_02_Acquisition.instEncoderM2.Homed,
+    HomedM1                 := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomedM2                 := PRG_02_Acquisition.Data.EncoderM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     SampleCount            := _CycleSampleCount
 );
 
 
-// === 📤 §3 PUBLICATION DU BUS AUTORISATIONS ===
+// === 📤 §3 PUBLICATION DU BUS INTER-PRG &amp; AUTORISATIONS ===
 
-Auth := instModes.Auth;
+// 1. Autorisations machine
+Data.Auth := instModes.Auth;
+
+// 2. Demandes programme et état public de séquence
+IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
+    // Demandes treuils M1 / M2
+    Data.ReqProgram.ReqWinchM1.ReqStartStop := instCycleSemiAuto.WinchM1Cmd.StartStop;
+    Data.ReqProgram.ReqWinchM1.ReqDirection := instCycleSemiAuto.WinchM1Cmd.Direction;
+    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := instCycleSemiAuto.WinchM1Cmd.SpeedPct;
+
+    Data.ReqProgram.ReqWinchM2.ReqStartStop := instCycleSemiAuto.WinchM2Cmd.StartStop;
+    Data.ReqProgram.ReqWinchM2.ReqDirection := instCycleSemiAuto.WinchM2Cmd.Direction;
+    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+
+    // Demande translation M3
+    Data.ReqProgram.ReqTranslation.ReqStart    := instCycleSemiAuto.TranslationCmd.Start;
+    Data.ReqProgram.ReqTranslation.PositionTgt := instCycleSemiAuto.TranslationCmd.Target;
+
+    // Demande benne
+    Data.ReqProgram.ReqBucket.ReqOpen                := instCycleSemiAuto.BucketCmd.Open;
+    Data.ReqProgram.ReqBucket.ReqClose               := instCycleSemiAuto.BucketCmd.Close;
+    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
+
+    // État séquence active
+    IF instCycleSemiAuto.Lifecycle.Busy THEN
+        Data.SequenceState.SequenceId := E_ProgramSequence.MAIN_CYCLE;
+    ELSE
+        Data.SequenceState.SequenceId := E_ProgramSequence.NONE;
+    END_IF;
+
+    Data.SequenceState.Ready                  := instCycleSemiAuto.Ready;
+    Data.SequenceState.Lifecycle              := instCycleSemiAuto.Lifecycle;
+    Data.SequenceState.Fault                  := instCycleSemiAuto.Fault;
+    Data.SequenceState.Step                   := instCycleSemiAuto.CycleStep;
+    Data.SequenceState.StepStr                := instCycleSemiAuto.CycleStateStr;
+    Data.SequenceState.StepAtFault            := instCycleSemiAuto.CycleStepAtError;
+    Data.SequenceState.OperatorActionId       := instCycleSemiAuto.OperatorActionId;
+    Data.SequenceState.OperatorAction         := instCycleSemiAuto.OperatorAction;
+    Data.SequenceState.ExpectedAxis           := instCycleSemiAuto.ExpectedAxis;
+    Data.SequenceState.ExpectedDirection      := instCycleSemiAuto.ExpectedDirection;
+    Data.SequenceState.WaitingForOperator     := instCycleSemiAuto.WaitingForOperator;
+    Data.SequenceState.WaitingForProcess      := instCycleSemiAuto.WaitingForProcess;
+    Data.SequenceState.RequestActive          := instCycleSemiAuto.RequestActive;
+    Data.SequenceState.SpeedMismatchMps       := instCycleSemiAuto.SpeedMismatchMps;
+    Data.SequenceState.SpeedMismatchActive    := instCycleSemiAuto.SpeedMismatchActive;
+    Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
+ELSE
+    // Neutralisation déterministe hors mode SEMI_AUTO
+    Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
+    Data.ReqProgram.ReqWinchM1.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := 0.0;
+
+    Data.ReqProgram.ReqWinchM2.ReqStartStop := FALSE;
+    Data.ReqProgram.ReqWinchM2.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := 0.0;
+
+    Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
+    Data.ReqProgram.ReqTranslation.PositionTgt := 0;
+
+    Data.ReqProgram.ReqBucket.ReqOpen                := FALSE;
+    Data.ReqProgram.ReqBucket.ReqClose               := FALSE;
+    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable := FALSE;
+
+    Data.SequenceState.SequenceId              := E_ProgramSequence.NONE;
+    Data.SequenceState.Ready                   := FALSE;
+    Data.SequenceState.Lifecycle.Busy          := FALSE;
+    Data.SequenceState.Lifecycle.Done          := FALSE;
+    Data.SequenceState.Lifecycle.Waiting       := FALSE;
+    Data.SequenceState.Fault.Error             := FALSE;
+    Data.SequenceState.Fault.ErrorId           := 0;
+    Data.SequenceState.Fault.Latched           := FALSE;
+    Data.SequenceState.Step                    := E_CycleStep.STEP_00_INIT;
+    Data.SequenceState.StepStr                 := 'INIT';
+    Data.SequenceState.StepAtFault             := E_CycleStep.STEP_00_INIT;
+    Data.SequenceState.OperatorActionId        := 0;
+    Data.SequenceState.OperatorAction          := '';
+    Data.SequenceState.ExpectedAxis            := E_OperatorAxis.NONE;
+    Data.SequenceState.ExpectedDirection       := 0;
+    Data.SequenceState.WaitingForOperator      := FALSE;
+    Data.SequenceState.WaitingForProcess       := FALSE;
+    Data.SequenceState.RequestActive           := FALSE;
+    Data.SequenceState.SpeedMismatchMps        := 0.0;
+    Data.SequenceState.SpeedMismatchActive     := FALSE;
+    Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
+END_IF;
 </xhtml>
           </ST>
         </body>
@@ -34841,11 +35645,11 @@ front descendant Kobold</xhtml>
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    // Direction déjà mise à l'échelle (-1/0/+1) par instJoystick (miroir DirectionY,
+    // Direction déjà mise à l'échelle (-1/0/+1) par le joystick (miroir DirectionY,
     // dérivé des bits DirectionPositive/Negative du struct ST_fbJoystick_AxisCmd).
-    CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+    CoupledUserRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
     CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
-                                     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
+                                     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0);
 
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
@@ -34863,7 +35667,7 @@ END_IF;
 // à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.
 DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
 DumpAtTremieAssistActive := DumpAtTremieActive
-    AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2);
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_AtTremieStable;
@@ -34871,7 +35675,7 @@ GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_A
 // Confirmation manuelle "fond touché" effacée hors conditions de garde (MAINT_N1/N2,
 // sous tension, pas de défaut, pas de descente couplée) — la confirmation se fait
 // précisément PENDANT que la benne est encore ouverte (avant que l'extraction ne la ferme).
-IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+IF NOT (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
    OR (CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)) THEN
@@ -34893,11 +35697,11 @@ GVL_IHM.DredgingAssist.State.BypassDiveActive          := GVL_IHM.DredgingAssist
 GVL_IHM.DredgingAssist.State.BypassKoboldBottomTouched := BypassKoboldBottomTouched;
 
 instDiveSearch(
-    Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+    Enable := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode := PRG_03_Modes_Cycle.Data.Auth.Mode,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection := CoupledUserRequestDirection,
     BucketIsOpen := _BucketState.IsOpen,
@@ -34926,11 +35730,11 @@ BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPo
 GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := BottomPositionConfirmed;
 
 instExtractionSequence(
-    Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+    Enable := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode := PRG_03_Modes_Cycle.Data.Auth.Mode,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection := CoupledUserRequestDirection,
     BottomPositionConfirmed := BottomPositionConfirmed,
@@ -34984,17 +35788,17 @@ END_IF;
 // par le mouvement couplé joystick, instBucket.Busy ne peut plus être déclenché QUE par action
 // manuelle benne/DumpAtTremie/ExtractionSequence.
 CoupledDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
-    AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
     AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
     AND NOT _BucketState.IsOpen;
 CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
-    AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
     AND CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)
     AND NOT _BucketState.IsClosed;
 
-IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Pont SEMI_AUTO : fermeture benne pilotée par le séquenceur de cycle.
-    CmdBucketCloseArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Close;
+    CmdBucketCloseArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
 ELSIF instExtractionSequence.BucketCloseRequest THEN
     CmdBucketCloseArbitrated := TRUE;
 ELSIF CoupledAscentBucketCloseArmed THEN
@@ -35008,9 +35812,9 @@ END_IF;
 // WAIT_PRECONDITIONS (DiveStartMin_M/ImmersionUpper_M/ImmersionLower_M). Avec le bypass
 // (TglBypassDiveSearchSequence), le contacteur doit être piloté
 // INDÉPENDAMMENT de ces préconditions dès qu'on descend réellement.
-IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Pont SEMI_AUTO : contacteur Kobold piloté par le séquenceur de cycle.
-    KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
+    KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 ELSE
     KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable
         OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
@@ -35032,19 +35836,19 @@ DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.M
 GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed := DumpAtTremieBucketOpenArmed;
 
 instBucket(
-    Enable              := NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable              := NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR DumpAtTremieBucketOpenArmed OR CoupledDiveBucketOpenArmed
-                           OR (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Open),
+                           OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen),
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection     := CoupledUserRequestDirection,
     CablePosM1          := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     CablePosM2          := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
-    HomedM1             := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomedM2             := PRG_02_Acquisition.instEncoderM2.Homed,
+    HomedM1             := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
     M2_Busy             := (instWinchM2.StepNumber &gt; 0),
     ConfirmOpenPosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
@@ -35052,8 +35856,8 @@ instBucket(
     Config              := _BucketCfgPersist.Config,
     CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
-    InhibitM1           := PRG_03_Modes_Cycle.Auth.InhibitM1,
-    InhibitM2           := PRG_03_Modes_Cycle.Auth.InhibitM2,
+    InhibitM1           := PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
+    InhibitM2           := PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
 
@@ -35071,7 +35875,7 @@ BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDire
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
 // au §5bis (lag d'un cycle automate nominal, sécurisé en amont par la lecture directe de M2_TensionedCable_DI).
-SlackCableAscentStep1 := NOT PRG_03_Modes_Cycle.Auth.SyncEnable AND (
+SlackCableAscentStep1 := NOT PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND (
     ((instSafetyWinchM1.Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
     ((instSafetyWinchM2.Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
     (NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI)
@@ -35099,12 +35903,12 @@ END_IF;
 {region "§3 Arbitrage consignes M1/M2"}
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
-IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
     // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
-    M1LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
-    M1LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
-    M1LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
+    M1LogicRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDirection;
+    M1LogicRequestStartStop := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqStartStop;
+    M1LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.SpeedTgtPct;
 ELSE
     IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Mode Boutons IHM
@@ -35120,9 +35924,9 @@ ELSE
         END_IF;
     ELSE
         // Mode Joystick Maître
-        IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
-            M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
-            M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
+        IF (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 1) THEN
+            M1LogicRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
+            M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.Data.Joystick.AxisY.SpeedTgt);
         ELSE
             M1LogicRequestDirection := 0;
             M1LogicRequestSpeedCmd_Pct  := 0.0;
@@ -35144,11 +35948,11 @@ IF instBucket.Lifecycle.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestDirection := instBucket.M2_Direction;
     M2LogicRequestSpeedCmd_Pct  := 15.0;
 ELSE
-    IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+    IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
         // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
-        M2LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
-        M2LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
-        M2LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+        M2LogicRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqDirection;
+        M2LogicRequestStartStop := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqStartStop;
+        M2LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.SpeedTgtPct;
     ELSE
         IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
             // Mode Boutons IHM
@@ -35164,9 +35968,9 @@ ELSE
             END_IF;
         ELSE
             // Mode Joystick Maître
-            IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
-                M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
-                M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt);
+            IF (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2) THEN
+                M2LogicRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
+                M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.Data.Joystick.AxisY.SpeedTgt);
             ELSE
                 M2LogicRequestDirection := 0;
                 M2LogicRequestSpeedCmd_Pct  := 0.0;
@@ -35220,15 +36024,15 @@ END_IF;
 // === 🔄 §4 SYNCHRONISATION M1 / M2 ===
 
 instWinchSync(
-    Enable          := PRG_03_Modes_Cycle.Auth.SyncEnable AND NOT instBucket.Lifecycle.Busy
-                        AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable          := PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND NOT instBucket.Lifecycle.Busy
+                        AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
-    Mode            := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode            := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CablePosM1      := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     CablePosM2      := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     HomedAndReliableM1 := PRG_02_Acquisition.Data.M1_HomedAndReliable,
     HomedAndReliableM2 := PRG_02_Acquisition.Data.M2_HomedAndReliable,
-    SyncEnable      := PRG_03_Modes_Cycle.Auth.SyncEnable,
+    SyncEnable      := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
     CfgSyncToleranceM  := _SyncCfgPersist.CfgSyncTolerance_M,
     CfgSyncCriticalToleranceM := _SyncCfgPersist.CfgSyncCriticalTolerance_M,
     ActiveOffsetM   := instBucket.ActiveOffsetM,
@@ -35306,7 +36110,7 @@ KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottom
 KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 
 // Levée du verrou au neutre du joystick/boutons ou si toggle désactivé
-IF PRG_02_Acquisition.instJoystick.AtNeutralXY OR NOT GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent THEN
+IF PRG_02_Acquisition.Data.Joystick.AtNeutralXY OR NOT GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent THEN
     KoboldImmersionConfirmed := FALSE;
     KoboldBottomTouchLatched := FALSE;
 END_IF;
@@ -35346,7 +36150,7 @@ DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequest
 // mémorisé, jogging libre) -- bornes directes ouvert/fermé (mêmes offsets que FB_Bucket,
 // relatifs à la position réelle de M1) + palier 1 (voir instWinchM2 §6 plus bas).
 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
-    AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2);
+    AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2);
 
 ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
 // Ce chemin (pilotage
@@ -35355,7 +36159,7 @@ ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTo
 ProcessPermitM2_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &lt;= (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
-M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
+M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
                       (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _CommunCfgPersist.CfgCableLimitAscent_M);
@@ -35364,29 +36168,29 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
 // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
 instSafetyWinchM1(
-    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                 := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
-    SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
-    JoystickOnline         := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
+    Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
+    JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
+    JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
-    EncoderAvailable       := PRG_02_Acquisition.instEncoderM1.Measurement.EncoderAvailable,
+    EncoderAvailable       := PRG_02_Acquisition.Data.EncoderM1.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy,
+    InReferencingMode      := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M1LogicRequestDirection,
     MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
-    Homed                  := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomingSuspect          := PRG_02_Acquisition.instEncoderM1.HomingSuspect,
+    Homed                  := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomingSuspect          := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
@@ -35394,7 +36198,7 @@ instSafetyWinchM1(
     BenneHoldStillActive   := instBucket.Lifecycle.Busy,
     ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.Encoders.M2.CablePosM - instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Lifecycle.Busy,
-    OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM2,
+    OtherWinchInhibited    := PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.Encoders.M1.SignedSpeed_Mps,
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M1.SpeedValid,
@@ -35420,29 +36224,29 @@ instSafetyWinchM1(
 );
 
 instSafetyWinchM2(
-    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                 := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
-    SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
-    JoystickOnline         := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
+    Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
+    JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
+    JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
-    EncoderAvailable       := PRG_02_Acquisition.instEncoderM2.Measurement.EncoderAvailable,
+    EncoderAvailable       := PRG_02_Acquisition.Data.EncoderM2.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Busy,
+    InReferencingMode      := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M2LogicRequestDirection,
     MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
-    Homed                  := PRG_02_Acquisition.instEncoderM2.Homed,
-    HomingSuspect          := PRG_02_Acquisition.instEncoderM2.HomingSuspect,
+    Homed                  := PRG_02_Acquisition.Data.EncoderM2.Homed,
+    HomingSuspect          := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
@@ -35450,7 +36254,7 @@ instSafetyWinchM2(
     BenneHoldStillActive   := FALSE,
     ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.Encoders.M1.CablePosM + instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Lifecycle.Busy,
-    OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM1,
+    OtherWinchInhibited    := PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.Encoders.M2.SignedSpeed_Mps,
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M2.SpeedValid,
@@ -35513,10 +36317,10 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinch
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 &amp; M2) ===
 
 instWinchM1(
-    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := EffectivePermitM1_Descend,
@@ -35530,11 +36334,11 @@ instWinchM1(
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
-    HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
+    HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback,
-    Homed                   := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomingSuspect           := PRG_02_Acquisition.instEncoderM1.HomingSuspect,
+    Homed                   := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomingSuspect           := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
@@ -35544,10 +36348,10 @@ instWinchM1(
 );
 
 instWinchM2(
-    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := EffectivePermitM2_Descend,
@@ -35566,11 +36370,11 @@ instWinchM2(
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
-    HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
+    HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback,
-    Homed                   := PRG_02_Acquisition.instEncoderM2.Homed,
-    HomingSuspect           := PRG_02_Acquisition.instEncoderM2.HomingSuspect,
+    Homed                   := PRG_02_Acquisition.Data.EncoderM2.Homed,
+    HomingSuspect           := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
@@ -35657,24 +36461,24 @@ WinchM1State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM1.Re
 WinchM1State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
 WinchM1State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.RestartDelayElapsed;
 WinchM1State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.StepDelayElapsed;
-WinchM1State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM1.Measurement.RawPos;
+WinchM1State.Encoder.RawPos := PRG_02_Acquisition.Data.EncoderM1.Measurement.RawPos;
 WinchM1State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
 WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
-WinchM1State.Encoder.SlaveOperational := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational;
-WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM1.HwOut.PresetTriggerCmd;
-WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM1.HwOut.PresetValueOut;
-WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderM1.Measurement.AbsFault.Error;
-WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM1.Measurement.AbsFault.ErrorId;
-WinchM1State.Encoder.Homed := PRG_02_Acquisition.instEncoderM1.Homed;
-WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy;
-WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Done;
-WinchM1State.Encoder.HomingError := PRG_02_Acquisition.instEncoderM1.Measurement.HomingFault.Error;
-WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.instEncoderM1.Measurement.HomingFault.ErrorId;
+WinchM1State.Encoder.SlaveOperational := PRG_02_Acquisition.Data.Network.EncoderM1.Operational;
+WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.Data.EncoderM1.HwOut.PresetTriggerCmd;
+WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.Data.EncoderM1.HwOut.PresetValueOut;
+WinchM1State.Encoder.Error := PRG_02_Acquisition.Data.EncoderM1.Measurement.AbsFault.Error;
+WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.Data.EncoderM1.Measurement.AbsFault.ErrorId;
+WinchM1State.Encoder.Homed := PRG_02_Acquisition.Data.EncoderM1.Homed;
+WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy;
+WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Done;
+WinchM1State.Encoder.HomingError := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingFault.Error;
+WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingFault.ErrorId;
 WinchM1State.Encoder.HomingState := E_State.READY;
 WinchM1State.Encoder.HomingStateAtError := E_State.DISABLED;
-WinchM1State.Encoder.HomingSuspect := PRG_02_Acquisition.instEncoderM1.HomingSuspect;
-WinchM1State.Encoder.HomingRefRaw := PRG_02_Acquisition.instEncoderM1.Measurement.HomingRefRaw;
-WinchM1State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
+WinchM1State.Encoder.HomingSuspect := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect;
+WinchM1State.Encoder.HomingRefRaw := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingRefRaw;
+WinchM1State.InhibitActive := PRG_03_Modes_Cycle.Data.Auth.InhibitM1;
 WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
 WinchM1State.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
 WinchM1State.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
@@ -35714,24 +36518,24 @@ WinchM2State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM2.Re
 WinchM2State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
 WinchM2State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.RestartDelayElapsed;
 WinchM2State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.StepDelayElapsed;
-WinchM2State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM2.Measurement.RawPos;
+WinchM2State.Encoder.RawPos := PRG_02_Acquisition.Data.EncoderM2.Measurement.RawPos;
 WinchM2State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
 WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
-WinchM2State.Encoder.SlaveOperational := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2.Operational;
-WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM2.HwOut.PresetTriggerCmd;
-WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM2.HwOut.PresetValueOut;
-WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderM2.Measurement.AbsFault.Error;
-WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM2.Measurement.AbsFault.ErrorId;
-WinchM2State.Encoder.Homed := PRG_02_Acquisition.instEncoderM2.Homed;
-WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Busy;
-WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Done;
-WinchM2State.Encoder.HomingError := PRG_02_Acquisition.instEncoderM2.Measurement.HomingFault.Error;
-WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.instEncoderM2.Measurement.HomingFault.ErrorId;
+WinchM2State.Encoder.SlaveOperational := PRG_02_Acquisition.Data.Network.EncoderM2.Operational;
+WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.Data.EncoderM2.HwOut.PresetTriggerCmd;
+WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.Data.EncoderM2.HwOut.PresetValueOut;
+WinchM2State.Encoder.Error := PRG_02_Acquisition.Data.EncoderM2.Measurement.AbsFault.Error;
+WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.Data.EncoderM2.Measurement.AbsFault.ErrorId;
+WinchM2State.Encoder.Homed := PRG_02_Acquisition.Data.EncoderM2.Homed;
+WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy;
+WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Done;
+WinchM2State.Encoder.HomingError := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingFault.Error;
+WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingFault.ErrorId;
 WinchM2State.Encoder.HomingState := E_State.READY;
 WinchM2State.Encoder.HomingStateAtError := E_State.DISABLED;
-WinchM2State.Encoder.HomingSuspect := PRG_02_Acquisition.instEncoderM2.HomingSuspect;
-WinchM2State.Encoder.HomingRefRaw := PRG_02_Acquisition.instEncoderM2.Measurement.HomingRefRaw;
-WinchM2State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
+WinchM2State.Encoder.HomingSuspect := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect;
+WinchM2State.Encoder.HomingRefRaw := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingRefRaw;
+WinchM2State.InhibitActive := PRG_03_Modes_Cycle.Data.Auth.InhibitM2;
 WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
 WinchM2State.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
 WinchM2State.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
@@ -35741,13 +36545,13 @@ WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
 
 // ⛔️ Limite haute atteinte (fait public) — miroir de la butée logicielle de AscentPermit
 // (Homed, hors homing, non suspect, position &gt;= limite). Fait pur "Reached", sans bypass.
-CableLimitAscentM1Reached := PRG_02_Acquisition.instEncoderM1.Homed
-    AND NOT PRG_02_Acquisition.instEncoderM1.HomingSuspect
-    AND NOT PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy
+CableLimitAscentM1Reached := PRG_02_Acquisition.Data.EncoderM1.Homed
+    AND NOT PRG_02_Acquisition.Data.EncoderM1.HomingSuspect
+    AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
     AND (PRG_02_Acquisition.Data.Encoders.M1.CablePosM &gt;= _CommunCfgPersist.CfgCableLimitAscent_M);
-CableLimitAscentM2Reached := PRG_02_Acquisition.instEncoderM2.Homed
-    AND NOT PRG_02_Acquisition.instEncoderM2.HomingSuspect
-    AND NOT PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Busy
+CableLimitAscentM2Reached := PRG_02_Acquisition.Data.EncoderM2.Homed
+    AND NOT PRG_02_Acquisition.Data.EncoderM2.HomingSuspect
+    AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
     AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &gt;= (_CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift));
 
 WinchM1Safety.CableLimitAscent := CableLimitAscentM1Reached;
@@ -36132,7 +36936,7 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 // P1 comme si c'était l'extrémité réelle : mot 00001 (P1=0 ET Maintenance=1), UN CRAN AVANT
 // la vraie extrémité Maintenance (00000) — backup si le verrou souple a déjà échoué à arrêter
 // avant P1, garde la machine hors de la zone interdite plutôt que d'attendre le vrai fond.
-M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
+M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
                                    NOT instPosDecoderM3.TranslationPosP1 AND instPosDecoderM3.TranslationPosMaintenance,
                                    instPosDecoderM3.LimitSwitchRev);
 
@@ -36147,7 +36951,7 @@ END_IF;
 
 IF M3_LimitSwitchRevEffective THEN
     M3_LimitSwitchRevStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchRev) THEN
+ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchRev) THEN
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
@@ -36182,12 +36986,12 @@ END_IF;
 {region "§1 Arbitrage cible et direction"}
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
-IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Pont SEMI_AUTO : consomme la demande du séquenceur de cycle.
     // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M3_PositioningActive  := TRUE;
-    SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
-    M3_StartStop_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Start;
+    SelTarget    := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt;
+    M3_StartStop_Active  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart;
 
     // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
     // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
@@ -36203,8 +37007,8 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
         M3_SpeedCmd_Active := 0.0;
         M3_Direction_Active := 0;
     END_IF;
-ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
-   OR (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2) THEN
+ELSIF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1)
+   OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2) THEN
     M3_PositioningActive := GVL_IHM.TranslationM3.Cmd.SelPositioning;
     SelTarget := 0;
 
@@ -36248,7 +37052,7 @@ END_IF;
 
 M3_SpeedCmd_Active := LIMIT(0.0, ABS(M3_SpeedCmd_Active), 100.0);
 
-IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
+IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable THEN
     SelTarget := 0;
 END_IF;
 
@@ -36273,7 +37077,7 @@ ELSE
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -&gt; arrêt sur Maintenance
         // - Si Maintenance interdite -&gt; arrêt sur P1
-        IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
+        IF PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable THEN
             M3_PositionSensorTarget := M3_AtMaintenanceStable;
         ELSE
             M3_PositionSensorTarget := M3_AtP1Stable;
@@ -36293,17 +37097,17 @@ END_CASE;
 // d'un scan. Bénin : BrakeReleaseRequest ne change pas plus vite qu'un scan MainTask 10 ms
 // sur une commande frein.
 instSafetyTranslationM3(
-    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE),
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE),
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
-    JoystickOnline          := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational     := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    JoystickOnline          := PRG_02_Acquisition.Data.Network.Joystick.Online,
+    JoystickOperational     := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     PhaseRotationOk         := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
-    DriveOnline             := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur.Online,
-    DriveOperational        := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur.Operational,
+    DriveOnline             := PRG_02_Acquisition.Data.Network.DriveM3.Online,
+    DriveOperational        := PRG_02_Acquisition.Data.Network.DriveM3.Operational,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
@@ -36335,10 +37139,10 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 // === ⚙️ §2 EXÉCUTION PILOTAGE TRANSLATION M3 ===
 
 instTranslationM3(
-    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE),
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE),
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M3_StartStop_Active,
     SafeStop                := M3_SafeStop_Aggregate,
     Direction               := M3_Direction_Active,
@@ -36356,7 +37160,7 @@ instTranslationM3(
     // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -&gt; 100% vitesse jusqu'à
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
     SlowdownSensorP1           := (NOT instPosDecoderM3.TranslationPosP2) AND instPosDecoderM3.TranslationPosP1
-                                   AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
+                                   AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
@@ -36375,7 +37179,7 @@ instTranslationM3(
 
 // 📐 Estimateur de position continue M3 (odométrie + recalage 5 capteurs)
 instPosEstimatorM3(
-    Enable               := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE),
+    Enable               := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE),
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
     DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     Direction            := M3_Direction_Active,
@@ -36403,7 +37207,7 @@ GVL_PERSISTENT._TranslationPosEstimatedInitialized := instPosEstimatorM3.Initial
 {region "§3 Publication demande translation"}
 // === 📤 §3 PUBLICATION DEMANDE BRUTE TRANSLATION ===
 
-TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE);
+TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE);
 TranslationFinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 TranslationFinalInterlockRequest.SafeStop := M3_SafeStop_Aggregate;
@@ -36461,7 +37265,7 @@ TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputIn
 TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
 TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) &lt;&gt; 0;
 TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) &lt;&gt; 0;
-TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
+TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable;
 TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 
 // 🛡️ Producteur unique (CODE_QUALITY_STANDARDS §5) : la safety M3 (instSafetyTranslationM3)
@@ -37776,8 +38580,8 @@ instPreflight(
     M3SensorWordIncoherent    := PRG_05_Translation.Data.M3_SensorWordIncoherent,
     EmergencyChainClosed      := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    EncoderM1Operational      := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational,
-    EncoderM2Operational      := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2.Operational,
+    EncoderM1Operational      := PRG_02_Acquisition.Data.Network.EncoderM1.Operational,
+    EncoderM2Operational      := PRG_02_Acquisition.Data.Network.EncoderM2.Operational,
     HomedM1                   := PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed,
     HomedM2                   := PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed,
     M1PositionInBounds        := NOT PRG_02_Acquisition.Data.Encoders.M1.EncoderIncoherent,
@@ -37806,7 +38610,7 @@ GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
 GVL_IHM.TranslationM3.State := PRG_05_Translation.Data.TranslationState;
 GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
 
-GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
+GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Data.Auth.Mode;
 GVL_IHM.Modes.State.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 GVL_IHM.Modes.State.PowerContactorOk := PRG_06_Outputs.EmergencyState.ContactorOk;
 GVL_IHM.Modes.State.EmergencyChainOk := PRG_06_Outputs.EmergencyState.ChainOk;
@@ -37821,29 +38625,29 @@ GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs.PowerCutOffActive;
 GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;
 GVL_IHM.JOY1Joystick.State.RawY := PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;
 GVL_IHM.JOY1Joystick.State.RawButton := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw;
-GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.instJoystick.AxisCmdX;
-GVL_IHM.JOY1Joystick.State.AxisCmdY := PRG_02_Acquisition.instJoystick.AxisCmdY;
-GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;
-GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;
+GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.Data.Joystick.AxisX;
+GVL_IHM.JOY1Joystick.State.AxisCmdY := PRG_02_Acquisition.Data.Joystick.AxisY;
+GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.Data.Joystick.NeutralXAct;
+GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.Data.Joystick.NeutralYAct;
 GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
-GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.instJoystick.AtNeutralXY;
-GVL_IHM.JOY1Joystick.State.Online := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online;
-GVL_IHM.JOY1Joystick.State.Operational := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational;
+GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
+GVL_IHM.JOY1Joystick.State.Online := PRG_02_Acquisition.Data.Network.Joystick.Online;
+GVL_IHM.JOY1Joystick.State.Operational := PRG_02_Acquisition.Data.Network.Joystick.Operational;
 // 🕹️ Le défaut fonctionnel du joystick (calibration bit0, capteur hors plage bit1, perte
 // bus bit2) vient du FB lui-même, pas du diagnostic bus. Le diagnostic CAN reste exposé
 // séparément (GVL_IHM.Network.CanError) — ici on remonte l'erreur du FB joystick.
-GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Fault.Error;
-GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instJoystick.Fault.ErrorId;
+GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.Data.Joystick.Fault.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.Data.Joystick.Fault.ErrorId;
 
-GVL_IHM.Network.BusCanOpen  := PRG_02_Acquisition.instDiagCanOpen.DeviceCanOpenMaster;
-GVL_IHM.Network.Joystick    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick;
+GVL_IHM.Network.BusCanOpen  := PRG_02_Acquisition.Data.Network.CanOpenMaster;
+GVL_IHM.Network.Joystick    := PRG_02_Acquisition.Data.Network.Joystick;
 GVL_IHM.Network.CanError    := GVL_IHM.Network.BusCanOpen.Error OR GVL_IHM.Network.Joystick.Error;
 GVL_IHM.Network.CanErrorId  := GVL_IHM.Network.BusCanOpen.ErrorId OR GVL_IHM.Network.Joystick.ErrorId;
 
-GVL_IHM.Network.BusEthercat := PRG_02_Acquisition.instDiagEthercat.DeviceEthercatMaster;
-GVL_IHM.Network.EncoderM1   := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1;
-GVL_IHM.Network.EncoderM2   := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2;
-GVL_IHM.Network.VariateurM3 := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur;
+GVL_IHM.Network.BusEthercat := PRG_02_Acquisition.Data.Network.EthercatMaster;
+GVL_IHM.Network.EncoderM1   := PRG_02_Acquisition.Data.Network.EncoderM1;
+GVL_IHM.Network.EncoderM2   := PRG_02_Acquisition.Data.Network.EncoderM2;
+GVL_IHM.Network.VariateurM3 := PRG_02_Acquisition.Data.Network.DriveM3;
 GVL_IHM.Network.EcatError   := GVL_IHM.Network.BusEthercat.Error OR GVL_IHM.Network.EncoderM1.Error OR GVL_IHM.Network.EncoderM2.Error OR GVL_IHM.Network.VariateurM3.Error;
 GVL_IHM.Network.EcatErrorId := GVL_IHM.Network.BusEthercat.ErrorId OR GVL_IHM.Network.EncoderM1.ErrorId OR GVL_IHM.Network.EncoderM2.ErrorId OR GVL_IHM.Network.VariateurM3.ErrorId;
 
@@ -37857,46 +38661,46 @@ GVL_IHM.Network.InputModules.Vh0008Er1Ok      := PRG_02_Acquisition.Data.Vh0008E
 GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputModuleFault;
 
 // ---------- §3g. État cycle semi-auto &amp; bandeau ----------
-GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready;
-GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Busy;
-GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Done;
-GVL_IHM.Cycle.State.Error                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.Error;
-GVL_IHM.Cycle.State.ErrorId                := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.ErrorId;
-GVL_IHM.Cycle.State.CycleStep              := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep;
-GVL_IHM.Cycle.State.CycleStateStr          := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStateStr;
-GVL_IHM.Cycle.State.CycleStepAtError       := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError;
+GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.Data.SequenceState.Ready;
+GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy;
+GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done;
+GVL_IHM.Cycle.State.Error                  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error;
+GVL_IHM.Cycle.State.ErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId;
+GVL_IHM.Cycle.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceState.Step;
+GVL_IHM.Cycle.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
+GVL_IHM.Cycle.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
 GVL_IHM.Cycle.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.Cycle.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
 GVL_IHM.Cycle.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
-GVL_IHM.Cycle.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
+GVL_IHM.Cycle.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 GVL_IHM.Cycle.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
 GVL_IHM.Cycle.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
 GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.instWinchSync.Fault.Error;
 GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM;
-GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchMps;
-GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive;
-GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchConfirmed;
+GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
+GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
+GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
 GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
 GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
-GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY;
-GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY;
+GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
+GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
 instHmiBannerFormatter(
     Enable                := TRUE,
     SimulationModeActive  := GVL_Simulation.SimulationModeActive,
-    CurrentMode           := PRG_03_Modes_Cycle.Auth.Mode,
+    CurrentMode           := PRG_03_Modes_Cycle.Data.Auth.Mode,
     BothAxesCoupled       := (GVL_IHM.Modes.Cmd.SelJoystickWinch = 0),
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     CycleStep             := GVL_IHM.Cycle.State.CycleStep,
     CycleStateStr         := GVL_IHM.Cycle.State.CycleStateStr,
-    CycleErrorId          := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.ErrorId,
-    CycleStepAtError      := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError,
+    CycleErrorId          := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
+    CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
     HomingActive          := (NOT PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed),
-    HomingStepM1          := SEL(PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy, 0, 1),
-    HomingStepM2          := SEL(PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Busy, 0, 1),
+    HomingStepM1          := SEL(PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy, 0, 1),
+    HomingStepM2          := SEL(PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy, 0, 1),
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
@@ -37917,10 +38721,10 @@ instHmiBannerFormatter(
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
     M1LogicRequestDirection     := PRG_04_Treuils_Benne.M1LogicRequestDirection,
     M2LogicRequestDirection     := PRG_04_Treuils_Benne.M2LogicRequestDirection,
-    CycleRequestDirection       := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction,
+    CycleRequestDirection       := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDirection,
     DeadmanArmed                := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
-    JoystickAtNeutral           := PRG_02_Acquisition.instJoystick.AtNeutralXY,
-    CycleAutoBusy               := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Busy,
+    JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
+    CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
@@ -37949,18 +38753,18 @@ instTroubleshootingView(
     LocalDigitalIoOk     := PRG_02_Acquisition.Data.LocalDigitalIoOk,
     Vh0800EndOk          := PRG_02_Acquisition.Data.Vh0800EndOk,
     Vh0808EtpOk          := PRG_02_Acquisition.Data.Vh0808EtpOk,
-    Auth                 := PRG_03_Modes_Cycle.Auth,
+    Auth                 := PRG_03_Modes_Cycle.Data.Auth,
     M1LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct,
     M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
     M2LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedCmd_Pct,
     M2LogicRequestDirection := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
     CoupledUserRequestActive := PRG_04_Treuils_Benne.CoupledUserRequestActive,
-    CycleAutoBusy := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Busy,
-    CycleM1SpeedTgt_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct,
-    CycleM2SpeedTgt_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct,
-    CycleBucketOpen := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Open,
-    CycleTargetPosition := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target,
+    CycleAutoBusy := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
+    CycleM1SpeedTgt_Pct := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.SpeedTgtPct,
+    CycleM2SpeedTgt_Pct := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.SpeedTgtPct,
+    CycleBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen,
+    CycleTargetPosition := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt,
     SimulationModeActive := GVL_Simulation.SimulationModeActive,
     SimWinchActive       := GVL_Simulation.SimWinchActive,
     SimTranslationActive := GVL_Simulation.SimTranslationActive,
@@ -37980,30 +38784,30 @@ instTroubleshootingView(
     ArmingPulseActive    := PRG_06_Outputs.EmergencyArmingPulseActive,
     MaintainAActive      := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     MaintainBActive      := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
-    CycleReady           := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready,
-    CycleDone            := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Done,
-    CycleError           := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.Error,
-    CycleErrorId         := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.ErrorId,
-    CycleStep            := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep,
-    CycleStepStr         := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStateStr,
-    CycleStepAtError     := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError,
-    CycleWaitingForOperator := PRG_03_Modes_Cycle.instCycleSemiAuto.WaitingForOperator,
-    CycleWaitingForProcess := PRG_03_Modes_Cycle.instCycleSemiAuto.WaitingForProcess,
-    CycleOperatorActionId := PRG_03_Modes_Cycle.instCycleSemiAuto.OperatorActionId,
-    CycleOperatorAction := PRG_03_Modes_Cycle.instCycleSemiAuto.OperatorAction,
-    CycleExpectedAxis := PRG_03_Modes_Cycle.instCycleSemiAuto.ExpectedAxis,
-    CycleExpectedDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.ExpectedDirection,
+    CycleReady           := PRG_03_Modes_Cycle.Data.SequenceState.Ready,
+    CycleDone            := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done,
+    CycleError           := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error,
+    CycleErrorId         := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
+    CycleStep            := PRG_03_Modes_Cycle.Data.SequenceState.Step,
+    CycleStepStr         := PRG_03_Modes_Cycle.Data.SequenceState.StepStr,
+    CycleStepAtError     := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
+    CycleWaitingForOperator := PRG_03_Modes_Cycle.Data.SequenceState.WaitingForOperator,
+    CycleWaitingForProcess := PRG_03_Modes_Cycle.Data.SequenceState.WaitingForProcess,
+    CycleOperatorActionId := PRG_03_Modes_Cycle.Data.SequenceState.OperatorActionId,
+    CycleOperatorAction := PRG_03_Modes_Cycle.Data.SequenceState.OperatorAction,
+    CycleExpectedAxis := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedAxis,
+    CycleExpectedDirection := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedDirection,
     CycleStartRequest    := GVL_IHM.Cycle.Cmd.BtnStart,
     CycleAbortRequest    := GVL_IHM.Cycle.Cmd.BtnAbort,
     CycleTargetDepth_M   := GVL_IHM.Cycle.Cfg.SetDepth_M,
     CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
-    CycleSpeedMismatchActive := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive,
+    CycleSpeedMismatchActive := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive,
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
     CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Fault.Error,
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
-    JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutralXY,
-    HomedM1              := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomedM2              := PRG_02_Acquisition.instEncoderM2.Homed,
+    JoystickAtNeutral    := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
+    HomedM1              := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomedM2              := PRG_02_Acquisition.Data.EncoderM2.Homed,
     CfgTopLimitM         := _CommunCfgPersist.CfgCableLimitAscent_M
 );
 
@@ -38752,7 +39556,6 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
             <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
             <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
             <Object Name="E_OperatorAxis" ObjectId="07a48a82-b7c8-54f5-9041-14c13244835f" />
-            <Object Name="E_ProgramSequence" ObjectId="e8e8ebc2-bfbe-517a-8c98-48abc432cba8" />
           </Folder>
           <Object Name="FB_Cycle" ObjectId="17fb99b4-f1ad-50d8-8736-de2357b93935" />
           <Object Name="FB_DiveSearch" ObjectId="0e6b7a8e-54c0-5c72-8612-9c2a76db57f8" />
@@ -38788,82 +39591,31 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
         </Folder>
-        <Folder Name="A_COMMUN">
-          <Folder Name="_TYPES">
-            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
-            <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
-            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
-            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
-            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
-            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
-          </Folder>
-          <Object Name="FB_Acquisition_Preflight" ObjectId="78a087ce-501c-55a1-a50d-014fd4495703" />
-          <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
-          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
-          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
-          <Object Name="FB_Filter" ObjectId="39721efb-445f-5f0c-882a-6b2b978076bc" />
-          <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
-        </Folder>
-        <Folder Name="I_TRANSLATION">
-          <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
-          <Object Name="FB_Safety_Translation" ObjectId="8774beae-e057-5af5-a522-7bfc99dfb4c8" />
-          <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
-          <Object Name="FB_TranslationOutputInterlock" ObjectId="25b7b4af-7ad3-51bb-8a91-14df3a52f0a4" />
-          <Object Name="FB_Translation_PositionDecoder" ObjectId="2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3" />
-          <Object Name="FB_Translation_PositionEstimator" ObjectId="17c88093-da61-51d7-ad4f-b07c5ebb2eb5" />
-          <Object Name="ST_fbCycle_TranslationCmdDemand" ObjectId="e3302f93-57a8-5949-b90f-a1621e17cb50" />
-        </Folder>
-        <Folder Name="H_TREUILS_BENNE">
-          <Folder Name="_TYPES">
-            <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
-            <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
-            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
-            <Object Name="ST_fbCycle_WinchCmdDemand" ObjectId="c006fffa-8ec1-5ea5-83e5-adad08ef4202" />
-            <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
-            <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
-            <Object Name="ST_fbWinch_Symmetry_Cfg" ObjectId="b3edf443-a7a8-5125-8877-3148f355844d" />
-            <Object Name="ST_fbWinch_Symmetry_Data" ObjectId="30d10f2c-209a-59ac-ab89-aae03e9399fe" />
-          </Folder>
-          <Folder Name="BENNE">
-            <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
-            <Folder Name="_TYPES">
-              <Object Name="ST_fbBucket_Config" ObjectId="b2af5901-62ea-5239-8b5e-fb6f7afb8a12" />
-              <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />
-              <Object Name="ST_fbCycle_BucketCmdDemand" ObjectId="e16788cb-2d99-53eb-b97c-ee6cf1555f75" />
-            </Folder>
-          </Folder>
-          <Object Name="FB_DriftGuard" ObjectId="e215f19f-4c29-5289-9559-f2cf7fa9d55e" />
-          <Object Name="FB_Safety_Winch" ObjectId="afbb4ccb-2339-5f22-9bee-0ed046924779" />
-          <Object Name="FB_SpeedStep" ObjectId="12afad9c-c87d-50d6-b33c-dd7c6f83a8e4" />
-          <Object Name="FB_SyncContactor" ObjectId="afd229de-316d-5899-8a37-8c30dbfd06db" />
-          <Object Name="FB_SyncDeviation" ObjectId="24ca6948-aaa5-587d-b1af-7e9dbd94d79d" />
-          <Object Name="FB_Winch" ObjectId="6f83143e-72ec-5e6b-80c8-39f828857ce4" />
-          <Object Name="FB_WinchLoadEstimator" ObjectId="1ca57a3d-7abe-5417-80b9-b0b83cdad590" />
-          <Object Name="FB_WinchOutputInterlock" ObjectId="2a1928e0-077f-59ff-bf93-fa875e0de69c" />
-          <Object Name="FB_WinchSync" ObjectId="05970ca2-4250-543c-bfcf-5f8ad1f9efae" />
-          <Object Name="FB_Winch_Symmetry" ObjectId="e8df262b-c45d-5348-8aea-652e2cf92204" />
-        </Folder>
         <Folder Name="J_SUPERVISION">
-          <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
-          <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
-          <Object Name="FB_MirrorBypassRetain" ObjectId="6b38f222-bba1-53c3-99fb-b91a23d65b9a" />
-          <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
-          <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />
-          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
-          <Folder Name="_BRIDGES">
-            <Object Name="FB_CfgPersistBridge_BucketCfg" ObjectId="92413952-2771-5afc-8a20-3321f99627f5" />
-            <Object Name="FB_CfgPersistBridge_CommunCfg" ObjectId="b0d11d68-8853-56c7-85fa-cb0f8b6449b6" />
-            <Object Name="FB_CfgPersistBridge_CycleCfg" ObjectId="8d6e7f94-2d43-5ea3-b409-34f87f99a9e5" />
-            <Object Name="FB_CfgPersistBridge_DredgingAssistCfg" ObjectId="01900664-1243-5018-b595-4c32b467d2c5" />
-            <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
-            <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
-            <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
-            <Object Name="FB_CfgPersistBridge_fbEncoder_Cfg" ObjectId="6a644b30-2e21-500a-820f-c38e8cb68b8e" />
-            <Object Name="FB_CfgPersistBridge_fbJoystick_Cfg" ObjectId="fffdfae7-d9f7-530c-8ef8-ba79e94ff2d7" />
-          </Folder>
           <Folder Name="_TYPES">
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="E_ProgramSequence" ObjectId="e8e8ebc2-bfbe-517a-8c98-48abc432cba8" />
+              <Object Name="ST_ChainCycleSemiAuto" ObjectId="fe0796b0-cbd2-54bf-ac31-2ae52afe32d2" />
+              <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
+              <Object Name="ST_CycleCmd" ObjectId="dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28" />
+              <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
+              <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
+              <Object Name="ST_ModesCmd" ObjectId="edbd07e7-72fc-5cee-a795-a49979bf9667" />
+              <Object Name="ST_ModesCycleInterPrg" ObjectId="c66e2ea9-61f6-5705-86e7-b9f19e28d4f1" />
+              <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
+              <Object Name="ST_ModesState" ObjectId="607d2d07-1efc-59e2-9ca9-53d413d7cf77" />
+              <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
+              <Object Name="ST_ProgramRequest" ObjectId="a28c1dba-faf7-5919-ab72-3a069b551a0d" />
+              <Object Name="ST_ProgramTranslationRequest" ObjectId="478a938b-bb21-5d74-8556-79842696e566" />
+              <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
+              <Object Name="ST_SequencePublicState" ObjectId="b0390064-912d-5ff4-8765-d2f9a7be3f8e" />
+              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
+            </Folder>
             <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="ST_AcquisitionEncoderQualified" ObjectId="bc4dc502-575b-5c03-a159-0fc9e08c35c2" />
               <Object Name="ST_AcquisitionInterPrg" ObjectId="ee4214b6-c9e0-5d00-aa74-b2d385e1b08d" />
+              <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
+              <Object Name="ST_AcquisitionNetworkDiagnostics" ObjectId="0c2483c3-e64e-5f3f-bfcc-41828a26d24e" />
               <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
               <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
               <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
@@ -38941,17 +39693,6 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
               <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
               <Object Name="ST_SafetyChecklist" ObjectId="eff8efbf-5fc5-566d-a0f9-2b4ea1c877a0" />
             </Folder>
-            <Folder Name="3_CYCLE_ET_MODES">
-              <Object Name="ST_ChainCycleSemiAuto" ObjectId="fe0796b0-cbd2-54bf-ac31-2ae52afe32d2" />
-              <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
-              <Object Name="ST_CycleCmd" ObjectId="dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28" />
-              <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
-              <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
-              <Object Name="ST_ModesCmd" ObjectId="edbd07e7-72fc-5cee-a795-a49979bf9667" />
-              <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
-              <Object Name="ST_ModesState" ObjectId="607d2d07-1efc-59e2-9ca9-53d413d7cf77" />
-              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
-            </Folder>
             <Folder Name="5_ASSISTANCE_DRAGAGE">
               <Object Name="ST_ChainDredgingAssist" ObjectId="26bb9fd2-df98-54a5-a16a-738f3d1532cd" />
               <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
@@ -38960,6 +39701,78 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
               <Object Name="ST_DredgingAssistState" ObjectId="4230b7ec-508c-5fc4-9124-31b8ff9632ea" />
             </Folder>
           </Folder>
+          <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
+          <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
+          <Object Name="FB_MirrorBypassRetain" ObjectId="6b38f222-bba1-53c3-99fb-b91a23d65b9a" />
+          <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
+          <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />
+          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
+          <Folder Name="_BRIDGES">
+            <Object Name="FB_CfgPersistBridge_BucketCfg" ObjectId="92413952-2771-5afc-8a20-3321f99627f5" />
+            <Object Name="FB_CfgPersistBridge_CommunCfg" ObjectId="b0d11d68-8853-56c7-85fa-cb0f8b6449b6" />
+            <Object Name="FB_CfgPersistBridge_CycleCfg" ObjectId="8d6e7f94-2d43-5ea3-b409-34f87f99a9e5" />
+            <Object Name="FB_CfgPersistBridge_DredgingAssistCfg" ObjectId="01900664-1243-5018-b595-4c32b467d2c5" />
+            <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
+            <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
+            <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
+            <Object Name="FB_CfgPersistBridge_fbEncoder_Cfg" ObjectId="6a644b30-2e21-500a-820f-c38e8cb68b8e" />
+            <Object Name="FB_CfgPersistBridge_fbJoystick_Cfg" ObjectId="fffdfae7-d9f7-530c-8ef8-ba79e94ff2d7" />
+          </Folder>
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Folder Name="_TYPES">
+            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+            <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
+            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
+            <Object Name="ST_Status" ObjectId="537f3533-9d7c-5703-b6a3-978725c61956" />
+          </Folder>
+          <Object Name="FB_Acquisition_Preflight" ObjectId="78a087ce-501c-55a1-a50d-014fd4495703" />
+          <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
+          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
+          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
+          <Object Name="FB_Filter" ObjectId="39721efb-445f-5f0c-882a-6b2b978076bc" />
+          <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
+        </Folder>
+        <Folder Name="I_TRANSLATION">
+          <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          <Object Name="FB_Safety_Translation" ObjectId="8774beae-e057-5af5-a522-7bfc99dfb4c8" />
+          <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
+          <Object Name="FB_TranslationOutputInterlock" ObjectId="25b7b4af-7ad3-51bb-8a91-14df3a52f0a4" />
+          <Object Name="FB_Translation_PositionDecoder" ObjectId="2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3" />
+          <Object Name="FB_Translation_PositionEstimator" ObjectId="17c88093-da61-51d7-ad4f-b07c5ebb2eb5" />
+          <Object Name="ST_fbCycle_TranslationCmdDemand" ObjectId="e3302f93-57a8-5949-b90f-a1621e17cb50" />
+        </Folder>
+        <Folder Name="H_TREUILS_BENNE">
+          <Folder Name="_TYPES">
+            <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
+            <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
+            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
+            <Object Name="ST_fbCycle_WinchCmdDemand" ObjectId="c006fffa-8ec1-5ea5-83e5-adad08ef4202" />
+            <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
+            <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
+            <Object Name="ST_fbWinch_Symmetry_Cfg" ObjectId="b3edf443-a7a8-5125-8877-3148f355844d" />
+            <Object Name="ST_fbWinch_Symmetry_Data" ObjectId="30d10f2c-209a-59ac-ab89-aae03e9399fe" />
+          </Folder>
+          <Folder Name="BENNE">
+            <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
+            <Folder Name="_TYPES">
+              <Object Name="ST_fbBucket_Config" ObjectId="b2af5901-62ea-5239-8b5e-fb6f7afb8a12" />
+              <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />
+              <Object Name="ST_fbCycle_BucketCmdDemand" ObjectId="e16788cb-2d99-53eb-b97c-ee6cf1555f75" />
+            </Folder>
+          </Folder>
+          <Object Name="FB_DriftGuard" ObjectId="e215f19f-4c29-5289-9559-f2cf7fa9d55e" />
+          <Object Name="FB_Safety_Winch" ObjectId="afbb4ccb-2339-5f22-9bee-0ed046924779" />
+          <Object Name="FB_SpeedStep" ObjectId="12afad9c-c87d-50d6-b33c-dd7c6f83a8e4" />
+          <Object Name="FB_SyncContactor" ObjectId="afd229de-316d-5899-8a37-8c30dbfd06db" />
+          <Object Name="FB_SyncDeviation" ObjectId="24ca6948-aaa5-587d-b1af-7e9dbd94d79d" />
+          <Object Name="FB_Winch" ObjectId="6f83143e-72ec-5e6b-80c8-39f828857ce4" />
+          <Object Name="FB_WinchLoadEstimator" ObjectId="1ca57a3d-7abe-5417-80b9-b0b83cdad590" />
+          <Object Name="FB_WinchOutputInterlock" ObjectId="2a1928e0-077f-59ff-bf93-fa875e0de69c" />
+          <Object Name="FB_WinchSync" ObjectId="05970ca2-4250-543c-bfcf-5f8ad1f9efae" />
+          <Object Name="FB_Winch_Symmetry" ObjectId="e8df262b-c45d-5348-8aea-652e2cf92204" />
         </Folder>
         <Folder Name="D_JOYSTICK">
           <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />

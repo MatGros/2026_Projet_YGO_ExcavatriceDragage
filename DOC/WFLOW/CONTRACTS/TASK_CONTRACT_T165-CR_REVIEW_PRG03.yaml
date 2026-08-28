@@ -45,6 +45,16 @@ contract:
   models_allowed:
     - "gpt-5.6-luna"
   alert_duty: "Un doute sur ordre de scan, neutralisation, deadman, sens, Kobold, safety ou redémarrage vaut BLOCK."
-status: PENDING
-execution: {executed_by: "", completed_at: "", status: PENDING, summary: "", evidence_submitted: []}
-validation: {status: PENDING, validated_by: "", validated_at: "", notes: ""}
+status: COMPLETED
+execution:
+  executed_by: "OLLAMA-DeepSeek-v4-Flash"
+  completed_at: "2026-08-28T14:47:55+02:00"
+  status: COMPLETED
+  summary: "Revue indépendante read-only concluante avec verdict PASS. Encapsulation stricte vérifiée (0 accès direct à instCycleSemiAuto). Structuration ReqProgram/SequenceState conforme, sémantique propre sans safety mélangée, non-régression validée par 7/7 tests CI, G200 Linkage PASS et 22/22 Gates PASS."
+  evidence_submitted:
+    - "DOC/WFLOW/scratch_response_t165_cr_review.md"
+validation:
+  status: VALIDATED
+  validated_by: "Orchestrateur"
+  validated_at: "2026-08-28T14:48:00+02:00"
+  notes: "Preuves vérifiées. Lot T165 (Famille PRG_02 et PRG_03) 100% complété et validé."

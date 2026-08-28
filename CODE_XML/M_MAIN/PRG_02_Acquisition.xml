@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:27:16.905056" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:27:16.905056">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:45:19.020035" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:45:19.020035">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,12 +26,54 @@
       <dataType name="ST_AcquisitionInterPrg">
         <baseType>
           <struct>
+            <variable name="DataValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Drapeau de vie &amp; validité globale des données ===
+🟢 TRUE = PRG_02 a complété son scan et les données sont fraîches et qualifiées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_AcquisitionJoystickQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📦 Structures qualifiées du bus ===
+🕹️ Données et commandes joystick qualifiées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Network">
+              <type>
+                <derived name="ST_AcquisitionNetworkDiagnostics" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Diagnostics réseaux CANopen et EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1">
+              <type>
+                <derived name="ST_AcquisitionEncoderQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Façade codeur qualifiée M1 (Retenue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2">
+              <type>
+                <derived name="ST_AcquisitionEncoderQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Façade codeur qualifiée M2 (Benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Encoders">
               <type>
                 <derived name="ST_EncoderMeasurements" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 Mesures codeurs M1/M2 (struct frontiere AF-06 §3ter) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 Mesures codeurs M1/M2 (compatibilité de transition) ===
 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)</xhtml>
               </documentation>
             </variable>
@@ -40,7 +82,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_fbEncoder_Measurement) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Gates fiabilité codeurs (compatibilité de transition) ===
 ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)</xhtml>
               </documentation>
             </variable>
@@ -73,7 +115,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🕹️ États joystick qualifiés ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🕹️ États joystick qualifiés (compatibilité de transition) ===
 🔒 Homme-mort joystick arme (1=Arme)</xhtml>
               </documentation>
             </variable>
@@ -1329,6 +1371,261 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_AcquisitionEncoderQualified">
+        <baseType>
+          <struct>
+            <variable name="Measurement">
+              <type>
+                <derived name="ST_fbEncoder_Measurement" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mesure métrique (CablePosM, SpeedMps, etc.)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Façade codeur prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Diagnostic défaut codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Codeur référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Référencement suspect</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Défaut fiabilité (indisponible ou incohérent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Référencé ET fiable (sans incohérence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetConfirmationFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Échec confirmation preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwOut">
+              <type>
+                <derived name="ST_fbEncoder_HwOut" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Commandes hardware de preset (lecture seule)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>bc4dc502-575b-5c03-a159-0fc9e08c35c2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧲 ST_AcquisitionEncoderQualified — Façade codeur qualifiée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les mesures métriques, statuts de référencement,
+      défauts et signaux hardware produits par FB_Encoder dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.EncoderM1 / Data.EncoderM2).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_AcquisitionJoystickQualified">
+        <baseType>
+          <struct>
+            <variable name="AxisX">
+              <type>
+                <derived name="ST_fbJoystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande et direction qualifiée axe X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisY">
+              <type>
+                <derived name="ST_fbJoystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande et direction qualifiée axe Y</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Homme-mort armé et valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AtNeutralXY">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Les deux axes X et Y sont au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingPermitDenied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Tentative d'armement sans permission</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Façade joystick prête et opérationnelle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Diagnostic défaut joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Valeur ADC neutre calibré X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralYAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Valeur ADC neutre calibré Y</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e915927d-33f8-504a-9060-48dca13140d7</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕹️ ST_AcquisitionJoystickQualified — Données joystick qualifiées
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes d'axes, statut homme-mort et diagnostics
+      produits par FB_Joystick dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Joystick).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_AcquisitionNetworkDiagnostics">
+        <baseType>
+          <struct>
+            <variable name="CanOpenMaster">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Diagnostic maître CANopen</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Diagnostic esclave Joystick MCB560</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EthercatMaster">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Diagnostic maître EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostic esclave Codeur M1 (COD1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostic esclave Codeur M2 (COD2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveM3">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic esclave Variateur M3 (AC600)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>0c2483c3-e64e-5f3f-bfcc-41828a26d24e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔌 ST_AcquisitionNetworkDiagnostics — Diagnostics réseaux qualifiés
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les états opérationnels et diagnostics des bus CANopen
+      et EtherCAT produits par PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Network).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_EncoderMeasurements">
         <baseType>
           <struct>
@@ -1760,7 +2057,7 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §2
    🎯 Rôle unique : Produire les images HwReal/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
-      et publier les retours.
+      et publier les retours qualifiés sur le bus Data.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -1917,6 +2214,14 @@ instDiagEthercat(
     EncoderM1BypassActive    := GVL_IHM.Network.Bypass.EncoderM1,
     EncoderM2BypassActive    := GVL_IHM.Network.Bypass.EncoderM2
 );
+
+// 📤 Publication du sous-bus diagnostics réseaux
+Data.Network.CanOpenMaster   := instDiagCanOpen.DeviceCanOpenMaster;
+Data.Network.Joystick        := instDiagCanOpen.DeviceJoystick;
+Data.Network.EthercatMaster  := instDiagEthercat.DeviceEthercatMaster;
+Data.Network.EncoderM1       := instDiagEthercat.DeviceEncoderM1;
+Data.Network.EncoderM2       := instDiagEthercat.DeviceEncoderM2;
+Data.Network.DriveM3         := instDiagEthercat.DeviceVariateur;
 {endregion}
 
 {region "§2 Simulation et aiguillage — HwIn"}
@@ -2031,7 +2336,18 @@ instJoystick(
     NeutralYMem               := _JoystickNeutralY
 );
 
-// 📤 Publication des états et axes joystick
+// 📤 Publication du sous-bus joystick qualifié
+Data.Joystick.AxisX              := instJoystick.AxisCmdX;
+Data.Joystick.AxisY              := instJoystick.AxisCmdY;
+Data.Joystick.DeadmanArmed       := instJoystick.DeadmanArmed;
+Data.Joystick.AtNeutralXY        := instJoystick.AtNeutralXY;
+Data.Joystick.ArmingPermitDenied := instJoystick.ArmingPermitDenied;
+Data.Joystick.Ready              := instJoystick.Ready;
+Data.Joystick.Fault              := instJoystick.Fault;
+Data.Joystick.NeutralXAct        := instJoystick.NeutralXAct;
+Data.Joystick.NeutralYAct        := instJoystick.NeutralYAct;
+
+// 📤 Publication des états et axes joystick (compatibilité de transition)
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
 Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
 Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
@@ -2054,8 +2370,8 @@ HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2),
+    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2),
     HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
@@ -2071,6 +2387,19 @@ instEncoderM1(
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     Calib                 := _CalibM1
 );
+
+// 📤 Publication de la façade codeur M1 qualifiée
+Data.EncoderM1.Measurement              := instEncoderM1.Measurement;
+Data.EncoderM1.Ready                    := instEncoderM1.Ready;
+Data.EncoderM1.Fault                    := instEncoderM1.Fault;
+Data.EncoderM1.Homed                    := instEncoderM1.Homed;
+Data.EncoderM1.HomingSuspect            := instEncoderM1.HomingSuspect;
+Data.EncoderM1.EncoderFault             := instEncoderM1.EncoderFault;
+Data.EncoderM1.HomedAndReliable         := instEncoderM1.HomedAndReliable;
+Data.EncoderM1.PresetConfirmationFailed := instEncoderM1.PresetConfirmationFailed;
+Data.EncoderM1.HwOut                    := instEncoderM1.HwOut;
+
+// Compatibilité de transition
 Data.Encoders.M1           := instEncoderM1.Measurement;
 Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
 Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
@@ -2085,7 +2414,7 @@ COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
 M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
-    AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
     AND NOT (PRG_04_Treuils_Benne.instWinchM1.StepNumber &gt; 0) AND NOT (PRG_04_Treuils_Benne.instWinchM2.StepNumber &gt; 0);
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
     M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
@@ -2102,8 +2431,8 @@ HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1),
+    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1),
     HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR M2BucketRefRequested,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
@@ -2119,6 +2448,19 @@ instEncoderM2(
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global,
     Calib                 := _CalibM2
 );
+
+// 📤 Publication de la façade codeur M2 qualifiée
+Data.EncoderM2.Measurement              := instEncoderM2.Measurement;
+Data.EncoderM2.Ready                    := instEncoderM2.Ready;
+Data.EncoderM2.Fault                    := instEncoderM2.Fault;
+Data.EncoderM2.Homed                    := instEncoderM2.Homed;
+Data.EncoderM2.HomingSuspect            := instEncoderM2.HomingSuspect;
+Data.EncoderM2.EncoderFault             := instEncoderM2.EncoderFault;
+Data.EncoderM2.HomedAndReliable         := instEncoderM2.HomedAndReliable;
+Data.EncoderM2.PresetConfirmationFailed := instEncoderM2.PresetConfirmationFailed;
+Data.EncoderM2.HwOut                    := instEncoderM2.HwOut;
+
+// Compatibilité de transition
 Data.Encoders.M2           := instEncoderM2.Measurement;
 Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
 Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
@@ -2133,6 +2475,14 @@ COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;
 // 📊 Retours variateur M3 conditionnés (HwIn arbitré en §2)
 Data.M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
 Data.M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
+{endregion}
+
+{region "§6 Qualification globale du bus Data"}
+// === 🛡️ §6 QUALIFICATION GLOBALE DU BUS DATA ===
+// DataValid = TRUE uniquement si les modules E/S physiques et les bus réseaux sont opérationnels.
+Data.DataValid := NOT Data.InputModuleFault 
+                  AND instDiagCanOpen.Ready 
+                  AND instDiagEthercat.Ready;
 {endregion}
 </xhtml>
           </ST>
@@ -8263,6 +8613,9 @@ TimeLast := TimeCurrent;
               <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
               <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
               <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
+              <Object Name="ST_AcquisitionEncoderQualified" ObjectId="bc4dc502-575b-5c03-a159-0fc9e08c35c2" />
+              <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
+              <Object Name="ST_AcquisitionNetworkDiagnostics" ObjectId="0c2483c3-e64e-5f3f-bfcc-41828a26d24e" />
             </Folder>
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />

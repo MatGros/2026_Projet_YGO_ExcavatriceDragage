@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T11:10:17.744926" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T11:10:17.744926">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:45:31.708602" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:45:31.708602">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,82 +23,47 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_fbModes_Autorisations">
+      <dataType name="ST_ModesCycleInterPrg">
         <baseType>
           <struct>
-            <variable name="Mode">
+            <variable name="Auth">
               <type>
-                <derived name="E_Mode" />
+                <derived name="ST_fbModes_Autorisations" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bus d'autorisations machine</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncEnable">
+            <variable name="ReqProgram">
               <type>
-                <BOOL />
+                <derived name="ST_ProgramRequest" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demandes programme vers PRG_04 / PRG_05</xhtml>
               </documentation>
             </variable>
-            <variable name="InhibitM1">
+            <variable name="SequenceState">
               <type>
-                <BOOL />
+                <derived name="ST_SequencePublicState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InhibitM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickWinchSelectArbitrated">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingApproachEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceM3TargetEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État public de la séquence</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
+            <ObjectId>c66e2ea9-61f6-5705-86e7-b9f19e28d4f1</ObjectId>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📦 ST_ModesCycleInterPrg — Bus public d'autorisations et demandes de cycle
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
-                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
-   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
-      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de données globale publiée par PRG_03_Modes_Cycle
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_CycleStep">
@@ -593,27 +558,475 @@
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbModes_Autorisations">
+        <baseType>
+          <struct>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickWinchSelectArbitrated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingApproachEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
+      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_ProgramRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqWinchM1">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqWinchM2">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqTranslation">
+              <type>
+                <derived name="ST_ProgramTranslationRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqBucket">
+              <type>
+                <derived name="ST_ProgramBucketRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme benne</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a28c1dba-faf7-5919-ab72-3a069b551a0d</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📋 ST_ProgramRequest — Ensemble des demandes de mouvements du programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes formulées vers PRG_04 (Treuils/Benne) et PRG_05 (Translation)
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SequencePublicState">
+        <baseType>
+          <struct>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquenceur disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Lifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle de vie IEC 61131-3 (Busy, Done)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut transverse (Error, ErrorId)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SequenceId">
+              <type>
+                <derived name="E_ProgramSequence" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant séquence active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape active du Grafcet</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFault">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape mémorisée au défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorActionId">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant action opérateur requise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorAction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Message explicatif pour l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExpectedAxis">
+              <type>
+                <derived name="E_OperatorAxis" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Organe joystick/bouton attendu</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExpectedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens attendu (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WaitingForOperator">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">En attente action opérateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WaitingForProcess">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">En attente condition procédé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de mouvement active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepStr">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Libellé en clair de l'étape</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart absolu vitesse M1/M2 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil vitesse dépassé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant timeout</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b0390064-912d-5ff4-8765-d2f9a7be3f8e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_SequencePublicState — État public et synoptique de la séquence
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Expose l'état, l'étape, le cycle de vie et les attentes opérateur du séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_ProgramBucketRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqKoboldMeasureEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande activation mesure/contacteur Kobold</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪣 ST_ProgramBucketRequest — Demande de mouvement benne par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de manœuvre benne et mesure Kobold
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_ProgramTranslationRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqStart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de démarrage mouvement translation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionTgt">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible de position demandée (1=Trémie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>478a938b-bb21-5d74-8556-79842696e566</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🎯 ST_ProgramTranslationRequest — Demande de mouvement translation par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de translation M3 formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_ProgramWinchRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqStartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arrêt demandé par le programme (TRUE=Marche)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedTgtPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne de vitesse cible demandée (0.0 à 100.0 %)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>edbf7141-2109-5344-bf49-1cd29f4686cd</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_ProgramWinchRequest — Demande de mouvement treuil par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_ProgramSequence">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="MAIN_CYCLE" value="1" />
+              <value name="DIVE_SEARCH" value="2" />
+              <value name="EXTRACTION" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucune séquence active</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAIN_CYCLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle semi-automatique principal (FB_Cycle)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DIVE_SEARCH</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Recherche de fond Kobold (réservé future migration)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>EXTRACTION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquence d'extraction (réservé future migration)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e8e8ebc2-bfbe-517a-8c98-48abc432cba8</ObjectId>
+          </data>
+        </addData>
+      </dataType>
     </dataTypes>
     <pous>
       <pou name="PRG_03_Modes_Cycle" pouType="program">
         <interface>
           <inputVars />
           <outputVars>
-            <variable name="Auth">
+            <variable name="Data">
               <type>
-                <derived name="ST_fbModes_Autorisations" />
+                <derived name="ST_ModesCycleInterPrg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎚️ BUS D'AUTORISATIONS &amp; DEMANDES DE CYCLE ===
-&lt;-- [STAT] Bus d'autorisations machine (producteur unique)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instCycleSemiAuto">
-              <type>
-                <derived name="FB_Cycle" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">*   [INST] Sequenceur de cycle semi-automatique public</xhtml>
+&lt;-- [BUS] Structure publique unique du programme de modes et cycle</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -625,6 +1038,14 @@
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧩 SOUS-INSTANCES FB INTERNES ===
 * [INST] Arbitrage des modes machine et calcul autorisations</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCycleSemiAuto">
+              <type>
+                <derived name="FB_Cycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Séquenceur de cycle semi-automatique (privé)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -673,11 +1094,11 @@ instModes(
 //    - HomingRequest := bouton homing IHM (BtnHome M1 OU M2)
 
 instCycleSemiAuto(
-    Enable                  := (Auth.Mode = E_Mode.SEMI_AUTO),
+    Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
     Reset                   := GVL_IHM.Cycle.Cmd.BtnReset,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := Auth.Mode,
-    CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY,
+    Mode                    := instModes.Auth.Mode,
+    CycleMotionPermit       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     DeadmanArmed            := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
@@ -707,17 +1128,101 @@ instCycleSemiAuto(
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
-    HomedM1                 := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomedM2                 := PRG_02_Acquisition.instEncoderM2.Homed,
+    HomedM1                 := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomedM2                 := PRG_02_Acquisition.Data.EncoderM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     SampleCount            := _CycleSampleCount
 );
 
 
-// === 📤 §3 PUBLICATION DU BUS AUTORISATIONS ===
+// === 📤 §3 PUBLICATION DU BUS INTER-PRG &amp; AUTORISATIONS ===
 
-Auth := instModes.Auth;
+// 1. Autorisations machine
+Data.Auth := instModes.Auth;
+
+// 2. Demandes programme et état public de séquence
+IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
+    // Demandes treuils M1 / M2
+    Data.ReqProgram.ReqWinchM1.ReqStartStop := instCycleSemiAuto.WinchM1Cmd.StartStop;
+    Data.ReqProgram.ReqWinchM1.ReqDirection := instCycleSemiAuto.WinchM1Cmd.Direction;
+    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := instCycleSemiAuto.WinchM1Cmd.SpeedPct;
+
+    Data.ReqProgram.ReqWinchM2.ReqStartStop := instCycleSemiAuto.WinchM2Cmd.StartStop;
+    Data.ReqProgram.ReqWinchM2.ReqDirection := instCycleSemiAuto.WinchM2Cmd.Direction;
+    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+
+    // Demande translation M3
+    Data.ReqProgram.ReqTranslation.ReqStart    := instCycleSemiAuto.TranslationCmd.Start;
+    Data.ReqProgram.ReqTranslation.PositionTgt := instCycleSemiAuto.TranslationCmd.Target;
+
+    // Demande benne
+    Data.ReqProgram.ReqBucket.ReqOpen                := instCycleSemiAuto.BucketCmd.Open;
+    Data.ReqProgram.ReqBucket.ReqClose               := instCycleSemiAuto.BucketCmd.Close;
+    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
+
+    // État séquence active
+    IF instCycleSemiAuto.Lifecycle.Busy THEN
+        Data.SequenceState.SequenceId := E_ProgramSequence.MAIN_CYCLE;
+    ELSE
+        Data.SequenceState.SequenceId := E_ProgramSequence.NONE;
+    END_IF;
+
+    Data.SequenceState.Ready                  := instCycleSemiAuto.Ready;
+    Data.SequenceState.Lifecycle              := instCycleSemiAuto.Lifecycle;
+    Data.SequenceState.Fault                  := instCycleSemiAuto.Fault;
+    Data.SequenceState.Step                   := instCycleSemiAuto.CycleStep;
+    Data.SequenceState.StepStr                := instCycleSemiAuto.CycleStateStr;
+    Data.SequenceState.StepAtFault            := instCycleSemiAuto.CycleStepAtError;
+    Data.SequenceState.OperatorActionId       := instCycleSemiAuto.OperatorActionId;
+    Data.SequenceState.OperatorAction         := instCycleSemiAuto.OperatorAction;
+    Data.SequenceState.ExpectedAxis           := instCycleSemiAuto.ExpectedAxis;
+    Data.SequenceState.ExpectedDirection      := instCycleSemiAuto.ExpectedDirection;
+    Data.SequenceState.WaitingForOperator     := instCycleSemiAuto.WaitingForOperator;
+    Data.SequenceState.WaitingForProcess      := instCycleSemiAuto.WaitingForProcess;
+    Data.SequenceState.RequestActive          := instCycleSemiAuto.RequestActive;
+    Data.SequenceState.SpeedMismatchMps       := instCycleSemiAuto.SpeedMismatchMps;
+    Data.SequenceState.SpeedMismatchActive    := instCycleSemiAuto.SpeedMismatchActive;
+    Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
+ELSE
+    // Neutralisation déterministe hors mode SEMI_AUTO
+    Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
+    Data.ReqProgram.ReqWinchM1.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := 0.0;
+
+    Data.ReqProgram.ReqWinchM2.ReqStartStop := FALSE;
+    Data.ReqProgram.ReqWinchM2.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := 0.0;
+
+    Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
+    Data.ReqProgram.ReqTranslation.PositionTgt := 0;
+
+    Data.ReqProgram.ReqBucket.ReqOpen                := FALSE;
+    Data.ReqProgram.ReqBucket.ReqClose               := FALSE;
+    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable := FALSE;
+
+    Data.SequenceState.SequenceId              := E_ProgramSequence.NONE;
+    Data.SequenceState.Ready                   := FALSE;
+    Data.SequenceState.Lifecycle.Busy          := FALSE;
+    Data.SequenceState.Lifecycle.Done          := FALSE;
+    Data.SequenceState.Lifecycle.Waiting       := FALSE;
+    Data.SequenceState.Fault.Error             := FALSE;
+    Data.SequenceState.Fault.ErrorId           := 0;
+    Data.SequenceState.Fault.Latched           := FALSE;
+    Data.SequenceState.Step                    := E_CycleStep.STEP_00_INIT;
+    Data.SequenceState.StepStr                 := 'INIT';
+    Data.SequenceState.StepAtFault             := E_CycleStep.STEP_00_INIT;
+    Data.SequenceState.OperatorActionId        := 0;
+    Data.SequenceState.OperatorAction          := '';
+    Data.SequenceState.ExpectedAxis            := E_OperatorAxis.NONE;
+    Data.SequenceState.ExpectedDirection       := 0;
+    Data.SequenceState.WaitingForOperator      := FALSE;
+    Data.SequenceState.WaitingForProcess       := FALSE;
+    Data.SequenceState.RequestActive           := FALSE;
+    Data.SequenceState.SpeedMismatchMps        := 0.0;
+    Data.SequenceState.SpeedMismatchActive     := FALSE;
+    Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
+END_IF;
 </xhtml>
           </ST>
         </body>
@@ -2464,7 +2969,14 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
             <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_ModesCycleInterPrg" ObjectId="c66e2ea9-61f6-5705-86e7-b9f19e28d4f1" />
               <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
+              <Object Name="ST_ProgramRequest" ObjectId="a28c1dba-faf7-5919-ab72-3a069b551a0d" />
+              <Object Name="ST_SequencePublicState" ObjectId="b0390064-912d-5ff4-8765-d2f9a7be3f8e" />
+              <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
+              <Object Name="ST_ProgramTranslationRequest" ObjectId="478a938b-bb21-5d74-8556-79842696e566" />
+              <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
+              <Object Name="E_ProgramSequence" ObjectId="e8e8ebc2-bfbe-517a-8c98-48abc432cba8" />
             </Folder>
           </Folder>
         </Folder>

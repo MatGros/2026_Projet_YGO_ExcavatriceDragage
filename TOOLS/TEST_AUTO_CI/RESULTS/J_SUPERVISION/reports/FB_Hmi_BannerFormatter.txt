@@ -1,14 +1,10 @@
-STruC++ Test Runner v1.0
+Error compiling source files:
 
-test_fb_hmi_bannerformatter.st
-  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
-  [PASS] TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM
-  [PASS] TC-P07-010 AntiFlickerText : affichage instantane force
-  [PASS] TC-P07-020 RootCause : alarme fille visible quand materiel sain
-  [PASS] TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO
-  [PASS] TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END
-  [PASS] TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT
-  [PASS] TC-P07-024 Priorite absolue AU sur defaut module E/S
+ST_ChainCycleSemiAuto.st:34:40: error: Undefined type 'E_OPERATORAXIS' in STRUCT 'ST_CHAINCYCLESEMIAUTO'
+  34 |     Idx213_ExpectedAxis              : E_OperatorAxis; // Organe attendu (NONE, JOYSTICK_X, JOYSTICK_Y, BUTTON)
+     |                                        ^
 
------------------------------------------
-8 tests, 8 passed, 0 failed
+ST_AcquisitionEncoderQualified.st:20:32: error: Undefined type 'ST_FBENCODER_HWOUT' in STRUCT 'ST_ACQUISITIONENCODERQUALIFIED'
+  20 |     HwOut                    : ST_fbEncoder_HwOut;       // 📡 Commandes hardware de preset (lecture seule)
+     |                                ^
+

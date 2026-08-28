@@ -27,16 +27,13 @@
         --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
     }
     * { box-sizing: border-box; }
-    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
-    * { scrollbar-width: none; -ms-overflow-style: none; }
-    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
         background-color: var(--bg);
         background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
         background-size: 28px 28px;
         background-position: -1px -1px;
         color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
-    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .page { max-width: 1720px; width: 96%; margin: 0 auto; padding: 28px 16px 60px; }
     .header { display: flex; justify-content: space-between; align-items: center;
         margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
         border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
@@ -59,7 +56,7 @@
     .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
 
     details { margin-bottom: 20px; }
-    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: text; }
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -70,52 +67,163 @@
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
-    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
-    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
-    .checks-summary:hover { color: var(--text); }
-    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
-    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
-    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
+    .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: text; }
+    .checks-summary:hover { color: var(--accent); }
+    .checks-label { font-size: 12px; font-weight: 600; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 12px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
     .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
-    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
-        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
-    .failure-head { color: var(--red-text); font-weight: 600; }
-    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
-    .failure-msg { color: #92400e; margin-top: 4px; }
-    .failure-diff { margin-top: 4px; }
-    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    .scenario-list li { font-size: 12px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
+    .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
+    .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+    .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
+        border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
+    .failure-head { color: var(--red-text); font-weight: 700; font-size: 13.5px; }
+    .failure-loc { color: var(--muted); margin-top: 3px; font-size: 11.5px; font-family: monospace; }
+    .failure-msg { color: var(--text); margin-top: 6px; font-weight: 600; }
+    .failure-diff { margin-top: 8px; color: var(--text); font-size: 12.5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .failure-diff code { padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 12px; font-weight: 700; }
+    .failure-diff code.val-expected { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .failure-diff code.val-actual { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    [data-theme="light"] .failure-diff code.val-expected { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    [data-theme="light"] .failure-diff code.val-actual { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
     pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
         overflow-x: auto; }
-    .chronogram-group { margin-top: 12px; }
+    .chronogram-group { margin-top: 10px; }
     .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
         padding: 8px 12px; }
-    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
-    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
-    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
-    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
-    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
-    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
-    .chrono-table .scan-t { color: var(--muted); }
-    .chrono-table td.changed { background: #fef9c3; }
-    .v-true { color: var(--green-text); font-weight: 600; }
-    .v-false { color: #cbd5e1; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); user-select: text; }
+    .chrono-summary-inner { display: inline-flex; justify-content: space-between; align-items: center; width: calc(100% - 24px); margin-left: 6px; vertical-align: middle; }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border);
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
+    .chrono-scroll::-webkit-scrollbar, .wf-scroll::-webkit-scrollbar { display: block !important; height: 8px !important; width: 8px !important; }
+    .chrono-scroll::-webkit-scrollbar-track, .wf-scroll::-webkit-scrollbar-track { background: var(--surface-card); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb, .wf-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb:hover, .wf-scroll::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+    .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; table-layout: auto; }
+    .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; position: relative; }
+    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; cursor: pointer; user-select: text; transition: max-width 0.2s, min-width 0.2s, padding 0.2s; }
+    .chrono-table th:hover { color: var(--accent); }
+    .col-resizer { position: absolute; top: 0; right: 0; width: 5px; cursor: col-resize; user-select: none; height: 100%; z-index: 10; }
+    .col-resizer:hover, .col-resizer.resizing { background: var(--accent); }
+    .chrono-table th.col-collapsed,
+    .chrono-table td.col-collapsed {
+        max-width: 24px !important;
+        min-width: 24px !important;
+        width: 24px !important;
+        padding: 4px 1px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        opacity: 0.35 !important;
+        background: rgba(0, 0, 0, 0.25) !important;
+        color: transparent !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+        font-size: 0 !important;
+        position: relative;
+    }
+    .chrono-table th.col-collapsed {
+        cursor: pointer;
+        opacity: 0.75 !important;
+        background: rgba(129, 140, 248, 0.18) !important;
+    }
+    .chrono-table th.col-collapsed:hover {
+        opacity: 1 !important;
+        background: rgba(129, 140, 248, 0.38) !important;
+    }
+    .chrono-table th.col-collapsed::after {
+        content: "⋮";
+        font-size: 12px;
+        color: var(--accent);
+        display: block;
+        text-align: center;
+    }
+    /* Mode Titres Verticaux (Compact) */
+    .chrono-table.headers-vertical {
+        width: max-content !important;
+    }
+    .chrono-table.headers-vertical th.note-th,
+    .chrono-table.headers-vertical td.chrono-note-cell {
+        max-width: 280px !important;
+        width: 280px !important;
+    }
+    .chrono-table.headers-vertical th.var-th {
+        height: 155px;
+        vertical-align: bottom;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        max-width: 36px;
+        min-width: 30px;
+        width: 34px;
+    }
+    .chrono-table.headers-vertical th.var-th .th-content {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        display: inline-block;
+        white-space: nowrap;
+        text-align: left;
+        max-height: 135px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .chrono-table th .th-content {
+        display: inline-block;
+        pointer-events: auto;
+    }
+    .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
+    .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
+    [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
+    [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    .v-true { color: #34d399; font-weight: 700; }
+    .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
-        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+        border-radius: 8px; margin-top: 8px; padding: 4px 0;
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
     .waveform { display: block; }
-    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
-    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
-    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
-    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
-    .wf-line { fill: none; stroke-width: 2; }
-    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
-    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
-    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-grid { stroke: var(--border); stroke-width: 1; opacity: 0.6; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-scan { font-size: 9px; fill: var(--muted); opacity: 0.7; text-anchor: middle; font-family: monospace; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; font-weight: 600; }
+    .wf-label.wf-clickable { cursor: pointer; transition: fill 0.15s; }
+    .wf-label.wf-clickable:hover { fill: var(--accent); font-weight: 700; text-decoration: underline; }
+    .wf-label.active-curve { fill: #38bdf8; font-weight: 700; }
+    [data-theme="light"] .wf-label.active-curve { fill: #0284c7; }
+    .wf-line { fill: none; stroke-width: 2.2; }
+    .wf-num-line { stroke: var(--border); stroke-width: 1; }
+    .wf-num { font-size: 10.5px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-num-changed { font-size: 10.5px; fill: #ffffff; font-weight: 700; text-anchor: middle; font-family: monospace; }
     .wf-chip { opacity: 0.95; }
     .wf-legend { font-size: 10px; fill: var(--muted); }
-    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; font-family: monospace; font-weight: 600; }
+    [data-theme="light"] .wf-scale { fill: #64748b; }
+    .wf-tooltip {
+        position: fixed; pointer-events: none; z-index: 9999;
+        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
+        border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        border-radius: 8px; padding: 8px 12px; font-size: 11.5px; color: #f8fafc;
+        display: none; max-width: 320px; line-height: 1.4;
+    }
+    [data-theme="light"] .wf-tooltip {
+        background: rgba(255, 255, 255, 0.97); border-color: #cbd5e1;
+        color: #1e293b; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
+    [data-theme="light"] .wf-tt-head { color: #0284c7; }
+    .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
+    .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
+    .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
+    [data-theme="light"] .wf-tt-note { border-top-color: rgba(0, 0, 0, 0.1); }
     .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
         border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
     .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
@@ -123,7 +231,7 @@
     .af-warning-banner li { margin: 3px 0; }
     .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
-    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
@@ -193,7 +301,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 00:02:50</div>
+    <div class="exec-time">2026-08-28 14:45:52</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
@@ -211,7 +319,7 @@
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 52 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 59 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -616,6 +724,62 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
+                <td><code>ST_fbJoystick_AxisCmd.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_AcquisitionJoystickQualified.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_Diag_State.st</code></td>
+                <td>DUT</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Diag_Device.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_AcquisitionNetworkDiagnostics.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbEncoder_HwOut.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_AcquisitionEncoderQualified.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
                 <td><code>ST_AcquisitionInterPrg.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -698,6 +862,102 @@
             </summary>
             <div style="margin-top:2px;">
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.Homed</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.HomingSuspect</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.HwOut.PresetTriggerCmd</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.HwOut.PresetValueOut</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.Measurement.AbsFault.Error</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.Measurement.AbsFault.ErrorId</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingFault.Error</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingFault.ErrorId</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Done</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingRefRaw</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM1.Measurement.RawPos</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.Homed</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.HomingSuspect</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.HwOut.PresetTriggerCmd</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.HwOut.PresetValueOut</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.Measurement.AbsFault.Error</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.Measurement.AbsFault.ErrorId</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingFault.Error</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingFault.ErrorId</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Done</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingRefRaw</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.EncoderM2.Measurement.RawPos</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.Encoders.M1.CablePosM</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
@@ -718,6 +978,14 @@
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.Joystick.AxisY.Direction</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.Joystick.AxisY.SpeedTgt</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.JoystickDeadmanArmed</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
@@ -727,6 +995,14 @@
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.M2_HomedAndReliable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.Network.EncoderM1.Operational</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.Network.EncoderM2.Operational</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
@@ -784,118 +1060,6 @@
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwReal.Winch.COD2_Warnings</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2.Operational</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.Homed</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.HomingSuspect</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.HwOut.PresetTriggerCmd</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.HwOut.PresetValueOut</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.Measurement.AbsFault.Error</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.Measurement.AbsFault.ErrorId</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.Measurement.HomingFault.Error</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.Measurement.HomingFault.ErrorId</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Done</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.Measurement.HomingRefRaw</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM1.Measurement.RawPos</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.Homed</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.HomingSuspect</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.HwOut.PresetTriggerCmd</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.HwOut.PresetValueOut</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.Measurement.AbsFault.Error</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.Measurement.AbsFault.ErrorId</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.Measurement.HomingFault.Error</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.Measurement.HomingFault.ErrorId</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Busy</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.Measurement.HomingLifecycle.Done</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.Measurement.HomingRefRaw</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instEncoderM2.Measurement.RawPos</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instJoystick.AxisCmdY.Direction</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div></div>
         </details>
         <details style="margin:4px 0;">
@@ -907,59 +1071,59 @@
             </summary>
             <div style="margin-top:2px;">
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Auth.InhibitM1</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.Auth.InhibitM1</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Auth.InhibitM2</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.Auth.InhibitM2</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Auth.Mode</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.Auth.Mode</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Auth.SyncEnable</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.Auth.SyncEnable</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Close</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Open</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDirection</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqStartStop</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.SpeedTgtPct</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqDirection</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqStartStop</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop</code></div>
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.SpeedTgtPct</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div></div>
         </details>
@@ -1650,26 +1814,46 @@
                 <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>ST_WinchInterPrg: Ordre RelayFwd genere vers PRG_06</li><li>ST_WinchInterPrg: Aucun SafeStop actif</li><li>ST_WinchInterPrg: consigne vitesse M1 non nulle en montee</li><li>ST_WinchInterPrg: WinchM1State.RelayFwd reflete la demande</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>ST_WinchInterPrg: Ordre RelayFwd genere vers PRG_06</li><li>ST_WinchInterPrg: Aucun SafeStop actif</li><li>ST_WinchInterPrg: consigne vitesse M1 non nulle en montee</li><li>ST_WinchInterPrg: WinchM1State.RelayFwd reflete la demande</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
         
         <details >
-            <summary>📊 Chronogramme graphique (2 scans, 0 variables actives)</summary>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (2 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
             <div class="wf-scroll"></div>
         </details>
         <details >
-            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (2 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
             <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th></tr></thead>
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
         <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
     </table></div>
         </details>
         
     <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (18)</summary>
-        <table class="static-table"><tbody><tr><td><code>MODESAUTH.MODE</code></td><td>1</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETCLOSE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1UP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNWINCHM1DOWN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDCFG.MAXMEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>BUCKETCFG.OFFSETOPENM</code></td><td>0</td></tr><tr><td><code>M1STARTSTOP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1DIRECTION</code></td><td>1</td></tr><tr><td><code>M1SPEEDTGT</code></td><td>50</td></tr><tr><td><code>STEPTABLE.P1R1</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+        <summary>🔒 Valeurs constantes sur toute la séquence (69)</summary>
+        <table class="static-table"><tbody><tr><td><code>ACQDATA.M1_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M2_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.INPUTMODULEFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDIRECTIONX</code></td><td>0</td></tr><tr><td><code>ACQDATA.JOYSTICKSPEEDPCTX</code></td><td>0</td></tr><tr><td><code>ACQDATA.JOYSTICKXNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKYNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.LOCALDIGITALIOOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M1_ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M2_ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M3_ACTUALFREQUENCYHZ_FILTERED</code></td><td>0</td></tr><tr><td><code>ACQDATA.M3_STATUSWORD_FILTERED</code></td><td>0</td></tr><tr><td><code>ACQDATA.VH0008ER1OK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0008EROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0800ENDOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0808ETPOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.WINCHINPUTSOURCECHANGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETCLOSE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1DOWN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1UP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUCKETCFG.COHERENCELIMITM</code></td><td>1</td></tr><tr><td><code>BUCKETCFG.OFFSETCLOSEM</code></td><td>15</td></tr><tr><td><code>BUCKETCFG.OFFSETOPENM</code></td><td>0</td></tr><tr><td><code>DATA.BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.KOBOLDCONTACTORCMDARBITRATED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1LOGICREQUESTSPEEDCMD_PCT</code></td><td>50</td></tr><tr><td><code>DATA.M2LOGICREQUESTSPEEDCMD_PCT</code></td><td>0</td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1DIRECTION</code></td><td>1</td></tr><tr><td><code>M1SPEEDTGT</code></td><td>50</td></tr><tr><td><code>M1STARTSTOP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>1</td></tr><tr><td><code>MODESAUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>1</td></tr><tr><td><code>MODESAUTH.SYNCENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SPEEDCFG.MAXMEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDCFG.SPEEDBANDHYSTERESISMPS</code></td><td>0</td></tr><tr><td><code>STEPTABLE.P1R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P1R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P1R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P1R4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P2R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P2R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P2R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P2R4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P3R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P3R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P3R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P3R4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P4R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P4R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P4R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P4R4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P5R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P5R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P5R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P5R4</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
         </article>
@@ -1679,37 +1863,57 @@
                 <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>ST_WinchInterPrg: SafeStop declenche immediatement sur defaut codeur</li><li>Mouvement neutralise sur defaut codeur</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>ST_WinchInterPrg: SafeStop declenche immediatement sur defaut codeur</li><li>Mouvement neutralise sur defaut codeur</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
         
         <details >
-            <summary>📊 Chronogramme graphique (2 scans, 0 variables actives)</summary>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (2 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
             <div class="wf-scroll"></div>
         </details>
         <details >
-            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (2 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
             <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th></tr></thead>
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
         <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
     </table></div>
         </details>
         
     <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (18)</summary>
-        <table class="static-table"><tbody><tr><td><code>MODESAUTH.MODE</code></td><td>1</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETCLOSE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1UP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1DOWN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SPEEDCFG.MAXMEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>BUCKETCFG.OFFSETOPENM</code></td><td>0</td></tr><tr><td><code>M1STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1DIRECTION</code></td><td>0</td></tr><tr><td><code>M1SPEEDTGT</code></td><td>0</td></tr><tr><td><code>STEPTABLE.P1R1</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+        <summary>🔒 Valeurs constantes sur toute la séquence (69)</summary>
+        <table class="static-table"><tbody><tr><td><code>ACQDATA.M1_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M2_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.INPUTMODULEFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDEADMANARMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDIRECTIONX</code></td><td>0</td></tr><tr><td><code>ACQDATA.JOYSTICKSPEEDPCTX</code></td><td>0</td></tr><tr><td><code>ACQDATA.JOYSTICKXNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKYNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.LOCALDIGITALIOOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M1_ENCODERFAULT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ACQDATA.M2_ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M3_ACTUALFREQUENCYHZ_FILTERED</code></td><td>0</td></tr><tr><td><code>ACQDATA.M3_STATUSWORD_FILTERED</code></td><td>0</td></tr><tr><td><code>ACQDATA.VH0008ER1OK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0008EROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0800ENDOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0808ETPOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.WINCHINPUTSOURCECHANGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETCLOSE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNBUCKETOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1DOWN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNWINCHM1UP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETCFG.COHERENCELIMITM</code></td><td>1</td></tr><tr><td><code>BUCKETCFG.OFFSETCLOSEM</code></td><td>15</td></tr><tr><td><code>BUCKETCFG.OFFSETOPENM</code></td><td>0</td></tr><tr><td><code>DATA.BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.KOBOLDCONTACTORCMDARBITRATED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1LOGICREQUESTSPEEDCMD_PCT</code></td><td>0</td></tr><tr><td><code>DATA.M2LOGICREQUESTSPEEDCMD_PCT</code></td><td>0</td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1DIRECTION</code></td><td>0</td></tr><tr><td><code>M1SPEEDTGT</code></td><td>0</td></tr><tr><td><code>M1STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>0</td></tr><tr><td><code>MODESAUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>1</td></tr><tr><td><code>MODESAUTH.SYNCENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SPEEDCFG.MAXMEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>SPEEDCFG.SPEEDBANDHYSTERESISMPS</code></td><td>0</td></tr><tr><td><code>STEPTABLE.P1R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P1R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P1R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P1R4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P2R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P2R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P2R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P2R4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P3R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P3R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P3R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P3R4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P4R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P4R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P4R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P4R4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P5R1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STEPTABLE.P5R2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P5R3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STEPTABLE.P5R4</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (52)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_SpeedCfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_Table.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Cfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Data.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchSync.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncDeviation.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncContactor.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st</code></li></ul>
+        <summary>Fichiers source compilés (59)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_SpeedCfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_Table.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Cfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Data.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchSync.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncDeviation.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncContactor.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (52)</summary>
+        <summary>Code source ST original (59)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -2490,7 +2694,7 @@ END_TYPE
    ⚙️ E_DiveSearchState — Phases internes de recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des phases de détection et recherche du fond
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 TYPE E_DiveSearchState :
@@ -2511,7 +2715,7 @@ END_TYPE
    ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des phases de la séquence d&#x27;extraction assistée
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 TYPE E_ExtractionSequenceState :
@@ -5331,6 +5535,170 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_fbJoystick_AxisCmd.st</code></summary>
+                <pre>(* =======================================================================
+   🕹️ ST_fbJoystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
+   ======================================================================= *)
+
+TYPE ST_fbJoystick_AxisCmd :
+STRUCT
+    // === CONSIGNES DE PILOTAGE AXE ===
+    Enable      : BOOL;   // --&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
+    StartStop   : BOOL;   // --&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)
+    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)
+    DirectionNegative   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
+    DirectionPositive   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
+    AtNeutral   : BOOL;   // --&gt; [CMD] TRUE si axes en zone morte (position centrale)
+
+    // === MONITORING IHM (derive des bits ci-dessus, jamais lu en interlock) ===
+    Direction   : INT;   // &lt;-- [STAT] Sens -1=Rev / 0=Neutre / +1=Fwd (anim IHM fleche ; lu aussi logique treuils PRG_04)
+    Deflection  : INT;   // &lt;-- [STAT] Deflexion signee -100..+100 % (anim IHM jauge/barre)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionJoystickQualified.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🕹️ ST_AcquisitionJoystickQualified — Données joystick qualifiées
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes d&#x27;axes, statut homme-mort et diagnostics
+      produits par FB_Joystick dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Joystick).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_AcquisitionJoystickQualified :
+STRUCT
+    AxisX               : ST_fbJoystick_AxisCmd; // 📊 Commande et direction qualifiée axe X
+    AxisY               : ST_fbJoystick_AxisCmd; // 📊 Commande et direction qualifiée axe Y
+    DeadmanArmed        : BOOL;                  // 🔒 Homme-mort armé et valide
+    AtNeutralXY         : BOOL;                  // 🟢 Les deux axes X et Y sont au neutre
+    ArmingPermitDenied  : BOOL;                  // ⚠️ Tentative d&#x27;armement sans permission
+    Ready               : BOOL;                  // 🟢 Façade joystick prête et opérationnelle
+    Fault               : ST_Fault;              // ❌ Diagnostic défaut joystick
+    NeutralXAct         : INT;                   // 📍 Valeur ADC neutre calibré X
+    NeutralYAct         : INT;                   // 📍 Valeur ADC neutre calibré Y
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\E_Diag_State.st</code></summary>
+                <pre>(* =======================================================================
+   📊 E_Diag_State — Enumération des états du cycle de diagnostic réseau
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Phases d&#x27;état de surveillance diagnostic d&#x27;un bus ou équipement
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
+   ======================================================================= *)
+TYPE E_Diag_State :
+(
+    DISABLED   := 0,  (* Désactivé (surveillance non active) *)
+    READY      := 1,  (* Opérationnel réel, pas de défaut *)
+    INIT       := 2,  (* Initialisation / Recherche de réseau *)
+    MONITORING := 3,  (* Surveillance active (états transitoires) *)
+    ERROR      := 4,  (* Anomalie de communication *)
+    SIMULATED  := 5   (* Bypass simulation ou bypass réseau IHM — pas le bus réel *)
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\C_DIAG_RESEAUX\ST_Diag_Device.st</code></summary>
+                <pre>(* =======================================================================
+   📊 ST_Diag_Device — Structure diagnostic d&#x27;un esclave ou bus
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de donnees d&#x27;état, diagnostic et alarme d&#x27;un equipement réseau
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
+   ======================================================================= *)
+TYPE ST_Diag_Device :
+STRUCT
+    Online         : BOOL;        (* Esclave visible sur le bus *)
+    Operational    : BOOL;        (* Esclave en mode OP (opérationnel) *)
+    Error          : BOOL;        (* Signal de défaut actif pour cet esclave *)
+    ErrorId        : WORD;        (* Code défaut détaillé *)
+    State          : E_Diag_State; (* Phase courante du cycle de diagnostic *)
+    StateAtError   : E_Diag_State; (* Instantané de la phase lors de l&#x27;anomalie *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionNetworkDiagnostics.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🔌 ST_AcquisitionNetworkDiagnostics — Diagnostics réseaux qualifiés
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les états opérationnels et diagnostics des bus CANopen
+      et EtherCAT produits par PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Network).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_AcquisitionNetworkDiagnostics :
+STRUCT
+    CanOpenMaster   : ST_Diag_Device; // 🔌 Diagnostic maître CANopen
+    Joystick        : ST_Diag_Device; // 🕹️ Diagnostic esclave Joystick MCB560
+    EthercatMaster  : ST_Diag_Device; // 🔌 Diagnostic maître EtherCAT
+    EncoderM1       : ST_Diag_Device; // 🧲 Diagnostic esclave Codeur M1 (COD1)
+    EncoderM2       : ST_Diag_Device; // 🧲 Diagnostic esclave Codeur M2 (COD2)
+    DriveM3         : ST_Diag_Device; // ⚙️ Diagnostic esclave Variateur M3 (AC600)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_fbEncoder_HwOut.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_fbEncoder_HwOut — Ordres preset de sortie codeur (HwOut)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les SEULES sorties/ordres preset d&#x27;un codeur absolu
+      EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
+   🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
+      vers le device.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE ST_fbEncoder_HwOut :
+STRUCT
+    // === SORTIES BUS ETHERCAT (ordres preset vers PDO Rx) ===
+    PresetTriggerCmd   : WORD;   // &lt;-- [ACT] Declenchement preset vers PDO Rx
+    CodeSeqTriggerCmd  : WORD;   // &lt;-- [ACT] Sequence code vers PDO Rx, maintenue a 0
+    PresetValueOut     : UDINT;  // &lt;-- [ACT] Valeur brute envoyee au preset
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionEncoderQualified.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🧲 ST_AcquisitionEncoderQualified — Façade codeur qualifiée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les mesures métriques, statuts de référencement,
+      défauts et signaux hardware produits par FB_Encoder dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.EncoderM1 / Data.EncoderM2).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_AcquisitionEncoderQualified :
+STRUCT
+    Measurement              : ST_fbEncoder_Measurement; // 📊 Mesure métrique (CablePosM, SpeedMps, etc.)
+    Ready                    : BOOL;                     // 🟢 Façade codeur prête
+    Fault                    : ST_Fault;                 // ❌ Diagnostic défaut codeur
+    Homed                    : BOOL;                     // 🎯 Codeur référencé
+    HomingSuspect            : BOOL;                     // ⚠️ Référencement suspect
+    EncoderFault             : BOOL;                     // ❌ Défaut fiabilité (indisponible ou incohérent)
+    HomedAndReliable         : BOOL;                     // ✅ Référencé ET fiable (sans incohérence)
+    PresetConfirmationFailed : BOOL;                     // ❌ Échec confirmation preset
+    HwOut                    : ST_fbEncoder_HwOut;       // 📡 Commandes hardware de preset (lecture seule)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧲 ST_AcquisitionInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_02_Acquisition
@@ -5345,29 +5713,38 @@ END_TYPE</pre>
 
 TYPE ST_AcquisitionInterPrg :
 STRUCT
-    // === 🧲 Mesures codeurs M1/M2 (struct frontiere AF-06 §3ter) ===
-    Encoders                : ST_EncoderMeasurements; // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
+    // === 🛡️ Drapeau de vie &amp; validité globale des données ===
+    DataValid                    : BOOL; // 🟢 TRUE = PRG_02 a complété son scan et les données sont fraîches et qualifiées
 
-    // === 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_fbEncoder_Measurement) ===
-    M1_EncoderFault          : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
-    M2_EncoderFault          : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
-    M1_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
-    M2_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
+    // === 📦 Structures qualifiées du bus ===
+    Joystick                     : ST_AcquisitionJoystickQualified;    // 🕹️ Données et commandes joystick qualifiées
+    Network                      : ST_AcquisitionNetworkDiagnostics;  // 🔌 Diagnostics réseaux CANopen et EtherCAT
+    EncoderM1                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M1 (Retenue)
+    EncoderM2                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M2 (Benne)
 
-    // === 🕹️ États joystick qualifiés ===
-    JoystickDeadmanArmed    : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
-    JoystickYNeutral        : BOOL; // 🟢 Axe Y joystick au neutre
-    JoystickDirectionX      : INT;  // 🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
-    JoystickSpeedPctX       : REAL; // 📈 Magnitude deviation axe X en % (0..100)
-    JoystickXNeutral        : BOOL; // 🟢 Axe X joystick au neutre
+    // === 🧲 Mesures codeurs M1/M2 (compatibilité de transition) ===
+    Encoders                     : ST_EncoderMeasurements;             // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
+
+    // === 🛡️ Gates fiabilité codeurs (compatibilité de transition) ===
+    M1_EncoderFault              : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
+    M2_EncoderFault              : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
+    M1_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
+    M2_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
+
+    // === 🕹️ États joystick qualifiés (compatibilité de transition) ===
+    JoystickDeadmanArmed         : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
+    JoystickYNeutral             : BOOL; // 🟢 Axe Y joystick au neutre
+    JoystickDirectionX           : INT;  // 🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
+    JoystickSpeedPctX            : REAL; // 📈 Magnitude deviation axe X en % (0..100)
+    JoystickXNeutral             : BOOL; // 🟢 Axe X joystick au neutre
 
     // === 🩺 Diagnostics modules E/S ===
-    LocalDigitalIoOk         : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
-    Vh0800EndOk              : BOOL; // 🟢 Module VH_0800END OK (DI8)
-    Vh0808EtpOk              : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
-    Vh0008ErOk               : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
-    Vh0008Er1Ok              : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
-    InputModuleFault         : BOOL; // ❌ Defaut sur au moins un module E/S
+    LocalDigitalIoOk             : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
+    Vh0800EndOk                  : BOOL; // 🟢 Module VH_0800END OK (DI8)
+    Vh0808EtpOk                  : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
+    Vh0008ErOk                   : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
+    Vh0008Er1Ok                  : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
+    InputModuleFault             : BOOL; // ❌ Defaut sur au moins un module E/S
 
     // === 🧪 Simulation &amp; variateur M3 filtré ===
     WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)
@@ -5606,6 +5983,152 @@ function copyPinExpr(el) {
     setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
 }
 
+function exportTableCSV(btn, testName) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var rows = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return '"' + th.textContent.replace(/"/g, '""').trim() + '"';
+    });
+    rows.push(headers.join(';'));
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return '"' + td.textContent.replace(/"/g, '""').trim() + '"';
+        });
+        rows.push(cells.join(';'));
+    });
+
+    var csvContent = "\uFEFF" + rows.join('\r\n');
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var safeName = (testName || 'chronogram').replace(/[^a-zA-Z0-9_\-]+/g, '_').substring(0, 50);
+    a.href = url;
+    a.download = safeName + '_chronogram.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📥 Téléchargé !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function copyTableMarkdown(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var lines = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return th.textContent.trim();
+    });
+    lines.push('| ' + headers.join(' | ') + ' |');
+    lines.push('| ' + headers.map(function() { return '---'; }).join(' | ') + ' |');
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return td.textContent.trim().replace(/\|/g, '\\|');
+        });
+        lines.push('| ' + cells.join(' | ') + ' |');
+    });
+
+    var md = lines.join('\n');
+    var ta = document.createElement('textarea');
+    ta.value = md;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📋 Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function toggleVerticalHeaders(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var isVert = table.classList.toggle('headers-vertical');
+    btn.innerHTML = isVert ? "↔️ Titres Horizontaux" : "📐 Titres Verticaux";
+    if (isVert) {
+        btn.classList.add('btn-copied');
+    } else {
+        btn.classList.remove('btn-copied');
+    }
+}
+
+function toggleWfLane(textEl, rowIdx) {
+    var svg = textEl.closest('svg');
+    if (!svg) return;
+    var group = svg.querySelector('.wf-numeric-group[data-row="' + rowIdx + '"]');
+    if (!group) return;
+    var analog = group.querySelector('.wf-analog-view');
+    var digital = group.querySelector('.wf-digital-view');
+    if (!analog || !digital) return;
+
+    var isAnalog = analog.style.display !== 'none';
+    if (isAnalog) {
+        analog.style.display = 'none';
+        digital.style.display = '';
+        textEl.classList.remove('active-curve');
+    } else {
+        analog.style.display = '';
+        digital.style.display = 'none';
+        textEl.classList.add('active-curve');
+    }
+}
+
+function toggleAllWaveforms(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var svg = details.querySelector('svg.waveform');
+    if (!svg) return;
+
+    var groups = svg.querySelectorAll('.wf-numeric-group');
+    if (!groups.length) return;
+
+    var firstAnalog = groups[0].querySelector('.wf-analog-view');
+    var currentlyAnalog = firstAnalog && firstAnalog.style.display !== 'none';
+    var targetAnalog = !currentlyAnalog;
+
+    groups.forEach(function(g) {
+        var a = g.querySelector('.wf-analog-view');
+        var d = g.querySelector('.wf-digital-view');
+        if (a) a.style.display = targetAnalog ? '' : 'none';
+        if (d) d.style.display = targetAnalog ? 'none' : '';
+    });
+
+    var labels = svg.querySelectorAll('.wf-label.wf-clickable');
+    labels.forEach(function(lbl) {
+        if (targetAnalog) lbl.classList.add('active-curve');
+        else lbl.classList.remove('active-curve');
+    });
+
+    btn.innerHTML = targetAnalog ? "🔢 Vue Chiffres" : "📈 Vue Courbes";
+}
+
 function toggleTheme() {
     var current = document.documentElement.getAttribute('data-theme') || 'light';
     var next = current === 'dark' ? 'light' : 'dark';
@@ -5630,6 +6153,175 @@ function updateThemeBtn(theme) {
         }
     } catch (e) {}
 })();
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Redimensionnement manuel des colonnes a la souris (Drag & Drop border)
+    var isResizing = false;
+    var currentTh = null;
+    var startX = 0;
+    var startWidth = 0;
+
+    document.addEventListener('mousedown', function(e) {
+        var resizer = e.target.closest('.col-resizer');
+        if (!resizer) return;
+        isResizing = true;
+        currentTh = resizer.closest('th');
+        startX = e.pageX;
+        startWidth = currentTh.offsetWidth;
+        resizer.classList.add('resizing');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing || !currentTh) return;
+        var diff = e.pageX - startX;
+        var newWidth = Math.max(30, startWidth + diff);
+        currentTh.style.width = newWidth + 'px';
+        currentTh.style.minWidth = newWidth + 'px';
+        currentTh.style.maxWidth = newWidth + 'px';
+
+        if (currentTh.classList.contains('note-th')) {
+            var table = currentTh.closest('.chrono-table');
+            if (table) {
+                table.querySelectorAll('.chrono-note-cell').forEach(function(td) {
+                    td.style.maxWidth = newWidth + 'px';
+                });
+                table.querySelectorAll('.chrono-note-chip').forEach(function(chip) {
+                    chip.style.maxWidth = Math.max(20, newWidth - 10) + 'px';
+                });
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.querySelectorAll('.col-resizer.resizing').forEach(function(r) {
+                r.classList.remove('resizing');
+            });
+            currentTh = null;
+        }
+    });
+
+    // Double-clic sur un en-tete de colonne pour la replier / deplier (hors barre de redimensionnement)
+    document.addEventListener('dblclick', function(e) {
+        if (e.target.closest('.col-resizer')) return;
+        var th = e.target.closest('.chrono-table th');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        var isCollapsed = th.classList.toggle('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.toggle('col-collapsed', isCollapsed);
+        });
+    });
+
+    // Clic simple sur colonne repliee pour la reouvrir
+    document.addEventListener('click', function(e) {
+        var th = e.target.closest('.chrono-table th.col-collapsed');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        th.classList.remove('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.remove('col-collapsed');
+        });
+    });
+
+    // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique
+    var tt = document.getElementById('wf-global-tooltip');
+    if (!tt) {
+        tt = document.createElement('div');
+        tt.id = 'wf-global-tooltip';
+        tt.className = 'wf-tooltip';
+        document.body.appendChild(tt);
+    }
+
+    document.addEventListener('mousemove', function(e) {
+        var svg = e.target.closest('svg.waveform');
+        if (!svg) {
+            if (tt) tt.style.display = 'none';
+            document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+            return;
+        }
+
+        var rect = svg.getBoundingClientRect();
+        var scaleX = svg.viewBox.baseVal.width / rect.width;
+        var scaleY = svg.viewBox.baseVal.height / rect.height;
+
+        var svgX = (e.clientX - rect.left) * scaleX;
+        var svgY = (e.clientY - rect.top) * scaleY;
+
+        var left = parseFloat(svg.getAttribute('data-left') || '200');
+        var top = parseFloat(svg.getAttribute('data-top') || '62');
+        var colw = parseFloat(svg.getAttribute('data-colw') || '56');
+        var laneh = parseFloat(svg.getAttribute('data-laneh') || '40');
+
+        var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
+        var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+
+        var colIdx = Math.floor((svgX - left) / colw);
+        var rowIdx = Math.floor((svgY - top) / laneh);
+
+        var cursorLine = svg.querySelector('.wf-cursor-line');
+
+        if (colIdx >= 0 && colIdx < scansData.length && rowIdx >= 0 && rowIdx < fieldsData.length) {
+            var s = scansData[colIdx];
+            var f = fieldsData[rowIdx];
+            var val = s.fields[f];
+            if (val === undefined) val = "—";
+
+            var displayVal = val;
+            if (val === "1") displayVal = "TRUE";
+            else if (val === "0") displayVal = "FALSE";
+            else {
+                var num = parseFloat(val);
+                if (!isNaN(num)) {
+                    displayVal = Math.abs(num) >= 100 ? num.toFixed(0) : num.toFixed(3);
+                }
+            }
+
+            if (cursorLine) {
+                var cx = left + (colIdx + 0.5) * colw;
+                cursorLine.setAttribute('x1', cx);
+                cursorLine.setAttribute('x2', cx);
+                cursorLine.style.display = '';
+            }
+
+            var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+
+            tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
+                           '<div class="wf-tt-var">' + f + '</div>' +
+                           '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
+                           noteHtml;
+
+            tt.style.display = 'block';
+            var ttX = e.clientX + 16;
+            var ttY = e.clientY + 16;
+            if (ttX + 280 > window.innerWidth) ttX = e.clientX - 280;
+            if (ttY + 120 > window.innerHeight) ttY = e.clientY - 120;
+            tt.style.left = ttX + 'px';
+            tt.style.top = ttY + 'px';
+        } else {
+            if (tt) tt.style.display = 'none';
+            if (cursorLine) cursorLine.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('mouseleave', function() {
+        if (tt) tt.style.display = 'none';
+        document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+    });
+});
 </script>
 </body>
 </html>
