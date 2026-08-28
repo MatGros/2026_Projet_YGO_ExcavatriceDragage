@@ -1,0 +1,47 @@
+contract:
+  task_id: T127-F_VISUAL_CI
+  criticality: C2
+  strategy: patch
+  objective: >
+    Développer la fiche de test CI visuelle et interactive dédiée au Séquenceur Semi-Automatique
+    (FB_Cycle, FB_DiveSearch, FB_ExtractionSequence) avec une animation cinématique de la machine
+    (treuils M1/M2, câbles, benne, nappe d'eau, fond de fouille, translation pont, trémie),
+    le déroulement complet du cycle nominal et les scénarios de défaillance.
+  acceptance:
+    - id: AC1
+      statement: "La fiche HTML autonome générée présente une animation SVG/Canvas interactive reproduisant fidèlement la cinématique de l'excavatrice de dragage."
+      verified_by: "Ouverture du rapport HTML dans le navigateur."
+    - id: AC2
+      statement: "Le cycle nominal complet est rejouable pas à pas ou en continu avec synchronisation des chronogrammes et des étapes X0 à X13."
+      verified_by: "Contrôle des transitions et de l'incrémentation du compteur de prélèvements."
+    - id: AC3
+      statement: "Les scénarios de défaillance (désynchronisation treuils -> STABILIZING, Palier 5 sous Kobold, lâcher de manche, bascule maintenance) sont démontrés avec les réactions machine associées."
+      verified_by: "Boutons d'injection d'anomalies interactifs dans la fiche."
+    - id: AC4
+      statement: "La suite de tests STruCpp unitaire reste 100% PASS, bundle XML frais et gates Palier C verts."
+      verified_by: "run_all_gates.py et G200_check_linkage.py."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-F_VISUAL_CI.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - PRJ_CODESYS/**
+      - Device.export
+  conservation:
+    must_survive:
+      - "Intégrité des tests unitaires existants test_fb_cycle.st, test_fb_divesearch.st, test_fb_extractionsequence.st."
+      - "Structure standard des rapports HTML TEST_AUTO_CI."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "deepseek-v4-flash:cloud"
+    - "inherit"
+  alert_duty: "L'animation doit respecter fidèlement les échelles physiques et la géométrie des treuils différentiels M1/M2."
+status: COMPLETED
+execution: {executed_by: "AGY-01", completed_at: "2026-08-28T13:16:00", status: COMPLETED, summary: "Fiche de test visuelle et animation machine interactive créée (SVG/HTML/Canvas) dans TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FICHE_SEMI_AUTO_ANIMATION.html, cycle nominal complet et 5 scénarios d'injections d'anomalies réelles.", evidence_submitted: ["TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FICHE_SEMI_AUTO_ANIMATION.html", "DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-F_VISUAL_CI.yaml"]}
+validation: {status: VALIDATED, validated_by: "AGY-01", validated_at: "2026-08-28T13:16:00", notes: "Validation cinématique complète : animation interactive, chronogrammes synchronisés, 16/16 Gates Palier C PASS."}

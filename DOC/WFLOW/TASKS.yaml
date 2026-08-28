@@ -961,11 +961,13 @@ tasks:
   - T165-C2
 - id: T127-E
   parent_id: T127
-  statut: ⬜
+  statut: ✅
   criticite: C1
   domaine: VALIDATION
-  agent: —
+  agent: AGY-01
   date: '2026-08-28T13:12:00'
+  locked_at: '2026-08-28T13:12:00'
+  completed_at: '2026-08-28T13:16:30'
   titre: Campagne de tests automatisés STruCpp CI & Validation non-régression G_CYCLE
   contexte: 'Délégation à un agent pour l''exécution récurrente de la suite de tests unitaires STruCpp (TEST_AUTO_CI) sur G_CYCLE et génération des artefacts de test.'
   description: 'Exécution commandée de python TOOLS/TEST_AUTO_CI/run_tests.py --domain G_CYCLE, contrôle des rapports HTML et vérification de la couverture des cas TC-P04-001 à TC-P04-021.'
@@ -978,15 +980,17 @@ tasks:
   - T127-B
 - id: T127-F
   parent_id: T127
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: VALIDATION
-  agent: —
-  date: '2026-08-28T13:13:00'
+  agent: AGY-01
+  date: '2026-08-28T13:15:00'
+  locked_at: '2026-08-28T13:15:00'
+  completed_at: '2026-08-28T13:16:00'
   titre: Fiche de test CI visuelle & Animation machine séquence Grafcet Semi-Auto
   contexte: 'Conception d''une fiche de test visuelle interactive avec animation machine de dragage (treuils M1/M2, benne, Kobold, translation pont, trémie), cycle nominal complet et scénarios d''anomalies.'
   description: 'Génération d''une animation cinématique interactive (SVG/HTML) couplée à un banc de test étendu reproduisant le cycle nominal de dragage jusqu''au déversement en trémie, avec injection de défaillances (désynchro treuils -> STABILIZING, Palier 5 sous Kobold, lâcher de manche, bascule maintenance).'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-F_VISUAL_CI.yaml
   objectifs:
   - Définir le scénario nominal de bout en bout (X0 -> X13) avec simulation de la matière et du fond
   - Intégrer les cas d''anomalie (désynchro treuils, violation séquence/vitesse Kobold, relâchement de manche, bascule de mode)

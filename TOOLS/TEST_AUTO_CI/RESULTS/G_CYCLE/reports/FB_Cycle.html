@@ -301,7 +301,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 13:07:27</div>
+    <div class="exec-time">2026-08-28 13:16:26</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (7 tests)</summary>
@@ -1540,7 +1540,7 @@ END_TYPE
    ⚙️ E_CycleStep — Étapes de la machine d&#x27;état du cycle automatique
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des étapes du cycle automatique de dragage (X0 à X13 + STABILIZING)
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 TYPE E_CycleStep :
@@ -1569,7 +1569,7 @@ END_TYPE
    ⚙️ E_OperatorAxis — Axe ou organe de pilotage attendu par le cycle
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération de l&#x27;organe joystick/bouton attendu pour le mouvement
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 TYPE E_OperatorAxis :
@@ -1588,7 +1588,7 @@ END_TYPE
    ⚙️ E_ProgramSequence — Identifiant de la séquence programme active
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Identification de la séquence en cours d&#x27;exécution
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 TYPE E_ProgramSequence :
@@ -1657,7 +1657,7 @@ END_TYPE</pre>
    🎯 Rôle : Automate de cycle automatique de dragage (X0 à X13 + STABILIZING)
    🔒 Sécurité : Gating par mode et homme-mort, repli STABILIZING sur défaut
    🔌 Interface : Demandes de mouvements (treuils, translation, benne)
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Cycle
