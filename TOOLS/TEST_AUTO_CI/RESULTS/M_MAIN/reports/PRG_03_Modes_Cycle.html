@@ -301,11 +301,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 17:57:47</div>
+    <div class="exec-time">2026-08-28 19:35:40</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (5 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-0">PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-1">PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-2">PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-3">PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-4">PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)</a></li></ul>
+        <summary>📋 Sommaire (8 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-1">TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-2">TC-P07-010 AntiFlickerText : affichage instantane force</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-3">TC-P07-020 RootCause : alarme fille visible quand materiel sain</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-4">TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-5">TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-6">TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-7">TC-P07-024 Priorite absolue AU sur defaut module E/S</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -314,7 +314,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/5 vérifications validées
+            8/8 vérifications validées
         </div>
     </div>
     
@@ -592,7 +592,7 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_03_Modes_Cycle</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 31 flux entrants · 59 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_03_Modes_Cycle</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 31 flux entrants · 60 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instModes <span style="color:var(--muted);font-weight:500;">(FB_Modes)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instCycleSemiAuto <span style="color:var(--muted);font-weight:500;">(FB_Cycle)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiveSearch <span style="color:var(--muted);font-weight:500;">(FB_DiveSearch)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instExtractionSequence <span style="color:var(--muted);font-weight:500;">(FB_ExtractionSequence)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BypassKoboldFallEdge <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span></div>
@@ -781,9 +781,9 @@
                     <div>• Retours PRG : <b style="color:#ffffff;">9</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">1</b></div>
-                    <div>• Champs Out : <b style="color:#ffffff;">58</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">59</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">1</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">31 IN</b> / <b style="color:#ffffff;">59 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">31 IN</b> / <b style="color:#ffffff;">60 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -798,7 +798,7 @@
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Data</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_ModesCycleInterPrg</span> <span style="font-size:11px;color:#a5b4fc;">(58 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Data</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_ModesCycleInterPrg</span> <span style="font-size:11px;color:#a5b4fc;">(59 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
@@ -901,6 +901,10 @@
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DiveState</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DiveStepAtFault</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -1163,9 +1167,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_DiveSearch</code></td>
-                <td>16</td><td>10</td>
-                <td>0</td><td>9</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (9 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>19</td><td>11</td>
+                <td>0</td><td>23</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (23 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1191,126 +1195,96 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-prg-03-modes-cycle-0" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 7 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-prg-03-modes-cycle-0" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires) </h3>
-            </header>
-            
-            
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary>
-                <ul class="checks-list"><li>Auth.Mode: MAINT_N1 arbitre</li><li>Auth.SyncEnable vrai en N1 par defaut</li><li>Auth.InhibitM1 faux en N1</li><li>Auth.InhibitM2 faux en N1</li><li>Auth.JoystickWinchSelectArbitrated = 1 (M1) en N1</li><li>Auth.HomingApproachEnable faux en N1 (N2 only)</li><li>Auth.MaintenanceM3TargetEnable vrai (N1 + bit)</li></ul>
-            </details>
-            
-            
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (37)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>1</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>1</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>1</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
-        </details>
-    </div>
-        </article>
         <article id="test-prg-03-modes-cycle-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance) </h3>
+                <h3>TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM </h3>
             </header>
             
             
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
-                <ul class="checks-list"><li>Auth.Mode MAINT_N2 arbitre</li><li>Auth.InhibitM1 actif en N2 (demande M1)</li><li>Auth.InhibitM2 inactif (exclusion mutuelle)</li><li>Auth.HomingApproachEnable vrai en N2</li><li>Auth.MaintenanceM3TargetEnable vrai en N2 + bit</li><li>Auth.JoystickWinchSelectArbitrated M2 en N2</li></ul>
-            </details>
             
             
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (37)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>2</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>2</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>2</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>2</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
-        </details>
-    </div>
         </article>
         <article id="test-prg-03-modes-cycle-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives) </h3>
+                <h3>TC-P07-010 AntiFlickerText : affichage instantane force </h3>
             </header>
             
             
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
-                <ul class="checks-list"><li>Exactement une inhibition devenue active</li><li>Exclusion mutuelle : les 2 inhibitions jamais simultanees</li></ul>
-            </details>
             
             
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (37)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>2</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>2</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>1</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
-        </details>
-    </div>
         </article>
         <article id="test-prg-03-modes-cycle-3" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1 </h3>
+                <h3>TC-P07-020 RootCause : alarme fille visible quand materiel sain </h3>
             </header>
             
             
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
-                <ul class="checks-list"><li>Auth.Mode degrade MAINT_N1 (refus Semi-Auto sur defaut codeur)</li></ul>
-            </details>
             
             
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (37)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>3</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>1</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>1</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
-        </details>
-    </div>
         </article>
         <article id="test-prg-03-modes-cycle-4" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale) </h3>
+                <h3>TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO </h3>
             </header>
             
             
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
-                <ul class="checks-list"><li>Auth.Mode SEMI_AUTO arbitre</li><li>Sequenceur a l etape X0_PREPARATION</li><li>Sequenceur non Busy initialement</li><li>Sequenceur sans erreur</li></ul>
-            </details>
             
             
-    <div class="chronogram-group">
-        
-        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
-        <details class="chronogram-static">
-            <summary>🔒 Valeurs du scan unique (37)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>3</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>3</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>0</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
-        </details>
-    </div>
+        </article>
+        <article id="test-prg-03-modes-cycle-5" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-prg-03-modes-cycle-6" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-prg-03-modes-cycle-7" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P07-024 Priorite absolue AU sur defaut module E/S </h3>
+            </header>
+            
+            
+            
+            
         </article>
         </div>
     </details>
@@ -2123,6 +2097,9 @@ VAR_INPUT
     DiveStartMin_M          : REAL;         // --&gt; [CFG] Seuil position min pour debut plongee (m)
     ImmersionUpper_M        : REAL;         // --&gt; [CFG] Borne haute fenetre d&#x27;immersion (m)
     ImmersionLower_M        : REAL;         // --&gt; [CFG] Borne basse fenetre d&#x27;immersion (m)
+    CableLimitAscent_M      : REAL := 7.5;  // --&gt; [CFG] Limite haute d&#x27;exploitation (m), plafond de course immersion
+    LimitLegalDepthMin_M    : REAL := -35.0;// --&gt; [CFG] Limite legale basse autorisee (m)
+    CycleTime               : TIME := T#10ms;// --&gt; [CFG] Base de temps d&#x27;integration (periode MainTask)
     BypassPreconditions     : BOOL := FALSE;// --&gt; [TST] Bypass preconditions et seuils (mode test)
 END_VAR
 VAR_OUTPUT
@@ -2132,6 +2109,7 @@ VAR_OUTPUT
     Fault                   : ST_Fault;
     Lifecycle               : ST_Lifecycle;
     DiveState               : E_DiveSearchState; // &lt;-- [STAT] Phase interne de recherche fond
+    StepAtFault             : E_DiveSearchState; // &lt;-- [DIAG] Etape active mémorisée lors du défaut
 
     // === PERMIS &amp; AUTORISATIONS ===
     DescendPermit           : BOOL;         // &lt;-- [ACT] Autorisation de descente assistee
@@ -2146,18 +2124,39 @@ END_VAR
 VAR
     // === DETECTEURS DE FRONTS ===
     ResetEdge               : R_TRIG;       // . [LOC] Detecteur front montant Reset
+    ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant apparition defaut
     KoboldRiseEdge          : R_TRIG;       // . [LOC] Detecteur front entrant eau (0-&gt;1)
     KoboldFallEdge          : F_TRIG;       // . [LOC] Detecteur front sortie eau / fond (1-&gt;0)
+
+    // === CALCUL DYNAMIQUE RUNTIME DES TIMEOUTS ===
+    ImmersionCourse_M          : REAL;      // . [LOC] Course credible max recherche immersion (m)
+    BottomCourse_M             : REAL;      // . [LOC] Course credible max recherche fond (m)
+    CalculatedImmersionTimeout : TIME;      // . [LOC] Plafond anti-blocage immersion calcule au runtime
+    CalculatedBottomTimeout    : TIME;      // . [LOC] Plafond anti-blocage fond calcule au runtime
+
+    // === ACCUMULATEURS DE TEMPS ANTI-POMPAGE ===
+    ImmersionTimerAcc       : TIME := T#0ms;// . [LOC] Temps cumule recherche immersion sous mouvement
+    BottomTimerAcc          : TIME := T#0ms;// . [LOC] Temps cumule recherche fond sous mouvement
+    PrevState               : E_DiveSearchState; // . [LOC] Etape au scan precedent (maintien survivant au gate)
 
     // === VARIABLES LOCALES INTERNES ===
     ImmersionConfirmed      : BOOL;         // . [LOC] Immersion dans la fenetre d&#x27;eau validee
     ErrorCausePresent       : BOOL;         // . [LOC] Presence d&#x27;une cause de defaut parametrage
     SeqErrorFault           : BOOL;         // . [LOC] Latch erreur séquence immersion
     Palier5ForbiddenFault   : BOOL;         // . [LOC] Latch tentative descente en Palier 5 sous Kobold
+    TimeoutImmersionFault   : BOOL;         // . [LOC] Latch timeout recherche immersion
+    TimeoutBottomFault      : BOOL;         // . [LOC] Latch timeout recherche fond
 
     // === SOCLE DEFAUT ===
     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
     instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+END_VAR
+VAR CONSTANT
+    // === CONSTANTES DERIVATION TIMEOUT ANTI-BLOCAGE ===
+    CST_DiveSpeedMin_Mps    : REAL := 0.15;   // Vitesse Palier 1 mini sous charge/mou (m/s)
+    CST_TimeoutMarginFactor : REAL := 1.5;    // Facteur de marge de securite sur la course theorique
+    CST_TimeoutMinCourse_M  : REAL := 1.0;    // Plancher de course pour le calcul (evite timeout degenere)
+    CST_SecToMs             : REAL := 1000.0; // Conversion secondes -&gt; millisecondes
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -2169,14 +2168,45 @@ KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 
 ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M &lt; ImmersionUpper_M)
-                  OR (ImmersionUpper_M &lt;= ImmersionLower_M));
+                  OR (ImmersionUpper_M &lt;= ImmersionLower_M)
+                  OR (ImmersionLower_M &lt;= LimitLegalDepthMin_M)
+                  OR (CableLimitAscent_M &lt;= ImmersionLower_M));
+
+// ⏱️ Plafonds anti-blocage calcules au runtime : course credible max / vitesse Palier 1 mini x marge.
+// Course immersion = du plafond haut d&#x27;exploitation a la borne basse d&#x27;immersion (depart de plongee
+// possible n&#x27;importe ou entre DiveStartMin_M et CableLimitAscent_M -&gt; on prend la borne la plus large).
+ImmersionCourse_M   := MAX(CST_TimeoutMinCourse_M, CableLimitAscent_M - ImmersionLower_M);
+BottomCourse_M      := MAX(CST_TimeoutMinCourse_M, ImmersionLower_M - LimitLegalDepthMin_M);
+CalculatedImmersionTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
+    ImmersionCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
+CalculatedBottomTimeout    := UDINT_TO_TIME(REAL_TO_UDINT(
+    BottomCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
+
+// ⏱️ Intégrateurs de temps de mouvement effectif (D1 anti-pompage)
+IF (DiveState = E_DiveSearchState.SEARCHING_IMMERSION) AND MotionRequestActive AND (MotionDirection = -1) THEN
+    ImmersionTimerAcc := ImmersionTimerAcc + CycleTime;
+    IF ImmersionTimerAcc &gt;= CalculatedImmersionTimeout THEN
+        TimeoutImmersionFault := TRUE;
+    END_IF;
+END_IF;
+
+IF (DiveState = E_DiveSearchState.SEARCHING_BOTTOM) AND MotionRequestActive AND (MotionDirection = -1) THEN
+    BottomTimerAcc := BottomTimerAcc + CycleTime;
+    IF BottomTimerAcc &gt;= CalculatedBottomTimeout THEN
+        TimeoutBottomFault := TRUE;
+    END_IF;
+END_IF;
 
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
-    SeqErrorFault := FALSE;
+    SeqErrorFault         := FALSE;
     Palier5ForbiddenFault := FALSE;
-    ImmersionConfirmed := FALSE;
-    BottomTouchConfirmed := FALSE;
-    DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    TimeoutImmersionFault := FALSE;
+    TimeoutBottomFault    := FALSE;
+    ImmersionTimerAcc     := T#0ms;
+    BottomTimerAcc        := T#0ms;
+    ImmersionConfirmed    := FALSE;
+    BottomTouchConfirmed  := FALSE;
+    DiveState             := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 
 instCauses[0].Active   := SeqErrorFault;
@@ -2191,9 +2221,25 @@ instCauses[3].Active   := Palier5ForbiddenFault;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := &#x27;Mesure Kobold impossible : vitesse trop elevee (Palier 5 interdit)&#x27;;
 
+instCauses[4].Active   := TimeoutImmersionFault;
+instCauses[4].Latching := TRUE;
+instCauses[4].Texte    := &#x27;Depassement tempo recherche immersion Kobold&#x27;;
+
+instCauses[5].Active   := TimeoutBottomFault;
+instCauses[5].Latching := TRUE;
+instCauses[5].Texte    := &#x27;Depassement tempo recherche fond Kobold&#x27;;
+
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
+
+// 📸 Capture ordonnée de StepAtFault sur front montant de défaut (D2)
+ErrorEdge(CLK := Fault.Error);
+IF ErrorEdge.Q THEN
+    StepAtFault := PrevState;
+ELSIF ResetEdge.Q THEN
+    StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
+END_IF;
 {endregion}
 
 {region &quot;§2 Gate neutralisation&quot;}
@@ -2207,9 +2253,13 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     KoboldContactorCmd := FALSE;
     BottomTouchConfirmed := FALSE;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
     OperatorActionId := 0;
     OperatorAction := &#x27;&#x27;;
     ImmersionConfirmed := FALSE;
+    ImmersionTimerAcc := T#0ms;
+    BottomTimerAcc := T#0ms;
+    PrevState := E_DiveSearchState.WAIT_PRECONDITIONS;
     RETURN;
 END_IF;
 
@@ -2247,6 +2297,7 @@ ELSE
             OperatorActionId := 16#0101;
             OperatorAction := &#x27;Demander une descente pour rechercher le fond.&#x27;;
             IF MotionRequestActive AND (MotionDirection = -1) THEN
+                ImmersionTimerAcc := T#0ms; // ⏱️ RAZ à l&#x27;entrée exacte de SEARCHING_IMMERSION
                 DiveState := E_DiveSearchState.SEARCHING_IMMERSION;
             END_IF;
 
@@ -2267,6 +2318,7 @@ ELSE
                 IF (M1Position_M &lt;= ImmersionUpper_M) AND (M1Position_M &gt;= ImmersionLower_M)
                    AND (M2Position_M &lt;= ImmersionUpper_M) AND (M2Position_M &gt;= ImmersionLower_M) THEN
                     ImmersionConfirmed := TRUE;
+                    BottomTimerAcc := T#0ms; // ⏱️ RAZ à l&#x27;entrée exacte de SEARCHING_BOTTOM
                     DiveState := E_DiveSearchState.SEARCHING_BOTTOM;
                 ELSE
                     SeqErrorFault := TRUE;
@@ -2305,6 +2357,9 @@ ELSE
             KoboldContactorCmd := FALSE;
     END_CASE;
 END_IF;
+
+// 💾 Mémorisation de l&#x27;étape précédente en toute fin de scan
+PrevState := DiveState;
 {endregion}
 
 END_FUNCTION_BLOCK
@@ -3315,6 +3370,7 @@ STRUCT
     DiveError                   : BOOL;                    // Défaut assistance plongée
     DiveErrorId                 : WORD;                    // Code défaut plongée
     DiveState                   : E_DiveSearchState;       // Phase interne de recherche fond Kobold
+    DiveStepAtFault             : E_DiveSearchState;       // Phase interne mémorisée au défaut plongée
     BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé
     ExtractionReady             : BOOL;                    // Assistance extraction prête
     ExtractionBusy              : BOOL;                    // Assistance extraction active

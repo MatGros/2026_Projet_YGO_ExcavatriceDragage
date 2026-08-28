@@ -1,19 +1,55 @@
 {
   "version": 1,
-  "file": "test_fb_modes.st",
+  "file": "test_fb_encoder.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
+      "name": "TC-P09-010 Acquisition codeur : mise en service nominale",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-015 Reset conscient : acquitte le latch sans valider le preset",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-016 Fault live : perte materiel codeur (Cause 0)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-018 Fault live : incoherence mesure (Cause 1)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 11,
+    "passed": 11,
     "failed": 0
   }
 }
