@@ -5006,14 +5006,20 @@ function render() {
 
   // Cinématique (rendu géométrique, PAS de calcul de mouvement)
   const bucketY = 250 - (m1 * 20);
+  // Position discrète du pont M3 (dérivée des capteurs de translation de la trace)
+  // Positions en px : Trémie=80, PV=190, P2=410, P1=520, MAINT=720
+  let bridgeX = 80;
+  if (isOn(scan,'TRANSLATION_AT_P1')) bridgeX = 520;
+  else if (isOn(scan,'TRANSLATION_AT_MAINTENANCE')) bridgeX = 720;
+  else if (isOn(scan,'TRANSLATION_AT_TREMIE')) bridgeX = 80;
   const gantry = document.getElementById('gantryGroup');
-  gantry.setAttribute('transform', 'translate(80, 36)');
+  gantry.setAttribute('transform', 'translate(' + bridgeX + ', 36)');
   const bucket = document.getElementById('bucketGroup');
-  bucket.setAttribute('transform', 'translate(80, ' + bucketY + ')');
+  bucket.setAttribute('transform', 'translate(' + bridgeX + ', ' + bucketY + ')');
   const cableM1 = document.getElementById('cablePathM1');
   const cableM2 = document.getElementById('cablePathM2');
-  cableM1.setAttribute('d', 'M 56,56 L 70,' + (bucketY - 14));
-  cableM2.setAttribute('d', 'M 104,56 L 90,' + (bucketY - 14));
+  cableM1.setAttribute('d', 'M ' + (bridgeX - 24) + ',56 L ' + (bridgeX - 10) + ',' + (bucketY - 14));
+  cableM2.setAttribute('d', 'M ' + (bridgeX + 24) + ',56 L ' + (bridgeX + 10) + ',' + (bucketY - 14));
   // Ouverture benne (état discret capté)
   const open = isOn(scan,'BENNE_ISOPEN');
   const angle = open ? 52 : 0;
