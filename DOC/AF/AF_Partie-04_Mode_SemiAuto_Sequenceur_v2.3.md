@@ -5,12 +5,9 @@
 
 ## 🎯 Rôle et périmètre
 
-- **Rôle** : définir le mode semi-automatique, son séquenceur (grafcet) et les petits cycles
-  réutilisables (Diving, Extraction).
-- **Périmètre** : logique de séquence, demandes de mouvement produites. Les sorties physiques
-  restent hors de ce document (Partie 06/Outputs).
-- **Type de composant** : `FB_Cycle` (contrat AF03 : programme Cycle ST, machine d'état de
-  séquence) — Transverse (partagé Maintenance + Semi-auto).
+- **Rôle** : définir le mode semi-automatique, son séquenceur (grafcet `FB_Cycle`) et les briques de cycle transverses (`FB_DiveSearch`, `FB_ExtractionSequence`).
+- **Périmètre & Architecture** : logique de séquence et demandes de mouvement produites. `PRG_03_Modes_Cycle` est l'unique instanciateur décisionnel de tous ces cycles. Les ordres sont transmis à `PRG_04_Treuils_Benne` via le bus public `Data.ReqProgram.ReqBucket`. Les sorties physiques directes restent hors de ce document (Partie 06/Outputs).
+- **Type de composant** : `FB_Cycle`, `FB_DiveSearch`, `FB_ExtractionSequence` (briques ST transverses partagées Maintenance + Semi-auto).
 - 🆕 Refonte du séquenceur conforme `GUIDE_SEQUENCEUR_v1.2.md` (§11bis R1-R9) : instance unique,
   homme-mort fenêtre 3 s, tempo max d'étape, `STABILIZING`.
   Conception : `DOC/WFLOW/AUDITS/DESIGN/DESIGN_SEMI_AUTO_CYCLE_v0.1.md`.

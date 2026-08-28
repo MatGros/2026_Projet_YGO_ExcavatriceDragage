@@ -82,8 +82,8 @@ safety et le bloc metier commande doit etre visible dans le meme POU, sans ouvri
 |---|---|---|---|
 | 01 | 📥 `PRG_02_Acquisition` | ST pur (`.st`) | **Frontière d'acquisition, qualification et substitution réel/simulé** : producteur unique de `HwReal`, `HwSim`, `HwIn`, chaîne codeurs/homing, gestes joystick et diagnostics devices/bus. |
 | — | ~~`PRG_01_Inputs_LD`~~ | ~~Ladder~~ | ✅ Retiré (2026-08-26, vérifié absent de `CODE/M_MAIN/`) — qualification absorbée par `PRG_02_Acquisition`. |
-| 03 | 🎚️ `PRG_03_Modes_Cycle` | ST pur (`.st`) | Modes, droits, autorisations, sélections de sources et **séquenceur de cycle** (`FB_Cycle`). Produit des demandes ; ne commande aucune sortie. |
-| 04 | 🪝 `PRG_04_Treuils_Benne` | ST pur (`.st`) | **Ensemble levage indissociable** : M1 (retenue) + M2 (benne) + synchronisation + benne + `FB_DiveSearch`/`FB_ExtractionSequence`, avec la safety M1/M2 appelée de manière explicite. |
+| 03 | 🎚️ `PRG_03_Modes_Cycle` | ST pur (`.st`) | **Cerveau décisionnel unique** : modes, droits, autorisations, sélections de sources, **séquenceur de cycle** (`FB_Cycle`) et **assistants de dragage** (`FB_DiveSearch`, `FB_ExtractionSequence`). Produit des demandes sur `Data` ; ne commande aucune sortie directe. |
+| 04 | 🪝 `PRG_04_Treuils_Benne` | ST pur (`.st`) | **Muscle & sécurité levage** : pilotage physique treuils M1 (retenue) + M2 (benne), synchronisation (`FB_WinchSync`), commande benne (`FB_Bucket`), application des requêtes cycle/assistants (`ReqProgram.ReqBucket`) et safety treuils (`FB_Safety_Winch`). |
 | 05 | ↔️ `PRG_05_Translation` | ST pur (`.st`) | Décodage des capteurs M3, positionnement et arbitrage final translation, avec la safety M3 appelée de manière explicite. |
 | 06 | ⚡ `PRG_06_Outputs` | ST pur (`.st`) | Barrières finales, commandes physiques, **agrégation finale des demandes `PowerCutOff`** et réarmement. |
 | 07 | 🔎 `PRG_07_Supervision` | ST pur (`.st`) | Agrégation IHM, persistance de configuration, synchronisation des bypass autorisés, diagnostics et vue troubleshooting en lecture seule. |

@@ -1,0 +1,34 @@
+contract:
+  task_id: T166-CR_REVIEW_OLLAMA
+  criticality: C4
+  strategy: patch
+  objective: >
+    Mener un audit indépendant du diff réel par le sous-agent Ollama
+    (ordre de scan, absence de décalage, dépendances circulaires, write-backs IHM, safety).
+  acceptance:
+    - id: AC1
+      statement: "Revue indépendante exécutée sur le code réel."
+      verified_by: "Rapport d'audit Ollama."
+    - id: AC2
+      statement: "Tous les points d'arbitrage (N-1, write-backs, safety) sont documentés et validés."
+      verified_by: "Validation orchestrateur."
+  scope:
+    allowed:
+      - CODE/**/*.st
+      - DOC/AF/**/*.md
+  conservation:
+    must_survive:
+      - "Revue strictly read-only."
+  evidence_required:
+    - independent_report
+status: COMPLETED
+execution:
+  executed_by: "OLLAMA-DeepSeek-v4-Flash"
+  completed_at: "2026-08-28T16:30:15+02:00"
+  status: COMPLETED
+  summary: "Audit indépendant du diff réel exécuté par Ollama avec verdict CONDITIONAL -> Tous les points de garde clarifiés et levés."
+validation:
+  status: VALIDATED
+  validated_by: "Orchestrateur"
+  validated_at: "2026-08-28T16:31:00+02:00"
+  notes: "Audit croisé concluant."

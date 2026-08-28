@@ -1,0 +1,36 @@
+contract:
+  task_id: T166-DOC_ALIGNEMENT_AF
+  criticality: C2
+  strategy: patch
+  objective: >
+    Mettre à jour les spécifications fonctionnelles AF-02, AF-04 et AF-10
+    afin d'acter la centralisation des cycles dans PRG_03, la décharge de PRG_04
+    en tant que muscle/sécurité, et le contrat d'échange ReqProgram.ReqBucket.
+  acceptance:
+    - id: AC1
+      statement: "AF_Partie-02 documente PRG_03 comme cerveau unique portant FB_Cycle, FB_DiveSearch, FB_ExtractionSequence."
+      verified_by: "Revue AF-02 §3."
+    - id: AC2
+      statement: "AF_Partie-04 et AF_Partie-10 sont synchronisés avec la nouvelle architecture."
+      verified_by: "Revue AF-04 et AF-10."
+  scope:
+    allowed:
+      - DOC/AF/AF_Partie-02*.md
+      - DOC/AF/AF_Partie-04*.md
+      - DOC/AF/AF_Partie-10*.md
+  conservation:
+    must_survive:
+      - "Intégrité des exigences techniques métier."
+  evidence_required:
+    - doc_links_check
+status: COMPLETED
+execution:
+  executed_by: "OLLAMA-DeepSeek-v4-Flash"
+  completed_at: "2026-08-28T16:32:00+02:00"
+  status: COMPLETED
+  summary: "Rédaction des amendements par sous-agent Ollama et application dans AF-02, AF-04, AF-10. G340 et gates 22/22 PASS."
+validation:
+  status: VALIDATED
+  validated_by: "Orchestrateur"
+  validated_at: "2026-08-28T16:33:00+02:00"
+  notes: "Documentation et code 100% alignés."

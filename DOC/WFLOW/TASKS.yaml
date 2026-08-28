@@ -2512,3 +2512,103 @@ tasks:
   - Confirmer que PRG_04/05 restent souverains pour arbitrage métier et safety
   bloque_par:
   - T165-C2
+- id: T166
+  parent_id: null
+  statut: ✅
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T16:35:00+02:00'
+  titre: Centralisation des Cycles et Assistants dans PRG_03_Modes_Cycle
+  contexte: Déplacement architectural de FB_DiveSearch et FB_ExtractionSequence de PRG_04 vers PRG_03, décharge de PRG_04 en muscle physique, remappage PRG_07 et alignement AF.
+  description: Famille T166 — Refactor architectural pour centraliser toutes les décisions et machines d'état de cycles dans PRG_03, préserver PRG_04 pour l'application mécanique/safety, éliminer les accès directs de PRG_07 et aligner la documentation AF-02/04/10.
+  contrat: ''
+  objectifs:
+  - Centraliser 100% des machines d'état de cycles (FB_Cycle, FB_DiveSearch, FB_ExtractionSequence) dans PRG_03
+  - Décharger PRG_04 des assistants et conserver son rôle souverain de muscle et sécurité physique
+  - Éliminer 100% des accès directs résiduels dans PRG_07
+  - Aligner rigoureusement la documentation d'architecture AF-02, AF-04, AF-10
+  bloque_par:
+  - T165-CR
+- id: T166-A
+  parent_id: T166
+  statut: ✅
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: AGY-01
+  date: '2026-08-28T16:20:00+02:00'
+  titre: Contrats de flux et enrichissement des bus publics inter-PRG
+  contexte: Enrichissement ST_WinchInterPrg, ST_TranslationInterPrg et remappage PRG_07.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-A_CONTRACTS_ET_FLUX.yaml. Validé : publication complète PRG_04/05, suppression des accès directs dans PRG_07 (instWinchSync remappé vers Data), 0 erreur G200.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-A_CONTRACTS_ET_FLUX.yaml
+  objectifs:
+  - Finaliser PRG_04.Data et PRG_05.Data
+  - Remapper PRG_07 vers PRG_04.Data (0 fuite)
+  bloque_par:
+  - T166
+- id: T166-B
+  parent_id: T166
+  statut: ✅
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: AGY-01
+  date: '2026-08-28T16:26:00+02:00'
+  titre: Migration et instanciation de DiveSearch et ExtractionSequence dans PRG_03
+  contexte: Cerveau décisionnel unique dans PRG_03, intention couplée et production continue de SequenceState.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-B_MIGRATION_CYCLES_PRG03.yaml. Validé : instDiveSearch et instExtractionSequence déclarées et exécutées en VAR interne de PRG_03, intention CoupledUserRequest calculée au même scan, Data.SequenceState produit en continu.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-B_MIGRATION_CYCLES_PRG03.yaml
+  objectifs:
+  - Instancier DiveSearch et ExtractionSequence dans PRG_03
+  - Calculer CoupledUserRequest sans retard de scan
+  - Produire DiveState, BottomTouchConfirmed, ExtractionState sur Data.SequenceState
+  bloque_par:
+  - T166-A
+- id: T166-C
+  parent_id: T166
+  statut: ✅
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: AGY-01
+  date: '2026-08-28T16:29:00+02:00'
+  titre: Allègement de PRG_04_Treuils_Benne et préservation de la sécurité physique
+  contexte: Retrait des instances cycles de PRG_04 et consommation de PRG_03.Data.ReqProgram.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-C_ALLEVIATION_PRG04.yaml. Validé : PRG_04 ne contient plus aucune instance de cycle, raccordement de CmdBucketCloseArbitrated et KoboldContactorCmdArbitrated sur le bus ReqProgram, sécurité locale 100% préservée.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-C_ALLEVIATION_PRG04.yaml
+  objectifs:
+  - Supprimer instDiveSearch et instExtractionSequence de PRG_04
+  - Raccorder l'arbitrage benne et Kobold sur PRG_03.Data.ReqProgram.ReqBucket
+  - Préserver les sécurités et interlocks locaux
+  bloque_par:
+  - T166-B
+- id: T166-DOC
+  parent_id: T166
+  statut: ✅
+  criticite: C2
+  domaine: DOCUMENTATION
+  agent: OLLAMA
+  date: '2026-08-28T16:32:00+02:00'
+  titre: Alignement documentaire des analyses fonctionnelles AF-02, AF-04, AF-10
+  contexte: Formalisation de la nouvelle architecture et des responsabilités PRG_03/PRG_04.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-DOC_ALIGNEMENT_AF.yaml. Validé : rédaction des amendements par sous-agent Ollama et intégration dans AF-02 (responsabilités), AF-04 (rattachement cycles) et AF-10 (muscle/sécurité PRG_04).'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-DOC_ALIGNEMENT_AF.yaml
+  objectifs:
+  - Mettre à jour AF-02 avec le tableau des 7 PRG
+  - Synchroniser AF-04 et AF-10 avec le contrat ReqProgram.ReqBucket
+  bloque_par:
+  - T166-C
+- id: T166-CR
+  parent_id: T166
+  statut: ✅
+  criticite: C4
+  domaine: REVIEW
+  agent: OLLAMA
+  date: '2026-08-28T16:30:15+02:00'
+  titre: Revue indépendante Ollama du diff réel et arbitrage des points de garde
+  contexte: Audit du diff réel sur l'ordre de scan, l'encapsulation, les write-backs et la safety.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-CR_REVIEW_OLLAMA.yaml. Validé : rapport d''audit Ollama analysant le diff, confirmation de l''absence de retard sur l''intention, validation du retard N-1 mécanique admissible et levée de tous les points de garde.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-CR_REVIEW_OLLAMA.yaml
+  objectifs:
+  - Audit indépendant du diff réel par modèle local
+  - Validation croisée des points d'arbitrage (N-1, write-backs, safety)
+  bloque_par:
+  - T166-DOC

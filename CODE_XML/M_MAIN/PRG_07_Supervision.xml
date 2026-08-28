@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:44:55.108650" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:44:55.108650">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:28:30.617966" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:28:30.617966">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6763,8 +6763,8 @@ GVL_IHM.Cycle.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1
 GVL_IHM.Cycle.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 GVL_IHM.Cycle.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
 GVL_IHM.Cycle.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
-GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.instWinchSync.Fault.Error;
-GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM;
+GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.Data.WinchSyncError;
+GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.WinchSyncSignedDeltaPosM;
 GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
 GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
 GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
