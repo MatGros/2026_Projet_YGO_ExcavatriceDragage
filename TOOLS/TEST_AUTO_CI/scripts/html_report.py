@@ -329,13 +329,15 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
             <div class="wf-scroll">{_render_waveform(scans, changed_fields, field_types, fail_scan_num)}</div>
         </details>
         <details {"open" if not test_passed else ""}>
-            <summary style="display:flex; justify-content:space-between; align-items:center;">
-                <span>📋 Chronogramme tableau ({len(scans)} scans)</span>
-                <span class="table-export-actions" onclick="event.stopPropagation();">
-                    <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
-                    <button type="button" class="btn-export" onclick="exportTableCSV(this, '{_html.escape(test_name)}')" title="Télécharger le tableau en CSV">📥 CSV</button>
-                    <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
-                </span>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau ({len(scans)} scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, '{_html.escape(test_name)}')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
             </summary>
             {_render_table(scans, changed_fields, field_types, fail_scan_num, scan_notes=scan_notes)}
         </details>
@@ -834,6 +836,7 @@ _CSS = """
     .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
         padding: 8px 12px; }
     .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); user-select: text; }
+    .chrono-summary-inner { display: inline-flex; justify-content: space-between; align-items: center; width: calc(100% - 24px); margin-left: 6px; vertical-align: middle; }
     .chrono-scroll { overflow-x: auto; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border);
         scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
     .chrono-scroll::-webkit-scrollbar, .wf-scroll::-webkit-scrollbar { display: block !important; height: 8px !important; width: 8px !important; }
