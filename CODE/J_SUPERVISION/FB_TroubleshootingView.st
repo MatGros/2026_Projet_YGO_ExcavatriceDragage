@@ -76,8 +76,14 @@ VAR_INPUT
     CycleError               : BOOL;   (* --> [STAT] Séquenceur en erreur *)
     CycleErrorId             : WORD;   (* --> [DIAG] Code erreur séquenceur *)
     CycleStep                : E_CycleStep; (* --> [STAT] Étape courante *)
-    CycleStepStr             : STRING(40);  (* --> [STAT] Libellé étape *)
+    CycleStepStr             : STRING(80);  (* --> [STAT] Libellé étape *)
     CycleStepAtError         : E_CycleStep; (* --> [DIAG] Étape au défaut *)
+    CycleWaitingForOperator  : BOOL;        (* --> [STAT] Attente action humaine *)
+    CycleWaitingForProcess   : BOOL;        (* --> [STAT] Attente condition procédé *)
+    CycleOperatorActionId    : UINT;        (* --> [DIAG] ID action attendue *)
+    CycleOperatorAction      : STRING(120); (* --> [DIAG] Consigne explicite *)
+    CycleExpectedAxis        : E_OperatorAxis; (* --> [STAT] Organe attendu *)
+    CycleExpectedDirection   : INT;         (* --> [STAT] Sens attendu (-1, 0, +1) *)
     CycleStartRequest        : BOOL;   (* --> [CMD] Demande Start *)
     CycleAbortRequest        : BOOL;   (* --> [CMD] Demande Abort *)
     CycleTargetDepth_M       : REAL;   (* --> [CFG] Profondeur consigne *)
@@ -664,6 +670,14 @@ GVL_Troubleshooting.CycleSemiAuto.Idx205_ErrorId                   := CycleError
 GVL_Troubleshooting.CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
 GVL_Troubleshooting.CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;
+GVL_Troubleshooting.CycleSemiAuto.Idx209_WaitingForOperator        := CycleWaitingForOperator;
+GVL_Troubleshooting.CycleSemiAuto.Idx210_WaitingForProcess         := CycleWaitingForProcess;
+GVL_Troubleshooting.CycleSemiAuto.Idx211_OperatorActionId          := CycleOperatorActionId;
+GVL_Troubleshooting.CycleSemiAuto.Idx212_OperatorAction            := CycleOperatorAction;
+GVL_Troubleshooting.CycleSemiAuto.Idx213_ExpectedAxis              := CycleExpectedAxis;
+GVL_Troubleshooting.CycleSemiAuto.Idx214_ExpectedDirection         := CycleExpectedDirection;
+GVL_Troubleshooting.CycleSemiAuto.Idx215_WaitingResume             := (Auth.Mode <> E_Mode.SEMI_AUTO) AND (CycleStep <> E_CycleStep.X0_PREPARATION) AND (CycleStep <> E_CycleStep.X13_DONE_SYNC) AND (CycleStep <> E_CycleStep.STABILIZING);
+GVL_Troubleshooting.CycleSemiAuto.Idx216_PausedState               := CycleStep;
 
 GVL_Troubleshooting.CycleSemiAuto.Idx301_TargetPosition            := CycleTargetPosition;
 GVL_Troubleshooting.CycleSemiAuto.Idx302_TargetDepth_M             := CycleTargetDepth_M;

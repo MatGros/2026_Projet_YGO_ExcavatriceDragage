@@ -124,7 +124,7 @@ restitution bloquante).
 | **Tâches** | EtherCAT 4 ms → CAN 20 ms → Main 10 ms ; surveillance périodicité = fonction système CODESYS (200 ms) |
 | **FB Standard** | Tous les FB métier respectent le contrat [AF_Partie-03](ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md) (profils selon catégorie, §1bis) |
 | **Sécurité** | `Enable` > `SafeStop` (par métier, rampe rapide) > `StartStop` (rampe normale) ; AU matériel = seul arrêt brutal + `PowerCutOff` ; `Reset` = front |
-| **Cycle** | Semi-auto : `E_CycleStep` ([AF_Partie-04](DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md)) |
+| **Cycle** | Semi-auto : `E_CycleStep` ([AF_Partie-04](DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md)) |
 
 ---
 

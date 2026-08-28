@@ -25,11 +25,15 @@
     {
       "name": "TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC",
       "passed": true
+    },
+    {
+      "name": "TC-P04-013 : Bascule Semi-Auto vers Maintenance preserve l etape et neutralise les demandes sans redemarrage auto",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 6,
-    "passed": 6,
+    "total": 7,
+    "passed": 7,
     "failed": 0
   }
 }

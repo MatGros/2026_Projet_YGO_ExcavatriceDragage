@@ -27,16 +27,13 @@
         --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
     }
     * { box-sizing: border-box; }
-    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
-    * { scrollbar-width: none; -ms-overflow-style: none; }
-    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
         background-color: var(--bg);
         background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
         background-size: 28px 28px;
         background-position: -1px -1px;
         color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
-    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .page { max-width: 1720px; width: 96%; margin: 0 auto; padding: 28px 16px 60px; }
     .header { display: flex; justify-content: space-between; align-items: center;
         margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
         border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
@@ -59,7 +56,7 @@
     .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
 
     details { margin-bottom: 20px; }
-    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: text; }
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -70,52 +67,163 @@
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
-    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
-    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
-    .checks-summary:hover { color: var(--text); }
-    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
-    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
-    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
+    .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: text; }
+    .checks-summary:hover { color: var(--accent); }
+    .checks-label { font-size: 12px; font-weight: 600; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 12px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
     .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
-    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
-        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
-    .failure-head { color: var(--red-text); font-weight: 600; }
-    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
-    .failure-msg { color: #92400e; margin-top: 4px; }
-    .failure-diff { margin-top: 4px; }
-    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    .scenario-list li { font-size: 12px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
+    .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
+    .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+    .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
+        border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
+    .failure-head { color: var(--red-text); font-weight: 700; font-size: 13.5px; }
+    .failure-loc { color: var(--muted); margin-top: 3px; font-size: 11.5px; font-family: monospace; }
+    .failure-msg { color: var(--text); margin-top: 6px; font-weight: 600; }
+    .failure-diff { margin-top: 8px; color: var(--text); font-size: 12.5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .failure-diff code { padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 12px; font-weight: 700; }
+    .failure-diff code.val-expected { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .failure-diff code.val-actual { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    [data-theme="light"] .failure-diff code.val-expected { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    [data-theme="light"] .failure-diff code.val-actual { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
     pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
         overflow-x: auto; }
-    .chronogram-group { margin-top: 12px; }
+    .chronogram-group { margin-top: 10px; }
     .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
         padding: 8px 12px; }
-    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
-    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
-    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
-    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
-    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
-    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
-    .chrono-table .scan-t { color: var(--muted); }
-    .chrono-table td.changed { background: #fef9c3; }
-    .v-true { color: var(--green-text); font-weight: 600; }
-    .v-false { color: #cbd5e1; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); user-select: text; }
+    .chrono-summary-inner { display: inline-flex; justify-content: space-between; align-items: center; width: calc(100% - 24px); margin-left: 6px; vertical-align: middle; }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border);
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
+    .chrono-scroll::-webkit-scrollbar, .wf-scroll::-webkit-scrollbar { display: block !important; height: 8px !important; width: 8px !important; }
+    .chrono-scroll::-webkit-scrollbar-track, .wf-scroll::-webkit-scrollbar-track { background: var(--surface-card); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb, .wf-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb:hover, .wf-scroll::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+    .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; table-layout: auto; }
+    .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; position: relative; }
+    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; cursor: pointer; user-select: text; transition: max-width 0.2s, min-width 0.2s, padding 0.2s; }
+    .chrono-table th:hover { color: var(--accent); }
+    .col-resizer { position: absolute; top: 0; right: 0; width: 5px; cursor: col-resize; user-select: none; height: 100%; z-index: 10; }
+    .col-resizer:hover, .col-resizer.resizing { background: var(--accent); }
+    .chrono-table th.col-collapsed,
+    .chrono-table td.col-collapsed {
+        max-width: 24px !important;
+        min-width: 24px !important;
+        width: 24px !important;
+        padding: 4px 1px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        opacity: 0.35 !important;
+        background: rgba(0, 0, 0, 0.25) !important;
+        color: transparent !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+        font-size: 0 !important;
+        position: relative;
+    }
+    .chrono-table th.col-collapsed {
+        cursor: pointer;
+        opacity: 0.75 !important;
+        background: rgba(129, 140, 248, 0.18) !important;
+    }
+    .chrono-table th.col-collapsed:hover {
+        opacity: 1 !important;
+        background: rgba(129, 140, 248, 0.38) !important;
+    }
+    .chrono-table th.col-collapsed::after {
+        content: "⋮";
+        font-size: 12px;
+        color: var(--accent);
+        display: block;
+        text-align: center;
+    }
+    /* Mode Titres Verticaux (Compact) */
+    .chrono-table.headers-vertical {
+        width: max-content !important;
+    }
+    .chrono-table.headers-vertical th.note-th,
+    .chrono-table.headers-vertical td.chrono-note-cell {
+        max-width: 280px !important;
+        width: 280px !important;
+    }
+    .chrono-table.headers-vertical th.var-th {
+        height: 155px;
+        vertical-align: bottom;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        max-width: 36px;
+        min-width: 30px;
+        width: 34px;
+    }
+    .chrono-table.headers-vertical th.var-th .th-content {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        display: inline-block;
+        white-space: nowrap;
+        text-align: left;
+        max-height: 135px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .chrono-table th .th-content {
+        display: inline-block;
+        pointer-events: auto;
+    }
+    .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
+    .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
+    [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
+    [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    .v-true { color: #34d399; font-weight: 700; }
+    .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
-        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+        border-radius: 8px; margin-top: 8px; padding: 4px 0;
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
     .waveform { display: block; }
-    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
-    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
-    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
-    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
-    .wf-line { fill: none; stroke-width: 2; }
-    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
-    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
-    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-grid { stroke: var(--border); stroke-width: 1; opacity: 0.6; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-scan { font-size: 9px; fill: var(--muted); opacity: 0.7; text-anchor: middle; font-family: monospace; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; font-weight: 600; }
+    .wf-label.wf-clickable { cursor: pointer; transition: fill 0.15s; }
+    .wf-label.wf-clickable:hover { fill: var(--accent); font-weight: 700; text-decoration: underline; }
+    .wf-label.active-curve { fill: #38bdf8; font-weight: 700; }
+    [data-theme="light"] .wf-label.active-curve { fill: #0284c7; }
+    .wf-line { fill: none; stroke-width: 2.2; }
+    .wf-num-line { stroke: var(--border); stroke-width: 1; }
+    .wf-num { font-size: 10.5px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-num-changed { font-size: 10.5px; fill: #ffffff; font-weight: 700; text-anchor: middle; font-family: monospace; }
     .wf-chip { opacity: 0.95; }
     .wf-legend { font-size: 10px; fill: var(--muted); }
-    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; font-family: monospace; font-weight: 600; }
+    [data-theme="light"] .wf-scale { fill: #64748b; }
+    .wf-tooltip {
+        position: fixed; pointer-events: none; z-index: 9999;
+        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
+        border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        border-radius: 8px; padding: 8px 12px; font-size: 11.5px; color: #f8fafc;
+        display: none; max-width: 320px; line-height: 1.4;
+    }
+    [data-theme="light"] .wf-tooltip {
+        background: rgba(255, 255, 255, 0.97); border-color: #cbd5e1;
+        color: #1e293b; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
+    [data-theme="light"] .wf-tt-head { color: #0284c7; }
+    .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
+    .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
+    .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
+    [data-theme="light"] .wf-tt-note { border-top-color: rgba(0, 0, 0, 0.1); }
     .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
         border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
     .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
@@ -123,7 +231,7 @@
     .af-warning-banner li { margin: 3px 0; }
     .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
-    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
@@ -193,11 +301,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 00:00:42</div>
+    <div class="exec-time">2026-08-28 13:07:25</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-divesearch-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-1">TC-P04-010 DiveSearch : mise en service recherche de couche</a></li></ul>
+        <summary>📋 Sommaire (4 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-divesearch-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-1">TC-P04-010 DiveSearch : mise en service recherche de couche</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-2">TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-3">TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -206,7 +314,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            4/4 vérifications validées
         </div>
     </div>
     
@@ -284,14 +392,14 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_DiveSearch</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 21 flux entrants · 10 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_DiveSearch</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 22 flux entrants · 11 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ KoboldRiseEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ KoboldFallEdge <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instFault <span style="color:var(--muted);font-weight:500;">(FB_FaultCore)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Mode <span class="pin-type" style="color:var(--muted);">E_Mode</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MotionRequestActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MotionDirection <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketIsOpen <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">KoboldImmersed <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1Position_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2Position_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionsValid <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DiveStartMin_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionUpper_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionLower_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassPreconditions <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Mode <span class="pin-type" style="color:var(--muted);">E_Mode</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MotionRequestActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MotionDirection <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketIsOpen <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">KoboldImmersed <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1Position_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2Position_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionsValid <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CurrentSpeedStep <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DiveStartMin_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionUpper_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionLower_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassPreconditions <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
@@ -333,15 +441,15 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">15</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">16</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">9</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">10</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">2</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">21 IN</b> / <b style="color:#ffffff;">10 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">22 IN</b> / <b style="color:#ffffff;">11 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -391,6 +499,10 @@
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>KoboldContactorCmd</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>BottomTouchConfirmed</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
@@ -408,8 +520,8 @@
     <details class="pin-diagram-details">
         <summary>🔌 Interface & câblage production</summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 24 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BOTTOMTOUCHCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BUCKETISOPEN</code> jamais câblé en production</li><li>Pin <code>BYPASSPRECONDITIONS</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIVESTARTMIN_M</code> jamais câblé en production</li><li>Pin <code>DIVESTATE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>IMMERSIONLOWER_M</code> jamais câblé en production</li><li>Pin <code>IMMERSIONUPPER_M</code> jamais câblé en production</li><li>Pin <code>KOBOLDIMMERSED</code> jamais câblé en production</li><li>Pin <code>KOBOLDMEASUREENABLE</code> jamais câblé en production</li><li>Pin <code>LIFECYCLE</code> jamais câblé en production</li><li>Pin <code>M1POSITION_M</code> jamais câblé en production</li><li>Pin <code>M2POSITION_M</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>MOTIONDIRECTION</code> jamais câblé en production</li><li>Pin <code>MOTIONREQUESTACTIVE</code> jamais câblé en production</li><li>Pin <code>OPERATORACTION</code> jamais câblé en production</li><li>Pin <code>OPERATORACTIONID</code> jamais câblé en production</li><li>Pin <code>POSITIONSVALID</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 26 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>BOTTOMTOUCHCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BUCKETISOPEN</code> jamais câblé en production</li><li>Pin <code>BYPASSPRECONDITIONS</code> jamais câblé en production</li><li>Pin <code>CURRENTSPEEDSTEP</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIVESTARTMIN_M</code> jamais câblé en production</li><li>Pin <code>DIVESTATE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>IMMERSIONLOWER_M</code> jamais câblé en production</li><li>Pin <code>IMMERSIONUPPER_M</code> jamais câblé en production</li><li>Pin <code>KOBOLDCONTACTORCMD</code> jamais câblé en production</li><li>Pin <code>KOBOLDIMMERSED</code> jamais câblé en production</li><li>Pin <code>KOBOLDMEASUREENABLE</code> jamais câblé en production</li><li>Pin <code>LIFECYCLE</code> jamais câblé en production</li><li>Pin <code>M1POSITION_M</code> jamais câblé en production</li><li>Pin <code>M2POSITION_M</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>MOTIONDIRECTION</code> jamais câblé en production</li><li>Pin <code>MOTIONREQUESTACTIVE</code> jamais câblé en production</li><li>Pin <code>OPERATORACTION</code> jamais câblé en production</li><li>Pin <code>OPERATORACTIONID</code> jamais câblé en production</li><li>Pin <code>POSITIONSVALID</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li></ul>
         </div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
@@ -447,6 +559,9 @@
             <div class="pin-name">POSITIONSVALID <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CURRENTSPEEDSTEP <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
             <div class="pin-name">DIVESTARTMIN_M <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
@@ -476,6 +591,9 @@
             <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">KOBOLDMEASUREENABLE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">KOBOLDCONTACTORCMD <span class="pin-type">IEC_BOOL</span></div>
             <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">BOTTOMTOUCHCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
@@ -565,9 +683,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_DiveSearch</code></td>
-                <td>15</td><td>9</td>
-                <td>0</td><td>8</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (8 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>16</td><td>10</td>
+                <td>0</td><td>9</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (9 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -581,27 +699,51 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
-            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation standard</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Prete en service</p><p class='comment'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Scan 0 : Enable=FALSE -&gt; Neutralisation standard</li><li>Scan 1 : Enable=TRUE -&gt; Prete en service</li><li>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
         
         <details >
-            <summary>📊 Chronogramme graphique (3 scans, 3 variables actives)</summary>
-            <div class="wf-scroll"><svg width="388" height="212" viewBox="0 0 388 212" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="194" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="206" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="194" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="206" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="194" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="206" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">READY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">OPERATORACTIONID</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="219.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">0</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="273.5" y="148.0" width="21" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">256</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><rect x="331.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="340.0" y="157.0" class="wf-num-changed">0</text></svg></div>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (3 scans, 3 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="388" height="212" viewBox="0 0 388 212" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;0&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;0&quot;, &quot;MOTIONDIRECTION&quot;: &quot;0&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;0&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;20&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;10&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;5&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;0&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;0&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;0&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;Scan 0 : Enable=FALSE -&gt; Neutralisation standard&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;0&quot;, &quot;MOTIONDIRECTION&quot;: &quot;0&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;0&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;20&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;10&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;5&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;0&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;256&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;Scan 1 : Enable=TRUE -&gt; Prete en service&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;0&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;0&quot;, &quot;MOTIONDIRECTION&quot;: &quot;0&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;0&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;20&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;10&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;5&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;0&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;0&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;0&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;Scan 2 : Enable=FALSE -&gt; Re-neutralisation&quot;}]" data-fields="[&quot;READY&quot;, &quot;ENABLE&quot;, &quot;OPERATORACTIONID&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="194" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="194" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="206" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="194" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="206" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="194" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="206" class="wf-scan">#2</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="182" y="86.0" class="wf-label">READY</text><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><circle cx="192" cy="122.0" r="4" fill="#059669"/><text x="182" y="126.0" class="wf-label">ENABLE</text><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#059669"/><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><text x="182" y="166.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 2)" title="Cliquer pour basculer Courbe / Chiffres">OPERATORACTIONID</text><g class="wf-numeric-group" data-row="2"><g class="wf-analog-view"><text x="194" y="152" class="wf-scale">256.0</text><text x="194" y="178" class="wf-scale">0</text><path d="M200,176.0L256,176.0L256,148.0L312,148.0L312,176.0L368,176.0" class="wf-line" stroke="#0891b2" stroke-width="2.2"/><circle cx="256" cy="148.0" r="2.5" fill="#0891b2"/><circle cx="312" cy="176.0" r="2.5" fill="#0891b2"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="219.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">0</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="273.5" y="148.0" width="21" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">256</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><rect x="331.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="340.0" y="157.0" class="wf-num-changed">0</text></g></g></svg></div>
         </details>
         <details >
-            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (3 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
             <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>READY</th><th>OPERATORACTIONID</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>256</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td></tr></tbody>
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>READY</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>ENABLE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>OPERATORACTIONID</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell' title='Scan 0 : Enable=FALSE -&gt; Neutralisation standard'><span class='chrono-note-chip'>Scan 0 : Enable=FALSE -&gt; Neutralisation standard</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell' title='Scan 1 : Enable=TRUE -&gt; Prete en service'><span class='chrono-note-chip'>Scan 1 : Enable=TRUE -&gt; Prete en service</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>256</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='chrono-note-cell' title='Scan 2 : Enable=FALSE -&gt; Re-neutralisation'><span class='chrono-note-chip'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td></tr></tbody>
     </table></div>
         </details>
         
     <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (23)</summary>
-        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>MOTIONREQUESTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOTIONDIRECTION</code></td><td>0</td></tr><tr><td><code>BUCKETISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>KOBOLDIMMERSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1POSITION_M</code></td><td>0</td></tr><tr><td><code>M2POSITION_M</code></td><td>0</td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIVESTARTMIN_M</code></td><td>20</td></tr><tr><td><code>IMMERSIONUPPER_M</code></td><td>10</td></tr><tr><td><code>IMMERSIONLOWER_M</code></td><td>5</td></tr><tr><td><code>BYPASSPRECONDITIONS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIFECYCLE.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIVESTATE</code></td><td>0</td></tr><tr><td><code>DESCENDPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>KOBOLDMEASUREENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BOTTOMTOUCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>IMMERSIONCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORCAUSEPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SEQERRORFAULT</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        <summary>🔒 Valeurs constantes sur toute la séquence (30)</summary>
+        <table class="static-table"><tbody><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERRORID</code></td><td>0</td></tr><tr><td><code>FAULT.LATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.LATCHEDID</code></td><td>0</td></tr><tr><td><code>LIFECYCLE.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>LIFECYCLE.DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BOTTOMTOUCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSPRECONDITIONS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CURRENTSPEEDSTEP</code></td><td>0</td></tr><tr><td><code>DESCENDPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIVESTARTMIN_M</code></td><td>20</td></tr><tr><td><code>DIVESTATE</code></td><td>0</td></tr><tr><td><code>ERRORCAUSEPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>IMMERSIONCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>IMMERSIONLOWER_M</code></td><td>5</td></tr><tr><td><code>IMMERSIONUPPER_M</code></td><td>10</td></tr><tr><td><code>KOBOLDCONTACTORCMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>KOBOLDIMMERSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>KOBOLDMEASUREENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1POSITION_M</code></td><td>0</td></tr><tr><td><code>M2POSITION_M</code></td><td>0</td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>MOTIONDIRECTION</code></td><td>0</td></tr><tr><td><code>MOTIONREQUESTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PALIER5FORBIDDENFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SEQERRORFAULT</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
         </article>
@@ -609,7 +751,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-divesearch-1" class="test-card test-card-pass">
@@ -617,27 +759,149 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P04-010 DiveSearch : mise en service recherche de couche </h3>
             </header>
-            <div class="comments"><p class='comment'>Demarrage de la descente : passe a SEARCHING_IMMERSION</p><p class='comment'>Scan suivant dans SEARCHING_IMMERSION : activation du permis et de Busy</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary><ul class="checks-list"><li>Module DiveSearch pret</li><li>Pret a descendre</li><li>Passe en recherche immersion</li><li>Permis descente actif en recherche immersion</li><li>Recherche en cours -&gt; Busy</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Demarrage de la descente : passe a SEARCHING_IMMERSION</li><li>Scan suivant dans SEARCHING_IMMERSION : activation du permis et de Busy</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>Module DiveSearch pret</li><li>Pret a descendre</li><li>Passe en recherche immersion</li><li>Permis descente actif en recherche immersion</li><li>Recherche en cours -&gt; Busy</li><li>Contacteur Kobold alimente a la volee</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
         
         <details >
-            <summary>📊 Chronogramme graphique (3 scans, 7 variables actives)</summary>
-            <div class="wf-scroll"><svg width="388" height="372" viewBox="0 0 388 372" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="354" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="366" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="354" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="366" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="354" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="366" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">MOTIONREQUESTACTIVE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L368,68" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">MOTIONDIRECTION</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="219.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">0</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><rect x="275.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="284.0" y="117.0" class="wf-num-changed">-1</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><text x="340.0" y="116.0" class="wf-num">-1</text><text x="182" y="166.0" class="wf-label">LIFECYCLE.BUSY</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L312,174L312,174L312,148L368,148" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">DIVESTATE</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="219.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">1</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><rect x="275.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="197.0" class="wf-num-changed">2</text><line x1="312" y1="202.0" x2="368" y2="202.0" class="wf-num-line"/><text x="340.0" y="196.0" class="wf-num">2</text><text x="182" y="246.0" class="wf-label">DESCENDPERMIT</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,254L256,254L312,254L312,254L312,228L368,228" class="wf-line" stroke="#0d9488"/><text x="182" y="286.0" class="wf-label">KOBOLDMEASUREENABLE</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><path d="M200,294L256,294L312,294L312,294L312,268L368,268" class="wf-line" stroke="#1d4ed8"/><text x="182" y="326.0" class="wf-label">OPERATORACTIONID</text><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="219.0" y="308.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">0</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><rect x="273.5" y="308.0" width="21" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="284.0" y="317.0" class="wf-num-changed">257</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><rect x="329.5" y="308.0" width="21" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="317.0" class="wf-num-changed">258</text></svg></div>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (3 scans, 8 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="388" height="412" viewBox="0 0 388 412" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;0&quot;, &quot;MOTIONDIRECTION&quot;: &quot;0&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;0&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;0&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;0&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;0&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;1&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;1&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;0&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;1&quot;, &quot;MOTIONDIRECTION&quot;: &quot;-1&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;0&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;0&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;0&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;0&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;1&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;2&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;257&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;Demarrage de la descente : passe a SEARCHING_IMMERSION&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;1&quot;, &quot;MOTIONDIRECTION&quot;: &quot;-1&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;0&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;0&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;0&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;0&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;1&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;1&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;2&quot;, &quot;DESCENDPERMIT&quot;: &quot;1&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;1&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;1&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;258&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;Scan suivant dans SEARCHING_IMMERSION : activation du permis et de Busy&quot;}]" data-fields="[&quot;LIFECYCLE.BUSY&quot;, &quot;DESCENDPERMIT&quot;, &quot;DIVESTATE&quot;, &quot;KOBOLDCONTACTORCMD&quot;, &quot;KOBOLDMEASUREENABLE&quot;, &quot;MOTIONDIRECTION&quot;, &quot;MOTIONREQUESTACTIVE&quot;, &quot;OPERATORACTIONID&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="394" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="394" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="406" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="394" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="406" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="394" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="406" class="wf-scan">#2</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="182" y="86.0" class="wf-label">LIFECYCLE.BUSY</text><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L312,94L312,68L368,68" class="wf-line" stroke="#2563eb"/><circle cx="192" cy="122.0" r="4" fill="#059669"/><text x="182" y="126.0" class="wf-label">DESCENDPERMIT</text><path d="M200,134L256,134L312,134L312,134L312,108L368,108" class="wf-line" stroke="#059669"/><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><text x="182" y="166.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 2)" title="Cliquer pour basculer Courbe / Chiffres">DIVESTATE</text><g class="wf-numeric-group" data-row="2"><g class="wf-analog-view"><text x="194" y="152" class="wf-scale">2.00</text><text x="194" y="178" class="wf-scale">1.00</text><path d="M200,176.0L256,176.0L256,148.0L312,148.0L368,148.0" class="wf-line" stroke="#0891b2" stroke-width="2.2"/><circle cx="256" cy="148.0" r="2.5" fill="#0891b2"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="219.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">1</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="275.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">2</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><text x="340.0" y="156.0" class="wf-num">2</text></g></g><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><text x="182" y="206.0" class="wf-label">KOBOLDCONTACTORCMD</text><path d="M200,214L256,214L312,214L312,214L312,188L368,188" class="wf-line" stroke="#65a30d"/><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><text x="182" y="246.0" class="wf-label">KOBOLDMEASUREENABLE</text><path d="M200,254L256,254L312,254L312,254L312,228L368,228" class="wf-line" stroke="#0d9488"/><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><text x="182" y="286.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 5)" title="Cliquer pour basculer Courbe / Chiffres">MOTIONDIRECTION</text><g class="wf-numeric-group" data-row="5"><g class="wf-analog-view"><text x="194" y="272" class="wf-scale">0</text><text x="194" y="298" class="wf-scale">-1.00</text><path d="M200,268.0L256,268.0L256,296.0L312,296.0L368,296.0" class="wf-line" stroke="#1d4ed8" stroke-width="2.2"/><circle cx="256" cy="296.0" r="2.5" fill="#1d4ed8"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="282.0" x2="256" y2="282.0" class="wf-num-line"/><rect x="219.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="228.0" y="277.0" class="wf-num-changed">0</text><line x1="256" y1="282.0" x2="312" y2="282.0" class="wf-num-line"/><rect x="275.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="284.0" y="277.0" class="wf-num-changed">-1</text><line x1="312" y1="282.0" x2="368" y2="282.0" class="wf-num-line"/><text x="340.0" y="276.0" class="wf-num">-1</text></g></g><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><text x="182" y="326.0" class="wf-label">MOTIONREQUESTACTIVE</text><path d="M200,334L256,334L256,334L256,308L312,308L368,308" class="wf-line" stroke="#2563eb"/><circle cx="192" cy="362.0" r="4" fill="#059669"/><text x="182" y="366.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 7)" title="Cliquer pour basculer Courbe / Chiffres">OPERATORACTIONID</text><g class="wf-numeric-group" data-row="7"><g class="wf-analog-view"><text x="194" y="352" class="wf-scale">258.0</text><text x="194" y="378" class="wf-scale">0</text><path d="M200,376.0L256,376.0L256,348.1L312,348.1L312,348.0L368,348.0" class="wf-line" stroke="#059669" stroke-width="2.2"/><circle cx="256" cy="348.1" r="2.5" fill="#059669"/><circle cx="312" cy="348.0" r="2.5" fill="#059669"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="362.0" x2="256" y2="362.0" class="wf-num-line"/><rect x="219.0" y="348.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="357.0" class="wf-num-changed">0</text><line x1="256" y1="362.0" x2="312" y2="362.0" class="wf-num-line"/><rect x="273.5" y="348.0" width="21" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="284.0" y="357.0" class="wf-num-changed">257</text><line x1="312" y1="362.0" x2="368" y2="362.0" class="wf-num-line"/><rect x="329.5" y="348.0" width="21" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="340.0" y="357.0" class="wf-num-changed">258</text></g></g></svg></div>
         </details>
         <details >
-            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (3 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P04-010 DiveSearch : mise en service recherche de couche')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
             <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>MOTIONREQUESTACTIVE</th><th>MOTIONDIRECTION</th><th>LIFECYCLE.BUSY</th><th>DIVESTATE</th><th>DESCENDPERMIT</th><th>KOBOLDMEASUREENABLE</th><th>OPERATORACTIONID</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>1</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>-1</td><td><span class="v-false">FALSE</span></td><td class='changed'>2</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>257</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td><span class="v-true">TRUE</span></td><td>-1</td><td class='changed'><span class="v-true">TRUE</span></td><td>2</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>258</td></tr></tbody>
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>LIFECYCLE.BUSY</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>DESCENDPERMIT</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>DIVESTATE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>KOBOLDCONTACTORCMD</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>KOBOLDMEASUREENABLE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>MOTIONDIRECTION</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>MOTIONREQUESTACTIVE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>OPERATORACTIONID</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell' style='color:var(--muted);'>—</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>1</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell' title='Demarrage de la descente : passe a SEARCHING_IMMERSION'><span class='chrono-note-chip'>Demarrage de la descente : passe a SEARCHING_IMMERSION</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>2</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>-1</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>257</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='chrono-note-cell' title='Scan suivant dans SEARCHING_IMMERSION : activation du permis et de Busy'><span class='chrono-note-chip'>Scan suivant dans SEARCHING_IMMERSION : activation du permis et de Busy</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td>2</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td>-1</td><td><span class="v-true">TRUE</span></td><td class='changed'>258</td></tr></tbody>
     </table></div>
         </details>
         
     <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (19)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>BUCKETISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>KOBOLDIMMERSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1POSITION_M</code></td><td>0</td></tr><tr><td><code>M2POSITION_M</code></td><td>0</td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIVESTARTMIN_M</code></td><td>0</td></tr><tr><td><code>IMMERSIONUPPER_M</code></td><td>0</td></tr><tr><td><code>IMMERSIONLOWER_M</code></td><td>0</td></tr><tr><td><code>BYPASSPRECONDITIONS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BOTTOMTOUCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>IMMERSIONCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORCAUSEPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SEQERRORFAULT</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        <summary>🔒 Valeurs constantes sur toute la séquence (25)</summary>
+        <table class="static-table"><tbody><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERRORID</code></td><td>0</td></tr><tr><td><code>FAULT.LATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.LATCHEDID</code></td><td>0</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>LIFECYCLE.DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BOTTOMTOUCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSPRECONDITIONS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CURRENTSPEEDSTEP</code></td><td>0</td></tr><tr><td><code>DIVESTARTMIN_M</code></td><td>0</td></tr><tr><td><code>ERRORCAUSEPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>IMMERSIONCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>IMMERSIONLOWER_M</code></td><td>0</td></tr><tr><td><code>IMMERSIONUPPER_M</code></td><td>0</td></tr><tr><td><code>KOBOLDIMMERSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1POSITION_M</code></td><td>0</td></tr><tr><td><code>M2POSITION_M</code></td><td>0</td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>PALIER5FORBIDDENFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SEQERRORFAULT</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-divesearch-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond </h3>
+            </header>
+            
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>Pret a descendre</li><li>Contacteur Kobold alimente</li><li>Passe en recherche du fond</li><li>Fond confirme</li><li>Contact fond valide</li><li>Coupure contacteur Kobold pour eviter surchauffe</li></ul>
+            </details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (5 scans, 13 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="500" height="612" viewBox="0 0 500 612" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;0&quot;, &quot;MOTIONDIRECTION&quot;: &quot;0&quot;, &quot;BUCKETISOPEN&quot;: &quot;1&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;20&quot;, &quot;M2POSITION_M&quot;: &quot;20&quot;, &quot;POSITIONSVALID&quot;: &quot;1&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;4&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;15&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;10&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;5&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;1&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;0&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;1&quot;, &quot;MOTIONDIRECTION&quot;: &quot;-1&quot;, &quot;BUCKETISOPEN&quot;: &quot;1&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;12&quot;, &quot;M2POSITION_M&quot;: &quot;12&quot;, &quot;POSITIONSVALID&quot;: &quot;1&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;4&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;15&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;10&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;5&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;2&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;257&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;1&quot;, &quot;MOTIONDIRECTION&quot;: &quot;-1&quot;, &quot;BUCKETISOPEN&quot;: &quot;1&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;12&quot;, &quot;M2POSITION_M&quot;: &quot;12&quot;, &quot;POSITIONSVALID&quot;: &quot;1&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;4&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;15&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;10&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;5&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;1&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;2&quot;, &quot;DESCENDPERMIT&quot;: &quot;1&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;1&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;1&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;258&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 3, &quot;t_ms&quot;: 30.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;1&quot;, &quot;MOTIONDIRECTION&quot;: &quot;-1&quot;, &quot;BUCKETISOPEN&quot;: &quot;1&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;1&quot;, &quot;M1POSITION_M&quot;: &quot;8&quot;, &quot;M2POSITION_M&quot;: &quot;8&quot;, &quot;POSITIONSVALID&quot;: &quot;1&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;4&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;15&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;10&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;5&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;1&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;3&quot;, &quot;DESCENDPERMIT&quot;: &quot;1&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;1&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;1&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;258&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;1&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 4, &quot;t_ms&quot;: 40.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;1&quot;, &quot;MOTIONDIRECTION&quot;: &quot;-1&quot;, &quot;BUCKETISOPEN&quot;: &quot;1&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;-5&quot;, &quot;M2POSITION_M&quot;: &quot;-5&quot;, &quot;POSITIONSVALID&quot;: &quot;1&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;4&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;15&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;10&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;5&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;1&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;4&quot;, &quot;DESCENDPERMIT&quot;: &quot;1&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;1&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;1&quot;, &quot;OPERATORACTIONID&quot;: &quot;259&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}]" data-fields="[&quot;LIFECYCLE.BUSY&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;, &quot;DESCENDPERMIT&quot;, &quot;DIVESTATE&quot;, &quot;IMMERSIONCONFIRMED&quot;, &quot;KOBOLDCONTACTORCMD&quot;, &quot;KOBOLDIMMERSED&quot;, &quot;KOBOLDMEASUREENABLE&quot;, &quot;M1POSITION_M&quot;, &quot;M2POSITION_M&quot;, &quot;MOTIONDIRECTION&quot;, &quot;MOTIONREQUESTACTIVE&quot;, &quot;OPERATORACTIONID&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="594" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="594" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="606" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="594" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="606" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="594" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="606" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="594" class="wf-grid"/><text x="396.0" y="52" class="wf-time">30ms</text><text x="396.0" y="606" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="594" class="wf-grid"/><text x="452.0" y="52" class="wf-time">40ms</text><text x="452.0" y="606" class="wf-scan">#4</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="182" y="86.0" class="wf-label">LIFECYCLE.BUSY</text><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L312,94L312,68L368,68L424,68L480,68" class="wf-line" stroke="#2563eb"/><circle cx="192" cy="122.0" r="4" fill="#059669"/><text x="182" y="126.0" class="wf-label">BOTTOMTOUCHCONFIRMED</text><path d="M200,134L256,134L312,134L368,134L424,134L424,134L424,108L480,108" class="wf-line" stroke="#059669"/><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><text x="182" y="166.0" class="wf-label">DESCENDPERMIT</text><path d="M200,174L256,174L312,174L312,174L312,148L368,148L424,148L480,148" class="wf-line" stroke="#0891b2"/><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><text x="182" y="206.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 3)" title="Cliquer pour basculer Courbe / Chiffres">DIVESTATE</text><g class="wf-numeric-group" data-row="3"><g class="wf-analog-view"><text x="194" y="192" class="wf-scale">4.00</text><text x="194" y="218" class="wf-scale">1.00</text><path d="M200,216.0L256,216.0L256,206.7L312,206.7L368,206.7L368,197.3L424,197.3L424,188.0L480,188.0" class="wf-line" stroke="#65a30d" stroke-width="2.2"/><circle cx="256" cy="206.7" r="2.5" fill="#65a30d"/><circle cx="368" cy="197.3" r="2.5" fill="#65a30d"/><circle cx="424" cy="188.0" r="2.5" fill="#65a30d"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="219.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">1</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><rect x="275.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="197.0" class="wf-num-changed">2</text><line x1="312" y1="202.0" x2="368" y2="202.0" class="wf-num-line"/><text x="340.0" y="196.0" class="wf-num">2</text><line x1="368" y1="202.0" x2="424" y2="202.0" class="wf-num-line"/><rect x="387.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="396.0" y="197.0" class="wf-num-changed">3</text><line x1="424" y1="202.0" x2="480" y2="202.0" class="wf-num-line"/><rect x="443.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="452.0" y="197.0" class="wf-num-changed">4</text></g></g><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><text x="182" y="246.0" class="wf-label">IMMERSIONCONFIRMED</text><path d="M200,254L256,254L312,254L368,254L368,254L368,228L424,228L424,228L424,254L480,254" class="wf-line" stroke="#0d9488"/><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><text x="182" y="286.0" class="wf-label">KOBOLDCONTACTORCMD</text><path d="M200,294L256,294L312,294L312,294L312,268L368,268L424,268L424,268L424,294L480,294" class="wf-line" stroke="#1d4ed8"/><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><text x="182" y="326.0" class="wf-label">KOBOLDIMMERSED</text><path d="M200,334L256,334L312,334L368,334L368,334L368,308L424,308L424,308L424,334L480,334" class="wf-line" stroke="#2563eb"/><circle cx="192" cy="362.0" r="4" fill="#059669"/><text x="182" y="366.0" class="wf-label">KOBOLDMEASUREENABLE</text><path d="M200,374L256,374L312,374L312,374L312,348L368,348L424,348L480,348" class="wf-line" stroke="#059669"/><circle cx="192" cy="402.0" r="4" fill="#0891b2"/><text x="182" y="406.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 8)" title="Cliquer pour basculer Courbe / Chiffres">M1POSITION_M</text><g class="wf-numeric-group" data-row="8"><g class="wf-analog-view"><text x="194" y="392" class="wf-scale">20.0</text><text x="194" y="418" class="wf-scale">-5.00</text><path d="M200,388.0L256,388.0L256,397.0L312,397.0L368,397.0L368,401.4L424,401.4L424,416.0L480,416.0" class="wf-line" stroke="#0891b2" stroke-width="2.2"/><circle cx="256" cy="397.0" r="2.5" fill="#0891b2"/><circle cx="368" cy="401.4" r="2.5" fill="#0891b2"/><circle cx="424" cy="416.0" r="2.5" fill="#0891b2"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="402.0" x2="256" y2="402.0" class="wf-num-line"/><rect x="219.0" y="388.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="397.0" class="wf-num-changed">20</text><line x1="256" y1="402.0" x2="312" y2="402.0" class="wf-num-line"/><rect x="275.0" y="388.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="284.0" y="397.0" class="wf-num-changed">12</text><line x1="312" y1="402.0" x2="368" y2="402.0" class="wf-num-line"/><text x="340.0" y="396.0" class="wf-num">12</text><line x1="368" y1="402.0" x2="424" y2="402.0" class="wf-num-line"/><rect x="387.0" y="388.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="396.0" y="397.0" class="wf-num-changed">8</text><line x1="424" y1="402.0" x2="480" y2="402.0" class="wf-num-line"/><rect x="443.0" y="388.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="452.0" y="397.0" class="wf-num-changed">-5</text></g></g><circle cx="192" cy="442.0" r="4" fill="#65a30d"/><text x="182" y="446.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 9)" title="Cliquer pour basculer Courbe / Chiffres">M2POSITION_M</text><g class="wf-numeric-group" data-row="9"><g class="wf-analog-view"><text x="194" y="432" class="wf-scale">20.0</text><text x="194" y="458" class="wf-scale">-5.00</text><path d="M200,428.0L256,428.0L256,437.0L312,437.0L368,437.0L368,441.4L424,441.4L424,456.0L480,456.0" class="wf-line" stroke="#65a30d" stroke-width="2.2"/><circle cx="256" cy="437.0" r="2.5" fill="#65a30d"/><circle cx="368" cy="441.4" r="2.5" fill="#65a30d"/><circle cx="424" cy="456.0" r="2.5" fill="#65a30d"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="442.0" x2="256" y2="442.0" class="wf-num-line"/><rect x="219.0" y="428.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="437.0" class="wf-num-changed">20</text><line x1="256" y1="442.0" x2="312" y2="442.0" class="wf-num-line"/><rect x="275.0" y="428.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="437.0" class="wf-num-changed">12</text><line x1="312" y1="442.0" x2="368" y2="442.0" class="wf-num-line"/><text x="340.0" y="436.0" class="wf-num">12</text><line x1="368" y1="442.0" x2="424" y2="442.0" class="wf-num-line"/><rect x="387.0" y="428.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="396.0" y="437.0" class="wf-num-changed">8</text><line x1="424" y1="442.0" x2="480" y2="442.0" class="wf-num-line"/><rect x="443.0" y="428.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="452.0" y="437.0" class="wf-num-changed">-5</text></g></g><circle cx="192" cy="482.0" r="4" fill="#0d9488"/><text x="182" y="486.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 10)" title="Cliquer pour basculer Courbe / Chiffres">MOTIONDIRECTION</text><g class="wf-numeric-group" data-row="10"><g class="wf-analog-view"><text x="194" y="472" class="wf-scale">0</text><text x="194" y="498" class="wf-scale">-1.00</text><path d="M200,468.0L256,468.0L256,496.0L312,496.0L368,496.0L424,496.0L480,496.0" class="wf-line" stroke="#0d9488" stroke-width="2.2"/><circle cx="256" cy="496.0" r="2.5" fill="#0d9488"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="482.0" x2="256" y2="482.0" class="wf-num-line"/><rect x="219.0" y="468.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="228.0" y="477.0" class="wf-num-changed">0</text><line x1="256" y1="482.0" x2="312" y2="482.0" class="wf-num-line"/><rect x="275.0" y="468.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="284.0" y="477.0" class="wf-num-changed">-1</text><line x1="312" y1="482.0" x2="368" y2="482.0" class="wf-num-line"/><text x="340.0" y="476.0" class="wf-num">-1</text><line x1="368" y1="482.0" x2="424" y2="482.0" class="wf-num-line"/><text x="396.0" y="476.0" class="wf-num">-1</text><line x1="424" y1="482.0" x2="480" y2="482.0" class="wf-num-line"/><text x="452.0" y="476.0" class="wf-num">-1</text></g></g><circle cx="192" cy="522.0" r="4" fill="#1d4ed8"/><text x="182" y="526.0" class="wf-label">MOTIONREQUESTACTIVE</text><path d="M200,534L256,534L256,534L256,508L312,508L368,508L424,508L480,508" class="wf-line" stroke="#1d4ed8"/><circle cx="192" cy="562.0" r="4" fill="#2563eb"/><text x="182" y="566.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 12)" title="Cliquer pour basculer Courbe / Chiffres">OPERATORACTIONID</text><g class="wf-numeric-group" data-row="12"><g class="wf-analog-view"><text x="194" y="552" class="wf-scale">259.0</text><text x="194" y="578" class="wf-scale">0</text><path d="M200,576.0L256,576.0L256,548.2L312,548.2L312,548.1L368,548.1L424,548.1L424,548.0L480,548.0" class="wf-line" stroke="#2563eb" stroke-width="2.2"/><circle cx="256" cy="548.2" r="2.5" fill="#2563eb"/><circle cx="312" cy="548.1" r="2.5" fill="#2563eb"/><circle cx="424" cy="548.0" r="2.5" fill="#2563eb"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="562.0" x2="256" y2="562.0" class="wf-num-line"/><rect x="219.0" y="548.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="557.0" class="wf-num-changed">0</text><line x1="256" y1="562.0" x2="312" y2="562.0" class="wf-num-line"/><rect x="273.5" y="548.0" width="21" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="284.0" y="557.0" class="wf-num-changed">257</text><line x1="312" y1="562.0" x2="368" y2="562.0" class="wf-num-line"/><rect x="329.5" y="548.0" width="21" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="557.0" class="wf-num-changed">258</text><line x1="368" y1="562.0" x2="424" y2="562.0" class="wf-num-line"/><text x="396.0" y="556.0" class="wf-num">258</text><line x1="424" y1="562.0" x2="480" y2="562.0" class="wf-num-line"/><rect x="441.5" y="548.0" width="21" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="452.0" y="557.0" class="wf-num-changed">259</text></g></g></svg></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (5 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>LIFECYCLE.BUSY</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>BOTTOMTOUCHCONFIRMED</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>DESCENDPERMIT</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>DIVESTATE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>IMMERSIONCONFIRMED</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>KOBOLDCONTACTORCMD</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>KOBOLDIMMERSED</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>KOBOLDMEASUREENABLE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>M1POSITION_M</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>M2POSITION_M</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>MOTIONDIRECTION</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>MOTIONREQUESTACTIVE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>OPERATORACTIONID</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>1</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>20</td><td>20</td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>2</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>12</td><td class='changed'>12</td><td class='changed'>-1</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>257</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td>2</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td>12</td><td>12</td><td>-1</td><td><span class="v-true">TRUE</span></td><td class='changed'>258</td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>30 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'>3</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'>8</td><td class='changed'>8</td><td>-1</td><td><span class="v-true">TRUE</span></td><td>258</td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>40 ms</td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'>4</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'>-5</td><td class='changed'>-5</td><td>-1</td><td><span class="v-true">TRUE</span></td><td class='changed'>259</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (20)</summary>
+        <table class="static-table"><tbody><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERRORID</code></td><td>0</td></tr><tr><td><code>FAULT.LATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.LATCHEDID</code></td><td>0</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>LIFECYCLE.DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETISOPEN</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BYPASSPRECONDITIONS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CURRENTSPEEDSTEP</code></td><td>4</td></tr><tr><td><code>DIVESTARTMIN_M</code></td><td>15</td></tr><tr><td><code>ERRORCAUSEPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>IMMERSIONLOWER_M</code></td><td>5</td></tr><tr><td><code>IMMERSIONUPPER_M</code></td><td>10</td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>PALIER5FORBIDDENFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SEQERRORFAULT</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-divesearch-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant </h3>
+            </header>
+            
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Defaut Palier 5 interdit</li><li>Verrouille en ERROR_HOLD</li><li>Contacteur coupe sur defaut</li></ul>
+            </details>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (4 scans, 15 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="444" height="692" viewBox="0 0 444 692" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;0&quot;, &quot;MOTIONDIRECTION&quot;: &quot;0&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;0&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;0&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;0&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;0&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;1&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;1&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;0&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;1&quot;, &quot;MOTIONDIRECTION&quot;: &quot;-1&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;4&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;0&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;0&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;0&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;1&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;2&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;257&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;1&quot;, &quot;MOTIONDIRECTION&quot;: &quot;-1&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;5&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;0&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;0&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;0&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;1&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;1&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;2&quot;, &quot;DESCENDPERMIT&quot;: &quot;1&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;1&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;1&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;258&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 3, &quot;t_ms&quot;: 30.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;MODE&quot;: &quot;0&quot;, &quot;MOTIONREQUESTACTIVE&quot;: &quot;1&quot;, &quot;MOTIONDIRECTION&quot;: &quot;-1&quot;, &quot;BUCKETISOPEN&quot;: &quot;0&quot;, &quot;KOBOLDIMMERSED&quot;: &quot;0&quot;, &quot;M1POSITION_M&quot;: &quot;0&quot;, &quot;M2POSITION_M&quot;: &quot;0&quot;, &quot;POSITIONSVALID&quot;: &quot;0&quot;, &quot;CURRENTSPEEDSTEP&quot;: &quot;5&quot;, &quot;DIVESTARTMIN_M&quot;: &quot;0&quot;, &quot;IMMERSIONUPPER_M&quot;: &quot;0&quot;, &quot;IMMERSIONLOWER_M&quot;: &quot;0&quot;, &quot;BYPASSPRECONDITIONS&quot;: &quot;1&quot;, &quot;READY&quot;: &quot;0&quot;, &quot;FAULT.ERROR&quot;: &quot;1&quot;, &quot;FAULT.ERRORID&quot;: &quot;8&quot;, &quot;FAULT.LATCHED&quot;: &quot;1&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;8&quot;, &quot;LIFECYCLE.BUSY&quot;: &quot;0&quot;, &quot;LIFECYCLE.DONE&quot;: &quot;0&quot;, &quot;DIVESTATE&quot;: &quot;5&quot;, &quot;DESCENDPERMIT&quot;: &quot;0&quot;, &quot;KOBOLDMEASUREENABLE&quot;: &quot;0&quot;, &quot;KOBOLDCONTACTORCMD&quot;: &quot;0&quot;, &quot;BOTTOMTOUCHCONFIRMED&quot;: &quot;0&quot;, &quot;OPERATORACTIONID&quot;: &quot;384&quot;, &quot;IMMERSIONCONFIRMED&quot;: &quot;0&quot;, &quot;ERRORCAUSEPRESENT&quot;: &quot;0&quot;, &quot;SEQERRORFAULT&quot;: &quot;0&quot;, &quot;PALIER5FORBIDDENFAULT&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;&quot;}]" data-fields="[&quot;FAULT.ERROR&quot;, &quot;FAULT.ERRORID&quot;, &quot;FAULT.LATCHED&quot;, &quot;FAULT.LATCHEDID&quot;, &quot;READY&quot;, &quot;LIFECYCLE.BUSY&quot;, &quot;CURRENTSPEEDSTEP&quot;, &quot;DESCENDPERMIT&quot;, &quot;DIVESTATE&quot;, &quot;KOBOLDCONTACTORCMD&quot;, &quot;KOBOLDMEASUREENABLE&quot;, &quot;MOTIONDIRECTION&quot;, &quot;MOTIONREQUESTACTIVE&quot;, &quot;OPERATORACTIONID&quot;, &quot;PALIER5FORBIDDENFAULT&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="674" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="674" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="686" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="674" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="686" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="674" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="686" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="674" class="wf-grid"/><text x="396.0" y="52" class="wf-time">30ms</text><text x="396.0" y="686" class="wf-scan">#3</text><circle cx="192" cy="82.0" r="4" fill="#dc2626"/><text x="182" y="86.0" class="wf-label">FAULT.ERROR</text><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L368,94L368,94L368,68L424,68" class="wf-line" stroke="#dc2626"/><circle cx="192" cy="122.0" r="4" fill="#b91c1c"/><text x="182" y="126.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 1)" title="Cliquer pour basculer Courbe / Chiffres">FAULT.ERRORID</text><g class="wf-numeric-group" data-row="1"><g class="wf-analog-view"><text x="194" y="112" class="wf-scale">8.00</text><text x="194" y="138" class="wf-scale">0</text><path d="M200,136.0L256,136.0L312,136.0L368,136.0L368,108.0L424,108.0" class="wf-line" stroke="#b91c1c" stroke-width="2.2"/><circle cx="368" cy="108.0" r="2.5" fill="#b91c1c"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="219.0" y="108.0" width="18" height="13" rx="3" fill="#b91c1c" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">0</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">0</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><text x="340.0" y="116.0" class="wf-num">0</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><rect x="387.0" y="108.0" width="18" height="13" rx="3" fill="#b91c1c" class="wf-chip"/><text x="396.0" y="117.0" class="wf-num-changed">8</text></g></g><circle cx="192" cy="162.0" r="4" fill="#2563eb"/><text x="182" y="166.0" class="wf-label">FAULT.LATCHED</text><path d="M200,174L256,174L312,174L368,174L368,174L368,148L424,148" class="wf-line" stroke="#2563eb"/><circle cx="192" cy="202.0" r="4" fill="#059669"/><text x="182" y="206.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 3)" title="Cliquer pour basculer Courbe / Chiffres">FAULT.LATCHEDID</text><g class="wf-numeric-group" data-row="3"><g class="wf-analog-view"><text x="194" y="192" class="wf-scale">8.00</text><text x="194" y="218" class="wf-scale">0</text><path d="M200,216.0L256,216.0L312,216.0L368,216.0L368,188.0L424,188.0" class="wf-line" stroke="#059669" stroke-width="2.2"/><circle cx="368" cy="188.0" r="2.5" fill="#059669"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="219.0" y="188.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">0</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><text x="284.0" y="196.0" class="wf-num">0</text><line x1="312" y1="202.0" x2="368" y2="202.0" class="wf-num-line"/><text x="340.0" y="196.0" class="wf-num">0</text><line x1="368" y1="202.0" x2="424" y2="202.0" class="wf-num-line"/><rect x="387.0" y="188.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="396.0" y="197.0" class="wf-num-changed">8</text></g></g><circle cx="192" cy="242.0" r="4" fill="#0891b2"/><text x="182" y="246.0" class="wf-label">READY</text><path d="M200,228L256,228L312,228L368,228L368,228L368,254L424,254" class="wf-line" stroke="#0891b2"/><circle cx="192" cy="282.0" r="4" fill="#65a30d"/><text x="182" y="286.0" class="wf-label">LIFECYCLE.BUSY</text><path d="M200,294L256,294L312,294L312,294L312,268L368,268L368,268L368,294L424,294" class="wf-line" stroke="#65a30d"/><circle cx="192" cy="322.0" r="4" fill="#0d9488"/><text x="182" y="326.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 6)" title="Cliquer pour basculer Courbe / Chiffres">CURRENTSPEEDSTEP</text><g class="wf-numeric-group" data-row="6"><g class="wf-analog-view"><text x="194" y="312" class="wf-scale">5.00</text><text x="194" y="338" class="wf-scale">0</text><path d="M200,336.0L256,336.0L256,313.6L312,313.6L312,308.0L368,308.0L424,308.0" class="wf-line" stroke="#0d9488" stroke-width="2.2"/><circle cx="256" cy="313.6" r="2.5" fill="#0d9488"/><circle cx="312" cy="308.0" r="2.5" fill="#0d9488"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="219.0" y="308.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">0</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><rect x="275.0" y="308.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="284.0" y="317.0" class="wf-num-changed">4</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><rect x="331.0" y="308.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="340.0" y="317.0" class="wf-num-changed">5</text><line x1="368" y1="322.0" x2="424" y2="322.0" class="wf-num-line"/><text x="396.0" y="316.0" class="wf-num">5</text></g></g><circle cx="192" cy="362.0" r="4" fill="#1d4ed8"/><text x="182" y="366.0" class="wf-label">DESCENDPERMIT</text><path d="M200,374L256,374L312,374L312,374L312,348L368,348L368,348L368,374L424,374" class="wf-line" stroke="#1d4ed8"/><circle cx="192" cy="402.0" r="4" fill="#2563eb"/><text x="182" y="406.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 8)" title="Cliquer pour basculer Courbe / Chiffres">DIVESTATE</text><g class="wf-numeric-group" data-row="8"><g class="wf-analog-view"><text x="194" y="392" class="wf-scale">5.00</text><text x="194" y="418" class="wf-scale">1.00</text><path d="M200,416.0L256,416.0L256,409.0L312,409.0L368,409.0L368,388.0L424,388.0" class="wf-line" stroke="#2563eb" stroke-width="2.2"/><circle cx="256" cy="409.0" r="2.5" fill="#2563eb"/><circle cx="368" cy="388.0" r="2.5" fill="#2563eb"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="402.0" x2="256" y2="402.0" class="wf-num-line"/><rect x="219.0" y="388.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="397.0" class="wf-num-changed">1</text><line x1="256" y1="402.0" x2="312" y2="402.0" class="wf-num-line"/><rect x="275.0" y="388.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="284.0" y="397.0" class="wf-num-changed">2</text><line x1="312" y1="402.0" x2="368" y2="402.0" class="wf-num-line"/><text x="340.0" y="396.0" class="wf-num">2</text><line x1="368" y1="402.0" x2="424" y2="402.0" class="wf-num-line"/><rect x="387.0" y="388.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="397.0" class="wf-num-changed">5</text></g></g><circle cx="192" cy="442.0" r="4" fill="#059669"/><text x="182" y="446.0" class="wf-label">KOBOLDCONTACTORCMD</text><path d="M200,454L256,454L312,454L312,454L312,428L368,428L368,428L368,454L424,454" class="wf-line" stroke="#059669"/><circle cx="192" cy="482.0" r="4" fill="#0891b2"/><text x="182" y="486.0" class="wf-label">KOBOLDMEASUREENABLE</text><path d="M200,494L256,494L312,494L312,494L312,468L368,468L368,468L368,494L424,494" class="wf-line" stroke="#0891b2"/><circle cx="192" cy="522.0" r="4" fill="#65a30d"/><text x="182" y="526.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 11)" title="Cliquer pour basculer Courbe / Chiffres">MOTIONDIRECTION</text><g class="wf-numeric-group" data-row="11"><g class="wf-analog-view"><text x="194" y="512" class="wf-scale">0</text><text x="194" y="538" class="wf-scale">-1.00</text><path d="M200,508.0L256,508.0L256,536.0L312,536.0L368,536.0L424,536.0" class="wf-line" stroke="#65a30d" stroke-width="2.2"/><circle cx="256" cy="536.0" r="2.5" fill="#65a30d"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="522.0" x2="256" y2="522.0" class="wf-num-line"/><rect x="219.0" y="508.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="517.0" class="wf-num-changed">0</text><line x1="256" y1="522.0" x2="312" y2="522.0" class="wf-num-line"/><rect x="275.0" y="508.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="517.0" class="wf-num-changed">-1</text><line x1="312" y1="522.0" x2="368" y2="522.0" class="wf-num-line"/><text x="340.0" y="516.0" class="wf-num">-1</text><line x1="368" y1="522.0" x2="424" y2="522.0" class="wf-num-line"/><text x="396.0" y="516.0" class="wf-num">-1</text></g></g><circle cx="192" cy="562.0" r="4" fill="#0d9488"/><text x="182" y="566.0" class="wf-label">MOTIONREQUESTACTIVE</text><path d="M200,574L256,574L256,574L256,548L312,548L368,548L424,548" class="wf-line" stroke="#0d9488"/><circle cx="192" cy="602.0" r="4" fill="#1d4ed8"/><text x="182" y="606.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 13)" title="Cliquer pour basculer Courbe / Chiffres">OPERATORACTIONID</text><g class="wf-numeric-group" data-row="13"><g class="wf-analog-view"><text x="194" y="592" class="wf-scale">384.0</text><text x="194" y="618" class="wf-scale">0</text><path d="M200,616.0L256,616.0L256,597.3L312,597.3L368,597.2L368,588.0L424,588.0" class="wf-line" stroke="#1d4ed8" stroke-width="2.2"/><circle cx="256" cy="597.3" r="2.5" fill="#1d4ed8"/><circle cx="312" cy="597.2" r="2.5" fill="#1d4ed8"/><circle cx="368" cy="588.0" r="2.5" fill="#1d4ed8"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="602.0" x2="256" y2="602.0" class="wf-num-line"/><rect x="219.0" y="588.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="228.0" y="597.0" class="wf-num-changed">0</text><line x1="256" y1="602.0" x2="312" y2="602.0" class="wf-num-line"/><rect x="273.5" y="588.0" width="21" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="284.0" y="597.0" class="wf-num-changed">257</text><line x1="312" y1="602.0" x2="368" y2="602.0" class="wf-num-line"/><rect x="329.5" y="588.0" width="21" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="340.0" y="597.0" class="wf-num-changed">258</text><line x1="368" y1="602.0" x2="424" y2="602.0" class="wf-num-line"/><rect x="385.5" y="588.0" width="21" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="396.0" y="597.0" class="wf-num-changed">384</text></g></g><circle cx="192" cy="642.0" r="4" fill="#2563eb"/><text x="182" y="646.0" class="wf-label">PALIER5FORBIDDENFAULT</text><path d="M200,654L256,654L312,654L312,654L312,628L368,628L424,628" class="wf-line" stroke="#2563eb"/></svg></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (4 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>FAULT.ERROR</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>FAULT.ERRORID</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>FAULT.LATCHED</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>FAULT.LATCHEDID</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>READY</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>LIFECYCLE.BUSY</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>CURRENTSPEEDSTEP</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>DESCENDPERMIT</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>DIVESTATE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>KOBOLDCONTACTORCMD</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>KOBOLDMEASUREENABLE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>MOTIONDIRECTION</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>MOTIONREQUESTACTIVE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>OPERATORACTIONID</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>PALIER5FORBIDDENFAULT</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>1</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>4</td><td><span class="v-false">FALSE</span></td><td class='changed'>2</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>-1</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>257</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>5</td><td class='changed'><span class="v-true">TRUE</span></td><td>2</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td>-1</td><td><span class="v-true">TRUE</span></td><td class='changed'>258</td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>30 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>8</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>8</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td>5</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>5</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td>-1</td><td><span class="v-true">TRUE</span></td><td class='changed'>384</td><td><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (18)</summary>
+        <table class="static-table"><tbody><tr><td><code>LIFECYCLE.DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BOTTOMTOUCHCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUCKETISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSPRECONDITIONS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIVESTARTMIN_M</code></td><td>0</td></tr><tr><td><code>ERRORCAUSEPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>IMMERSIONCONFIRMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>IMMERSIONLOWER_M</code></td><td>0</td></tr><tr><td><code>IMMERSIONUPPER_M</code></td><td>0</td></tr><tr><td><code>KOBOLDIMMERSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1POSITION_M</code></td><td>0</td></tr><tr><td><code>M2POSITION_M</code></td><td>0</td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>POSITIONSVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SEQERRORFAULT</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
         </article>
@@ -897,6 +1161,7 @@ VAR_INPUT
     M1Position_M            : REAL;         // --&gt; [HW] Position codeur treuil M1 (m)
     M2Position_M            : REAL;         // --&gt; [HW] Position codeur treuil M2 (m)
     PositionsValid          : BOOL;         // --&gt; [HW] Validite des mesures de position
+    CurrentSpeedStep        : INT;          // --&gt; [HW] Palier de vitesse actuel (1..5)
 
     // === CONFIGURATION &amp; SEUILS ===
     DiveStartMin_M          : REAL;         // --&gt; [CFG] Seuil position min pour debut plongee (m)
@@ -915,6 +1180,7 @@ VAR_OUTPUT
     // === PERMIS &amp; AUTORISATIONS ===
     DescendPermit           : BOOL;         // &lt;-- [ACT] Autorisation de descente assistee
     KoboldMeasureEnable     : BOOL;         // &lt;-- [ACT] Activation mesure/acquisition Kobold
+    KoboldContactorCmd      : BOOL;         // &lt;-- [ACT] Commande alimentation contacteur Kobold (anti-chauffe)
     BottomTouchConfirmed    : BOOL;         // &lt;-- [STAT] Contact fond valide et confirme
 
     // === DIAGNOSTIC IHM ===
@@ -931,6 +1197,7 @@ VAR
     ImmersionConfirmed      : BOOL;         // . [LOC] Immersion dans la fenetre d&#x27;eau validee
     ErrorCausePresent       : BOOL;         // . [LOC] Presence d&#x27;une cause de defaut parametrage
     SeqErrorFault           : BOOL;         // . [LOC] Latch erreur séquence immersion
+    Palier5ForbiddenFault   : BOOL;         // . [LOC] Latch tentative descente en Palier 5 sous Kobold
 
     // === SOCLE DEFAUT ===
     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
@@ -950,6 +1217,7 @@ ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M &lt; Immersion
 
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
     SeqErrorFault := FALSE;
+    Palier5ForbiddenFault := FALSE;
     ImmersionConfirmed := FALSE;
     BottomTouchConfirmed := FALSE;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
@@ -962,6 +1230,10 @@ instCauses[0].Texte    := &#x27;Incoherence sequence immersion Kobold&#x27;;
 instCauses[2].Active   := ErrorCausePresent;
 instCauses[2].Latching := TRUE;
 instCauses[2].Texte    := &#x27;Parametrage invalide des seuils de plongee&#x27;;
+
+instCauses[3].Active   := Palier5ForbiddenFault;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := &#x27;Mesure Kobold impossible : vitesse trop elevee (Palier 5 interdit)&#x27;;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -976,6 +1248,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Lifecycle.Done := FALSE;
     DescendPermit := FALSE;
     KoboldMeasureEnable := FALSE;
+    KoboldContactorCmd := FALSE;
     BottomTouchConfirmed := FALSE;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
     OperatorActionId := 0;
@@ -990,16 +1263,19 @@ Ready := Enable AND NOT Fault.Latched;
 {region &quot;§3 Machine etat plongee recherche fond&quot;}
 DescendPermit := FALSE;
 KoboldMeasureEnable := FALSE;
+KoboldContactorCmd := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
 
 IF Fault.Error THEN
     DiveState := E_DiveSearchState.ERROR_HOLD;
+    KoboldContactorCmd := FALSE;
     OperatorActionId := 16#0180;
     OperatorAction := &#x27;Vérifier les conditions puis réarmer avant une nouvelle plongée.&#x27;;
 ELSE
     CASE DiveState OF
         E_DiveSearchState.WAIT_PRECONDITIONS:
+            KoboldContactorCmd := FALSE;
             IF NOT BypassPreconditions
                AND (NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
                     OR (M1Position_M &lt; DiveStartMin_M) OR (M2Position_M &lt; DiveStartMin_M)) THEN
@@ -1011,6 +1287,7 @@ ELSE
 
         E_DiveSearchState.READY_TO_DESCEND:
             Ready := TRUE;
+            KoboldContactorCmd := FALSE;
             OperatorActionId := 16#0101;
             OperatorAction := &#x27;Demander une descente pour rechercher le fond.&#x27;;
             IF MotionRequestActive AND (MotionDirection = -1) THEN
@@ -1021,8 +1298,15 @@ ELSE
             Lifecycle.Busy := TRUE;
             DescendPermit := MotionRequestActive AND (MotionDirection = -1);
             KoboldMeasureEnable := TRUE;
+            KoboldContactorCmd := TRUE; // Alimentation contacteur Kobold activée à la volée
             OperatorActionId := 16#0102;
             OperatorAction := &#x27;Maintenir la descente : recherche immersion Kobold.&#x27;;
+
+            // 🛑 Interdiction du Palier 5 pendant la détection Kobold
+            IF CurrentSpeedStep &gt; 4 THEN
+                Palier5ForbiddenFault := TRUE;
+            END_IF;
+
             IF KoboldRiseEdge.Q THEN
                 IF (M1Position_M &lt;= ImmersionUpper_M) AND (M1Position_M &gt;= ImmersionLower_M)
                    AND (M2Position_M &lt;= ImmersionUpper_M) AND (M2Position_M &gt;= ImmersionLower_M) THEN
@@ -1039,21 +1323,30 @@ ELSE
             Lifecycle.Busy := TRUE;
             DescendPermit := MotionRequestActive AND (MotionDirection = -1);
             KoboldMeasureEnable := TRUE;
+            KoboldContactorCmd := TRUE; // Alimentation maintenue pendant la descente
             OperatorActionId := 16#0103;
             OperatorAction := &#x27;Maintenir la descente : immersion validée, recherche du fond.&#x27;;
+
+            // 🛑 Interdiction du Palier 5 pendant la détection Kobold
+            IF CurrentSpeedStep &gt; 4 THEN
+                Palier5ForbiddenFault := TRUE;
+            END_IF;
+
             IF KoboldFallEdge.Q AND ImmersionConfirmed THEN
                 BottomTouchConfirmed := TRUE;
                 ImmersionConfirmed := FALSE;
+                KoboldContactorCmd := FALSE; // Coupure immédiate à la détection pour éviter surchauffe
                 DiveState := E_DiveSearchState.BOTTOM_CONFIRMED;
             END_IF;
 
         E_DiveSearchState.BOTTOM_CONFIRMED:
             Lifecycle.Done := TRUE;
+            KoboldContactorCmd := FALSE; // Coupure anti-chauffe
             OperatorActionId := 16#0104;
             OperatorAction := &#x27;Fond détecté : demander la fermeture ou l extraction.&#x27;;
 
         E_DiveSearchState.ERROR_HOLD:
-            ;
+            KoboldContactorCmd := FALSE;
     END_CASE;
 END_IF;
 {endregion}
@@ -1069,9 +1362,11 @@ END_FUNCTION_BLOCK
 test_fb_divesearch.st
   [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
   [PASS] TC-P04-010 DiveSearch : mise en service recherche de couche
+  [PASS] TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond
+  [PASS] TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant
 
 -----------------------------------------
-2 tests, 2 passed, 0 failed
+4 tests, 4 passed, 0 failed
 </pre>
     </details>
 </div>
@@ -1088,6 +1383,152 @@ function copyPinExpr(el) {
     document.body.removeChild(ta);
     el.classList.add('pin-copied');
     setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
+
+function exportTableCSV(btn, testName) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var rows = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return '"' + th.textContent.replace(/"/g, '""').trim() + '"';
+    });
+    rows.push(headers.join(';'));
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return '"' + td.textContent.replace(/"/g, '""').trim() + '"';
+        });
+        rows.push(cells.join(';'));
+    });
+
+    var csvContent = "\uFEFF" + rows.join('\r\n');
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var safeName = (testName || 'chronogram').replace(/[^a-zA-Z0-9_\-]+/g, '_').substring(0, 50);
+    a.href = url;
+    a.download = safeName + '_chronogram.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📥 Téléchargé !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function copyTableMarkdown(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var lines = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return th.textContent.trim();
+    });
+    lines.push('| ' + headers.join(' | ') + ' |');
+    lines.push('| ' + headers.map(function() { return '---'; }).join(' | ') + ' |');
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return td.textContent.trim().replace(/\|/g, '\\|');
+        });
+        lines.push('| ' + cells.join(' | ') + ' |');
+    });
+
+    var md = lines.join('\n');
+    var ta = document.createElement('textarea');
+    ta.value = md;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📋 Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function toggleVerticalHeaders(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var isVert = table.classList.toggle('headers-vertical');
+    btn.innerHTML = isVert ? "↔️ Titres Horizontaux" : "📐 Titres Verticaux";
+    if (isVert) {
+        btn.classList.add('btn-copied');
+    } else {
+        btn.classList.remove('btn-copied');
+    }
+}
+
+function toggleWfLane(textEl, rowIdx) {
+    var svg = textEl.closest('svg');
+    if (!svg) return;
+    var group = svg.querySelector('.wf-numeric-group[data-row="' + rowIdx + '"]');
+    if (!group) return;
+    var analog = group.querySelector('.wf-analog-view');
+    var digital = group.querySelector('.wf-digital-view');
+    if (!analog || !digital) return;
+
+    var isAnalog = analog.style.display !== 'none';
+    if (isAnalog) {
+        analog.style.display = 'none';
+        digital.style.display = '';
+        textEl.classList.remove('active-curve');
+    } else {
+        analog.style.display = '';
+        digital.style.display = 'none';
+        textEl.classList.add('active-curve');
+    }
+}
+
+function toggleAllWaveforms(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var svg = details.querySelector('svg.waveform');
+    if (!svg) return;
+
+    var groups = svg.querySelectorAll('.wf-numeric-group');
+    if (!groups.length) return;
+
+    var firstAnalog = groups[0].querySelector('.wf-analog-view');
+    var currentlyAnalog = firstAnalog && firstAnalog.style.display !== 'none';
+    var targetAnalog = !currentlyAnalog;
+
+    groups.forEach(function(g) {
+        var a = g.querySelector('.wf-analog-view');
+        var d = g.querySelector('.wf-digital-view');
+        if (a) a.style.display = targetAnalog ? '' : 'none';
+        if (d) d.style.display = targetAnalog ? 'none' : '';
+    });
+
+    var labels = svg.querySelectorAll('.wf-label.wf-clickable');
+    labels.forEach(function(lbl) {
+        if (targetAnalog) lbl.classList.add('active-curve');
+        else lbl.classList.remove('active-curve');
+    });
+
+    btn.innerHTML = targetAnalog ? "🔢 Vue Chiffres" : "📈 Vue Courbes";
 }
 
 function toggleTheme() {
@@ -1114,6 +1555,175 @@ function updateThemeBtn(theme) {
         }
     } catch (e) {}
 })();
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Redimensionnement manuel des colonnes a la souris (Drag & Drop border)
+    var isResizing = false;
+    var currentTh = null;
+    var startX = 0;
+    var startWidth = 0;
+
+    document.addEventListener('mousedown', function(e) {
+        var resizer = e.target.closest('.col-resizer');
+        if (!resizer) return;
+        isResizing = true;
+        currentTh = resizer.closest('th');
+        startX = e.pageX;
+        startWidth = currentTh.offsetWidth;
+        resizer.classList.add('resizing');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing || !currentTh) return;
+        var diff = e.pageX - startX;
+        var newWidth = Math.max(30, startWidth + diff);
+        currentTh.style.width = newWidth + 'px';
+        currentTh.style.minWidth = newWidth + 'px';
+        currentTh.style.maxWidth = newWidth + 'px';
+
+        if (currentTh.classList.contains('note-th')) {
+            var table = currentTh.closest('.chrono-table');
+            if (table) {
+                table.querySelectorAll('.chrono-note-cell').forEach(function(td) {
+                    td.style.maxWidth = newWidth + 'px';
+                });
+                table.querySelectorAll('.chrono-note-chip').forEach(function(chip) {
+                    chip.style.maxWidth = Math.max(20, newWidth - 10) + 'px';
+                });
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.querySelectorAll('.col-resizer.resizing').forEach(function(r) {
+                r.classList.remove('resizing');
+            });
+            currentTh = null;
+        }
+    });
+
+    // Double-clic sur un en-tete de colonne pour la replier / deplier (hors barre de redimensionnement)
+    document.addEventListener('dblclick', function(e) {
+        if (e.target.closest('.col-resizer')) return;
+        var th = e.target.closest('.chrono-table th');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        var isCollapsed = th.classList.toggle('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.toggle('col-collapsed', isCollapsed);
+        });
+    });
+
+    // Clic simple sur colonne repliee pour la reouvrir
+    document.addEventListener('click', function(e) {
+        var th = e.target.closest('.chrono-table th.col-collapsed');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        th.classList.remove('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.remove('col-collapsed');
+        });
+    });
+
+    // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique
+    var tt = document.getElementById('wf-global-tooltip');
+    if (!tt) {
+        tt = document.createElement('div');
+        tt.id = 'wf-global-tooltip';
+        tt.className = 'wf-tooltip';
+        document.body.appendChild(tt);
+    }
+
+    document.addEventListener('mousemove', function(e) {
+        var svg = e.target.closest('svg.waveform');
+        if (!svg) {
+            if (tt) tt.style.display = 'none';
+            document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+            return;
+        }
+
+        var rect = svg.getBoundingClientRect();
+        var scaleX = svg.viewBox.baseVal.width / rect.width;
+        var scaleY = svg.viewBox.baseVal.height / rect.height;
+
+        var svgX = (e.clientX - rect.left) * scaleX;
+        var svgY = (e.clientY - rect.top) * scaleY;
+
+        var left = parseFloat(svg.getAttribute('data-left') || '200');
+        var top = parseFloat(svg.getAttribute('data-top') || '62');
+        var colw = parseFloat(svg.getAttribute('data-colw') || '56');
+        var laneh = parseFloat(svg.getAttribute('data-laneh') || '40');
+
+        var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
+        var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+
+        var colIdx = Math.floor((svgX - left) / colw);
+        var rowIdx = Math.floor((svgY - top) / laneh);
+
+        var cursorLine = svg.querySelector('.wf-cursor-line');
+
+        if (colIdx >= 0 && colIdx < scansData.length && rowIdx >= 0 && rowIdx < fieldsData.length) {
+            var s = scansData[colIdx];
+            var f = fieldsData[rowIdx];
+            var val = s.fields[f];
+            if (val === undefined) val = "—";
+
+            var displayVal = val;
+            if (val === "1") displayVal = "TRUE";
+            else if (val === "0") displayVal = "FALSE";
+            else {
+                var num = parseFloat(val);
+                if (!isNaN(num)) {
+                    displayVal = Math.abs(num) >= 100 ? num.toFixed(0) : num.toFixed(3);
+                }
+            }
+
+            if (cursorLine) {
+                var cx = left + (colIdx + 0.5) * colw;
+                cursorLine.setAttribute('x1', cx);
+                cursorLine.setAttribute('x2', cx);
+                cursorLine.style.display = '';
+            }
+
+            var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+
+            tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
+                           '<div class="wf-tt-var">' + f + '</div>' +
+                           '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
+                           noteHtml;
+
+            tt.style.display = 'block';
+            var ttX = e.clientX + 16;
+            var ttY = e.clientY + 16;
+            if (ttX + 280 > window.innerWidth) ttX = e.clientX - 280;
+            if (ttY + 120 > window.innerHeight) ttY = e.clientY - 120;
+            tt.style.left = ttX + 'px';
+            tt.style.top = ttY + 'px';
+        } else {
+            if (tt) tt.style.display = 'none';
+            if (cursorLine) cursorLine.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('mouseleave', function() {
+        if (tt) tt.style.display = 'none';
+        document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+    });
+});
 </script>
 </body>
 </html>

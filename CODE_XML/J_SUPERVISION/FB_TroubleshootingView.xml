@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:37:02.459129" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:37:02.459129">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T11:08:19.427054" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T11:08:19.427054">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -141,6 +141,57 @@
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>6cb965ad-bf44-5119-9acc-50ecd5c9f87b</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_OperatorAxis">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="JOYSTICK_X" value="1" />
+              <value name="JOYSTICK_Y" value="2" />
+              <value name="BUTTON" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun axe attendu (étape automatique ou arrêt)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>JOYSTICK_X</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe X translation attendu</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>JOYSTICK_Y</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe Y treuils / plongée attendu</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUTTON</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action bouton attendue (ex: validation, homing)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>07a48a82-b7c8-54f5-9041-14c13244835f</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -1484,7 +1535,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md §3ter
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -6197,7 +6248,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
             </variable>
             <variable name="CycleStepStr">
               <type>
-                <string length="40" />
+                <string length="80" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Libellé étape</xhtml>
@@ -6209,6 +6260,54 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Étape au défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleWaitingForOperator">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Attente action humaine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleWaitingForProcess">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Attente condition procédé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleOperatorActionId">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] ID action attendue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleOperatorAction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Consigne explicite</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleExpectedAxis">
+              <type>
+                <derived name="E_OperatorAxis" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Organe attendu</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleExpectedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Sens attendu (-1, 0, +1)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStartRequest">
@@ -6912,6 +7011,14 @@ GVL_Troubleshooting.CycleSemiAuto.Idx205_ErrorId                   := CycleError
 GVL_Troubleshooting.CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
 GVL_Troubleshooting.CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;
+GVL_Troubleshooting.CycleSemiAuto.Idx209_WaitingForOperator        := CycleWaitingForOperator;
+GVL_Troubleshooting.CycleSemiAuto.Idx210_WaitingForProcess         := CycleWaitingForProcess;
+GVL_Troubleshooting.CycleSemiAuto.Idx211_OperatorActionId          := CycleOperatorActionId;
+GVL_Troubleshooting.CycleSemiAuto.Idx212_OperatorAction            := CycleOperatorAction;
+GVL_Troubleshooting.CycleSemiAuto.Idx213_ExpectedAxis              := CycleExpectedAxis;
+GVL_Troubleshooting.CycleSemiAuto.Idx214_ExpectedDirection         := CycleExpectedDirection;
+GVL_Troubleshooting.CycleSemiAuto.Idx215_WaitingResume             := (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO) AND (CycleStep &lt;&gt; E_CycleStep.X0_PREPARATION) AND (CycleStep &lt;&gt; E_CycleStep.X13_DONE_SYNC) AND (CycleStep &lt;&gt; E_CycleStep.STABILIZING);
+GVL_Troubleshooting.CycleSemiAuto.Idx216_PausedState               := CycleStep;
 
 GVL_Troubleshooting.CycleSemiAuto.Idx301_TargetPosition            := CycleTargetPosition;
 GVL_Troubleshooting.CycleSemiAuto.Idx302_TargetDepth_M             := CycleTargetDepth_M;
@@ -7007,6 +7114,7 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
         <Folder Name="G_CYCLE">
           <Folder Name="_TYPES">
             <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
+            <Object Name="E_OperatorAxis" ObjectId="07a48a82-b7c8-54f5-9041-14c13244835f" />
             <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
             <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
           </Folder>
