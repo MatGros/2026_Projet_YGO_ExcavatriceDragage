@@ -375,6 +375,7 @@ TEST 'NEG-F2 : SampleCount +1 strict sur X13 multi-scan (doit ECHOUER sur origin
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
+    SampleCount := FB.SampleCount; (* copy-out émulé — sans lui, le copy-in masque l'incrément abusif de l'original *)
     (* X13 (2e scan) : SampleCount doit rester 1 (sur original : 2) *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
@@ -388,6 +389,7 @@ TEST 'NEG-F2 : SampleCount +1 strict sur X13 multi-scan (doit ECHOUER sur origin
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
+    SampleCount := FB.SampleCount; (* copy-out émulé (cf. scan précédent) *)
     (* X13 (3e scan) : SampleCount doit rester 1 (sur original : 3) — expose l'incrément abusif *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
