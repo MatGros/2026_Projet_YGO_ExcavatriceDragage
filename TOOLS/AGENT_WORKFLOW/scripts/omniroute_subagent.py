@@ -14,12 +14,13 @@ Config (variables d'environnement, JAMAIS en dur dans le repo) :
 
 Usage :
   set OMNIROUTE_API_KEY=sk-...
-  python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --file prompt.md --model codex/gpt-5.6-terra-high --output rep.md
+  python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --file prompt.md --model auto/best-reasoning --output rep.md
   python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --list-models
 
-Modeles confirmes (voir TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) :
-  codex/gpt-5.6-terra-high, codex/gpt-5.6-sol-max, codex/gpt-5.6-luna-high, ollamacloud/glm-5.2,
-  auto/best-reasoning, auto/best-coding, claude/claude-sonnet-5
+Modeles VIABLES sur gros prompt (matrice 2026-08-28, voir DSH_PROVIDERS.md) :
+  auto/best-reasoning (defaut, ~15s), auto/best-coding, auto/best-fast,
+  codex/gpt-5.6-terra-medium (~90s), codex/gpt-5.6-sol-medium (~140s).
+  NE PAS utiliser : *-high / *-max, ollamacloud/*, claude/claude-sonnet-5 via omniroute -> timeout sur prompt lourd.
 Fallback : si l'endpoint natif Ollama (ollama_subagent.py, /api/generate) echoue/timeout.
 """
 
@@ -34,7 +35,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 BASE_URL = os.environ.get("OMNIROUTE_BASE_URL", "http://localhost:20128/v1").rstrip("/")
 API_KEY = os.environ.get("OMNIROUTE_API_KEY", "")
-DEFAULT_MODEL = "codex/gpt-5.6-terra-high"
+DEFAULT_MODEL = "auto/best-reasoning"
 TIMEOUT_S = int(os.environ.get("OMNIROUTE_TIMEOUT_S", "300"))
 PREAMBLE_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "subagent_preamble.md")
 

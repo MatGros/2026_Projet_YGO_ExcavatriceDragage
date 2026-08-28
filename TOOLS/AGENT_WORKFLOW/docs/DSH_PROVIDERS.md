@@ -19,32 +19,39 @@ C'est la cause n°1 d'échec d'override (REX 2026-08-16).
 
 ---
 
-## 🧠 Modèles disponibles (catalogue `omniroute`)
+## 🧠 Modèles utilisables pour les sous-agents (matrice 2026-08-28)
 
-> L'**ID** est ce qu'on passe à l'override `model`. Le **display name** ne sert qu'à l'affichage.
-> ⚠️ Catalogue à **`réfetch`** dans la GUI si un ID ci-dessous 404 — l'ID exact prime toujours.
+> Testé sur un **prompt court** (« PONG ») + un **prompt lourd de ~7,6k tokens** (taille d'une revue de
+> code FB réelle). Le critère `omniroute_subagent.py` : réponse non vide **avant le timeout** (300 s
+> par défaut ; les entrées ci-dessous sont mesurées à `TMO=95..180 s`).
+> ⚠️ Un modèle « OK sur prompt court » mais qui **timeout sur prompt lourd** est **inutilisable pour une
+> revue/audit** — c'est le cas d'usage principal.
 
-### ⚡ Rapides — raisonnement rapide, recherche, modif de code
+### ✅ À utiliser (répondent au prompt lourd)
 
-| ID (à utiliser) | Statut (test 2026-08-16) |
-|---|---|
-| `codex/gpt-5.6-luna` | ✅ répond |
-| `kc/stepfun/step-3.7-flash:free` | ✅ répond (gratuit — raisonnement rapide) |
-| `ollamacloud/glm-5.2` | ✅ répond · ⭐ **recommandé** (qualité validée utilisateur) |
-| `nvidia/nvidia/nemotron-3-super-120b-a12b` | ✅ répond |
+| ID (`--model`) | Endpoint | Prompt lourd | Note |
+|---|---|---|---|
+| `auto/best-reasoning` | omniroute | ✅ **~15 s** | ⭐ **défaut recommandé** — rapide + capable, réponse dense |
+| `auto/best-coding` | omniroute | ✅ ~15 s | revue/refactor de code |
+| `auto/best-fast` | omniroute | ✅ ~16 s | itération rapide |
+| `codex/gpt-5.6-terra-medium` | omniroute | ✅ ~90 s | revue profonde, plus lent |
+| `codex/gpt-5.6-sol-medium` | omniroute | ✅ ~140 s | revue profonde, **limite** de patience |
+| `deepseek-v4-flash:cloud` | natif `:11434` | ✅ ~130 s | **seul** modèle du daemon natif viable sur gros prompt (avec `--num-ctx 16384`) |
 
-### 🛠️ Profonds — raisonnement agentique, codage profond, refactoring
+### ❌ À NE PAS utiliser — timeout systématique sur prompt lourd
 
-| ID (à utiliser) | Statut (test 2026-08-16) |
-|---|---|
-| `claude/claude-sonnet-5` | ✅ répond (préfixe `claude/`) |
-| `codex/gpt-5.6-terra` | ✅ répond |
-| `codex/gpt-5.6-sol` | ✅ répond |
+| ID | Endpoint | Raison |
+|---|---|---|
+| `codex/gpt-5.6-terra-high`, `codex/gpt-5.6-sol-max`, `codex/gpt-5.6-luna-high` | omniroute | > 180 s (raisonnement « high » trop lent) |
+| `ollamacloud/glm-5.2`, `ollamacloud/deepseek-v4-flash` | omniroute | > 95 s |
+| `claude/claude-sonnet-5` | omniroute | > 95 s (route omniroute lente — pour Sonnet, utiliser l'agent natif Claude Code) |
+| `kc/stepfun/step-3.7-flash:free` | omniroute | > 95 s |
+| `nvidia/nvidia/nemotron-3-super-120b-a12b` | omniroute | > 95 s |
+| `qwen3:8b`, `qwen3.8:27b`, `gemma4:e4b`, `gemma4:latest` | natif local | > 100 s (modèles locaux : OK prompt court seulement) |
 
-> ✅ **Seuls les modèles ci-dessus sont confirmés utilisables** via le harness.
-> ⚠️ D'autres modèles existent côté gateway mais ne sont **pas** dans le catalogue harness
-> `omniroute` → `LlmError('UNKNOWN_MODEL')` → **non utilisables** tant qu'ils ne sont pas ajoutés
-> dans la GUI DSH (settings provider). Ne pas les intégrer tels quels.
+> Les variantes `-high` / `-max` répondent si on relève le timeout à ~420 s, mais un sous-agent qui met
+> 5–7 min n'est pas exploitable en boucle de revue. Préférer `auto/best-reasoning` (même qualité observée
+> sur les revues T167-CR, en 15 s).
 
 ---
 
@@ -55,7 +62,7 @@ C'est la cause n°1 d'échec d'override (REX 2026-08-16).
 ```js
 const resultat = await agent("Ta tâche ici", {
   provider: "omniroute",
-  model: "codex/gpt-5.6-luna",
+  model: "auto/best-reasoning",
   label: "mon-agent"
 });
 ```
@@ -85,11 +92,11 @@ par défaut et **avertit** si l'entrée dépasse 90 % du contexte. Options : `--
 
 Même rôle, mais via le gateway `omniroute` (`http://localhost:20128/v1`, API OpenAI `chat/completions`).
 À utiliser quand `ollama_subagent.py` (endpoint natif `/api/generate`) échoue ou timeout, ou pour un
-modèle non-Ollama (`codex/gpt-5.6-*`, `ollamacloud/glm-5.2`, `auto/best-reasoning`, `claude/claude-sonnet-5`).
+modèle non-Ollama. Défaut = `auto/best-reasoning` (cf. matrice ci-dessus).
 ```bash
 set OMNIROUTE_API_KEY=sk-...            # jamais en dur dans le repo (cf. ~/.dsh/.credentials.yaml)
 python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --list-models
-python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --file CONTRAT.md --model codex/gpt-5.6-terra-high --output RESULTAT.md
+python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --file CONTRAT.md --model auto/best-reasoning --output RESULTAT.md
 ```
 Timeout via `OMNIROUTE_TIMEOUT_S` (défaut 300). Injecte `subagent_preamble.md` comme les autres runners.
 
@@ -97,7 +104,8 @@ Timeout via `OMNIROUTE_TIMEOUT_S` (défaut 300). Injecte `subagent_preamble.md` 
 
 ## ✅ Vérifié (REX 2026-08-16)
 
-- ✅ `workflow` + `provider: "omniroute"` + `model: "codex/gpt-5.6-luna"` → agent lancé, réponse reçue.
+- ✅ `workflow` + `provider: "omniroute"` + `model: "auto/best-reasoning"` → réponse en ~15 s sur prompt lourd (matrice 2026-08-28).
+- ⚠️ `codex/gpt-5.6-*-high` / `*-max`, `ollamacloud/*`, `claude/claude-sonnet-5` (via omniroute) : **timeout** sur prompt lourd (matrice 2026-08-28).
 - ✅ `ollama_subagent.py` + `model: "deepseek-v4-flash:cloud"` → réponse locale instantanée reçue.
 - ❌ `omni-route` / `omni_cloud` / `omniRoute` / `omni-cloud` → échec (mauvais nom de route).
 
