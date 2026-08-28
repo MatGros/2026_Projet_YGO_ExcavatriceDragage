@@ -73,10 +73,11 @@
     .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
         color: var(--muted); font-weight: 600; outline: none; user-select: none; }
     .checks-summary:hover { color: var(--text); }
-    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
-    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
     .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
     .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .scenario-list li { font-size: 12.5px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
@@ -202,7 +203,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 10:49:10</div>
+    <div class="exec-time">2026-08-28 10:50:25</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (11 tests)</summary>
@@ -878,8 +879,16 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
-            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation initiale</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; Prete en service</p><p class='comment'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Scan 0 : Enable=FALSE -&gt; Neutralisation initiale</li><li>Scan 1 : Enable=TRUE -&gt; Prete en service</li><li>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -915,7 +924,11 @@
                 <h3>TC-P09-010 Acquisition codeur : mise en service nominale </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>Codeur actif et pret</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>Codeur actif et pret</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -932,8 +945,16 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms </h3>
             </header>
-            <div class="comments"><p class='comment'>Front de demande : aucune calibration n est publiee avant verification.</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>Avant verification : Homed reste FALSE</li><li>Avant verification : reference existante preservee</li><li>READBACK_ONLY : mesure egale a la cible -&gt; sortie Homed</li><li>READBACK_ONLY nominal : pas de suspicion</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Front de demande : aucune calibration n est publiee avant verification.</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>Avant verification : Homed reste FALSE</li><li>Avant verification : reference existante preservee</li><li>READBACK_ONLY : mesure egale a la cible -&gt; sortie Homed</li><li>READBACK_ONLY nominal : pas de suspicion</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -962,7 +983,11 @@
                 <h3>TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>READBACK_AND_STATUSBIT : bit FALSE -&gt; pas de validation</li><li>READBACK_AND_STATUSBIT : bit FALSE -&gt; suspicion</li><li>READBACK_AND_STATUSBIT : fait diagnostic publie</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>READBACK_AND_STATUSBIT : bit FALSE -&gt; pas de validation</li><li>READBACK_AND_STATUSBIT : bit FALSE -&gt; suspicion</li><li>READBACK_AND_STATUSBIT : fait diagnostic publie</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -990,8 +1015,16 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation </h3>
             </header>
-            <div class="comments"><p class='comment'>+50mm a 4096 points/m</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Echec relecture : sortie Homed non validee</li><li>Echec relecture : suspicion active</li><li>Echec relecture : fait diagnostic publie</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>+50mm a 4096 points/m</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Echec relecture : sortie Homed non validee</li><li>Echec relecture : suspicion active</li><li>Echec relecture : fait diagnostic publie</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -1020,7 +1053,11 @@
                 <h3>TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary><ul class="checks-list"><li>STATUSBIT_ONLY : bit TRUE -&gt; validation</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>STATUSBIT_ONLY : bit TRUE -&gt; validation</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -1048,8 +1085,16 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P09-015 Reset conscient : acquitte le latch sans valider le preset </h3>
             </header>
-            <div class="comments"><p class='comment'>Echec de relecture : preset non confirme -&gt; latch pose.</p><p class='comment'>+50mm -&gt; hors tolerance</p><p class='comment'>Reset front : acquitte le latch, ne valide pas le preset (Homed reste FALSE).</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>echec : latch pose</li><li>echec : pas de validation</li><li>Reset : latch acquitte</li><li>Reset : ne valide pas le preset</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Echec de relecture : preset non confirme -&gt; latch pose.</li><li>+50mm -&gt; hors tolerance</li><li>Reset front : acquitte le latch, ne valide pas le preset (Homed reste FALSE).</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>echec : latch pose</li><li>echec : pas de validation</li><li>Reset : latch acquitte</li><li>Reset : ne valide pas le preset</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -1078,7 +1123,11 @@
                 <h3>TC-P09-016 Fault live : perte materiel codeur (Cause 0) </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>perte materiel -&gt; Fault.Error live</li><li>bit0 = cause perte materiel</li><li>cause live non latchee</li><li>cause disparue -&gt; Error retombe seule</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>perte materiel -&gt; Fault.Error live</li><li>bit0 = cause perte materiel</li><li>cause live non latchee</li><li>cause disparue -&gt; Error retombe seule</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -1106,8 +1155,16 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2) </h3>
             </header>
-            <div class="comments"><p class='comment'>Echec de relecture : preset non confirme -&gt; latch pose.</p><p class='comment'>+50mm -&gt; hors tolerance</p><p class='comment'>Reset front : acquitte le latch.</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>echec : latch preset pose</li><li>echec preset -&gt; Fault.Latched</li><li>bit2 = cause preset latched</li><li>Reset -&gt; latch acquitte</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Echec de relecture : preset non confirme -&gt; latch pose.</li><li>+50mm -&gt; hors tolerance</li><li>Reset front : acquitte le latch.</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>echec : latch preset pose</li><li>echec preset -&gt; Fault.Latched</li><li>bit2 = cause preset latched</li><li>Reset -&gt; latch acquitte</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -1135,8 +1192,16 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P09-018 Fault live : incoherence mesure (Cause 1) </h3>
             </header>
-            <div class="comments"><p class='comment'>-&gt; Safety.EncoderIncoherent -&gt; Cause 1</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>incoherence -&gt; Fault.Error live</li><li>bit1 = cause incoherence</li><li>cause live non latchee</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>-&gt; Safety.EncoderIncoherent -&gt; Cause 1</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>incoherence -&gt; Fault.Error live</li><li>bit1 = cause incoherence</li><li>cause live non latchee</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
@@ -1153,8 +1218,16 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations) </h3>
             </header>
-            <div class="comments"><p class='comment'>1. Initialisation chaine codeur</p><p class='comment'>Scan 0 : Repos initial (Position = 0.0 m)</p><p class='comment'>Scans 1..5 : Montee ideale a 1.50 m/s (+123 pts = +15mm par 10ms)</p><p class='comment'>Scan 6 : 50ms atteintes -&gt; Valid=TRUE et Vitesse = 1.50 m/s</p><p class='comment'>Scans 7..10 : Palier stable 1.50 m/s</p><p class='comment'>Scans 11..15 : Perturbations dynamiques / vibrations cable (+/- 4mm d ondulation)</p><p class='comment'>+98 pts = +12mm au lieu de +15mm</p><p class='comment'>+148 pts = +18mm -&gt; saut instantane</p><p class='comment'>+106 pts = +13mm</p><p class='comment'>+139 pts = +17mm</p><p class='comment'>Scan 16 : Descente treuil -1.50 m/s (-123 pts)</p><p class='comment'>50ms de descente</p><p class='comment'>Scan 17 : Rupture de confiance codeur (perte bus) -&gt; Purge immediate</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (12)</span></summary><ul class="checks-list"><li>Echantillon 1 : Fenetre 50ms pas encore remplie</li><li>50ms atteintes -&gt; SpeedValid=TRUE</li><li>Vitesse nominale filtree = 1.50 m/s</li><li>Vitesse signee montee = +1.50 m/s</li><li>Palier stable 1.50 m/s</li><li>Palier stable 1.50 m/s</li><li>Bruit filtre : vitesse reste stable a 1.50 m/s</li><li>Ondulation absorbee</li><li>Descente : SignedSpeed negatif</li><li>Perte bus -&gt; SpeedValid retombe immediatement a FALSE</li><li>Purge vitesse -&gt; Speed_Mps=0.0</li><li>Purge vitesse signee -&gt; SignedSpeed_Mps=0.0</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (13)</span></summary>
+                <ul class="scenario-list"><li>1. Initialisation chaine codeur</li><li>Scan 0 : Repos initial (Position = 0.0 m)</li><li>Scans 1..5 : Montee ideale a 1.50 m/s (+123 pts = +15mm par 10ms)</li><li>Scan 6 : 50ms atteintes -&gt; Valid=TRUE et Vitesse = 1.50 m/s</li><li>Scans 7..10 : Palier stable 1.50 m/s</li><li>Scans 11..15 : Perturbations dynamiques / vibrations cable (+/- 4mm d ondulation)</li><li>+98 pts = +12mm au lieu de +15mm</li><li>+148 pts = +18mm -&gt; saut instantane</li><li>+106 pts = +13mm</li><li>+139 pts = +17mm</li><li>Scan 16 : Descente treuil -1.50 m/s (-123 pts)</li><li>50ms de descente</li><li>Scan 17 : Rupture de confiance codeur (perte bus) -&gt; Purge immediate</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (12)</span></summary>
+                <ul class="checks-list"><li>Echantillon 1 : Fenetre 50ms pas encore remplie</li><li>50ms atteintes -&gt; SpeedValid=TRUE</li><li>Vitesse nominale filtree = 1.50 m/s</li><li>Vitesse signee montee = +1.50 m/s</li><li>Palier stable 1.50 m/s</li><li>Palier stable 1.50 m/s</li><li>Bruit filtre : vitesse reste stable a 1.50 m/s</li><li>Ondulation absorbee</li><li>Descente : SignedSpeed negatif</li><li>Perte bus -&gt; SpeedValid retombe immediatement a FALSE</li><li>Purge vitesse -&gt; Speed_Mps=0.0</li><li>Purge vitesse signee -&gt; SignedSpeed_Mps=0.0</li></ul>
+            </details>
             
             
     <div class="chronogram-group">
