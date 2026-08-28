@@ -131,7 +131,7 @@
   </div>
 
   <div class="card out">
-    <h2>🟢 SORTIES de l'étape — ce qui sort de FB_Cycle</h2>
+    <h2>🟢 SORTIES du séquenceur FB_Cycle — ce qui sort de l'étape</h2>
 
     <!-- Scène machine SVG live (le monde que tu conduis au joystick) -->
     <div style="background:#030712;border-radius:6px;border:1px solid #1f2937;margin-bottom:10px;">
@@ -348,7 +348,7 @@ function fmtAct(ss, dir, spd) {
 
 function render(o) {
   const step = parseInt(o.CYCLESTEP, 10);
-  document.getElementById('out').querySelector('.step').innerHTML = '🟢 Sortie séquenceur — étape <b>' + (STEP_NAMES[step] || 'X'+step) + '</b>';
+  document.getElementById('out').querySelector('.step').innerHTML = '🟢 Étape <b>' + (STEP_NAMES[step] || 'X'+step) + '</b> — sortie du séquenceur';
   document.getElementById('out').querySelector('.op').innerHTML = '🖐️ ' + (o.OPERATORACTION || '—');
   document.getElementById('oM1').innerHTML = fmtAct(o['WINCHM1CMD.STARTSTOP'], o['WINCHM1CMD.DIRECTION'], o['WINCHM1CMD.SPEEDPCT']);
   document.getElementById('oM2').innerHTML = fmtAct(o['WINCHM2CMD.STARTSTOP'], o['WINCHM2CMD.DIRECTION'], o['WINCHM2CMD.SPEEDPCT']);
