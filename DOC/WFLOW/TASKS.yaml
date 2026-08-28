@@ -2796,13 +2796,14 @@ tasks:
 - id: T170
   parent_id: null
   statut: ⏳
-  criticite: C4
+  criticite: C2
   domaine: REVIEW
-  agent: ORCHESTRATEUR
+  agent: CC
   date: '2026-08-28T16:38:00+02:00'
+  updated_at: '2026-08-28T22:00:00+02:00'
   titre: Clôture d'Ingénierie & Revue Globale du Système
-  contexte: Audit de fin de chantier global.
-  description: Famille T170 — Validation globale, freeze de release et bilan de conception.
+  contexte: 'Audit T170-A produit : DOC/WFLOW/T170-A_AUDIT_RELEASE_T166_T170.md. Release NON gelee. Blocages : T167-CR Extraction (serveur Ollama timeout x5), visa humain T167-B/C (IN_REVIEW), T168-CR a re-verifier, T169-A scenarios end-to-end manquants (mode/puissance/synchro), guard-fou CI --all non deterministe Windows.'
+  description: G200 PASS, run_all_gates PASS (tout), CODESYS 3.5 OK. Tests STruCpp verts en sequentiel (le mode --all est flaky sous Windows, WinError 193/32).
   contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T170-A_AUDIT_RELEASE_ET_CLOTURE.yaml'
   objectifs:
   - Clôturer le grand chantier des cycles
