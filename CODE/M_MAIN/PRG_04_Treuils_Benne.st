@@ -1160,8 +1160,13 @@ Data.WinchM2State                 := WinchM2State;
 Data.WinchM1Safety                := WinchM1Safety;
 Data.WinchM2Safety                := WinchM2Safety;
 Data.SyncState                    := SyncState;
+Data.WinchSyncError               := instWinchSync.Fault.Error;
+Data.WinchSyncSignedDeltaPosM     := instWinchSync.SignedDeltaPosM;
 Data.BucketState                  := BucketState;
 Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
+Data.BucketBusy                   := instBucket.Lifecycle.Busy;
+Data.BucketDone                   := instBucket.Lifecycle.Done;
+Data.BucketError                  := instBucket.Fault.Error;
 
 {endregion}
 END_PROGRAM

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.182791" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.182791">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:19:12.402593" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:19:12.402593">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -110,6 +110,22 @@
 🔄 Etat synchronisation treuils M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Defaut de desynchronisme treuils M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSyncSignedDeltaPosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Ecart signe M2 - M1 (m)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BucketState">
               <type>
                 <derived name="ST_BucketHMIState" />
@@ -125,6 +141,30 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🏗️ Benne consideree fermee (tolerance matiere)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Mouvement d'ouverture/fermeture benne en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Mouvement benne termine avec succes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur sous-systeme benne</xhtml>
               </documentation>
             </variable>
           </struct>

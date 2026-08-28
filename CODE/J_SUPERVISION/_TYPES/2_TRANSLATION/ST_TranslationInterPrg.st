@@ -35,5 +35,12 @@ STRUCT
     M3_LimitSwitchRev         : BOOL; // 🛡️ Fin de course arriere M3 (1=Actionne)
     M3_SensorWordIncoherent   : BOOL; // ❌ Incoherence detectee mot capteurs M3
     M3_SensorsWord             : BYTE; // 📊 Mot d'etat capteurs M3
+
+    // === ⚙️ États dynamiques & positions stables translation M3 ===
+    TranslationBusy           : BOOL; // ⚙️ Translation M3 en mouvement effectif
+    TranslationDone           : BOOL; // ✅ Cible translation atteinte et confirmee
+    M3_AtTremieStable         : BOOL; // 🎯 M3 positionne stable a la Tremie
+    M3_AtP1Stable             : BOOL; // 🎯 M3 positionne stable au Point 1
+    M3_AtMaintenanceStable    : BOOL; // 🎯 M3 positionne stable en zone Maintenance
 END_STRUCT
 END_TYPE

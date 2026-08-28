@@ -30,6 +30,7 @@ VAR
 END_VAR
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE ===
+{region "§1 Modes machine"}
 
 instModes(
     Enable                  := TRUE,
@@ -45,13 +46,13 @@ instModes(
     SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess
 );
 
+{endregion}
+
 
 // === 🔄 §2 SÉQUENCEUR DE CYCLE SEMI-AUTOMATIQUE ===
+{region "§2 Séquenceur de cycle"}
 // 🕹️ CycleMotionPermit = manche défléchi (non centré) — D2
-// ⚠️ Entrées sans source définie câblées en fail-safe documenté :
-//    - SpeedMismatchThresholdMps := 0 / SpeedMismatchTimeout := T#0ms (contrôle désactivé)
-//    - Benne_IsRoughlyClosed := Benne_IsClosed (fallback sûr : exige fermé)
-//    - HomingRequest := bouton homing IHM (BtnHome M1 OU M2)
+// ⚠️ Entrées consommées sur les bus publics Data (retard N-1 admis AF-02) :
 
 instCycleSemiAuto(
     Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
@@ -69,8 +70,8 @@ instCycleSemiAuto(
     KoboldContactFond       := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     LimitLegalReached       := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
-    WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Fault.Error,
-    WinchSyncDeltaM         := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM,
+    WinchSyncError          := PRG_04_Treuils_Benne.Data.WinchSyncError,
+    WinchSyncDeltaM         := PRG_04_Treuils_Benne.Data.WinchSyncSignedDeltaPosM,
     M1_CablePosM            := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     M2_CablePosM            := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
@@ -78,13 +79,13 @@ instCycleSemiAuto(
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
-    Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
-    Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
-    Translation_At_Maintenance := PRG_05_Translation.M3_AtMaintenanceStable,
-    Translation_Busy        := (ABS(PRG_05_Translation.instTranslationM3.RequestedDriveFreqHz) > 0.1),
-    Translation_Done        := PRG_05_Translation.instTranslationM3.TargetReached,
-    Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Lifecycle.Busy,
-    Benne_Done              := PRG_04_Treuils_Benne.instBucket.Lifecycle.Done,
+    Translation_At_P1       := PRG_05_Translation.Data.M3_AtP1Stable,
+    Translation_At_Tremie   := PRG_05_Translation.Data.M3_AtTremieStable,
+    Translation_At_Maintenance := PRG_05_Translation.Data.M3_AtMaintenanceStable,
+    Translation_Busy        := PRG_05_Translation.Data.TranslationBusy,
+    Translation_Done        := PRG_05_Translation.Data.TranslationDone,
+    Benne_Busy              := PRG_04_Treuils_Benne.Data.BucketBusy,
+    Benne_Done              := PRG_04_Treuils_Benne.Data.BucketDone,
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
@@ -95,8 +96,11 @@ instCycleSemiAuto(
     SampleCount            := _CycleSampleCount
 );
 
+{endregion}
+
 
 // === 📤 §3 PUBLICATION DU BUS INTER-PRG & AUTORISATIONS ===
+{region "§3 Publication bus public"}
 
 // 1. Autorisations machine
 Data.Auth := instModes.Auth;
@@ -182,5 +186,7 @@ ELSE
     Data.SequenceState.SpeedMismatchActive     := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
 END_IF;
+
+{endregion}
 
 END_PROGRAM

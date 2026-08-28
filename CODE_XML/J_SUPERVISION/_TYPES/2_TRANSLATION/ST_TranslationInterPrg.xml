@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T20:07:01.685825" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T20:07:01.685825">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:19:18.368006" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:19:18.368006">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -164,6 +164,47 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat capteurs M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚙️ États dynamiques &amp; positions stables translation M3 ===
+⚙️ Translation M3 en mouvement effectif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Cible translation atteinte et confirmee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtTremieStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable a la Tremie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtP1Stable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable au Point 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtMaintenanceStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable en zone Maintenance</xhtml>
               </documentation>
             </variable>
           </struct>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:44:39.524742" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:44:39.524742">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:19:23.963396" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:19:23.963396">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -381,6 +381,47 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat capteurs M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚙️ États dynamiques &amp; positions stables translation M3 ===
+⚙️ Translation M3 en mouvement effectif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Cible translation atteinte et confirmee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtTremieStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable a la Tremie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtP1Stable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable au Point 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtMaintenanceStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable en zone Maintenance</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1647,6 +1688,11 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
 Data.TranslationFinalInterlockRequest := TranslationFinalInterlockRequest;
 Data.TranslationState                 := TranslationState;
 Data.TranslationSafety                := TranslationSafety;
+Data.TranslationBusy                  := (ABS(instTranslationM3.RequestedDriveFreqHz) &gt; 0.1);
+Data.TranslationDone                  := instTranslationM3.TargetReached;
+Data.M3_AtTremieStable                := M3_AtTremieStable;
+Data.M3_AtP1Stable                    := M3_AtP1Stable;
+Data.M3_AtMaintenanceStable           := M3_AtMaintenanceStable;
 
 {endregion}
 </xhtml>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:44:48.022526" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:44:48.022526">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:19:53.203913" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:19:53.203913">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -926,6 +926,22 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
 🔄 Etat synchronisation treuils M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Defaut de desynchronisme treuils M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSyncSignedDeltaPosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Ecart signe M2 - M1 (m)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BucketState">
               <type>
                 <derived name="ST_BucketHMIState" />
@@ -941,6 +957,30 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🏗️ Benne consideree fermee (tolerance matiere)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Mouvement d'ouverture/fermeture benne en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Mouvement benne termine avec succes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur sous-systeme benne</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3815,8 +3855,13 @@ Data.WinchM2State                 := WinchM2State;
 Data.WinchM1Safety                := WinchM1Safety;
 Data.WinchM2Safety                := WinchM2Safety;
 Data.SyncState                    := SyncState;
+Data.WinchSyncError               := instWinchSync.Fault.Error;
+Data.WinchSyncSignedDeltaPosM     := instWinchSync.SignedDeltaPosM;
 Data.BucketState                  := BucketState;
 Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
+Data.BucketBusy                   := instBucket.Lifecycle.Busy;
+Data.BucketDone                   := instBucket.Lifecycle.Done;
+Data.BucketError                  := instBucket.Fault.Error;
 
 {endregion}
 </xhtml>
