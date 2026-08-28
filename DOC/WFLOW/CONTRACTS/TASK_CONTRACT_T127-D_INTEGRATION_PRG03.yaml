@@ -1,0 +1,59 @@
+contract:
+  task_id: T127-D_INTEGRATION_PRG03
+  criticality: C4
+  strategy: patch
+  objective: >
+    Vérifier et formaliser le raccordement de bout en bout de FB_Cycle à PRG_03.Data
+    et l'encapsulation privée complète de instCycleSemiAuto post-lot T165.
+  acceptance:
+    - id: AC1
+      statement: "instCycleSemiAuto est déclarée en VAR privé dans PRG_03_Modes_Cycle.st et 0 accès externe n'existe."
+      verified_by: "Recherche statique et G200 Linkage PASS."
+    - id: AC2
+      statement: "Toutes les demandes de FB_Cycle (WinchM1, WinchM2, Translation, Bucket) sont transmises sur PRG_03.Data.ReqProgram."
+      verified_by: "Tests unitaires CI PRG_03_Modes_Cycle PASS."
+    - id: AC3
+      statement: "L'état public de séquence (SequenceState, Step, StepStr, Fault, Ready, WaitingForOperator) est alimenté en direct."
+      verified_by: "Tests unitaires CI PRG_07_Supervision et MAIN_GLOBAL PASS."
+    - id: AC4
+      statement: "La compilation CODESYS est validée avec 0 erreur."
+      verified_by: "Log de compilation CODESYS (0 erreurs)."
+  scope:
+    allowed:
+      - CODE/G_CYCLE/**/*.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - PRJ_CODESYS/**
+      - Device.export
+  conservation:
+    must_survive:
+      - "Souveraineté des sécurités locales dans PRG_04 et PRG_05."
+      - "Neutralisation déterministe hors SEMI_AUTO."
+    dropped_on_purpose:
+      - "Accès directs à instCycleSemiAuto."
+  evidence_required:
+    - static_zero_internal_access
+    - test_auto_ci_m_main
+    - test_auto_ci_g_cycle
+    - codesys_compilation_log
+    - run_all_gates
+  models_allowed:
+    - "gpt-5.6-luna"
+  alert_duty: "Tout résidu d'accès non encapsulé ou divergence de signal impose BLOCK."
+status: COMPLETED
+execution:
+  executed_by: "AGY-01"
+  completed_at: "2026-08-28T16:00:00+02:00"
+  status: COMPLETED
+  summary: "Raccordement validé et consolidé via les lots T165 et T127. instCycleSemiAuto encapsulée en VAR interne, flux publiés sur PRG_03.Data. 100% tests CI G_CYCLE et M_MAIN PASS. Compilation CODESYS 0 erreur."
+  evidence_submitted:
+    - "TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_Cycle.html"
+    - "TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/PRG_03_Modes_Cycle.html"
+    - "TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/MAIN_GLOBAL.html"
+validation:
+  status: VALIDATED
+  validated_by: "Orchestrateur"
+  validated_at: "2026-08-28T16:00:30+02:00"
+  notes: "Preuves vérifiées. Raccordement et encapsulation opérationnels."
