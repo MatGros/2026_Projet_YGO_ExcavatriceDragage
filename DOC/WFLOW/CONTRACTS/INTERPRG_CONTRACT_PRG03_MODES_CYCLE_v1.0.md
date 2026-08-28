@@ -52,10 +52,11 @@ Le contrat est une **demande**, pas une commande effective :
 ```iecst
 TYPE ST_ProgramRequest :
 STRUCT
-    ReqWinchM1       : ST_ProgramWinchRequest;
-    ReqWinchM2       : ST_ProgramWinchRequest;
-    ReqTranslation   : ST_ProgramTranslationRequest;
-    ReqBucket        : ST_ProgramBucketRequest;
+    ReqWinchM1            : ST_ProgramWinchRequest;
+    ReqWinchM2            : ST_ProgramWinchRequest;
+    ReqTranslation        : ST_ProgramTranslationRequest;
+    ReqBucket             : ST_ProgramBucketRequest;
+    OperatorCoupledIntent : ST_OperatorCoupledIntent; // Intention couplée continue opérateur (joystick/boutons), TOUS modes
 END_STRUCT
 END_TYPE
 ```

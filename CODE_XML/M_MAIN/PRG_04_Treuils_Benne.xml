@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:59:20.680018" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:59:20.680018">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T15:07:26.585800" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T15:07:26.585800">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2701,9 +2701,9 @@ front descendant Kobold</xhtml>
 {region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
-// Consommation de l'intention couplée calculée au même scan par PRG_03_Modes_Cycle (cerveau unique)
-CoupledUserRequestActive    := PRG_03_Modes_Cycle.Data.SequenceState.RequestActive;
-CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedDirection;
+// Consommation de l'intention couplée continue opérateur (cerveau unique PRG_03, tous modes)
+CoupledUserRequestActive    := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Active;
+CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Direction;
 
 // mode "vidage à la trémie" (verrouillage). Périmètre identique
 // à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.
