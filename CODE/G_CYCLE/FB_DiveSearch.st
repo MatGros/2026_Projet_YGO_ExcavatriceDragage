@@ -206,7 +206,9 @@ KoboldContactorCmd := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
 
-IF Fault.Error THEN
+// Garde-fou non-redemarrage auto : un defaut latche non acquitte verrouille la machine
+// d'etat en ERROR_HOLD, meme si la vue live Fault.Error retombe (cause disparue).
+IF Fault.Error OR Fault.Latched THEN
     DiveState := E_DiveSearchState.ERROR_HOLD;
     KoboldContactorCmd := FALSE;
     OperatorActionId := 16#0180;

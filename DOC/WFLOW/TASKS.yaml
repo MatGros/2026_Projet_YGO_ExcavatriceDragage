@@ -2682,17 +2682,19 @@ tasks:
   - T167-B
 - id: T167-CR
   parent_id: T167
-  statut: ⬜
-  criticite: C4
+  statut: ⏳
+  criticite: C2
   domaine: REVIEW
   agent: OLLAMA
   date: '2026-08-28T16:38:00+02:00'
-  titre: Revue de Code & Certification Indépendante T167
-  contexte: Revue indépendante par sous-agent local Ollama.
-  description: Certification des briques FB_DiveSearch et FB_ExtractionSequence.
-  contrat: ''
+  updated_at: '2026-08-28T21:15:00+02:00'
+  titre: Revue de Code & Certification Indépendante T167 (Ollama, par brique)
+  contexte: Revue independante deepseek-v4-flash par brique. DiveSearch fait (MAJEUR = faux positif prouve + garde-fou ajoute). Extraction Ollama en timeout x3 -> revue orchestrateur substituee, meme garde-fou, TC-P04-024 etendu ; a rejouer avant T170.
+  description: 'Résultats : DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md. Garde-fou non-redemarrage IF Fault.Error OR Fault.Latched ajoute aux 2 FB. Tests : FB_DiveSearch 7/7, FB_ExtractionSequence 6/6.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-CR_REVIEW_CYCLES.yaml
   objectifs:
-  - Valider l'absence de régression et la conformité aux standards
+  - Certifier securite ISO 13849, non-redemarrage auto, ordre de scan
+  - Rejouer la revue Ollama independante FB_ExtractionSequence (serveur indispo)
   bloque_par:
   - T167-C
 - id: T168
@@ -2729,19 +2731,23 @@ tasks:
   - T168
 - id: T168-B
   parent_id: T168
-  statut: ✅
+  statut: ⏳
   criticite: C3
   domaine: SUPERVISION
-  agent: AGY-01
+  agent: CC
   date: '2026-08-28T16:38:00+02:00'
-  titre: Intégration du diagnostic unifié dans PRG_07_Supervision
-  contexte: Projection exclusive vers GVL_IHM.DredgingAssist.State.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml.'
+  updated_at: '2026-08-28T21:15:00+02:00'
+  titre: Intégration du diagnostic unifié dans PRG_07_Supervision (+ StepAtFault assistants)
+  contexte: Projection exclusive vers GVL_IHM.DredgingAssist.State. Complété après T167-B/C : DiveStepAtFault / ExtractionStepAtFault (etape figee au defaut, l'etat vivant ExtractionState/DiveState valant ERROR_HOLD apres faute) desormais projetes jusqu'a FB_TroubleshootingView (Idx208 / Idx307).
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml. Chaine PRG_03.Data.SequenceState -> PRG_07 -> GVL_IHM.DredgingAssist.State -> GVL_Troubleshooting.AssistanceDragage. G200 PASS, gates C 16/16, PRG_07 3/3.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml
   objectifs:
   - Éliminer 100% des écritures directes dans PRG_03 et PRG_04
+  - Projeter StepAtFault des assistants (Dive / Extraction) jusqu'a la vue troubleshooting
   bloque_par:
   - T168-A
+  - T167-B
+  - T167-C
 - id: T168-CR
   parent_id: T168
   statut: ✅

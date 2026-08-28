@@ -193,7 +193,9 @@ BottomConfirmationConsumed := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
 
-IF Fault.Error THEN
+// Garde-fou non-redemarrage auto : un defaut latche non acquitte verrouille la machine
+// d'etat en ERROR_HOLD, meme si la vue live Fault.Error retombe (cause disparue).
+IF Fault.Error OR Fault.Latched THEN
     ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
     OperatorActionId := 16#0280;
     OperatorAction := 'Vérifier la benne et les treuils puis réarmer avant de reprendre.';
