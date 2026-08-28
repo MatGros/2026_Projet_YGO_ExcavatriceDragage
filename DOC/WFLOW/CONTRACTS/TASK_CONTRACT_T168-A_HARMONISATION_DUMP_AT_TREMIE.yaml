@@ -1,0 +1,29 @@
+contract:
+  task_id: T168-A_HARMONISATION_DUMP_AT_TREMIE
+  criticality: C4
+  strategy: patch
+  objective: >
+    Harmoniser l'assistance de vidage trémie (DumpAtTremie) sur le modèle
+    strict Décision PRG_03 / Muscle PRG_04 & PRG_05.
+    Déplacer les conditions d'armement et de déclenchement dans PRG_03,
+    et raccorder PRG_04 pour l'ouverture benne et le blocage physique de descente treuil à la trémie.
+  acceptance:
+    - id: AC1
+      statement: "PRG_03 est l'unique décideur de l'armement DumpAtTremie (modes MAINT_N1/N2, détection trémie M3_AtTremieStable)."
+      verified_by: "Revue ST PRG_03."
+    - id: AC2
+      statement: "PRG_04 applique l'ouverture benne via ReqProgram.ReqBucket et verrouille la descente treuil."
+      verified_by: "Revue ST PRG_04 et G200 Linkage."
+  scope:
+    allowed:
+      - CODE/M_MAIN/*.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st
+    forbidden:
+      - PRJ_CODESYS/**
+  conservation:
+    must_survive:
+      - "Comportement de sécurité à la trémie (interdiction descente treuil en zone de déversement)."
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+status: READY_FOR_EXECUTION

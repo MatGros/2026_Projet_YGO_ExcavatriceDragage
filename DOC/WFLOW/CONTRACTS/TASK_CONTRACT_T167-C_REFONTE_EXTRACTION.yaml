@@ -1,0 +1,32 @@
+contract:
+  task_id: T167-C_REFONTE_EXTRACTION
+  criticality: C4
+  strategy: patch
+  objective: >
+    Refondre le code ST de FB_ExtractionSequence selon la spécification de T167-A :
+    gestion étagée de la fermeture benne, phase de décollage matière sous vitesse
+    lente contrôlée, capture de ExtractionStateAtError, passage de témoin fluide
+    vers la montée nominale et timeouts de garde d'étape.
+  acceptance:
+    - id: AC1
+      statement: "FB_ExtractionSequence gère la séquence : Attente fond -> Fermeture benne -> Décollage contrôlé -> Fin d'assistance."
+      verified_by: "Revue ST et validation G200."
+    - id: AC2
+      statement: "L'effacement de BottomPositionConfirmed est verrouillé et confirmé consommé (BottomConfirmationConsumed)."
+      verified_by: "Revue ST."
+    - id: AC3
+      statement: "Neutralisation déterministe sur NOT Enable et capture ExtractionStateAtError sur tout blocage."
+      verified_by: "Gate G127 PASS et revue logique."
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_ExtractionSequence.st
+      - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
+    forbidden:
+      - PRJ_CODESYS/**
+  conservation:
+    must_survive:
+      - "Interface consommée par PRG_03.Data."
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+status: READY_FOR_EXECUTION

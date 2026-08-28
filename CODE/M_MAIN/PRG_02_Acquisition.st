@@ -251,7 +251,7 @@ instSimBench(
     // commande brute (sinon il outrepasse butées/limites). Même principe que les treuils M1/M2
     // (alimentés par la sortie PRG_06). Gate direction + vitesse = demande réelle (rampe/arrêt).
     M3_Direction             := SEL(PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord <> 0,
-                                    PRG_05_Translation.M3_Direction_Active, 0),
+                                    PRG_05_Translation.Data.TranslationState.ActiveDirection, 0),
     M3_SpeedCmd_Pct          := LIMIT(0.0,
                                       PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
@@ -410,7 +410,7 @@ M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-    AND NOT (PRG_04_Treuils_Benne.instWinchM1.StepNumber > 0) AND NOT (PRG_04_Treuils_Benne.instWinchM2.StepNumber > 0);
+    AND NOT (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber > 0) AND NOT (PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber > 0);
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
     M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN

@@ -2612,3 +2612,127 @@ tasks:
   - Validation croisée des points d'arbitrage (N-1, write-backs, safety)
   bloque_par:
   - T166-DOC
+- id: T167
+  parent_id: null
+  statut: ⏳
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Refonte & Unification du Grafcet Plongée / Recherche Fond / Extraction
+  contexte: Refonte fonctionnelle des briques FB_DiveSearch et FB_ExtractionSequence selon les exigences des audits.
+  description: Famille T167 — Unification des séquences, traitement guard sur le bypass Kobold, gestion des time-outs et capture StepAtFault.
+  contrat: ''
+  objectifs:
+  - Définir le Grafcet unifié cible
+  - Refondre FB_DiveSearch avec fix+guard sur le bypass Kobold
+  - Refondre FB_ExtractionSequence avec coordination de vitesse contrôlée
+  bloque_par:
+  - T166
+- id: T167-A
+  parent_id: T167
+  statut: ⏳
+  criticite: C3
+  domaine: SPECIFICATION
+  agent: OLLAMA
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Spécification fonctionnelle et Grafcet cible unifié
+  contexte: Cadrage du Grafcet et des transitions Dive/Extraction.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-A_SPEC_GRAFCET_CIBLE.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-A_SPEC_GRAFCET_CIBLE.yaml
+  objectifs:
+  - Formaliser les étapes, transitions, timeouts et conditions de reset
+  bloque_par:
+  - T167
+- id: T167-B
+  parent_id: T167
+  statut: ⬜
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: AGY-01
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Refonte FB_DiveSearch (fix + guard Kobold et timeouts)
+  contexte: Implémentation ST du nouveau FB_DiveSearch.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml
+  objectifs:
+  - Supprimer les sauts brutaux et sécuriser le bypass Kobold
+  - Intégrer les timers d'étape et StepAtFault
+  bloque_par:
+  - T167-A
+- id: T167-C
+  parent_id: T167
+  statut: ⬜
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: AGY-01
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Refonte FB_ExtractionSequence (décollage et vitesse contrôlée)
+  contexte: Implémentation ST du nouveau FB_ExtractionSequence.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml
+  objectifs:
+  - Assurer la coordination fermeture benne et décollage matière
+  bloque_par:
+  - T167-B
+- id: T167-CR
+  parent_id: T167
+  statut: ⬜
+  criticite: C4
+  domaine: REVIEW
+  agent: OLLAMA
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Revue indépendante Ollama du code ST Dive/Extraction
+  contexte: Audit de conformité des nouvelles briques.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-CR_REVIEW_CYCLES.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-CR_REVIEW_CYCLES.yaml
+  objectifs:
+  - Audit indépendant read-only
+  bloque_par:
+  - T167-C
+- id: T168
+  parent_id: null
+  statut: ⬜
+  criticite: C3
+  domaine: MODES_CYCLE
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Harmonisation DumpAtTremie & Diagnostic Troubleshooting
+  contexte: Intégration de l'assistance trémie et projection des diagnostics opérateurs.
+  description: Famille T168 — Cadrage du vidage trémie sur le modèle Décision PRG_03 / Muscle PRG_04-05, et raccordement supervision.
+  contrat: ''
+  objectifs:
+  - Centraliser DumpAtTremie dans PRG_03
+  - Connecter le diagnostic dans PRG_07
+  bloque_par:
+  - T167-CR
+- id: T169
+  parent_id: null
+  statut: ⬜
+  criticite: C4
+  domaine: TEST_AUTO_CI
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Qualification Automatisée des Scénarios de Dragage (CI)
+  contexte: Écriture et exécution de la suite de tests automatisés STruCpp / ST2C.
+  description: Famille T169 — Validation des scénarios nominaux, limites et dégradés en simulation CI.
+  contrat: ''
+  objectifs:
+  - 100% des tests unitaires de cycle verts en CI
+  bloque_par:
+  - T168
+- id: T170
+  parent_id: null
+  statut: ⬜
+  criticite: C4
+  domaine: REVIEW
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T16:38:00+02:00'
+  titre: Clôture d'Ingénierie & Revue Globale du Système
+  contexte: Audit de fin de chantier global.
+  description: Famille T170 — Validation globale, freeze de release et bilan de conception.
+  contrat: ''
+  objectifs:
+  - Clôturer le grand chantier des cycles
+  bloque_par:
+  - T169

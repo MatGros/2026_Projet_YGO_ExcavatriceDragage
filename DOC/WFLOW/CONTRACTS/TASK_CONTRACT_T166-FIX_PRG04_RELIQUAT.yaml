@@ -1,0 +1,77 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T166-FIX
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Éliminer les reliquats d'appels d'instances privées déplacées (instExtractionSequence.ForceMinSpeedStep)
+    dans PRG_04_Treuils_Benne, assainir les liaisons inter-PRG vers le bus Data public,
+    et garantir 100% de compilation CODESYS et conformité des 21 gates.
+
+  acceptance:
+    - id: AC1
+      statement: "Zéro occurrence de instExtractionSequence ou instDiveSearch dans PRG_04_Treuils_Benne."
+      verified_by: "grep_search sur CODE/M_MAIN/PRG_04_Treuils_Benne.st"
+    - id: AC2
+      statement: "Plafonnement de vitesse M1 et M2 branché sur PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep."
+      verified_by: "Lecture directe lignes 719 et 755 de PRG_04_Treuils_Benne.st"
+    - id: AC3
+      statement: "G200_check_linkage.py valide 100% du câblage (0 erreur) et run_all_gates.py valide les 21 gates (22/22 PASS)."
+      verified_by: "Exécution de python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py"
+
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE_XML/CODE_Bundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Plafonnement au Palier 1 pour mou de câble et benne non fermée"
+      - "Sécurités locales M1/M2 dans PRG_04"
+    dropped_on_purpose:
+      - "Accès directs résiduels aux instances internes de PRG_03"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "antigravity"
+
+  alert_duty: >
+    Toute incohérence sur le bus ReqProgram ou sur la sécurité locale treuils doit être
+    remontée immédiatement.
+
+status: VALIDATED
+
+execution:
+  executed_by: "Antigravity (Orchestrateur)"
+  completed_at: "2026-08-28T16:48:00+02:00"
+  status: COMPLETED
+  summary: >
+    Correction effectuée : remplacement des 2 occurrences résiduelles de ForceMinSpeedStep
+    dans PRG_04 par PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep.
+    Assainissement des liaisons PRG_02 et PRG_04 vers les bus publics Data.
+    Bundle régénéré et validé par 100% des gates.
+  evidence_submitted:
+    - "G200 Linkage : PASS (0 erreur)"
+    - "Suite complète : 22/22 gates PASS"
+    - "Bundle XML : CODE_XML/CODE_Bundle.xml régénéré et conforme"
+
+validation:
+  status: APPROVED
+  validated_by: "Orchestrateur"
+  validated_at: "2026-08-28T16:49:00+02:00"
+  notes: >
+    Socle T166 assaini et certifié compilable CODESYS. Prérequis validé pour lancer T167.

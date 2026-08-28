@@ -34736,7 +34736,7 @@ instSimBench(
     // commande brute (sinon il outrepasse butées/limites). Même principe que les treuils M1/M2
     // (alimentés par la sortie PRG_06). Gate direction + vitesse = demande réelle (rampe/arrêt).
     M3_Direction             := SEL(PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord &lt;&gt; 0,
-                                    PRG_05_Translation.M3_Direction_Active, 0),
+                                    PRG_05_Translation.Data.TranslationState.ActiveDirection, 0),
     M3_SpeedCmd_Pct          := LIMIT(0.0,
                                       PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
@@ -34895,7 +34895,7 @@ M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-    AND NOT (PRG_04_Treuils_Benne.instWinchM1.StepNumber &gt; 0) AND NOT (PRG_04_Treuils_Benne.instWinchM2.StepNumber &gt; 0);
+    AND NOT (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber &gt; 0) AND NOT (PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber &gt; 0);
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
     M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
@@ -36037,19 +36037,7 @@ DumpAtTremieAssistActive := DumpAtTremieActive
     AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
-GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_AtTremieStable;
-
-// Confirmation manuelle "fond touché" effacée hors conditions de garde (MAINT_N1/N2,
-// sous tension, pas de défaut, pas de descente couplée) — la confirmation se fait
-// précisément PENDANT que la benne est encore ouverte (avant que l'extraction ne la ferme).
-IF NOT (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-   OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
-   OR PRG_07_Supervision.FaultMachineReset_IHM
-   OR (CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)) THEN
-    GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
-    BypassKoboldBottomTouched := FALSE;
-END_IF;
-ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
+GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.Data.M3_AtTremieStable;
 
 // Récupération de l'état fond synthétisé par PRG_03
 BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
@@ -36087,7 +36075,7 @@ KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.Req
 // gouverné par MotionRequestActive/MotionDirection ci-dessous (rien ne bouge tant que
 // l'opérateur ne pousse pas réellement DOWN) ; instBucket.Busy prend alors la main sur
 // l'arbitrage M2 normal (voir §3bis plus bas).
-DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.M3_AtTremieStable;
+DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
 GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed := DumpAtTremieBucketOpenArmed;
 
 instBucket(
@@ -36545,7 +36533,7 @@ ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_D
 // que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
 // descente-treuil / translation pour se rapprocher d'un enchaînement automatique sûr.
 GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked :=
-    DumpAtTremieAssistActive AND NOT (PRG_05_Translation.M3_AtP1Stable OR PRG_05_Translation.M3_AtMaintenanceStable);
+    DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
 IF GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
     ProcessAndSafetyPermitM2_Descend := FALSE;
@@ -36583,7 +36571,7 @@ instWinchM1(
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := SEL(instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
     // Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
+    MaxStepAscent           := SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
@@ -36619,7 +36607,7 @@ instWinchM2(
     // instWinchSync.SyncDeviationWarn dégrade M2 au Palier 1 sur écart modéré.
     // BucketNotClosedAscentStep1 et SlackCableAscentStep1 dégradent la montée au Palier 1.
     CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
+    MaxStepAscent           := SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
