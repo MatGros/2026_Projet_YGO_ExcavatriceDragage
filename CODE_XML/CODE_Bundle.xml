@@ -36704,9 +36704,8 @@ ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_D
 // Mode "vidage à la trémie" : descente M1 ET M2 interdite tant
 // que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
 // descente-treuil / translation pour se rapprocher d'un enchaînement automatique sûr.
-GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked :=
-    DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
-IF GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked THEN
+// Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked
+IF PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
     ProcessAndSafetyPermitM2_Descend := FALSE;
 END_IF;
