@@ -868,14 +868,15 @@ tasks:
   bloque_par: []
 - id: T127
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
   agent: AGY-01
-  date: '2026-08-28T12:35:00'
+  date: '2026-08-28T16:01:00'
+  completed_at: '2026-08-28T16:01:30'
   titre: Implémentation et validation complète du cycle semi-auto (séquenceur Grafcet)
   contexte: 'Séquenceur de dragage X0..X13 + STABILIZING, conformité GUIDE_SEQUENCEUR_v1.2, sous-cycles Dive/Extraction, bascule sans à-coup Semi-Auto/Maintenance et raccordement PRG_03.'
-  description: 'Parent des lots T127-A (Types & Interface AF-03) -> T127-B (Logique Grafcet & Tests STruCpp) -> T127-C (Documentation AF-04 v2.3) -> T127-D (Interconnexion PRG_03 post-T165).'
+  description: 'Validé : Parent des lots T127-A -> T127-F. 100% tests CI G_CYCLE et M_MAIN PASS, G200 PASS, 22/22 Gates PASS, compilation CODESYS 0 erreur.'
   contrat: ''
   objectifs:
   - Figer une interface standard AF-03 §3 avec socle FB_FaultCore et ST_Lifecycle
@@ -944,14 +945,15 @@ tasks:
   - T127-B
 - id: T127-D
   parent_id: T127
-  statut: ⬜
+  statut: ✅
   criticite: C4
   domaine: MODES_CYCLE
-  agent: —
-  date: '2026-08-28T12:35:00'
+  agent: AGY-01
+  date: '2026-08-28T16:00:00'
+  completed_at: '2026-08-28T16:01:00'
   titre: Raccordement final PRG_03 et encapsulation privée de instCycleSemiAuto
   contexte: 'Raccordement des sorties FB_Cycle sur le bus PRG_03.Data.ReqProgram et PRG_03.Data.SequenceState, suppression des accès externes à instCycleSemiAuto.'
-  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml. Dépendant de la livraison de T165-C2.'
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml. Validé : raccordement et encapsulation consolidés suite aux lots T165 et T127.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml
   objectifs:
   - Éliminer tout accès externe direct à instCycleSemiAuto
