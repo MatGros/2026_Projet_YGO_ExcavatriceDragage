@@ -68,17 +68,27 @@ const resultat = await agent("Ta tâche ici", {
 - Délégation 1–2 tâches ; le modèle cible dépend de la config, pas d'un paramètre direct.
 - Pour forcer un modèle précis → préférer `workflow`.
 
+### Outil `ollama_subagent.py` (Local Ollama / DeepSeek — Zéro quota cloud)
+
+Pour déléguer directement à l'instance locale Ollama (`deepseek-v4-flash:cloud`, `qwen3.8:27b`, etc.) :
+```bash
+python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "Analyse de sécurité..." --model deepseek-v4-flash:cloud
+python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file CONTRAT.md --output RESULTAT.md
+```
+
 ---
 
 ## ✅ Vérifié (REX 2026-08-16)
 
 - ✅ `workflow` + `provider: "omniroute"` + `model: "codex/gpt-5.6-luna"` → agent lancé, réponse reçue.
+- ✅ `ollama_subagent.py` + `model: "deepseek-v4-flash:cloud"` → réponse locale instantanée reçue.
 - ❌ `omni-route` / `omni_cloud` / `omniRoute` / `omni-cloud` → échec (mauvais nom de route).
 
 ---
 
 ## 📌 Règles de délégation (rappel AGENTS.md)
 
-- Coller `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de chaque tâche déléguée.
+- Coller `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de chaque tâche déléguée (automatique via `ollama_subagent.py`).
 - La **validation finale** reste à l'orchestrateur (lecture du `git diff` réel).
 - ⚠️ **Aucun commit sans validation humaine explicite**.
+

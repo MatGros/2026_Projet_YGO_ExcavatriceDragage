@@ -203,7 +203,7 @@ un garde-fou automatique dans `TOOLS/AGENT_WORKFLOW/scripts/`. Une réponse pure
 
 ---
 
-## 🤝 Délégation (Gemini/antigravity, Codex, sous-agents)
+## 🤝 Délégation (Gemini/antigravity, Codex, sous-agents, Ollama)
 
 Coller `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` **en tête de chaque tâche déléguée** :
 l'agent distant n'a pas le contexte de la conversation. La validation finale reste à
@@ -211,6 +211,16 @@ l'orchestrateur (lecture du `git diff` réel), jamais à l'agent qui a produit l
 
 Plugin antigravity : `antigravity:delegate` · `antigravity:resume` · `antigravity:review`.
 Workflow multi-agents et criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`.
+
+### 🧠 Modes de Délégation : Subagent Plateforme vs Subagent Ollama Local
+- 🌐 **Subagent standard (`invoke_subagent` / `agent`)** : Utilise le modèle cloud de la plateforme (consomme le quota API).
+- 💻 **Subagent Ollama Local (`ollama_subagent.py`)** : Quand l'utilisateur demande explicitement un *« subagent Ollama »* ou *« DeepSeek »*, déléguer l'analyse, l'audit ou la revue au modèle local sans consommer aucun quota cloud :
+  ```bash
+  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "..." --model deepseek-v4-flash:cloud
+  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file PROMPT.md --output REPONSE.md
+  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --list-models
+  ```
+  Modèles locaux configurés : `deepseek-v4-flash:cloud` (défaut), `qwen3.8:27b`, `gemma4:e4b`. Le runner injecte automatiquement `subagent_preamble.md`.
 
 ### 🛡️ Pattern de commit en 2 temps (Checkpoint & Sécurité)
 
