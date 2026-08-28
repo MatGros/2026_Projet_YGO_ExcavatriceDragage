@@ -433,6 +433,30 @@ GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.JoystickDe
 GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
+// Projection Assistance Dragage (DredgingAssist.State)
+GVL_IHM.DredgingAssist.State.DiveReady                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveReady;
+GVL_IHM.DredgingAssist.State.DiveBusy                   := PRG_03_Modes_Cycle.Data.SequenceState.DiveBusy;
+GVL_IHM.DredgingAssist.State.DiveDone                   := PRG_03_Modes_Cycle.Data.SequenceState.DiveDone;
+GVL_IHM.DredgingAssist.State.DiveError                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveError;
+GVL_IHM.DredgingAssist.State.DiveErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.DiveErrorId;
+GVL_IHM.DredgingAssist.State.DiveState                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveState;
+GVL_IHM.DredgingAssist.State.BottomTouchConfirmed       := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
+GVL_IHM.DredgingAssist.State.ExtractionReady             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionReady;
+GVL_IHM.DredgingAssist.State.ExtractionBusy              := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionBusy;
+GVL_IHM.DredgingAssist.State.ExtractionDone              := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionDone;
+GVL_IHM.DredgingAssist.State.ExtractionError             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionError;
+GVL_IHM.DredgingAssist.State.ExtractionErrorId           := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionErrorId;
+GVL_IHM.DredgingAssist.State.ExtractionState             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionState;
+GVL_IHM.DredgingAssist.State.OperatorActionId           := PRG_03_Modes_Cycle.Data.SequenceState.OperatorActionId;
+GVL_IHM.DredgingAssist.State.OperatorAction             := PRG_03_Modes_Cycle.Data.SequenceState.OperatorAction;
+GVL_IHM.DredgingAssist.State.DumpAtTremieArmed           := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieArmed;
+GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive      := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieAssistActive;
+GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie          := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieAtTremie;
+GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed   := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieBucketOpenArmed;
+GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked     := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked;
+GVL_IHM.DredgingAssist.State.BypassDiveActive            := PRG_03_Modes_Cycle.Data.SequenceState.BypassDiveActive;
+GVL_IHM.DredgingAssist.State.BypassKoboldBottomTouched   := PRG_03_Modes_Cycle.Data.SequenceState.BypassKoboldBottomTouched;
+
 instHmiBannerFormatter(
     Enable                := TRUE,
     SimulationModeActive  := GVL_Simulation.SimulationModeActive,

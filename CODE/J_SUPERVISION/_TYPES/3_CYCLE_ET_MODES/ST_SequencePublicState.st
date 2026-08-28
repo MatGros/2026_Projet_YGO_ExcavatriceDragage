@@ -25,8 +25,25 @@ STRUCT
     SpeedMismatchConfirmed : BOOL;          // Écart vitesse confirmé pendant timeout
 
     // === 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
-    DiveState           : E_DiveSearchState;       // Phase interne de recherche fond Kobold
-    BottomTouchConfirmed: BOOL;                    // Contact fond Kobold confirmé
-    ExtractionState     : E_ExtractionSequenceState;// Phase interne séquence extraction
+    DiveReady                   : BOOL;                    // Assistance plongée prête
+    DiveBusy                    : BOOL;                    // Assistance plongée active
+    DiveDone                    : BOOL;                    // Assistance plongée terminée
+    DiveError                   : BOOL;                    // Défaut assistance plongée
+    DiveErrorId                 : WORD;                    // Code défaut plongée
+    DiveState                   : E_DiveSearchState;       // Phase interne de recherche fond Kobold
+    BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé
+    ExtractionReady             : BOOL;                    // Assistance extraction prête
+    ExtractionBusy              : BOOL;                    // Assistance extraction active
+    ExtractionDone              : BOOL;                    // Assistance extraction terminée
+    ExtractionError             : BOOL;                    // Défaut assistance extraction
+    ExtractionErrorId           : WORD;                    // Code défaut extraction
+    ExtractionState             : E_ExtractionSequenceState;// Phase interne séquence extraction
+    DumpAtTremieArmed           : BOOL;                    // Option vidage trémie armée IHM
+    DumpAtTremieAssistActive    : BOOL;                    // Assistance vidage trémie active
+    DumpAtTremieAtTremie        : BOOL;                    // Chariot M3 positionné à la trémie
+    DumpAtTremieBucketOpenArmed : BOOL;                    // Commande ouverture benne à la trémie
+    DumpAtTremieDescentLocked   : BOOL;                    // Descente treuil verrouillée à la trémie
+    BypassDiveActive            : BOOL;                    // Bypass séquence plongée armé
+    BypassKoboldBottomTouched   : BOOL;                    // Fond touché sous bypass
 END_STRUCT
 END_TYPE

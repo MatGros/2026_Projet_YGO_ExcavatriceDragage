@@ -98,8 +98,6 @@ IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
    AND BypassKoboldFallEdge.Q THEN
     BypassKoboldBottomTouched := TRUE;
 END_IF;
-GVL_IHM.DredgingAssist.State.BypassDiveActive          := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
-GVL_IHM.DredgingAssist.State.BypassKoboldBottomTouched := BypassKoboldBottomTouched;
 
 // 3. Instance FB_DiveSearch (Recherche de fond Kobold)
 instDiveSearch(
@@ -124,13 +122,6 @@ instDiveSearch(
 
 // Synthèse de confirmation fond
 BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed OR BypassKoboldBottomTouched;
-GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := BottomPositionConfirmed;
-GVL_IHM.DredgingAssist.State.DiveReady            := instDiveSearch.Ready;
-GVL_IHM.DredgingAssist.State.DiveBusy             := instDiveSearch.Lifecycle.Busy;
-GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Lifecycle.Done;
-GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Fault.Error;
-GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.Fault.ErrorId;
-GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
 
 // 4. Instance FB_ExtractionSequence (Fermeture et décollage assisté)
 instExtractionSequence(
@@ -158,13 +149,6 @@ instExtractionSequence(
 IF instExtractionSequence.BottomConfirmationConsumed THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
 END_IF;
-
-GVL_IHM.DredgingAssist.State.ExtractionReady   := instExtractionSequence.Ready;
-GVL_IHM.DredgingAssist.State.ExtractionBusy    := instExtractionSequence.Lifecycle.Busy;
-GVL_IHM.DredgingAssist.State.ExtractionDone    := instExtractionSequence.Lifecycle.Done;
-GVL_IHM.DredgingAssist.State.ExtractionError   := instExtractionSequence.Fault.Error;
-GVL_IHM.DredgingAssist.State.ExtractionErrorId := instExtractionSequence.Fault.ErrorId;
-GVL_IHM.DredgingAssist.State.ExtractionState   := instExtractionSequence.ExtractionState;
 
 {endregion}
 
@@ -296,12 +280,6 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     DumpAtTremieAssistActive := DumpAtTremieActive;
     DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
 
-    GVL_IHM.DredgingAssist.State.DumpAtTremieArmed             := DumpAtTremieActive;
-    GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
-    GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
-    GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed   := DumpAtTremieBucketOpenArmed;
-    GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked     := DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
-
     Data.ReqProgram.ReqBucket.ReqOpen                     := DumpAtTremieBucketOpenArmed;
     Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionSequence.BucketCloseRequest;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.KoboldMeasureEnable
@@ -352,13 +330,26 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchMps       := 0.0;
     Data.SequenceState.SpeedMismatchActive    := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
-    Data.SequenceState.DiveState              := instDiveSearch.DiveState;
-    Data.SequenceState.BottomTouchConfirmed   := BottomPositionConfirmed;
-    Data.SequenceState.ExtractionState        := instExtractionSequence.ExtractionState;
-
-    // Miroir pour GVL_IHM.DredgingAssist.State.OperatorActionId
-    GVL_IHM.DredgingAssist.State.OperatorActionId := Data.SequenceState.OperatorActionId;
-    GVL_IHM.DredgingAssist.State.OperatorAction   := Data.SequenceState.OperatorAction;
+    Data.SequenceState.DiveReady                  := instDiveSearch.Ready;
+    Data.SequenceState.DiveBusy                   := instDiveSearch.Lifecycle.Busy;
+    Data.SequenceState.DiveDone                   := instDiveSearch.Lifecycle.Done;
+    Data.SequenceState.DiveError                  := instDiveSearch.Fault.Error;
+    Data.SequenceState.DiveErrorId                := instDiveSearch.Fault.ErrorId;
+    Data.SequenceState.DiveState                  := instDiveSearch.DiveState;
+    Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
+    Data.SequenceState.ExtractionReady             := instExtractionSequence.Ready;
+    Data.SequenceState.ExtractionBusy              := instExtractionSequence.Lifecycle.Busy;
+    Data.SequenceState.ExtractionDone              := instExtractionSequence.Lifecycle.Done;
+    Data.SequenceState.ExtractionError             := instExtractionSequence.Fault.Error;
+    Data.SequenceState.ExtractionErrorId           := instExtractionSequence.Fault.ErrorId;
+    Data.SequenceState.ExtractionState             := instExtractionSequence.ExtractionState;
+    Data.SequenceState.DumpAtTremieArmed           := DumpAtTremieActive;
+    Data.SequenceState.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
+    Data.SequenceState.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
+    Data.SequenceState.DumpAtTremieBucketOpenArmed   := DumpAtTremieBucketOpenArmed;
+    Data.SequenceState.DumpAtTremieDescentLocked     := DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
+    Data.SequenceState.BypassDiveActive            := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
+    Data.SequenceState.BypassKoboldBottomTouched   := BypassKoboldBottomTouched;
 
 ELSE
     // Neutralisation déterministe (DISABLE)
@@ -398,13 +389,26 @@ ELSE
     Data.SequenceState.RequestActive           := FALSE;
     Data.SequenceState.SpeedMismatchMps        := 0.0;
     Data.SequenceState.SpeedMismatchActive     := FALSE;
-    Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
-    Data.SequenceState.DiveState              := E_DiveSearchState.WAIT_PRECONDITIONS;
-    Data.SequenceState.BottomTouchConfirmed   := FALSE;
-    Data.SequenceState.ExtractionState        := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-
-    GVL_IHM.DredgingAssist.State.OperatorActionId := 0;
-    GVL_IHM.DredgingAssist.State.OperatorAction   := '';
+    Data.SequenceState.DiveReady                  := FALSE;
+    Data.SequenceState.DiveBusy                   := FALSE;
+    Data.SequenceState.DiveDone                   := FALSE;
+    Data.SequenceState.DiveError                  := FALSE;
+    Data.SequenceState.DiveErrorId                := 0;
+    Data.SequenceState.DiveState                  := E_DiveSearchState.WAIT_PRECONDITIONS;
+    Data.SequenceState.BottomTouchConfirmed       := FALSE;
+    Data.SequenceState.ExtractionReady             := FALSE;
+    Data.SequenceState.ExtractionBusy              := FALSE;
+    Data.SequenceState.ExtractionDone              := FALSE;
+    Data.SequenceState.ExtractionError             := FALSE;
+    Data.SequenceState.ExtractionErrorId           := 0;
+    Data.SequenceState.ExtractionState             := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.DumpAtTremieArmed           := FALSE;
+    Data.SequenceState.DumpAtTremieAssistActive      := FALSE;
+    Data.SequenceState.DumpAtTremieAtTremie          := FALSE;
+    Data.SequenceState.DumpAtTremieBucketOpenArmed   := FALSE;
+    Data.SequenceState.DumpAtTremieDescentLocked     := FALSE;
+    Data.SequenceState.BypassDiveActive            := FALSE;
+    Data.SequenceState.BypassKoboldBottomTouched   := FALSE;
 END_IF;
 
 {endregion}

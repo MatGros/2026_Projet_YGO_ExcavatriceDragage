@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T15:22:26.492835" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T15:22:26.492835">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T15:24:31.220184" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T15:24:31.220184">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -964,13 +964,53 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant timeout</xhtml>
               </documentation>
             </variable>
+            <variable name="DiveReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
+Assistance plongée prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance plongée active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance plongée terminée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut assistance plongée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut plongée</xhtml>
+              </documentation>
+            </variable>
             <variable name="DiveState">
               <type>
                 <derived name="E_DiveSearchState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
-Phase interne de recherche fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne de recherche fond Kobold</xhtml>
               </documentation>
             </variable>
             <variable name="BottomTouchConfirmed">
@@ -981,12 +1021,108 @@ Phase interne de recherche fond Kobold</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact fond Kobold confirmé</xhtml>
               </documentation>
             </variable>
+            <variable name="ExtractionReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction terminée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut assistance extraction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut extraction</xhtml>
+              </documentation>
+            </variable>
             <variable name="ExtractionState">
               <type>
                 <derived name="E_ExtractionSequenceState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne séquence extraction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Option vidage trémie armée IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAssistActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance vidage trémie active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chariot M3 positionné à la trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande ouverture benne à la trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieDescentLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente treuil verrouillée à la trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassDiveActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass séquence plongée armé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassKoboldBottomTouched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond touché sous bypass</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1429,8 +1565,6 @@ IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
    AND BypassKoboldFallEdge.Q THEN
     BypassKoboldBottomTouched := TRUE;
 END_IF;
-GVL_IHM.DredgingAssist.State.BypassDiveActive          := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
-GVL_IHM.DredgingAssist.State.BypassKoboldBottomTouched := BypassKoboldBottomTouched;
 
 // 3. Instance FB_DiveSearch (Recherche de fond Kobold)
 instDiveSearch(
@@ -1455,13 +1589,6 @@ instDiveSearch(
 
 // Synthèse de confirmation fond
 BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed OR BypassKoboldBottomTouched;
-GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := BottomPositionConfirmed;
-GVL_IHM.DredgingAssist.State.DiveReady            := instDiveSearch.Ready;
-GVL_IHM.DredgingAssist.State.DiveBusy             := instDiveSearch.Lifecycle.Busy;
-GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Lifecycle.Done;
-GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Fault.Error;
-GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.Fault.ErrorId;
-GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
 
 // 4. Instance FB_ExtractionSequence (Fermeture et décollage assisté)
 instExtractionSequence(
@@ -1489,13 +1616,6 @@ instExtractionSequence(
 IF instExtractionSequence.BottomConfirmationConsumed THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
 END_IF;
-
-GVL_IHM.DredgingAssist.State.ExtractionReady   := instExtractionSequence.Ready;
-GVL_IHM.DredgingAssist.State.ExtractionBusy    := instExtractionSequence.Lifecycle.Busy;
-GVL_IHM.DredgingAssist.State.ExtractionDone    := instExtractionSequence.Lifecycle.Done;
-GVL_IHM.DredgingAssist.State.ExtractionError   := instExtractionSequence.Fault.Error;
-GVL_IHM.DredgingAssist.State.ExtractionErrorId := instExtractionSequence.Fault.ErrorId;
-GVL_IHM.DredgingAssist.State.ExtractionState   := instExtractionSequence.ExtractionState;
 
 {endregion}
 
@@ -1627,12 +1747,6 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     DumpAtTremieAssistActive := DumpAtTremieActive;
     DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
 
-    GVL_IHM.DredgingAssist.State.DumpAtTremieArmed             := DumpAtTremieActive;
-    GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
-    GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
-    GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed   := DumpAtTremieBucketOpenArmed;
-    GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked     := DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
-
     Data.ReqProgram.ReqBucket.ReqOpen                     := DumpAtTremieBucketOpenArmed;
     Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionSequence.BucketCloseRequest;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.KoboldMeasureEnable
@@ -1683,13 +1797,26 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchMps       := 0.0;
     Data.SequenceState.SpeedMismatchActive    := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
-    Data.SequenceState.DiveState              := instDiveSearch.DiveState;
-    Data.SequenceState.BottomTouchConfirmed   := BottomPositionConfirmed;
-    Data.SequenceState.ExtractionState        := instExtractionSequence.ExtractionState;
-
-    // Miroir pour GVL_IHM.DredgingAssist.State.OperatorActionId
-    GVL_IHM.DredgingAssist.State.OperatorActionId := Data.SequenceState.OperatorActionId;
-    GVL_IHM.DredgingAssist.State.OperatorAction   := Data.SequenceState.OperatorAction;
+    Data.SequenceState.DiveReady                  := instDiveSearch.Ready;
+    Data.SequenceState.DiveBusy                   := instDiveSearch.Lifecycle.Busy;
+    Data.SequenceState.DiveDone                   := instDiveSearch.Lifecycle.Done;
+    Data.SequenceState.DiveError                  := instDiveSearch.Fault.Error;
+    Data.SequenceState.DiveErrorId                := instDiveSearch.Fault.ErrorId;
+    Data.SequenceState.DiveState                  := instDiveSearch.DiveState;
+    Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
+    Data.SequenceState.ExtractionReady             := instExtractionSequence.Ready;
+    Data.SequenceState.ExtractionBusy              := instExtractionSequence.Lifecycle.Busy;
+    Data.SequenceState.ExtractionDone              := instExtractionSequence.Lifecycle.Done;
+    Data.SequenceState.ExtractionError             := instExtractionSequence.Fault.Error;
+    Data.SequenceState.ExtractionErrorId           := instExtractionSequence.Fault.ErrorId;
+    Data.SequenceState.ExtractionState             := instExtractionSequence.ExtractionState;
+    Data.SequenceState.DumpAtTremieArmed           := DumpAtTremieActive;
+    Data.SequenceState.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
+    Data.SequenceState.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
+    Data.SequenceState.DumpAtTremieBucketOpenArmed   := DumpAtTremieBucketOpenArmed;
+    Data.SequenceState.DumpAtTremieDescentLocked     := DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
+    Data.SequenceState.BypassDiveActive            := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
+    Data.SequenceState.BypassKoboldBottomTouched   := BypassKoboldBottomTouched;
 
 ELSE
     // Neutralisation déterministe (DISABLE)
@@ -1729,13 +1856,26 @@ ELSE
     Data.SequenceState.RequestActive           := FALSE;
     Data.SequenceState.SpeedMismatchMps        := 0.0;
     Data.SequenceState.SpeedMismatchActive     := FALSE;
-    Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
-    Data.SequenceState.DiveState              := E_DiveSearchState.WAIT_PRECONDITIONS;
-    Data.SequenceState.BottomTouchConfirmed   := FALSE;
-    Data.SequenceState.ExtractionState        := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-
-    GVL_IHM.DredgingAssist.State.OperatorActionId := 0;
-    GVL_IHM.DredgingAssist.State.OperatorAction   := '';
+    Data.SequenceState.DiveReady                  := FALSE;
+    Data.SequenceState.DiveBusy                   := FALSE;
+    Data.SequenceState.DiveDone                   := FALSE;
+    Data.SequenceState.DiveError                  := FALSE;
+    Data.SequenceState.DiveErrorId                := 0;
+    Data.SequenceState.DiveState                  := E_DiveSearchState.WAIT_PRECONDITIONS;
+    Data.SequenceState.BottomTouchConfirmed       := FALSE;
+    Data.SequenceState.ExtractionReady             := FALSE;
+    Data.SequenceState.ExtractionBusy              := FALSE;
+    Data.SequenceState.ExtractionDone              := FALSE;
+    Data.SequenceState.ExtractionError             := FALSE;
+    Data.SequenceState.ExtractionErrorId           := 0;
+    Data.SequenceState.ExtractionState             := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.DumpAtTremieArmed           := FALSE;
+    Data.SequenceState.DumpAtTremieAssistActive      := FALSE;
+    Data.SequenceState.DumpAtTremieAtTremie          := FALSE;
+    Data.SequenceState.DumpAtTremieBucketOpenArmed   := FALSE;
+    Data.SequenceState.DumpAtTremieDescentLocked     := FALSE;
+    Data.SequenceState.BypassDiveActive            := FALSE;
+    Data.SequenceState.BypassKoboldBottomTouched   := FALSE;
 END_IF;
 
 {endregion}

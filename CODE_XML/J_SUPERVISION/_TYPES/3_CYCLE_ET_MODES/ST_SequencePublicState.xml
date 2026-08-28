@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:19:09.201474" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:19:09.201474">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T15:24:07.609704" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T15:24:07.609704">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -162,13 +162,53 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant timeout</xhtml>
               </documentation>
             </variable>
+            <variable name="DiveReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
+Assistance plongée prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance plongée active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance plongée terminée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut assistance plongée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut plongée</xhtml>
+              </documentation>
+            </variable>
             <variable name="DiveState">
               <type>
                 <derived name="E_DiveSearchState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
-Phase interne de recherche fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne de recherche fond Kobold</xhtml>
               </documentation>
             </variable>
             <variable name="BottomTouchConfirmed">
@@ -179,12 +219,108 @@ Phase interne de recherche fond Kobold</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact fond Kobold confirmé</xhtml>
               </documentation>
             </variable>
+            <variable name="ExtractionReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction terminée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut assistance extraction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut extraction</xhtml>
+              </documentation>
+            </variable>
             <variable name="ExtractionState">
               <type>
                 <derived name="E_ExtractionSequenceState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne séquence extraction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Option vidage trémie armée IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAssistActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance vidage trémie active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chariot M3 positionné à la trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande ouverture benne à la trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieDescentLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente treuil verrouillée à la trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassDiveActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass séquence plongée armé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassKoboldBottomTouched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond touché sous bypass</xhtml>
               </documentation>
             </variable>
           </struct>
