@@ -1,0 +1,89 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T173-C C2 : Tests & non-régression réarmement AU
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T173-C_TESTS
+  criticality: C2            # tests safety AU — validation de la table de vérité
+  strategy: patch            # suite de validation, aucun changement de logique
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Valider par la preuve que l'élimination des sorties silencieuses (T173-B) tient sur les 4
+    scénarios d'armement AU : nominal (réussite, aucun message), échec contacteur (timeout 2s →
+    message), coupure volontaire (BtnEmergencyCutOff → tracée, pas alarmée), 1er boot (échec →
+    message de cause). Vérifier qu'aucune sortie silencieuse résiduelle n'existe (table de vérité)
+    et que les gates CI passent.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Nominal : armement réussi en 1 essai (séquence complète 1→6, PowerContactorEngaged, ErrorId=0, aucun message IHM)."
+      verified_by: "test unitaire FB_Safety_EmergencyManagementLogic : sequence complète + assertions (ErrorId=0, Done=TRUE)"
+    - id: AC2
+      statement: "Échec contacteur : PowerContactorEngaged reste FALSE après le pulse → timeout 2s → ErrorId bit arming + message 'contacteur non engagé'."
+      verified_by: "test unitaire avec Timeout ; assertion ErrorId≠0"
+    - id: AC3
+      statement: "Coupure volontaire : BtnEmergencyCutOff pendant la séquence → arrêt immédiat, tracé 'coupe volontaire' sans alarme défaut (ErrorId bit coupure volontaire si défini, sinon trace)."
+      verified_by: "test unitaire + revue du mapping IHM"
+    - id: AC4
+      statement: "1er boot : échec silencieux d'origine → message de cause (la provenance T173-A déclenche désormais un affichage) ; 2e tentative après acquittement réusssit."
+      verified_by: "snapshot simulation boot + test unitaire du scénario boot"
+    - id: AC5
+      statement: "Table de vérité : AUCUNE sortie silencieuse résiduelle — pour chaque signal d'échec injecté, un outcome (ErrorId/message) distinct est observé ; la case 'sortie sans message' est vide."
+      verified_by: "table de vérité complète (tous les signaux x outcomes) jointe au rapport, revue humaine"
+    - id: AC6
+      statement: "Non-régression : run_all_gates palier C PASS (bundle validé), G200_check_linkage 0 erreur."
+      verified_by: "run_all_gates --palier C + G200 --report"
+    - id: AC7
+      statement: "Le nom de fichier est egal au nom du POU pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+    - id: AC8
+      statement: "Le suffixe de langage est egal au langage genere dans le bundle pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/tests/                                  # nouveaux tests unitaires (dossier domaine)
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ArningSilencieux_AU_20260828.md  # verdict final + non-régression
+      - TOOLS/TEST_AUTO_CI/registry.yaml                           # enregistrement nouveaux tests si requis
+    forbidden:
+      - CODE/B_AU_SECURITE/                                        # aucun changement de logique AU dans cette tâche
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export            # regenere par l'humain
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "La logique AU testée telle que livrée par T173-A/B (aucune modification ici)"
+      - "Les tests existants du domaine sécurité (non-régression)"
+    dropped_on_purpose:
+      - "Aucun"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Si un scénario révèle une sortie encore silencieuse ou un message insuffisant, le signaler
+    immédiatement : T173-B devra être amendée (retour au lot). Ne jamais affaiblir un interlock de
+    sécurité pour faire passer un test.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

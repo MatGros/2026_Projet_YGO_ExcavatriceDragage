@@ -1,0 +1,87 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T173-A C2 : Traçage provenance échec 1er réarmement AU
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T173-A_TRACING
+  criticality: C2            # safety AU — patch de diagnostic uniquement (aucun changement de comportement)
+  strategy: patch            # ajout d'une variable de trace, pas de modification de la logique
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Prouver par preuve la provenance de l'échec silencieux du 1er réarmement AU au premier boot
+    (simulation). En l'état, FB_Safety_EmergencyManagementLogic sort de la séquence vers ArmingSeqStep
+    := 0 sans poser de Cause (lignes 165/168/207/234, ou front ArmRequest avalé par le RETURN de
+    l'autotest ligne 145) et GVL_Troubleshooting.ArmingStep retombe immédiatement à 0 — la cause
+    exacte n'est donc pas capturable avec les variables actuelles. Ce contrat ajoute UNE variable de
+    traçage (dernière cause d'abandon + étape atteinte) sans modifier la logique fonctionnelle.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "L'ajout de traçage ne change AUCUN comportement fonctionnel de la séquence AU (ni step, ni consignes, ni ErrorId existant)."
+      verified_by: "git diff n'ajoute aucune modification hors déclaration/affectation d'une variable trace"
+    - id: AC2
+      statement: "Une variable trace (ex. LastAbortCause: WORD + LastAbortStep: INT) capture toute sortie silencieuse : chaque branche 165/168/207/234 et le retour autotest §2 écrit une valeur distincte."
+      verified_by: "lecture du code : chaque sortie ArmingSeqStep := 0 (sauf reset/coupure volontaire notée) met à jour LastAbortCause/LastAbortStep"
+    - id: AC3
+      statement: "La variable trace est exposée dans GVL_Troubleshooting (structure Safety ou dédiée) et ajoutée à troubleshooting_variables.txt via le générateur."
+      verified_by: "grep du chemin dans CODE/J_SUPERVISION/GVL_Troubleshooting.st + TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt"
+    - id: AC4
+      statement: "Un snapshot au boot simulation (1er réarmement) documente la valeur de trace : la provenance de l'échec est explicitée (ex: LastAbortStep=6, LastAbortCause=chute chaîne)."
+      verified_by: "snapshot CSV fourni en preuve avec LastAbort* non nul et libellé de cause"
+    - id: AC5
+      statement: "Le nom de fichier est egal au nom du POU pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+    - id: AC6
+      statement: "Le suffixe de langage est egal au langage genere dans le bundle pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st    # ajout variable trace (déclaration + affectation aux 4 sorties)
+      - CODE/J_SUPERVISION/GVL_Troubleshooting.st                  # exposition trace
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st               # câblage trace
+      - TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt  # régénéré via generate_variable_list_from_code.py
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ArningSilencieux_AU_20260828.md  # verdict de provenance
+    forbidden:
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st    # AUCUNE modification de la logique de séquence (step, consignes, ErrorId)
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export            # regenere par l'humain
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Le comportement fonctionnel de la séquence AU strictement identique (patch diagnostic pur)"
+      - "Les temporisations et seuils CST_* (test 200ms, pulse 1s, confirm 2s, lockout 5s)"
+      - "L'interlock de sécurité sur Cause brute (jamais sur Ack)"
+    dropped_on_purpose:
+      - "Aucun (tout le fonctionnel survit ; seule une variable trace est ajoutée)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Si en instrumentant on découvre qu'une sortie silencieuse est en réalité une logique de
+    sécurité (coupe volontaire), le signaler : la branche sera marquée comme coupe volontaire
+    tracée, et NON comme un bug à corriger en T173-B. Ne pas modifier la logique fonctionnelle.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

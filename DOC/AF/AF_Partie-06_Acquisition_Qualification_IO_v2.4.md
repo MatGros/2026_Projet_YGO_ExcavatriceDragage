@@ -186,23 +186,23 @@ disponibilité (device, communication) restent évalués sur la source réelle p
 - Simulation active sur un domaine : `HwIn.<Domaine> == HwSim.<Domaine>` quel que soit le réel.
 - Aucun `_DI` de `HwIn` n'a une polarité physique : tout `TRUE` = état logique normalisé.
 
-### 🔢 `ST_InputsQualified` — statut de retrait
+### 🔢 `ST_InputsQualified` — retrait déjà effectué
 
-`ST_InputsQualified` et ses sous-DUT sont **hérités de l'ancienne architecture**. Ils ne doivent plus
-recevoir de nouveau lecteur ni de nouvelle donnée. Leur retrait sera autorisé uniquement lorsque la
-recherche active prouvera l'absence de consommateur CODESYS et lorsque chaque champ requis sera
-consommé depuis `PRG_02_Acquisition.HwIn`.
+`ST_InputsQualified` et ses sous-DUT sont déjà archivés dans
+`ARCHIVES/Code/SUPERVISION/_TYPES/` et ne sont plus présents dans `CODE/` : zéro consommateur actif
+est donc attendu. Ils ne doivent recevoir **ni nouveau champ, ni nouveau lecteur, ni nouvelle donnée**.
+Les faits qualifiés sont publiés exclusivement par `PRG_02_Acquisition.HwIn`.
 
-| Point de contrôle | Exigence avant suppression |
+| Règle maintenue | Exigence |
 |---|---|
-| Producteur | Aucun nouveau producteur ; `PRG_02_Acquisition` publie `HwIn` |
-| Lecteurs | `grep` CODE + inspection CODESYS : zéro lecteur réel restant |
-| Polarité | Chaque champ `HwIn` conserve le nom et l'état métier attendus |
-| Filtrage | Filtre matériel prouvé ou filtrage équivalent intégré à `PRG_02` |
+| Non-réintroduction | Ne jamais recréer `ST_InputsQualified*` ni un POU `PRG_01` de qualification retiré |
+| Producteur | `PRG_02_Acquisition` publie `HwIn` |
+| Polarité | Chaque champ `HwIn` conserve son nom et son état métier attendu |
 | Simulation | La sélection `HwReal`/`HwSim` reste centralisée dans `PRG_02` |
 | Diagnostic | `InputModuleFault` et les trois états module restent publiés |
 
-Aucune suppression de type n'est effectuée dans cette phase documentaire.
+Aucune suppression de type n'est effectuée dans cette phase documentaire : le retrait est déjà tracé
+dans les archives, qui ne sont pas une source active.
 
 ### 📏 `ST_EncoderMeasurements` — mesures codeur M1/M2 (à créer)
 
@@ -213,7 +213,7 @@ Facts de la chaîne de mesure pure (Abs → Scale → Safety → SpeedMeasure), 
 | Propriétaire / producteur | `PRG_02_Acquisition` (chaîne de mesure pure, rang 02) |
 | Écrivain unique | `PRG_02_Acquisition` |
 | Lecteurs | `PRG_04_Treuils_Benne` (conduite + `FB_Safety_Winch`), `PRG_03_Modes_Cycle` (`EncoderIncoherent` → blocage SEMI_AUTO), Supervision/IHM |
-| Cadence | tâche `T01_Acquisition`, cycle rapide |
+| Cadence | tâche `MainTask`, cycle rapide (AF02 §4) |
 
 **Structure** (1 sous-DUT par treuil, M1 et M2) :
 
@@ -331,8 +331,8 @@ separee : c'est ce qui supprime le cycle prouve `Acquisition ↔ Diagnostics` et
 | Module | Type | E/S portées | Fonctions critiques supportées |
 |---|---|---|---|
 | `Local_Digital_IO` | DI8 / DO8 | 8 DI + 8 DO | Winch (mou câble, sécurité), Machine (Kobold) |
-| `VH_0800END` | DI8 | 7 DI | Machine (AU, phases, thermiques), retours freins M1/M2/M3 |
-| `VH_0808ETP` | DI8 / DO8 | 7 DI + 8 DO | Translation (positions M3), résistances contacteurs M1/M2 |
+| `VH_0800END` | DI8 | 8 DI | Machine (AU, phases, thermiques), retours freins M1/M2/M3, voie Bit5 non nommée |
+| `VH_0808ETP` | DI8 / DO8 | 8 DI + 8 DO | Translation (positions M3), résistances contacteurs M1/M2, Bit5 `TremieFull_OR_GateRaised_DI` réservée non câblée |
 | `VH_0008ER` | DO8 Relais | 8 DO relais | Bobines freins treuils M1/M2/M3 & Moteur Kobold |
 | `VH_0008ER_1` | DO8 Relais | 8 DO relais | Réarmement AU (`EmergencyArming_RQ`) & Coupure puissance (`PowerKeepAlive_A/B_RQ`) |
 
@@ -365,16 +365,12 @@ avec le traitement `EncoderFault` deja en place (§3ter). En simulation ou lors 
 
 ## 🔌 5 · TOR d'entrée — liste exhaustive de `HwIn`
 
-> 📌 **Source de vérité matérielle** : `TOOLS/AGENT_WORKFLOW/config/Device_IO_20260814.csv`
-> (nom de fichier corrigé 2026-08-26 — l'ancien `Device_IO_20260806.csv` n'existe plus)
-> (export CODESYS → CSV, référence T100). **22 TOR d'entrée réelles** sont recensées ici.
+> 📌 **Source de vérité matérielle** : `TOOLS/AGENT_WORKFLOW/config/Device_IO_20260826.csv`
+> (export CODESYS → CSV, référence T100). **24 voies DI configurées** sont recensées ici : les trois
+> modules DI portent chacun huit voies, dont Bit5 `TremieFull_OR_GateRaised_DI` réservée non câblée
+> à cette mise en service et Bit5 `VH_0800END` sans nom ni fonction déclarée.
 > La structure `ST_HardwareImage` porte les champs ; aucun nouveau champ ne doit être créé dans
 > `ST_InputsQualified` ou dans un POU `PRG_01` en retrait.
->
-> ⚠️ **Table non exhaustive (trouvé 2026-08-26)** : `ST_HwMachine` porte un 23e champ,
-> `TremieFull_OR_GateRaised_DI` (`VH_0808ETP · 5`, CSV `Device_IO_20260826.csv:456`) — déclaré
-> dans le code, **pas encore câblé électriquement**, absent de la liste ci-dessous. À ajouter dès
-> câblage effectif.
 
 Le nom d'une E/S dit ce que signifie `TRUE` (`<Domaine>_<ÉtatQuandTRUE>_DI`). La polarité est
 normalisée une seule fois dans le mapping d'acquisition `PRG_02_Acquisition` ou garantie par la
@@ -386,9 +382,9 @@ configuration matérielle ; aucun `InvertLogic` aval ne doit être ajouté.
 | 2 | `EmergencyChainClosed_DI` | VH_0800END · 7 | Machine | NC | Boucle AU fermée (coup-de-poing + contact PLC) |
 | 3 | `PhaseRotationOk_DI` | VH_0800END · 4 | Machine | NC | Rotation des phases électriques correcte |
 | 4 | `M1_M2_M3_BrakeThermalOk_DI` | VH_0800END · 3 | Machine | NC | Thermique freins M1/M2/M3 commun OK *(corrigé 2026-08-26, ancien nom `BrakeThermalOk_DI` ne correspond plus au code)* |
-| 5 | `M1_BrakeIsOpen_DI` | VH_0800END · 0 | Winch | inversée* | Frein M1 **ouvert** (desserré) — normalisée TRUE=serré |
-| 6 | `M2_BrakeIsOpen_DI` | VH_0800END · 1 | Winch | inversée* | Frein M2 **ouvert** — normalisée TRUE=serré |
-| 7 | `M3_BrakeIsOpen_DI` | VH_0800END · 2 | Translation | inversée* | Frein M3 **ouvert** — normalisée TRUE=serré |
+| 5 | `M1_BrakeIsOpen_DI` | VH_0800END · 0 | Winch | inversée* | Frein M1 **ouvert** (desserré) — normalisée TRUE = frein ouvert |
+| 6 | `M2_BrakeIsOpen_DI` | VH_0800END · 1 | Winch | inversée* | Frein M2 **ouvert** — normalisée TRUE = frein ouvert |
+| 7 | `M3_BrakeIsOpen_DI` | VH_0800END · 2 | Translation | inversée* | Frein M3 **ouvert** — normalisée TRUE = frein ouvert |
 | 8 | `M1_ContactorsReleased_DI` | Local_Digital_IO · 0 | Winch | NO | Contacteurs sens M1 relâchés |
 | 9 | `M1_ThermalOk_DI` | Local_Digital_IO · 1 | Winch | NC | Thermique M1 OK |
 | 10 | `M2_ContactorsReleased_DI` | Local_Digital_IO · 2 | Winch | NO | Contacteurs sens M2 relâchés |
@@ -404,9 +400,17 @@ configuration matérielle ; aucun `InvertLogic` aval ne doit être ajouté.
 | 20 | `M3_PosMaintenance_DI` | VH_0808ETP · 4 | Translation | NO | Chariot position Maintenance |
 | 21 | `HydraulicThermalOk_DI` | VH_0808ETP · 6 | Machine | NC | Thermique moteur hydraulique OK *(nouveau vs legacy 19)* |
 | 22 | `ConveyorInfeedReady_DI` | VH_0808ETP · 7 | Machine | NO | Autorisation démarrage crible (dépose gravats) *(nouveau vs legacy 19)* |
+| 23 | `TremieFull_OR_GateRaised_DI` | VH_0808ETP · 5 | Machine | réservée, non câblée | Mise en service actuelle : `FALSE` validé terrain ; futur : trémie pleine ou grille levée |
+| 24 | `—` | VH_0800END · 5 | Machine | non documentée | Voie présente dans le CSV sans nom ni fonction — confirmation humaine requise |
 
 * Freins : `M*_BrakeIsOpen_DI` porte **TRUE = frein ouvert**. Cette polarité est celle du nom
 métier actuel et doit rester identique dans `HwReal`/`HwIn`, sauf décision safety documentée.
+
+> ⚠️ `TremieFull_OR_GateRaised_DI` est déclarée et mappée, mais **non câblée à cette mise en service**
+> (validation humaine 2026-08-29). Aucun consommateur ne l'utilise : l'interlock directionnel M3
+> vers trémie reste hors scope, planifié séparément par T108. Avant son câblage futur, prouver au
+> bornier que la voie vaut `FALSE` hors détection ; une entrée DI non raccordée ne doit jamais être
+> présumée stable uniquement par logiciel.
 
 ### Sorties de maintien / réarmement (familles liées, Q/RQ)
 

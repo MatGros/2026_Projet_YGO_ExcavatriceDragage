@@ -453,7 +453,7 @@ M3_PosPV_DI;Bit1;;Capteur d'info position chariot;%IX224.1;VH_0808ETP
 M3_PosPVP2_DI;Bit2;;Capteur d'info position chariot;%IX224.2;VH_0808ETP
 M3_PosP1_DI;Bit3;;Capteur d'info position chariot;%IX224.3;VH_0808ETP
 M3_PosMaintenance_DI;Bit4;;Capteur d'info position;%IX224.4;VH_0808ETP
-TremieFull_OR_GateRaised_DI;Bit5;;Trémie pleine ou grille levée permet d'interdire la translation M3 vers trémie;%IX224.5;VH_0808ETP
+TremieFull_OR_GateRaised_DI;Bit5;;Réservée non câblée à la mise en service — futur signal trémie pleine ou grille levée;%IX224.5;VH_0808ETP
 HydraulicThermalOk_DI;Bit6;;Disjoncteur thermique moteur hydraulique;%IX224.6;VH_0808ETP
 ConveyorInfeedReady_DI;Bit7;;Autorisation démarrage crible - dépose gravats sur crible;%IX224.7;VH_0808ETP
 ;out0;;Digital output00~07;%QB26;VH_0808ETP

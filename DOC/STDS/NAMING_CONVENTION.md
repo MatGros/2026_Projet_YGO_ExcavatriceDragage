@@ -185,6 +185,12 @@ entrée de réglage `Cfg`) ne relève **pas** de la convention `ST_<Domaine>_<R�
 porte le préfixe **`ST_fb<NomFb>_<Rôle>`** — `fb` minuscule collé, puis le nom du FB propriétaire,
 puis `_`, puis le rôle.
 
+**Portée PROGRAM — clarification T172-C** : cette règle décrit la propriété d'une **instance de FB**.
+Un DUT publié par un `PRG_*` est un bus de domaine public, même si son écrivain est unique ; il reste
+donc nommé `ST_<Domaine>_<Rôle>`. Exemple : `ST_EncoderMeasurements`, produit uniquement par
+`PRG_02_Acquisition`, ne devient pas `ST_fbPRG02_*`. Le producteur unique reste obligatoire selon
+AF03 §2 ; il ne transforme pas un PROGRAM en propriétaire de FB.
+
 ```text
 ST_fb<NomFb>_<Rôle>        (Rôle : Cfg, AxisCmd, State, HwIn, HwOut, …)
 ```

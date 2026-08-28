@@ -1,0 +1,1474 @@
+domains:
+  AF-01:
+    file: AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+    functions:
+      F01.01:
+        fonction: Couper la puissance (AU)
+        description: Boucle AU physique ouverte ➔ coupure matérielle des moteurs/actionneurs,
+          indépendante du PLC
+        realisee_par: FB_Safety_EmergencyManagement
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P01-001
+        statut: ✅
+        etat: NV-I
+      F01.02:
+        fonction: Maintenir 2 canaux fail-safe
+        description: Perte de maintien A ou B ➔ ouvre la boucle AU
+        realisee_par: FB_Safety_EmergencyManagement
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P01-002
+        statut: ✅
+        etat: NV-I
+      F01.03:
+        fonction: Réarmer sur demande explicite
+        description: Front ArmRequest + boucle saine ➔ séquence de réarmement ; jamais
+          automatique
+        realisee_par: FB_Safety_EmergencyManagement
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P01-003
+        - TC-P01-005
+        statut: ✅
+        etat: NV-I
+      F01.04:
+        fonction: Acquitter sans lever l'interlock
+        description: Reset efface l'affichage (pattern Cause/Ack) sans jamais ouvrir
+          l'interlock de sécurité
+        realisee_par: FB_Safety_EmergencyManagement
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P01-004
+        - TC-P01-009
+        statut: ✅
+        etat: NV-I
+      F01.05:
+        fonction: Auto-tester la redondance A/B
+        description: Test croisé des 2 canaux à chaque réarmement (preuve runtime,
+          pas de procédure manuelle séparée)
+        realisee_par: FB_Safety_EmergencyManagement
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P01-006
+        statut: ✅
+        etat: NV-I
+      F01.06:
+        fonction: Verrouiller après échec
+        description: Non-confirmation contacteur après pulse ➔ lockout 5s avant nouvel
+          essai
+        realisee_par: FB_Safety_EmergencyManagement
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P01-007
+        statut: ✅
+        etat: NV-I
+      F01.07:
+        fonction: Couper sur demande safety métier
+        description: PowerCutOffRequest (agrégat M1/M2/M3) ➔ coupe A et B sans déclencher
+          d'armement
+        realisee_par: FB_Safety_EmergencyManagement
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P01-008
+        statut: ✅
+        etat: NV-I
+      F01.08:
+        fonction: Cohérence coupure IHM / réarmement
+        description: BtnEmergencyCutOff pendant le pulse de réarmement
+        realisee_par: FB_Safety_EmergencyManagement
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P01-010
+        statut: ⚠️ écart relevé, non corrigé (audit 2026-08-22)
+        etat: NV
+    validation_points:
+      TC-P01-001, TC-P01-008:
+        intention: AU physique et demande safety métier agrégée coupent A+B, sans
+          passer par une séquence d'armement
+        type: 🟢 SITE+AUTO
+        ref: FB_Safety_EmergencyManagement
+        etat: NV
+      TC-P01-002, TC-P01-006:
+        intention: Perte d'un canal ouvre la boucle ; auto-test croisé des 2 canaux
+          prouvé à chaque réarmement
+        type: ⚡ SITE+AUTO_PLC
+        ref: FB_Safety_EmergencyManagement
+        etat: NV-I
+      TC-P01-003, TC-P01-005, TC-P01-007:
+        intention: Front explicite requis, jamais automatique ; acquittement et réarmement
+          = 2 actions distinctes ; échec de confirmation ➔ lockout 5s
+        type: ⚡ AUTO_PLC
+        ref: FB_Safety_EmergencyManagement
+        etat: NV-I
+      TC-P01-004, TC-P01-009:
+        intention: Reset efface l'affichage sans jamais lever l'interlock de sécurité
+          ; re-latch si nouvel échec
+        type: 💻 AUTO
+        ref: FB_Safety_EmergencyManagement
+        etat: NV-I
+      TC-P01-010:
+        intention: BtnEmergencyCutOff pendant le pulse de réarmement (step 5)
+        preuve: ⚠️ ArmPulse_RQ reste TRUE — écart relevé, non corrigé (audit 2026-08-22)
+        type: 💻 AUTO
+        ref: §7
+        etat: NV-I
+      TC-P01-001:
+        intention: Coupe puissance moteurs, API vivant
+        preuve: Contacteur ouvert
+        type: 🟢 SITE
+        ref: §6.1
+        etat: NV
+      TC-P01-002:
+        intention: Perte canal A ou B ouvre la boucle AU
+        preuve: MaintainA/B_RQ=FALSE
+        type: ⚡ SITE+AUTO
+        ref: §5
+        etat: NV-I
+      TC-P01-003:
+        intention: Front ArmRequest + boucle OK ➔ pulse 1s
+        preuve: Pulse 1s (step 5)
+        type: ⚡ AUTO_PLC
+        ref: §4.3
+        etat: NV-I
+      TC-P01-004:
+        intention: Reset efface l'affichage (interlock reste sur Cause)
+        preuve: Error=FALSE
+        type: 💻 AUTO
+        ref: §4.4bis
+        etat: NV-I
+      TC-P01-005:
+        intention: Acquittement et réarmement 2 actions distinctes
+        preuve: 2 actions requises
+        type: ⚡ SITE+AUTO
+        ref: §4.4
+        etat: NV-I
+      TC-P01-006:
+        intention: Test croisé A/B au réarmement (échec ➔ RedundancyFail)
+        preuve: Steps 1–4 (200ms)
+        type: ⚡ AUTO_PLC
+        ref: §4.3bis
+        etat: NV-I
+      TC-P01-007:
+        intention: Échec confirmation contacteur ➔ verrouillage 5s
+        preuve: LockoutActive=TRUE
+        type: 💻 AUTO
+        ref: §4.3
+        etat: NV-I
+      TC-P01-008:
+        intention: PowerCutOffRequest=TRUE coupe A et B sans armer
+        preuve: MaintainA/B_RQ=FALSE
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P01-009:
+        intention: Cause persistante ➔ ré-alarme au prochain essai
+        preuve: Ack=FALSE
+        type: 💻 AUTO
+        ref: §4.4bis
+        etat: NV-I
+  AF-02:
+    file: AF_Partie-02_Architecture_Programme_v3.2.md
+    functions:
+      F02.01:
+        fonction: Ordonner le cycle applicatif
+        description: Exécute les six PRG dans l'ordre Acquisition → Modes/Cycle →
+          Treuils/Benne → Translation → Outputs → Supervision.
+        realisee_par: MainTask + PRG_02 à PRG_07
+        criticite: 🔵 C2
+        tc_couvrants:
+        - TC-P02-004
+        statut: ⚠️ revue MainTask manuelle
+        etat: NV
+      F02.02:
+        fonction: Encapsuler l'orchestration ST
+        description: Les PRG rendent visibles leurs instances, flux et arbitrages
+          ; calculs et machines d'état résident dans les FB.
+        realisee_par: PRG_02 à PRG_07
+        criticite: ⚪ C1
+        tc_couvrants:
+        - TC-P02-002
+        statut: ✅
+        etat: NV-I
+      F02.03:
+        fonction: Garantir un producteur unique
+        description: Chaque image, bus, commande et état public a un propriétaire
+          unique, identifié avant tout raccordement.
+        realisee_par: Contrats ST_* + PRG producteurs
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P02-001
+        statut: ⚠️ gate à fiabiliser (TBD §8)
+        etat: NV
+      F02.04:
+        fonction: Isoler la barrière de sortie
+        description: Seul PRG_06_Outputs applique les interlocks finaux et écrit les
+          Q/PDO des actionneurs.
+        realisee_par: PRG_06_Outputs
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P02-003
+        statut: ✅
+        etat: NV-I
+      F02.05:
+        fonction: Rendre explicites les retards de scan
+        description: Toute donnée consommée avant son producteur est interdite, sauf
+          retard d'un scan nommé et justifié.
+        realisee_par: Ordonnancement MainTask
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P02-004
+        statut: ⚠️ revue MainTask manuelle
+        etat: NV
+      F02.06:
+        fonction: Séparer supervision et commande métier
+        description: La vue troubleshooting observe seulement ; PRG_07 porte distinctement
+          reset IHM, persistance et bypass autorisés.
+        realisee_par: PRG_07_Supervision + FB_TroubleshootingView
+        criticite: 🔵 C2
+        tc_couvrants:
+        - TC-P02-005
+        statut: ✅
+        etat: NV-I
+    validation_points:
+      TC-P02-001:
+        intention: Un seul producteur par donnée
+        preuve: Aucun écouteur/écrivain multiple sur un contrat *(⚠️ G200_check_linkage.py
+          L10 remonte des faux positifs intra-POU — voir TBD §8)*
+        type: 💻 AUTO
+        ref: §2
+        etat: NV
+      TC-P02-002:
+        intention: Programme d'orchestration ST sans logique métier cachée
+        preuve: Les calculs et machines d'état résident dans les FB ; le PRG rend
+          ses arbitrages et flux explicitement lisibles
+        type: 💻 AUTO
+        ref: §2
+        etat: NV
+      TC-P02-003:
+        intention: Sorties physiques via PRG_06_Outputs
+        preuve: Aucun autre POU n'écrit les Q/PDO finaux
+        type: 💻 AUTO
+        ref: §3
+        etat: NV
+      TC-P02-004:
+        intention: Ordre d'exécution MainTask conforme
+        preuve: Tâche CODESYS + G200_check_linkage.py PASS *(⚠️ ne vérifie pas l'ordre
+          inter-POU — revue manuelle à ce jour, voir TBD §8)*
+        type: ⚡ SITE+AUTO
+        ref: §5
+        etat: NV
+      TC-P02-005:
+        intention: Vue troubleshooting en lecture seule
+        preuve: FB_TroubleshootingView ne produit aucune commande, configuration ni
+          interlock
+        type: 💻 AUTO
+        ref: §3
+        etat: NV
+  AF-03:
+    file: AF_Partie-03_Contrats_Composants_v2.3.md
+    functions: {}
+    validation_points:
+      TC-P03-001:
+        intention: Cycle de vie et neutralisation Enable
+        preuve: Enable=FALSE neutralise commandes et statut (gate) ; Enable=TRUE autorise
+          l'état Ready
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P03-002:
+        intention: Reset inconditionnel (Cause/Ack)
+        preuve: Front Reset efface l'affichage (interlock reste sur Cause)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P03-003:
+        intention: Pas de redémarrage auto après Ack
+        preuve: Retour READY, nouvel ordre explicite requis
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P03-004:
+        intention: Pas de SafeStop/StartStop hors mouvement
+        preuve: Absents des briques E/S, joystick et diag
+        type: 💻 AUTO
+        ref: §3
+        etat: NV
+      TC-P03-005:
+        intention: Encapsulation stricte
+        preuve: Échanges via interfaces/DUTs publics uniquement
+        type: 💻 AUTO
+        ref: §2
+        etat: NV
+      TC-P03-006:
+        intention: Re-latch sur ré-apparition Cause
+        preuve: Nouveau front Cause ➔ Ack=FALSE
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P03-007:
+        intention: Warning auto-effaçable vs Fault latché
+        preuve: Warning s'efface sans Reset, Fault exige Ack
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P03-008:
+        intention: 'Cumul de plusieurs causes latchées : 2 Causes[i] distincts (Active
+          AND Latching) apparus à des instants différents s''accumulent dans LatchedId
+          ; un seul front Reset les acquitte ensemble'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P03-009:
+        intention: 'Cause live (Latching=FALSE) + cause latchée (Latching=TRUE) simultanées
+          : la live alimente ErrorId et retombe seule quand Active repasse FALSE ;
+          la latchée arme LatchedId et reste jusqu''au front Reset'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P03-010:
+        intention: 'Bornes de la liste Causes[0..15] : Causes[0] et Causes[15] correctement
+          mappés sur le bit 0 et le bit 15 (SHL(WORD#1, i)), pas d''off-by-one'
+        type: 💻 AUTO
+        ref: §3
+        etat: NV-I
+      TC-P03-011:
+        intention: 'Reset sans historique de défaut : aucun effet parasite, LatchedId
+          reste 0, Latched reste FALSE'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P03-012:
+        intention: 'Reset maintenu (niveau haut) sans nouveau front pendant qu''une
+          cause latchée disparaît puis réapparaît : pas d''acquittement silencieux
+          (le clear n''agit que sur le front R_TRIG) ; la cause réapparue Active AND
+          Latching ré-arme son bit (ré-alarme) — faille T148 non applicable à cette
+          brique'
+        type: 💻 AUTO
+        ref: §6
+        etat: NV-I
+      TC-P03-013:
+        intention: 'Enable=FALSE : la vue LIVE n''est pas évaluée (ErrorId=0, Error=FALSE)
+          mais la vue LATCHÉE reste publiée — un défaut laté non acquitté ne disparaît
+          pas sur bascule Enable OFF→ON sans Reset'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+  AF-04:
+    file: AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+    functions: {}
+    validation_points:
+      TC-P04-001:
+        intention: Relâchement manche (retour centre) stoppe sans perte d'étape
+        preuve: StartStop=FALSE, étape inchangée
+        type: 💻 AUTO
+        ref: §2
+        etat: V-I
+      TC-P04-002:
+        intention: Cycle produit des demandes, zéro sortie physique
+        preuve: Aucune Q/PDO écrite par FB_Cycle
+        type: 💻 AUTO
+        ref: §2
+        etat: V-I
+      TC-P04-003:
+        intention: STABILIZING fige l'étape (hold sûr)
+        preuve: Étape figée, pas de reprise auto
+        type: 💻 AUTO
+        ref: §4
+        etat: V-I
+      TC-P04-004:
+        intention: 'Reprise après STABILIZING : Cause + Reset + nouvel ordre'
+        preuve: 3 conditions nécessaires
+        type: 💻 AUTO
+        ref: §2
+        etat: V-I
+      TC-P04-010:
+        intention: 'FB_DiveSearch : mise en service recherche de couche'
+        preuve: Transition READY -> SEARCHING
+        type: 💻 AUTO
+        ref: §3
+        etat: V-I
+      TC-P04-011:
+        intention: Séquence Kobold 4 temps à la volée + coupure contacteur sur fond
+        preuve: Alimentation contacteur + coupure anti-chauffe
+        type: 💻 AUTO
+        ref: §3
+        etat: V-I
+      TC-P04-012:
+        intention: Interdiction Palier 5 sous Kobold
+        preuve: Vitesse > 4 déclenche défaut bloquant immédiat
+        type: 💻 AUTO
+        ref: §3
+        etat: V-I
+      TC-P04-013:
+        intention: Bascule Semi-Auto vers Maintenance
+        preuve: Mémorise étape, bloque commandes, reprise explicite
+        type: 💻 AUTO
+        ref: §4
+        etat: V-I
+      TC-P04-020:
+        intention: 'FB_ExtractionSequence : mise en service séquence extraction'
+        preuve: Transition READY -> CLOSING
+        type: 💻 AUTO
+        ref: §3
+        etat: V-I
+      TC-P04-021:
+        intention: Enchaînement continu d'extraction sous maintien joystick
+        preuve: Fermeture $\rightarrow$ Décollage $\rightarrow$ Nominal sans à-coup
+        type: 💻 AUTO
+        ref: §3
+        etat: V-I
+  AF-05:
+    file: AF_Partie-05_Modes_Maintenance_v2.1.md
+    functions: {}
+    validation_points:
+      TC-P05-001:
+        intention: Modes machine restreints (DISABLE, MAINT_N1, MAINT_N2, SEMI_AUTO)
+        preuve: SyncEnable, Diving, Extraction hors E_Mode
+        type: 💻 AUTO
+        ref: §2-3
+        etat: NV
+      TC-P05-002:
+        intention: 'Mode nominal : joystick pilote M1+M2 conjointement'
+        preuve: M1 et M2 reçoivent la même intention
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P05-003:
+        intention: 'Mode MAINT_N2 M1 seul : M2 bloqué, frein serré'
+        preuve: Safety reste active sur M2
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P05-004:
+        intention: Refus mode SEMI_AUTO si codeurs invalides
+        preuve: Bascule refusée + message IHM
+        type: 💻 AUTO
+        ref: §7
+        etat: NV
+      TC-P05-005:
+        intention: Limite légale = blocage exploitation, pas safety
+        preuve: Pas de PowerCutOff sur simple limite légale
+        type: 💻 AUTO
+        ref: §6
+        etat: NV
+      TC-P05-006:
+        intention: Pas de redémarrage automatique après défaut
+        preuve: Reset + nouvel ordre explicite requis
+        type: 💻 AUTO
+        ref: §7
+        etat: NV
+  AF-06:
+    file: AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+    functions:
+      F06.01:
+        fonction: Établir un verdict préflight passif
+        description: Sur front Execute (demande IHM GVL_IHM.Commun.Preflight.BtnRun)
+          uniquement, attend l'immobilité machine, agrège 16 contrôles et publie PreflightOk,
+          PreflightDone, PreflightBusy, PreflightErrorId. Aucun verdict automatique
+          au démarrage automate.
+        realisee_par: FB_Acquisition_Preflight + PRG_07_Supervision
+        criticite: 🔵 C2
+        tc_couvrants:
+        - TC-P06-007
+        statut: ✅ code lu
+        etat: NV-I
+    validation_points:
+      TC-P06-001:
+        intention: Aucune lecture d'E/S brute dans les FB métier
+        preuve: Consommateurs lisent des faits qualifiés
+        type: 💻 AUTO
+        ref: §3
+        etat: NV
+      TC-P06-002:
+        intention: Polarité normalisée une seule fois à l'acquisition
+        preuve: Zéro ré-inversion dans les FB métier
+        type: 💻 AUTO
+        ref: §3
+        etat: NV
+      TC-P06-003:
+        intention: Bascule réel/simulation centralisée
+        preuve: HwIn source unique par domaine
+        type: 💻 AUTO
+        ref: §3
+        etat: NV
+      TC-P06-004:
+        intention: Diag CANopen/EtherCAT publié en ligne
+        preuve: Statuts dispos pour Modes/Safety/IHM
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P06-005:
+        intention: Noms des signaux de puissance validés
+        preuve: PowerKeepAlive_A/B_RQ, EmergencyChainClosed_DI
+        type: 🟢 SITE
+        ref: §5
+        etat: NV
+      TC-P06-006:
+        intention: Écriture des sorties physiques centralisée
+        preuve: PRG_06_Outputs seul producteur final
+        type: 💻 AUTO
+        ref: §6
+        etat: NV
+      TC-P06-007:
+        intention: 'Sans front Execute, PreflightDone reste FALSE (aucun verdict au
+          démarrage). Sur front Execute, tant que la machine n''est pas immobile :
+          PreflightBusy=TRUE et aucun verdict final. Une fois immobile, les 16 bits
+          sont agrégés et PreflightOk=(PreflightErrorId=0).'
+        type: 💻 AUTO_PLC
+        ref: FB_Acquisition_PreflightPRG_07_Supervision
+        etat: NV-I
+  AF-07:
+    file: AF_Partie-07_Interface_IHM_v2.2.md
+    functions: {}
+    validation_points:
+      TC-P07-001:
+        intention: IHM et PLC partagent les mêmes DUTs
+        preuve: Aucun miroir parallèle de variables
+        type: 💻 AUTO
+        ref: §2
+        etat: NV-I
+      TC-P07-002:
+        intention: Structures Cmd/State/Cfg par domaine
+        preuve: Convention respectée dans GVL_IHM
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P07-003:
+        intention: IHM limitée aux variables de GVL_IHM
+        preuve: Zéro accès direct aux internes des FB
+        type: 💻 AUTO
+        ref: §2
+        etat: NV
+      TC-P07-004:
+        intention: Producteur unique par champ State
+        preuve: Un seul écrivain PLC par variable d'état
+        type: 💻 AUTO
+        ref: §2
+        etat: NV
+      TC-P07-005:
+        intention: Page Troubleshooting en lecture seule
+        preuve: Zéro écriture de commande/config/bypass
+        type: 💻 AUTO
+        ref: §7
+        etat: NV
+      TC-P07-006:
+        intention: Séparation messages action vs état
+        preuve: 2 familles distinctes, alarmes sur ErrorId
+        type: ⚡ SITE+AUTO
+        ref: §5
+        etat: NV
+      TC-P07-007:
+        intention: Warning auto-effaçable vs Fault sur Reset
+        preuve: Warning s'efface seul, Fault exige Ack
+        type: ⚡ SITE+AUTO
+        ref: §5
+        etat: NV
+      TC-P07-008:
+        intention: Carrousel d'alarmes un message à la fois, index n/N
+        preuve: Banner.AlarmBanner.Index/Count cohérents
+        type: 💻 AUTO
+        ref: §6
+        etat: NV
+      TC-P07-009:
+        intention: Aucun défaut actif → bandeau d'alarme vide
+        preuve: HasAlarm=FALSE, Text='', Index=0, Count=0
+        type: 💻 AUTO
+        ref: §6
+        etat: NV
+  AF-08:
+    file: AF_Partie-08_Fonction_Joystick_v2.5.md
+    functions:
+      F08.01:
+        fonction: Acquérir axes + bouton
+        description: Lit RawX/RawY/RawButton (bus CANopen ou image simulée)
+        realisee_par: FB_Joystick
+        criticite: 🔵 C2
+        tc_couvrants:
+        - TC-P08-010
+        statut: ✅
+        etat: NV-I
+      F08.02:
+        fonction: Mettre à l'échelle
+        description: Brut ADC → % signé ±100, deadband ADC sur neutre persistant,
+          saturation stricte
+        realisee_par: FB_AxisScale
+        criticite: 🔵 C2
+        tc_couvrants:
+        - TC-P08-010
+        statut: ✅
+        etat: NV-I
+      F08.03:
+        fonction: Armer homme-mort
+        description: Maintien bouton DeadmanArmHoldTime (100ms) ET ArmingPermit=TRUE
+        realisee_par: FB_Joystick
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P08-020
+        statut: ✅
+        etat: NV-I
+      F08.04:
+        fonction: Désarmer homme-mort
+        description: ArmingPermit=FALSE (immédiat) ou neutre tenu NeutralHoldTime
+          après grâce DeadmanArmGraceTime (3s)
+        realisee_par: FB_Joystick
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P08-020
+        statut: ✅
+        etat: NV-I
+      F08.05:
+        fonction: Détecter défaut capteur
+        description: RawX/RawY hors [0;10000] ± marge 500 → SpeedTgt=0 2 axes + Warning
+        realisee_par: FB_Joystick
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P08-030
+        statut: ✅
+        etat: NV-I
+      F08.06:
+        fonction: Calibrer neutre
+        description: Front Calibrate en zone [2000;8000] → mémorise neutre persistant,
+          sinon Fault
+        realisee_par: FB_Joystick
+        criticite: 🔵 C2
+        tc_couvrants:
+        - TC-P08-040
+        statut: ⚠️ SITE non exécuté
+        etat: NV
+      F08.07:
+        fonction: Interdire mouvement sans armement
+        description: Consommateur combine AxisCmd*.StartStop AND DeadmanArmed avant
+          tout ordre translation ; partiel sur treuils (voir §Intégration)
+        realisee_par: PRG_04/PRG_05 (câblage), vérifié par gate G375
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P08-050
+        statut: ⚠️ partiel (treuils)
+        etat: NV
+      F08.08:
+        fonction: Signaler armement refusé
+        description: ArmingPermitDenied := RawButton AND NOT ArmingPermit (warning
+          IHM)
+        realisee_par: FB_Joystick
+        criticite: ⚪ C1
+        tc_couvrants:
+        - TC-P08-060
+        statut: ⚠️ non testé
+        etat: NV
+    validation_points:
+      TC-P08-010:
+        intention: RawX=9000→80%, RawY=300→-94% proportionnel (pas seulement aux bornes)
+          ; deadband ADC centrée neutre
+        type: 💻 AUTO
+        ref: FB_AxisScale
+        etat: NV
+      TC-P08-020:
+        intention: Armement maintien+permission ; relâché avant fin = annulé ; désarmement
+          (décélération normale, pas coupure) sur ArmingPermit=FALSE ou neutre tenu
+          après grâce 3s
+        type: 💻 AUTO
+        ref: FB_Joystick
+        etat: NV
+      TC-P08-030:
+        intention: Hors plage ±marge ➔ SpeedTgt=0 2 axes, ErrorId bit1 Warning auto-effacé
+        type: 💻 AUTO
+        ref: FB_Joystick
+        etat: NV
+      TC-P08-040:
+        intention: Hors [2000;8000] ➔ Fault bit0 à acquitter ; neutre persiste après
+          redémarrage PLC
+        type: ⚡ AUTO+SITE
+        ref: FB_Joystick
+        etat: NV
+      TC-P08-050:
+        intention: Translation refuse tout ordre sans DeadmanArmed (tous modes) ;
+          Treuils seulement en mode Joystick Maître (asymétrie non tranchée, §7/Q2)
+        type: 🔒 GATE
+        ref: G375_check_deadman_arming_gate.py
+        etat: NV
+      TC-P08-060:
+        intention: ArmingPermitDenied=TRUE pendant tout appui bouton si ArmingPermit=FALSE
+        type: ⬜ GAP
+        ref: FB_Joystick
+        etat: NV
+      TC-P08-010.1:
+        intention: 'Échelle proportionnelle asymétrique : RawX=9000 (neutre 5000)
+          → 80% ; RawY=300 (neutre 5000) → -94% — pas seulement aux bornes'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P08-010.2:
+        intention: 'Deadband ADC centrée sur le neutre : \|RawIn-Neutral\| <= DeadbandRaw
+          ⇒ OutPct=0.0'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P08-010.3:
+        intention: 'Saturation stricte : toute sortie de plage RawIn (hors [0;10000])
+          ne produit jamais \|OutPct\| > 100.0'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+  AF-09:
+    file: AF_Partie-09_Fonction_Encoder_v2.3.md
+    functions:
+      F09.01:
+        fonction: Acquérir position brute + gérer le preset SDO
+        description: Lit RawPosIn/AlarmsIn/SlaveOperational (EtherCAT), séquence l'écriture
+          preset (déclenchement, tolérance, timeout)
+        realisee_par: FB_Encoder_Abs
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P09-010
+        statut: ✅
+        etat: NV-I
+      F09.02:
+        fonction: Référencer l'axe (homing)
+        description: '3 modes : nominal (capteur haut, front), unitaire (cible libre
+          CfgHomingTargetM), dynamique (cible calculée par l''appelant, ex. benne)'
+        realisee_par: FB_Encoder_Homing
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P09-020
+        statut: ✅
+        etat: NV-I
+      F09.03:
+        fonction: Détecter une incohérence codeur au redémarrage
+        description: Écart entre position au boot et dernière position connue (RETAIN)
+          > tolérance → HomingSuspect, levé par BtnConfirmCoherence
+        realisee_par: FB_Encoder_Homing
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P09-020
+        statut: ✅
+        etat: NV-I
+      F09.04:
+        fonction: Mettre à l'échelle points → mètres
+        description: CablePosM := (RawPos - HomingRefRaw) × CableM_PerRev / PointsPerRev
+        realisee_par: FB_Encoder_Scale
+        criticite: 🔵 C2
+        tc_couvrants:
+        - TC-P09-030
+        statut: ✅
+        etat: NV-I
+      F09.05:
+        fonction: Borner physiquement + relayer l'incohérence
+        description: Hors [PositionMinM;PositionMaxM] (déf. ±99m) OU HomingSuspect
+          → EncoderIncoherent=TRUE
+        realisee_par: FB_Encoder_Safety
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P09-030
+        statut: ✅
+        etat: NV-I
+      F09.06:
+        fonction: Synthétiser les gates de fiabilité
+        description: EncoderFault := NOT Available OR Incoherent (sans Homed) ; HomedAndReliable
+          := Available AND Homed AND NOT Incoherent (gate stricte M3)
+        realisee_par: FB_EncoderReliability
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P09-040
+        statut: ✅
+        etat: NV-I
+      F09.07:
+        fonction: Mesurer la vitesse câble
+        description: Fenêtre glissante horodatée (6 échantillons, ≥50ms), signée (+
+          montée)
+        realisee_par: FB_Encoder_SpeedMeasure
+        criticite: 🔵 C2
+        tc_couvrants:
+        - TC-P09-050
+        statut: ✅
+        etat: NV-I
+    validation_points:
+      TC-P09-010:
+        intention: Bus/esclave KO → EncoderAvailable=FALSE, RawPos gelé ; preset hors
+          tolérance après timeout → PresetNak + Fault
+        type: 💻 AUTO
+        ref: FB_Encoder_Abs
+        etat: NV-I
+      TC-P09-020:
+        intention: 3 modes homing bornent la cible [-99;+99]m avant écriture ; écart
+          au boot > tolérance → HomingSuspect, levé par confirmation explicite
+        type: 💻 AUTO
+        ref: FB_Encoder_Homing
+        etat: NV
+      TC-P09-030:
+        intention: Conversion signée exacte ; hors bornes ou suspect → EncoderIncoherent=TRUE
+        type: 💻 AUTO
+        ref: FB_Encoder_ScaleFB_Encoder_Safety
+        etat: NV
+      TC-P09-040:
+        intention: EncoderFault ne dépend pas de Homed (non-référencé ≠ incohérent)
+          ; HomedAndReliable exige les 3 conditions
+        type: 💻 AUTO
+        ref: FB_EncoderReliability
+        etat: NV
+      TC-P09-050:
+        intention: Valid=TRUE après 6 échantillons (≥50ms) ; absorption des perturbations
+          mécaniques câble & vibrations ; purge sur perte validité amont
+        type: 💻 AUTO
+        ref: FB_Encoder_SpeedMeasure
+        etat: V-I
+      TC-P09-060:
+        intention: —
+        type: —
+        ref: —
+        etat: NV
+      TC-P09-010.1:
+        intention: AlarmsIn≠0 OU NOT SlaveOperational → EncoderAvailable=FALSE, RawPos/AngleRaw/TurnCount
+          gelés (dernière valeur)
+        type: 💻 AUTO
+        ref: §5
+        etat: NV-I
+      TC-P09-010.2:
+        intention: 'Preset : écart abs(RawPos - PresetValueOut) ≤ PresetTolerancePts
+          → PresetAck après 500ms visuel ; sinon timeout PresetTimeout → PresetNak
+          + ErrorId bit1'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P09-020.1:
+        intention: 'Nominal : front Home + front TopPositionSensor (dans les 2 ordres)
+          → HomingRefRaw calculé pour CablePosM = CfgTopSensorPosM'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-020.2:
+        intention: 'Unitaire : front Home seul → cible CfgHomingTargetM'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-020.3:
+        intention: 'Dynamique : front UseDynamicTarget (ou combiné Home) → cible DynamicHomingTargetM
+          (ex. auto-référencement benne M2)'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-020.4:
+        intention: Toute cible hors [-99;+99]m → homing refusé, ErrorId bit4, pas
+          d'écriture RETAIN
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-020.5:
+        intention: Écart RawPos/Calib.LastKnownRawPos au boot > tolérance → HomingSuspect=TRUE,
+          Homed=FALSE ; levé uniquement par front BtnConfirmCoherence ET HomingPermit=TRUE
+        type: 💻 AUTO
+        ref: §5
+        etat: NV
+      TC-P09-030.4:
+        intention: CablePosM hors [PositionMinM;PositionMaxM] (déf. ±99m) → EncoderIncoherent=TRUE,
+          bit0, auto-effacé au retour en plage
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-030.5:
+        intention: HomingSuspect=TRUE → EncoderIncoherent=TRUE, bit1, tant que non
+          confirmé
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-030.6:
+        intention: BypassGlobal=TRUE → neutralise les 2 causes (mise en service)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-030.7:
+        intention: CablePosMSafe = CablePosM toujours (jamais gelée — distinct du
+          gel RawPos côté Abs)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-030.1:
+        intention: RawPos=HomingRefRaw+4096 (soit ½ tour), CableM_PerRev=2.0, PointsPerRev=8192
+          → CablePosM=1.0
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-030.2:
+        intention: RawPos<HomingRefRaw → CablePosM négative (sous l'eau)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-030.3:
+        intention: PointsPerRev=0 → CablePosM=0.0 (garde division par zéro), pas de
+          plantage
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-050.1:
+        intention: Valid=TRUE seulement après 6 échantillons couvrant WindowElapsed
+          ≥ T#50ms
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-050.2:
+        intention: PositionValid=FALSE (amont) → purge complète immédiate (CollectedSamples:=0,
+          Valid:=FALSE)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-050.3:
+        intention: Rebouclage TIME() détecté (CurrentTimestamp < LastTimestamp) →
+          purge sans réutiliser le delta aberrant
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-050.4:
+        intention: SignedSpeed_Mps signée (+ montée) ; Speed_Mps = ABS(SignedSpeed_Mps)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-040.1:
+        intention: EncoderAvailable=TRUE, Homed=FALSE, EncoderIncoherent=FALSE → EncoderFault=FALSE
+          (non-référencé ≠ incohérent)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-040.2:
+        intention: Même cas → HomedAndReliable=FALSE (gate stricte exige Homed)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-040.3:
+        intention: EncoderAvailable=FALSE → EncoderFault=TRUE quel que soit Homed/EncoderIncoherent
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+  AF-10:
+    file: AF_Partie-10_Fonction_Winch_v2.1.md
+    functions:
+      F10.01:
+        fonction: Piloter le mouvement treuil par palier
+        description: 5 paliers vitesse, sens, tempo asymétrique montée/descente
+        realisee_par: FB_Winch
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P10-011
+        - 017-019
+        statut: ✅
+        etat: NV-I
+      F10.02:
+        fonction: Protéger le treuil (défense en profondeur)
+        description: 7 mécanismes A-G (safety métier), masques, bypass
+        realisee_par: FB_Safety_Winch
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P10-001-010
+        statut: ✅
+        etat: NV-I
+      F10.03:
+        fonction: Synchroniser M1/M2 (3 zones)
+        description: Nominal / dégradé palier 1 / SafeStop selon écart
+        realisee_par: FB_WinchSync
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P10-014-016
+        statut: ✅
+        etat: NV-I
+      F10.04:
+        fonction: Barrière finale sorties + watchdog frein
+        description: Contacteurs + frein couplé direct, anti-redémarrage
+        realisee_par: FB_WinchOutputInterlock
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P10-012
+        - '013'
+        - 020-022
+        statut: ✅
+        etat: NV-I
+      F10.05:
+        fonction: Piloter la benne (désynchro M1/M2)
+        description: Ouverture/fermeture, glissement, assistants Dive/Extraction
+        realisee_par: FB_Bucket
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P10-023-034
+        statut: ✅
+        etat: NV-I
+      F10.06:
+        fonction: Diagnostiquer la symétrie M1/M2
+        description: Écarts démarrage/frein/arrêt/position, passif
+        realisee_par: FB_Winch_Symmetry
+        criticite: ⚪ C1
+        tc_couvrants: []
+        statut: ✅
+        etat: NV-I
+      F10.07:
+        fonction: Décoder consigne % → contacteurs
+        description: Palier 1-5 + garde-fou vitesse mesurée
+        realisee_par: FB_SpeedStep
+        criticite: 🟠 C3
+        tc_couvrants: []
+        statut: ✅
+        etat: NV-I
+      F10.08:
+        fonction: Estimer la charge 2D (palier × vitesse)
+        description: Diagnostic, pas d'action sécurité
+        realisee_par: FB_WinchLoadEstimator
+        criticite: ⚪ C1
+        tc_couvrants: []
+        statut: ✅
+        etat: NV-I
+      F10.09:
+        fonction: Surveiller la dérive sous frein serré
+        description: Capture position, alerte si dérive
+        realisee_par: FB_DriftGuard
+        criticite: 🟠 C3
+        tc_couvrants: []
+        statut: ✅
+        etat: NV-I
+    validation_points:
+      TC-P10-023:
+        intention: Fermeture seulement si MotionDirection=1 ET MotionRequestActive
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-024:
+        intention: Ouverture seulement si MotionDirection=-1 ET MotionRequestActive
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-025:
+        intention: Demande refusée si M1_Busy OR M2_Busy à l'entrée
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-026:
+        intention: Glissement M1>1.0m pendant BUSY ➔ bit4 + M1SlipDetected + coupe
+          M2
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-027:
+        intention: M1SlipDetected force SafeStop sur M1 côté Treuils
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-028:
+        intention: 'Couche 2 (Méca C) : dérive M1>2.0m ➔ PowerCutOff'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-029:
+        intention: Recul (sens inverse) borné à la position de départ, jamais au-delà
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-030:
+        intention: 'ConfirmOpen/ClosePosition : effet seulement MAINT_N1/N2 arrêtés'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-031:
+        intention: Codeur(s) non référencé(s) ➔ bit3 permanent, indépendant de Reset
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-032:
+        intention: FB_ExtractionSequence.Busy préserve l'armement joystick en fin
+          benne
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-033:
+        intention: Butée haute M2 décalée de OffsetCloseM si fermé/en fermeture
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-034:
+        intention: 'Terrain : cinématique réelle en charge, amplitude offset validée'
+        type: 🟢 SITE
+        etat: NV
+      TC-P10-001:
+        intention: 'Méca A (bit7) : dérive>2m ou v>0.02m/s arrêt ➔ SafeStop+PowerCutOff'
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-002:
+        intention: 'Méca B (bit8) : non-confirmation arrêt 3s ➔ SafeStop+PowerCutOff'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-003:
+        intention: 'Méca C (bit9) : dérive M1>2m en maintien M1 ➔ SafeStop+PowerCutOff'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-004:
+        intention: 'Méca D (bit11) : capteur haut sans arrêt 3s ➔ SafeStop+PowerCutOff'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-005:
+        intention: 'Méca E bit12 : écart>2m ➔ SafeStop seul (pas PowerCutOff)'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-006:
+        intention: 'Méca E bit13 : bit12 non confirmé 3s ➔ escalade PowerCutOff'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-007:
+        intention: 'Méca F (bit14) : sens mesuré opposé au sens commandé 500ms ➔ SafeStop'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-008:
+        intention: 'Méca G (bit15) : vitesse nulle malgré commande 3s ➔ SafeStop seul'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-009:
+        intention: PowerCutOff = exactement bits 2,7,8,9,10,11,13 (masque 16#2F84)
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-010:
+        intention: SafeStop exclut bit3 (mou câble) si SyncEnable=FALSE
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-011:
+        intention: Interlock sens & temporisations d'inversion / redémarrage 1s
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-017:
+        intention: Config palier invalide (FB_SpeedStep) ➔ palier 0, sorties sûres
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-018:
+        intention: 'StuckClosed : contacteurs off non confirmés 500ms ➔ bit1'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-019:
+        intention: 'Ordre MainTask : Safety ➔ WinchControl ➔ PRG_06_Outputs'
+        type: ⚡ SITE+AUTO
+        etat: NV
+      TC-P10-012:
+        intention: Watchdog frein barrière 500ms sans confirmation ➔ FAULT + Inhibit
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P10-013:
+        intention: 'Anti-redémarrage : Cause + Reset + Neutre ➔ réautorisation'
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P10-020:
+        intention: Watchdog frein réel terrain (temps, contacteur/bobine)
+        type: 🟢 SITE
+        etat: NV
+      TC-P10-021:
+        intention: 'Temps mort même sens : 1s après arrêt ➔ nouvelle demande'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-022:
+        intention: 'Temps mort inversion : 1s après arrêt + inversion sens'
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-014:
+        intention: Sync bit0 (écart > 0.10 m, instantané + latch, sans timer) ➔ SyncWarn
+          IHM seul
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-015:
+        intention: Sync bit1 (incohérence commande, 500 ms) ➔ SafeStop fast
+        type: 💻 AUTO
+        etat: NV
+      TC-P10-016:
+        intention: 'Couplage croisé : SyncActive ➔ arrêt d''un treuil coupe l''autre'
+        type: 💻 AUTO
+        etat: NV
+  AF-11:
+    file: AF_Partie-11_Fonction_Translation_v2.3.md
+    functions:
+      F11.01:
+        fonction: Décoder la position M3 (5 capteurs)
+        description: Position qualifiée Travail/Trémie/Extrêmes ; incohérence → défaut
+          immédiat
+        realisee_par: FB_Translation_PositionDecoder
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P11-001
+        - '002'
+        statut: ⚠️ cible PRG‑05 ; code encore PRG‑02
+        etat: NV
+      F11.02:
+        fonction: Protéger M3 (Méca A/B, incohérence, bypass)
+        description: Arrêt commandé mais mouvement résiduel / incohérence prolongée
+          → SafeStop+PowerCutOff
+        realisee_par: FB_Safety_Translation
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P11-002
+        - '010'
+        - '011'
+        - '014'
+        statut: ✅
+        etat: NV-I
+      F11.03:
+        fonction: Piloter le mouvement M3 (rampe, ralentissement, interlock sens)
+        description: Joystick/SemiAuto → rampe → AC600 ; ralentissement PV ; boutons
+          IHM MAINT exigent homme-mort
+        realisee_par: FB_Translation
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P11-003-005
+        - '013'
+        statut: ✅
+        etat: NV-I
+      F11.04:
+        fonction: Barrière finale sorties + watchdog frein
+        description: Watchdog frein 500ms, réautorisation post-timeout, gate mot/fréquence,
+          reset AC600 sous inhibition
+        realisee_par: FB_TranslationOutputInterlock
+        criticite: 🔴 C4
+        tc_couvrants:
+        - TC-P11-006-009
+        statut: ✅
+        etat: NV-I
+      F11.05:
+        fonction: Anti-télescopage hauteur M1/M2 (collision benne/translation)
+        description: Bloque translation si câbles M1/M2 sous hauteur mini, sauf Bypass.MinHeight
+          conscient (jamais via BypassGlobal)
+        realisee_par: PRG_05_Translation §0 (câblage direct, hors FB dédié)
+        criticite: 🔴 C4
+        tc_couvrants: []
+        statut: ⚠️ non testé (TC- manquant)
+        etat: NV
+    validation_points:
+      TC-P11-001/002:
+        intention: 5 capteurs ➔ mot valide ➔ position qualifiée. Mot incohérent ➔
+          Incoherent=TRUE ➔ Safety bit7 ➔ SafeStop+PowerCutOff
+        type: 💻 AUTO
+        ref: FB_Translation_PositionDecoder
+        etat: NV-I
+      TC-P11-010/011/014:
+        intention: Arrêt commandé mais mouvement résiduel (Méca A) ou incohérence
+          prolongée (Méca B) ➔ SafeStop+PowerCutOff. BypassGlobal efface ErrorId
+        type: ⚡ AUTO_PLC
+        ref: FB_Safety_Translation
+        etat: NV-I
+      TC-P11-003/004/005/013:
+        intention: Joystick/SemiAuto ➔ Rampe ➔ AC600. Ralentissement PV si Direction=1+capteur.
+          Interlock sens 200ms si vitesse≠0. Boutons IHM MAINT exigent homme-mort
+        type: ⚡ AUTO_PLC
+        ref: FB_Translation
+        etat: NV
+      TC-P11-006-009:
+        intention: Watchdog frein 500ms sans confirmation ➔ FAULT+Inhibit. Réautorisation
+          = Cause+Reset+Mot 0+nouvelle demande. Zéro redémarrage auto
+        type: ⚡ AUTO_PLC
+        ref: FB_TranslationOutputInterlock
+        etat: NV
+      — (aucun TC):
+        intention: Translation bloquée si CablePosM1 ou CablePosM2 sous _TranslationMinHeightM1M2_M,
+          sauf Bypass.MinHeight conscient. ⚠️ Câblé directement dans PRG_05_Translation.st
+          §0, hors FB_Safety_Translation — pas de test dédié aujourd'hui
+        type: ⚠️ manquant
+        ref: PRG_05_Translation
+        etat: NV
+      TC-P11-002:
+        intention: Mot incohérent ➔ Incoherent=TRUE ➔ bit7 Safety ➔ SafeStop+PowerCutOff
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-010:
+        intention: 'Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff'
+        type: ⚡ AUTO_PLC
+        etat: NV-I
+      TC-P11-011:
+        intention: 'Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff'
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-014:
+        intention: BypassGlobal efface ErrorId, coupe TONs, Reset fonctionnel
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-001:
+        intention: 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ Incoherent
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P11-003:
+        intention: Enable=FALSE coupe tout indépendamment de SafeStop/StartStop
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-004:
+        intention: Ralentissement PV actif si Direction=1 (Trémie) ET SlowdownSensor
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-005:
+        intention: 'Interlock sens : bascule directe si vitesse=0, sinon délai 200ms'
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-013:
+        intention: Boutons IHM en MAINT exigent DeadmanArmed=TRUE
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-006:
+        intention: Watchdog frein 500ms sans confirmation ➔ FAULT + Inhibit
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-007:
+        intention: 'Réautorisation post-timeout : Cause + Reset + Mot 0 + Nouvelle
+          demande'
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-008:
+        intention: 'Gate final : Mot/fréquence nuls sans confirmation frein simultanée'
+        type: ⚡ AUTO_PLC
+        etat: NV
+      TC-P11-009:
+        intention: Mot 7 (reset AC600) autorisé pendant RestartInhibit (sans levée
+          inhibition)
+        type: ⚡ AUTO_PLC
+        etat: NV
+  AF-12:
+    file: AF_Partie-12_Fonction_Diagnostic_v1.4.md
+    functions:
+      F12.01:
+        fonction: Diagnostiquer le bus CANopen (joystick)
+        description: Perte liaison / non-opérationnel → ErrorId bit0/1
+        realisee_par: FB_Diag_CanOpen
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P12-010
+        - '020'
+        - '040'
+        statut: ⚠️ conçu, non implémenté
+        etat: NV
+      F12.02:
+        fonction: Diagnostiquer le bus EtherCAT (variateur M3, codeurs M1/M2)
+        description: Perte liaison par device → ErrorId bit4/5/6 (nibbles)
+        realisee_par: FB_Diag_Ethercat
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P12-010
+        - '020'
+        - '030'
+        - '040'
+        statut: ⚠️ conçu, non implémenté
+        etat: NV
+      F12.03:
+        fonction: Surveiller le heartbeat IHM↔PLC
+        description: Toggle bidirectionnel, détecte timeout communication
+        realisee_par: FB_Diag_IhmHeartbeat
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P12-050
+        statut: ⚠️ conçu, non implémenté
+        etat: NV
+    validation_points:
+      TC-P12-010:
+        intention: 'Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur
+          M2) : StateRaw≠RUNNING/ACTIVE ➔ Online=FALSE, Operational=FALSE, State=INIT,
+          sans effet sur les autres devices'
+        type: 💻 AUTO
+        ref: FB_Diag_CanOpenFB_Diag_Ethercat
+        etat: NV-I
+      TC-P12-020:
+        intention: Défaut isolé sur un seul device ➔ ErrorId de ce device porte exactement
+          son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices
+          (Joystick bit0/1, Variateur bit4, M1 bit5, M2 bit6)
+        type: 💻 AUTO
+        ref: FB_Diag_CanOpenFB_Diag_Ethercat
+        etat: NV-I
+      TC-P12-030:
+        intention: Error global et synthèse ErrorId par nibble (0x00F0 variateur /
+          0x0F00 M1 / 0xF000 M2) reflètent l'état Error booléen de chaque device,
+          indépendamment du détail bit-level
+        type: 💻 AUTO
+        etat: NV
+      TC-P12-040:
+        intention: SimBypass/NetworkBypassActive sans device réel RUNNING ➔ SIMULATED
+          ; réel RUNNING sans bypass ➔ READY ; ni l'un ni l'autre ➔ INIT ; Enable=FALSE
+          prioritaire ➔ DISABLED
+        type: 💻 AUTO
+        ref: FB_Diag_CanOpenFB_Diag_Ethercat
+        etat: NV
+      TC-P12-050:
+        intention: Absence de front TglHeartbeatIhm pendant IhmTimeout ➔ HeartbeatIhmTimeout=TRUE/HeartbeatIhmOk=FALSE
+          ; TglHeartbeatPlc bascule toutes les PlcTogglePeriod indépendamment de l'IHM
+          ; nouveau front après timeout ➔ HeartbeatIhmOk restauré immédiatement
+        type: 💻 AUTO
+        etat: NV
+  AF-13:
+    file: AF_Partie-13_Fonction_Simulation_v2.4.md
+    functions: {}
+    validation_points:
+      TC-P13-030:
+        intention: RelayFwd/RelayRev font compter RawPos de SpeedTgt_Pct * 0.1 * SpeedScaleFactor
+          par scan
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-031:
+        intention: PresetCmd=TRUE charge PresetValue directement (priorité sur Fwd/Rev)
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-032:
+        intention: RawPos ne descend jamais sous 0 (borne explicite en soustraction)
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-033:
+        intention: RawPos survit à un reset froid (via VAR_IN_OUT référençant GVL_PERSISTENT)
+        type: 👁️ MANUEL
+        etat: NV
+      TC-P13-050:
+        intention: Initialise au neutre (NeutralRaw) au premier cycle uniquement
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-051:
+        intention: RawX/RawY/RawButton restent forçables librement en instance CODESYS
+          ensuite
+        type: 👁️ MANUEL
+        etat: NV
+      TC-P13-052:
+        intention: Le homme-mort réel de FB_Joystick reste actif — un RawButton non
+          forcé bloque toujours l'armement
+        type: ⚡ SITE+AUTO
+        etat: NV
+      TC-P13-020:
+        intention: SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop
+          — un seul canal FALSE ouvre la boucle
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-021:
+        intention: SimContactorOk s'auto-maintient (latch) sur EmergencyArming, retombe
+          immédiatement si SimChainOk repasse FALSE
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-022:
+        intention: Enable=FALSE neutralise tout (SimChainOk/SimContactorOk/ContactorLatch
+          à FALSE)
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-023:
+        intention: 🆕 Un défaut AU réel latché (RedundancyTestFailedCause/EmergencyArmingFailedCause
+          dans FB_Safety_EmergencyManagementLogic) survit à un cycle Reset/Restart
+          de ce modèle simulé — voir §4
+        type: 👁️ MANUEL
+        etat: NV
+      TC-P13-040:
+        intention: Ne publie que les 6 mots thermomètre valides de FB_Translation_PositionDecoder
+          (11111→00000)
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-041:
+        intention: Direction=+1 progresse vers Trémie, -1 vers Maintenance, 0 maintient
+          la position
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-042:
+        intention: Position bornée [Trémie, Maintenance] — jamais de dépassement
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-043:
+        intention: Enable=FALSE réinitialise sur la Trémie (0 m) — état de départ
+          propre (REX 2026-08-21, était P2)
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-010:
+        intention: Enable=FALSE neutralise tout le banc en un seul RETURN (aucun sous-modèle
+          actif)
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-011:
+        intention: 0 lecture de GVL_* en interne — toutes les entrées passées en paramètres
+          par l'appelant (PRG_02_Acquisition)
+        type: 👁️ MANUEL
+        etat: NV
+      TC-P13-012:
+        intention: M1_BrakeIsOpen_DI := M1_BrakeCmd (jamais de NOT) — polarité maintien
+          (P1 Lot L6)
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-013:
+        intention: 🆕 M3_StatusWordSim bit0 retombe à l'arrêt (Direction=0) — ne déclenche
+          plus FB_Safety_Translation Méca B en continu
+        type: 💻 AUTO
+        etat: NV
+  AF-14:
+    file: AF_Partie-14_Fonction_Troubleshooting_v1.4.md
+    functions: {}
+    validation_points: {}

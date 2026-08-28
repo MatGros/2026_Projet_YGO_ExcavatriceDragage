@@ -1,0 +1,92 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T173-B C2 : Éliminer les sorties silencieuses du réarmement AU
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T173-B_ANTI_SILENT
+  criticality: C2            # safety AU — changement de comportement sur la base de la preuve T173-A
+  strategy: patch            # modification ciblée de FB_Safety_EmergencyManagementLogic + affichage
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Faire disparaître TOUTE sortie silencieuse de la séquence de réarmement AU : chaque abandon
+    de la séquence (coupure par PowerCutOffRequest/BtnEmergencyCutOff, chute de chaîne en
+    step 5/6, échec de restauration A/B en step 2/4, autotest d'échec, front ArmRequest avalé au
+    boot) doit produire un message IHM EXPLICITE à l'opérateur (cause + action requise), jamais
+    un retour silencieux à "chain OK/contacteur OK". L'interlock de sécurité reste arbitré par la
+    Cause brute (jamais par l'Ack, jamais affaibli). Basé sur la provenance prouvée en T173-A.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Chaque branche silencieuse identifiée (165 PowerCutOff/coupe, 168 chute chaîne, 207/234 restauration, 145 autotest, front avalé) produit une erreur/message explicite (ErrorId bit dédié + message IHM cause/action) au lieu d'un retour silencieux."
+      verified_by: "table de vérité : pour chaque signal d'échec injecté, un ErrorId/message distinct est observé (test unitaire ou snapshot)"
+    - id: AC2
+      statement: "L'interlock de sécurité reste inchangé : jamais l'Ack n'ouvre l'arbitrage ; la Cause brute reste l'arbitre de Cmd/Armable (même logique qu'avant)."
+      verified_by: "grep : aucune occurrence de l'Ack dans les conditions de Cmd.Maintain*, Cmd.ArmPulse, Armable ; lecture §7 Logic"
+    - id: AC3
+      statement: "Un message IHM présente cause + action : l'utilisateur sait POURQUOI (ex. 'chaîne d'urgence tombée pendant le test') et QUOI faire (ex. 'relâcher les coup-de-poing, puis réarmer')."
+      verified_by: "présence mapping ErrorId → (cause, action) dans l'IHM/affichage, revue humaine"
+    - id: AC4
+      statement: "Un échec produit ErrorId ≠ 0 ET ArmingFailed (ou équivalent) ; un succès nominal ne produit aucun message (régression évitée)."
+      verified_by: "tests unitaires nominal (ErrorId=0) + échecs (ErrorId≠0)"
+    - id: AC5
+      statement: "La coupure volontaire (BtnEmergencyCutOff) est distinguée d'un défaut (tracée mais pas alarmée comme anomalie)."
+      verified_by: "table de vérité : BtnEmergencyCutOff → trace 'coupe volontaire', pas d'alarme défaut"
+    - id: AC6
+      statement: "Le nom de fichier est egal au nom du POU pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+    - id: AC7
+      statement: "Le suffixe de langage est egal au langage genere dans le bundle pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st    # séquence : poser Cause/ErrorId sur chaque sortie anormale
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st         # propagation erreurs/messages
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st   # buses State/Diag si besoin
+      - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/                # struct diag AU si nouveau champ
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st                # exposition snapshot
+      - DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md + sous-fiche FB_Safety_EmergencyManagement_v1.2.md  # doc du nouveau comportement
+    forbidden:
+      - Code safety procédé (PRG_04/05, FB_Safety_Winch, FB_Safety_Translation, PRG_06_Outputs)  # hors scope
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export            # regenere par l'humain
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Le comportement de l'interlock de sécurité : Cause brute seule arbitre Cmd/Armable, jamais l'Ack"
+      - "Les temporisations CST_* (200ms / 1s / 2s / 5s)"
+      - "La coupure immédiate de la séquence sur BtnEmergencyCutOff / PowerCutOffRequest (sécurité, pas un défaut)"
+      - "L'API publique du FB (entrées/sorties) inchangée sauf ajout de diagnostic tracé"
+    dropped_on_purpose:
+      - "Le retour silencieux des 4 sorties (remplacé par erreur/message actionnable)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Ne jamais affaiblir l'interlock en affichant un message « acquittable » qui ouvrirait un
+    arbitrage : un acquittement ne doit jamais lever une Cause bruter. Toute divergence avec la
+    spec AF-01 (pattern Cause/Ack, auto-test) remontée immédiatement.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
