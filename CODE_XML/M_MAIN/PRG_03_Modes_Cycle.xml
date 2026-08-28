@@ -3713,7 +3713,7 @@ IF (DiveState = E_DiveSearchState.SEARCHING_BOTTOM) AND MotionRequestActive AND 
     END_IF;
 END_IF;
 
-IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
     SeqErrorFault         := FALSE;
     Palier5ForbiddenFault := FALSE;
     TimeoutImmersionFault := FALSE;
@@ -3757,7 +3757,7 @@ ErrorEdge(CLK := Fault.Error);
 IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
     StepAtFault := PrevState;
     StepAtFaultCaptured := TRUE;
-ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
     StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 {endregion}
@@ -4331,6 +4331,14 @@ PrevState := DiveState;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Entrees [SAFE] saines pour la remontee nominale</xhtml>
               </documentation>
             </variable>
+            <variable name="CausesPhysiquesEffacees">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Toutes les entrees defaut treuil/benne revenues a l'etat sain</xhtml>
+              </documentation>
+            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
@@ -4398,6 +4406,17 @@ Vitesse Palier 1 mini sous charge/mou (m/s)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond de distance : borne le calcul avant REAL_TO_UDINT (anti-overflow)</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_BackstopMax">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#600s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond du backstop fermeture benne : au-dela, risque d'overflow de l'accumulateur</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_SecToMs">
               <type>
                 <REAL />
@@ -4434,7 +4453,8 @@ ResetEdge(CLK := Reset);
 ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0)
                   OR (CfgBucketCloseTimeout &lt;= T#0ms)
                   OR (CycleTime &lt;= T#0ms)
-                  OR (CfgBucketCloseTimeout &lt;= BucketMoveTimeout);
+                  OR (CfgBucketCloseTimeout &lt;= BucketMoveTimeout)
+                  OR (CfgBucketCloseTimeout &gt; CST_BackstopMax);  // borne haute : evite l'overflow de BucketCloseTimerAcc (F3)
 
 // ⏱️ Plafond anti-blocage decollage calcule au runtime : course de controle bornee [plancher..plafond]
 // avant conversion REAL-&gt;UDINT-&gt;TIME (anti-overflow sur valeur IHM aberrante, CQS §6).
@@ -4457,15 +4477,22 @@ IF (ExtractionState = E_ExtractionSequenceState.CONTROL_ASCENT) AND MotionReques
     END_IF;
 END_IF;
 
+// Etat physique des causes treuil/benne : conditionne l'acquittement des latches a cause persistante (F2).
+CausesPhysiquesEffacees := NOT BucketError AND NOT WinchSyncError
+                        AND PositionsValid AND M1MeasuredSpeedValid AND M2MeasuredSpeedValid;
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
-    BucketErrorFault          := FALSE;
-    SyncOrSpeedErrorFault     := FALSE;
+    // Latches sans cause physique persistante (timeouts, backstop) : acquittables sur simple front Reset.
     TimeoutBucketCloseFault   := FALSE;
     TimeoutControlAscentFault := FALSE;
     BucketCloseTimerAcc       := T#0ms;
     ControlAscentTimerAcc     := T#0ms;
     StepAtFaultCaptured       := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    // Latches de cause physique : acquittables SEULEMENT si l'entree de defaut est revenue saine (F2).
+    IF CausesPhysiquesEffacees THEN
+        BucketErrorFault      := FALSE;
+        SyncOrSpeedErrorFault := FALSE;
+    END_IF;
 END_IF;
 
 instCauses[1].Active   := BucketErrorFault;
@@ -4590,7 +4617,7 @@ ELSE
         E_ExtractionSequenceState.CONTROL_ASCENT:
             Lifecycle.Busy := TRUE;
             AscentPermit := AssistPermit AND AscentControlSafe; // coupure meme-scan sur defaut synchro/capteurs (H2)
-            ForceMinSpeedStep := TRUE;
+            ForceMinSpeedStep := AscentPermit;                  // bridage suit le permis (F1), jamais actif sans montee autorisee
             OperatorActionId := 16#0203;
             OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
             IF NOT AscentControlSafe THEN

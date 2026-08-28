@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T19:25:18.364447" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T19:25:18.364447">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T20:31:27.700532" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T20:31:27.700532">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -849,7 +849,7 @@ IF (DiveState = E_DiveSearchState.SEARCHING_BOTTOM) AND MotionRequestActive AND 
     END_IF;
 END_IF;
 
-IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
     SeqErrorFault         := FALSE;
     Palier5ForbiddenFault := FALSE;
     TimeoutImmersionFault := FALSE;
@@ -893,7 +893,7 @@ ErrorEdge(CLK := Fault.Error);
 IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
     StepAtFault := PrevState;
     StepAtFaultCaptured := TRUE;
-ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
     StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 {endregion}
