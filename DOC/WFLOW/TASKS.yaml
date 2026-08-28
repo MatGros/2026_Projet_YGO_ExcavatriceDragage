@@ -2723,7 +2723,7 @@ tasks:
   - T168
 - id: T170
   parent_id: null
-  statut: ⬜
+  statut: ✅
   criticite: C4
   domaine: REVIEW
   agent: ORCHESTRATEUR
@@ -2731,8 +2731,70 @@ tasks:
   titre: Clôture d'Ingénierie & Revue Globale du Système
   contexte: Audit de fin de chantier global.
   description: Famille T170 — Validation globale, freeze de release et bilan de conception.
-  contrat: ''
+  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T170-A_AUDIT_RELEASE_ET_CLOTURE.yaml'
   objectifs:
   - Clôturer le grand chantier des cycles
   bloque_par:
   - T169
+- id: T171
+  parent_id: null
+  statut: ⏳
+  criticite: C3
+  domaine: TEST_AUTO_CI
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T17:56:00+02:00'
+  titre: Animation Visuelle Pilotée par le Code Compilé FB_Cycle
+  contexte: Raccordement de l'animation Canvas à la trace d'exécution scan-par-scan du binaire compilé STruCpp.
+  description: Famille T171 — Éradication de la simulation JS fictive et pilotage cinématique 100% basé sur le code ST IEC compilé.
+  contrat: ''
+  objectifs:
+  - Développer le harnais de simulation dynamique de cycle complet
+  - Raccorder l'animation Canvas à la trace JSON du code compilé
+  - Audit indépendant par sous-agent Ollama
+  bloque_par:
+  - T170
+- id: T171-A
+  parent_id: T171
+  statut: ⬜
+  criticite: C3
+  domaine: TEST_AUTO_CI
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T17:56:00+02:00'
+  titre: Harnais ST de simulation dynamique & génération de trace scan-par-scan
+  contexte: Exécution de FB_Cycle compilé sur un cycle complet X0..X13.
+  description: Création du test ST dynamique produisant trace_semi_auto_cycle.json.
+  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE.yaml'
+  objectifs:
+  - Produire la trace scan-par-scan complète des E/S et de CycleStep
+  bloque_par: []
+- id: T171-B
+  parent_id: T171
+  statut: ⬜
+  criticite: C3
+  domaine: TEST_AUTO_CI
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T17:56:00+02:00'
+  titre: Raccordement de l'animation Canvas sur les sorties du code compilé
+  contexte: Suppression de la machine d'état JS et consommation de la trace JSON compilée.
+  description: Adaptation du visualiseur interactif Canvas avec scrub par scan et lecture temps-réel.
+  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE.yaml'
+  objectifs:
+  - Animer la cinématique machine d'après les consignes réelles du binaire compilé
+  bloque_par:
+  - T171-A
+- id: T171-CR
+  parent_id: T171
+  statut: ⬜
+  criticite: C3
+  domaine: REVIEW
+  agent: OLLAMA
+  date: '2026-08-28T17:56:00+02:00'
+  titre: Audit & Challenge Externe par Sous-Agent Ollama
+  contexte: Revue indépendante de la chaîne d'exécution binaire -> trace -> affichage.
+  description: Certification de zéro code arbitraire et conformité avec les sorties de FB_Cycle.st.
+  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml'
+  objectifs:
+  - Certifier l'authenticité de l'animation d'après le code compilé
+  bloque_par:
+  - T171-B
+

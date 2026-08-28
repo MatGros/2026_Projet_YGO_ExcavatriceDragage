@@ -1,0 +1,22 @@
+﻿contract:
+  task_id: T171-CR_REVUE_ANIMATION_COMPILED_CODE
+  parent_id: T171
+  criticality: C3
+  strategy: review
+  objective: >
+    Audit indépendant par le sous-agent Ollama local (DeepSeek) pour certifier
+    que l'animation est rigoureusement et exclusivement alimentée par le code ST compilé,
+    sans aucune logique métier fictive ou code arbitraire en JS.
+  acceptance:
+    - id: AC1
+      statement: "Rapport d'audit Ollama confirmant la traçabilité intégrale entre FB_Cycle.st, le compilateur C++ STruCpp et le lecteur Canvas."
+      verified_by: "Rapport d'audit dans DOC/WFLOW/TROUBLESHOOTING/ ou TASKS."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/**
+  conservation:
+    must_survive:
+      - "Règle de sécurité machine et exactitude des états d'automate."
+  evidence_required:
+    - audit_report_pass
+status: READY_FOR_EXECUTION

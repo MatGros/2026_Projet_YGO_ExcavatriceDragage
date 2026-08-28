@@ -1,0 +1,28 @@
+﻿contract:
+  task_id: T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE
+  parent_id: T171
+  criticality: C3
+  strategy: new_feature
+  objective: >
+    Adapter l'animation visuelle FICHE_SEMI_AUTO_ANIMATION.html (ou créer FICHE_SEMI_AUTO_COMPILED_ANIMATION.html)
+    pour supprimer toute machine d'état JS simulée et piloter le rendu cinématique Canvas
+    directement à partir des données de trace scan-par-scan générées par le binaire C++ compilé de FB_Cycle.st.
+  acceptance:
+    - id: AC1
+      statement: "La cinématique Canvas (mouvements treuils M1/M2, pont M3, benne, états de fond) reflète fidèlement et exclusivement les sorties du code compilé."
+      verified_by: "Revue visuelle et cohérence temporelle avec les graphiques de test STruCpp."
+    - id: AC2
+      statement: "L'interface offre des contrôles interactifs : Play, Pause, Vitesse (x1, x2, x5), Scrubbing par curseur de scan et affichage temps-réel de l'étape Grafcet et des E/S."
+      verified_by: "Vérification fonctionnelle dans le navigateur."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/**
+    forbidden:
+      - CODE/**
+      - PRJ_CODESYS/**
+  conservation:
+    must_survive:
+      - "Rendu esthétique et éléments visuels de FICHE_SEMI_AUTO_ANIMATION.html."
+  evidence_required:
+    - html_report_pass
+status: READY_FOR_EXECUTION
