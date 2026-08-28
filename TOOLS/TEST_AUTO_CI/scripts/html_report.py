@@ -66,8 +66,8 @@ def _failure_block(failure: dict) -> str:
         parts.append(f"<div class='failure-msg'>{_html.escape(failure['message'])}</div>")
     if failure.get("expected") or failure.get("actual"):
         parts.append(
-            f"<div class='failure-diff'>attendu <code>{_html.escape(failure.get('expected', ''))}</code>"
-            f" · obtenu <code>{_html.escape(failure.get('actual', ''))}</code></div>"
+            f"<div class='failure-diff'>attendu <code class='val-expected'>{_html.escape(failure.get('expected', ''))}</code>"
+            f" · obtenu <code class='val-actual'>{_html.escape(failure.get('actual', ''))}</code></div>"
         )
     parts.append("</div>")
     return "".join(parts)
@@ -873,13 +873,17 @@ _CSS = """
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
     .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
-    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
-        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
-    .failure-head { color: var(--red-text); font-weight: 600; }
-    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
-    .failure-msg { color: #92400e; margin-top: 4px; }
-    .failure-diff { margin-top: 4px; }
-    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
+        border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
+    .failure-head { color: var(--red-text); font-weight: 700; font-size: 13.5px; }
+    .failure-loc { color: var(--muted); margin-top: 3px; font-size: 11.5px; font-family: monospace; }
+    .failure-msg { color: var(--text); margin-top: 6px; font-weight: 600; }
+    .failure-diff { margin-top: 8px; color: var(--text); font-size: 12.5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .failure-diff code { padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 12px; font-weight: 700; }
+    .failure-diff code.val-expected { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .failure-diff code.val-actual { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    [data-theme="light"] .failure-diff code.val-expected { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    [data-theme="light"] .failure-diff code.val-actual { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
     pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
         overflow-x: auto; }
     .chronogram-group { margin-top: 10px; }
