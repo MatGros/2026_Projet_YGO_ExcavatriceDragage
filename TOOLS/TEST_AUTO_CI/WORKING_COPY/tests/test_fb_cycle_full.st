@@ -794,6 +794,7 @@ TEST 'TC-P04-105 : SampleCount +1 strict sur X13 multi-scan (F2)'
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X11_OPEN_DUMP, 'X11 atteint (call 13)');
+    ASSERT_EQ(FB.SampleCount, 0, 'SampleCount = 0 avant entree X13 (precondition F2)');
     (* Call 14 : X13 (observe) — SampleCount +1 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
@@ -807,8 +808,12 @@ TEST 'TC-P04-105 : SampleCount +1 strict sur X13 multi-scan (F2)'
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
+    (* 🔒 Émulation copy-out VAR_IN_OUT : le codegen STruCpp génère le IN_OUT en copy-in SEUL
+       (pas de copy-out), alors qu'en CODESYS réel le IN_OUT est passé par référence.
+       Sans resynchronisation, le copy-in du scan suivant ré-écrase le compteur incrémenté
+       avec la valeur locale périmée (artefact harnais, pas un bug FB). *)
+    SampleCount := FB.SampleCount;
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X13_DONE_SYNC, 'X13 atteint');
-    PRINT('DBG14: CycleStep=', FB.CycleStep, ' SampleCount=', FB.SampleCount, ' SampleCountDone=', FB.SampleCountDone);
     ASSERT_EQ(FB.SampleCount, 1, 'SampleCount = 1 après 1er scan en X13');
 
     (* Call 15 : X13 (2e scan) — SampleCount ne doit PAS augmenter (F2) *)
@@ -825,6 +830,7 @@ TEST 'TC-P04-105 : SampleCount +1 strict sur X13 multi-scan (F2)'
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     ASSERT_EQ(FB.SampleCount, 1, 'F2: SampleCount reste 1 au 2e scan en X13 (front)');
+    SampleCount := FB.SampleCount; (* copy-out émulé avant le scan suivant (cf. ci-dessus) *)
 
     (* Call 16 : X13 (3e scan) — SampleCount doit rester 1 (F2) *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,

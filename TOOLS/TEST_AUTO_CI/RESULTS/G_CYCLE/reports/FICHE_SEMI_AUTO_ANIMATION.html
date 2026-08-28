@@ -22,6 +22,8 @@
   .banner-operator { background: #0284c7; color: #fff; padding: 10px 16px; border-radius: 6px; font-size: 0.88rem; font-weight: 600; }
   .banner-operator.stabilizing { background: #b45309; }
   .banner-operator.error { background: #b91c1c; }
+  .banner-unreliable { display: none; background: #7f1d1d; border: 2px dashed #f59e0b; color: #fff; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; margin-top: 4px; }
+  .grafcet-glyph { vertical-align: middle; margin-right: 6px; }
   .banner-transition { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-size: 0.78rem; color: var(--text-dim); }
   .banner-transition b { color: var(--accent); }
   .top-grid { display: grid; grid-template-columns: 820px 1fr; gap: 12px; }
@@ -41,6 +43,7 @@
   button { background: #1e293b; color: #fff; border: 1px solid #334155; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 0.78rem; }
   button:hover { background: #334155; }
   button.btn-primary { background: #0284c7; border-color: #38bdf8; }
+  button.btn-attention { background: #b45309; border-color: #f59e0b; font-weight: 700; box-shadow: 0 0 8px rgba(245,158,11,0.6); }
   .scrub { width: 100%; margin-top: 6px; }
   .legend { font-size: 0.7rem; color: var(--text-dim); display: flex; gap: 14px; margin-top: 4px; flex-wrap: wrap; }
   .src-note { font-size: 0.72rem; color: var(--text-dim); background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
@@ -67,14 +70,31 @@
   </div>
 </header>
 
-<div class="banner-operator" id="bannerOperator">ℹ️ Chargement de la trace…</div>
-<div class="banner-transition" id="bannerTransition">➡️ Conditions de transition : —</div>
+<!-- Rangée étape : glyphe GRAFCET industriel à gauche du texte étape (retour utilisateur) -->
+<div style="display:flex; gap:10px; align-items:stretch;">
+  <div style="flex:0 0 auto; background:var(--bg-panel); border:1px solid var(--border); border-radius:6px; padding:2px 4px;">
+    <svg class="grafcet-glyph" id="grafcetGlyph" width="40" height="64" viewBox="0 0 40 64">
+      <line x1="20" y1="0" x2="20" y2="6" stroke="#64748b" stroke-width="2"/>
+      <rect id="gfStepBox" x="6" y="6" width="28" height="24" rx="3" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+      <text id="gfStepNum" x="20" y="23" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="bold">X0</text>
+      <line x1="20" y1="30" x2="20" y2="46" stroke="#64748b" stroke-width="2"/>
+      <line id="gfTransBar" x1="9" y1="46" x2="31" y2="46" stroke="#64748b" stroke-width="4"/>
+      <text id="gfTransNext" x="20" y="61" text-anchor="middle" fill="#64748b" font-size="9">→</text>
+    </svg>
+  </div>
+  <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+    <div class="banner-operator" id="bannerOperator" style="height:100%;">ℹ️ Chargement de la trace…</div>
+    <div class="banner-transition" id="bannerTransition">➡️ Conditions de transition : —</div>
+  </div>
+</div>
+<div class="banner-unreliable" id="bannerUnreliable">⚠️ ANIMATION NON FIABLE — codeurs non référencés (homing absent) : la position benne affichée n'est pas exploitable. Référencer M1/M2 avant d'interpréter la scène.</div>
 
 <div class="top-grid">
   <div class="scene-card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
       <h2 style="font-size:0.9rem; color:var(--accent);">🎮 Vue Profil Carrière & Cinématique (lecture trace)</h2>
       <div class="btn-group">
+        <button onclick="startCycleReplay()" id="btnStartCycle" title="Appui conscient StartCycle : retour au scan 0 (front StartCycle) et lecture">🔄 StartCycle</button>
         <button onclick="play()" class="btn-primary">▶️ Play</button>
         <button onclick="pause()">⏸️ Pause</button>
         <button onclick="setSpeed(1)">x1</button>
@@ -102,6 +122,8 @@
           <line x1="25" y1="70" x2="25" y2="470" stroke="#475569" stroke-width="1.5"/>
           <line x1="20" y1="120" x2="30" y2="120" stroke="#f59e0b" stroke-width="2"/>
           <text x="3" y="124" fill="#f59e0b" font-size="8" font-weight="bold">+7.0m</text>
+          <line x1="18" y1="80" x2="32" y2="80" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3,2"/>
+          <text x="1" y="84" fill="#38bdf8" font-size="8" font-weight="bold">+8.5m</text>
           <line x1="20" y1="250" x2="30" y2="250" stroke="#38bdf8" stroke-width="2"/>
           <text x="3" y="254" fill="#38bdf8" font-size="8" font-weight="bold">0.0m</text>
           <line x1="20" y1="450" x2="30" y2="450" stroke="#ef4444" stroke-width="2"/>
@@ -168,6 +190,10 @@
           <text x="0" y="14" fill="#fff" font-size="8.5" font-weight="bold" text-anchor="middle">PONT M3</text>
           <g transform="translate(-24, 20)"><circle cx="0" cy="0" r="11" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/><text x="0" y="3" fill="#f59e0b" font-size="7.5" font-weight="bold" text-anchor="middle">M1</text></g>
           <g transform="translate(24, 20)"><circle cx="0" cy="0" r="11" fill="#1e293b" stroke="#22c55e" stroke-width="2"/><text x="0" y="3" fill="#22c55e" font-size="7.5" font-weight="bold" text-anchor="middle">M2</text></g>
+          <g id="grpUnknownBadge" transform="translate(0, 48)" opacity="0">
+            <rect x="-82" y="0" width="164" height="15" rx="3" fill="#7f1d1d" stroke="#ef4444"/>
+            <text x="0" y="11" fill="#fff" font-size="8" font-weight="bold" text-anchor="middle">❓ POSITION NON LOCALISÉE</text>
+          </g>
         </g>
 
         <!-- Câbles -->
@@ -177,11 +203,21 @@
         <!-- Benne -->
         <g id="bucketGroup" transform="translate(80, 120)">
           <rect x="-18" y="-14" width="36" height="14" rx="2" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+          <g id="gravelGroup" opacity="0">
+            <path d="M -13,4 Q -8,10 -2,9 Q 3,13 9,9 Q 13,7 12,3 L -12,3 Z" fill="#8a9a76" stroke="#6b7b5a" stroke-width="1"/>
+            <circle cx="-7" cy="9" r="2.3" fill="#a3b193"/>
+            <circle cx="1" cy="11" r="2.6" fill="#8a9a76"/>
+            <circle cx="7" cy="8" r="2" fill="#b5c2a4"/>
+          </g>
           <g id="jawLeftGroup" transform="rotate(0, -14, 0)"><path d="M -14,0 C -26,10 -22,32 0,35 C -8,22 -12,12 -14,0 Z" fill="#b45309" stroke="#d97706" stroke-width="1.5"/></g>
           <g id="jawRightGroup" transform="rotate(0, 14, 0)"><path d="M 14,0 C 26,10 22,32 0,35 C 8,22 12,12 14,0 Z" fill="#d97706" stroke="#b45309" stroke-width="1.5"/></g>
           <g id="grpSlackBadge" transform="translate(0, -28)" opacity="0">
             <rect x="-45" y="0" width="90" height="13" rx="3" fill="#b45309" stroke="#f59e0b"/>
             <text x="0" y="9.5" fill="#fff" font-size="7.5" font-weight="bold" text-anchor="middle">⚠️ Mou de Câble</text>
+          </g>
+          <g id="grpTopBadge" transform="translate(0, -48)" opacity="0">
+            <rect x="-48" y="0" width="96" height="13" rx="3" fill="#0c4a6e" stroke="#38bdf8"/>
+            <text x="0" y="9.5" fill="#fff" font-size="7.5" font-weight="bold" text-anchor="middle">▲ TOP — 8.5 m (homing)</text>
           </g>
         </g>
       </svg>
@@ -207,13 +243,20 @@
         <tr><td>Étape (CycleStep)</td><td id="lblStep">—</td></tr>
         <tr><td>Pos Câble M1</td><td id="lblM1">—</td></tr>
         <tr><td>Pos Câble M2</td><td id="lblM2">—</td></tr>
-        <tr><td>M1 StartStop</td><td id="lblM1SS">—</td></tr>
-        <tr><td>M2 StartStop</td><td id="lblM2SS">—</td></tr>
-        <tr><td>Translation Start</td><td id="lblTrans">—</td></tr>
-        <tr><td>Benne Open</td><td id="lblBucket">—</td></tr>
-        <tr><td>Kobold Contact Fond</td><td id="lblKobold">—</td></tr>
         <tr><td>SampleCount</td><td id="lblSample">—</td></tr>
       </table>
+    </div>
+
+    <div class="panel-card">
+      <h2>⚙️ Actionneurs pilotés (sorties du grafcet)</h2>
+      <table class="telemetry-table">
+        <tr><td>Treuil M1</td><td id="actM1">—</td></tr>
+        <tr><td>Treuil M2</td><td id="actM2">—</td></tr>
+        <tr><td>Translation M3</td><td id="actTrans">—</td></tr>
+        <tr><td>Benne</td><td id="actBucket">—</td></tr>
+        <tr><td>Kobold contacteur</td><td id="actKobold">—</td></tr>
+      </table>
+      <div style="font-size:0.7rem; color:var(--text-dim); margin-top:4px;">Ordres COMPILED du binaire — StartStop / Direction / SpeedPct / Target / Open / Close.</div>
     </div>
 
     <div class="panel-card">
@@ -224,11 +267,13 @@
 
     <div class="src-note">
       <strong>🔬 Provenance & sémantique</strong><br>
-      Cette animation est un <strong>pur lecteur</strong> de la trace scan-par-scan produite par le
-      binaire ST compilé (<code>WORKING_COPY/FB_Cycle.st</code>). Aucune décision d'étape ni aucun
-      calcul de mouvement en JavaScript : chaque valeur est lue depuis la trace et affichée avec sa
-      provenance. La trace est une <strong>logique de décision sous stimuli de harnais</strong> —
-      <em>pas</em> une dynamique physique réelle ni une cadence automate.
+      Lecture directe de la trace scan-par-scan du binaire ST compilé (<code>WORKING_COPY/FB_Cycle.st</code>) —
+      <strong>aucune décision d'étape ni calcul de mouvement métier en JS</strong>.
+      <em>Il y a un peu de JS d'affichage</em> (scrub/play = index dans la trace, positionnement SVG d'après les champs,
+      libellés dérivés affichés) : tout est dérivé des champs de la trace et certifié par le garde-fou
+      <code>guard_animation_no_business_logic.py</code> (gate <code>G460</code>) — détail des règles dans
+      <code>DOC/WFLOW/REX/REX_Harnais_StruCpp_InOut_Trace_20260828.md</code>.
+      La trace est une <strong>logique de décision sous stimuli de harnais</strong> — pas une dynamique physique ni une cadence automate.
     </div>
   </div>
 </div>
@@ -244,8 +289,8 @@ const __TRACE = {
     "source_sha256": "664c799e7a2159d8eb3b04b0ca5edda9428aca9dd3de345ce9f0710d6a387131",
     "semantics": "logique de décision du séquenceur sous stimuli de harnais scan-par-scan — PAS une dynamique physique réelle ni une cadence automate",
     "test": "TC-P04-100",
-    "n_scans": 14,
-    "sha256": "145d5a9dacaf5d318063022f3849f8465893aa58ac229b4c11dc914ec16f7ac9"
+    "n_scans": 15,
+    "sha256": "eba0322ed31dad8937a86ae92df6642a9cb4d89e548576aa3031ac76498f5653"
   },
   "scans": [
     {
@@ -4346,6 +4391,337 @@ const __TRACE = {
           "provenance": "HARNESS_STIMULUS"
         },
         "BENNE_DONE": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_ISOPEN": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_ISCLOSED": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_ISROUGHLYCLOSED": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "HOMEDM1": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "HOMEDM2": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TOPPOSITIONSENSOR": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "HOMINGREQUEST": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "READY": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "FAULT.ERROR": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "FAULT.ERRORID": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "FAULT.LATCHED": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "FAULT.LATCHEDID": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "LIFECYCLE.BUSY": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "LIFECYCLE.DONE": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "SPEEDMISMATCHMPS": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "SPEEDMISMATCHACTIVE": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "SPEEDMISMATCHCONFIRMED": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "WINCHM1CMD.STARTSTOP": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "WINCHM1CMD.DIRECTION": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "WINCHM1CMD.SPEEDPCT": {
+          "value": "20",
+          "provenance": "COMPILED"
+        },
+        "WINCHM2CMD.STARTSTOP": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "WINCHM2CMD.DIRECTION": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "WINCHM2CMD.SPEEDPCT": {
+          "value": "20",
+          "provenance": "COMPILED"
+        },
+        "TRANSLATIONCMD.START": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "TRANSLATIONCMD.TARGET": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "BUCKETCMD.OPEN": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "BUCKETCMD.CLOSE": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "BUCKETCMD.KOBOLDCONTACTORCMD": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "CYCLESTEP": {
+          "value": "11",
+          "provenance": "COMPILED"
+        },
+        "CYCLESTEPATERROR": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "OPERATORACTIONID": {
+          "value": "1035",
+          "provenance": "COMPILED"
+        },
+        "EXPECTEDAXIS": {
+          "value": "2",
+          "provenance": "COMPILED"
+        },
+        "EXPECTEDDIRECTION": {
+          "value": "-1",
+          "provenance": "COMPILED"
+        },
+        "WAITINGFOROPERATOR": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "WAITINGFORPROCESS": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "REQUESTACTIVE": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "SAMPLECOUNT": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "STATE": {
+          "value": "11",
+          "provenance": "DERIVED"
+        },
+        "SAVEDSTATE": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "PAUSEDSTATE": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "WAITINGRESUME": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "SAMPLECOUNTDONE": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "TOUCHPOSITIONM": {
+          "value": "-10",
+          "provenance": "DERIVED"
+        },
+        "RAISETARGETM": {
+          "value": "-9.5",
+          "provenance": "DERIVED"
+        },
+        "SELECTEDWORKTARGET": {
+          "value": "3",
+          "provenance": "DERIVED"
+        },
+        "CTRLASCENTDISTM": {
+          "value": "2",
+          "provenance": "DERIVED"
+        },
+        "CTRLASCENTTOLERANCEM": {
+          "value": "0.25",
+          "provenance": "DERIVED"
+        },
+        "CTRLASCENTTIMEOUT": {
+          "value": "30000000000",
+          "provenance": "DERIVED"
+        },
+        "DRAININGTIME": {
+          "value": "5000000000",
+          "provenance": "DERIVED"
+        },
+        "STEPMAXTIMEOUT": {
+          "value": "60000000000",
+          "provenance": "DERIVED"
+        }
+      }
+    },
+    {
+      "test": "TC-P04-100 : Cycle complet nominal X0->X13 sur la copie corrigee",
+      "scan": 13,
+      "t_ns": 5000000000,
+      "fields": {
+        "ENABLE": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "RESET": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "POWERCONTACTORENGAGED": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "MODE": {
+          "value": "3",
+          "provenance": "DERIVED"
+        },
+        "CYCLEMOTIONPERMIT": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "DEADMANARMED": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "HEARTBEATIHMOK": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "STARTCYCLE": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "ABORTCYCLE": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "SELTARGET": {
+          "value": "3",
+          "provenance": "CONFIG"
+        },
+        "SETDEPTHM": {
+          "value": "-10",
+          "provenance": "CONFIG"
+        },
+        "SETOFFSETM": {
+          "value": "0",
+          "provenance": "CONFIG"
+        },
+        "KOBOLDCONTACTFOND": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "LIMITLEGALREACHED": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "LIMITLEGALDEPTHM": {
+          "value": "-10.5",
+          "provenance": "CONFIG"
+        },
+        "WINCHSYNCERROR": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "WINCHSYNCDELTAM": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "M1_CABLEPOSM": {
+          "value": "7",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "M2_CABLEPOSM": {
+          "value": "7",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "M1_MEASUREDSPEEDMPS": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "M2_MEASUREDSPEEDMPS": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "SPEEDMISMATCHTHRESHOLDMPS": {
+          "value": "0",
+          "provenance": "CONFIG"
+        },
+        "SPEEDMISMATCHTIMEOUT": {
+          "value": "0",
+          "provenance": "CONFIG"
+        },
+        "CABLELIMITM1ASCENTM": {
+          "value": "7",
+          "provenance": "CONFIG"
+        },
+        "TRANSLATION_AT_P1": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TRANSLATION_AT_TREMIE": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TRANSLATION_AT_MAINTENANCE": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TRANSLATION_BUSY": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TRANSLATION_DONE": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_BUSY": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_DONE": {
           "value": "1",
           "provenance": "HARNESS_STIMULUS"
         },
@@ -4553,7 +4929,7 @@ const __TRACE = {
     },
     {
       "test": "TC-P04-100 : Cycle complet nominal X0->X13 sur la copie corrigee",
-      "scan": 13,
+      "scan": 14,
       "t_ns": 5000000000,
       "fields": {
         "ENABLE": {
@@ -4950,17 +5326,30 @@ function render() {
   // Télémétrie
   setLbl('lblM1', field(scan,'M1_CABLEPOSM'), prov(scan,'M1_CABLEPOSM'));
   setLbl('lblM2', field(scan,'M2_CABLEPOSM'), prov(scan,'M2_CABLEPOSM'));
-  setLbl('lblM1SS', field(scan,'WINCHM1CMD.STARTSTOP'), prov(scan,'WINCHM1CMD.STARTSTOP'));
-  setLbl('lblM2SS', field(scan,'WINCHM2CMD.STARTSTOP'), prov(scan,'WINCHM2CMD.STARTSTOP'));
-  setLbl('lblTrans', field(scan,'TRANSLATIONCMD.START'), prov(scan,'TRANSLATIONCMD.START'));
-  setLbl('lblBucket', field(scan,'BUCKETCMD.OPEN'), prov(scan,'BUCKETCMD.OPEN'));
-  setLbl('lblKobold', field(scan,'KOBOLDCONTACTFOND'), prov(scan,'KOBOLDCONTACTFOND'));
   setLbl('lblSample', field(scan,'SAMPLECOUNT'), prov(scan,'SAMPLECOUNT'));
+
+  // Actionneurs pilotés — ordres complets du binaire (COMPILED), formatés pour lecture
+  document.getElementById('actM1').innerHTML = fmtAct(
+    field(scan,'WINCHM1CMD.STARTSTOP'), field(scan,'WINCHM1CMD.DIRECTION'), field(scan,'WINCHM1CMD.SPEEDPCT'));
+  document.getElementById('actM2').innerHTML = fmtAct(
+    field(scan,'WINCHM2CMD.STARTSTOP'), field(scan,'WINCHM2CMD.DIRECTION'), field(scan,'WINCHM2CMD.SPEEDPCT'));
+  document.getElementById('actTrans').innerHTML = fmtAct(
+    field(scan,'TRANSLATIONCMD.START'), field(scan,'TRANSLATIONCMD.TARGET'), null);
+  document.getElementById('actBucket').innerHTML = fmtBucket(
+    field(scan,'BUCKETCMD.OPEN'), field(scan,'BUCKETCMD.CLOSE'));
+  document.getElementById('actKobold').innerHTML = fmtKobold(field(scan,'BUCKETCMD.KOBOLDCONTACTORCMD'));
 
   // Bannière étape
   const banner = document.getElementById('bannerOperator');
+  const waitingOp = isOn(scan,'WAITINGFOROPERATOR');
+  const opAction = field(scan,'OPERATORACTION') || '';
   if (step === 14) { banner.className = 'banner-operator stabilizing'; banner.innerText = 'STABILIZING — cycle en attente'; }
   else if (isOn(scan,'FAULT.ERROR')) { banner.className = 'banner-operator error'; banner.innerText = 'DÉFAUT actif'; }
+  else if (waitingOp && opAction) {
+    banner.className = 'banner-operator stabilizing';
+    banner.innerText = 'Étape ' + stepName + ' — lecture trace scan ' + currentScan +
+      ' — ⏸ attente opérateur : ' + opAction + ' (pas de reprise automatique — appui conscient requis)';
+  }
   else { banner.className = 'banner-operator'; banner.innerText = 'Étape ' + stepName + ' — lecture trace scan ' + currentScan; }
 
   // Bannière conditions de transition
@@ -4977,13 +5366,35 @@ function render() {
   }
   document.getElementById('bannerTransition').innerHTML = transHtml;
 
+  // Bannière ANIMATION NON FIABLE (retour utilisateur : visibilité immédiate du homing)
+  const unreliable = !homedM1 || !homedM2;
+  document.getElementById('bannerUnreliable').style.display = unreliable ? 'block' : 'none';
+
+  // Glyphe GRAFCET industriel : carré étape (numéro) + barre de transition dessous
+  const stepNum = parseInt(step, 10);
+  const faultOn = isOn(scan,'FAULT.ERROR');
+  document.getElementById('gfStepNum').textContent = (step === 14 ? 'X14' : 'X' + step);
+  document.getElementById('gfStepBox').setAttribute('fill', (step === 14 || faultOn) ? '#7f1d1d' : '#1e293b');
+  document.getElementById('gfStepBox').setAttribute('stroke', faultOn ? '#ef4444' : '#38bdf8');
+  document.getElementById('gfTransBar').setAttribute('stroke', faultOn ? '#ef4444' : '#38bdf8');
+  const nextName = (TRANSITIONS[step] || {}).next || '—';
+  document.getElementById('gfTransNext').textContent = '→ ' + String(nextName).split('_')[0];
+
   // Capteurs (sensorRow)
+  const atP1 = isOn(scan,'TRANSLATION_AT_P1');
+  const atTr = isOn(scan,'TRANSLATION_AT_TREMIE');
+  const atM  = isOn(scan,'TRANSLATION_AT_MAINTENANCE');
+  const nLoc = (atP1?1:0) + (atTr?1:0) + (atM?1:0);
+  const unknown = nLoc !== 1; // 0 ou >=2 capteurs actifs = position non localisée
   const sensors = [
     { label: 'Kobold Fond', on: isOn(scan,'KOBOLDCONTACTFOND'), cls: 'on' },
     { label: 'Top Haut', on: isOn(scan,'TOPPOSITIONSENSOR'), cls: 'on' },
-    { label: 'Translation P1', on: isOn(scan,'TRANSLATION_AT_P1'), cls: 'on' },
-    { label: 'Translation Trémie', on: isOn(scan,'TRANSLATION_AT_TREMIE'), cls: 'on' },
-    { label: 'Translation Maint', on: isOn(scan,'TRANSLATION_AT_MAINTENANCE'), cls: 'on' },
+    { label: 'Référencé M1 (homing)', on: homedM1, cls: 'on' },
+    { label: 'Référencé M2 (homing)', on: homedM2, cls: 'on' },
+    { label: 'Translation P1', on: atP1, cls: 'on' },
+    { label: 'Translation Trémie', on: atTr, cls: 'on' },
+    { label: 'Translation Maint', on: atM, cls: 'on' },
+    { label: '⚠️ Position M3 non localisée', on: unknown, cls: 'alert' },
     { label: 'Benne Ouverte', on: isOn(scan,'BENNE_ISOPEN'), cls: 'on' },
     { label: 'Benne Fermée', on: isOn(scan,'BENNE_ISCLOSED'), cls: 'on' },
     { label: 'Benne ~Fermée', on: isOn(scan,'BENNE_ISROUGHLYCLOSED'), cls: 'warn' }
@@ -5005,13 +5416,18 @@ function render() {
   ).join('');
 
   // Cinématique (rendu géométrique, PAS de calcul de mouvement)
-  const bucketY = 250 - (m1 * 20);
+  // Convention affichage (retour utilisateur 2026-08-28) : en X1 (homing) avec capteur
+  // TOP HAUT actif, le treuil se dessine à 8.5 m (repère d'échelle dédié "+8.5m").
+  // Ailleurs : position brute M1 de la trace. Aucune interpolation, aucune physique.
+  const TOP_SNAP_M = 8.5;
+  const effM1 = (stepNum === 1 && top) ? TOP_SNAP_M : m1;
+  const bucketY = 250 - (effM1 * 20);
   // Position discrète du pont M3 (dérivée des capteurs de translation de la trace)
-  // Positions en px : Trémie=80, PV=190, P2=410, P1=520, MAINT=720
-  let bridgeX = 80;
-  if (isOn(scan,'TRANSLATION_AT_P1')) bridgeX = 520;
-  else if (isOn(scan,'TRANSLATION_AT_MAINTENANCE')) bridgeX = 720;
-  else if (isOn(scan,'TRANSLATION_AT_TREMIE')) bridgeX = 80;
+  // Exactement UN capteur Translation_At_* doit être actif ; sinon POSITION NON LOCALISÉE.
+  // Positions en px : Trémie=80, PV=190, P2=410, P1=520, MAINT=720 ; inconnu=365 (centre)
+  let bridgeX = unknown ? 365 : (atP1 ? 520 : (atM ? 720 : 80));
+  document.getElementById('grpUnknownBadge').setAttribute('opacity', unknown ? '1' : '0');
+  document.getElementById('gantryGroup').setAttribute('opacity', unknown ? '0.55' : '1');
   const gantry = document.getElementById('gantryGroup');
   gantry.setAttribute('transform', 'translate(' + bridgeX + ', 36)');
   const bucket = document.getElementById('bucketGroup');
@@ -5025,6 +5441,15 @@ function render() {
   const angle = open ? 52 : 0;
   document.getElementById('jawLeftGroup').setAttribute('transform', 'rotate(' + angle + ', -14, 0)');
   document.getElementById('jawRightGroup').setAttribute('transform', 'rotate(' + (-angle) + ', 14, 0)');
+  // Prise de matière (retour utilisateur) : gravier visible de X6 (fermeture benne au fond,
+  // matière prélevée) jusqu'à X10 ; invisible en X11 (vidage, benne ouverte) et avant X6.
+  // Dérivation pure de CYCLESTEP — aucune mémorisation JS inter-scan.
+  const loaded = (stepNum >= 6 && stepNum <= 10);
+  document.getElementById('gravelGroup').setAttribute('opacity', loaded ? '1' : '0');
+  // Badge TOP 8.5 m : visible uniquement en homing (X1) avec capteur haut actif
+  document.getElementById('grpTopBadge').setAttribute('opacity', (stepNum === 1 && top) ? '1' : '0');
+  // Bouton StartCycle : mis en évidence en X13 — l'appui conscient attendu par le FB
+  document.getElementById('btnStartCycle').className = (step === 13) ? 'btn-attention' : '';
   // Mou de câble (dérivé : écart M1/M2)
   const m2 = parseFloat(field(scan,'M2_CABLEPOSM')) || 0;
   const slack = Math.abs(m1 - m2) > 0.05;
@@ -5050,6 +5475,21 @@ function setLbl(id, val, p) {
   el.className = p === 'COMPILED' ? 'prov-compiled' : (p === 'HARNESS_STIMULUS' ? 'prov-harness' : (p === 'CONFIG' ? 'prov-config' : ''));
 }
 
+// Formatage d'affichage des ordres actionneurs (dérivé des champs de la trace, aucun calcul métier)
+function fmtAct(ss, dir, spd) {
+  const on = ss === '1';
+  const dirTxt = dir === '1' ? '▲ montée' : (dir === '-1' ? '▼ descente' : (dir === '0' ? '—' : '?'));
+  const spdTxt = (spd === null || spd === undefined || spd === '') ? '' : ' · ' + spd + '%';
+  return (on ? '🟢 MARCHE' : '⚪ ARRÊT') + ' · ' + dirTxt + spdTxt;
+}
+function fmtBucket(open, close) {
+  const o = open === '1', c = close === '1';
+  return (o ? '🟢 OUVERTURE' : '') + (c ? '🟢 FERMETURE' : '') + ((!o && !c) ? '⚪ neutre' : '');
+}
+function fmtKobold(k) {
+  return k === '1' ? '🟢 contacteur ON' : '⚪ contacteur OFF';
+}
+
 function gotoScan(i) {
   if (i < 0) i = 0;
   if (i >= SCANS.length) i = SCANS.length - 1;
@@ -5068,6 +5508,9 @@ function play() {
 }
 function pause() { playing = false; if (timer) clearInterval(timer); timer = null; }
 function setSpeed(s) { speed = s; if (playing) { pause(); play(); } }
+// StartCycle (retour utilisateur) : appui conscient simulé = retour au scan 0 (le front
+// StartCycle du harnais) puis lecture. Pure navigation d'index — aucune commande du binaire.
+function startCycleReplay() { gotoScan(0); play(); }
 
 // Init
 document.getElementById('lblSha').innerText = 'sha256=' + (TRACE_META.sha256 || '—');

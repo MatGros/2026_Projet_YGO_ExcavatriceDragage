@@ -5,8 +5,8 @@
     "source_sha256": "664c799e7a2159d8eb3b04b0ca5edda9428aca9dd3de345ce9f0710d6a387131",
     "semantics": "logique de décision du séquenceur sous stimuli de harnais scan-par-scan — PAS une dynamique physique réelle ni une cadence automate",
     "test": "TC-P04-100",
-    "n_scans": 14,
-    "sha256": "145d5a9dacaf5d318063022f3849f8465893aa58ac229b4c11dc914ec16f7ac9"
+    "n_scans": 15,
+    "sha256": "eba0322ed31dad8937a86ae92df6642a9cb4d89e548576aa3031ac76498f5653"
   },
   "scans": [
     {
@@ -4107,6 +4107,337 @@
           "provenance": "HARNESS_STIMULUS"
         },
         "BENNE_DONE": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_ISOPEN": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_ISCLOSED": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_ISROUGHLYCLOSED": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "HOMEDM1": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "HOMEDM2": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TOPPOSITIONSENSOR": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "HOMINGREQUEST": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "READY": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "FAULT.ERROR": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "FAULT.ERRORID": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "FAULT.LATCHED": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "FAULT.LATCHEDID": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "LIFECYCLE.BUSY": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "LIFECYCLE.DONE": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "SPEEDMISMATCHMPS": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "SPEEDMISMATCHACTIVE": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "SPEEDMISMATCHCONFIRMED": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "WINCHM1CMD.STARTSTOP": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "WINCHM1CMD.DIRECTION": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "WINCHM1CMD.SPEEDPCT": {
+          "value": "20",
+          "provenance": "COMPILED"
+        },
+        "WINCHM2CMD.STARTSTOP": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "WINCHM2CMD.DIRECTION": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "WINCHM2CMD.SPEEDPCT": {
+          "value": "20",
+          "provenance": "COMPILED"
+        },
+        "TRANSLATIONCMD.START": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "TRANSLATIONCMD.TARGET": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "BUCKETCMD.OPEN": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "BUCKETCMD.CLOSE": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "BUCKETCMD.KOBOLDCONTACTORCMD": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "CYCLESTEP": {
+          "value": "11",
+          "provenance": "COMPILED"
+        },
+        "CYCLESTEPATERROR": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "OPERATORACTIONID": {
+          "value": "1035",
+          "provenance": "COMPILED"
+        },
+        "EXPECTEDAXIS": {
+          "value": "2",
+          "provenance": "COMPILED"
+        },
+        "EXPECTEDDIRECTION": {
+          "value": "-1",
+          "provenance": "COMPILED"
+        },
+        "WAITINGFOROPERATOR": {
+          "value": "0",
+          "provenance": "COMPILED"
+        },
+        "WAITINGFORPROCESS": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "REQUESTACTIVE": {
+          "value": "1",
+          "provenance": "COMPILED"
+        },
+        "SAMPLECOUNT": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "STATE": {
+          "value": "11",
+          "provenance": "DERIVED"
+        },
+        "SAVEDSTATE": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "PAUSEDSTATE": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "WAITINGRESUME": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "SAMPLECOUNTDONE": {
+          "value": "0",
+          "provenance": "DERIVED"
+        },
+        "TOUCHPOSITIONM": {
+          "value": "-10",
+          "provenance": "DERIVED"
+        },
+        "RAISETARGETM": {
+          "value": "-9.5",
+          "provenance": "DERIVED"
+        },
+        "SELECTEDWORKTARGET": {
+          "value": "3",
+          "provenance": "DERIVED"
+        },
+        "CTRLASCENTDISTM": {
+          "value": "2",
+          "provenance": "DERIVED"
+        },
+        "CTRLASCENTTOLERANCEM": {
+          "value": "0.25",
+          "provenance": "DERIVED"
+        },
+        "CTRLASCENTTIMEOUT": {
+          "value": "30000000000",
+          "provenance": "DERIVED"
+        },
+        "DRAININGTIME": {
+          "value": "5000000000",
+          "provenance": "DERIVED"
+        },
+        "STEPMAXTIMEOUT": {
+          "value": "60000000000",
+          "provenance": "DERIVED"
+        }
+      }
+    },
+    {
+      "test": "TC-P04-100 : Cycle complet nominal X0->X13 sur la copie corrigee",
+      "scan": 13,
+      "t_ns": 5000000000,
+      "fields": {
+        "ENABLE": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "RESET": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "POWERCONTACTORENGAGED": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "MODE": {
+          "value": "3",
+          "provenance": "DERIVED"
+        },
+        "CYCLEMOTIONPERMIT": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "DEADMANARMED": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "HEARTBEATIHMOK": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "STARTCYCLE": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "ABORTCYCLE": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "SELTARGET": {
+          "value": "3",
+          "provenance": "CONFIG"
+        },
+        "SETDEPTHM": {
+          "value": "-10",
+          "provenance": "CONFIG"
+        },
+        "SETOFFSETM": {
+          "value": "0",
+          "provenance": "CONFIG"
+        },
+        "KOBOLDCONTACTFOND": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "LIMITLEGALREACHED": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "LIMITLEGALDEPTHM": {
+          "value": "-10.5",
+          "provenance": "CONFIG"
+        },
+        "WINCHSYNCERROR": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "WINCHSYNCDELTAM": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "M1_CABLEPOSM": {
+          "value": "7",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "M2_CABLEPOSM": {
+          "value": "7",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "M1_MEASUREDSPEEDMPS": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "M2_MEASUREDSPEEDMPS": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "SPEEDMISMATCHTHRESHOLDMPS": {
+          "value": "0",
+          "provenance": "CONFIG"
+        },
+        "SPEEDMISMATCHTIMEOUT": {
+          "value": "0",
+          "provenance": "CONFIG"
+        },
+        "CABLELIMITM1ASCENTM": {
+          "value": "7",
+          "provenance": "CONFIG"
+        },
+        "TRANSLATION_AT_P1": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TRANSLATION_AT_TREMIE": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TRANSLATION_AT_MAINTENANCE": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TRANSLATION_BUSY": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "TRANSLATION_DONE": {
+          "value": "1",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_BUSY": {
+          "value": "0",
+          "provenance": "HARNESS_STIMULUS"
+        },
+        "BENNE_DONE": {
           "value": "1",
           "provenance": "HARNESS_STIMULUS"
         },
@@ -4314,7 +4645,7 @@
     },
     {
       "test": "TC-P04-100 : Cycle complet nominal X0->X13 sur la copie corrigee",
-      "scan": 13,
+      "scan": 14,
       "t_ns": 5000000000,
       "fields": {
         "ENABLE": {

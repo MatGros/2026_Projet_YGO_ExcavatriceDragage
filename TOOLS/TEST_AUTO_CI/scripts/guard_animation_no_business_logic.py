@@ -19,6 +19,7 @@ Usage :
 """
 
 import argparse
+import json
 import pathlib
 import re
 import sys
@@ -152,9 +153,58 @@ def check_trace_derivation(js: str) -> list:
     return problems
 
 
+def check_trace_freshness(html: str, html_path: pathlib.Path) -> list:
+    """Contrôle de fraîcheur (T171-B) : le sha256 de la trace embarquée (__TRACE) doit
+    correspondre à celui de la trace courante trace_semi_auto_cycle.json. Un embed périmé
+    signifie que l'animation ne joue plus le binaire compilé courant."""
+    problems = []
+    trace_path = html_path.parent / "trace_semi_auto_cycle.json"
+    if not trace_path.exists():
+        return [f"trace courante introuvable : {trace_path}"]
+    try:
+        current = json.loads(trace_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [f"trace courante illisible (JSON invalide) : {exc}"]
+    current_sha = current.get("meta", {}).get("sha256", "")
+    current_scans = current.get("meta", {}).get("n_scans", 0)
+
+    m = re.search(r"const\s+__TRACE\s*=\s*(\{.*?\});\s*\n", html, re.DOTALL)
+    if not m:
+        return ["bloc 'const __TRACE = {...};' introuvable dans le HTML"]
+    try:
+        embedded = json.loads(m.group(1))
+    except json.JSONDecodeError as exc:
+        return [f"trace embarquée illisible (JSON invalide) : {exc}"]
+    embedded_sha = embedded.get("meta", {}).get("sha256", "")
+    embedded_scans = embedded.get("meta", {}).get("n_scans", 0)
+
+    if embedded_sha != current_sha:
+        problems.append(
+            f"trace embarquée PÉRIMÉE : sha256={embedded_sha[:16]}… (n_scans={embedded_scans}) "
+            f"≠ trace courante sha256={current_sha[:16]}… (n_scans={current_scans}) — "
+            f"relancer embed_trace_in_animation.py")
+
+    # Maillon source : la trace doit avoir été générée depuis la source FB COURANTE
+    fb_source = html_path.parents[3] / "WORKING_COPY" / "CODE" / "G_CYCLE" / "FB_Cycle.st"
+    if not fb_source.exists():
+        problems.append(f"source FB introuvable : {fb_source}")
+    else:
+        import hashlib
+        source_sha = hashlib.sha256(fb_source.read_bytes()).hexdigest()
+        declared_sha = current.get("meta", {}).get("source_sha256", "")
+        if declared_sha != source_sha:
+            problems.append(
+                f"trace générée depuis une source PÉRIMÉE : meta.source_sha256="
+                f"{declared_sha[:16]}… ≠ hash courant {source_sha[:16]}… de {fb_source.name} — "
+                f"relancer generate_trace_cycle.py puis embed_trace_in_animation.py")
+    return problems
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--html", default=str(DEFAULT_HTML))
+    parser.add_argument("--no-freshness", action="store_true",
+                        help="Désactive le contrôle de fraîcheur trace (pour les pages non-lecteur, ex. banc interactif T173)")
     args = parser.parse_args()
 
     html_path = pathlib.Path(args.html)
@@ -171,10 +221,11 @@ def main() -> int:
     blocking = check_blocking(js)
     sink_problems = check_sinks(js)
     derivation = check_trace_derivation(js)
+    freshness = [] if args.no_freshness else check_trace_freshness(html, html_path)
 
-    all_problems = blocking + sink_problems + derivation
+    all_problems = blocking + sink_problems + derivation + freshness
     if all_problems:
-        print("❌ GARDE-FOU ÉCHOUÉ — logique métier / calcul de mouvement détecté en JS :")
+        print("❌ GARDE-FOU ÉCHOUÉ — logique métier / embed périmé détecté :")
         for p in all_problems:
             print(f"  - {p}")
         return 1
@@ -183,6 +234,9 @@ def main() -> int:
     print(f"   - 0 pattern bloquant (STATE/simStep/executeAutoSequence/Math.random/…)")
     print(f"   - 0 sink de position alimenté par une source non-trace")
     print(f"   - positions Canvas dérivées des champs de la trace")
+    if not args.no_freshness:
+        print(f"   - trace embarquée À JOUR (sha256 == trace_semi_auto_cycle.json)")
+        print(f"   - chaîne SHA complète : HTML == trace JSON == WORKING_COPY/FB_Cycle.st (source_sha256 vérifiée)")
     print(f"   - fichier : {html_path}")
     return 0
 
