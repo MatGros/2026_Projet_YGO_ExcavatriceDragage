@@ -440,6 +440,7 @@ GVL_IHM.DredgingAssist.State.DiveDone                   := PRG_03_Modes_Cycle.Da
 GVL_IHM.DredgingAssist.State.DiveError                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveError;
 GVL_IHM.DredgingAssist.State.DiveErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.DiveErrorId;
 GVL_IHM.DredgingAssist.State.DiveState                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveState;
+GVL_IHM.DredgingAssist.State.DiveStepAtFault            := PRG_03_Modes_Cycle.Data.SequenceState.DiveStepAtFault;
 GVL_IHM.DredgingAssist.State.BottomTouchConfirmed       := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
 GVL_IHM.DredgingAssist.State.ExtractionReady             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionReady;
 GVL_IHM.DredgingAssist.State.ExtractionBusy              := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionBusy;

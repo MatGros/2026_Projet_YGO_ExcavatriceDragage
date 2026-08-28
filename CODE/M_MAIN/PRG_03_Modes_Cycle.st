@@ -117,6 +117,9 @@ instDiveSearch(
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
+    CableLimitAscent_M := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M,
+    LimitLegalDepthMin_M := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M,
+    CycleTime := T#10ms,
     BypassPreconditions := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
 );
 
@@ -336,6 +339,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.DiveError                  := instDiveSearch.Fault.Error;
     Data.SequenceState.DiveErrorId                := instDiveSearch.Fault.ErrorId;
     Data.SequenceState.DiveState                  := instDiveSearch.DiveState;
+    Data.SequenceState.DiveStepAtFault             := instDiveSearch.StepAtFault;
     Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
     Data.SequenceState.ExtractionReady             := instExtractionSequence.Ready;
     Data.SequenceState.ExtractionBusy              := instExtractionSequence.Lifecycle.Busy;

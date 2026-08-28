@@ -20,24 +20,5 @@ contract:
   conservation:
     must_survive:
       - "Intégrité globale du référentiel projet."
-status: VALIDATED
+status: READY_FOR_EXECUTION
 
-execution:
-  executed_by: "Antigravity + Ollama (deepseek-v4-flash:cloud)"
-  completed_at: "2026-08-28T17:31:00+02:00"
-  status: SUCCESS
-  summary: >
-    Audit final de release et clôture validés :
-    - 100% des contrats T166 à T170 (T166, T167-TEST-0, T167-A, T167-B, T167-C, T168-A, T168-B, T169-A, T170-A) validés et archivés.
-    - Entrée de version T166_T170_REFONTE_CYCLES_ET_DIAGNOSTICS consignée dans VERSION_HISTORY.md.
-    - Suite de 22 gates mécaniques et suite complète CI 27/27 validées 100% PASS.
-  evidence_submitted:
-    - "DOC/VERSION_HISTORY.md"
-    - "TOOLS/TEST_AUTO_CI/index.html (27/27 PASS)"
-    - "Run all gates: 22/22 PASS (6.80s)"
-
-validation:
-  status: VALIDATED
-  validated_by: "Orchestrateur Antigravity"
-  validated_at: "2026-08-28T17:31:00+02:00"
-  notes: "Clôture globale validée. Base de code stable, saine et certifiée."

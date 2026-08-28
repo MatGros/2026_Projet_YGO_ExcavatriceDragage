@@ -31,6 +31,7 @@ STRUCT
     DiveError                   : BOOL;                    // Défaut assistance plongée
     DiveErrorId                 : WORD;                    // Code défaut plongée
     DiveState                   : E_DiveSearchState;       // Phase interne de recherche fond Kobold
+    DiveStepAtFault             : E_DiveSearchState;       // Phase interne mémorisée au défaut plongée
     BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé
     ExtractionReady             : BOOL;                    // Assistance extraction prête
     ExtractionBusy              : BOOL;                    // Assistance extraction active

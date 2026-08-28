@@ -313,6 +313,14 @@ Assistance plongée prête</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne de recherche fond Kobold</xhtml>
               </documentation>
             </variable>
+            <variable name="DiveStepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne mémorisée au défaut plongée</xhtml>
+              </documentation>
+            </variable>
             <variable name="BottomTouchConfirmed">
               <type>
                 <BOOL />

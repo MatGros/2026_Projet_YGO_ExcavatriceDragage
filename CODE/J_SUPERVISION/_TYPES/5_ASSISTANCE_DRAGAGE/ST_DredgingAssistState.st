@@ -9,6 +9,7 @@ STRUCT
     DiveError                  : BOOL;
     DiveErrorId                : WORD;
     DiveState                  : E_DiveSearchState;
+    DiveStepAtFault            : E_DiveSearchState;
     BottomTouchConfirmed       : BOOL;
     ExtractionReady            : BOOL;
     ExtractionBusy             : BOOL;

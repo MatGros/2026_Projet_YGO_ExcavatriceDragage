@@ -1648,6 +1648,11 @@ seule source de confirmation).</xhtml>
                 <derived name="E_DiveSearchState" />
               </type>
             </variable>
+            <variable name="DiveStepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+            </variable>
             <variable name="BottomTouchConfirmed">
               <type>
                 <BOOL />

@@ -305,3 +305,12 @@ Découplage strict entre les champs synoptiques IHM / Diagnostic de séquence et
 | `PRG_03.Data.SequenceState.RequestActive` | Synoptique IHM / Diagnostic attente séquence | **Rôle clarifié** : ne sert plus de canal de commande pour `PRG_04`. Représente l'état synoptique de la séquence (en `SEMI_AUTO`, porte `instCycleSemiAuto.RequestActive` ; en `MAINT`, reflète l'intention opérateur). |
 | `PRG_03.Data.SequenceState.ExpectedDirection` | Synoptique IHM / Diagnostic direction attendue | **Rôle clarifié** : direction attendue par le séquenceur ou intention courante en maintenance. |
 
+---
+
+## 🆕 Lot T167-B — Diagnostic StepAtFault Plongée Kobold
+
+| Nouveau chemin | Rôle | Source d'ownership |
+|---|---|---|
+| `GVL_IHM.DredgingAssist.State.DiveStepAtFault` | Mémorisation de l'étape active lors de l'apparition d'un défaut en plongée (`E_DiveSearchState`) | Produit par `FB_DiveSearch.StepAtFault` $\to$ exposé par `PRG_03.Data.SequenceState.DiveStepAtFault` $\to$ projeté exclusivement dans `PRG_07_Supervision`. |
+
+

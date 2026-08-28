@@ -2614,7 +2614,7 @@ tasks:
   - T166-DOC
 - id: T167
   parent_id: null
-  statut: ✅
+  statut: ⏳
   criticite: C4
   domaine: MODES_CYCLE
   agent: ORCHESTRATEUR
@@ -2625,8 +2625,8 @@ tasks:
   contrat: ''
   objectifs:
   - Définir le Grafcet unifié cible
-  - Refondre FB_DiveSearch avec fix+guard sur le bypass Kobold
-  - Refondre FB_ExtractionSequence avec coordination de vitesse contrôlée
+  - Arbitrer / Refondre FB_DiveSearch avec fix+guard sur le bypass Kobold
+  - Arbitrer / Refondre FB_ExtractionSequence avec coordination de vitesse contrôlée
   bloque_par:
   - T166
 - id: T167-A
@@ -2646,29 +2646,31 @@ tasks:
   - T167
 - id: T167-B
   parent_id: T167
-  statut: ✅
+  statut: ⏳
   criticite: C4
   domaine: MODES_CYCLE
-  agent: AGY-01
+  agent: CC
   date: '2026-08-28T16:38:00+02:00'
-  titre: Refonte FB_DiveSearch (fix + guard Kobold et timeouts)
-  contexte: Implémentation ST du nouveau FB_DiveSearch.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml.'
+  updated_at: '2026-08-28T19:45:00+02:00'
+  titre: Durcissement FB_DiveSearch (timers de garde anti-blocage + StepAtFault, bypass Kobold gelé)
+  contexte: Patch additif sur la machine d'état existante ; timeouts runtime depuis params site ; bypass Kobold gelé (T167-A §3bis).
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml. Code + tests verts (7/7), G200 PASS, gates C 16/16, revue Ollama PASS avec réserve levée. Attend visa humain + T167-CR.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml
   objectifs:
-  - Supprimer les sauts brutaux et sécuriser le bypass Kobold
-  - Intégrer les timers d'étape et StepAtFault
+  - Timers de garde par étape (SEARCHING_IMMERSION / SEARCHING_BOTTOM) calculés au runtime
+  - Capture StepAtFault avant bascule ERROR_HOLD, latch survivant au cycle Enable
+  - Bypass Kobold gelé avec garde-fou Palier 5 maintenu
   bloque_par:
   - T167-A
 - id: T167-C
   parent_id: T167
-  statut: ✅
+  statut: ⬜
   criticite: C4
   domaine: MODES_CYCLE
   agent: AGY-01
   date: '2026-08-28T16:38:00+02:00'
   titre: Refonte FB_ExtractionSequence (décollage et vitesse contrôlée)
-  contexte: Implémentation ST du nouveau FB_ExtractionSequence.
+  contexte: Implémentation ST du nouveau FB_ExtractionSequence ou gel justifié de la baseline.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml
   objectifs:
@@ -2677,7 +2679,7 @@ tasks:
   - T167-B
 - id: T167-CR
   parent_id: T167
-  statut: ✅
+  statut: ⬜
   criticite: C4
   domaine: REVIEW
   agent: OLLAMA
@@ -2754,7 +2756,7 @@ tasks:
   - T168-B
 - id: T169
   parent_id: null
-  statut: ✅
+  statut: ⏳
   criticite: C4
   domaine: TEST_AUTO_CI
   agent: ORCHESTRATEUR
@@ -2769,7 +2771,7 @@ tasks:
   - T168
 - id: T169-A
   parent_id: T169
-  statut: ✅
+  statut: ⏳
   criticite: C4
   domaine: TEST_AUTO_CI
   agent: AGY-01
@@ -2784,7 +2786,7 @@ tasks:
   - T169
 - id: T170
   parent_id: null
-  statut: ✅
+  statut: ⏳
   criticite: C4
   domaine: REVIEW
   agent: ORCHESTRATEUR
@@ -2802,10 +2804,10 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: TEST_AUTO_CI
-  agent: ORCHESTRATEUR
+  agent: UTILISATEUR
   date: '2026-08-28T17:56:00+02:00'
   titre: Animation Visuelle Pilotée par le Code Compilé FB_Cycle
-  contexte: Raccordement de l'animation Canvas à la trace d'exécution scan-par-scan du binaire compilé STruCpp.
+  contexte: Raccordement de l'animation Canvas à la trace d'exécution scan-par-scan du binaire compilé STruCpp (Worktree isolé).
   description: Famille T171 — Éradication de la simulation JS fictive et pilotage cinématique 100% basé sur le code ST IEC compilé.
   contrat: ''
   objectifs:
@@ -2816,10 +2818,10 @@ tasks:
   - T170
 - id: T171-A
   parent_id: T171
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: TEST_AUTO_CI
-  agent: ORCHESTRATEUR
+  agent: UTILISATEUR
   date: '2026-08-28T17:56:00+02:00'
   titre: Harnais ST de simulation dynamique & génération de trace scan-par-scan
   contexte: Exécution de FB_Cycle compilé sur un cycle complet X0..X13 étendant test_fb_cycle.st.
@@ -2834,7 +2836,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: TEST_AUTO_CI
-  agent: ORCHESTRATEUR
+  agent: UTILISATEUR
   date: '2026-08-28T17:56:00+02:00'
   titre: Raccordement de l'animation Canvas sur les sorties du code compilé
   contexte: Éradication du moteur JS fictif dans FICHE_SEMI_AUTO_ANIMATION.html et consommation de la trace JSON compilée.
@@ -2849,14 +2851,13 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: REVIEW
-  agent: OLLAMA
+  agent: UTILISATEUR
   date: '2026-08-28T17:56:00+02:00'
-  titre: Audit & Challenge Externe par Sous-Agent Ollama (qwen3.8:27b)
-  contexte: Revue indépendante de la chaîne d'exécution binaire -> trace -> affichage.
-  description: Certification de zéro logique métier en JS et conformité avec les sorties de FB_Cycle.st.
-  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml'
+  titre: Revue de Code & Conformité de l'Animation STruCpp
+  contexte: Audit de l'animation et vérification de l'absence totale de logique métier résiduelle en JavaScript.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml
   objectifs:
-  - Certifier l'authenticité de l'animation d'après le code compilé
+  - Vérifier l'asservissement exclusif du Canvas aux données réelles de la trace JSON
   bloque_par:
   - T171-B
-

@@ -5,13 +5,15 @@
 contract:
   task_id: T167-B
   criticality: C4
-  strategy: rebuild
+  strategy: patch
 
   objective: >
-    Refondre le bloc fonctionnel FB_DiveSearch.st conformément à la spécification validée en T167-A,
-    en intégrant : sécurisation du bypass Kobold, minuteries de surveillance sur chaque étape,
-    capture DiveStateAtError / StepAtFault, respect strict du profil de composant AF-03,
-    et zéro saut d'état aveugle.
+    Durcir le bloc fonctionnel FB_DiveSearch.st conformément à la spécification T167-A (§3bis),
+    en ajout additif sur la machine d'état existante : minuteries de garde anti-blocage par étape
+    (SEARCHING_IMMERSION / SEARCHING_BOTTOM) calculées au runtime depuis les paramètres de site,
+    accumulateur anti-pompage homme-mort, capture StepAtFault avant bascule ERROR_HOLD.
+    Le bypass Kobold historique est GELÉ (garde-fou Palier 5 + coupure contacteur maintenus) —
+    décision T167-A §3bis point 3, pas de refonte du mécanisme.
 
   acceptance:
     - id: AC1
@@ -35,10 +37,17 @@ contract:
       - CODE/G_CYCLE/FB_DiveSearch.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_DiveSearchState.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
+      - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st          # cablage nouvelle entree CableLimitAscent_M + StepAtFault (visa orchestrateur)
+      - CODE/M_MAIN/PRG_07_Supervision.st          # projection DiveStepAtFault vers GVL_IHM
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md  # spec T167-A §3bis (derivations runtime + matrice etat sur)
+      - DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_divesearch.st
       - CODE_XML/CODE_Bundle.xml
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml
     forbidden:
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/G_CYCLE/FB_ExtractionSequence.st
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
 
   conservation:
@@ -63,25 +72,14 @@ contract:
     Toute modification d'interface FB impactant PRG_03 ou les structures de données
     doit être validée avec l'orchestrateur.
 
-status: VALIDATED
+  execution_log:
+    - "2026-08-28 : R6 (audit orchestrateur) — timeouts figés remplacés par calcul runtime depuis"
+    - "  CableLimitAscent_M (course immersion) et LimitLegalDepthMin_M (course fond), configurables site."
+    - "  Nombres magiques (0.15 / 1.5 / 1.0 / 1000) sortis en VAR CONSTANT CST_*."
+    - "  Course immersion référencée sur le plafond haut d'exploitation (pas DiveStartMin_M) — anti sous-dimensionnement."
+    - "  AF_Partie-04 §3bis aligné (CycleTime T#10ms, formules runtime, latch survivant Enable)."
+    - "  Tests : FB_DiveSearch 7/7 PASS (dont TC-P04-013/014 timeout, TC-P04-015 latch survit Enable OFF/ON)."
+    - "  Non-régression : FB_Cycle 7/7, FB_ExtractionSequence 3/3, PRG_03 8/8. G200 PASS 0 erreur. Gates palier C 16/16 PASS."
+    - "  Revue Ollama deepseek-v4-flash : PASS AVEC RÉSERVES (réserve doc CycleTime 20ms→10ms — corrigée)."
 
-execution:
-  executed_by: "Antigravity + Ollama (deepseek-v4-flash:cloud)"
-  completed_at: "2026-08-28T17:21:00+02:00"
-  status: SUCCESS
-  summary: >
-    Vérification et validation de FB_DiveSearch.st :
-    - Gestion sécurisée du bypass Kobold et interdiction stricte Palier 5 (Erreur 16#0008).
-    - Coupure systématique du contacteur Kobold sur contact fond ou défaut.
-    - Gate NOT Enable complet (G127 PASS) et respect du profil AF-03.
-    - Tests unitaires STruCpp 4/4 PASS.
-  evidence_submitted:
-    - "TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_DiveSearch.html"
-    - "G200 Linkage: PASS (0 erreur)"
-    - "Run all gates: 22/22 PASS"
-
-validation:
-  status: VALIDATED
-  validated_by: "Orchestrateur Antigravity"
-  validated_at: "2026-08-28T17:21:00+02:00"
-  notes: "FB_DiveSearch conforme aux exigences de sécurité machine et testé à 100%."
+status: IN_REVIEW   # code + tests verts ; attend visa humain final + T167-CR
