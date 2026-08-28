@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banc de test interactif FB_Cycle (T173)</title>
+<style>
+  :root { --bg:#0b0f19; --card:#151d30; --panel:#0d1322; --border:#233354; --accent:#38bdf8; --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444; --text:#f8fafc; --dim:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Tahoma,sans-serif; }
+  body { background:var(--bg); color:var(--text); padding:16px; }
+  h1 { font-size:1.1rem; margin-bottom:4px; }
+  .sub { color:var(--dim); font-size:0.78rem; margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns: 360px 1fr; gap:14px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px; }
+  .card h2 { font-size:0.85rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:10px; }
+  .row { display:flex; align-items:center; gap:8px; margin-bottom:7px; font-size:0.8rem; }
+  .row label { flex:1; color:var(--dim); }
+  .row input[type=checkbox] { width:16px; height:16px; }
+  .row select, .row input[type=number] { background:#1e293b; color:#fff; border:1px solid #334155; border-radius:4px; padding:3px 6px; }
+  .row input[type=range] { flex:1; }
+  .btn { background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 14px; border-radius:5px; cursor:pointer; font-size:0.85rem; }
+  .btn:hover { background:#334155; }
+  .btn-primary { background:#0284c7; border-color:#38bdf8; }
+  .btn-danger { background:#7f1d1d; border-color:#ef4444; }
+  .btn-row { display:flex; gap:8px; margin-top:10px; }
+  .out { font-size:0.8rem; }
+  .out .step { font-size:1.05rem; font-weight:700; color:var(--accent); margin-bottom:8px; }
+  .out .op { color:var(--warn); margin-bottom:10px; }
+  .out table { width:100%; border-collapse:collapse; }
+  .out td { padding:4px 6px; border-bottom:1px solid #1f293d; }
+  .out td:first-child { color:var(--dim); }
+  .out td:last-child { font-weight:600; text-align:right; }
+  .on { color:var(--ok); } .off { color:var(--dim); } .warn { color:var(--warn); } .err { color:var(--danger); }
+  .note { font-size:0.7rem; color:var(--dim); margin-top:10px; }
+</style>
+</head>
+<body>
+<h1>🧪 Banc de test interactif — FB_Cycle (binaire compilé)</h1>
+<div class="sub">Tu pilotes les stimuli (joystick/positions, armement, capteurs) → le <b>binaire compilé</b> (WORKING_COPY) décide → les sorties s'affichent. Zéro logique métier en JS.</div>
+
+<div class="grid">
+  <div class="card">
+    <h2>🎛️ Stimuli (entrées)</h2>
+
+    <div class="row"><label>Mode</label>
+      <select id="MODE"><option value="SEMI_AUTO">SEMI_AUTO</option><option value="MAINT_N1">MAINT_N1</option><option value="MAINT_N2">MAINT_N2</option><option value="DISABLE">DISABLE</option></select></div>
+    <div class="row"><label>Enable</label><input type="checkbox" id="ENABLE" checked></div>
+    <div class="row"><label>PowerContactorEngaged</label><input type="checkbox" id="POWERCONTACTORENGAGED" checked></div>
+    <div class="row"><label>DeadmanArmed (homme-mort)</label><input type="checkbox" id="DEADMANARMED"></div>
+    <div class="row"><label>CycleMotionPermit</label><input type="checkbox" id="CYCLEMOTIONPERMIT" checked></div>
+    <div class="row"><label>HeartbeatIhmOk</label><input type="checkbox" id="HEARTBEATIHMOK" checked></div>
+    <div class="row"><label>StartCycle (front)</label><input type="checkbox" id="STARTCYCLE"></div>
+    <div class="row"><label>AbortCycle</label><input type="checkbox" id="ABORTCYCLE"></div>
+    <div class="row"><label>SelTarget</label><input type="number" id="SELTARGET" value="3" style="width:70px"></div>
+
+    <div class="row"><label>Pos Câble M1 (joystick treuil)</label><input type="range" id="M1_CABLEPOSM" min="-10.5" max="8.5" step="0.1" value="7.0"></div>
+    <div class="row"><label>Pos Câble M2</label><input type="range" id="M2_CABLEPOSM" min="-10.5" max="8.5" step="0.1" value="7.0"></div>
+
+    <div class="row"><label>Capteur Top Haut</label><input type="checkbox" id="TOPPOSITIONSENSOR" checked></div>
+    <div class="row"><label>Kobold Contact Fond</label><input type="checkbox" id="KOBOLDCONTACTFOND"></div>
+    <div class="row"><label>Translation P1</label><input type="checkbox" id="TRANSLATION_AT_P1" checked></div>
+    <div class="row"><label>Translation Trémie</label><input type="checkbox" id="TRANSLATION_AT_TREMIE"></div>
+    <div class="row"><label>Translation Maintenance</label><input type="checkbox" id="TRANSLATION_AT_MAINTENANCE"></div>
+    <div class="row"><label>Translation Done</label><input type="checkbox" id="TRANSLATION_DONE" checked></div>
+    <div class="row"><label>Benne Done</label><input type="checkbox" id="BENNE_DONE" checked></div>
+    <div class="row"><label>Benne IsOpen</label><input type="checkbox" id="BENNE_ISOPEN"></div>
+    <div class="row"><label>Benne IsClosed</label><input type="checkbox" id="BENNE_ISCLOSED" checked></div>
+    <div class="row"><label>Benne ~Fermée</label><input type="checkbox" id="BENNE_ISROUGHLYCLOSED" checked></div>
+    <div class="row"><label>HomedM1</label><input type="checkbox" id="HOMEDM1" checked></div>
+    <div class="row"><label>HomedM2</label><input type="checkbox" id="HOMEDM2" checked></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="scan()">▶️ Scan (1 pas)</button>
+      <button class="btn btn-danger" onclick="resetEngine()">↺ Reset moteur</button>
+    </div>
+    <div class="note">StartCycle = front : coche-le pour démarrer, décoche-le ensuite. Le joystick = position câble M1/M2 (slider).</div>
+  </div>
+
+  <div class="card out">
+    <h2>📤 Sorties du binaire compilé</h2>
+    <div id="out" style="margin-top:8px;">
+      <div class="step">—</div>
+      <div class="op">—</div>
+      <table>
+        <tr><td>Treuil M1</td><td id="oM1">—</td></tr>
+        <tr><td>Treuil M2</td><td id="oM2">—</td></tr>
+        <tr><td>Translation M3</td><td id="oTrans">—</td></tr>
+        <tr><td>Benne</td><td id="oBucket">—</td></tr>
+        <tr><td>Kobold contacteur</td><td id="oKobold">—</td></tr>
+        <tr><td>Fault</td><td id="oFault">—</td></tr>
+        <tr><td>Lifecycle</td><td id="oLife">—</td></tr>
+        <tr><td>SampleCount</td><td id="oSample">—</td></tr>
+        <tr><td>Attente opérateur</td><td id="oWait">—</td></tr>
+      </table>
+      <div class="note" id="oRaw" style="white-space:pre-wrap; font-size:0.62rem; margin-top:8px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// BANC DE TEST — JS d'envoi/affichage uniquement. AUCUNE logique métier.
+// Le binaire compilé décide ; ce script envoie les stimuli et affiche les
+// sorties reçues. (Certifié par guard_animation_no_business_logic.py.)
+// ═══════════════════════════════════════════════════════════════════════
+const STEP_NAMES = {0:'X0_PREPARATION',1:'X1_HOMING',2:'X2_WORK_POS_SELECT',3:'X3_OPEN_BUCKET',4:'X4_DESCEND_OPEN',5:'X5_BOTTOM_CONFIRMED',6:'X6_CLOSE_BUCKET',7:'X7_CTRL_ASCENT',8:'X8_ASCENT_LOADED',9:'X9_DRAIN_PAUSE',10:'X10_TRANSLATE_DUMP',11:'X11_OPEN_DUMP',13:'X13_DONE_SYNC',14:'STABILIZING'};
+
+function collectStimuli() {
+  const s = {};
+  const bools = ['ENABLE','POWERCONTACTORENGAGED','DEADMANARMED','CYCLEMOTIONPERMIT','HEARTBEATIHMOK','STARTCYCLE','ABORTCYCLE','TOPPOSITIONSENSOR','KOBOLDCONTACTFOND','TRANSLATION_AT_P1','TRANSLATION_AT_TREMIE','TRANSLATION_AT_MAINTENANCE','TRANSLATION_DONE','BENNE_DONE','BENNE_ISOPEN','BENNE_ISCLOSED','BENNE_ISROUGHLYCLOSED','HOMEDM1','HOMEDM2'];
+  bools.forEach(id => { const el = document.getElementById(id); if (el) s[id] = el.checked ? 1 : 0; });
+  s.MODE = document.getElementById('MODE').value;
+  s.SELTARGET = parseInt(document.getElementById('SELTARGET').value || '0', 10);
+  s.M1_CABLEPOSM = parseFloat(document.getElementById('M1_CABLEPOSM').value);
+  s.M2_CABLEPOSM = parseFloat(document.getElementById('M2_CABLEPOSM').value);
+  return s;
+}
+
+function fmtAct(ss, dir, spd) {
+  const on = ss === '1';
+  const d = dir === '1' ? '▲ montée' : (dir === '-1' ? '▼ descente' : '—');
+  return (on ? '<span class="on">🟢 MARCHE</span>' : '<span class="off">⚪ ARRÊT</span>') + ' · ' + d + (spd && spd !== '0' ? ' · ' + spd + '%' : '');
+}
+
+async function scan() {
+  const stimuli = collectStimuli();
+  const res = await fetch('/scan', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({stimuli}) });
+  const data = await res.json();
+  if (!data.ok) { document.getElementById('oRaw').textContent = 'ERREUR: ' + (data.error||''); return; }
+  render(data.outputs);
+}
+
+async function resetEngine() {
+  await fetch('/reset', { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+  document.getElementById('oRaw').textContent = 'Moteur réinitialisé.';
+}
+
+function render(o) {
+  const step = parseInt(o.CYCLESTEP, 10);
+  document.getElementById('out').querySelector('.step').innerHTML = '🔄 Étape : <b>' + (STEP_NAMES[step] || 'X'+step) + '</b> (scan)';
+  document.getElementById('out').querySelector('.op').innerHTML = '🖐️ ' + (o.OPERATORACTION || '—');
+  document.getElementById('oM1').innerHTML = fmtAct(o['WINCHM1CMD.STARTSTOP'], o['WINCHM1CMD.DIRECTION'], o['WINCHM1CMD.SPEEDPCT']);
+  document.getElementById('oM2').innerHTML = fmtAct(o['WINCHM2CMD.STARTSTOP'], o['WINCHM2CMD.DIRECTION'], o['WINCHM2CMD.SPEEDPCT']);
+  document.getElementById('oTrans').innerHTML = fmtAct(o['TRANSLATIONCMD.START'], o['TRANSLATIONCMD.TARGET'], null);
+  const bOpen = o['BUCKETCMD.OPEN']==='1', bClose = o['BUCKETCMD.CLOSE']==='1';
+  document.getElementById('oBucket').innerHTML = (bOpen?'<span class="on">🟢 OUVERTURE</span>':'') + (bClose?'<span class="on">🟢 FERMETURE</span>':'') + ((!bOpen&&!bClose)?'<span class="off">⚪ neutre</span>':'');
+  document.getElementById('oKobold').innerHTML = o['BUCKETCMD.KOBOLDCONTACTORCMD']==='1' ? '<span class="on">🟢 ON</span>' : '<span class="off">⚪ OFF</span>';
+  const fault = o['FAULT.ERROR']==='1';
+  document.getElementById('oFault').innerHTML = fault ? '<span class="err">⚠️ DÉFAUT (id ' + o['FAULT.ERRORID'] + ')</span>' : '<span class="off">aucun</span>';
+  document.getElementById('oLife').innerHTML = (o['LIFECYCLE.BUSY']==='1'?'Busy ':'') + (o['LIFECYCLE.DONE']==='1'?'Done':'');
+  document.getElementById('oSample').innerHTML = o.SAMPLECOUNT;
+  document.getElementById('oWait').innerHTML = o.WAITINGFOROPERATOR==='1' ? '<span class="warn">⏸ attente opérateur</span>' : '<span class="off">non</span>';
+  document.getElementById('oRaw').textContent = JSON.stringify(o, null, 1);
+}
+</script>
+</body>
+</html>
