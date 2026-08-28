@@ -13,6 +13,9 @@
   .grid { display:grid; grid-template-columns: 1fr 400px; grid-template-areas:"outputs commands"; gap:14px; min-width:0; }
   .grid > .card:first-child { grid-area: commands; }  /* carte commandes -> droite */
   .grid > .card:nth-child(2) { grid-area: outputs; }  /* carte sorties -> gauche */
+  @media (max-width: 1200px) {
+    .grid { grid-template-columns: 1fr; grid-template-areas:"commands" "outputs"; }
+  }
   .scene-wrap { min-width:0; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px; }
   .card h2 { font-size:0.85rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:10px; }
