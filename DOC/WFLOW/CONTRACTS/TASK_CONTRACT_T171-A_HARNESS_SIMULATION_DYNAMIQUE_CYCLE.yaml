@@ -1,4 +1,4 @@
-﻿contract:
+contract:
   task_id: T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE
   parent_id: T171
   criticality: C3
@@ -46,4 +46,15 @@
     - test_suite_pass
     - trace_json_validated
 
-status: READY_FOR_EXECUTION
+status: VALIDATED
+
+execution:
+  completed_at: "2026-08-28T22:40:00+02:00"
+  status: SUCCESS
+  summary: >
+    Harnais complet TC-P04-100..105 : 6/6 PASS (run_cycle_tests.py, binaire STruCpp compilé
+    manuellement par g++). Preuve par négatif sur CODE/ original : 3/3 (défauts F1/F2/F6 prouvés).
+    Trace trace_semi_auto_cycle.json : 15 scans, AC1 (ordre strict X0→X13, X12 réservé) et
+    AC2 (sorties COMPILED par scan, SampleCount front unique) validés mécaniquement.
+    REX codegen : VAR_IN_OUT généré en copy-in seul par STruCpp — émulation copy-out imposée
+    dans le harnais (documentée dans run_cycle_tests.py).

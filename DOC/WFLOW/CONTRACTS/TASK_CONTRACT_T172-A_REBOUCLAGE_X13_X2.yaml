@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T172-A : Rebouclage X13 -> X2 (homing conservé)
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T172-A_REBOUCLAGE_X13_X2
+  parent_id: T172
+  criticality: C3            # comportement machine (mouvement) — sécurité réelle
+  strategy: patch
+
+  objective: >
+    À la fin du cycle (X13_DONE_SYNC), la machine est à la trémie, treuils en position
+    haute et homing déjà réalisé. Le rebouclage doit enchaîner directement vers
+    X2_WORK_POS_SELECT (sélection de la position de travail suivante) SANS attendre
+    StartCycle et SANS repasser par X0/X1 (pas de re-homing). StartCycle reste réservé
+    à l'initialisation complète du graphe depuis X0.
+
+  acceptance:
+    - id: AC1
+      statement: "En X13, le FB enchaîne automatiquement vers X2_WORK_POS_SELECT (pas d'attente StartCycle, pas de retour X0)."
+      verified_by: "Harnais STruCpp : TC-P04-100 étendu — après X13, CycleStep = X2_WORK_POS_SELECT au scan suivant, sans front StartCycle."
+    - id: AC2
+      statement: "Le homing n'est pas rejoué : la transition X13->X2 ne passe pas par X0/X1."
+      verified_by: "Trace scan-par-scan : séquence X13 -> X2 sans X0/X1 intercalés."
+    - id: AC3
+      statement: "La spec AF_Partie-04 §2 (ligne 58) est mise à jour : rebouclage sur X2_WORK_POS_SELECT (homing conservé)."
+      verified_by: "Lecture du diff spec + G340 liens doc."
+    - id: AC4
+      statement: "L'animation et la trace reflètent le nouveau rebouclage (X13 -> X2)."
+      verified_by: "generate_trace_cycle.py + embed_trace_in_animation.py + guard PASS."
+    - id: AC5
+      statement: "L'orchestrateur lit, vérifie et valide le git diff réel (visa P5)."
+      verified_by: "Visa formel de l'orchestrateur."
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_Cycle.st
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+      - TOOLS/TEST_AUTO_CI/**
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "100% des tests unitaires existants (TC-P03-001, TC-P04-001..013) dans test_fb_cycle.st."
+      - "Le compteur SampleCount (front unique par cycle, F2)."
+      - "Le principe 'pas de redémarrage auto après défaut' (X13->X2 n'est PAS une reprise après défaut, c'est un enchaînement de fin de cycle nominal)."
+    dropped_on_purpose:
+      - "L'attente StartCycle en X13 (remplacée par l'enchaînement automatique vers X2)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - trace_json_validated
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    ⚠️ SÉCURITÉ : X13->X2 déclenche un MOUVEMENT automatique (translation vers la position
+    de travail) en fin de cycle, sans action opérateur. Ceci est un choix utilisateur
+    explicite (2026-08-28). À confirmer par l'orchestrateur : le mouvement auto de fin de
+    cycle est-il acceptable au regard d'ISO 13849 / des principes du projet ? Si non,
+    prévoir un garde (ex. DeadmanArmed maintenu) avant l'enchaînement.
+
+# 🚦 SUIVI
+status: PENDING               # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+
+execution:
+  executed_by: "DSH-DeepSeek-WT3"
+  completed_at: "2026-08-28T23:10:00+02:00"
+  status: PENDING
+  summary: >
+    Contrat rédigé + diff proposé (spec AF-04 + bloc X13 FB) préparé dans
+    DOC/WFLOW/PROPOSAL_T172_X13_X2_20260828.md. AUCUNE modif CODE/ appliquée —
+    validation humaine requise avant application.
+  evidence_submitted: []
+
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Décision utilisateur 2026-08-28 : rebouclage X13 -> X2 (homing conservé, pas
+    d'attente StartCycle). À valider formellement (visa P5) avant toute modif CODE/.

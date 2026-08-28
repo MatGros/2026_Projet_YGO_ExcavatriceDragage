@@ -1,0 +1,91 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T173-A : Banc de test web interactif FB_Cycle
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T173-A_BANC_WEB_INTERACTIF
+  parent_id: T173
+  criticality: C3
+  strategy: new_feature
+
+  objective: >
+    Fournir un banc de test WEB interactif où l'utilisateur pilote manuellement les
+    transitions du cycle (joystick, armement homme-mort, capteurs, StartCycle, Reset,
+    mode) contre le BINAIRE FB_Cycle COMPILÉ (STruCpp/g++), et observe les sorties
+    (CycleStep, WinchM1Cmd/M2Cmd, TranslationCmd, BucketCmd, Fault) à chaque scan.
+    Le JS navigateur n'envoie que des entrées et affiche des sorties — AUCUNE logique
+    métier en JS (le binaire décide).
+
+  acceptance:
+    - id: AC1
+      statement: "L'utilisateur peut injecter les stimuli (joystick axe/sens, armement, capteurs top/Kobold/translation, StartCycle, Reset, mode) et déclencher un scan."
+      verified_by: "UI web : contrôles présents + POST /scan renvoie les sorties du binaire."
+    - id: AC2
+      statement: "Les sorties affichées proviennent du binaire FB_Cycle compilé (pas d'un calcul JS)."
+      verified_by: "Le serveur exécute le binaire g++ ; le JS ne fait que rendre le JSON reçu."
+    - id: AC3
+      statement: "Zéro logique métier en JS : le garde-fou anti-logique-métier passe sur le HTML du banc."
+      verified_by: "guard_animation_no_business_logic.py --html <banc> PASS."
+    - id: AC4
+      statement: "Le banc compile FB_Cycle depuis WORKING_COPY (jamais CODE/)."
+      verified_by: "Chaîne convert_codesys_to_iec.py + strucpp + g++ sur WORKING_COPY."
+    - id: AC5
+      statement: "L'orchestrateur lit, vérifie et valide le git diff réel (visa P5)."
+      verified_by: "Visa formel de l'orchestrateur."
+
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/**
+    forbidden:
+      - CODE/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Le principe 'zéro logique métier en JS' (le binaire décide, le JS affiche)."
+      - "La chaîne de compilation WORKING_COPY (jamais CODE/)."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - guard_pass
+    - engine_compiled
+    - manual_test
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Le banc est un OUTIL DE TEST, pas un contrôleur machine. Il ne doit JAMAIS être
+    présenté comme pilotant la machine réelle. Toute ambiguïté (ex. un stimulus qui
+    semble commander un actionneur réel) est remontée immédiatement.
+
+# 🚦 SUIVI
+status: PENDING               # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+
+execution:
+  executed_by: "DSH-DeepSeek-WT3"
+  completed_at: "2026-08-28T23:50:00+02:00"
+  status: COMPLETED
+  summary: >
+    Banc construit et validé mécaniquement :
+    - Moteur cycle_engine.exe (FB_Cycle WORKING_COPY compilé, protocole ligne key=value,
+      état persistant) — build_cycle_engine.py.
+    - Serveur cycle_bench_server.py (stdlib, /scan + /reset) — testé : X0 -> X1 sur front
+      StartCycle, persistance d'état confirmée.
+    - UI cycle_bench.html (joystick=positions M1/M2, armement, capteurs, StartCycle, Reset,
+      mode) — garde-fou PASS (--no-freshness, zéro logique métier JS).
+    En attente de validation utilisateur (test manuel du banc).
+  evidence_submitted:
+    - "guard_animation_no_business_logic.py --html cycle_bench.html --no-freshness: PASS"
+    - "POST /scan: X0 -> X1, persistance OK"
+
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Décision utilisateur 2026-08-28 : banc web interactif pour tester le programme
+    en pilotant manuellement les transitions contre le binaire compilé.
