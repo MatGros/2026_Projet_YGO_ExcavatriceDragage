@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""RÃ©-embedde la trace fraÃ®che (trace_semi_auto_cycle.json) dans FICHE_SEMI_AUTO_ANIMATION.html.
+"""Ré-embedde la trace fraîche (trace_semi_auto_cycle.json) dans FICHE_SEMI_AUTO_ANIMATION.html.
 
 Remplace le bloc `const __TRACE = { ... };` du HTML par le contenu courant du JSON de trace.
-Le HTML reste un PUR LECTEUR : cette opÃ©ration ne touche que la constante de donnÃ©es,
+Le HTML reste un PUR LECTEUR : cette opération ne touche que la constante de données,
 jamais le code applicatif (le garde-fou guard_animation_no_business_logic.py exclut __TRACE
 de son analyse pour cette raison exacte).
 
-ChaÃ®ne de fraÃ®cheur imposÃ©e (T171-B) :
-    1. python TOOLS/TEST_AUTO_CI/anim_bench/generate_trace_cycle.py     # trace fraÃ®che
-    2. python TOOLS/TEST_AUTO_CI/anim_bench/embed_trace_in_animation.py # rÃ©-embed
+Chaîne de fraîcheur imposée (T171-B) :
+    1. python TOOLS/TEST_AUTO_CI/anim_bench/generate_trace_cycle.py     # trace fraîche
+    2. python TOOLS/TEST_AUTO_CI/anim_bench/embed_trace_in_animation.py # ré-embed
     3. python TOOLS/TEST_AUTO_CI/anim_bench/guard_animation_no_business_logic.py  # certification
 
 Usage :
     python TOOLS/TEST_AUTO_CI/anim_bench/embed_trace_in_animation.py
-    python TOOLS/TEST_AUTO_CI/anim_bench/embed_trace_in_animation.py --check  # 0 si dÃ©jÃ  Ã  jour
+    python TOOLS/TEST_AUTO_CI/anim_bench/embed_trace_in_animation.py --check  # 0 si déjà à jour
 """
 
 import argparse
@@ -37,9 +37,9 @@ MARKER = "const __TRACE = "
 
 
 def _find_block_end(text: str, start: int) -> int:
-    """Retourne l'index du ';' fermant le bloc objet commenÃ§ant Ã  `start` ('{').
-    Comptage d'accolades en ignorant les littÃ©raux de chaÃ®ne (pas de commentaire JS
-    dans le JSON embarquÃ© â€” sortie de json.dumps)."""
+    """Retourne l'index du ';' fermant le bloc objet commençant à `start` ('{').
+    Comptage d'accolades en ignorant les littéraux de chaîne (pas de commentaire JS
+    dans le JSON embarqué — sortie de json.dumps)."""
     depth = 0
     i = start
     in_str = False
@@ -71,7 +71,7 @@ def _find_block_end(text: str, start: int) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true",
-                        help="Ne modifie rien : retourne 1 si l'embed est pÃ©rimÃ©")
+                        help="Ne modifie rien : retourne 1 si l'embed est périmé")
     args = parser.parse_args()
 
     if not TRACE_JSON.exists():
@@ -97,25 +97,25 @@ def main() -> int:
     try:
         embedded_trace = json.loads(embedded)
     except json.JSONDecodeError as exc:
-        print(f"[ERREUR] JSON embarquÃ© invalide : {exc}")
+        print(f"[ERREUR] JSON embarqué invalide : {exc}")
         return 1
     embedded_sha = embedded_trace.get("meta", {}).get("sha256", "")
     embedded_scans = embedded_trace.get("meta", {}).get("n_scans", 0)
 
-    print(f"Trace JSON    : sha256={trace_sha[:16]}â€¦ Â· n_scans={n_scans}")
-    print(f"Trace embarquÃ©e: sha256={embedded_sha[:16]}â€¦ Â· n_scans={embedded_scans}")
+    print(f"Trace JSON    : sha256={trace_sha[:16]}… · n_scans={n_scans}")
+    print(f"Trace embarquée: sha256={embedded_sha[:16]}… · n_scans={embedded_scans}")
 
     if embedded_sha == trace_sha:
-        print("âœ… Embed dÃ©jÃ  Ã  jour â€” rien Ã  faire")
+        print("✅ Embed déjà à jour — rien à faire")
         return 0
 
     if args.check:
-        print("âŒ Embed PÃ‰RIMÃ‰ â€” relancer embed_trace_in_animation.py (sans --check)")
+        print("❌ Embed PÉRIMÉ — relancer embed_trace_in_animation.py (sans --check)")
         return 1
 
     new_html = html[:brace_start] + trace_text.rstrip("\n") + html[block_end:]
     HTML.write_text(new_html, encoding="utf-8")
-    print(f"âœ… Trace rÃ©-embeddÃ©e dans {HTML.name} ({embedded_scans} -> {n_scans} scans)")
+    print(f"✅ Trace ré-embeddée dans {HTML.name} ({embedded_scans} -> {n_scans} scans)")
     return 0
 
 

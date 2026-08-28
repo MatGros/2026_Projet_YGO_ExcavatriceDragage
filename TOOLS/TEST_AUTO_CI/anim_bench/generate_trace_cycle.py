@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""GÃ©nÃ¨re la trace scan-par-scan du cycle complet FB_Cycle depuis la COPIE DE TRAVAIL.
+"""Génère la trace scan-par-scan du cycle complet FB_Cycle depuis la COPIE DE TRAVAIL.
 
-SOURCE_TESTÃ‰E = WORKING_COPY/FB_Cycle.st (corrigÃ© F1/F2/F6) â€” jamais CODE/.
+SOURCE_TESTÉE = WORKING_COPY/FB_Cycle.st (corrigé F1/F2/F6) — jamais CODE/.
 Produit : RESULTS/G_CYCLE/reports/trace_semi_auto_cycle.json
 
-SÃ©mantique de la trace : logique de dÃ©cision du sÃ©quenceur sous stimuli de harnais
-scan-par-scan â€” PAS une dynamique physique rÃ©elle ni une cadence automate.
+Sémantique de la trace : logique de décision du séquenceur sous stimuli de harnais
+scan-par-scan — PAS une dynamique physique réelle ni une cadence automate.
 
-Chaque champ est Ã©tiquetÃ© avec sa provenance :
-  COMPILED          = calculÃ© par le binaire ST compilÃ© (sorties, Ã©tats, dÃ©cisions)
-  HARNESS_STIMULUS  = injectÃ© par le harnais (entrÃ©es capteurs/positions) â€” simulÃ©
+Chaque champ est étiqueté avec sa provenance :
+  COMPILED          = calculé par le binaire ST compilé (sorties, états, décisions)
+  HARNESS_STIMULUS  = injecté par le harnais (entrées capteurs/positions) — simulé
   CONFIG            = constante de configuration fournie au harnais
-  DERIVED           = dÃ©rivÃ© Ã  la gÃ©nÃ©ration (Python, hors JS) pour le rendu
+  DERIVED           = dérivé à la génération (Python, hors JS) pour le rendu
 
 Usage :
     python TOOLS/TEST_AUTO_CI/anim_bench/generate_trace_cycle.py
@@ -36,7 +36,7 @@ if sys.platform == "win32":
 SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
-# chronogram.py vit dans scripts/ (outillage CI gÃ©nÃ©rique) â€” pas dans anim_bench/
+# chronogram.py vit dans scripts/ (outillage CI generique) - pas dans anim_bench/
 SCRIPTS_DIR = SCRIPT_DIR.parent / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
@@ -51,13 +51,13 @@ STRUCPP = COMPILER_DIR / "bin" / "win32-x64" / "strucpp.exe"
 RUNTIME_INCLUDE = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "include"
 RUNTIME_TEST = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "test"
 
-# Copie de travail (source testÃ©e) â€” jamais CODE/
+# Copie de travail (source testée) — jamais CODE/
 WORKING_COPY = TEST_AUTO_CI / "WORKING_COPY"
 FB_SOURCE = WORKING_COPY / "CODE" / "G_CYCLE" / "FB_Cycle.st"
 TEST_FILE = WORKING_COPY / "tests" / "test_fb_cycle_full.st"
 OUT_JSON = TEST_AUTO_CI / "RESULTS" / "G_CYCLE" / "reports" / "trace_semi_auto_cycle.json"
 
-# Fermeture de types complÃ¨te de FB_Cycle (ordre de compilation = registry.yaml)
+# Fermeture de types complète de FB_Cycle (ordre de compilation = registry.yaml)
 SOURCES = [
     "CODE/A_COMMUN/_TYPES/E_State.st",
     "CODE/A_COMMUN/_TYPES/ST_Fault.st",
@@ -78,7 +78,7 @@ SOURCES = [
 TARGET_TEST = "TC-P04-100"
 
 # Provenance des champs (source : interface FB_Cycle.st)
-# COMPILED = sorties/Ã©tats calculÃ©s par le binaire
+# COMPILED = sorties/états calculés par le binaire
 COMPILED_FIELDS = {
     "Ready", "CycleStep", "CycleStateStr", "CycleStepAtError",
     "OperatorActionId", "OperatorAction", "ExpectedAxis", "ExpectedDirection",
@@ -90,7 +90,7 @@ COMPILED_FIELDS = {
     "BucketCmd.Open", "BucketCmd.Close", "BucketCmd.KoboldContactorCmd",
     "Fault.Error", "Fault.Latched", "Lifecycle.Busy", "Lifecycle.Done",
 }
-# HARNESS_STIMULUS = entrÃ©es capteurs/positions injectÃ©es par le harnais (simulÃ©)
+# HARNESS_STIMULUS = entrées capteurs/positions injectées par le harnais (simulé)
 HARNESS_FIELDS = {
     "M1_CablePosM", "M2_CablePosM", "M1_MeasuredSpeedMps", "M2_MeasuredSpeedMps",
     "KoboldContactFond", "WinchSyncError", "WinchSyncDeltaM",
@@ -136,8 +136,8 @@ def _find_strucpp_temp_dir(before: set, tmp_root: pathlib.Path) -> pathlib.Path 
 
 
 def _provenance(field: str) -> str:
-    """DÃ©termine la provenance d'un champ. Les clÃ©s extraites par chronogram sont en
-    MAJUSCULES (ex: M1_CABLEPOSM, WINCHM1CMD.STARTSTOP) â€” on normalise en majuscules."""
+    """Détermine la provenance d'un champ. Les clés extraites par chronogram sont en
+    MAJUSCULES (ex: M1_CABLEPOSM, WINCHM1CMD.STARTSTOP) — on normalise en majuscules."""
     f = field.upper()
     if f in {x.upper() for x in COMPILED_FIELDS}:
         return "COMPILED"
@@ -149,24 +149,24 @@ def _provenance(field: str) -> str:
 
 
 def _check_coherence(entries: list) -> list:
-    """ContrÃ´le de cohÃ©rence commandeâ†”delta-position (garde-fou, hors JS).
-    Pour chaque commande exigeant un mouvement, vÃ©rifie que la position captÃ©e Ã©volue
-    dans le bon sens entre scans consÃ©cutifs. Retourne la liste des incohÃ©rences.
-    ClÃ©s en MAJUSCULES (chronogram)."""
+    """Contrôle de cohérence commande↔delta-position (garde-fou, hors JS).
+    Pour chaque commande exigeant un mouvement, vérifie que la position captée évolue
+    dans le bon sens entre scans consécutifs. Retourne la liste des incohérences.
+    Clés en MAJUSCULES (chronogram)."""
     problems = []
     for i in range(1, len(entries)):
         prev, cur = entries[i - 1], entries[i]
         pf, cf = prev["fields"], cur["fields"]
-        # M1 : StartStop + Direction -> M1_CablePosM doit Ã©voluer dans le bon sens
+        # M1 : StartStop + Direction -> M1_CablePosM doit évoluer dans le bon sens
         if pf.get("WINCHM1CMD.STARTSTOP") == "1" and cf.get("WINCHM1CMD.STARTSTOP") == "1":
             try:
                 ppos = float(pf.get("M1_CABLEPOSM", "0"))
                 cpos = float(cf.get("M1_CABLEPOSM", "0"))
                 direction = int(cf.get("WINCHM1CMD.DIRECTION", "0"))
                 if direction == 1 and cpos < ppos - 1e-6:
-                    problems.append(f"scan {cur['scan']}: M1 commandÃ© montÃ©e (dir=1) mais position dÃ©croÃ®t")
+                    problems.append(f"scan {cur['scan']}: M1 commandé montée (dir=1) mais position décroît")
                 if direction == -1 and cpos > ppos + 1e-6:
-                    problems.append(f"scan {cur['scan']}: M1 commandÃ© descente (dir=-1) mais position croÃ®t")
+                    problems.append(f"scan {cur['scan']}: M1 commandé descente (dir=-1) mais position croît")
             except (ValueError, TypeError):
                 pass
     return problems
@@ -188,14 +188,14 @@ def main() -> int:
     _ensure_gpp_in_path()
 
     src_paths = [WORKING_COPY / s for s in SOURCES]
-    # Dossier temp DANS le workspace (writable) pour la conversion â€” le tempdir systÃ¨me
-    # peut Ãªtre bloquÃ© pour l'Ã©criture Python, mais STruCpp y crÃ©e ses strucpp-test-*.
+    # Dossier temp DANS le workspace (writable) pour la conversion — le tempdir système
+    # peut être bloqué pour l'écriture Python, mais STruCpp y crée ses strucpp-test-*.
     tmp_root = TEST_AUTO_CI / ".tmp_trace"
     tmp_root.mkdir(parents=True, exist_ok=True)
     import uuid
     work_dir = tmp_root / f"run_{uuid.uuid4().hex[:8]}"
     work_dir.mkdir(parents=True, exist_ok=True)
-    # STruCpp crÃ©e ses dossiers strucpp-test-* dans le tempdir systÃ¨me
+    # STruCpp crée ses dossiers strucpp-test-* dans le tempdir système
     sys_tmp_root = pathlib.Path(tempfile.gettempdir())
 
     try:
@@ -207,7 +207,7 @@ def main() -> int:
         result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8",
                                 creationflags=subproc_flags)
         if result.returncode != 0:
-            print("[ERREUR] Conversion Ã©chouÃ©e")
+            print("[ERREUR] Conversion échouée")
             print(result.stderr)
             return 1
 
@@ -240,22 +240,22 @@ def main() -> int:
             print(f"[ERREUR] chronogram : {exc}")
             return 1
 
-        # 4. Filtrer le test cible (prÃ©fixe : le nom de test inclut le titre complet)
+        # 4. Filtrer le test cible (préfixe : le nom de test inclut le titre complet)
         target_entries = [e for e in entries if e.get("test", "").startswith(TARGET_TEST)]
         if not target_entries:
             print(f"[ERREUR] Aucune trace pour le test '{TARGET_TEST}'")
-            print(f"  Tests tracÃ©s : {sorted({e.get('test') for e in entries})}")
+            print(f"  Tests tracés : {sorted({e.get('test') for e in entries})}")
             return 1
 
-        # 5. ContrÃ´le de cohÃ©rence
+        # 5. Contrôle de cohérence
         problems = _check_coherence(target_entries)
         if problems:
-            print("[ERREUR] IncohÃ©rences commandeâ†”position dÃ©tectÃ©es :")
+            print("[ERREUR] Incohérences commande↔position détectées :")
             for p in problems[:20]:
                 print(f"  - {p}")
             return 1
 
-        # 6. Ã‰tiqueter la provenance + construire le JSON
+        # 6. Étiqueter la provenance + construire le JSON
         scans = []
         for e in target_entries:
             fields = {}
@@ -268,9 +268,9 @@ def main() -> int:
         payload = {
             "meta": {
                 "generated_by": "generate_trace_cycle.py",
-                "source": "WORKING_COPY/FB_Cycle.st (compilÃ© STruCpp)",
+                "source": "WORKING_COPY/FB_Cycle.st (compilé STruCpp)",
                 "source_sha256": source_sha,
-                "semantics": "logique de dÃ©cision du sÃ©quenceur sous stimuli de harnais scan-par-scan â€” PAS une dynamique physique rÃ©elle ni une cadence automate",
+                "semantics": "logique de décision du séquenceur sous stimuli de harnais scan-par-scan — PAS une dynamique physique réelle ni une cadence automate",
                 "test": TARGET_TEST,
                 "n_scans": len(scans),
             },
@@ -283,11 +283,11 @@ def main() -> int:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
-        print(f"âœ… Trace gÃ©nÃ©rÃ©e : {out_path}")
-        print(f"   SOURCE_TESTÃ‰E = WORKING_COPY/FB_Cycle.st")
+        print(f"✅ Trace générée : {out_path}")
+        print(f"   SOURCE_TESTÉE = WORKING_COPY/FB_Cycle.st")
         print(f"   source_sha256 = {source_sha}")
         print(f"   sha256 (trace) = {payload_sha}")
-        print(f"   scans = {len(scans)} Â· test = {TARGET_TEST}")
+        print(f"   scans = {len(scans)} · test = {TARGET_TEST}")
         return 0
     finally:
         # Nettoyage best-effort (le sandbox peut bloquer la suppression)
