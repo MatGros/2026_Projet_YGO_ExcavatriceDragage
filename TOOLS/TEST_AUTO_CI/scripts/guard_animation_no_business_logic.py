@@ -115,6 +115,9 @@ def check_trace_derivation(js: str) -> list:
     # field(scan,'X') -> assigné à une variable
     for m in re.finditer(r"([a-zA-Z_]\w*)\s*=\s*(?:parseFloat\()?\s*field\(\s*scan\s*,\s*['\"][A-Z0-9_.]+['\"]\s*\)", js):
         trace_vars.add(m.group(1))
+    # isOn(scan,'X') -> assigné à une variable (fonction de lecture de trace)
+    for m in re.finditer(r"([a-zA-Z_]\w*)\s*=\s*isOn\(\s*scan\s*,\s*['\"][A-Z0-9_.]+['\"]\s*\)", js):
+        trace_vars.add(m.group(1))
     # propagation : var2 = var1 + constante (var1 déjà trace)
     changed = True
     while changed:
