@@ -23,7 +23,28 @@ def parse_test_checks(test_st_path) -> dict:
         name, body = m.group(1), m.group(2)
         checks = ASSERT_RE.findall(body)
         comments = [c.strip() for c in COMMENT_RE.findall(body) if c.strip()]
-        out[name] = {"checks": checks, "comments": comments}
+        
+        # Extraction contextuelle des notes par scan
+        scan_notes = {}
+        s_idx = 0
+        last_comment = ""
+        for line in body.splitlines():
+            line_s = line.strip()
+            cm = re.search(r"\(\*\s*(.*?)\s*\*\)", line_s)
+            if cm:
+                c_text = cm.group(1).strip()
+                if not c_text.startswith("1.") and not c_text.startswith("2.") and not c_text.startswith("==="):
+                    last_comment = c_text
+
+            if re.search(r"\bfb\s*\(", line_s, re.IGNORECASE) or re.search(r"\bharness\s*\(", line_s, re.IGNORECASE):
+                inline_cm = re.search(r"\(\*\s*(.*?)\s*\*\)", line_s)
+                if inline_cm:
+                    scan_notes[s_idx] = inline_cm.group(1).strip()
+                elif last_comment:
+                    scan_notes[s_idx] = last_comment
+                s_idx += 1
+
+        out[name] = {"checks": checks, "comments": comments, "scan_notes": scan_notes}
     return out
 
 
@@ -78,7 +99,11 @@ def _split_static_fields(scans: list, field_names: list) -> tuple:
     return changed, static
 
 
-def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_num=None) -> str:
+def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_num=None, scan_notes=None) -> str:
+    scan_notes = scan_notes or {}
+    has_notes = any(bool(scan_notes.get(s["scan"])) for s in scans)
+
+    note_th = "<th style='min-width:180px;'>💬 Étape / Contexte</th>" if has_notes else ""
     header = "".join(f"<th>{_html.escape(f)}</th>" for f in field_names)
     rows = []
     prev = None
@@ -91,11 +116,22 @@ def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_n
             cells.append(f"<td{cls}>{_fmt_val(v, field_types.get(f, True))}</td>")
         row_cls = " class='row-fail-scan'" if s["scan"] == fail_scan_num else ""
         marker = " ⚠️" if s["scan"] == fail_scan_num else ""
+
+        note_td = ""
+        if has_notes:
+            note = scan_notes.get(s["scan"], "")
+            if note:
+                note_td = f"<td class='chrono-note-cell' title='{_html.escape(note)}'><span class='chrono-note-chip'>💬 {_html.escape(note)}</span></td>"
+            else:
+                note_td = "<td class='chrono-note-cell' style='color:var(--muted);'>—</td>"
+
         rows.append(f"<tr{row_cls}><td class='scan-idx'>#{s['scan']}{marker}</td>"
-                     f"<td class='scan-t'>{s['t_display_ms']:.0f} ms</td>{''.join(cells)}</tr>")
+                     f"<td class='scan-t'>{s['t_display_ms']:.0f} ms</td>"
+                     f"{note_td}"
+                     f"{''.join(cells)}</tr>")
         prev = s["fields"]
     return f"""<div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th>{header}</tr></thead>
+        <thead><tr><th>Scan</th><th>Temps</th>{note_th}{header}</tr></thead>
         <tbody>{"".join(rows)}</tbody>
     </table></div>"""
 
@@ -251,7 +287,7 @@ def _apply_realistic_time(scans: list, cycle_time_ms: float) -> list:
 
 
 def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, field_types: dict,
-                        test_passed: bool = True) -> str:
+                        test_passed: bool = True, scan_notes: dict = None) -> str:
     scans = [e for e in entries if e.get("test") == test_name]
     if not scans:
         return ""
@@ -259,10 +295,6 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
     all_fields = list(scans[0]["fields"].keys())
     changed_fields, static_fields = _split_static_fields(scans, all_fields)
 
-    # Un ASSERT_* qui echoue interrompt immediatement l'execution du test (return false cote
-    # C++) -- la trace s'arrete donc net, et le DERNIER scan capture est precisement celui ou
-    # l'assertion a echoue. On le signale explicitement, sinon rien ne le distingue visuellement
-    # d'un arret normal de fin de test.
     fail_note = ""
     fail_scan_num = None
     if not test_passed:
@@ -273,10 +305,6 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
             f"n'existent pas).</div>"
         )
 
-    # Test a scan unique (souvent un test d'etat fige, pas une sequence temporelle) : la
-    # detection de changement compare 2 scans consecutifs, donc TOUJOURS 0 variable "active"
-    # ici par construction -- afficher un graphique/tableau vides serait trompeur. On montre
-    # directement les valeurs plutot que 2 panneaux vides.
     if len(scans) == 1:
         single_rows = "".join(
             f"<tr><td><code>{_html.escape(f)}</code></td>"
@@ -302,7 +330,7 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
         </details>
         <details {"open" if not test_passed else ""}>
             <summary>📋 Chronogramme tableau ({len(scans)} scans)</summary>
-            {_render_table(scans, changed_fields, field_types, fail_scan_num)}
+            {_render_table(scans, changed_fields, field_types, fail_scan_num, scan_notes=scan_notes)}
         </details>
         {_render_static_table(scans, static_fields, field_types)}
     </div>"""
@@ -339,11 +367,11 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
     for i, r in enumerate(results):
         name = r.get("name", "")
         passed_r = r.get("passed", False)
-        info = checks_by_test.get(name, {"checks": [], "comments": []})
+        info = checks_by_test.get(name, {"checks": [], "comments": [], "scan_notes": {}})
 
         checks_html = "".join(f"<li>{_html.escape(c)}</li>" for c in info["checks"])
         comments_html = "".join(f"<p class='comment'>{_html.escape(c)}</p>" for c in info["comments"])
-        chrono_html = _render_chronogram(name, trace_entries or [], cycle_time_ms, field_types, passed_r)
+        chrono_html = _render_chronogram(name, trace_entries or [], cycle_time_ms, field_types, passed_r, scan_notes=info.get("scan_notes"))
 
         # Détection si c'est un test d'interface/socle standard (TC-P03-*)
         # Exception : pour FB_FbStatus, l'AF03 est son AF métier propre, ses TC-P03 vont donc dans la section principale.
@@ -788,10 +816,14 @@ _CSS = """
     .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; }
     .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; }
     .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
-    .chrono-table .scan-t { color: var(--muted); font-family: monospace; }
     .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
     [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
     [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .chrono-note-cell { text-align: left !important; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 270px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
     .v-true { color: #34d399; font-weight: 700; }
     .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
