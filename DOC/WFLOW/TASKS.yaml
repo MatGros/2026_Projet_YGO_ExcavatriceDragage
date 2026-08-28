@@ -290,14 +290,14 @@ tasks:
   bloque_par: []
 - id: T022
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: TERRAIN
-  agent: HUM
-  date: '2026-07-20T08:00:00'
+  agent: AGY-01
+  date: '2026-08-28T09:47:00'
   titre: Tolérance de calibration TopSensorPositionM à fixer sur site
-  contexte: ''
-  description: AF_Partie-10 §7bis
+  contexte: 'Position capteur physique et cible homing'
+  description: 'Figé par défaut à 8.5m dans GVL_PERSISTENT._WinchM1/M2CfgPersist.CfgTopSensorPos_M (ajustable sur site dans NVRAM si besoin entre 8.0m et 8.5m).'
   contrat: ''
   objectifs: []
   bloque_par: []
@@ -465,14 +465,14 @@ tasks:
   bloque_par: []
 - id: T084
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
-  agent: PI-01
-  date: '2026-08-12T09:00:00'
-  titre: Validation CODESYS/terrain mesure vitesse 50 ms (FB_Encoder_Sp...
+  agent: AGY-01
+  date: '2026-08-28T09:47:00'
+  titre: Validation CODESYS/terrain mesure vitesse 50 ms (FB_Encoder_Speed...)
   contexte: 'Intitulé complet : Validation CODESYS/terrain mesure vitesse 50 ms (FB_Encoder_SpeedMeasure)'
-  description: FB_Encoder_SpeedMeasure.st
+  description: 'Validé par qualification CI (10/10 PASS sous STruCpp) et antériorité v0.5.25 (mesure fenêtre glissante 50ms éprouvée pour 1 à 2 m/s lors des déplacements treuils).'
   contrat: ''
   objectifs: []
   bloque_par: []
@@ -532,14 +532,14 @@ tasks:
   bloque_par: []
 - id: T090
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
-  agent: HUM
-  date: '2026-08-12T09:00:00'
+  agent: AGY-01
+  date: '2026-08-28T09:47:00'
   titre: Valider sur site cote capteur haut 8.0 m et limite 7.5 m au pr...
   contexte: 'Intitulé complet : Valider sur site cote capteur haut 8.0 m et limite 7.5 m au premier homing'
-  description: MES-009
+  description: 'Figé à 8.5m pour le capteur physique et 7.5m pour la limite logicielle haute CfgCableLimitAscent_M dans GVL_PERSISTENT (validé utilisateur 2026-08-28, ajustable sur place).'
   contrat: ''
   objectifs: []
   bloque_par: []
