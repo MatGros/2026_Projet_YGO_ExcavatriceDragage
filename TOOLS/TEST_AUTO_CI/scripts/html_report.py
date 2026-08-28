@@ -103,8 +103,8 @@ def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_n
     scan_notes = scan_notes or {}
     has_notes = any(bool(scan_notes.get(s["scan"])) for s in scans)
 
-    note_th = "<th style='min-width:180px;' title='Double-cliquez pour replier cette colonne'>💬 Étape / Contexte</th>" if has_notes else ""
-    header = "".join(f"<th title='Double-cliquez pour replier cette colonne'>{_html.escape(f)}</th>" for f in field_names)
+    note_th = "<th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>💬 Étape / Contexte</span><div class='col-resizer'></div></th>" if has_notes else ""
+    header = "".join(f"<th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>{_html.escape(f)}</span><div class='col-resizer'></div></th>" for f in field_names)
     rows = []
     prev = None
     for s in scans:
@@ -131,7 +131,7 @@ def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_n
                      f"{''.join(cells)}</tr>")
         prev = s["fields"]
     return f"""<div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th title="Double-cliquez pour replier">Scan</th><th title="Double-cliquez pour replier">Temps</th>{note_th}{header}</tr></thead>
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th>{note_th}{header}</tr></thead>
         <tbody>{"".join(rows)}</tbody>
     </table></div>"""
 
@@ -332,6 +332,7 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
             <summary style="display:flex; justify-content:space-between; align-items:center;">
                 <span>📋 Chronogramme tableau ({len(scans)} scans)</span>
                 <span class="table-export-actions" onclick="event.stopPropagation();">
+                    <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
                     <button type="button" class="btn-export" onclick="exportTableCSV(this, '{_html.escape(test_name)}')" title="Télécharger le tableau en CSV">📥 CSV</button>
                     <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
                 </span>
@@ -839,10 +840,12 @@ _CSS = """
     .chrono-scroll::-webkit-scrollbar-track, .wf-scroll::-webkit-scrollbar-track { background: var(--surface-card); border-radius: 4px; }
     .chrono-scroll::-webkit-scrollbar-thumb, .wf-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
     .chrono-scroll::-webkit-scrollbar-thumb:hover, .wf-scroll::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
-    .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; }
-    .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; }
+    .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; table-layout: auto; }
+    .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; position: relative; }
     .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; cursor: pointer; user-select: text; transition: max-width 0.2s, min-width 0.2s, padding 0.2s; }
     .chrono-table th:hover { color: var(--accent); }
+    .col-resizer { position: absolute; top: 0; right: 0; width: 5px; cursor: col-resize; user-select: none; height: 100%; z-index: 10; }
+    .col-resizer:hover, .col-resizer.resizing { background: var(--accent); }
     .chrono-table th.col-collapsed,
     .chrono-table td.col-collapsed {
         max-width: 24px !important;
@@ -873,6 +876,29 @@ _CSS = """
         color: var(--accent);
         display: block;
         text-align: center;
+    }
+    /* Mode Titres Verticaux (Compact) */
+    .chrono-table.headers-vertical th.var-th {
+        height: 155px;
+        vertical-align: bottom;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        max-width: 36px;
+        min-width: 30px;
+    }
+    .chrono-table.headers-vertical th.var-th .th-content {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        display: inline-block;
+        white-space: nowrap;
+        text-align: left;
+        max-height: 135px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .chrono-table th .th-content {
+        display: inline-block;
+        pointer-events: auto;
     }
     .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
     .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
@@ -1062,6 +1088,21 @@ function copyTableMarkdown(btn) {
     }, 1200);
 }
 
+function toggleVerticalHeaders(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var isVert = table.classList.toggle('headers-vertical');
+    btn.innerHTML = isVert ? "↔️ Titres Horizontaux" : "📐 Titres Verticaux";
+    if (isVert) {
+        btn.classList.add('btn-copied');
+    } else {
+        btn.classList.remove('btn-copied');
+    }
+}
+
 function toggleTheme() {
     var current = document.documentElement.getAttribute('data-theme') || 'light';
     var next = current === 'dark' ? 'light' : 'dark';
@@ -1088,8 +1129,62 @@ function updateThemeBtn(theme) {
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Double-clic sur un en-tete de colonne pour la replier / deplier
+    // Redimensionnement manuel des colonnes a la souris (Drag & Drop border)
+    var isResizing = false;
+    var currentTh = null;
+    var startX = 0;
+    var startWidth = 0;
+
+    document.addEventListener('mousedown', function(e) {
+        var resizer = e.target.closest('.col-resizer');
+        if (!resizer) return;
+        isResizing = true;
+        currentTh = resizer.closest('th');
+        startX = e.pageX;
+        startWidth = currentTh.offsetWidth;
+        resizer.classList.add('resizing');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing || !currentTh) return;
+        var diff = e.pageX - startX;
+        var newWidth = Math.max(30, startWidth + diff);
+        currentTh.style.width = newWidth + 'px';
+        currentTh.style.minWidth = newWidth + 'px';
+        currentTh.style.maxWidth = newWidth + 'px';
+
+        if (currentTh.classList.contains('note-th')) {
+            var table = currentTh.closest('.chrono-table');
+            if (table) {
+                table.querySelectorAll('.chrono-note-cell').forEach(function(td) {
+                    td.style.maxWidth = newWidth + 'px';
+                });
+                table.querySelectorAll('.chrono-note-chip').forEach(function(chip) {
+                    chip.style.maxWidth = Math.max(20, newWidth - 10) + 'px';
+                });
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.querySelectorAll('.col-resizer.resizing').forEach(function(r) {
+                r.classList.remove('resizing');
+            });
+            currentTh = null;
+        }
+    });
+
+    // Double-clic sur un en-tete de colonne pour la replier / deplier (hors barre de redimensionnement)
     document.addEventListener('dblclick', function(e) {
+        if (e.target.closest('.col-resizer')) return;
         var th = e.target.closest('.chrono-table th');
         if (!th) return;
         var table = th.closest('.chrono-table');
