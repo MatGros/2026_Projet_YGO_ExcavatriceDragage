@@ -120,7 +120,7 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 // P1 comme si c'était l'extrémité réelle : mot 00001 (P1=0 ET Maintenance=1), UN CRAN AVANT
 // la vraie extrémité Maintenance (00000) — backup si le verrou souple a déjà échoué à arrêter
 // avant P1, garde la machine hors de la zone interdite plutôt que d'attendre le vrai fond.
-M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
+M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
                                    NOT instPosDecoderM3.TranslationPosP1 AND instPosDecoderM3.TranslationPosMaintenance,
                                    instPosDecoderM3.LimitSwitchRev);
 
@@ -135,7 +135,7 @@ END_IF;
 
 IF M3_LimitSwitchRevEffective THEN
     M3_LimitSwitchRevStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchRev) THEN
+ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchRev) THEN
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
@@ -170,12 +170,12 @@ END_IF;
 {region "§1 Arbitrage cible et direction"}
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
-IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Pont SEMI_AUTO : consomme la demande du séquenceur de cycle.
     // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M3_PositioningActive  := TRUE;
-    SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
-    M3_StartStop_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Start;
+    SelTarget    := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt;
+    M3_StartStop_Active  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart;
 
     // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
     // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
@@ -191,8 +191,8 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
         M3_SpeedCmd_Active := 0.0;
         M3_Direction_Active := 0;
     END_IF;
-ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
-   OR (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2) THEN
+ELSIF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1)
+   OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2) THEN
     M3_PositioningActive := GVL_IHM.TranslationM3.Cmd.SelPositioning;
     SelTarget := 0;
 
@@ -236,7 +236,7 @@ END_IF;
 
 M3_SpeedCmd_Active := LIMIT(0.0, ABS(M3_SpeedCmd_Active), 100.0);
 
-IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
+IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable THEN
     SelTarget := 0;
 END_IF;
 
@@ -261,7 +261,7 @@ ELSE
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -> arrêt sur Maintenance
         // - Si Maintenance interdite -> arrêt sur P1
-        IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
+        IF PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable THEN
             M3_PositionSensorTarget := M3_AtMaintenanceStable;
         ELSE
             M3_PositionSensorTarget := M3_AtP1Stable;
@@ -281,17 +281,17 @@ END_CASE;
 // d'un scan. Bénin : BrakeReleaseRequest ne change pas plus vite qu'un scan MainTask 10 ms
 // sur une commande frein.
 instSafetyTranslationM3(
-    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE),
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE),
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
-    JoystickOnline          := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational     := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    JoystickOnline          := PRG_02_Acquisition.Data.Network.Joystick.Online,
+    JoystickOperational     := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     PhaseRotationOk         := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
-    DriveOnline             := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur.Online,
-    DriveOperational        := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur.Operational,
+    DriveOnline             := PRG_02_Acquisition.Data.Network.DriveM3.Online,
+    DriveOperational        := PRG_02_Acquisition.Data.Network.DriveM3.Operational,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
@@ -323,10 +323,10 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 // === ⚙️ §2 EXÉCUTION PILOTAGE TRANSLATION M3 ===
 
 instTranslationM3(
-    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE),
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE),
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M3_StartStop_Active,
     SafeStop                := M3_SafeStop_Aggregate,
     Direction               := M3_Direction_Active,
@@ -344,7 +344,7 @@ instTranslationM3(
     // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -> 100% vitesse jusqu'à
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
     SlowdownSensorP1           := (NOT instPosDecoderM3.TranslationPosP2) AND instPosDecoderM3.TranslationPosP1
-                                   AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
+                                   AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
@@ -363,7 +363,7 @@ instTranslationM3(
 
 // 📐 Estimateur de position continue M3 (odométrie + recalage 5 capteurs)
 instPosEstimatorM3(
-    Enable               := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE),
+    Enable               := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE),
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
     DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     Direction            := M3_Direction_Active,
@@ -391,7 +391,7 @@ GVL_PERSISTENT._TranslationPosEstimatedInitialized := instPosEstimatorM3.Initial
 {region "§3 Publication demande translation"}
 // === 📤 §3 PUBLICATION DEMANDE BRUTE TRANSLATION ===
 
-TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE);
+TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE);
 TranslationFinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 TranslationFinalInterlockRequest.SafeStop := M3_SafeStop_Aggregate;
@@ -449,7 +449,7 @@ TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputIn
 TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
 TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) <> 0;
 TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) <> 0;
-TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
+TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable;
 TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 
 // 🛡️ Producteur unique (CODE_QUALITY_STANDARDS §5) : la safety M3 (instSafetyTranslationM3)

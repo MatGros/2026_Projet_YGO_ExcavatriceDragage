@@ -1,0 +1,415 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T11:35:37.477017" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T11:35:37.477017">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_AcquisitionEncoderQualified">
+        <baseType>
+          <struct>
+            <variable name="Measurement">
+              <type>
+                <derived name="ST_fbEncoder_Measurement" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mesure métrique (CablePosM, SpeedMps, etc.)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Façade codeur prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Diagnostic défaut codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Codeur référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Référencement suspect</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Défaut fiabilité (indisponible ou incohérent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Référencé ET fiable (sans incohérence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetConfirmationFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Échec confirmation preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwOut">
+              <type>
+                <derived name="ST_fbEncoder_HwOut" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Commandes hardware de preset (lecture seule)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>bc4dc502-575b-5c03-a159-0fc9e08c35c2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧲 ST_AcquisitionEncoderQualified — Façade codeur qualifiée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les mesures métriques, statuts de référencement,
+      défauts et signaux hardware produits par FB_Encoder dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.EncoderM1 / Data.EncoderM2).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Fault">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ErrorId figé à l'apparition du défaut, effacé au Reset</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ffe904a3-501c-5aac-bc38-202f178a61f2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'état défaut d'un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu'au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l'acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbEncoder_HwOut">
+        <baseType>
+          <struct>
+            <variable name="PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES BUS ETHERCAT (ordres preset vers PDO Rx) ===
+&lt;-- [ACT] Declenchement preset vers PDO Rx</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CodeSeqTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Sequence code vers PDO Rx, maintenue a 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Valeur brute envoyee au preset</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1d8c05ba-e087-546f-9435-81c2f041e74c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_fbEncoder_HwOut — Ordres preset de sortie codeur (HwOut)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les SEULES sorties/ordres preset d'un codeur absolu
+      EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
+   🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
+      vers le device.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbEncoder_Measurement">
+        <baseType>
+          <struct>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES BRUTES &amp; STATUT BUS ===
+Position brute codeur (gelee si EncoderAvailable=FALSE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bus/esclave EtherCAT operationnel et disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE POSITION CABLE ===
+Position cable (m, signee, + enroule)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosMSafe">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable instantanee validee par EncoderIncoherent (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incoherence redemarrage ou hors bornes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
+Vitesse absolue sur fenetre glissante (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUTS DES SOUS-FB &amp; REFERENCE ===
+Défaut FB_Encoder_Homing (état du référencement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingLifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle FB_Encoder_Homing (Busy/Done)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbsFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut FB_Encoder_Abs (état acquisition bus)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference brute du dernier homing reussi (re-expose)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>db273cb7-b66e-5a93-99be-e648e3db5387</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_fbEncoder_Measurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
+   🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Lifecycle">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b6983c9c-4d76-5d4e-899b-e996cbf34849</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d'exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'avancement d'une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="ST_AcquisitionEncoderQualified" ObjectId="bc4dc502-575b-5c03-a159-0fc9e08c35c2" />
+            </Folder>
+          </Folder>
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Folder Name="_TYPES">
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
+          </Folder>
+        </Folder>
+        <Folder Name="E_CODEURS">
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbEncoder_HwOut" ObjectId="1d8c05ba-e087-546f-9435-81c2f041e74c" />
+            <Object Name="ST_fbEncoder_Measurement" ObjectId="db273cb7-b66e-5a93-99be-e648e3db5387" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

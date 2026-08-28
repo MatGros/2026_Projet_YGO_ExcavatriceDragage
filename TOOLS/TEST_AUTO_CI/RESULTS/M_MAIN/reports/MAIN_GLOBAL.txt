@@ -1,34 +1,12 @@
-Error compiling source files:
-
-FB_Safety_Winch.st:343:18: error: Expected `Assign`, found `.`.
- 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
-     |                  ^
-
-FB_Safety_Winch.st:343:30: error: Expected `Semicolon`, found `TO`.
- 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
-     |                              ^
-
-FB_Safety_Winch.st:343:44: error: Expected `END_IF`, found `END_FOR`.
- 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
-     |                                            ^
-
-FB_Safety_Winch.st:344:1: error: Expected `END_FUNCTION_BLOCK`, found `END_IF`.
- 344 | END_IF;
-     | ^
-
-FB_Safety_Translation.st:208:18: error: Expected `Assign`, found `.`.
- 208 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR; // No-op
-     |                  ^
-
-FB_Safety_Translation.st:208:30: error: Expected `Semicolon`, found `TO`.
- 208 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR; // No-op
-     |                              ^
-
-FB_Safety_Translation.st:208:44: error: Expected `END_IF`, found `END_FOR`.
- 208 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR; // No-op
-     |                                            ^
-
-FB_Safety_Translation.st:209:1: error: Expected `END_FUNCTION_BLOCK`, found `END_IF`.
- 209 | END_IF;
-     | ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_wxwdlbao\strucpp-test-9RqDFx\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_03::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_wxwdlbao\strucpp-test-9RqDFx\generated.cpp:17486:35: error: 'class strucpp::FB_CYCLE' has no member named 'BUSY'
+17486 |     CYCLEBUSY = INSTCYCLESEMIAUTO.BUSY;
+      |                                   ^~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_wxwdlbao\strucpp-test-9RqDFx\generated.cpp:17487:35: error: 'class strucpp::FB_CYCLE' has no member named 'DONE'
+17487 |     CYCLEDONE = INSTCYCLESEMIAUTO.DONE;
+      |                                   ^~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_wxwdlbao\strucpp-test-9RqDFx\generated.cpp:17488:36: error: 'class strucpp::FB_CYCLE' has no member named 'ERROR'
+17488 |     CYCLEERROR = INSTCYCLESEMIAUTO.ERROR;
+      |                                    ^~~~~
 

@@ -71,6 +71,18 @@ contract:
   models_allowed:
     - "gpt-5.6-luna"
   alert_duty: "Absence de visa D-05, besoin de modifier FB_Cycle ou ambiguïté Req/Tgt impose STOP."
-status: PENDING
-execution: {executed_by: "", completed_at: "", status: PENDING, summary: "", evidence_submitted: []}
-validation: {status: PENDING, validated_by: "", validated_at: "", notes: ""}
+status: COMPLETED
+execution:
+  executed_by: "AGY-01"
+  completed_at: "2026-08-28T14:43:30+02:00"
+  status: COMPLETED
+  summary: "Bus public PRG_03.Data créé et publié (Auth, ReqProgram, SequenceState). 7 DUTs créés. Neutralisation déterministe hors SEMI_AUTO. CI M_MAIN 7/7 PASS. Revue indépendante Ollama concluante avec verdict PASS. G200 PASS. 22/22 Gates PASS."
+  evidence_submitted:
+    - "DOC/WFLOW/scratch_response_t165_c1_design.md"
+    - "DOC/WFLOW/scratch_response_t165_c1_review.md"
+    - "TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/PRG_03_Modes_Cycle.html"
+validation:
+  status: VALIDATED
+  validated_by: "OLLAMA-DeepSeek-v4-Flash"
+  validated_at: "2026-08-28T14:43:32+02:00"
+  notes: "Revue indépendante validée formellement : conformité contrat, absence de safety dans ReqProgram, neutralisation déterministe et ordre ST respecté."

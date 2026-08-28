@@ -5,7 +5,7 @@
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §2
    🎯 Rôle unique : Produire les images HwReal/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
-      et publier les retours.
+      et publier les retours qualifiés sur le bus Data.
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_02_Acquisition
@@ -209,6 +209,14 @@ instDiagEthercat(
     EncoderM1BypassActive    := GVL_IHM.Network.Bypass.EncoderM1,
     EncoderM2BypassActive    := GVL_IHM.Network.Bypass.EncoderM2
 );
+
+// 📤 Publication du sous-bus diagnostics réseaux
+Data.Network.CanOpenMaster   := instDiagCanOpen.DeviceCanOpenMaster;
+Data.Network.Joystick        := instDiagCanOpen.DeviceJoystick;
+Data.Network.EthercatMaster  := instDiagEthercat.DeviceEthercatMaster;
+Data.Network.EncoderM1       := instDiagEthercat.DeviceEncoderM1;
+Data.Network.EncoderM2       := instDiagEthercat.DeviceEncoderM2;
+Data.Network.DriveM3         := instDiagEthercat.DeviceVariateur;
 {endregion}
 
 {region "§2 Simulation et aiguillage — HwIn"}
@@ -323,7 +331,18 @@ instJoystick(
     NeutralYMem               := _JoystickNeutralY
 );
 
-// 📤 Publication des états et axes joystick
+// 📤 Publication du sous-bus joystick qualifié
+Data.Joystick.AxisX              := instJoystick.AxisCmdX;
+Data.Joystick.AxisY              := instJoystick.AxisCmdY;
+Data.Joystick.DeadmanArmed       := instJoystick.DeadmanArmed;
+Data.Joystick.AtNeutralXY        := instJoystick.AtNeutralXY;
+Data.Joystick.ArmingPermitDenied := instJoystick.ArmingPermitDenied;
+Data.Joystick.Ready              := instJoystick.Ready;
+Data.Joystick.Fault              := instJoystick.Fault;
+Data.Joystick.NeutralXAct        := instJoystick.NeutralXAct;
+Data.Joystick.NeutralYAct        := instJoystick.NeutralYAct;
+
+// 📤 Publication des états et axes joystick (compatibilité de transition)
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
 Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
 Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
@@ -346,8 +365,8 @@ HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 2),
+    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 2),
     HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
@@ -363,6 +382,19 @@ instEncoderM1(
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     Calib                 := _CalibM1
 );
+
+// 📤 Publication de la façade codeur M1 qualifiée
+Data.EncoderM1.Measurement              := instEncoderM1.Measurement;
+Data.EncoderM1.Ready                    := instEncoderM1.Ready;
+Data.EncoderM1.Fault                    := instEncoderM1.Fault;
+Data.EncoderM1.Homed                    := instEncoderM1.Homed;
+Data.EncoderM1.HomingSuspect            := instEncoderM1.HomingSuspect;
+Data.EncoderM1.EncoderFault             := instEncoderM1.EncoderFault;
+Data.EncoderM1.HomedAndReliable         := instEncoderM1.HomedAndReliable;
+Data.EncoderM1.PresetConfirmationFailed := instEncoderM1.PresetConfirmationFailed;
+Data.EncoderM1.HwOut                    := instEncoderM1.HwOut;
+
+// Compatibilité de transition
 Data.Encoders.M1           := instEncoderM1.Measurement;
 Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
 Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
@@ -377,7 +409,7 @@ COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
 M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
-    AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
     AND NOT (PRG_04_Treuils_Benne.instWinchM1.StepNumber > 0) AND NOT (PRG_04_Treuils_Benne.instWinchM2.StepNumber > 0);
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
     M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
@@ -394,8 +426,8 @@ HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 1),
+    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 1),
     HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR M2BucketRefRequested,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
@@ -411,6 +443,19 @@ instEncoderM2(
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global,
     Calib                 := _CalibM2
 );
+
+// 📤 Publication de la façade codeur M2 qualifiée
+Data.EncoderM2.Measurement              := instEncoderM2.Measurement;
+Data.EncoderM2.Ready                    := instEncoderM2.Ready;
+Data.EncoderM2.Fault                    := instEncoderM2.Fault;
+Data.EncoderM2.Homed                    := instEncoderM2.Homed;
+Data.EncoderM2.HomingSuspect            := instEncoderM2.HomingSuspect;
+Data.EncoderM2.EncoderFault             := instEncoderM2.EncoderFault;
+Data.EncoderM2.HomedAndReliable         := instEncoderM2.HomedAndReliable;
+Data.EncoderM2.PresetConfirmationFailed := instEncoderM2.PresetConfirmationFailed;
+Data.EncoderM2.HwOut                    := instEncoderM2.HwOut;
+
+// Compatibilité de transition
 Data.Encoders.M2           := instEncoderM2.Measurement;
 Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
 Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
@@ -425,6 +470,14 @@ COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;
 // 📊 Retours variateur M3 conditionnés (HwIn arbitré en §2)
 Data.M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
 Data.M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
+{endregion}
+
+{region "§6 Qualification globale du bus Data"}
+// === 🛡️ §6 QUALIFICATION GLOBALE DU BUS DATA ===
+// DataValid = TRUE uniquement si les modules E/S physiques et les bus réseaux sont opérationnels.
+Data.DataValid := NOT Data.InputModuleFault 
+                  AND instDiagCanOpen.Ready 
+                  AND instDiagEthercat.Ready;
 {endregion}
 
 END_PROGRAM

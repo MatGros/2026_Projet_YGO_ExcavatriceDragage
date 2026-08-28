@@ -20,13 +20,13 @@ END_VAR
 
 VAR_OUTPUT
     // === 🎚️ BUS D'AUTORISATIONS & DEMANDES DE CYCLE ===
-    Auth              : ST_fbModes_Autorisations; // <-- [STAT] Bus d'autorisations machine (producteur unique)
-    instCycleSemiAuto : FB_Cycle;               // *   [INST] Sequenceur de cycle semi-automatique public
+    Data              : ST_ModesCycleInterPrg;  // <-- [BUS] Structure publique unique du programme de modes et cycle
 END_VAR
 
 VAR
     // === 🧩 SOUS-INSTANCES FB INTERNES ===
-    instModes : FB_Modes; // * [INST] Arbitrage des modes machine et calcul autorisations
+    instModes         : FB_Modes; // * [INST] Arbitrage des modes machine et calcul autorisations
+    instCycleSemiAuto : FB_Cycle; // * [INST] Séquenceur de cycle semi-automatique (privé)
 END_VAR
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE ===
@@ -54,11 +54,11 @@ instModes(
 //    - HomingRequest := bouton homing IHM (BtnHome M1 OU M2)
 
 instCycleSemiAuto(
-    Enable                  := (Auth.Mode = E_Mode.SEMI_AUTO),
+    Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
     Reset                   := GVL_IHM.Cycle.Cmd.BtnReset,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := Auth.Mode,
-    CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY,
+    Mode                    := instModes.Auth.Mode,
+    CycleMotionPermit       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     DeadmanArmed            := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
@@ -88,16 +88,100 @@ instCycleSemiAuto(
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
-    HomedM1                 := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomedM2                 := PRG_02_Acquisition.instEncoderM2.Homed,
+    HomedM1                 := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    HomedM2                 := PRG_02_Acquisition.Data.EncoderM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     SampleCount            := _CycleSampleCount
 );
 
 
-// === 📤 §3 PUBLICATION DU BUS AUTORISATIONS ===
+// === 📤 §3 PUBLICATION DU BUS INTER-PRG & AUTORISATIONS ===
 
-Auth := instModes.Auth;
+// 1. Autorisations machine
+Data.Auth := instModes.Auth;
+
+// 2. Demandes programme et état public de séquence
+IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
+    // Demandes treuils M1 / M2
+    Data.ReqProgram.ReqWinchM1.ReqStartStop := instCycleSemiAuto.WinchM1Cmd.StartStop;
+    Data.ReqProgram.ReqWinchM1.ReqDirection := instCycleSemiAuto.WinchM1Cmd.Direction;
+    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := instCycleSemiAuto.WinchM1Cmd.SpeedPct;
+
+    Data.ReqProgram.ReqWinchM2.ReqStartStop := instCycleSemiAuto.WinchM2Cmd.StartStop;
+    Data.ReqProgram.ReqWinchM2.ReqDirection := instCycleSemiAuto.WinchM2Cmd.Direction;
+    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+
+    // Demande translation M3
+    Data.ReqProgram.ReqTranslation.ReqStart    := instCycleSemiAuto.TranslationCmd.Start;
+    Data.ReqProgram.ReqTranslation.PositionTgt := instCycleSemiAuto.TranslationCmd.Target;
+
+    // Demande benne
+    Data.ReqProgram.ReqBucket.ReqOpen                := instCycleSemiAuto.BucketCmd.Open;
+    Data.ReqProgram.ReqBucket.ReqClose               := instCycleSemiAuto.BucketCmd.Close;
+    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
+
+    // État séquence active
+    IF instCycleSemiAuto.Lifecycle.Busy THEN
+        Data.SequenceState.SequenceId := E_ProgramSequence.MAIN_CYCLE;
+    ELSE
+        Data.SequenceState.SequenceId := E_ProgramSequence.NONE;
+    END_IF;
+
+    Data.SequenceState.Ready                  := instCycleSemiAuto.Ready;
+    Data.SequenceState.Lifecycle              := instCycleSemiAuto.Lifecycle;
+    Data.SequenceState.Fault                  := instCycleSemiAuto.Fault;
+    Data.SequenceState.Step                   := instCycleSemiAuto.CycleStep;
+    Data.SequenceState.StepStr                := instCycleSemiAuto.CycleStateStr;
+    Data.SequenceState.StepAtFault            := instCycleSemiAuto.CycleStepAtError;
+    Data.SequenceState.OperatorActionId       := instCycleSemiAuto.OperatorActionId;
+    Data.SequenceState.OperatorAction         := instCycleSemiAuto.OperatorAction;
+    Data.SequenceState.ExpectedAxis           := instCycleSemiAuto.ExpectedAxis;
+    Data.SequenceState.ExpectedDirection      := instCycleSemiAuto.ExpectedDirection;
+    Data.SequenceState.WaitingForOperator     := instCycleSemiAuto.WaitingForOperator;
+    Data.SequenceState.WaitingForProcess      := instCycleSemiAuto.WaitingForProcess;
+    Data.SequenceState.RequestActive          := instCycleSemiAuto.RequestActive;
+    Data.SequenceState.SpeedMismatchMps       := instCycleSemiAuto.SpeedMismatchMps;
+    Data.SequenceState.SpeedMismatchActive    := instCycleSemiAuto.SpeedMismatchActive;
+    Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
+ELSE
+    // Neutralisation déterministe hors mode SEMI_AUTO
+    Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
+    Data.ReqProgram.ReqWinchM1.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := 0.0;
+
+    Data.ReqProgram.ReqWinchM2.ReqStartStop := FALSE;
+    Data.ReqProgram.ReqWinchM2.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := 0.0;
+
+    Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
+    Data.ReqProgram.ReqTranslation.PositionTgt := 0;
+
+    Data.ReqProgram.ReqBucket.ReqOpen                := FALSE;
+    Data.ReqProgram.ReqBucket.ReqClose               := FALSE;
+    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable := FALSE;
+
+    Data.SequenceState.SequenceId              := E_ProgramSequence.NONE;
+    Data.SequenceState.Ready                   := FALSE;
+    Data.SequenceState.Lifecycle.Busy          := FALSE;
+    Data.SequenceState.Lifecycle.Done          := FALSE;
+    Data.SequenceState.Lifecycle.Waiting       := FALSE;
+    Data.SequenceState.Fault.Error             := FALSE;
+    Data.SequenceState.Fault.ErrorId           := 0;
+    Data.SequenceState.Fault.Latched           := FALSE;
+    Data.SequenceState.Step                    := E_CycleStep.STEP_00_INIT;
+    Data.SequenceState.StepStr                 := 'INIT';
+    Data.SequenceState.StepAtFault             := E_CycleStep.STEP_00_INIT;
+    Data.SequenceState.OperatorActionId        := 0;
+    Data.SequenceState.OperatorAction          := '';
+    Data.SequenceState.ExpectedAxis            := E_OperatorAxis.NONE;
+    Data.SequenceState.ExpectedDirection       := 0;
+    Data.SequenceState.WaitingForOperator      := FALSE;
+    Data.SequenceState.WaitingForProcess       := FALSE;
+    Data.SequenceState.RequestActive           := FALSE;
+    Data.SequenceState.SpeedMismatchMps        := 0.0;
+    Data.SequenceState.SpeedMismatchActive     := FALSE;
+    Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
+END_IF;
 
 END_PROGRAM

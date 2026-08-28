@@ -121,9 +121,9 @@ instCycleSemiAuto(
 );
 
 CycleStep     := instCycleSemiAuto.CycleStep;
-CycleBusy     := instCycleSemiAuto.Busy;
-CycleDone     := instCycleSemiAuto.Done;
-CycleError    := instCycleSemiAuto.Error;
+CycleBusy     := instCycleSemiAuto.Lifecycle.Busy;
+CycleDone     := instCycleSemiAuto.Lifecycle.Done;
+CycleError    := instCycleSemiAuto.Fault.Error;
 CycleStateStr := instCycleSemiAuto.CycleStateStr;
 
 {endregion}

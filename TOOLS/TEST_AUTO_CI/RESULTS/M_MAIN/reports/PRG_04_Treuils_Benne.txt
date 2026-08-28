@@ -1,8 +1,26 @@
-STruC++ Test Runner v1.0
+Error compiling source files:
 
-test_prg_04_treuils_benne.st
-  [PASS] PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth
-  [PASS] PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)
+ST_AcquisitionNetworkDiagnostics.st:12:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
+  12 |     CanOpenMaster   : ST_Diag_Device; // 🔌 Diagnostic maître CANopen
+     |                       ^
 
------------------------------------------
-2 tests, 2 passed, 0 failed
+ST_AcquisitionNetworkDiagnostics.st:13:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
+  13 |     Joystick        : ST_Diag_Device; // 🕹️ Diagnostic esclave Joystick MCB560
+     |                       ^
+
+ST_AcquisitionNetworkDiagnostics.st:14:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
+  14 |     EthercatMaster  : ST_Diag_Device; // 🔌 Diagnostic maître EtherCAT
+     |                       ^
+
+ST_AcquisitionNetworkDiagnostics.st:15:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
+  15 |     EncoderM1       : ST_Diag_Device; // 🧲 Diagnostic esclave Codeur M1 (COD1)
+     |                       ^
+
+ST_AcquisitionNetworkDiagnostics.st:16:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
+  16 |     EncoderM2       : ST_Diag_Device; // 🧲 Diagnostic esclave Codeur M2 (COD2)
+     |                       ^
+
+ST_AcquisitionNetworkDiagnostics.st:17:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
+  17 |     DriveM3         : ST_Diag_Device; // ⚙️ Diagnostic esclave Variateur M3 (AC600)
+     |                       ^
+

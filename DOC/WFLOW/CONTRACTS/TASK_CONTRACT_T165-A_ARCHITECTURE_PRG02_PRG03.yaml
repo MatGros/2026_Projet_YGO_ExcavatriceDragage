@@ -60,7 +60,7 @@ execution:
     - "TASKS.yaml : YAML valide, zéro ID dupliqué, zéro dépendance absente"
     - "git diff --check : PASS"
 validation:
-  status: PENDING
-  validated_by: ""
-  validated_at: ""
-  notes: ""
+  status: VALIDATED
+  validated_by: "Humain & Orchestrateur"
+  validated_at: "2026-08-28T13:35:15+02:00"
+  notes: "Visa humain reçu sur D-01 (ArmingPermit stub documenté), D-05 (Ordre scan et fraîcheur) et intégration DataValid."

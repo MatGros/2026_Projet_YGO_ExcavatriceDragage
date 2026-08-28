@@ -1,14 +1,22 @@
 Error compiling source files:
 
-ST_AcquisitionInterPrg.st:15:31: error: Undefined type 'ST_ENCODERMEASUREMENTS' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  15 |     Encoders                : ST_EncoderMeasurements; // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
-     |                               ^
+ST_ChainCycleSemiAuto.st:34:40: error: Undefined type 'E_OPERATORAXIS' in STRUCT 'ST_CHAINCYCLESEMIAUTO'
+  34 |     Idx213_ExpectedAxis              : E_OperatorAxis; // Organe attendu (NONE, JOYSTICK_X, JOYSTICK_Y, BUTTON)
+     |                                        ^
 
-ST_JoystickHMI.st:13:13: error: Undefined type 'ST_FBJOYSTICK_CFG' in STRUCT 'ST_JOYSTICKHMI'
-  13 |     Cfg   : ST_fbJoystick_Cfg;
-     |             ^
+ST_AcquisitionInterPrg.st:18:36: error: Undefined type 'ST_ACQUISITIONJOYSTICKQUALIFIED' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  18 |     Joystick                     : ST_AcquisitionJoystickQualified;    // 🕹️ Données et commandes joystick qualifiées
+     |                                    ^
 
-ST_CommunHMI.st:54:18: error: Undefined type 'ST_FBENCODER_CFG' in STRUCT 'ST_COMMUNHMI'
-  54 |     EncoderCfg : ST_fbEncoder_Cfg; (* Réglage mode confirmation preset, ponté vers GVL_PERSISTENT *)
-     |                  ^
+ST_AcquisitionInterPrg.st:19:36: error: Undefined type 'ST_ACQUISITIONNETWORKDIAGNOSTICS' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  19 |     Network                      : ST_AcquisitionNetworkDiagnostics;  // 🔌 Diagnostics réseaux CANopen et EtherCAT
+     |                                    ^
+
+ST_AcquisitionInterPrg.st:20:36: error: Undefined type 'ST_ACQUISITIONENCODERQUALIFIED' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  20 |     EncoderM1                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M1 (Retenue)
+     |                                    ^
+
+ST_AcquisitionInterPrg.st:21:36: error: Undefined type 'ST_ACQUISITIONENCODERQUALIFIED' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  21 |     EncoderM2                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M2 (Benne)
+     |                                    ^
 

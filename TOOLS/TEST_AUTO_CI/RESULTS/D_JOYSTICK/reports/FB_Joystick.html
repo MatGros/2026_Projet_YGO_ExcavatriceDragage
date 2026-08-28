@@ -27,16 +27,13 @@
         --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
     }
     * { box-sizing: border-box; }
-    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
-    * { scrollbar-width: none; -ms-overflow-style: none; }
-    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
         background-color: var(--bg);
         background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
         background-size: 28px 28px;
         background-position: -1px -1px;
         color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
-    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .page { max-width: 1720px; width: 96%; margin: 0 auto; padding: 28px 16px 60px; }
     .header { display: flex; justify-content: space-between; align-items: center;
         margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
         border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
@@ -59,7 +56,7 @@
     .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
 
     details { margin-bottom: 20px; }
-    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: text; }
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -70,52 +67,163 @@
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
-    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
-    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
-    .checks-summary:hover { color: var(--text); }
-    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
-    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
-    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
+    .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: text; }
+    .checks-summary:hover { color: var(--accent); }
+    .checks-label { font-size: 12px; font-weight: 600; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 12px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
     .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
-    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
-        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
-    .failure-head { color: var(--red-text); font-weight: 600; }
-    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
-    .failure-msg { color: #92400e; margin-top: 4px; }
-    .failure-diff { margin-top: 4px; }
-    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    .scenario-list li { font-size: 12px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
+    .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
+    .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+    .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
+        border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
+    .failure-head { color: var(--red-text); font-weight: 700; font-size: 13.5px; }
+    .failure-loc { color: var(--muted); margin-top: 3px; font-size: 11.5px; font-family: monospace; }
+    .failure-msg { color: var(--text); margin-top: 6px; font-weight: 600; }
+    .failure-diff { margin-top: 8px; color: var(--text); font-size: 12.5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .failure-diff code { padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 12px; font-weight: 700; }
+    .failure-diff code.val-expected { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .failure-diff code.val-actual { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    [data-theme="light"] .failure-diff code.val-expected { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    [data-theme="light"] .failure-diff code.val-actual { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
     pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
         overflow-x: auto; }
-    .chronogram-group { margin-top: 12px; }
+    .chronogram-group { margin-top: 10px; }
     .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
         padding: 8px 12px; }
-    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
-    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
-    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
-    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
-    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
-    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
-    .chrono-table .scan-t { color: var(--muted); }
-    .chrono-table td.changed { background: #fef9c3; }
-    .v-true { color: var(--green-text); font-weight: 600; }
-    .v-false { color: #cbd5e1; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); user-select: text; }
+    .chrono-summary-inner { display: inline-flex; justify-content: space-between; align-items: center; width: calc(100% - 24px); margin-left: 6px; vertical-align: middle; }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border);
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
+    .chrono-scroll::-webkit-scrollbar, .wf-scroll::-webkit-scrollbar { display: block !important; height: 8px !important; width: 8px !important; }
+    .chrono-scroll::-webkit-scrollbar-track, .wf-scroll::-webkit-scrollbar-track { background: var(--surface-card); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb, .wf-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb:hover, .wf-scroll::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+    .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; table-layout: auto; }
+    .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; position: relative; }
+    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; cursor: pointer; user-select: text; transition: max-width 0.2s, min-width 0.2s, padding 0.2s; }
+    .chrono-table th:hover { color: var(--accent); }
+    .col-resizer { position: absolute; top: 0; right: 0; width: 5px; cursor: col-resize; user-select: none; height: 100%; z-index: 10; }
+    .col-resizer:hover, .col-resizer.resizing { background: var(--accent); }
+    .chrono-table th.col-collapsed,
+    .chrono-table td.col-collapsed {
+        max-width: 24px !important;
+        min-width: 24px !important;
+        width: 24px !important;
+        padding: 4px 1px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        opacity: 0.35 !important;
+        background: rgba(0, 0, 0, 0.25) !important;
+        color: transparent !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+        font-size: 0 !important;
+        position: relative;
+    }
+    .chrono-table th.col-collapsed {
+        cursor: pointer;
+        opacity: 0.75 !important;
+        background: rgba(129, 140, 248, 0.18) !important;
+    }
+    .chrono-table th.col-collapsed:hover {
+        opacity: 1 !important;
+        background: rgba(129, 140, 248, 0.38) !important;
+    }
+    .chrono-table th.col-collapsed::after {
+        content: "⋮";
+        font-size: 12px;
+        color: var(--accent);
+        display: block;
+        text-align: center;
+    }
+    /* Mode Titres Verticaux (Compact) */
+    .chrono-table.headers-vertical {
+        width: max-content !important;
+    }
+    .chrono-table.headers-vertical th.note-th,
+    .chrono-table.headers-vertical td.chrono-note-cell {
+        max-width: 280px !important;
+        width: 280px !important;
+    }
+    .chrono-table.headers-vertical th.var-th {
+        height: 155px;
+        vertical-align: bottom;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        max-width: 36px;
+        min-width: 30px;
+        width: 34px;
+    }
+    .chrono-table.headers-vertical th.var-th .th-content {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        display: inline-block;
+        white-space: nowrap;
+        text-align: left;
+        max-height: 135px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .chrono-table th .th-content {
+        display: inline-block;
+        pointer-events: auto;
+    }
+    .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
+    .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
+    [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
+    [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    .v-true { color: #34d399; font-weight: 700; }
+    .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
-        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+        border-radius: 8px; margin-top: 8px; padding: 4px 0;
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
     .waveform { display: block; }
-    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
-    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
-    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
-    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
-    .wf-line { fill: none; stroke-width: 2; }
-    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
-    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
-    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-grid { stroke: var(--border); stroke-width: 1; opacity: 0.6; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-scan { font-size: 9px; fill: var(--muted); opacity: 0.7; text-anchor: middle; font-family: monospace; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; font-weight: 600; }
+    .wf-label.wf-clickable { cursor: pointer; transition: fill 0.15s; }
+    .wf-label.wf-clickable:hover { fill: var(--accent); font-weight: 700; text-decoration: underline; }
+    .wf-label.active-curve { fill: #38bdf8; font-weight: 700; }
+    [data-theme="light"] .wf-label.active-curve { fill: #0284c7; }
+    .wf-line { fill: none; stroke-width: 2.2; }
+    .wf-num-line { stroke: var(--border); stroke-width: 1; }
+    .wf-num { font-size: 10.5px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-num-changed { font-size: 10.5px; fill: #ffffff; font-weight: 700; text-anchor: middle; font-family: monospace; }
     .wf-chip { opacity: 0.95; }
     .wf-legend { font-size: 10px; fill: var(--muted); }
-    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; font-family: monospace; font-weight: 600; }
+    [data-theme="light"] .wf-scale { fill: #64748b; }
+    .wf-tooltip {
+        position: fixed; pointer-events: none; z-index: 9999;
+        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
+        border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        border-radius: 8px; padding: 8px 12px; font-size: 11.5px; color: #f8fafc;
+        display: none; max-width: 320px; line-height: 1.4;
+    }
+    [data-theme="light"] .wf-tooltip {
+        background: rgba(255, 255, 255, 0.97); border-color: #cbd5e1;
+        color: #1e293b; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
+    [data-theme="light"] .wf-tt-head { color: #0284c7; }
+    .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
+    .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
+    .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
+    [data-theme="light"] .wf-tt-note { border-top-color: rgba(0, 0, 0, 0.1); }
     .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
         border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
     .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
@@ -123,7 +231,7 @@
     .af-warning-banner li { margin: 3px 0; }
     .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
-    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
@@ -193,7 +301,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-27 23:58:02</div>
+    <div class="exec-time">2026-08-28 13:42:32</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (11 tests)</summary>
@@ -463,10 +571,7 @@
     
     <details class="pin-diagram-details">
         <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 2 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ARMINGPERMITDENIED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li></ul>
-        </div>
+        
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired">
             <div class="pin-expr"><code title="TRUE" onclick="copyPinExpr(this)">TRUE</code></div>
@@ -506,33 +611,33 @@
             <div class="pin-name">NEUTRALYMEM<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_INT</span></div>
         </div></div>
             <div class="pin-block">FB_Joystick</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Joystick.Ready              := instJoystick.Ready;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Joystick.Ready              := instJoystick.Ready;</code></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Fault.Error;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Fault.Error;</code> <span class='pin-more'>(+1)</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Joystick.Fault              := instJoystick.Fault;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Joystick.Fault              := instJoystick.Fault;</code></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">AXISCMDX <span class="pin-type">ST_FBJOYSTICK_AXISCMD</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;</code> <span class='pin-more'>(+3)</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Joystick.AxisX              := instJoystick.AxisCmdX;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Joystick.AxisX              := instJoystick.AxisCmdX;</code> <span class='pin-more'>(+3)</span></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">AXISCMDY <span class="pin-type">ST_FBJOYSTICK_AXISCMD</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);</code> <span class='pin-more'>(+6)</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Joystick.AxisY              := instJoystick.AxisCmdY;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Joystick.AxisY              := instJoystick.AxisCmdY;</code> <span class='pin-more'>(+1)</span></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">DEADMANARMED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;</code></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Joystick.DeadmanArmed       := instJoystick.DeadmanArmed;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Joystick.DeadmanArmed       := instJoystick.DeadmanArmed;</code> <span class='pin-more'>(+1)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">ARMINGPERMITDENIED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Joystick.ArmingPermitDenied := instJoystick.ArmingPermitDenied;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Joystick.ArmingPermitDenied := instJoystick.ArmingPermitDenied;</code></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">ATNEUTRALXY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_03_Modes_Cycle.st: CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY," onclick="copyPinExpr(this)">M_MAIN/PRG_03_Modes_Cycle.st: CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutralXY,</code> <span class='pin-more'>(+6)</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Joystick.AtNeutralXY        := instJoystick.AtNeutralXY;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Joystick.AtNeutralXY        := instJoystick.AtNeutralXY;</code></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">NEUTRALXACT <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;</code></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Joystick.NeutralXAct        := instJoystick.NeutralXAct;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Joystick.NeutralXAct        := instJoystick.NeutralXAct;</code></div>
         </div><div class="pin-row pin-row-wired pin-row-out">
             <div class="pin-name">NEUTRALYACT <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;</code></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.Joystick.NeutralYAct        := instJoystick.NeutralYAct;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.Joystick.NeutralYAct        := instJoystick.NeutralYAct;</code></div>
         </div></div>
         </div>
     </details>
@@ -635,29 +740,18 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
-            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation initiale absolue, Ready=FALSE, sorties neutralisees</p><p class='comment'>Scan 1 : Front montant Enable=TRUE avec entrees au repos -&gt; Transition nominale prete</p><p class='comment'>Scan 2 : Front descendant Enable=FALSE -&gt; Coupure nette et re-neutralisation immediate</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (14)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=FALSE -&gt; Status.Error=FALSE (neutralise)</li><li>Enable=FALSE -&gt; Status.Warning=FALSE</li><li>Enable=FALSE -&gt; Sortie X neutralisee a 0</li><li>Enable=FALSE -&gt; Sortie Y neutralisee a 0</li><li>Enable=TRUE au repos -&gt; Ready=TRUE (nominal)</li><li>Au repos -&gt; Pas d erreur</li><li>Au repos -&gt; Pas de warning</li><li>Au repos -&gt; Sortie X a 0</li><li>Au repos -&gt; Sortie Y a 0</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li><li>Coupure -&gt; Pas d erreur parasite</li><li>Coupure -&gt; Sortie X maintenue a 0</li><li>Coupure -&gt; Sortie Y maintenue a 0</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Scan 0 : Enable=FALSE -&gt; Neutralisation initiale absolue, Ready=FALSE, sorties neutralisees</li><li>Scan 1 : Front montant Enable=TRUE avec entrees au repos -&gt; Transition nominale prete</li><li>Scan 2 : Front descendant Enable=FALSE -&gt; Coupure nette et re-neutralisation immediate</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (14)</span></summary>
+                <ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=FALSE -&gt; Status.Error=FALSE (neutralise)</li><li>Enable=FALSE -&gt; Status.Warning=FALSE</li><li>Enable=FALSE -&gt; Sortie X neutralisee a 0</li><li>Enable=FALSE -&gt; Sortie Y neutralisee a 0</li><li>Enable=TRUE au repos -&gt; Ready=TRUE (nominal)</li><li>Au repos -&gt; Pas d erreur</li><li>Au repos -&gt; Pas de warning</li><li>Au repos -&gt; Sortie X a 0</li><li>Au repos -&gt; Sortie Y a 0</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li><li>Coupure -&gt; Pas d erreur parasite</li><li>Coupure -&gt; Sortie X maintenue a 0</li><li>Coupure -&gt; Sortie Y maintenue a 0</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (3 scans, 7 variables actives)</summary>
-            <div class="wf-scroll"><svg width="388" height="372" viewBox="0 0 388 372" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="354" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="366" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="354" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="366" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="354" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="366" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">ENABLE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">RAWX</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="214.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">8000</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><rect x="270.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="284.0" y="117.0" class="wf-num-changed">5000</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><text x="340.0" y="116.0" class="wf-num">5000</text><text x="182" y="166.0" class="wf-label">RAWY</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="214.0" y="148.0" width="28" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">8000</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="270.0" y="148.0" width="28" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">5000</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><text x="340.0" y="156.0" class="wf-num">5000</text><text x="182" y="206.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,188L256,188L256,188L256,214L312,214L368,214" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">READY</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,254L256,254L256,254L256,228L312,228L312,228L312,254L368,254" class="wf-line" stroke="#0d9488"/><text x="182" y="286.0" class="wf-label">AXISCMDX.ENABLE</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><path d="M200,294L256,294L256,294L256,268L312,268L312,268L312,294L368,294" class="wf-line" stroke="#1d4ed8"/><text x="182" y="326.0" class="wf-label">AXISCMDY.ENABLE</text><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><path d="M200,334L256,334L256,334L256,308L312,308L312,308L312,334L368,334" class="wf-line" stroke="#2563eb"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (3 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>ENABLE</th><th>RAWX</th><th>RAWY</th><th>RAWBUTTON</th><th>READY</th><th>AXISCMDX.ENABLE</th><th>AXISCMDY.ENABLE</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td>8000</td><td>8000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>5000</td><td class='changed'>5000</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td>5000</td><td>5000</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (20)</summary>
-        <table class="static-table"><tbody><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ATNEUTRALXY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALYACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>5000</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>5000</td></tr><tr><td><code>CMDXVAL</code></td><td>0</td></tr><tr><td><code>CMDYVAL</code></td><td>0</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMPENDING</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         </div>
     </details>
@@ -671,302 +765,192 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour) </h3>
             </header>
-            <div class="comments"><p class='comment'>arme le geste au neutre, bus sain</p><p class='comment'>deplace le joystick : mouvement actif, bus toujours sain</p><p class='comment'>perte du bus CAN EN PLEIN MOUVEMENT : neutralisation immediate + desarmement</p><p class='comment'>bus revient : pas de rearmement automatique, nouvel appui conscient exige</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (19)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>mouvement actif : consigne non nulle (RawX=8000, Neutral=5000)</li><li>sens avant pendant le mouvement</li><li>RawY au neutre : axe Y reste a 0, aucun couplage entre les axes</li><li>axe Y au neutre : DirectionY=0</li><li>bus CAN non operationnel doit bloquer Ready</li><li>perte bus = Warning auto-efface, PAS un defaut a acquitter (socle FB_FbStatus)</li><li>perte de comm doit lever un Warning (liste de causes)</li><li>bit2 : HW/bus non operationnel porte par WarningId</li><li>sorties axe X neutralisees des la perte du bus, meme en plein mouvement</li><li>consigne X coupee immediatement, pas de decel progressive</li><li>sorties axe Y aussi neutralisees (gate global, pas seulement l axe en mouvement)</li><li>consigne Y aussi coupee</li><li>le geste est desarme par la perte du bus (AF08 TC-P08-001)</li><li>bus revenu : FB de nouveau pret</li><li>bus revenu : pas de defaut (bus = Warning, jamais un Fault a acquitter)</li><li>bus revenu : Warning auto-efface sans geste operateur</li><li>bit2 efface automatiquement</li><li>pas de rearmement automatique au retour du bus : nouvel appui conscient exige</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>arme le geste au neutre, bus sain</li><li>deplace le joystick : mouvement actif, bus toujours sain</li><li>perte du bus CAN EN PLEIN MOUVEMENT : neutralisation immediate + desarmement</li><li>bus revient : pas de rearmement automatique, nouvel appui conscient exige</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (19)</span></summary>
+                <ul class="checks-list"><li>precondition : geste arme</li><li>mouvement actif : consigne non nulle (RawX=8000, Neutral=5000)</li><li>sens avant pendant le mouvement</li><li>RawY au neutre : axe Y reste a 0, aucun couplage entre les axes</li><li>axe Y au neutre : DirectionY=0</li><li>bus CAN non operationnel doit bloquer Ready</li><li>perte bus = Warning auto-efface, PAS un defaut a acquitter (socle FB_FbStatus)</li><li>perte de comm doit lever un Warning (liste de causes)</li><li>bit2 : HW/bus non operationnel porte par WarningId</li><li>sorties axe X neutralisees des la perte du bus, meme en plein mouvement</li><li>consigne X coupee immediatement, pas de decel progressive</li><li>sorties axe Y aussi neutralisees (gate global, pas seulement l axe en mouvement)</li><li>consigne Y aussi coupee</li><li>le geste est desarme par la perte du bus (AF08 TC-P08-001)</li><li>bus revenu : FB de nouveau pret</li><li>bus revenu : pas de defaut (bus = Warning, jamais un Fault a acquitter)</li><li>bus revenu : Warning auto-efface sans geste operateur</li><li>bit2 efface automatiquement</li><li>pas de rearmement automatique au retour du bus : nouvel appui conscient exige</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (5 scans, 12 variables actives)</summary>
-            <div class="wf-scroll"><svg width="500" height="572" viewBox="0 0 500 572" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="554" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="566" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="554" class="wf-grid"/><text x="284.0" y="52" class="wf-time">110ms</text><text x="284.0" y="566" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="554" class="wf-grid"/><text x="340.0" y="52" class="wf-time">120ms</text><text x="340.0" y="566" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="554" class="wf-grid"/><text x="396.0" y="52" class="wf-time">130ms</text><text x="396.0" y="566" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="554" class="wf-grid"/><text x="452.0" y="52" class="wf-time">140ms</text><text x="452.0" y="566" class="wf-scan">#4</text><text x="182" y="86.0" class="wf-label">BUSCANOPENOP.ONLINE</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L312,68L368,68L368,68L368,94L424,94L424,94L424,68L480,68" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">RAWX</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="214.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">5000</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">5000</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><rect x="326.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="340.0" y="117.0" class="wf-num-changed">8000</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><text x="396.0" y="116.0" class="wf-num">8000</text><line x1="424" y1="122.0" x2="480" y2="122.0" class="wf-num-line"/><rect x="438.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="452.0" y="117.0" class="wf-num-changed">5000</text><text x="182" y="166.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L312,148L312,148L312,174L368,174L424,174L480,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">READY</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,188L256,188L312,188L368,188L368,188L368,214L424,214L424,214L424,188L480,188" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">FAULT.ERROR</text><circle cx="192" cy="242.0" r="4" fill="#dc2626"/><path d="M200,254L256,254L312,254L368,254L368,254L368,228L424,228L424,228L424,254L480,254" class="wf-line" stroke="#dc2626"/><text x="182" y="286.0" class="wf-label">AXISCMDX.ENABLE</text><circle cx="192" cy="282.0" r="4" fill="#0d9488"/><path d="M200,268L256,268L312,268L368,268L368,268L368,294L424,294L424,294L424,268L480,268" class="wf-line" stroke="#0d9488"/><text x="182" y="326.0" class="wf-label">AXISCMDY.ENABLE</text><circle cx="192" cy="322.0" r="4" fill="#1d4ed8"/><path d="M200,308L256,308L312,308L368,308L368,308L368,334L424,334L424,334L424,308L480,308" class="wf-line" stroke="#1d4ed8"/><text x="182" y="366.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="362.0" r="4" fill="#2563eb"/><path d="M200,374L256,374L256,374L256,348L312,348L368,348L368,348L368,374L424,374L480,374" class="wf-line" stroke="#2563eb"/><text x="182" y="406.0" class="wf-label">ATNEUTRALXY</text><circle cx="192" cy="402.0" r="4" fill="#059669"/><path d="M200,388L256,388L312,388L312,388L312,414L368,414L368,414L368,388L424,388L480,388" class="wf-line" stroke="#059669"/><text x="182" y="446.0" class="wf-label">CMDXVAL</text><circle cx="192" cy="442.0" r="4" fill="#0891b2"/><line x1="200" y1="442.0" x2="256" y2="442.0" class="wf-num-line"/><rect x="219.0" y="428.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="437.0" class="wf-num-changed">0</text><line x1="256" y1="442.0" x2="312" y2="442.0" class="wf-num-line"/><text x="284.0" y="436.0" class="wf-num">0</text><line x1="312" y1="442.0" x2="368" y2="442.0" class="wf-num-line"/><rect x="331.0" y="428.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="340.0" y="437.0" class="wf-num-changed">60</text><line x1="368" y1="442.0" x2="424" y2="442.0" class="wf-num-line"/><text x="396.0" y="436.0" class="wf-num">60</text><line x1="424" y1="442.0" x2="480" y2="442.0" class="wf-num-line"/><rect x="443.0" y="428.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="452.0" y="437.0" class="wf-num-changed">0</text><text x="182" y="486.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="482.0" r="4" fill="#65a30d"/><path d="M200,468L256,468L256,468L256,494L312,494L368,494L424,494L480,494" class="wf-line" stroke="#65a30d"/><text x="182" y="526.0" class="wf-label">BUSLOST</text><circle cx="192" cy="522.0" r="4" fill="#0d9488"/><path d="M200,534L256,534L312,534L368,534L368,534L368,508L424,508L424,508L424,534L480,534" class="wf-line" stroke="#0d9488"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (5 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>BUSCANOPENOP.ONLINE</th><th>RAWX</th><th>RAWBUTTON</th><th>READY</th><th>FAULT.ERROR</th><th>AXISCMDX.ENABLE</th><th>AXISCMDY.ENABLE</th><th>DEADMANARMED</th><th>ATNEUTRALXY</th><th>CMDXVAL</th><th>DEADMANARMPENDING</th><th>BUSLOST</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td>5000</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td>0</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>110 ms</td><td><span class="v-true">TRUE</span></td><td>5000</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td>0</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>120 ms</td><td><span class="v-true">TRUE</span></td><td class='changed'>8000</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>60</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>130 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td>8000</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td>60</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>140 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>5000</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'>0</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (15)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RAWY</code></td><td>5000</td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALYACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>5000</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>5000</td></tr><tr><td><code>CMDYVAL</code></td><td>0</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         <article id="test-fb-joystick-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant </h3>
             </header>
-            <div class="comments"><p class='comment'>baseline : neutre, bouton relache</p><p class='comment'>front bouton : demarre le maintien, pas encore arme</p><p class='comment'>50ms plus tard : maintien pas termine -- l operateur bouge DEJA l axe X seul (Y reste
-       neutre) pendant l attente : aucune commande ne doit partir tant que ce n est pas arme</p><p class='comment'>20ms de plus (toujours &lt; 100ms) : cette fois l axe Y seul est pousse (X revient au
-       neutre) -- meme preuve, isolee sur l autre axe</p><p class='comment'>relache a 50ms, avant la fin des 100ms de maintien : annule la tentative</p><p class='comment'>le bouton reste relache PENDANT 1s ENTIERE, manche pousse a fond (RawX=8000) tout du
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (7)</span></summary>
+                <ul class="scenario-list"><li>baseline : neutre, bouton relache</li><li>front bouton : demarre le maintien, pas encore arme</li><li>50ms plus tard : maintien pas termine -- l operateur bouge DEJA l axe X seul (Y reste
+       neutre) pendant l attente : aucune commande ne doit partir tant que ce n est pas arme</li><li>20ms de plus (toujours &lt; 100ms) : cette fois l axe Y seul est pousse (X revient au
+       neutre) -- meme preuve, isolee sur l autre axe</li><li>relache a 50ms, avant la fin des 100ms de maintien : annule la tentative</li><li>le bouton reste relache PENDANT 1s ENTIERE, manche pousse a fond (RawX=8000) tout du
        long : aucun armement differe, et surtout aucune commande de mouvement ne demarre,
-       meme apres une longue attente sur une position hors neutre</p><p class='comment'>nouveau front + maintien complet (110ms) : l armement redevient possible normalement</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (12)</span></summary><ul class="checks-list"><li>baseline : bouton relache, pas arme</li><li>front bouton seul ne doit pas armer immediatement (maintien requis)</li><li>50ms &lt; DeadmanArmHoldTime (100ms) : pas encore arme</li><li>consigne interne X (CmdXVal) forcee a 0 : pas encore arme</li><li>axe X seul pousse (RawX=8000, RawY neutre) mais pas encore arme : aucune commande ne part</li><li>70ms &lt; DeadmanArmHoldTime (100ms) : toujours pas arme</li><li>consigne interne Y (CmdYVal) forcee a 0 : pas encore arme</li><li>axe Y seul pousse (RawY=2000, RawX neutre) mais pas encore arme : aucune commande ne part</li><li>relachement avant la fin du maintien annule la tentative</li><li>pas d armement differe sur une tentative deja annulee, meme apres 1s (nouvel appui conscient exige)</li><li>manche a fond depuis 1s mais jamais arme : toujours aucune commande de mouvement</li><li>110ms &gt;= DeadmanArmHoldTime (100ms) : geste arme</li></ul></details>
+       meme apres une longue attente sur une position hors neutre</li><li>nouveau front + maintien complet (110ms) : l armement redevient possible normalement</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (12)</span></summary>
+                <ul class="checks-list"><li>baseline : bouton relache, pas arme</li><li>front bouton seul ne doit pas armer immediatement (maintien requis)</li><li>50ms &lt; DeadmanArmHoldTime (100ms) : pas encore arme</li><li>consigne interne X (CmdXVal) forcee a 0 : pas encore arme</li><li>axe X seul pousse (RawX=8000, RawY neutre) mais pas encore arme : aucune commande ne part</li><li>70ms &lt; DeadmanArmHoldTime (100ms) : toujours pas arme</li><li>consigne interne Y (CmdYVal) forcee a 0 : pas encore arme</li><li>axe Y seul pousse (RawY=2000, RawX neutre) mais pas encore arme : aucune commande ne part</li><li>relachement avant la fin du maintien annule la tentative</li><li>pas d armement differe sur une tentative deja annulee, meme apres 1s (nouvel appui conscient exige)</li><li>manche a fond depuis 1s mais jamais arme : toujours aucune commande de mouvement</li><li>110ms &gt;= DeadmanArmHoldTime (100ms) : geste arme</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (8 scans, 7 variables actives)</summary>
-            <div class="wf-scroll"><svg width="668" height="372" viewBox="0 0 668 372" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="354" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="366" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="354" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="366" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="354" class="wf-grid"/><text x="340.0" y="52" class="wf-time">50ms</text><text x="340.0" y="366" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="354" class="wf-grid"/><text x="396.0" y="52" class="wf-time">70ms</text><text x="396.0" y="366" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="354" class="wf-grid"/><text x="452.0" y="52" class="wf-time">80ms</text><text x="452.0" y="366" class="wf-scan">#4</text><line x1="480" y1="56" x2="480" y2="354" class="wf-grid"/><text x="508.0" y="52" class="wf-time">1070ms</text><text x="508.0" y="366" class="wf-scan">#5</text><line x1="536" y1="56" x2="536" y2="354" class="wf-grid"/><text x="564.0" y="52" class="wf-time">1080ms</text><text x="564.0" y="366" class="wf-scan">#6</text><line x1="592" y1="56" x2="592" y2="354" class="wf-grid"/><text x="620.0" y="52" class="wf-time">1190ms</text><text x="620.0" y="366" class="wf-scan">#7</text><text x="182" y="86.0" class="wf-label">RAWX</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="214.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5000</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><text x="284.0" y="76.0" class="wf-num">5000</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="326.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">8000</text><line x1="368" y1="82.0" x2="424" y2="82.0" class="wf-num-line"/><rect x="382.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="77.0" class="wf-num-changed">5000</text><line x1="424" y1="82.0" x2="480" y2="82.0" class="wf-num-line"/><text x="452.0" y="76.0" class="wf-num">5000</text><line x1="480" y1="82.0" x2="536" y2="82.0" class="wf-num-line"/><rect x="494.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="508.0" y="77.0" class="wf-num-changed">8000</text><line x1="536" y1="82.0" x2="592" y2="82.0" class="wf-num-line"/><rect x="550.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="564.0" y="77.0" class="wf-num-changed">5000</text><line x1="592" y1="82.0" x2="648" y2="82.0" class="wf-num-line"/><text x="620.0" y="76.0" class="wf-num">5000</text><text x="182" y="126.0" class="wf-label">RAWY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="214.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">5000</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">5000</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><text x="340.0" y="116.0" class="wf-num">5000</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><rect x="382.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="396.0" y="117.0" class="wf-num-changed">2000</text><line x1="424" y1="122.0" x2="480" y2="122.0" class="wf-num-line"/><rect x="438.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="452.0" y="117.0" class="wf-num-changed">5000</text><line x1="480" y1="122.0" x2="536" y2="122.0" class="wf-num-line"/><text x="508.0" y="116.0" class="wf-num">5000</text><line x1="536" y1="122.0" x2="592" y2="122.0" class="wf-num-line"/><text x="564.0" y="116.0" class="wf-num">5000</text><line x1="592" y1="122.0" x2="648" y2="122.0" class="wf-num-line"/><text x="620.0" y="116.0" class="wf-num">5000</text><text x="182" y="166.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,174L256,174L256,174L256,148L312,148L368,148L424,148L424,148L424,174L480,174L536,174L536,174L536,148L592,148L648,148" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L312,214L368,214L424,214L480,214L536,214L592,214L592,214L592,188L648,188" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">CMDXVAL</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><line x1="200" y1="242.0" x2="256" y2="242.0" class="wf-num-line"/><rect x="219.0" y="228.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="228.0" y="237.0" class="wf-num-changed">0</text><line x1="256" y1="242.0" x2="312" y2="242.0" class="wf-num-line"/><text x="284.0" y="236.0" class="wf-num">0</text><line x1="312" y1="242.0" x2="368" y2="242.0" class="wf-num-line"/><text x="340.0" y="236.0" class="wf-num">0</text><line x1="368" y1="242.0" x2="424" y2="242.0" class="wf-num-line"/><text x="396.0" y="236.0" class="wf-num">0</text><line x1="424" y1="242.0" x2="480" y2="242.0" class="wf-num-line"/><text x="452.0" y="236.0" class="wf-num">0</text><line x1="480" y1="242.0" x2="536" y2="242.0" class="wf-num-line"/><text x="508.0" y="236.0" class="wf-num">0</text><line x1="536" y1="242.0" x2="592" y2="242.0" class="wf-num-line"/><text x="564.0" y="236.0" class="wf-num">0</text><line x1="592" y1="242.0" x2="648" y2="242.0" class="wf-num-line"/><rect x="611.0" y="228.0" width="18" height="13" rx="3" fill="#0d9488" class="wf-chip"/><text x="620.0" y="237.0" class="wf-num-changed">50</text><text x="182" y="286.0" class="wf-label">CMDYVAL</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><line x1="200" y1="282.0" x2="256" y2="282.0" class="wf-num-line"/><rect x="219.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="228.0" y="277.0" class="wf-num-changed">0</text><line x1="256" y1="282.0" x2="312" y2="282.0" class="wf-num-line"/><text x="284.0" y="276.0" class="wf-num">0</text><line x1="312" y1="282.0" x2="368" y2="282.0" class="wf-num-line"/><text x="340.0" y="276.0" class="wf-num">0</text><line x1="368" y1="282.0" x2="424" y2="282.0" class="wf-num-line"/><text x="396.0" y="276.0" class="wf-num">0</text><line x1="424" y1="282.0" x2="480" y2="282.0" class="wf-num-line"/><text x="452.0" y="276.0" class="wf-num">0</text><line x1="480" y1="282.0" x2="536" y2="282.0" class="wf-num-line"/><text x="508.0" y="276.0" class="wf-num">0</text><line x1="536" y1="282.0" x2="592" y2="282.0" class="wf-num-line"/><text x="564.0" y="276.0" class="wf-num">0</text><line x1="592" y1="282.0" x2="648" y2="282.0" class="wf-num-line"/><rect x="611.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="620.0" y="277.0" class="wf-num-changed">50</text><text x="182" y="326.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><path d="M200,334L256,334L256,334L256,308L312,308L368,308L424,308L424,308L424,334L480,334L536,334L536,334L536,308L592,308L592,308L592,334L648,334" class="wf-line" stroke="#2563eb"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (8 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>RAWX</th><th>RAWY</th><th>RAWBUTTON</th><th>DEADMANARMED</th><th>CMDXVAL</th><th>CMDYVAL</th><th>DEADMANARMPENDING</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>5000</td><td>5000</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td>5000</td><td>5000</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>50 ms</td><td class='changed'>8000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>70 ms</td><td class='changed'>5000</td><td class='changed'>2000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>80 ms</td><td>5000</td><td class='changed'>5000</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#5</td><td class='scan-t'>1070 ms</td><td class='changed'>8000</td><td>5000</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#6</td><td class='scan-t'>1080 ms</td><td class='changed'>5000</td><td>5000</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#7</td><td class='scan-t'>1190 ms</td><td>5000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>50</td><td class='changed'>50</td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (20)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AXISCMDX.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AXISCMDY.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ATNEUTRALXY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>0</td></tr><tr><td><code>NEUTRALYACT</code></td><td>0</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>0</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>0</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         <article id="test-fb-joystick-3" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-003 Zone morte joystick (Deadband) : signal dans la plage neutre +/- DeadbandRaw donne consigne nulle </h3>
             </header>
-            <div class="comments"><p class='comment'>Arme le geste avec le manche au neutre</p><p class='comment'>Test dans la zone morte superieure : RawX = 5150 (neutre 5000 + 150 &lt; 300)</p><p class='comment'>Test dans la zone morte inferieure : RawY = 4850 (neutre 5000 - 150 &gt; -300)</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>Geste arme au neutre</li><li>RawX=5150 dans deadband (300) : consigne X strictement 0.0</li><li>RawX dans deadband : DirectionX=0</li><li>Signal dans deadband : considere au neutre</li><li>RawY=4850 dans deadband (300) : consigne Y strictement 0.0</li><li>RawY dans deadband : DirectionY=0</li><li>Signal dans deadband : considere au neutre</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Arme le geste avec le manche au neutre</li><li>Test dans la zone morte superieure : RawX = 5150 (neutre 5000 + 150 &lt; 300)</li><li>Test dans la zone morte inferieure : RawY = 4850 (neutre 5000 - 150 &gt; -300)</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary>
+                <ul class="checks-list"><li>Geste arme au neutre</li><li>RawX=5150 dans deadband (300) : consigne X strictement 0.0</li><li>RawX dans deadband : DirectionX=0</li><li>Signal dans deadband : considere au neutre</li><li>RawY=4850 dans deadband (300) : consigne Y strictement 0.0</li><li>RawY dans deadband : DirectionY=0</li><li>Signal dans deadband : considere au neutre</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (4 scans, 5 variables actives)</summary>
-            <div class="wf-scroll"><svg width="444" height="292" viewBox="0 0 444 292" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="274" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="286" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="274" class="wf-grid"/><text x="284.0" y="52" class="wf-time">110ms</text><text x="284.0" y="286" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="274" class="wf-grid"/><text x="340.0" y="52" class="wf-time">120ms</text><text x="340.0" y="286" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="274" class="wf-grid"/><text x="396.0" y="52" class="wf-time">130ms</text><text x="396.0" y="286" class="wf-scan">#3</text><text x="182" y="86.0" class="wf-label">RAWX</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="214.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5000</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><text x="284.0" y="76.0" class="wf-num">5000</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="326.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">5150</text><line x1="368" y1="82.0" x2="424" y2="82.0" class="wf-num-line"/><rect x="382.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="77.0" class="wf-num-changed">5000</text><text x="182" y="126.0" class="wf-label">RAWY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="214.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">5000</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">5000</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><text x="340.0" y="116.0" class="wf-num">5000</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><rect x="382.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="396.0" y="117.0" class="wf-num-changed">4850</text><text x="182" y="166.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L312,148L312,148L312,174L368,174L424,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L256,214L256,188L312,188L368,188L424,188" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,228L256,228L256,228L256,254L312,254L368,254L424,254" class="wf-line" stroke="#0d9488"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (4 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>RAWX</th><th>RAWY</th><th>RAWBUTTON</th><th>DEADMANARMED</th><th>DEADMANARMPENDING</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>5000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>110 ms</td><td>5000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>120 ms</td><td class='changed'>5150</td><td>5000</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>130 ms</td><td class='changed'>5000</td><td class='changed'>4850</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (22)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AXISCMDX.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AXISCMDY.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ATNEUTRALXY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALYACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>5000</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>5000</td></tr><tr><td><code>CMDXVAL</code></td><td>0</td></tr><tr><td><code>CMDYVAL</code></td><td>0</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         <article id="test-fb-joystick-4" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace </h3>
             </header>
-            <div class="comments"><p class='comment'>nx/ny fixes explicitement a 5000 avant CHAQUE appel : STruCpp ne re-copie PAS la sortie
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
+                <ul class="scenario-list"><li>nx/ny fixes explicitement a 5000 avant CHAQUE appel : STruCpp ne re-copie PAS la sortie
        VAR_IN_OUT vers la variable de test entre deux appels fb() (limite outillage constatee,
        round-trip IN_OUT absent -- cf. README). Sans ce forcage, NeutralXMem retomberait a 0
-       (valeur SETUP jamais appliquee non plus) des le 2e scan, et AtNeutral resterait FALSE.</p><p class='comment'>arme le geste au neutre</p><p class='comment'>bouton relache, reste au neutre : 500ms plus tard (largement &gt; NeutralHoldTime seul 100ms) mais &lt; grace (3s)</p><p class='comment'>2.6s de plus (total 3.1s depuis l armement) : la grace vient de s ecouler ce scan meme --
-       NeutralHoldTimer ne fait que DEMARRER (son IN passe a TRUE ce scan), pas encore Q</p><p class='comment'>100ms de plus (NeutralHoldTime ecoule depuis la fin de la grace) : desarme</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>la grace (3s) protege l armement malgre un neutre deja tenu bien plus longtemps que NeutralHoldTime seul (evite le REX terrain : desarmement 100-200ms apres l armement)</li><li>grace tout juste ecoulee : NeutralHoldTimer demarre seulement ce scan (pas encore ecoule)</li><li>grace ecoulee (3s) + neutre tenu (NeutralHoldTime) : desarmement</li></ul></details>
+       (valeur SETUP jamais appliquee non plus) des le 2e scan, et AtNeutral resterait FALSE.</li><li>arme le geste au neutre</li><li>bouton relache, reste au neutre : 500ms plus tard (largement &gt; NeutralHoldTime seul 100ms) mais &lt; grace (3s)</li><li>2.6s de plus (total 3.1s depuis l armement) : la grace vient de s ecouler ce scan meme --
+       NeutralHoldTimer ne fait que DEMARRER (son IN passe a TRUE ce scan), pas encore Q</li><li>100ms de plus (NeutralHoldTime ecoule depuis la fin de la grace) : desarme</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>precondition : geste arme</li><li>la grace (3s) protege l armement malgre un neutre deja tenu bien plus longtemps que NeutralHoldTime seul (evite le REX terrain : desarmement 100-200ms apres l armement)</li><li>grace tout juste ecoulee : NeutralHoldTimer demarre seulement ce scan (pas encore ecoule)</li><li>grace ecoulee (3s) + neutre tenu (NeutralHoldTime) : desarmement</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (5 scans, 3 variables actives)</summary>
-            <div class="wf-scroll"><svg width="500" height="212" viewBox="0 0 500 212" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="194" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="206" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="194" class="wf-grid"/><text x="284.0" y="52" class="wf-time">110ms</text><text x="284.0" y="206" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="194" class="wf-grid"/><text x="340.0" y="52" class="wf-time">610ms</text><text x="340.0" y="206" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="194" class="wf-grid"/><text x="396.0" y="52" class="wf-time">3210ms</text><text x="396.0" y="206" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="194" class="wf-grid"/><text x="452.0" y="52" class="wf-time">3310ms</text><text x="452.0" y="206" class="wf-scan">#4</text><text x="182" y="86.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L312,68L312,68L312,94L368,94L424,94L480,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L368,108L424,108L424,108L424,134L480,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L256,148L256,174L312,174L368,174L424,174L480,174" class="wf-line" stroke="#0891b2"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (5 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>RAWBUTTON</th><th>DEADMANARMED</th><th>DEADMANARMPENDING</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>110 ms</td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>610 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>3210 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>3310 ms</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (24)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RAWX</code></td><td>5000</td></tr><tr><td><code>RAWY</code></td><td>5000</td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AXISCMDX.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AXISCMDY.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ATNEUTRALXY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALYACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>5000</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>5000</td></tr><tr><td><code>CMDXVAL</code></td><td>0</td></tr><tr><td><code>CMDYVAL</code></td><td>0</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         <article id="test-fb-joystick-5" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-005 Changement de mode desarme le geste, nouvel appui exige </h3>
             </header>
-            <div class="comments"><p class='comment'>arme en MAINT_N1</p><p class='comment'>désarmement externe (ex. changement de mode, fin benne) : ArmingPermit tombe à FALSE</p><p class='comment'>ArmingPermit reste FALSE, sans nouvel appui : reste desarme</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>ArmingPermit=FALSE desarme immediatement (désarmement externe, ex. changement de mode)</li><li>pas de rearmement automatique tant que ArmingPermit=FALSE : nouvel appui conscient + permission exigee</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>arme en MAINT_N1</li><li>désarmement externe (ex. changement de mode, fin benne) : ArmingPermit tombe à FALSE</li><li>ArmingPermit reste FALSE, sans nouvel appui : reste desarme</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>precondition : geste arme</li><li>ArmingPermit=FALSE desarme immediatement (désarmement externe, ex. changement de mode)</li><li>pas de rearmement automatique tant que ArmingPermit=FALSE : nouvel appui conscient + permission exigee</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (4 scans, 8 variables actives)</summary>
-            <div class="wf-scroll"><svg width="444" height="412" viewBox="0 0 444 412" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="394" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="406" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="394" class="wf-grid"/><text x="284.0" y="52" class="wf-time">110ms</text><text x="284.0" y="406" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="394" class="wf-grid"/><text x="340.0" y="52" class="wf-time">120ms</text><text x="340.0" y="406" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="394" class="wf-grid"/><text x="396.0" y="52" class="wf-time">130ms</text><text x="396.0" y="406" class="wf-scan">#3</text><text x="182" y="86.0" class="wf-label">ARMINGPERMIT</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L312,68L312,68L312,94L368,94L424,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,108L256,108L312,108L312,108L312,134L368,134L424,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">AXISCMDX.ENABLE</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L312,148L312,148L312,174L368,174L424,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">AXISCMDY.ENABLE</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,188L256,188L312,188L312,188L312,214L368,214L424,214" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,254L256,254L256,254L256,228L312,228L312,228L312,254L368,254L424,254" class="wf-line" stroke="#0d9488"/><text x="182" y="286.0" class="wf-label">CMDXVAL</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><line x1="200" y1="282.0" x2="256" y2="282.0" class="wf-num-line"/><rect x="219.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="228.0" y="277.0" class="wf-num-changed">0</text><line x1="256" y1="282.0" x2="312" y2="282.0" class="wf-num-line"/><rect x="275.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="284.0" y="277.0" class="wf-num-changed">50</text><line x1="312" y1="282.0" x2="368" y2="282.0" class="wf-num-line"/><rect x="331.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="340.0" y="277.0" class="wf-num-changed">0</text><line x1="368" y1="282.0" x2="424" y2="282.0" class="wf-num-line"/><text x="396.0" y="276.0" class="wf-num">0</text><text x="182" y="326.0" class="wf-label">CMDYVAL</text><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="219.0" y="308.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">0</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><rect x="275.0" y="308.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="284.0" y="317.0" class="wf-num-changed">50</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><rect x="331.0" y="308.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="317.0" class="wf-num-changed">0</text><line x1="368" y1="322.0" x2="424" y2="322.0" class="wf-num-line"/><text x="396.0" y="316.0" class="wf-num">0</text><text x="182" y="366.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="362.0" r="4" fill="#059669"/><path d="M200,348L256,348L256,348L256,374L312,374L368,374L424,374" class="wf-line" stroke="#059669"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (4 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>ARMINGPERMIT</th><th>RAWBUTTON</th><th>AXISCMDX.ENABLE</th><th>AXISCMDY.ENABLE</th><th>DEADMANARMED</th><th>CMDXVAL</th><th>CMDYVAL</th><th>DEADMANARMPENDING</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>110 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>50</td><td class='changed'>50</td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>120 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td><td class='changed'>0</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>130 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (19)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RAWX</code></td><td>5000</td></tr><tr><td><code>RAWY</code></td><td>5000</td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ATNEUTRALXY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>0</td></tr><tr><td><code>NEUTRALYACT</code></td><td>0</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>0</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>0</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         <article id="test-fb-joystick-6" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu </h3>
             </header>
-            <div class="comments"><p class='comment'>RawX/RawY hors zone neutre valide (2000..8000) + front BtnCalibrate</p><p class='comment'>Reset alors que la cause est toujours presente (axes toujours hors zone) : ne doit PAS acquitter</p><p class='comment'>Reset retombe (front consomme) ; axes reviennent en zone ; nouveau front Reset : doit acquitter</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>calibration hors zone doit lever Error</li><li>Reset ne doit PAS acquitter tant que les axes restent hors zone (cause toujours presente)</li><li>front Reset avec axes revenus en zone valide doit acquitter (cause disparue + appui conscient)</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>RawX/RawY hors zone neutre valide (2000..8000) + front BtnCalibrate</li><li>Reset alors que la cause est toujours presente (axes toujours hors zone) : ne doit PAS acquitter</li><li>Reset retombe (front consomme) ; axes reviennent en zone ; nouveau front Reset : doit acquitter</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>calibration hors zone doit lever Error</li><li>Reset ne doit PAS acquitter tant que les axes restent hors zone (cause toujours presente)</li><li>front Reset avec axes revenus en zone valide doit acquitter (cause disparue + appui conscient)</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (5 scans, 8 variables actives)</summary>
-            <div class="wf-scroll"><svg width="500" height="412" viewBox="0 0 500 412" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="394" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="406" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="394" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="406" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="394" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="406" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="394" class="wf-grid"/><text x="396.0" y="52" class="wf-time">30ms</text><text x="396.0" y="406" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="394" class="wf-grid"/><text x="452.0" y="52" class="wf-time">40ms</text><text x="452.0" y="406" class="wf-scan">#4</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L312,94L312,68L368,68L368,68L368,94L424,94L424,94L424,68L480,68" class="wf-line" stroke="#111827"/><text x="182" y="126.0" class="wf-label">RAWX</text><circle cx="192" cy="122.0" r="4" fill="#2563eb"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="214.0" y="108.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">9500</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">9500</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><text x="340.0" y="116.0" class="wf-num">9500</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><rect x="382.0" y="108.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="117.0" class="wf-num-changed">5000</text><line x1="424" y1="122.0" x2="480" y2="122.0" class="wf-num-line"/><text x="452.0" y="116.0" class="wf-num">5000</text><text x="182" y="166.0" class="wf-label">RAWY</text><circle cx="192" cy="162.0" r="4" fill="#059669"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="214.0" y="148.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">9500</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><text x="284.0" y="156.0" class="wf-num">9500</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><text x="340.0" y="156.0" class="wf-num">9500</text><line x1="368" y1="162.0" x2="424" y2="162.0" class="wf-num-line"/><rect x="382.0" y="148.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="396.0" y="157.0" class="wf-num-changed">5000</text><line x1="424" y1="162.0" x2="480" y2="162.0" class="wf-num-line"/><text x="452.0" y="156.0" class="wf-num">5000</text><text x="182" y="206.0" class="wf-label">CALIBRATE</text><circle cx="192" cy="202.0" r="4" fill="#0891b2"/><path d="M200,214L256,214L256,214L256,188L312,188L312,188L312,214L368,214L424,214L480,214" class="wf-line" stroke="#0891b2"/><text x="182" y="246.0" class="wf-label">READY</text><circle cx="192" cy="242.0" r="4" fill="#65a30d"/><path d="M200,228L256,228L256,228L256,254L312,254L368,254L424,254L424,254L424,228L480,228" class="wf-line" stroke="#65a30d"/><text x="182" y="286.0" class="wf-label">FAULT.ERROR</text><circle cx="192" cy="282.0" r="4" fill="#dc2626"/><path d="M200,294L256,294L256,294L256,268L312,268L368,268L424,268L424,268L424,294L480,294" class="wf-line" stroke="#dc2626"/><text x="182" y="326.0" class="wf-label">LASTCALIBRATE</text><circle cx="192" cy="322.0" r="4" fill="#0d9488"/><path d="M200,334L256,334L256,334L256,308L312,308L312,308L312,334L368,334L424,334L480,334" class="wf-line" stroke="#0d9488"/><text x="182" y="366.0" class="wf-label">CALIBFAIL</text><circle cx="192" cy="362.0" r="4" fill="#b91c1c"/><path d="M200,374L256,374L256,374L256,348L312,348L368,348L424,348L424,348L424,374L480,374" class="wf-line" stroke="#b91c1c"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (5 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th><th>RAWX</th><th>RAWY</th><th>CALIBRATE</th><th>READY</th><th>FAULT.ERROR</th><th>LASTCALIBRATE</th><th>CALIBFAIL</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td>9500</td><td>9500</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td><span class="v-false">FALSE</span></td><td>9500</td><td>9500</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td>9500</td><td>9500</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>30 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>5000</td><td class='changed'>5000</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>40 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td>5000</td><td>5000</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (19)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RAWBUTTON</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AXISCMDX.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AXISCMDY.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ATNEUTRALXY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>0</td></tr><tr><td><code>NEUTRALYACT</code></td><td>0</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>0</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>0</td></tr><tr><td><code>CMDXVAL</code></td><td>0</td></tr><tr><td><code>CMDYVAL</code></td><td>0</td></tr><tr><td><code>DEADMANARMPENDING</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         <article id="test-fb-joystick-7" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur) </h3>
             </header>
-            <div class="comments"><p class='comment'>init explicite -- STruCpp n applique pas &quot;:= 5000&quot; du SETUP, cf. README limite outillage</p><p class='comment'>arme le geste au neutre</p><p class='comment'>RawX/RawY au maximum nominal (10000) : saturation +100</p><p class='comment'>RawX/RawY au minimum nominal (0) : saturation -100</p><p class='comment'>Depassement franc au-dela de la plage ADC nominale + marge de tolerance (defaut
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (7)</span></summary>
+                <ul class="scenario-list"><li>init explicite -- STruCpp n applique pas &quot;:= 5000&quot; du SETUP, cf. README limite outillage</li><li>arme le geste au neutre</li><li>RawX/RawY au maximum nominal (10000) : saturation +100</li><li>RawX/RawY au minimum nominal (0) : saturation -100</li><li>Depassement franc au-dela de la plage ADC nominale + marge de tolerance (defaut
        capteur/cablage Hall, ex: fil coupe -&gt; ADC fige a une valeur aberrante) : neutre +
        defaut visible, PAS une saturation a pleine vitesse dans une direction sur une donnee
-       dont on ne peut plus garantir la validite (AF08 §5bis).</p><p class='comment'>Valeur negative (hors plage ADC + marge, meme scenario defaut cablage)</p><p class='comment'>Depassement leger (&lt; marge de tolerance) : ne doit PAS declencher le defaut -- evite les
-       faux positifs sur bruit ADC/overshoot mineur pres des bornes nominales</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (18)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>RawX au max nominal (10000) : SpeedRef sature a +100</li><li>meme comportement sur l axe Y</li><li>Direction coherente avec le signe de la consigne</li><li>RawX au min nominal (0) : SpeedRef sature a 100</li><li>Direction coherente avec le signe de la consigne</li><li>RawX=20000 (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse</li><li>meme garde-fou sur l axe Y</li><li>capteur hors plage = Warning, PAS un defaut a acquitter (socle FB_FbStatus)</li><li>capteur hors plage pendant fonctionnement : leve un Warning (visible operateur)</li><li>bit1 : capteur hors plage porte par WarningId</li><li>AF08 S5bis : Enable doit tomber a FALSE comme pour la perte bus (bit2), pas seulement SpeedRef=0 -- coherence de traitement entre les 2 causes de perte de confiance</li><li>meme coherence sur l axe Y</li><li>RawX negatif (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse</li><li>meme garde-fou sur l axe Y</li><li>RawX=10200 : dans la marge de tolerance (+500), toujours saturation normale +100, pas de defaut</li><li>leger depassement tolere : aucun warning leve</li><li>aucun bit warning actif</li></ul></details>
+       dont on ne peut plus garantir la validite (AF08 §5bis).</li><li>Valeur negative (hors plage ADC + marge, meme scenario defaut cablage)</li><li>Depassement leger (&lt; marge de tolerance) : ne doit PAS declencher le defaut -- evite les
+       faux positifs sur bruit ADC/overshoot mineur pres des bornes nominales</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (18)</span></summary>
+                <ul class="checks-list"><li>precondition : geste arme</li><li>RawX au max nominal (10000) : SpeedRef sature a +100</li><li>meme comportement sur l axe Y</li><li>Direction coherente avec le signe de la consigne</li><li>RawX au min nominal (0) : SpeedRef sature a 100</li><li>Direction coherente avec le signe de la consigne</li><li>RawX=20000 (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse</li><li>meme garde-fou sur l axe Y</li><li>capteur hors plage = Warning, PAS un defaut a acquitter (socle FB_FbStatus)</li><li>capteur hors plage pendant fonctionnement : leve un Warning (visible operateur)</li><li>bit1 : capteur hors plage porte par WarningId</li><li>AF08 S5bis : Enable doit tomber a FALSE comme pour la perte bus (bit2), pas seulement SpeedRef=0 -- coherence de traitement entre les 2 causes de perte de confiance</li><li>meme coherence sur l axe Y</li><li>RawX negatif (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse</li><li>meme garde-fou sur l axe Y</li><li>RawX=10200 : dans la marge de tolerance (+500), toujours saturation normale +100, pas de defaut</li><li>leger depassement tolere : aucun warning leve</li><li>aucun bit warning actif</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (7 scans, 12 variables actives)</summary>
-            <div class="wf-scroll"><svg width="612" height="572" viewBox="0 0 612 572" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="554" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="566" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="554" class="wf-grid"/><text x="284.0" y="52" class="wf-time">110ms</text><text x="284.0" y="566" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="554" class="wf-grid"/><text x="340.0" y="52" class="wf-time">120ms</text><text x="340.0" y="566" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="554" class="wf-grid"/><text x="396.0" y="52" class="wf-time">130ms</text><text x="396.0" y="566" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="554" class="wf-grid"/><text x="452.0" y="52" class="wf-time">140ms</text><text x="452.0" y="566" class="wf-scan">#4</text><line x1="480" y1="56" x2="480" y2="554" class="wf-grid"/><text x="508.0" y="52" class="wf-time">150ms</text><text x="508.0" y="566" class="wf-scan">#5</text><line x1="536" y1="56" x2="536" y2="554" class="wf-grid"/><text x="564.0" y="52" class="wf-time">160ms</text><text x="564.0" y="566" class="wf-scan">#6</text><text x="182" y="86.0" class="wf-label">RAWX</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="214.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5000</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><text x="284.0" y="76.0" class="wf-num">5000</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="322.5" y="68.0" width="35" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">10000</text><line x1="368" y1="82.0" x2="424" y2="82.0" class="wf-num-line"/><rect x="387.0" y="68.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="77.0" class="wf-num-changed">0</text><line x1="424" y1="82.0" x2="480" y2="82.0" class="wf-num-line"/><rect x="434.5" y="68.0" width="35" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="452.0" y="77.0" class="wf-num-changed">20000</text><line x1="480" y1="82.0" x2="536" y2="82.0" class="wf-num-line"/><rect x="487.0" y="68.0" width="42" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="508.0" y="77.0" class="wf-num-changed">-10000</text><line x1="536" y1="82.0" x2="592" y2="82.0" class="wf-num-line"/><rect x="546.5" y="68.0" width="35" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="564.0" y="77.0" class="wf-num-changed">10200</text><text x="182" y="126.0" class="wf-label">RAWY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="214.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">5000</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">5000</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><rect x="322.5" y="108.0" width="35" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="340.0" y="117.0" class="wf-num-changed">10000</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><rect x="387.0" y="108.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="396.0" y="117.0" class="wf-num-changed">0</text><line x1="424" y1="122.0" x2="480" y2="122.0" class="wf-num-line"/><rect x="434.5" y="108.0" width="35" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="452.0" y="117.0" class="wf-num-changed">20000</text><line x1="480" y1="122.0" x2="536" y2="122.0" class="wf-num-line"/><rect x="487.0" y="108.0" width="42" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="508.0" y="117.0" class="wf-num-changed">-10000</text><line x1="536" y1="122.0" x2="592" y2="122.0" class="wf-num-line"/><rect x="550.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="564.0" y="117.0" class="wf-num-changed">5000</text><text x="182" y="166.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L312,148L312,148L312,174L368,174L424,174L480,174L536,174L592,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">FAULT.ERROR</text><circle cx="192" cy="202.0" r="4" fill="#dc2626"/><path d="M200,214L256,214L312,214L368,214L424,214L424,214L424,188L480,188L536,188L536,188L536,214L592,214" class="wf-line" stroke="#dc2626"/><text x="182" y="246.0" class="wf-label">AXISCMDX.ENABLE</text><circle cx="192" cy="242.0" r="4" fill="#65a30d"/><path d="M200,228L256,228L312,228L368,228L424,228L424,228L424,254L480,254L536,254L536,254L536,228L592,228" class="wf-line" stroke="#65a30d"/><text x="182" y="286.0" class="wf-label">AXISCMDY.ENABLE</text><circle cx="192" cy="282.0" r="4" fill="#0d9488"/><path d="M200,268L256,268L312,268L368,268L424,268L424,268L424,294L480,294L536,294L536,294L536,268L592,268" class="wf-line" stroke="#0d9488"/><text x="182" y="326.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="322.0" r="4" fill="#1d4ed8"/><path d="M200,334L256,334L256,334L256,308L312,308L368,308L424,308L480,308L536,308L592,308" class="wf-line" stroke="#1d4ed8"/><text x="182" y="366.0" class="wf-label">ATNEUTRALXY</text><circle cx="192" cy="362.0" r="4" fill="#2563eb"/><path d="M200,348L256,348L312,348L312,348L312,374L368,374L424,374L480,374L536,374L592,374" class="wf-line" stroke="#2563eb"/><text x="182" y="406.0" class="wf-label">CMDXVAL</text><circle cx="192" cy="402.0" r="4" fill="#059669"/><line x1="200" y1="402.0" x2="256" y2="402.0" class="wf-num-line"/><rect x="219.0" y="388.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="397.0" class="wf-num-changed">0</text><line x1="256" y1="402.0" x2="312" y2="402.0" class="wf-num-line"/><text x="284.0" y="396.0" class="wf-num">0</text><line x1="312" y1="402.0" x2="368" y2="402.0" class="wf-num-line"/><rect x="329.5" y="388.0" width="21" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="340.0" y="397.0" class="wf-num-changed">100</text><line x1="368" y1="402.0" x2="424" y2="402.0" class="wf-num-line"/><rect x="382.0" y="388.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="396.0" y="397.0" class="wf-num-changed">-100</text><line x1="424" y1="402.0" x2="480" y2="402.0" class="wf-num-line"/><rect x="443.0" y="388.0" width="18" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="452.0" y="397.0" class="wf-num-changed">0</text><line x1="480" y1="402.0" x2="536" y2="402.0" class="wf-num-line"/><text x="508.0" y="396.0" class="wf-num">0</text><line x1="536" y1="402.0" x2="592" y2="402.0" class="wf-num-line"/><rect x="553.5" y="388.0" width="21" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="564.0" y="397.0" class="wf-num-changed">100</text><text x="182" y="446.0" class="wf-label">CMDYVAL</text><circle cx="192" cy="442.0" r="4" fill="#0891b2"/><line x1="200" y1="442.0" x2="256" y2="442.0" class="wf-num-line"/><rect x="219.0" y="428.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="437.0" class="wf-num-changed">0</text><line x1="256" y1="442.0" x2="312" y2="442.0" class="wf-num-line"/><text x="284.0" y="436.0" class="wf-num">0</text><line x1="312" y1="442.0" x2="368" y2="442.0" class="wf-num-line"/><rect x="329.5" y="428.0" width="21" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="340.0" y="437.0" class="wf-num-changed">100</text><line x1="368" y1="442.0" x2="424" y2="442.0" class="wf-num-line"/><rect x="382.0" y="428.0" width="28" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="396.0" y="437.0" class="wf-num-changed">-100</text><line x1="424" y1="442.0" x2="480" y2="442.0" class="wf-num-line"/><rect x="443.0" y="428.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="452.0" y="437.0" class="wf-num-changed">0</text><line x1="480" y1="442.0" x2="536" y2="442.0" class="wf-num-line"/><text x="508.0" y="436.0" class="wf-num">0</text><line x1="536" y1="442.0" x2="592" y2="442.0" class="wf-num-line"/><text x="564.0" y="436.0" class="wf-num">0</text><text x="182" y="486.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="482.0" r="4" fill="#65a30d"/><path d="M200,468L256,468L256,468L256,494L312,494L368,494L424,494L480,494L536,494L592,494" class="wf-line" stroke="#65a30d"/><text x="182" y="526.0" class="wf-label">RAWOUTOFRANGE</text><circle cx="192" cy="522.0" r="4" fill="#0d9488"/><path d="M200,534L256,534L312,534L368,534L424,534L424,534L424,508L480,508L536,508L536,508L536,534L592,534" class="wf-line" stroke="#0d9488"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (7 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>RAWX</th><th>RAWY</th><th>RAWBUTTON</th><th>FAULT.ERROR</th><th>AXISCMDX.ENABLE</th><th>AXISCMDY.ENABLE</th><th>DEADMANARMED</th><th>ATNEUTRALXY</th><th>CMDXVAL</th><th>CMDYVAL</th><th>DEADMANARMPENDING</th><th>RAWOUTOFRANGE</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>5000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td>0</td><td>0</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>110 ms</td><td>5000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td>0</td><td>0</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>120 ms</td><td class='changed'>10000</td><td class='changed'>10000</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>100</td><td class='changed'>100</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>130 ms</td><td class='changed'>0</td><td class='changed'>0</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>-100</td><td class='changed'>-100</td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>140 ms</td><td class='changed'>20000</td><td class='changed'>20000</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>0</td><td class='changed'>0</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#5</td><td class='scan-t'>150 ms</td><td class='changed'>-10000</td><td class='changed'>-10000</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#6</td><td class='scan-t'>160 ms</td><td class='changed'>10200</td><td class='changed'>5000</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>100</td><td>0</td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (15)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALYACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>5000</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>5000</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         <article id="test-fb-joystick-8" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-011 Fin de cycle benne desarme le geste par defaut </h3>
             </header>
-            <div class="comments"><p class='comment'>arme le geste</p><p class='comment'>ArmingPermit actif : ne desarme pas seul (l&#x27;armement reste tant que la permission est accordee)</p><p class='comment'>retrait de permission (ex. fin de cycle benne) : desarme immediatement</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>ArmingPermit actif seul ne desarme pas (attend le retrait de permission, fin de cycle)</li><li>retrait de permission (ex. fin benne) desarme immediatement (pas de M1/M2 surprise)</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>arme le geste</li><li>ArmingPermit actif : ne desarme pas seul (l&#x27;armement reste tant que la permission est accordee)</li><li>retrait de permission (ex. fin de cycle benne) : desarme immediatement</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>precondition : geste arme</li><li>ArmingPermit actif seul ne desarme pas (attend le retrait de permission, fin de cycle)</li><li>retrait de permission (ex. fin benne) desarme immediatement (pas de M1/M2 surprise)</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (4 scans, 8 variables actives)</summary>
-            <div class="wf-scroll"><svg width="444" height="412" viewBox="0 0 444 412" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="394" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="406" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="394" class="wf-grid"/><text x="284.0" y="52" class="wf-time">110ms</text><text x="284.0" y="406" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="394" class="wf-grid"/><text x="340.0" y="52" class="wf-time">120ms</text><text x="340.0" y="406" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="394" class="wf-grid"/><text x="396.0" y="52" class="wf-time">130ms</text><text x="396.0" y="406" class="wf-scan">#3</text><text x="182" y="86.0" class="wf-label">ARMINGPERMIT</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L312,68L368,68L368,68L368,94L424,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,108L256,108L312,108L312,108L312,134L368,134L424,134" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">AXISCMDX.ENABLE</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L312,148L368,148L368,148L368,174L424,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">AXISCMDY.ENABLE</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,188L256,188L312,188L368,188L368,188L368,214L424,214" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,254L256,254L256,254L256,228L312,228L368,228L368,228L368,254L424,254" class="wf-line" stroke="#0d9488"/><text x="182" y="286.0" class="wf-label">CMDXVAL</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><line x1="200" y1="282.0" x2="256" y2="282.0" class="wf-num-line"/><rect x="219.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="228.0" y="277.0" class="wf-num-changed">0</text><line x1="256" y1="282.0" x2="312" y2="282.0" class="wf-num-line"/><rect x="275.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="284.0" y="277.0" class="wf-num-changed">50</text><line x1="312" y1="282.0" x2="368" y2="282.0" class="wf-num-line"/><text x="340.0" y="276.0" class="wf-num">50</text><line x1="368" y1="282.0" x2="424" y2="282.0" class="wf-num-line"/><rect x="387.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="396.0" y="277.0" class="wf-num-changed">0</text><text x="182" y="326.0" class="wf-label">CMDYVAL</text><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="219.0" y="308.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">0</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><rect x="275.0" y="308.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="284.0" y="317.0" class="wf-num-changed">50</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><text x="340.0" y="316.0" class="wf-num">50</text><line x1="368" y1="322.0" x2="424" y2="322.0" class="wf-num-line"/><rect x="387.0" y="308.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="317.0" class="wf-num-changed">0</text><text x="182" y="366.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="362.0" r="4" fill="#059669"/><path d="M200,348L256,348L256,348L256,374L312,374L368,374L424,374" class="wf-line" stroke="#059669"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (4 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>ARMINGPERMIT</th><th>RAWBUTTON</th><th>AXISCMDX.ENABLE</th><th>AXISCMDY.ENABLE</th><th>DEADMANARMED</th><th>CMDXVAL</th><th>CMDYVAL</th><th>DEADMANARMPENDING</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>110 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>50</td><td class='changed'>50</td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>120 ms</td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td>50</td><td>50</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>130 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td><td class='changed'>0</td><td><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (19)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RAWX</code></td><td>5000</td></tr><tr><td><code>RAWY</code></td><td>5000</td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ATNEUTRALXY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>0</td></tr><tr><td><code>NEUTRALYACT</code></td><td>0</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>0</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>0</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         <article id="test-fb-joystick-9" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE </h3>
             </header>
-            <div class="comments"><p class='comment'>arme le geste</p><p class='comment'>permission maintenue (ex. exception CLOSING Extraction) : l&#x27;armement est conserve</p><p class='comment'>permission toujours maintenue : l armement doit etre conserve</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>ArmingPermit maintenu : armement conserve (exception CLOSING Extraction gere par l externe qui maintient la permission - alerte P1 : ne jamais elargir hors CLOSING Extraction)</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>arme le geste</li><li>permission maintenue (ex. exception CLOSING Extraction) : l&#x27;armement est conserve</li><li>permission toujours maintenue : l armement doit etre conserve</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>precondition : geste arme</li><li>ArmingPermit maintenu : armement conserve (exception CLOSING Extraction gere par l externe qui maintient la permission - alerte P1 : ne jamais elargir hors CLOSING Extraction)</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (4 scans, 5 variables actives)</summary>
-            <div class="wf-scroll"><svg width="444" height="292" viewBox="0 0 444 292" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="274" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="286" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="274" class="wf-grid"/><text x="284.0" y="52" class="wf-time">110ms</text><text x="284.0" y="286" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="274" class="wf-grid"/><text x="340.0" y="52" class="wf-time">120ms</text><text x="340.0" y="286" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="274" class="wf-grid"/><text x="396.0" y="52" class="wf-time">130ms</text><text x="396.0" y="286" class="wf-scan">#3</text><text x="182" y="86.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L312,68L312,68L312,94L368,94L424,94" class="wf-line" stroke="#2563eb"/><text x="182" y="126.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><path d="M200,134L256,134L256,134L256,108L312,108L368,108L424,108" class="wf-line" stroke="#059669"/><text x="182" y="166.0" class="wf-label">CMDXVAL</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="219.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">0</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><rect x="275.0" y="148.0" width="18" height="13" rx="3" fill="#0891b2" class="wf-chip"/><text x="284.0" y="157.0" class="wf-num-changed">50</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><text x="340.0" y="156.0" class="wf-num">50</text><line x1="368" y1="162.0" x2="424" y2="162.0" class="wf-num-line"/><text x="396.0" y="156.0" class="wf-num">50</text><text x="182" y="206.0" class="wf-label">CMDYVAL</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="219.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">0</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><rect x="275.0" y="188.0" width="18" height="13" rx="3" fill="#65a30d" class="wf-chip"/><text x="284.0" y="197.0" class="wf-num-changed">50</text><line x1="312" y1="202.0" x2="368" y2="202.0" class="wf-num-line"/><text x="340.0" y="196.0" class="wf-num">50</text><line x1="368" y1="202.0" x2="424" y2="202.0" class="wf-num-line"/><text x="396.0" y="196.0" class="wf-num">50</text><text x="182" y="246.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,228L256,228L256,228L256,254L312,254L368,254L424,254" class="wf-line" stroke="#0d9488"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (4 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>RAWBUTTON</th><th>DEADMANARMED</th><th>CMDXVAL</th><th>CMDYVAL</th><th>DEADMANARMPENDING</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td>0</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>110 ms</td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>50</td><td class='changed'>50</td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>120 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td>50</td><td>50</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>130 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td>50</td><td>50</td><td><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (22)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RAWX</code></td><td>5000</td></tr><tr><td><code>RAWY</code></td><td>5000</td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AXISCMDX.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AXISCMDY.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ATNEUTRALXY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>0</td></tr><tr><td><code>NEUTRALYACT</code></td><td>0</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>0</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>0</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         <article id="test-fb-joystick-10" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes </h3>
             </header>
-            <div class="comments"><p class='comment'>arme le geste au neutre</p><p class='comment'>RawX=9000 (au-dela du neutre 5000, hors zone morte) : OutPct = (9000-5000)/(10000-5000)*100 = 80%</p><p class='comment'>RawY=300 (en-deca du neutre 5000, hors zone morte) : OutPct = (300-5000)/5000*100 = -94%</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary><ul class="checks-list"><li>precondition : geste arme</li><li>RawX=9000 : proportionnel, 80% -- pas seulement correct aux bornes 0/10000</li><li>sens avant coherent</li><li>RawY toujours au neutre : axe Y inchange</li><li>RawY=300 : proportionnel, 94% -- pas seulement correct aux bornes 0/10000</li><li>sens arriere coherent</li><li>RawX revenu au neutre : axe X inchange</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>arme le geste au neutre</li><li>RawX=9000 (au-dela du neutre 5000, hors zone morte) : OutPct = (9000-5000)/(10000-5000)*100 = 80%</li><li>RawY=300 (en-deca du neutre 5000, hors zone morte) : OutPct = (300-5000)/5000*100 = -94%</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary>
+                <ul class="checks-list"><li>precondition : geste arme</li><li>RawX=9000 : proportionnel, 80% -- pas seulement correct aux bornes 0/10000</li><li>sens avant coherent</li><li>RawY toujours au neutre : axe Y inchange</li><li>RawY=300 : proportionnel, 94% -- pas seulement correct aux bornes 0/10000</li><li>sens arriere coherent</li><li>RawX revenu au neutre : axe X inchange</li></ul>
+            </details>
             
             
-    <div class="chronogram-group">
-        
-        <details >
-            <summary>📊 Chronogramme graphique (4 scans, 8 variables actives)</summary>
-            <div class="wf-scroll"><svg width="444" height="412" viewBox="0 0 444 412" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="394" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="406" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="394" class="wf-grid"/><text x="284.0" y="52" class="wf-time">110ms</text><text x="284.0" y="406" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="394" class="wf-grid"/><text x="340.0" y="52" class="wf-time">120ms</text><text x="340.0" y="406" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="394" class="wf-grid"/><text x="396.0" y="52" class="wf-time">130ms</text><text x="396.0" y="406" class="wf-scan">#3</text><text x="182" y="86.0" class="wf-label">RAWX</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="214.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5000</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><text x="284.0" y="76.0" class="wf-num">5000</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="326.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">9000</text><line x1="368" y1="82.0" x2="424" y2="82.0" class="wf-num-line"/><rect x="382.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="77.0" class="wf-num-changed">5000</text><text x="182" y="126.0" class="wf-label">RAWY</text><circle cx="192" cy="122.0" r="4" fill="#059669"/><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="214.0" y="108.0" width="28" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">5000</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">5000</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><text x="340.0" y="116.0" class="wf-num">5000</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><rect x="385.5" y="108.0" width="21" height="13" rx="3" fill="#059669" class="wf-chip"/><text x="396.0" y="117.0" class="wf-num-changed">300</text><text x="182" y="166.0" class="wf-label">RAWBUTTON</text><circle cx="192" cy="162.0" r="4" fill="#0891b2"/><path d="M200,148L256,148L312,148L312,148L312,174L368,174L424,174" class="wf-line" stroke="#0891b2"/><text x="182" y="206.0" class="wf-label">DEADMANARMED</text><circle cx="192" cy="202.0" r="4" fill="#65a30d"/><path d="M200,214L256,214L256,214L256,188L312,188L368,188L424,188" class="wf-line" stroke="#65a30d"/><text x="182" y="246.0" class="wf-label">ATNEUTRALXY</text><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><path d="M200,228L256,228L312,228L312,228L312,254L368,254L424,254" class="wf-line" stroke="#0d9488"/><text x="182" y="286.0" class="wf-label">CMDXVAL</text><circle cx="192" cy="282.0" r="4" fill="#1d4ed8"/><line x1="200" y1="282.0" x2="256" y2="282.0" class="wf-num-line"/><rect x="219.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="228.0" y="277.0" class="wf-num-changed">0</text><line x1="256" y1="282.0" x2="312" y2="282.0" class="wf-num-line"/><text x="284.0" y="276.0" class="wf-num">0</text><line x1="312" y1="282.0" x2="368" y2="282.0" class="wf-num-line"/><rect x="331.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="340.0" y="277.0" class="wf-num-changed">80</text><line x1="368" y1="282.0" x2="424" y2="282.0" class="wf-num-line"/><rect x="387.0" y="268.0" width="18" height="13" rx="3" fill="#1d4ed8" class="wf-chip"/><text x="396.0" y="277.0" class="wf-num-changed">0</text><text x="182" y="326.0" class="wf-label">CMDYVAL</text><circle cx="192" cy="322.0" r="4" fill="#2563eb"/><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="219.0" y="308.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">0</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><text x="284.0" y="316.0" class="wf-num">0</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><text x="340.0" y="316.0" class="wf-num">0</text><line x1="368" y1="322.0" x2="424" y2="322.0" class="wf-num-line"/><rect x="385.5" y="308.0" width="21" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="396.0" y="317.0" class="wf-num-changed">-94</text><text x="182" y="366.0" class="wf-label">DEADMANARMPENDING</text><circle cx="192" cy="362.0" r="4" fill="#059669"/><path d="M200,348L256,348L256,348L256,374L312,374L368,374L424,374" class="wf-line" stroke="#059669"/></svg></div>
-        </details>
-        <details >
-            <summary>📋 Chronogramme tableau (4 scans)</summary>
-            <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th>Scan</th><th>Temps</th><th>RAWX</th><th>RAWY</th><th>RAWBUTTON</th><th>DEADMANARMED</th><th>ATNEUTRALXY</th><th>CMDXVAL</th><th>CMDYVAL</th><th>DEADMANARMPENDING</th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>5000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td>0</td><td>0</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>110 ms</td><td>5000</td><td>5000</td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td>0</td><td>0</td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>120 ms</td><td class='changed'>9000</td><td>5000</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>80</td><td>0</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>130 ms</td><td class='changed'>5000</td><td class='changed'>300</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'>0</td><td class='changed'>-94</td><td><span class="v-false">FALSE</span></td></tr></tbody>
-    </table></div>
-        </details>
-        
-    <details class="chronogram-static">
-        <summary>🔒 Valeurs constantes sur toute la séquence (19)</summary>
-        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BUSCANOPENOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOP.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AXISCMDX.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AXISCMDY.ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ARMINGPERMITDENIED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NEUTRALXACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALYACT</code></td><td>5000</td></tr><tr><td><code>NEUTRALXMEM</code></td><td>5000</td></tr><tr><td><code>NEUTRALYMEM</code></td><td>5000</td></tr><tr><td><code>LASTCALIBRATE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RAWOUTOFRANGE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBFAIL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BUSLOST</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
-    </details>
-    </div>
         </article>
         </div>
     </details>
@@ -1580,6 +1564,152 @@ function copyPinExpr(el) {
     setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
 }
 
+function exportTableCSV(btn, testName) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var rows = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return '"' + th.textContent.replace(/"/g, '""').trim() + '"';
+    });
+    rows.push(headers.join(';'));
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return '"' + td.textContent.replace(/"/g, '""').trim() + '"';
+        });
+        rows.push(cells.join(';'));
+    });
+
+    var csvContent = "\uFEFF" + rows.join('\r\n');
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var safeName = (testName || 'chronogram').replace(/[^a-zA-Z0-9_\-]+/g, '_').substring(0, 50);
+    a.href = url;
+    a.download = safeName + '_chronogram.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📥 Téléchargé !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function copyTableMarkdown(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var lines = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return th.textContent.trim();
+    });
+    lines.push('| ' + headers.join(' | ') + ' |');
+    lines.push('| ' + headers.map(function() { return '---'; }).join(' | ') + ' |');
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return td.textContent.trim().replace(/\|/g, '\\|');
+        });
+        lines.push('| ' + cells.join(' | ') + ' |');
+    });
+
+    var md = lines.join('\n');
+    var ta = document.createElement('textarea');
+    ta.value = md;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📋 Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function toggleVerticalHeaders(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var isVert = table.classList.toggle('headers-vertical');
+    btn.innerHTML = isVert ? "↔️ Titres Horizontaux" : "📐 Titres Verticaux";
+    if (isVert) {
+        btn.classList.add('btn-copied');
+    } else {
+        btn.classList.remove('btn-copied');
+    }
+}
+
+function toggleWfLane(textEl, rowIdx) {
+    var svg = textEl.closest('svg');
+    if (!svg) return;
+    var group = svg.querySelector('.wf-numeric-group[data-row="' + rowIdx + '"]');
+    if (!group) return;
+    var analog = group.querySelector('.wf-analog-view');
+    var digital = group.querySelector('.wf-digital-view');
+    if (!analog || !digital) return;
+
+    var isAnalog = analog.style.display !== 'none';
+    if (isAnalog) {
+        analog.style.display = 'none';
+        digital.style.display = '';
+        textEl.classList.remove('active-curve');
+    } else {
+        analog.style.display = '';
+        digital.style.display = 'none';
+        textEl.classList.add('active-curve');
+    }
+}
+
+function toggleAllWaveforms(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var svg = details.querySelector('svg.waveform');
+    if (!svg) return;
+
+    var groups = svg.querySelectorAll('.wf-numeric-group');
+    if (!groups.length) return;
+
+    var firstAnalog = groups[0].querySelector('.wf-analog-view');
+    var currentlyAnalog = firstAnalog && firstAnalog.style.display !== 'none';
+    var targetAnalog = !currentlyAnalog;
+
+    groups.forEach(function(g) {
+        var a = g.querySelector('.wf-analog-view');
+        var d = g.querySelector('.wf-digital-view');
+        if (a) a.style.display = targetAnalog ? '' : 'none';
+        if (d) d.style.display = targetAnalog ? 'none' : '';
+    });
+
+    var labels = svg.querySelectorAll('.wf-label.wf-clickable');
+    labels.forEach(function(lbl) {
+        if (targetAnalog) lbl.classList.add('active-curve');
+        else lbl.classList.remove('active-curve');
+    });
+
+    btn.innerHTML = targetAnalog ? "🔢 Vue Chiffres" : "📈 Vue Courbes";
+}
+
 function toggleTheme() {
     var current = document.documentElement.getAttribute('data-theme') || 'light';
     var next = current === 'dark' ? 'light' : 'dark';
@@ -1604,6 +1734,175 @@ function updateThemeBtn(theme) {
         }
     } catch (e) {}
 })();
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Redimensionnement manuel des colonnes a la souris (Drag & Drop border)
+    var isResizing = false;
+    var currentTh = null;
+    var startX = 0;
+    var startWidth = 0;
+
+    document.addEventListener('mousedown', function(e) {
+        var resizer = e.target.closest('.col-resizer');
+        if (!resizer) return;
+        isResizing = true;
+        currentTh = resizer.closest('th');
+        startX = e.pageX;
+        startWidth = currentTh.offsetWidth;
+        resizer.classList.add('resizing');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing || !currentTh) return;
+        var diff = e.pageX - startX;
+        var newWidth = Math.max(30, startWidth + diff);
+        currentTh.style.width = newWidth + 'px';
+        currentTh.style.minWidth = newWidth + 'px';
+        currentTh.style.maxWidth = newWidth + 'px';
+
+        if (currentTh.classList.contains('note-th')) {
+            var table = currentTh.closest('.chrono-table');
+            if (table) {
+                table.querySelectorAll('.chrono-note-cell').forEach(function(td) {
+                    td.style.maxWidth = newWidth + 'px';
+                });
+                table.querySelectorAll('.chrono-note-chip').forEach(function(chip) {
+                    chip.style.maxWidth = Math.max(20, newWidth - 10) + 'px';
+                });
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.querySelectorAll('.col-resizer.resizing').forEach(function(r) {
+                r.classList.remove('resizing');
+            });
+            currentTh = null;
+        }
+    });
+
+    // Double-clic sur un en-tete de colonne pour la replier / deplier (hors barre de redimensionnement)
+    document.addEventListener('dblclick', function(e) {
+        if (e.target.closest('.col-resizer')) return;
+        var th = e.target.closest('.chrono-table th');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        var isCollapsed = th.classList.toggle('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.toggle('col-collapsed', isCollapsed);
+        });
+    });
+
+    // Clic simple sur colonne repliee pour la reouvrir
+    document.addEventListener('click', function(e) {
+        var th = e.target.closest('.chrono-table th.col-collapsed');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        th.classList.remove('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.remove('col-collapsed');
+        });
+    });
+
+    // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique
+    var tt = document.getElementById('wf-global-tooltip');
+    if (!tt) {
+        tt = document.createElement('div');
+        tt.id = 'wf-global-tooltip';
+        tt.className = 'wf-tooltip';
+        document.body.appendChild(tt);
+    }
+
+    document.addEventListener('mousemove', function(e) {
+        var svg = e.target.closest('svg.waveform');
+        if (!svg) {
+            if (tt) tt.style.display = 'none';
+            document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+            return;
+        }
+
+        var rect = svg.getBoundingClientRect();
+        var scaleX = svg.viewBox.baseVal.width / rect.width;
+        var scaleY = svg.viewBox.baseVal.height / rect.height;
+
+        var svgX = (e.clientX - rect.left) * scaleX;
+        var svgY = (e.clientY - rect.top) * scaleY;
+
+        var left = parseFloat(svg.getAttribute('data-left') || '200');
+        var top = parseFloat(svg.getAttribute('data-top') || '62');
+        var colw = parseFloat(svg.getAttribute('data-colw') || '56');
+        var laneh = parseFloat(svg.getAttribute('data-laneh') || '40');
+
+        var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
+        var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+
+        var colIdx = Math.floor((svgX - left) / colw);
+        var rowIdx = Math.floor((svgY - top) / laneh);
+
+        var cursorLine = svg.querySelector('.wf-cursor-line');
+
+        if (colIdx >= 0 && colIdx < scansData.length && rowIdx >= 0 && rowIdx < fieldsData.length) {
+            var s = scansData[colIdx];
+            var f = fieldsData[rowIdx];
+            var val = s.fields[f];
+            if (val === undefined) val = "—";
+
+            var displayVal = val;
+            if (val === "1") displayVal = "TRUE";
+            else if (val === "0") displayVal = "FALSE";
+            else {
+                var num = parseFloat(val);
+                if (!isNaN(num)) {
+                    displayVal = Math.abs(num) >= 100 ? num.toFixed(0) : num.toFixed(3);
+                }
+            }
+
+            if (cursorLine) {
+                var cx = left + (colIdx + 0.5) * colw;
+                cursorLine.setAttribute('x1', cx);
+                cursorLine.setAttribute('x2', cx);
+                cursorLine.style.display = '';
+            }
+
+            var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+
+            tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
+                           '<div class="wf-tt-var">' + f + '</div>' +
+                           '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
+                           noteHtml;
+
+            tt.style.display = 'block';
+            var ttX = e.clientX + 16;
+            var ttY = e.clientY + 16;
+            if (ttX + 280 > window.innerWidth) ttX = e.clientX - 280;
+            if (ttY + 120 > window.innerHeight) ttY = e.clientY - 120;
+            tt.style.left = ttX + 'px';
+            tt.style.top = ttY + 'px';
+        } else {
+            if (tt) tt.style.display = 'none';
+            if (cursorLine) cursorLine.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('mouseleave', function() {
+        if (tt) tt.style.display = 'none';
+        document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+    });
+});
 </script>
 </body>
 </html>

@@ -27,16 +27,13 @@
         --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
     }
     * { box-sizing: border-box; }
-    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
-    * { scrollbar-width: none; -ms-overflow-style: none; }
-    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
         background-color: var(--bg);
         background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
         background-size: 28px 28px;
         background-position: -1px -1px;
         color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
-    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .page { max-width: 1720px; width: 96%; margin: 0 auto; padding: 28px 16px 60px; }
     .header { display: flex; justify-content: space-between; align-items: center;
         margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
         border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
@@ -59,7 +56,7 @@
     .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
 
     details { margin-bottom: 20px; }
-    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: text; }
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -70,52 +67,163 @@
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
-    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
-    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
-    .checks-summary:hover { color: var(--text); }
-    .checks-label { font-size: 11px; color: var(--muted); font-weight: 600; }
-    .checks-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
-    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
+    .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: text; }
+    .checks-summary:hover { color: var(--accent); }
+    .checks-label { font-size: 12px; font-weight: 600; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
+    .checks-list li { font-size: 12px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
     .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
-    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
-        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
-    .failure-head { color: var(--red-text); font-weight: 600; }
-    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
-    .failure-msg { color: #92400e; margin-top: 4px; }
-    .failure-diff { margin-top: 4px; }
-    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    .scenario-list li { font-size: 12px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
+    .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
+    .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+    .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
+        border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
+    .failure-head { color: var(--red-text); font-weight: 700; font-size: 13.5px; }
+    .failure-loc { color: var(--muted); margin-top: 3px; font-size: 11.5px; font-family: monospace; }
+    .failure-msg { color: var(--text); margin-top: 6px; font-weight: 600; }
+    .failure-diff { margin-top: 8px; color: var(--text); font-size: 12.5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .failure-diff code { padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 12px; font-weight: 700; }
+    .failure-diff code.val-expected { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .failure-diff code.val-actual { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    [data-theme="light"] .failure-diff code.val-expected { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    [data-theme="light"] .failure-diff code.val-actual { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
     pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
         overflow-x: auto; }
-    .chronogram-group { margin-top: 12px; }
+    .chronogram-group { margin-top: 10px; }
     .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
         padding: 8px 12px; }
-    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
-    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
-    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
-    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
-    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
-    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
-    .chrono-table .scan-t { color: var(--muted); }
-    .chrono-table td.changed { background: #fef9c3; }
-    .v-true { color: var(--green-text); font-weight: 600; }
-    .v-false { color: #cbd5e1; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); user-select: text; }
+    .chrono-summary-inner { display: inline-flex; justify-content: space-between; align-items: center; width: calc(100% - 24px); margin-left: 6px; vertical-align: middle; }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border);
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
+    .chrono-scroll::-webkit-scrollbar, .wf-scroll::-webkit-scrollbar { display: block !important; height: 8px !important; width: 8px !important; }
+    .chrono-scroll::-webkit-scrollbar-track, .wf-scroll::-webkit-scrollbar-track { background: var(--surface-card); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb, .wf-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb:hover, .wf-scroll::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+    .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; table-layout: auto; }
+    .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; position: relative; }
+    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; cursor: pointer; user-select: text; transition: max-width 0.2s, min-width 0.2s, padding 0.2s; }
+    .chrono-table th:hover { color: var(--accent); }
+    .col-resizer { position: absolute; top: 0; right: 0; width: 5px; cursor: col-resize; user-select: none; height: 100%; z-index: 10; }
+    .col-resizer:hover, .col-resizer.resizing { background: var(--accent); }
+    .chrono-table th.col-collapsed,
+    .chrono-table td.col-collapsed {
+        max-width: 24px !important;
+        min-width: 24px !important;
+        width: 24px !important;
+        padding: 4px 1px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        opacity: 0.35 !important;
+        background: rgba(0, 0, 0, 0.25) !important;
+        color: transparent !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+        font-size: 0 !important;
+        position: relative;
+    }
+    .chrono-table th.col-collapsed {
+        cursor: pointer;
+        opacity: 0.75 !important;
+        background: rgba(129, 140, 248, 0.18) !important;
+    }
+    .chrono-table th.col-collapsed:hover {
+        opacity: 1 !important;
+        background: rgba(129, 140, 248, 0.38) !important;
+    }
+    .chrono-table th.col-collapsed::after {
+        content: "⋮";
+        font-size: 12px;
+        color: var(--accent);
+        display: block;
+        text-align: center;
+    }
+    /* Mode Titres Verticaux (Compact) */
+    .chrono-table.headers-vertical {
+        width: max-content !important;
+    }
+    .chrono-table.headers-vertical th.note-th,
+    .chrono-table.headers-vertical td.chrono-note-cell {
+        max-width: 280px !important;
+        width: 280px !important;
+    }
+    .chrono-table.headers-vertical th.var-th {
+        height: 155px;
+        vertical-align: bottom;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        max-width: 36px;
+        min-width: 30px;
+        width: 34px;
+    }
+    .chrono-table.headers-vertical th.var-th .th-content {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        display: inline-block;
+        white-space: nowrap;
+        text-align: left;
+        max-height: 135px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .chrono-table th .th-content {
+        display: inline-block;
+        pointer-events: auto;
+    }
+    .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
+    .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
+    [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
+    [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    .v-true { color: #34d399; font-weight: 700; }
+    .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
-        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+        border-radius: 8px; margin-top: 8px; padding: 4px 0;
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
     .waveform { display: block; }
-    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
-    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
-    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
-    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
-    .wf-line { fill: none; stroke-width: 2; }
-    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
-    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
-    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-grid { stroke: var(--border); stroke-width: 1; opacity: 0.6; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-scan { font-size: 9px; fill: var(--muted); opacity: 0.7; text-anchor: middle; font-family: monospace; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; font-weight: 600; }
+    .wf-label.wf-clickable { cursor: pointer; transition: fill 0.15s; }
+    .wf-label.wf-clickable:hover { fill: var(--accent); font-weight: 700; text-decoration: underline; }
+    .wf-label.active-curve { fill: #38bdf8; font-weight: 700; }
+    [data-theme="light"] .wf-label.active-curve { fill: #0284c7; }
+    .wf-line { fill: none; stroke-width: 2.2; }
+    .wf-num-line { stroke: var(--border); stroke-width: 1; }
+    .wf-num { font-size: 10.5px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-num-changed { font-size: 10.5px; fill: #ffffff; font-weight: 700; text-anchor: middle; font-family: monospace; }
     .wf-chip { opacity: 0.95; }
     .wf-legend { font-size: 10px; fill: var(--muted); }
-    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; font-family: monospace; font-weight: 600; }
+    [data-theme="light"] .wf-scale { fill: #64748b; }
+    .wf-tooltip {
+        position: fixed; pointer-events: none; z-index: 9999;
+        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
+        border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        border-radius: 8px; padding: 8px 12px; font-size: 11.5px; color: #f8fafc;
+        display: none; max-width: 320px; line-height: 1.4;
+    }
+    [data-theme="light"] .wf-tooltip {
+        background: rgba(255, 255, 255, 0.97); border-color: #cbd5e1;
+        color: #1e293b; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
+    [data-theme="light"] .wf-tt-head { color: #0284c7; }
+    .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
+    .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
+    .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
+    [data-theme="light"] .wf-tt-note { border-top-color: rgba(0, 0, 0, 0.1); }
     .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
         border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
     .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
@@ -123,7 +231,7 @@
     .af-warning-banner li { margin: 3px 0; }
     .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
-    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
@@ -193,7 +301,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 00:01:50</div>
+    <div class="exec-time">2026-08-28 14:11:08</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
@@ -211,7 +319,7 @@
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 115 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 120 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -768,6 +876,14 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
+                <td><code>E_OperatorAxis.st</code></td>
+                <td>DUT</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
                 <td><code>ST_ChainCycleSemiAuto.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -833,6 +949,38 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>ST_fbModes_Autorisations.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_AcquisitionJoystickQualified.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_AcquisitionNetworkDiagnostics.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbEncoder_HwOut.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_AcquisitionEncoderQualified.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -1727,8 +1875,16 @@
                 <span class="badge badge-pass">PASS</span>
                 <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
-            <div class="comments"><p class='comment'>Scan 0 : Enable=FALSE -&gt; Neutralisation</p><p class='comment'>Scan 1 : Enable=TRUE -&gt; SimBench actif</p><p class='comment'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</p></div>
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary><ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Scan 0 : Enable=FALSE -&gt; Neutralisation</li><li>Scan 1 : Enable=TRUE -&gt; SimBench actif</li><li>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</li></ul>
+            </details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul>
+            </details>
             
             
         </article>
@@ -1745,18 +1901,22 @@
                 <h3>TC-P13-001 Sim_Safety : neutralisation sans Enable </h3>
             </header>
             
-            <details class="checks-details"><summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary><ul class="checks-list"><li>AU non ferme</li><li>Contacteur coupe</li></ul></details>
+            
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>AU non ferme</li><li>Contacteur coupe</li></ul>
+            </details>
             
             
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (115)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinchSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchBenneHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_BypassTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_ChainTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_PreflightHMI.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Encoder.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Joystick.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Safety.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Translation.st</code></li><li><code>CODE/L_SIMULATION/FB_SimBench.st</code></li></ul>
+        <summary>Fichiers source compilés (120)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinchSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchBenneHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_BypassTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_ChainTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_PreflightHMI.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Encoder.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Joystick.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Safety.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Translation.st</code></li><li><code>CODE/L_SIMULATION/FB_SimBench.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (115)</summary>
+        <summary>Code source ST original (120)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -2372,7 +2532,7 @@ END_TYPE
    ⚙️ E_CycleStep — Étapes de la machine d&#x27;état du cycle automatique
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des étapes du cycle automatique de dragage (X0 à X13 + STABILIZING)
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 TYPE E_CycleStep :
@@ -2401,7 +2561,7 @@ END_TYPE
    ⚙️ E_DiveSearchState — Phases internes de recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des phases de détection et recherche du fond
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 TYPE E_DiveSearchState :
@@ -2422,7 +2582,7 @@ END_TYPE
    ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des phases de la séquence d&#x27;extraction assistée
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 TYPE E_ExtractionSequenceState :
@@ -3643,6 +3803,25 @@ END_TYPE
 </pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\E_OperatorAxis.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_OperatorAxis — Axe ou organe de pilotage attendu par le cycle
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération de l&#x27;organe joystick/bouton attendu pour le mouvement
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+   ======================================================================= *)
+
+TYPE E_OperatorAxis :
+(
+    NONE        := 0, (* Aucun axe attendu (étape automatique ou arrêt) *)
+    JOYSTICK_X  := 1, (* Axe X translation attendu *)
+    JOYSTICK_Y  := 2, (* Axe Y treuils / plongée attendu *)
+    BUTTON      := 3  (* Action bouton attendue (ex: validation, homing) *)
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ChainCycleSemiAuto.st</code></summary>
                 <pre>(* =======================================================================
    🔄 ST_ChainCycleSemiAuto — Diagnostic chronologique Séquenceur Semi-Auto
@@ -3671,8 +3850,16 @@ STRUCT
     Idx204_Error                     : BOOL; // 1 = Défaut ou anomalie bloquante sur le cycle
     Idx205_ErrorId                   : WORD; // Code d&#x27;erreur interne FB_Cycle
     Idx206_Step                      : E_CycleStep; // Étape courante (X0 à X13 + STABILIZING)
-    Idx207_StepStr                   : STRING(40);  // Libellé explicite de l&#x27;étape
+    Idx207_StepStr                   : STRING(80);  // Libellé explicite de l&#x27;étape
     Idx208_StepAtError               : E_CycleStep; // Étape mémorisée lors du dernier défaut
+    Idx209_WaitingForOperator        : BOOL;        // 1 = En attente d&#x27;une action humaine
+    Idx210_WaitingForProcess         : BOOL;        // 1 = En attente d&#x27;une condition physique/procédé
+    Idx211_OperatorActionId          : UINT;        // Identifiant numérique de l&#x27;action attendue
+    Idx212_OperatorAction            : STRING(120); // Description explicite de l&#x27;action/attente
+    Idx213_ExpectedAxis              : E_OperatorAxis; // Organe attendu (NONE, JOYSTICK_X, JOYSTICK_Y, BUTTON)
+    Idx214_ExpectedDirection         : INT;         // Sens attendu (-1, 0, +1)
+    Idx215_WaitingResume             : BOOL;        // 1 = En pause suite à bascule de mode (attente StartCycle)
+    Idx216_PausedState               : E_CycleStep; // Étape mémorisée prête pour reprise
 
     // 🎯 3. Consignes &amp; Feedbacks Opérationnels
     Idx301_TargetPosition            : INT;  // Cible translation sélectionnée (1=Trémie, 3=P1)
@@ -3864,6 +4051,103 @@ END_STRUCT
 END_TYPE</pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionJoystickQualified.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🕹️ ST_AcquisitionJoystickQualified — Données joystick qualifiées
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes d&#x27;axes, statut homme-mort et diagnostics
+      produits par FB_Joystick dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Joystick).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_AcquisitionJoystickQualified :
+STRUCT
+    AxisX               : ST_fbJoystick_AxisCmd; // 📊 Commande et direction qualifiée axe X
+    AxisY               : ST_fbJoystick_AxisCmd; // 📊 Commande et direction qualifiée axe Y
+    DeadmanArmed        : BOOL;                  // 🔒 Homme-mort armé et valide
+    AtNeutralXY         : BOOL;                  // 🟢 Les deux axes X et Y sont au neutre
+    ArmingPermitDenied  : BOOL;                  // ⚠️ Tentative d&#x27;armement sans permission
+    Ready               : BOOL;                  // 🟢 Façade joystick prête et opérationnelle
+    Fault               : ST_Fault;              // ❌ Diagnostic défaut joystick
+    NeutralXAct         : INT;                   // 📍 Valeur ADC neutre calibré X
+    NeutralYAct         : INT;                   // 📍 Valeur ADC neutre calibré Y
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionNetworkDiagnostics.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🔌 ST_AcquisitionNetworkDiagnostics — Diagnostics réseaux qualifiés
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les états opérationnels et diagnostics des bus CANopen
+      et EtherCAT produits par PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Network).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_AcquisitionNetworkDiagnostics :
+STRUCT
+    CanOpenMaster   : ST_Diag_Device; // 🔌 Diagnostic maître CANopen
+    Joystick        : ST_Diag_Device; // 🕹️ Diagnostic esclave Joystick MCB560
+    EthercatMaster  : ST_Diag_Device; // 🔌 Diagnostic maître EtherCAT
+    EncoderM1       : ST_Diag_Device; // 🧲 Diagnostic esclave Codeur M1 (COD1)
+    EncoderM2       : ST_Diag_Device; // 🧲 Diagnostic esclave Codeur M2 (COD2)
+    DriveM3         : ST_Diag_Device; // ⚙️ Diagnostic esclave Variateur M3 (AC600)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_fbEncoder_HwOut.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_fbEncoder_HwOut — Ordres preset de sortie codeur (HwOut)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les SEULES sorties/ordres preset d&#x27;un codeur absolu
+      EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
+   🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
+      vers le device.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   ======================================================================= *)
+
+TYPE ST_fbEncoder_HwOut :
+STRUCT
+    // === SORTIES BUS ETHERCAT (ordres preset vers PDO Rx) ===
+    PresetTriggerCmd   : WORD;   // &lt;-- [ACT] Declenchement preset vers PDO Rx
+    CodeSeqTriggerCmd  : WORD;   // &lt;-- [ACT] Sequence code vers PDO Rx, maintenue a 0
+    PresetValueOut     : UDINT;  // &lt;-- [ACT] Valeur brute envoyee au preset
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionEncoderQualified.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🧲 ST_AcquisitionEncoderQualified — Façade codeur qualifiée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les mesures métriques, statuts de référencement,
+      défauts et signaux hardware produits par FB_Encoder dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.EncoderM1 / Data.EncoderM2).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_AcquisitionEncoderQualified :
+STRUCT
+    Measurement              : ST_fbEncoder_Measurement; // 📊 Mesure métrique (CablePosM, SpeedMps, etc.)
+    Ready                    : BOOL;                     // 🟢 Façade codeur prête
+    Fault                    : ST_Fault;                 // ❌ Diagnostic défaut codeur
+    Homed                    : BOOL;                     // 🎯 Codeur référencé
+    HomingSuspect            : BOOL;                     // ⚠️ Référencement suspect
+    EncoderFault             : BOOL;                     // ❌ Défaut fiabilité (indisponible ou incohérent)
+    HomedAndReliable         : BOOL;                     // ✅ Référencé ET fiable (sans incohérence)
+    PresetConfirmationFailed : BOOL;                     // ❌ Échec confirmation preset
+    HwOut                    : ST_fbEncoder_HwOut;       // 📡 Commandes hardware de preset (lecture seule)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧲 ST_AcquisitionInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_02_Acquisition
@@ -3878,29 +4162,38 @@ END_TYPE</pre>
 
 TYPE ST_AcquisitionInterPrg :
 STRUCT
-    // === 🧲 Mesures codeurs M1/M2 (struct frontiere AF-06 §3ter) ===
-    Encoders                : ST_EncoderMeasurements; // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
+    // === 🛡️ Drapeau de vie &amp; validité globale des données ===
+    DataValid                    : BOOL; // 🟢 TRUE = PRG_02 a complété son scan et les données sont fraîches et qualifiées
 
-    // === 🛡️ Gates fiabilite codeurs (sorties FB_Encoder, hors ST_fbEncoder_Measurement) ===
-    M1_EncoderFault          : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
-    M2_EncoderFault          : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
-    M1_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
-    M2_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
+    // === 📦 Structures qualifiées du bus ===
+    Joystick                     : ST_AcquisitionJoystickQualified;    // 🕹️ Données et commandes joystick qualifiées
+    Network                      : ST_AcquisitionNetworkDiagnostics;  // 🔌 Diagnostics réseaux CANopen et EtherCAT
+    EncoderM1                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M1 (Retenue)
+    EncoderM2                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M2 (Benne)
 
-    // === 🕹️ États joystick qualifiés ===
-    JoystickDeadmanArmed    : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
-    JoystickYNeutral        : BOOL; // 🟢 Axe Y joystick au neutre
-    JoystickDirectionX      : INT;  // 🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
-    JoystickSpeedPctX       : REAL; // 📈 Magnitude deviation axe X en % (0..100)
-    JoystickXNeutral        : BOOL; // 🟢 Axe X joystick au neutre
+    // === 🧲 Mesures codeurs M1/M2 (compatibilité de transition) ===
+    Encoders                     : ST_EncoderMeasurements;             // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
+
+    // === 🛡️ Gates fiabilité codeurs (compatibilité de transition) ===
+    M1_EncoderFault              : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
+    M2_EncoderFault              : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
+    M1_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
+    M2_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
+
+    // === 🕹️ États joystick qualifiés (compatibilité de transition) ===
+    JoystickDeadmanArmed         : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
+    JoystickYNeutral             : BOOL; // 🟢 Axe Y joystick au neutre
+    JoystickDirectionX           : INT;  // 🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
+    JoystickSpeedPctX            : REAL; // 📈 Magnitude deviation axe X en % (0..100)
+    JoystickXNeutral             : BOOL; // 🟢 Axe X joystick au neutre
 
     // === 🩺 Diagnostics modules E/S ===
-    LocalDigitalIoOk         : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
-    Vh0800EndOk              : BOOL; // 🟢 Module VH_0800END OK (DI8)
-    Vh0808EtpOk              : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
-    Vh0008ErOk               : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
-    Vh0008Er1Ok              : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
-    InputModuleFault         : BOOL; // ❌ Defaut sur au moins un module E/S
+    LocalDigitalIoOk             : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
+    Vh0800EndOk                  : BOOL; // 🟢 Module VH_0800END OK (DI8)
+    Vh0808EtpOk                  : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
+    Vh0008ErOk                   : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
+    Vh0008Er1Ok                  : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
+    InputModuleFault             : BOOL; // ❌ Defaut sur au moins un module E/S
 
     // === 🧪 Simulation &amp; variateur M3 filtré ===
     WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)
@@ -4136,7 +4429,7 @@ END_TYPE
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\5_ASSISTANCE_DRAGAGE\ST_DredgingAssistCfg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md §3ter
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_DredgingAssistCfg :
 STRUCT
@@ -5659,6 +5952,152 @@ function copyPinExpr(el) {
     setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
 }
 
+function exportTableCSV(btn, testName) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var rows = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return '"' + th.textContent.replace(/"/g, '""').trim() + '"';
+    });
+    rows.push(headers.join(';'));
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return '"' + td.textContent.replace(/"/g, '""').trim() + '"';
+        });
+        rows.push(cells.join(';'));
+    });
+
+    var csvContent = "\uFEFF" + rows.join('\r\n');
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var safeName = (testName || 'chronogram').replace(/[^a-zA-Z0-9_\-]+/g, '_').substring(0, 50);
+    a.href = url;
+    a.download = safeName + '_chronogram.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📥 Téléchargé !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function copyTableMarkdown(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var lines = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return th.textContent.trim();
+    });
+    lines.push('| ' + headers.join(' | ') + ' |');
+    lines.push('| ' + headers.map(function() { return '---'; }).join(' | ') + ' |');
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return td.textContent.trim().replace(/\|/g, '\\|');
+        });
+        lines.push('| ' + cells.join(' | ') + ' |');
+    });
+
+    var md = lines.join('\n');
+    var ta = document.createElement('textarea');
+    ta.value = md;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📋 Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function toggleVerticalHeaders(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var isVert = table.classList.toggle('headers-vertical');
+    btn.innerHTML = isVert ? "↔️ Titres Horizontaux" : "📐 Titres Verticaux";
+    if (isVert) {
+        btn.classList.add('btn-copied');
+    } else {
+        btn.classList.remove('btn-copied');
+    }
+}
+
+function toggleWfLane(textEl, rowIdx) {
+    var svg = textEl.closest('svg');
+    if (!svg) return;
+    var group = svg.querySelector('.wf-numeric-group[data-row="' + rowIdx + '"]');
+    if (!group) return;
+    var analog = group.querySelector('.wf-analog-view');
+    var digital = group.querySelector('.wf-digital-view');
+    if (!analog || !digital) return;
+
+    var isAnalog = analog.style.display !== 'none';
+    if (isAnalog) {
+        analog.style.display = 'none';
+        digital.style.display = '';
+        textEl.classList.remove('active-curve');
+    } else {
+        analog.style.display = '';
+        digital.style.display = 'none';
+        textEl.classList.add('active-curve');
+    }
+}
+
+function toggleAllWaveforms(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var svg = details.querySelector('svg.waveform');
+    if (!svg) return;
+
+    var groups = svg.querySelectorAll('.wf-numeric-group');
+    if (!groups.length) return;
+
+    var firstAnalog = groups[0].querySelector('.wf-analog-view');
+    var currentlyAnalog = firstAnalog && firstAnalog.style.display !== 'none';
+    var targetAnalog = !currentlyAnalog;
+
+    groups.forEach(function(g) {
+        var a = g.querySelector('.wf-analog-view');
+        var d = g.querySelector('.wf-digital-view');
+        if (a) a.style.display = targetAnalog ? '' : 'none';
+        if (d) d.style.display = targetAnalog ? 'none' : '';
+    });
+
+    var labels = svg.querySelectorAll('.wf-label.wf-clickable');
+    labels.forEach(function(lbl) {
+        if (targetAnalog) lbl.classList.add('active-curve');
+        else lbl.classList.remove('active-curve');
+    });
+
+    btn.innerHTML = targetAnalog ? "🔢 Vue Chiffres" : "📈 Vue Courbes";
+}
+
 function toggleTheme() {
     var current = document.documentElement.getAttribute('data-theme') || 'light';
     var next = current === 'dark' ? 'light' : 'dark';
@@ -5683,6 +6122,175 @@ function updateThemeBtn(theme) {
         }
     } catch (e) {}
 })();
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Redimensionnement manuel des colonnes a la souris (Drag & Drop border)
+    var isResizing = false;
+    var currentTh = null;
+    var startX = 0;
+    var startWidth = 0;
+
+    document.addEventListener('mousedown', function(e) {
+        var resizer = e.target.closest('.col-resizer');
+        if (!resizer) return;
+        isResizing = true;
+        currentTh = resizer.closest('th');
+        startX = e.pageX;
+        startWidth = currentTh.offsetWidth;
+        resizer.classList.add('resizing');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing || !currentTh) return;
+        var diff = e.pageX - startX;
+        var newWidth = Math.max(30, startWidth + diff);
+        currentTh.style.width = newWidth + 'px';
+        currentTh.style.minWidth = newWidth + 'px';
+        currentTh.style.maxWidth = newWidth + 'px';
+
+        if (currentTh.classList.contains('note-th')) {
+            var table = currentTh.closest('.chrono-table');
+            if (table) {
+                table.querySelectorAll('.chrono-note-cell').forEach(function(td) {
+                    td.style.maxWidth = newWidth + 'px';
+                });
+                table.querySelectorAll('.chrono-note-chip').forEach(function(chip) {
+                    chip.style.maxWidth = Math.max(20, newWidth - 10) + 'px';
+                });
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.querySelectorAll('.col-resizer.resizing').forEach(function(r) {
+                r.classList.remove('resizing');
+            });
+            currentTh = null;
+        }
+    });
+
+    // Double-clic sur un en-tete de colonne pour la replier / deplier (hors barre de redimensionnement)
+    document.addEventListener('dblclick', function(e) {
+        if (e.target.closest('.col-resizer')) return;
+        var th = e.target.closest('.chrono-table th');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        var isCollapsed = th.classList.toggle('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.toggle('col-collapsed', isCollapsed);
+        });
+    });
+
+    // Clic simple sur colonne repliee pour la reouvrir
+    document.addEventListener('click', function(e) {
+        var th = e.target.closest('.chrono-table th.col-collapsed');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        th.classList.remove('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.remove('col-collapsed');
+        });
+    });
+
+    // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique
+    var tt = document.getElementById('wf-global-tooltip');
+    if (!tt) {
+        tt = document.createElement('div');
+        tt.id = 'wf-global-tooltip';
+        tt.className = 'wf-tooltip';
+        document.body.appendChild(tt);
+    }
+
+    document.addEventListener('mousemove', function(e) {
+        var svg = e.target.closest('svg.waveform');
+        if (!svg) {
+            if (tt) tt.style.display = 'none';
+            document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+            return;
+        }
+
+        var rect = svg.getBoundingClientRect();
+        var scaleX = svg.viewBox.baseVal.width / rect.width;
+        var scaleY = svg.viewBox.baseVal.height / rect.height;
+
+        var svgX = (e.clientX - rect.left) * scaleX;
+        var svgY = (e.clientY - rect.top) * scaleY;
+
+        var left = parseFloat(svg.getAttribute('data-left') || '200');
+        var top = parseFloat(svg.getAttribute('data-top') || '62');
+        var colw = parseFloat(svg.getAttribute('data-colw') || '56');
+        var laneh = parseFloat(svg.getAttribute('data-laneh') || '40');
+
+        var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
+        var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+
+        var colIdx = Math.floor((svgX - left) / colw);
+        var rowIdx = Math.floor((svgY - top) / laneh);
+
+        var cursorLine = svg.querySelector('.wf-cursor-line');
+
+        if (colIdx >= 0 && colIdx < scansData.length && rowIdx >= 0 && rowIdx < fieldsData.length) {
+            var s = scansData[colIdx];
+            var f = fieldsData[rowIdx];
+            var val = s.fields[f];
+            if (val === undefined) val = "—";
+
+            var displayVal = val;
+            if (val === "1") displayVal = "TRUE";
+            else if (val === "0") displayVal = "FALSE";
+            else {
+                var num = parseFloat(val);
+                if (!isNaN(num)) {
+                    displayVal = Math.abs(num) >= 100 ? num.toFixed(0) : num.toFixed(3);
+                }
+            }
+
+            if (cursorLine) {
+                var cx = left + (colIdx + 0.5) * colw;
+                cursorLine.setAttribute('x1', cx);
+                cursorLine.setAttribute('x2', cx);
+                cursorLine.style.display = '';
+            }
+
+            var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+
+            tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
+                           '<div class="wf-tt-var">' + f + '</div>' +
+                           '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
+                           noteHtml;
+
+            tt.style.display = 'block';
+            var ttX = e.clientX + 16;
+            var ttY = e.clientY + 16;
+            if (ttX + 280 > window.innerWidth) ttX = e.clientX - 280;
+            if (ttY + 120 > window.innerHeight) ttY = e.clientY - 120;
+            tt.style.left = ttX + 'px';
+            tt.style.top = ttY + 'px';
+        } else {
+            if (tt) tt.style.display = 'none';
+            if (cursorLine) cursorLine.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('mouseleave', function() {
+        if (tt) tt.style.display = 'none';
+        document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+    });
+});
 </script>
 </body>
 </html>

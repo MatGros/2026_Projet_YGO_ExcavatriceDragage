@@ -1,34 +1,12 @@
-Error compiling source files:
-
-FB_Modes.st:34:31: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_MODES'
-  34 |     Fault                   : ST_Fault;
-     |                               ^
-
-FB_Modes.st:45:31: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_MODES'
-  45 |     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
-     |                               ^
-
-FB_DiveSearch.st:36:31: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_DIVESEARCH'
-  36 |     Fault                   : ST_Fault;
-     |                               ^
-
-FB_DiveSearch.st:37:31: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_DIVESEARCH'
-  37 |     Lifecycle               : ST_Lifecycle;
-     |                               ^
-
-FB_DiveSearch.st:61:31: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_DIVESEARCH'
-  61 |     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
-     |                               ^
-
-FB_ExtractionSequence.st:37:35: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
-  37 |     Fault                       : ST_Fault;
-     |                                   ^
-
-FB_ExtractionSequence.st:38:35: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
-  38 |     Lifecycle                   : ST_Lifecycle;
-     |                                   ^
-
-FB_ExtractionSequence.st:65:35: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_EXTRACTIONSEQUENCE'
-  65 |     instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
-     |                                   ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_03_Modes_Cycle_xr7_xawe\strucpp-test-HJUEWQ\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_03::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_03_Modes_Cycle_xr7_xawe\strucpp-test-HJUEWQ\generated.cpp:13606:35: error: 'class strucpp::FB_CYCLE' has no member named 'BUSY'
+13606 |     CYCLEBUSY = INSTCYCLESEMIAUTO.BUSY;
+      |                                   ^~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_03_Modes_Cycle_xr7_xawe\strucpp-test-HJUEWQ\generated.cpp:13607:35: error: 'class strucpp::FB_CYCLE' has no member named 'DONE'
+13607 |     CYCLEDONE = INSTCYCLESEMIAUTO.DONE;
+      |                                   ^~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_03_Modes_Cycle_xr7_xawe\strucpp-test-HJUEWQ\generated.cpp:13608:36: error: 'class strucpp::FB_CYCLE' has no member named 'ERROR'
+13608 |     CYCLEERROR = INSTCYCLESEMIAUTO.ERROR;
+      |                                    ^~~~~
 
