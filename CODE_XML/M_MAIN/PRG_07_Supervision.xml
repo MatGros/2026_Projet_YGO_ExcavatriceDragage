@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T16:28:23.421027" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T16:28:23.421027">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T17:46:36.414687" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T17:46:36.414687">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3129,6 +3129,11 @@ seule source de confirmation).</xhtml>
               </type>
             </variable>
             <variable name="ExtractionState">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+            </variable>
+            <variable name="ExtractionStepAtFault">
               <type>
                 <derived name="E_ExtractionSequenceState" />
               </type>
@@ -6794,6 +6799,7 @@ GVL_IHM.DredgingAssist.State.ExtractionDone              := PRG_03_Modes_Cycle.D
 GVL_IHM.DredgingAssist.State.ExtractionError             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionError;
 GVL_IHM.DredgingAssist.State.ExtractionErrorId           := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionErrorId;
 GVL_IHM.DredgingAssist.State.ExtractionState             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionState;
+GVL_IHM.DredgingAssist.State.ExtractionStepAtFault       := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionStepAtFault;
 GVL_IHM.DredgingAssist.State.OperatorActionId           := PRG_03_Modes_Cycle.Data.SequenceState.OperatorActionId;
 GVL_IHM.DredgingAssist.State.OperatorAction             := PRG_03_Modes_Cycle.Data.SequenceState.OperatorAction;
 GVL_IHM.DredgingAssist.State.DumpAtTremieArmed           := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieArmed;

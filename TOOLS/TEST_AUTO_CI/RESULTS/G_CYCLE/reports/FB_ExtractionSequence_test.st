@@ -111,3 +111,122 @@ TEST 'TC-P04-021 : Sequence extraction complete et continue avec maintien consta
     ASSERT_TRUE(FB.AscentPermit, 'Maintien continu du permis de montee');
 END_TEST
 
+TEST 'TC-P04-022 : Depassement tempo decollage controle -> ERROR_HOLD et capture StepAtFault'
+    // Timeout runtime = MAX(0.1, 2.0m) / 0.15 * 2.0 = 26.7s ; CycleTime=10s -> depassement au 3e scan d'accumulation.
+    // Mise en condition CONTROL_ASCENT (fond confirme -> fermeture -> benne fermee), distance jamais atteinte.
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0,
+       MotionRequestActive := TRUE, MotionDirection := 1, CycleTime := T#10s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1, CycleTime := T#10s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1, CycleTime := T#10s);
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.CONTROL_ASCENT, 'En decollage controle');
+
+    // Accumulation : 4 scans de 10s = 40s (> 26.7s), distance de controle jamais franchie (M1/M2 fixes a -9.0)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -9.0, M2Position_M := -9.0, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1, CycleTime := T#10s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -9.0, M2Position_M := -9.0, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1, CycleTime := T#10s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -9.0, M2Position_M := -9.0, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1, CycleTime := T#10s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -9.0, M2Position_M := -9.0, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1, CycleTime := T#10s);
+
+    ASSERT_TRUE(FB.Fault.Error, 'Defaut timeout decollage controle declenche');
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.ERROR_HOLD, 'Verrouille en ERROR_HOLD');
+    ASSERT_EQ(FB.StepAtFault, E_ExtractionSequenceState.CONTROL_ASCENT, 'StepAtFault memorise CONTROL_ASCENT');
+    ASSERT_FALSE(FB.AscentPermit, 'Permis montee coupe');
+    ASSERT_FALSE(FB.ForceMinSpeedStep, 'Consignes automatiques arretees');
+END_TEST
+
+TEST 'TC-P04-023 : Backstop fermeture benne (FB_Bucket sans faute) -> ERROR_HOLD et capture StepAtFault'
+    // Backstop = 20s (test) ; CycleTime=8s -> depassement au 3e scan. BucketIsClosed jamais vrai, BucketError jamais vrai.
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.CLOSING_BUCKET, 'En fermeture benne');
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+
+    ASSERT_TRUE(FB.Fault.Error, 'Backstop fermeture benne declenche');
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.ERROR_HOLD, 'Verrouille en ERROR_HOLD');
+    ASSERT_EQ(FB.StepAtFault, E_ExtractionSequenceState.CLOSING_BUCKET, 'StepAtFault memorise CLOSING_BUCKET');
+    ASSERT_FALSE(FB.BucketCloseRequest, 'Ordre fermeture coupe');
+END_TEST
+
+TEST 'TC-P04-024 : Latch timeout extraction survit au cycle Enable OFF/ON, acquitte seulement sur front Reset'
+    // Declenche un backstop fermeture -> latch arme
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       CfgBucketCloseTimeout := T#20s, BucketMoveTimeout := T#5s, CycleTime := T#8s);
+    ASSERT_TRUE(FB.Fault.Latched, 'Latch backstop fermeture arme');
+
+    // Enable OFF : neutralisation, latch conserve
+    FB(Enable := FALSE, Reset := FALSE, PowerContactorEngaged := TRUE, ControlAscentDistance_M := 2.0);
+    ASSERT_TRUE(FB.Fault.Latched, 'Latch conserve sous Enable=FALSE');
+
+    // Enable ON sans Reset : defaut toujours latche
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, MotionRequestActive := FALSE);
+    ASSERT_TRUE(FB.Fault.Latched, 'Latch toujours actif sans acquittement');
+
+    // Front Reset : acquittement effectif
+    FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, MotionRequestActive := FALSE);
+    ASSERT_FALSE(FB.Fault.Latched, 'Front Reset acquitte le latch');
+END_TEST
+

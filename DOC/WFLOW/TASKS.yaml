@@ -2664,17 +2664,20 @@ tasks:
   - T167-A
 - id: T167-C
   parent_id: T167
-  statut: ⬜
+  statut: ⏳
   criticite: C4
   domaine: MODES_CYCLE
-  agent: AGY-01
+  agent: CC
   date: '2026-08-28T16:38:00+02:00'
-  titre: Refonte FB_ExtractionSequence (décollage et vitesse contrôlée)
-  contexte: Implémentation ST du nouveau FB_ExtractionSequence ou gel justifié de la baseline.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml.'
+  updated_at: '2026-08-28T20:30:00+02:00'
+  titre: Durcissement FB_ExtractionSequence (backstop fermeture benne + timeout décollage runtime + StepAtFault)
+  contexte: Patch additif ; backstop CfgBucketCloseTimeout verrouillé > BucketMoveTimeout (watchdog benne), timeout CONTROL_ASCENT runtime depuis ControlAscentDistance_M.
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml. Code + tests verts (6/6), G200 PASS, gates C 16/16. Revue Ollama PASS avec 3 réserves — toutes traitées (contrôle runtime ordre watchdogs, garde CycleTime, StepAtFault Reset conditionné). Attend visa humain + T167-CR.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml
   objectifs:
-  - Assurer la coordination fermeture benne et décollage matière
+  - Backstop fermeture benne verrouillé pour ne jamais masquer BucketError
+  - Timeout décollage CONTROL_ASCENT calculé au runtime + capture StepAtFault
+  - Latch survivant au cycle Enable, Reset jamais conditionné
   bloque_par:
   - T167-B
 - id: T167-CR

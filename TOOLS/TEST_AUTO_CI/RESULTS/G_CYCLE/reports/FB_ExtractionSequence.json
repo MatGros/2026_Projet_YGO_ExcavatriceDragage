@@ -13,11 +13,23 @@
     {
       "name": "TC-P04-021 : Sequence extraction complete et continue avec maintien constant du joystick operateur",
       "passed": true
+    },
+    {
+      "name": "TC-P04-022 : Depassement tempo decollage controle -> ERROR_HOLD et capture StepAtFault",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-023 : Backstop fermeture benne (FB_Bucket sans faute) -> ERROR_HOLD et capture StepAtFault",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-024 : Latch timeout extraction survit au cycle Enable OFF/ON, acquitte seulement sur front Reset",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 6,
+    "passed": 6,
     "failed": 0
   }
 }

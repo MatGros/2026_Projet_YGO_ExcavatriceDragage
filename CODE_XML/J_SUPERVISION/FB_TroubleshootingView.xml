@@ -1688,6 +1688,11 @@ seule source de confirmation).</xhtml>
                 <derived name="E_ExtractionSequenceState" />
               </type>
             </variable>
+            <variable name="ExtractionStepAtFault">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+            </variable>
             <variable name="OperatorActionId">
               <type>
                 <WORD />

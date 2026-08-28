@@ -448,6 +448,7 @@ GVL_IHM.DredgingAssist.State.ExtractionDone              := PRG_03_Modes_Cycle.D
 GVL_IHM.DredgingAssist.State.ExtractionError             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionError;
 GVL_IHM.DredgingAssist.State.ExtractionErrorId           := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionErrorId;
 GVL_IHM.DredgingAssist.State.ExtractionState             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionState;
+GVL_IHM.DredgingAssist.State.ExtractionStepAtFault       := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionStepAtFault;
 GVL_IHM.DredgingAssist.State.OperatorActionId           := PRG_03_Modes_Cycle.Data.SequenceState.OperatorActionId;
 GVL_IHM.DredgingAssist.State.OperatorAction             := PRG_03_Modes_Cycle.Data.SequenceState.OperatorAction;
 GVL_IHM.DredgingAssist.State.DumpAtTremieArmed           := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieArmed;

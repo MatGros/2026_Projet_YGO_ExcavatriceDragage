@@ -146,7 +146,10 @@ instExtractionSequence(
     M2MeasuredSpeedValid := PRG_02_Acquisition.Data.Encoders.M2.SpeedValid,
     PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
                        AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
-    ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M
+    ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M,
+    CfgBucketCloseTimeout := T#75s,
+    BucketMoveTimeout := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
+    CycleTime := T#10ms
 );
 
 IF instExtractionSequence.BottomConfirmationConsumed THEN
@@ -262,8 +265,10 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchActive    := instCycleSemiAuto.SpeedMismatchActive;
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
     Data.SequenceState.DiveState              := E_DiveSearchState.WAIT_PRECONDITIONS;
+    Data.SequenceState.DiveStepAtFault        := E_DiveSearchState.WAIT_PRECONDITIONS;
     Data.SequenceState.BottomTouchConfirmed   := FALSE;
     Data.SequenceState.ExtractionState        := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionStepAtFault  := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
 
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
@@ -347,6 +352,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.ExtractionError             := instExtractionSequence.Fault.Error;
     Data.SequenceState.ExtractionErrorId           := instExtractionSequence.Fault.ErrorId;
     Data.SequenceState.ExtractionState             := instExtractionSequence.ExtractionState;
+    Data.SequenceState.ExtractionStepAtFault       := instExtractionSequence.StepAtFault;
     Data.SequenceState.DumpAtTremieArmed           := DumpAtTremieActive;
     Data.SequenceState.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
     Data.SequenceState.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
@@ -399,6 +405,7 @@ ELSE
     Data.SequenceState.DiveError                  := FALSE;
     Data.SequenceState.DiveErrorId                := 0;
     Data.SequenceState.DiveState                  := E_DiveSearchState.WAIT_PRECONDITIONS;
+    Data.SequenceState.DiveStepAtFault            := E_DiveSearchState.WAIT_PRECONDITIONS;
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
     Data.SequenceState.ExtractionReady             := FALSE;
     Data.SequenceState.ExtractionBusy              := FALSE;
@@ -406,6 +413,7 @@ ELSE
     Data.SequenceState.ExtractionError             := FALSE;
     Data.SequenceState.ExtractionErrorId           := 0;
     Data.SequenceState.ExtractionState             := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionStepAtFault       := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
     Data.SequenceState.DumpAtTremieArmed           := FALSE;
     Data.SequenceState.DumpAtTremieAssistActive      := FALSE;
     Data.SequenceState.DumpAtTremieAtTremie          := FALSE;

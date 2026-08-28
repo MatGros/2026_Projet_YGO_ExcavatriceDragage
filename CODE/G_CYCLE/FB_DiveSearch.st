@@ -98,10 +98,12 @@ ResetEdge(CLK := Reset);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 
-ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M < ImmersionUpper_M)
-                  OR (ImmersionUpper_M <= ImmersionLower_M)
-                  OR (ImmersionLower_M <= LimitLegalDepthMin_M)
-                  OR (CableLimitAscent_M <= ImmersionLower_M));
+// Base de temps nulle = timers de garde inoperants : defaut de parametrage inconditionnel.
+ErrorCausePresent := (CycleTime <= T#0ms)
+                  OR (NOT BypassPreconditions AND ((DiveStartMin_M < ImmersionUpper_M)
+                       OR (ImmersionUpper_M <= ImmersionLower_M)
+                       OR (ImmersionLower_M <= LimitLegalDepthMin_M)
+                       OR (CableLimitAscent_M <= ImmersionLower_M)));
 
 // ⏱️ Plafonds anti-blocage calcules au runtime : course credible max / vitesse Palier 1 mini x marge.
 // Course immersion = du plafond haut d'exploitation a la borne basse d'immersion (depart de plongee
@@ -168,7 +170,7 @@ Fault := instFault.Fault;
 ErrorEdge(CLK := Fault.Error);
 IF ErrorEdge.Q THEN
     StepAtFault := PrevState;
-ELSIF ResetEdge.Q THEN
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
     StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 {endregion}

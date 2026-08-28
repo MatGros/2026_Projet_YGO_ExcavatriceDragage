@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T16:28:25.957832" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T16:28:25.957832">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T17:46:16.782856" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T17:46:16.782856">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -273,6 +273,14 @@ Assistance plongée prête</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne séquence extraction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionStepAtFault">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne mémorisée au défaut extraction</xhtml>
               </documentation>
             </variable>
             <variable name="DumpAtTremieArmed">

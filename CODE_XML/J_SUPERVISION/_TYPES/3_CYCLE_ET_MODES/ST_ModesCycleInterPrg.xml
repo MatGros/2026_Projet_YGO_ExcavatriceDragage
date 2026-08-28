@@ -377,6 +377,14 @@ Assistance plongée prête</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne séquence extraction</xhtml>
               </documentation>
             </variable>
+            <variable name="ExtractionStepAtFault">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne mémorisée au défaut extraction</xhtml>
+              </documentation>
+            </variable>
             <variable name="DumpAtTremieArmed">
               <type>
                 <BOOL />
