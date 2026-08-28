@@ -59,6 +59,12 @@ def _fmt_val(v: str, is_bool: bool = True) -> str:
         return '<span class="v-true">TRUE</span>'
     if is_bool and v == "0":
         return '<span class="v-false">FALSE</span>'
+    try:
+        if "." in v or ("e" in v.lower() and not v.startswith("0x")):
+            fval = float(v)
+            return f"{fval:.3f}"
+    except ValueError:
+        pass
     return _html.escape(v)
 
 
@@ -777,26 +783,28 @@ _CSS = """
     .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
         padding: 8px 12px; }
     .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
-    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
-    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
-    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
-    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
-    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
-    .chrono-table .scan-t { color: var(--muted); }
-    .chrono-table td.changed { background: #fef9c3; }
-    .v-true { color: var(--green-text); font-weight: 600; }
-    .v-false { color: #cbd5e1; }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border); }
+    .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; }
+    .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; }
+    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; }
+    .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
+    .chrono-table .scan-t { color: var(--muted); font-family: monospace; }
+    .chrono-table td.changed { background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 700; }
+    [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
+    [data-theme="light"] .chrono-table td.changed { background: #fef9c3; color: #854d0e; }
+    .v-true { color: #34d399; font-weight: 700; }
+    .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
         border-radius: 8px; margin-top: 8px; padding: 4px 0; }
     .waveform { display: block; }
-    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
-    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
-    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
-    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
-    .wf-line { fill: none; stroke-width: 2; }
-    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
-    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
-    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-grid { stroke: var(--border); stroke-width: 1; opacity: 0.6; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-scan { font-size: 9px; fill: var(--muted); opacity: 0.7; text-anchor: middle; font-family: monospace; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; font-weight: 600; }
+    .wf-line { fill: none; stroke-width: 2.2; }
+    .wf-num-line { stroke: var(--border); stroke-width: 1; }
+    .wf-num { font-size: 10.5px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-num-changed { font-size: 10.5px; fill: #ffffff; font-weight: 700; text-anchor: middle; font-family: monospace; }
     .wf-chip { opacity: 0.95; }
     .wf-legend { font-size: 10px; fill: var(--muted); }
     .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }

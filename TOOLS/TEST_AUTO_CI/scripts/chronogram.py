@@ -18,8 +18,8 @@ import pathlib
 import re
 import subprocess
 
-FIELD_LINE_RE = re.compile(r"^\s*(\w+)\s+(\w+)\s*;\s*$")
-STRUCT_RE = re.compile(r"struct\s+(\w+)\s*\{(.*?)\};", re.DOTALL)
+FIELD_LINE_RE = re.compile(r"^\s*(\w+)\s+(\w+)\s*(?:\{.*?\})?\s*;\s*$")
+STRUCT_RE = re.compile(r"struct\s+(\w+)\s*(?::\s*public\s+\w+\s*)?\{(.*?)\n\};", re.DOTALL)
 SCAN_CALL_RE = re.compile(r"(\n(\s*)s\.FB\(\);\n\s*s\.FB\.ENO = true;)")
 TEST_FUNC_RE = re.compile(
     r"// TEST '([^']*)'\nbool (test_\d+)\(strucpp::TestContext& ctx\) \{.*?"
@@ -36,7 +36,10 @@ def _extract_structs(hpp_text: str) -> dict:
         name, body = m.group(1), m.group(2)
         fields = []
         for line in body.splitlines():
-            fm = FIELD_LINE_RE.match(line.split("{")[0] + ";" if "{" in line else line)
+            line = line.strip()
+            if not line or line.startswith("//"):
+                continue
+            fm = FIELD_LINE_RE.match(line)
             if fm and fm.group(1).startswith("IEC_"):
                 fields.append((fm.group(2), fm.group(1)))
         if fields:
