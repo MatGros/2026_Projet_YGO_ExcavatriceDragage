@@ -294,6 +294,19 @@ async function doScan() {
   if (!data.ok) { document.getElementById('oRaw').textContent = 'ERREUR: ' + (data.error||''); return; }
   lastStep = parseInt(data.outputs.CYCLESTEP, 10);
   render(data.outputs);
+
+  // Monde simulé (🟡) : la benne s'ouvre/se ferme quand FB la commande ET l'opérateur tient le joystick.
+  // (ex. X3 : BucketCmd.Open=1, OperatorAction "maintenir le joystick : ouverture complète de la benne")
+  const opActive = deadman && (Math.abs(joyY) > 0.2 || Math.abs(joyX) > 0.2);
+  if (opActive && data.outputs['BUCKETCMD.OPEN']==='1') {
+    const cb = document.getElementById('BENNE_ISOPEN'); if (cb) cb.checked = true;
+    const cb2 = document.getElementById('BENNE_ISCLOSED'); if (cb2) cb2.checked = false;
+  }
+  if (opActive && data.outputs['BUCKETCMD.CLOSE']==='1') {
+    const cb2 = document.getElementById('BENNE_ISCLOSED'); if (cb2) cb2.checked = true;
+    const cb = document.getElementById('BENNE_ISOPEN'); if (cb) cb.checked = false;
+  }
+
   // Simulation physique : le treuil bouge si le FB le commande ET l'opérateur est d'accord
   // (intention joystick même sens + homme-mort). C'est la réponse du MONDE, pas du FB.
   const cmdStart = data.outputs['WINCHM1CMD.STARTSTOP'] === '1';
