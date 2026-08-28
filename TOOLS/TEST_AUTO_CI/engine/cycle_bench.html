@@ -207,9 +207,10 @@ const STEP_NAMES = {0:'X0_PREPARATION',1:'X1_HOMING',2:'X2_WORK_POS_SELECT',3:'X
 
 // État de simulation de l'environnement (positions treuil)
 let simM1 = 7.0, simM2 = 7.0;
-let joyY = 0, joyX = 0;        // -1..1 intention opérateur (Y: -1=montée? on choisit +1=descendre joystick, cf convention)
+let joyY = 0, joyX = 0;        // -1..1 intention opérateur (Y: >0 = montée, <0 = descente)
 let deadman = false;
 let autoTimer = null;
+let lastStep = 0;              // dernière étape décidée par le binaire (pour l'homing auto)
 
 // --- Joystick (pointer events) ---
 const joyEl = document.getElementById('joy');
@@ -240,8 +241,21 @@ function dead() {
 // --- Collecte stimuli ---
 function collectStimuli() {
   const s = {};
-  const bools = ['ENABLE','POWERCONTACTORENGAGED','CYCLEMOTIONPERMIT','HEARTBEATIHMOK','STARTCYCLE','ABORTCYCLE','RESET','TRANSLATION_AT_P1','TRANSLATION_AT_TREMIE','TRANSLATION_AT_MAINTENANCE','TRANSLATION_DONE','BENNE_DONE','BENNE_ISOPEN','BENNE_ISCLOSED','BENNE_ISROUGHLYCLOSED','HOMEDM1','HOMEDM2'];
+  const bools = ['ENABLE','POWERCONTACTORENGAGED','CYCLEMOTIONPERMIT','HEARTBEATIHMOK','STARTCYCLE','ABORTCYCLE','RESET','TRANSLATION_AT_P1','TRANSLATION_AT_TREMIE','TRANSLATION_AT_MAINTENANCE','TRANSLATION_DONE','BENNE_DONE','BENNE_ISOPEN','BENNE_ISCLOSED','BENNE_ISROUGHLYCLOSED'];
   bools.forEach(id => { const el = document.getElementById(id); if (el) s[id] = el.checked ? 1 : 0; });
+
+  // Homing auto (🟡 monde simulé = FB_Encoder_Homing) : pendant X1, si le câble atteint le
+  // capteur top, le codeur devient référencé → HomedM1/HomedM2=1 → le séquenceur quitte X1.
+  const elM1 = document.getElementById('HOMEDM1'), elM2 = document.getElementById('HOMEDM2');
+  let hM1 = elM1.checked, hM2 = elM2.checked;
+  if (lastStep === 1 && simM1 >= 8.5 - 0.05 && simM2 >= 8.5 - 0.05) {
+    hM1 = hM2 = true;
+    if (!elM1.checked) elM1.checked = true;
+    if (!elM2.checked) elM2.checked = true;
+  }
+  s.HOMEDM1 = hM1 ? 1 : 0;
+  s.HOMEDM2 = hM2 ? 1 : 0;
+
   s.MODE = document.getElementById('MODE').value;
   s.SELTARGET = parseInt(document.getElementById('SELTARGET').value || '0', 10);
   // Capteurs dérivés de la position (simulation environnement)
@@ -260,6 +274,7 @@ async function doScan() {
   const res = await fetch('/scan', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({stimuli}) });
   const data = await res.json();
   if (!data.ok) { document.getElementById('oRaw').textContent = 'ERREUR: ' + (data.error||''); return; }
+  lastStep = parseInt(data.outputs.CYCLESTEP, 10);
   render(data.outputs);
   // Simulation physique : le treuil bouge si le FB le commande ET l'opérateur est d'accord
   // (intention joystick même sens + homme-mort). C'est la réponse du MONDE, pas du FB.
@@ -281,7 +296,12 @@ function toggleAuto(el) {
 }
 
 async function resetEngine() {
-  simM1 = 7.0; simM2 = 7.0; updatePosBar();
+  simM1 = 7.0; simM2 = 7.0; lastStep = 0;
+  // Codeurs remis non référencés (pour re-tester l'homing)
+  const e1 = document.getElementById('HOMEDM1'), e2 = document.getElementById('HOMEDM2');
+  if (e1) e1.checked = false;
+  if (e2) e2.checked = false;
+  updatePosBar(); updateScene({CYCLESTEP: '0'});
   await fetch('/reset', { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
   document.getElementById('oRaw').textContent = 'Moteur réinitialisé.';
 }
