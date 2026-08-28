@@ -6,6 +6,7 @@ PASS/FAIL + 1re erreur, jamais la liste des ASSERT_* verifies)."""
 
 import datetime as _dt
 import html as _html
+import json
 import pathlib
 import re
 
@@ -212,7 +213,7 @@ def _fmt_scale(v: float) -> str:
         return f"{v:.2f}"
 
 
-def _render_waveform(scans: list, field_names: list, field_types: dict, fail_scan_num=None) -> str:
+def _render_waveform(scans: list, field_names: list, field_types: dict, fail_scan_num=None, scan_notes: dict = None) -> str:
     """Chronogramme graphique SVG : 1 ligne par variable, temps en abscisse (par index de
     scan -- espacement uniforme pour rester lisible meme quand les t_ns reels sont tres
     inegaux -- le temps simule reel est annote sous chaque colonne). BOOL = creneau
@@ -250,8 +251,27 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
         return _other_colors[f]
 
     legend = [("#111827", "Reset"), ("#dc2626", "Erreur / défaut"), ("#ea580c", "Lockout"), ("#2563eb", "Autres (palette)")]
+    
+    notes_dict = scan_notes or {}
+    scans_data = []
+    for s in scans:
+        scans_data.append({
+            "scan": s["scan"],
+            "t_ms": round(s["t_display_ms"], 1),
+            "fields": s["fields"],
+            "note": notes_dict.get(s["scan"], "")
+        })
+    scans_json = _html.escape(json.dumps(scans_data))
+    fields_json = _html.escape(json.dumps(field_names))
+
     svg_parts = [f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
+                 f'data-scans="{scans_json}" data-fields="{fields_json}" '
+                 f'data-left="{left_margin}" data-top="{top_margin}" '
+                 f'data-colw="{col_w}" data-laneh="{lane_h}" '
                  f'xmlns="http://www.w3.org/2000/svg" class="waveform">']
+
+    # Curseur vertical guide
+    svg_parts.append(f'<line class="wf-cursor-line" x1="0" y1="{top_margin - 6}" x2="0" y2="{height - 18}" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/>')
 
     # legende couleurs
     lx = left_margin
@@ -442,7 +462,7 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
                     </span>
                 </div>
             </summary>
-            <div class="wf-scroll">{_render_waveform(scans, changed_fields, field_types, fail_scan_num)}</div>
+            <div class="wf-scroll">{_render_waveform(scans, changed_fields, field_types, fail_scan_num, scan_notes=scan_notes)}</div>
         </details>
         <details {"open" if not test_passed else ""}>
             <summary class="chrono-table-summary">
@@ -1063,6 +1083,24 @@ _CSS = """
     .wf-legend { font-size: 10px; fill: var(--muted); }
     .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; font-family: monospace; font-weight: 600; }
     [data-theme="light"] .wf-scale { fill: #64748b; }
+    .wf-tooltip {
+        position: fixed; pointer-events: none; z-index: 9999;
+        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
+        border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        border-radius: 8px; padding: 8px 12px; font-size: 11.5px; color: #f8fafc;
+        display: none; max-width: 320px; line-height: 1.4;
+    }
+    [data-theme="light"] .wf-tooltip {
+        background: rgba(255, 255, 255, 0.97); border-color: #cbd5e1;
+        color: #1e293b; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
+    [data-theme="light"] .wf-tt-head { color: #0284c7; }
+    .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
+    .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
+    .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
+    [data-theme="light"] .wf-tt-note { border-top-color: rgba(0, 0, 0, 0.1); }
     .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
         border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
     .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
@@ -1396,6 +1434,91 @@ document.addEventListener('DOMContentLoaded', function() {
             var cell = row.children[colIdx];
             if (cell) cell.classList.remove('col-collapsed');
         });
+    });
+
+    // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique
+    var tt = document.getElementById('wf-global-tooltip');
+    if (!tt) {
+        tt = document.createElement('div');
+        tt.id = 'wf-global-tooltip';
+        tt.className = 'wf-tooltip';
+        document.body.appendChild(tt);
+    }
+
+    document.addEventListener('mousemove', function(e) {
+        var svg = e.target.closest('svg.waveform');
+        if (!svg) {
+            if (tt) tt.style.display = 'none';
+            document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+            return;
+        }
+
+        var rect = svg.getBoundingClientRect();
+        var scaleX = svg.viewBox.baseVal.width / rect.width;
+        var scaleY = svg.viewBox.baseVal.height / rect.height;
+
+        var svgX = (e.clientX - rect.left) * scaleX;
+        var svgY = (e.clientY - rect.top) * scaleY;
+
+        var left = parseFloat(svg.getAttribute('data-left') || '200');
+        var top = parseFloat(svg.getAttribute('data-top') || '62');
+        var colw = parseFloat(svg.getAttribute('data-colw') || '56');
+        var laneh = parseFloat(svg.getAttribute('data-laneh') || '40');
+
+        var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
+        var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+
+        var colIdx = Math.floor((svgX - left) / colw);
+        var rowIdx = Math.floor((svgY - top) / laneh);
+
+        var cursorLine = svg.querySelector('.wf-cursor-line');
+
+        if (colIdx >= 0 && colIdx < scansData.length && rowIdx >= 0 && rowIdx < fieldsData.length) {
+            var s = scansData[colIdx];
+            var f = fieldsData[rowIdx];
+            var val = s.fields[f];
+            if (val === undefined) val = "—";
+
+            var displayVal = val;
+            if (val === "1") displayVal = "TRUE";
+            else if (val === "0") displayVal = "FALSE";
+            else {
+                var num = parseFloat(val);
+                if (!isNaN(num)) {
+                    displayVal = Math.abs(num) >= 100 ? num.toFixed(0) : num.toFixed(3);
+                }
+            }
+
+            if (cursorLine) {
+                var cx = left + (colIdx + 0.5) * colw;
+                cursorLine.setAttribute('x1', cx);
+                cursorLine.setAttribute('x2', cx);
+                cursorLine.style.display = '';
+            }
+
+            var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+
+            tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
+                           '<div class="wf-tt-var">' + f + '</div>' +
+                           '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
+                           noteHtml;
+
+            tt.style.display = 'block';
+            var ttX = e.clientX + 16;
+            var ttY = e.clientY + 16;
+            if (ttX + 280 > window.innerWidth) ttX = e.clientX - 280;
+            if (ttY + 120 > window.innerHeight) ttY = e.clientY - 120;
+            tt.style.left = ttX + 'px';
+            tt.style.top = ttY + 'px';
+        } else {
+            if (tt) tt.style.display = 'none';
+            if (cursorLine) cursorLine.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('mouseleave', function() {
+        if (tt) tt.style.display = 'none';
+        document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
     });
 });
 """
