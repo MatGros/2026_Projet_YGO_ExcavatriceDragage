@@ -81,5 +81,9 @@ contract:
     - "  Tests : FB_DiveSearch 7/7 PASS (dont TC-P04-013/014 timeout, TC-P04-015 latch survit Enable OFF/ON)."
     - "  Non-régression : FB_Cycle 7/7, FB_ExtractionSequence 3/3, PRG_03 8/8. G200 PASS 0 erreur. Gates palier C 16/16 PASS."
     - "  Revue Ollama deepseek-v4-flash : PASS AVEC RÉSERVES (réserve doc CycleTime 20ms→10ms — corrigée)."
+    - "2026-08-28 : T167-CR 3 revues indépendantes (deepseek-v4-flash, gpt-5.6-terra-high, gpt-5.6-sol-max)."
+    - "  2 passes de durcissement : H1-H5 (anti-chauffe contacteur, coupure même-scan, bornage LIMIT,"
+    - "  StepAtFault au site du latch, garde Mode) puis F2 (garde Reset NOT Palier5). Tests FB_DiveSearch 8/8."
+    - "2026-08-28 : VISA HUMAIN — compilation CODESYS 3.5 OK confirmée. Contrat VALIDÉ."
 
-status: IN_REVIEW   # code + tests verts ; attend visa humain final + T167-CR
+status: VALIDATED   # visa humain 2026-08-28 (CODESYS OK) ; 3 revues indépendantes + 2 passes durcissement
