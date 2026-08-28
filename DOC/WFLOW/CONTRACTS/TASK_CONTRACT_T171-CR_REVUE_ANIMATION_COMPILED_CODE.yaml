@@ -1,22 +1,31 @@
 ﻿contract:
   task_id: T171-CR_REVUE_ANIMATION_COMPILED_CODE
   parent_id: T171
-  criticality: C3
+  criticality: C2
   strategy: review
+
+  depends_on:
+    - T171-B
+
   objective: >
-    Audit indépendant par le sous-agent Ollama local (DeepSeek) pour certifier
-    que l'animation est rigoureusement et exclusivement alimentée par le code ST compilé,
-    sans aucune logique métier fictive ou code arbitraire en JS.
+    Audit indépendant par sous-agent local Ollama (modèle distinct qwen3.8:27b) et contre-revue humaine
+    pour certifier l'éradication totale de toute logique métier fictive en JS et garantir que l'animation
+    est asservie à 100% sur la trace JSON issue du compilateur STruCpp.
+
   acceptance:
     - id: AC1
-      statement: "Rapport d'audit Ollama confirmant la traçabilité intégrale entre FB_Cycle.st, le compilateur C++ STruCpp et le lecteur Canvas."
-      verified_by: "Rapport d'audit dans DOC/WFLOW/TROUBLESHOOTING/ ou TASKS."
+      statement: "Revue indépendante confirmant l'absence de tout calcul décisionnel d'étape ou d'état de mouvement en JavaScript."
+      verified_by: "Rapport d'audit du sous-agent qwen3.8:27b."
+    - id: AC2
+      statement: "L'orchestrateur lit, vérifie et valide le git diff réel (visa P5)."
+      verified_by: "Visa formel de l'orchestrateur."
+
   scope:
     allowed:
-      - TOOLS/TEST_AUTO_CI/**
-  conservation:
-    must_survive:
-      - "Règle de sécurité machine et exactitude des états d'automate."
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FICHE_SEMI_AUTO_ANIMATION.html
+      - DOC/WFLOW/**
+
   evidence_required:
     - audit_report_pass
+
 status: READY_FOR_EXECUTION

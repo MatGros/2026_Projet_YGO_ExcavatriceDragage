@@ -2822,22 +2822,23 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T17:56:00+02:00'
   titre: Harnais ST de simulation dynamique & génération de trace scan-par-scan
-  contexte: Exécution de FB_Cycle compilé sur un cycle complet X0..X13.
-  description: Création du test ST dynamique produisant trace_semi_auto_cycle.json.
+  contexte: Exécution de FB_Cycle compilé sur un cycle complet X0..X13 étendant test_fb_cycle.st.
+  description: Création du test ST dynamique produisant trace_semi_auto_cycle.json selon le Grafcet AF-04.
   contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE.yaml'
   objectifs:
-  - Produire la trace scan-par-scan complète des E/S et de CycleStep
-  bloque_par: []
+  - Traversée séquentielle ordonnée X0 à X13 sous stimuli réalistes
+  bloque_par:
+  - T171
 - id: T171-B
   parent_id: T171
   statut: ⬜
-  criticite: C3
+  criticite: C2
   domaine: TEST_AUTO_CI
   agent: ORCHESTRATEUR
   date: '2026-08-28T17:56:00+02:00'
   titre: Raccordement de l'animation Canvas sur les sorties du code compilé
-  contexte: Suppression de la machine d'état JS et consommation de la trace JSON compilée.
-  description: Adaptation du visualiseur interactif Canvas avec scrub par scan et lecture temps-réel.
+  contexte: Éradication du moteur JS fictif dans FICHE_SEMI_AUTO_ANIMATION.html et consommation de la trace JSON compilée.
+  description: Adaptation du visualiseur interactif Canvas avec scrub par scan, window.__traceScan et lecture temps-réel.
   contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE.yaml'
   objectifs:
   - Animer la cinématique machine d'après les consignes réelles du binaire compilé
@@ -2846,13 +2847,13 @@ tasks:
 - id: T171-CR
   parent_id: T171
   statut: ⬜
-  criticite: C3
+  criticite: C2
   domaine: REVIEW
   agent: OLLAMA
   date: '2026-08-28T17:56:00+02:00'
-  titre: Audit & Challenge Externe par Sous-Agent Ollama
+  titre: Audit & Challenge Externe par Sous-Agent Ollama (qwen3.8:27b)
   contexte: Revue indépendante de la chaîne d'exécution binaire -> trace -> affichage.
-  description: Certification de zéro code arbitraire et conformité avec les sorties de FB_Cycle.st.
+  description: Certification de zéro logique métier en JS et conformité avec les sorties de FB_Cycle.st.
   contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml'
   objectifs:
   - Certifier l'authenticité de l'animation d'après le code compilé
