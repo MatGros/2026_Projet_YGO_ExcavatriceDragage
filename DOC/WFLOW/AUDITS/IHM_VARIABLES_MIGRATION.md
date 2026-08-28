@@ -313,4 +313,12 @@ Découplage strict entre les champs synoptiques IHM / Diagnostic de séquence et
 |---|---|---|
 | `GVL_IHM.DredgingAssist.State.DiveStepAtFault` | Mémorisation de l'étape active lors de l'apparition d'un défaut en plongée (`E_DiveSearchState`) | Produit par `FB_DiveSearch.StepAtFault` $\to$ exposé par `PRG_03.Data.SequenceState.DiveStepAtFault` $\to$ projeté exclusivement dans `PRG_07_Supervision`. |
 
+---
+
+## 🆕 Lot T167-C — Diagnostic StepAtFault Extraction
+
+| Nouveau chemin | Rôle | Source d'ownership |
+|---|---|---|
+| `GVL_IHM.DredgingAssist.State.ExtractionStepAtFault` | Mémorisation de l'étape active lors de l'apparition d'un défaut d'extraction (`E_ExtractionSequenceState`) | Produit par `FB_ExtractionSequence.StepAtFault` $\to$ exposé par `PRG_03.Data.SequenceState.ExtractionStepAtFault` $\to$ projeté exclusivement dans `PRG_07_Supervision`. |
+
 

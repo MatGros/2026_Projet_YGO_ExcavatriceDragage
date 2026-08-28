@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T17:27:56.426531" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T17:27:56.426531">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T17:54:02.960655" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T17:54:02.960655">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -788,10 +788,12 @@ ResetEdge(CLK := Reset);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 
-ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M &lt; ImmersionUpper_M)
-                  OR (ImmersionUpper_M &lt;= ImmersionLower_M)
-                  OR (ImmersionLower_M &lt;= LimitLegalDepthMin_M)
-                  OR (CableLimitAscent_M &lt;= ImmersionLower_M));
+// Base de temps nulle = timers de garde inoperants : defaut de parametrage inconditionnel.
+ErrorCausePresent := (CycleTime &lt;= T#0ms)
+                  OR (NOT BypassPreconditions AND ((DiveStartMin_M &lt; ImmersionUpper_M)
+                       OR (ImmersionUpper_M &lt;= ImmersionLower_M)
+                       OR (ImmersionLower_M &lt;= LimitLegalDepthMin_M)
+                       OR (CableLimitAscent_M &lt;= ImmersionLower_M)));
 
 // ⏱️ Plafonds anti-blocage calcules au runtime : course credible max / vitesse Palier 1 mini x marge.
 // Course immersion = du plafond haut d'exploitation a la borne basse d'immersion (depart de plongee
@@ -858,7 +860,7 @@ Fault := instFault.Fault;
 ErrorEdge(CLK := Fault.Error);
 IF ErrorEdge.Q THEN
     StepAtFault := PrevState;
-ELSIF ResetEdge.Q THEN
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
     StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 {endregion}

@@ -5,13 +5,15 @@
 contract:
   task_id: T167-C
   criticality: C4
-  strategy: rebuild
+  strategy: patch
 
   objective: >
-    Refondre le code ST de FB_ExtractionSequence selon la spécification validée en T167-A :
-    gestion étagée de la fermeture benne, phase de décollage matière sous vitesse
-    lente contrôlée (Palier 1 forcé), capture de ExtractionStateAtError, passage de témoin fluide
-    vers la montée nominale et timeouts de garde d'étape.
+    Durcir FB_ExtractionSequence en ajout additif sur la machine d'état existante (T167-A §3bis) :
+    backstop de fermeture benne (CfgBucketCloseTimeout) verrouillé au runtime pour rester
+    superieur au watchdog mouvement de FB_Bucket (BucketMoveTimeout) — ne jamais masquer BucketError ;
+    timeout de garde CONTROL_ASCENT calcule au runtime depuis ControlAscentDistance_M ;
+    capture StepAtFault avant bascule ERROR_HOLD ; accumulateurs anti-pompage homme-mort ;
+    latch survivant au cycle Enable, Reset jamais conditionne.
 
   acceptance:
     - id: AC1
@@ -31,10 +33,17 @@ contract:
     allowed:
       - CODE/G_CYCLE/FB_ExtractionSequence.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ExtractionSequenceState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
+      - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st          # cablage CfgBucketCloseTimeout / BucketMoveTimeout / ExtractionStepAtFault (visa orchestrateur)
+      - CODE/M_MAIN/PRG_07_Supervision.st          # projection ExtractionStepAtFault vers GVL_IHM
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md  # T167-A §3bis points 3 et 4
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_extractionsequence.st
       - CODE_XML/CODE_Bundle.xml
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml
     forbidden:
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/G_CYCLE/FB_DiveSearch.st
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
 
   conservation:
@@ -58,17 +67,27 @@ contract:
     Tout comportement non linéaire sur l'extraction ou le forçage de vitesse doit être
     remonté immédiatement.
 
-status: READY_FOR_EXECUTION
+status: IN_REVIEW   # code + tests verts ; attend visa humain final + T167-CR
 
 execution:
-  executed_by: ""
-  completed_at: ""
-  status: PENDING
-  summary: ""
-  evidence_submitted: []
+  executed_by: "CC (orchestrateur, mandat autonomie T167)"
+  completed_at: "2026-08-28T20:30:00+02:00"
+  status: DONE_PENDING_REVIEW
+  summary: >
+    Backstop CfgBucketCloseTimeout (defaut T#75s) verrouille au runtime : ErrorCausePresent si
+    <= BucketMoveTimeout (ref FB_Bucket.CfgTimeoutDuration cable depuis PRG_03) ou <= T#0ms, idem CycleTime.
+    Timeout CONTROL_ASCENT runtime = MAX(0.1, ControlAscentDistance_M)/0.15*2.0 (constantes CST_*).
+    Accumulateurs anti-pompage (avancent seulement sous montee demandee). StepAtFault := PrevState avant
+    ERROR_HOLD, Reset du StepAtFault conditionne aux memes gardes que le reset du latch.
+    AF_Partie-04 §3bis points 3-4 corriges (watchdog benne reel = T#60s, pas T#6s ; backstop, pas seuil primaire).
+  evidence_submitted:
+    - "FB_ExtractionSequence 6/6 PASS (TC-P04-022 timeout decollage, -023 backstop benne, -024 latch survit Enable)"
+    - "Non-regression : FB_DiveSearch 7/7, FB_Cycle 7/7, PRG_03 5/5, PRG_07 3/3"
+    - "G200 PASS (0 erreur), gates palier C 16/16 PASS, bundle frais"
+    - "Revue Ollama deepseek-v4-flash : PASS AVEC RESERVES -> 3 reserves toutes traitees"
 
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
-  notes: ""
+  notes: "Visa humain + T167-CR (revue independante DiveSearch et ExtractionSequence separement)"

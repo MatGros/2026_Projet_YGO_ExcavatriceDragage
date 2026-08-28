@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T11:10:17.716045" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T11:10:17.716045">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T17:53:22.979682" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T17:53:22.979682">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -431,6 +431,39 @@
 --&gt; [CFG] Distance palier 1 de controle remontee (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgBucketCloseTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#75s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Backstop fermeture benne (doit rester &gt; BucketMoveTimeout)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketMoveTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#60s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Reference watchdog mouvement FB_Bucket (verrouillage ordre backstop)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#10ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Base de temps d'integration (periode MainTask)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -461,6 +494,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase interne extraction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFault">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Phase active memorisee lors du defaut</xhtml>
               </documentation>
             </variable>
             <variable name="BucketCloseRequest">
@@ -524,6 +565,14 @@
 . [LOC] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant apparition defaut</xhtml>
+              </documentation>
+            </variable>
             <variable name="ControlStartM1Position_M">
               <type>
                 <REAL />
@@ -539,6 +588,46 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 au debut du palier de controle (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevState">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Phase au scan precedent (survit au gate)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalculatedControlAscentTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCUL DYNAMIQUE RUNTIME DU TIMEOUT DECOLLAGE ===
+. [LOC] Plafond anti-blocage decollage calcule au runtime</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketCloseTimerAcc">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACCUMULATEURS DE TEMPS ANTI-POMPAGE ===
+. [LOC] Temps cumule fermeture benne sous montee demandee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ControlAscentTimerAcc">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps cumule decollage controle sous montee demandee</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorCausePresent">
@@ -566,6 +655,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch erreur synchro/vitesse</xhtml>
               </documentation>
             </variable>
+            <variable name="TimeoutBucketCloseFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch backstop fermeture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutControlAscentFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch timeout decollage controle</xhtml>
+              </documentation>
+            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
@@ -588,6 +693,51 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_MinSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES DERIVATION TIMEOUT ANTI-BLOCAGE ===
+Vitesse Palier 1 mini sous charge/mou (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ControlAscentMargin">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Facteur de marge sur la course de decollage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_TimeoutMinDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher de distance pour le calcul (evite timeout degenere)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_SecToMs">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conversion secondes -&gt; millisecondes</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -608,11 +758,39 @@
 {region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
 // 🔑 1. FRONTS
 ResetEdge(CLK := Reset);
-ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0);
+// Parametrage invalide : distance nulle, backstop nul, base de temps nulle, ou backstop
+// qui fauterait AVANT le watchdog benne (masquerait BucketError - ordre des watchdogs).
+ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0)
+                  OR (CfgBucketCloseTimeout &lt;= T#0ms)
+                  OR (CycleTime &lt;= T#0ms)
+                  OR (CfgBucketCloseTimeout &lt;= BucketMoveTimeout);
+
+// ⏱️ Plafond anti-blocage decollage calcule au runtime : course de controle / vitesse Palier 1 mini x marge.
+CalculatedControlAscentTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
+    MAX(CST_TimeoutMinDistance_M, ControlAscentDistance_M) / CST_MinSpeed_Mps * CST_ControlAscentMargin * CST_SecToMs));
+
+// ⏱️ Integrateurs de temps de montee effective (anti-pompage homme-mort)
+IF (ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET) AND MotionRequestActive AND (MotionDirection = 1) THEN
+    BucketCloseTimerAcc := BucketCloseTimerAcc + CycleTime;
+    IF BucketCloseTimerAcc &gt;= CfgBucketCloseTimeout THEN
+        TimeoutBucketCloseFault := TRUE;
+    END_IF;
+END_IF;
+
+IF (ExtractionState = E_ExtractionSequenceState.CONTROL_ASCENT) AND MotionRequestActive AND (MotionDirection = 1) THEN
+    ControlAscentTimerAcc := ControlAscentTimerAcc + CycleTime;
+    IF ControlAscentTimerAcc &gt;= CalculatedControlAscentTimeout THEN
+        TimeoutControlAscentFault := TRUE;
+    END_IF;
+END_IF;
 
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
-    BucketErrorFault := FALSE;
-    SyncOrSpeedErrorFault := FALSE;
+    BucketErrorFault          := FALSE;
+    SyncOrSpeedErrorFault     := FALSE;
+    TimeoutBucketCloseFault   := FALSE;
+    TimeoutControlAscentFault := FALSE;
+    BucketCloseTimerAcc       := T#0ms;
+    ControlAscentTimerAcc     := T#0ms;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
 END_IF;
 
@@ -626,11 +804,27 @@ instCauses[2].Texte    := 'Defaut synchro ou capteurs treuils pendant remontee';
 
 instCauses[3].Active   := ErrorCausePresent;
 instCauses[3].Latching := TRUE;
-instCauses[3].Texte    := 'Parametrage distance de controle invalide';
+instCauses[3].Texte    := 'Parametrage distance de controle ou backstop invalide';
+
+instCauses[4].Active   := TimeoutBucketCloseFault;
+instCauses[4].Latching := TRUE;
+instCauses[4].Texte    := 'Depassement backstop fermeture benne';
+
+instCauses[5].Active   := TimeoutControlAscentFault;
+instCauses[5].Latching := TRUE;
+instCauses[5].Texte    := 'Depassement tempo decollage controle';
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
+
+// 📸 Capture ordonnee de StepAtFault sur front montant de defaut, avant bascule ERROR_HOLD
+ErrorEdge(CLK := Fault.Error);
+IF ErrorEdge.Q THEN
+    StepAtFault := PrevState;
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
+    StepAtFault := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+END_IF;
 {endregion}
 
 {region "§2 Gate neutralisation"}
@@ -644,6 +838,10 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     ForceMinSpeedStep := FALSE;
     BottomConfirmationConsumed := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    StepAtFault := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    PrevState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    BucketCloseTimerAcc := T#0ms;
+    ControlAscentTimerAcc := T#0ms;
     OperatorActionId := 0;
     OperatorAction := '';
     RETURN;
@@ -680,6 +878,7 @@ ELSE
             OperatorAction := 'Demander la montée pour fermer la benne.';
             IF MotionRequestActive AND (MotionDirection = 1) THEN
                 BottomConfirmationConsumed := TRUE;
+                BucketCloseTimerAcc := T#0ms;   // ⏱️ RAZ a l'entree exacte de CLOSING_BUCKET
                 ExtractionState := E_ExtractionSequenceState.CLOSING_BUCKET;
             END_IF;
 
@@ -693,6 +892,7 @@ ELSE
             ELSIF BucketIsClosed AND NOT BucketBusy THEN
                 ControlStartM1Position_M := M1Position_M;
                 ControlStartM2Position_M := M2Position_M;
+                ControlAscentTimerAcc := T#0ms;   // ⏱️ RAZ a l'entree exacte de CONTROL_ASCENT
                 ExtractionState := E_ExtractionSequenceState.CONTROL_ASCENT;
             END_IF;
 
@@ -722,6 +922,9 @@ ELSE
             ;
     END_CASE;
 END_IF;
+
+// 💾 Memorisation de la phase precedente en toute fin de scan (capture StepAtFault fiable)
+PrevState := ExtractionState;
 {endregion}
 </xhtml>
           </ST>

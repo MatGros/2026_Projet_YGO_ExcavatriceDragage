@@ -95,13 +95,14 @@ Toutes les temporisations de garde constituent un **plafond anti-blocage** (surv
      $$\Delta T_{fond} = \frac{\max(1.0, \text{ImmersionLower\_M} - \text{LimitLegalDepthMin\_M})}{V_{P1\_mini}} \times 1.5$$
      *(Pour les valeurs de référence $-0.5\text{ m} - (-35.0\text{ m}) = 34.5\text{ m} \Rightarrow \Delta T_{fond} = 345.0\text{ s}$)*.
    - 🛡️ **Garde de sécurité** : Si l'exploitant modifie la profondeur légale admissible sur le site, le plafond de temporisation s'ajuste automatiquement sans nécessiter de modification logicielle.
-3. **Fermeture benne (`CfgBucketCloseTimeout`)** :
-   - Formule : $\text{CfgBucketCloseTimeout} \ge 2.5 \times \text{FB\_Bucket.CfgTimeoutDuration}$ (où $\text{CfgTimeoutDuration} = 6.0\text{ s}$ est le watchdog mécanique interne).
-   - Dérivation : $\Delta T_{close} = 6.0\text{ s} \times 2.5 = 15.0\text{ s} \Rightarrow$ **Seuil figé : `T#15s`** (évite la course entre les deux watchdogs).
-4. **Contrôle remontée lente (`ControlAscentTimeout`)** :
-   - **Calcul dynamique en RUNTIME** car la distance $\text{ControlAscentDistance\_M}$ ($d_{ctrl}$) est paramétrable par l'opérateur sur l'IHM (ex: 1.0 m à 5.0 m) :
-     $$\Delta T_{ctrl} = \frac{\text{ControlAscentDistance\_M}}{V_{P1\_mini}} \times 2.0 = \frac{d_{ctrl}}{0.15} \times 2.0$$
-     *(Exemple pour $d_{ctrl} = 2.0\text{ m} \Rightarrow \Delta T = 26.6\text{ s} \approx \text{T\#27s}$)*.
+3. **Fermeture benne (`CfgBucketCloseTimeout`)** — **backstop, pas garde primaire** :
+   - `FB_Bucket` porte déjà son propre watchdog de mouvement (`CfgTimeoutDuration`, défaut `T#60s`) et publie `BucketError`. `FB_ExtractionSequence.CLOSING_BUCKET` consomme ce `BucketError` → `BucketErrorFault`. Le backstop ne couvre QUE le cas où `FB_Bucket` lui-même n'a pas fauté (benne silencieusement bloquée).
+   - **Contrainte vérifiée au runtime** : `FB_ExtractionSequence` reçoit `BucketMoveTimeout` (référence = `FB_Bucket.CfgTimeoutDuration`, câblée depuis `PRG_03`) et lève `ErrorCausePresent` si `CfgBucketCloseTimeout <= BucketMoveTimeout` — le backstop ne peut pas fauter avant la benne, `BucketError` reste la cause visible en premier.
+   - **Valeur par défaut : `T#75s`** (watchdog benne `T#60s` + marge). Entrée `[CFG]` câblée dans `PRG_03`. `ErrorCausePresent` couvre aussi `CfgBucketCloseTimeout <= T#0ms` et `CycleTime <= T#0ms`.
+4. **Contrôle remontée lente (`CalculatedControlAscentTimeout`)** :
+   - **Calcul dynamique en RUNTIME** car la distance $\text{ControlAscentDistance\_M}$ ($d_{ctrl}$) est paramétrable par l'opérateur sur l'IHM (ex: 1.0 m à 5.0 m). Facteurs en `VAR CONSTANT` : `CST_MinSpeed_Mps = 0.15`, `CST_ControlAscentMargin = 2.0`, plancher `CST_TimeoutMinDistance_M = 0.1` :
+     $$\Delta T_{ctrl} = \frac{\max(0.1,\ \text{ControlAscentDistance\_M})}{V_{P1\_mini}} \times 2.0$$
+     *(Exemple pour $d_{ctrl} = 2.0\text{ m} \Rightarrow \Delta T = 26.7\text{ s}$)*.
 
 #### 2. Matrice d'état sûr post-Timeout par étape
 
@@ -110,7 +111,7 @@ Toutes les temporisations de garde constituent un **plafond anti-blocage** (surv
 | `SEARCHING_IMMERSION` | Immersion non détectée après `CalculatedImmersionTimeout` | `ERROR_HOLD` | `DescendPermit := FALSE`, coupure contacteur Kobold (`KoboldContactorCmd := FALSE`), `Ready := FALSE`. `FB_DiveSearch` cesse d'imposer `DescendPermit` ; la remontée de dégagement reste disponible via le pilotage treuil normal. |
 | `SEARCHING_BOTTOM` | Fond non détecté après `CalculatedBottomTimeout` | `ERROR_HOLD` | `DescendPermit := FALSE`, coupure contacteur Kobold anti-chauffe, `Ready := FALSE`. Descente bloquée, remontée disponible via pilotage treuil normal. |
 | `CLOSING_BUCKET` | Benne non fermée après `CfgBucketCloseTimeout` | `ERROR_HOLD` | `BucketCloseRequest := FALSE`, `AscentPermit := FALSE`, `Lifecycle.Busy := FALSE`. Arrêt des consignes benne/treuils, dégagement opérateur requis. |
-| `CONTROL_ASCENT` | Décollage non achevé après `ControlAscentTimeout` | `ERROR_HOLD` | `AscentPermit := FALSE`, `ForceMinSpeedStep := FALSE`, `Lifecycle.Busy := FALSE`. Arrêt sécurisé des consignes automatiques, maintien sous frein. |
+| `CONTROL_ASCENT` | Décollage non achevé après `CalculatedControlAscentTimeout` | `ERROR_HOLD` | `AscentPermit := FALSE`, `ForceMinSpeedStep := FALSE`, `Lifecycle.Busy := FALSE`. Arrêt sécurisé des consignes automatiques, maintien sous frein. |
 
 #### 3. Arbitrage et Gel formel du Bypass Séquence Kobold (`BypassPreconditions`)
 - **Contexte terrain & REX** : En exploitation sur plan d'eau boueux ou en cas de capteur Kobold défaillant, l'opérateur de carrière doit pouvoir poursuivre l'extraction en mode manuel/dégradé sous sa responsabilité visuelle directe sans être bloqué par l'automate.

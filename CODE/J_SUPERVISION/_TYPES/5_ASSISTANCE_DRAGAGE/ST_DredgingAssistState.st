@@ -17,6 +17,7 @@ STRUCT
     ExtractionError            : BOOL;
     ExtractionErrorId          : WORD;
     ExtractionState            : E_ExtractionSequenceState;
+    ExtractionStepAtFault      : E_ExtractionSequenceState;
     OperatorActionId           : WORD;       (* Une seule consigne conduite, arbitré en PRG_09 *)
     OperatorAction             : STRING(120); (* Texte de secours ; IHM peut mapper l'identifiant *)
     // : mode vidage à la trémie (pas de FB dédié, logique combinatoire PRG_04)
