@@ -73,8 +73,13 @@ const resultat = await agent("Ta tâche ici", {
 Pour déléguer directement à l'instance locale Ollama (`deepseek-v4-flash:cloud`, `qwen3.8:27b`, etc.) :
 ```bash
 python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "Analyse de sécurité..." --model deepseek-v4-flash:cloud
-python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file CONTRAT.md --output RESULTAT.md
+python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file CONTRAT.md --output RESULTAT.md --num-ctx 16384 --timeout 400
 ```
+⚠️ **`num_ctx` par défaut d'Ollama ≈ 4k tokens → TRONQUE SILENCIEUSEMENT le prompt d'entrée** (REX 2026-08-28) :
+un gros contrat/diff arrive amputé et l'auditeur croit qu'il manque des infos. Le runner force `num_ctx=8192`
+par défaut et **avertit** si l'entrée dépasse 90 % du contexte. Options : `--num-ctx N` (fenêtre),
+`--num-predict N` (sortie), `--timeout S`. Env : `OLLAMA_NUM_CTX`, `OLLAMA_TIMEOUT_S`.
+(`num_predict: -1` fait échouer certains endpoints en HTTP 400 → n'est envoyé que si > 0.)
 
 ### Outil `omniroute_subagent.py` (Fallback — gateway OpenAI-compatible `omniroute`)
 
