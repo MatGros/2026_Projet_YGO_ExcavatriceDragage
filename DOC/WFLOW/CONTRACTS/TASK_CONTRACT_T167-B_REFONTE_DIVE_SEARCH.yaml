@@ -26,6 +26,9 @@ contract:
     - id: AC4
       statement: "Liaison 100% propre (G200 PASS, 0 erreur) et Bundle exporté."
       verified_by: "generate_codesys_bundle.py && G200_check_linkage.py"
+    - id: AC5
+      statement: "L'orchestrateur lit, vérifie et valide le git diff réel ligne par ligne."
+      verified_by: "Visa formel de l'orchestrateur"
 
   scope:
     allowed:
@@ -33,6 +36,7 @@ contract:
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_DiveSearchState.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
       - CODE_XML/CODE_Bundle.xml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml
     forbidden:
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
