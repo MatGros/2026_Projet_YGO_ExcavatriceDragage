@@ -17,9 +17,10 @@ Usage :
   python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --file prompt.md --model auto/best-reasoning --output rep.md
   python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --list-models
 
-Modeles VIABLES sur gros prompt (matrice 2026-08-28, voir DSH_PROVIDERS.md) :
+Catalogue retenu (matrice 2026-08-28, voir DSH_PROVIDERS.md) :
   auto/best-reasoning (defaut, ~15s), auto/best-coding, auto/best-fast,
-  codex/gpt-5.6-terra-medium (~90s), codex/gpt-5.6-sol-medium (~140s).
+  codex/gpt-5.6-terra-medium (~90s, gros lots).
+  Depannage seulement : codex/gpt-5.6-sol-medium (~140s), deepseek-v4-flash:cloud natif.
   NE PAS utiliser : *-high / *-max, ollamacloud/*, claude/claude-sonnet-5 via omniroute -> timeout sur prompt lourd.
 Fallback : si l'endpoint natif Ollama (ollama_subagent.py, /api/generate) echoue/timeout.
 """

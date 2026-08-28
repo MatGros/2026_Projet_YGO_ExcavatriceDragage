@@ -27,16 +27,17 @@ C'est la cause n°1 d'échec d'override (REX 2026-08-16).
 > ⚠️ Un modèle « OK sur prompt court » mais qui **timeout sur prompt lourd** est **inutilisable pour une
 > revue/audit** — c'est le cas d'usage principal.
 
-### ✅ À utiliser (répondent au prompt lourd)
+### ✅ Catalogue retenu (planning / orchestration / gros refactors — agents de codage & sous-agents)
 
-| ID (`--model`) | Endpoint | Prompt lourd | Note |
+| ID (`--model`) | Endpoint | Prompt lourd | Rôle |
 |---|---|---|---|
-| `auto/best-reasoning` | omniroute | ✅ **~15 s** | ⭐ **défaut recommandé** — rapide + capable, réponse dense |
-| `auto/best-coding` | omniroute | ✅ ~15 s | revue/refactor de code |
-| `auto/best-fast` | omniroute | ✅ ~16 s | itération rapide |
-| `codex/gpt-5.6-terra-medium` | omniroute | ✅ ~90 s | revue profonde, plus lent |
-| `codex/gpt-5.6-sol-medium` | omniroute | ✅ ~140 s | revue profonde, **limite** de patience |
-| `deepseek-v4-flash:cloud` | natif `:11434` | ✅ ~130 s | **seul** modèle du daemon natif viable sur gros prompt (avec `--num-ctx 16384`) |
+| `auto/best-reasoning` | omniroute | ✅ **~15 s** | ⭐ **défaut** — planning, orchestration, arbitrage, audit |
+| `auto/best-coding` | omniroute | ✅ ~15 s | revue / refactor / génération de code |
+| `auto/best-fast` | omniroute | ✅ ~16 s | itération rapide, passes légères |
+| `codex/gpt-5.6-terra-medium` | omniroute | ✅ ~90 s | revue profonde (plus lent, à réserver aux gros lots) |
+
+> Hors catalogue mais **techniquement viables** en dépannage (plus lents, non retenus par défaut) :
+> `codex/gpt-5.6-sol-medium` (~140 s), `deepseek-v4-flash:cloud` natif `:11434` (~130 s, `--num-ctx 16384`).
 
 ### ❌ À NE PAS utiliser — timeout systématique sur prompt lourd
 
