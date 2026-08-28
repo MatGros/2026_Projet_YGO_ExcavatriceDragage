@@ -378,7 +378,7 @@ sont rendus en états discrets captés ; aucun calcul cinématique en JS."
 
 1. **Gate de faisabilité** : smoke-test STruCpp de la **fermeture de types complète** de
    `WORKING_COPY/` (runner isolé) **avant** d'écrire TC-P04-100.
-2. `python TOOLS/TEST_AUTO_CI/scripts/generate_trace_cycle.py` → produit `trace_semi_auto_cycle.json`
+2. Trace JSON fraîche produite par `TOOLS/TEST_AUTO_CI/anim_bench/generate_trace_cycle.py` → produit `trace_semi_auto_cycle.json`
    + contrôle de cohérence + **comparaison SHA-256** (fail si dérive) + `SOURCE_TESTÉE`/`sha256`.
 3. `python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Cycle` (runner isolé sur `WORKING_COPY/`)
    → tous les tests PASS (unitaires + TC-P04-100 + robustesse).

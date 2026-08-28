@@ -99,9 +99,9 @@ fictive de l'animation existante.
 | `TOOLS/TEST_AUTO_CI/WORKING_COPY/tests/test_fb_cycle_negative.st` | Harnais tests négatifs (NEG-F1/F2/F6) |
 | `TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/trace_semi_auto_cycle.json` | Trace scan-par-scan (14 scans) |
 | `TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FICHE_SEMI_AUTO_ANIMATION.html` | Animation pur lecteur |
-| `TOOLS/TEST_AUTO_CI/scripts/generate_trace_cycle.py` | Génération trace + provenance + SHA-256 |
-| `TOOLS/TEST_AUTO_CI/scripts/guard_animation_no_business_logic.py` | Garde-fou AST |
-| `TOOLS/TEST_AUTO_CI/scripts/run_negative_tests.py` | Runner tests négatifs sur l'original |
+| `TOOLS/TEST_AUTO_CI/anim_bench/generate_trace_cycle.py` | Génération trace + provenance + SHA-256 |
+| `TOOLS/TEST_AUTO_CI/anim_bench/guard_animation_no_business_logic.py` | Garde-fou AST |
+| `TOOLS/TEST_AUTO_CI/anim_bench/run_negative_tests.py` | Runner tests négatifs sur l'original |
 
 ---
 
