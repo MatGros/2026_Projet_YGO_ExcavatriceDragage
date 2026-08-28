@@ -301,7 +301,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 14:52:53</div>
+    <div class="exec-time">2026-08-28 17:29:36</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (5 tests)</summary>
@@ -319,7 +319,7 @@
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 32 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 33 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -548,6 +548,14 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
+                <td><code>ST_OperatorCoupledIntent.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
                 <td><code>ST_ProgramRequest.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -584,10 +592,10 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_03_Modes_Cycle</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 14 flux entrants · 34 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_03_Modes_Cycle</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 31 flux entrants · 59 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instModes <span style="color:var(--muted);font-weight:500;">(FB_Modes)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instCycleSemiAuto <span style="color:var(--muted);font-weight:500;">(FB_Cycle)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instModes <span style="color:var(--muted);font-weight:500;">(FB_Modes)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instCycleSemiAuto <span style="color:var(--muted);font-weight:500;">(FB_Cycle)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiveSearch <span style="color:var(--muted);font-weight:500;">(FB_DiveSearch)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instExtractionSequence <span style="color:var(--muted);font-weight:500;">(FB_ExtractionSequence)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BypassKoboldFallEdge <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
@@ -595,13 +603,25 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_IHM</span> <span style="font-size:11px;color:#38bdf8;">(6 signaux ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_IHM</span> <span style="font-size:11px;color:#38bdf8;">(9 signaux ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Lecture Globale</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Commun.Cfg.SelHomingApproachEnable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
@@ -628,13 +648,25 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_02_Acquisition</span> <span style="font-size:11px;color:#818cf8;">(2 retours ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_02_Acquisition</span> <span style="font-size:11px;color:#818cf8;">(5 retours ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.Joystick.AxisY.Direction</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
@@ -644,8 +676,42 @@
         </details>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_04_Treuils_Benne</span> <span style="font-size:11px;color:#818cf8;">(1 retours ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div></div>
+        </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_05_Translation</span> <span style="font-size:11px;color:#818cf8;">(3 retours ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.M3_AtMaintenanceStable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.M3_AtP1Stable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.M3_AtTremieStable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div></div>
+        </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">(6 constantes ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">(13 constantes ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.3);color:#f1f5f9;">Type Global</span></div>
                 </div>
             </summary>
@@ -659,11 +725,39 @@
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_DiveSearchState.WAIT_PRECONDITIONS</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_Mode.MAINT_N1</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_Mode.MAINT_N2</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_Mode.SEMI_AUTO</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_OperatorAxis.JOYSTICK_Y</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_OperatorAxis.NONE</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_ProgramSequence.DIVE_SEARCH</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_ProgramSequence.EXTRACTION</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
@@ -683,13 +777,13 @@
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
                     <div>• Entrées Formelles : <b style="color:#ffffff;">0</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
-                    <div>• Lectures GVL : <b style="color:#ffffff;">6</b></div>
-                    <div>• Retours PRG : <b style="color:#ffffff;">2</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">9</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">9</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">1</b></div>
-                    <div>• Champs Out : <b style="color:#ffffff;">34</b></div>
-                    <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">14 IN</b> / <b style="color:#ffffff;">34 OUT</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">58</b></div>
+                    <div>• Écritures GVL : <b style="color:#ffffff;">1</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">31 IN</b> / <b style="color:#ffffff;">59 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -704,13 +798,29 @@
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Data</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_ModesCycleInterPrg</span> <span style="font-size:11px;color:#a5b4fc;">(34 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Data</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_ModesCycleInterPrg</span> <span style="font-size:11px;color:#a5b4fc;">(58 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
                 <div style="margin-top:2px;">
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.Auth</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.ReqProgram.OperatorCoupledIntent.Active</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.ReqProgram.OperatorCoupledIntent.Direction</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.ReqProgram.ReqBucket.ForceMinSpeedStep</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -758,11 +868,91 @@
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.BottomTouchConfirmed</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.BypassDiveActive</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.BypassKoboldBottomTouched</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DiveBusy</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DiveDone</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DiveError</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DiveErrorId</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DiveReady</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DiveState</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DumpAtTremieArmed</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DumpAtTremieAssistActive</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DumpAtTremieAtTremie</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DumpAtTremieBucketOpenArmed</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DumpAtTremieDescentLocked</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.ExpectedAxis</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.ExpectedDirection</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.ExtractionBusy</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.ExtractionDone</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.ExtractionError</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.ExtractionErrorId</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.ExtractionReady</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.ExtractionState</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -845,7 +1035,20 @@
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.WaitingForProcess</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
                 </div></div>
-            </details></div>
+            </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired pin-row-out" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
+                    <div class="pin-name"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_IHM</span> <span style="font-size:11px;color:#38bdf8;">(1 écritures ▾)</span></div>
+                    <div class="pin-expr"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Écriture Globale</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired pin-row-out" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL Out</span></div>
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed</code></div>
+            </div></div>
+        </details></div>
         </div>
     </details>
     
@@ -1112,11 +1315,11 @@
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (32)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st</code></li><li><code>CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st</code></li><li><code>CODE/G_CYCLE/FB_DiveSearch.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/G_CYCLE/FB_Cycle.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCycleInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st</code></li></ul>
+        <summary>Fichiers source compilés (33)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st</code></li><li><code>CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st</code></li><li><code>CODE/G_CYCLE/FB_DiveSearch.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/G_CYCLE/FB_Cycle.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_OperatorCoupledIntent.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCycleInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (32)</summary>
+        <summary>Code source ST original (33)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -3032,9 +3235,28 @@ END_TYPE
    ======================================================================= *)
 TYPE ST_ProgramBucketRequest :
 STRUCT
-    ReqOpen                : BOOL; // Demande ouverture benne
-    ReqClose               : BOOL; // Demande fermeture benne
-    ReqKoboldMeasureEnable : BOOL; // Demande activation mesure/contacteur Kobold
+    ReqOpen                     : BOOL; // Demande ouverture benne
+    ReqClose                    : BOOL; // Demande fermeture benne
+    ReqKoboldMeasureEnable      : BOOL; // Demande activation mesure/contacteur Kobold
+    DescendPermitDiveBucketOpen : BOOL; // Autorisation de descente conditionnée benne ouverte (DiveSearch)
+    ForceMinSpeedStep           : BOOL; // Forçage vitesse minimale (palier de contrôle extraction)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_OperatorCoupledIntent.st</code></summary>
+                <pre>(* =======================================================================
+   🎮 ST_OperatorCoupledIntent — Intention couplée continue de l&#x27;opérateur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Transmet l&#x27;intention de mouvement couplé (homme-mort / boutons)
+      produite inconditionnellement par PRG_03 vers PRG_04 (tous modes).
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   ======================================================================= *)
+TYPE ST_OperatorCoupledIntent :
+STRUCT
+    Active    : BOOL; // Intention couplée active (JoyBtnRaw + Select=0 OU boutons BothUp/BothDown)
+    Direction : INT;  // Sens d&#x27;intention (-1: Descente, 0: Neutre, +1: Montée)
 END_STRUCT
 END_TYPE
 </pre>
@@ -3049,10 +3271,11 @@ END_TYPE
    ======================================================================= *)
 TYPE ST_ProgramRequest :
 STRUCT
-    ReqWinchM1     : ST_ProgramWinchRequest;       // Demande programme treuil M1
-    ReqWinchM2     : ST_ProgramWinchRequest;       // Demande programme treuil M2
-    ReqTranslation : ST_ProgramTranslationRequest; // Demande programme translation M3
-    ReqBucket      : ST_ProgramBucketRequest;      // Demande programme benne
+    ReqWinchM1            : ST_ProgramWinchRequest;       // Demande programme treuil M1
+    ReqWinchM2            : ST_ProgramWinchRequest;       // Demande programme treuil M2
+    ReqTranslation        : ST_ProgramTranslationRequest; // Demande programme translation M3
+    ReqBucket             : ST_ProgramBucketRequest;      // Demande programme benne
+    OperatorCoupledIntent : ST_OperatorCoupledIntent;     // Intention couplée continue opérateur (joystick/boutons), TOUS modes
 END_STRUCT
 END_TYPE
 </pre>
@@ -3084,6 +3307,28 @@ STRUCT
     SpeedMismatchMps    : REAL;             // Écart absolu vitesse M1/M2 (m/s)
     SpeedMismatchActive : BOOL;             // Seuil vitesse dépassé
     SpeedMismatchConfirmed : BOOL;          // Écart vitesse confirmé pendant timeout
+
+    // === 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
+    DiveReady                   : BOOL;                    // Assistance plongée prête
+    DiveBusy                    : BOOL;                    // Assistance plongée active
+    DiveDone                    : BOOL;                    // Assistance plongée terminée
+    DiveError                   : BOOL;                    // Défaut assistance plongée
+    DiveErrorId                 : WORD;                    // Code défaut plongée
+    DiveState                   : E_DiveSearchState;       // Phase interne de recherche fond Kobold
+    BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé
+    ExtractionReady             : BOOL;                    // Assistance extraction prête
+    ExtractionBusy              : BOOL;                    // Assistance extraction active
+    ExtractionDone              : BOOL;                    // Assistance extraction terminée
+    ExtractionError             : BOOL;                    // Défaut assistance extraction
+    ExtractionErrorId           : WORD;                    // Code défaut extraction
+    ExtractionState             : E_ExtractionSequenceState;// Phase interne séquence extraction
+    DumpAtTremieArmed           : BOOL;                    // Option vidage trémie armée IHM
+    DumpAtTremieAssistActive    : BOOL;                    // Assistance vidage trémie active
+    DumpAtTremieAtTremie        : BOOL;                    // Chariot M3 positionné à la trémie
+    DumpAtTremieBucketOpenArmed : BOOL;                    // Commande ouverture benne à la trémie
+    DumpAtTremieDescentLocked   : BOOL;                    // Descente treuil verrouillée à la trémie
+    BypassDiveActive            : BOOL;                    // Bypass séquence plongée armé
+    BypassKoboldBottomTouched   : BOOL;                    // Fond touché sous bypass
 END_STRUCT
 END_TYPE
 </pre>

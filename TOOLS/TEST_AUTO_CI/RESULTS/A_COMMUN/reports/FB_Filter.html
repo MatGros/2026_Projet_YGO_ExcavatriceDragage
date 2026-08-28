@@ -301,7 +301,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 13:42:09</div>
+    <div class="exec-time">2026-08-28 17:29:15</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (3 tests)</summary>
@@ -516,6 +516,14 @@
             </details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (6)</summary>
+            <table class="static-table"><tbody><tr><td><code>VALUEIN</code></td><td>10</td></tr><tr><td><code>TIMECONST</code></td><td>0</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.100</td></tr><tr><td><code>VALUEOUT</code></td><td>10</td></tr><tr><td><code>T</code></td><td>0</td></tr><tr><td><code>ALPHA</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-fb-filter-1" class="test-card test-card-pass">
             <header>
@@ -530,6 +538,14 @@
             </details>
             
             
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (6)</summary>
+            <table class="static-table"><tbody><tr><td><code>VALUEIN</code></td><td>10</td></tr><tr><td><code>TIMECONST</code></td><td>200000000</td></tr><tr><td><code>CYCLETIMES</code></td><td>0</td></tr><tr><td><code>VALUEOUT</code></td><td>10</td></tr><tr><td><code>T</code></td><td>0.200</td></tr><tr><td><code>ALPHA</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
         </article>
         <article id="test-fb-filter-2" class="test-card test-card-pass">
             <header>
@@ -548,6 +564,41 @@
             </details>
             
             
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (3 scans, 1 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="388" height="132" viewBox="0 0 388 132" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;VALUEIN&quot;: &quot;10&quot;, &quot;TIMECONST&quot;: &quot;100000000&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;VALUEOUT&quot;: &quot;5&quot;, &quot;T&quot;: &quot;0.1&quot;, &quot;ALPHA&quot;: &quot;0.5&quot;}, &quot;note&quot;: &quot;TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;VALUEIN&quot;: &quot;10&quot;, &quot;TIMECONST&quot;: &quot;100000000&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;VALUEOUT&quot;: &quot;7.5&quot;, &quot;T&quot;: &quot;0.1&quot;, &quot;ALPHA&quot;: &quot;0.5&quot;}, &quot;note&quot;: &quot;TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;VALUEIN&quot;: &quot;10&quot;, &quot;TIMECONST&quot;: &quot;100000000&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;VALUEOUT&quot;: &quot;8.75&quot;, &quot;T&quot;: &quot;0.1&quot;, &quot;ALPHA&quot;: &quot;0.5&quot;}, &quot;note&quot;: &quot;TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5&quot;}]" data-fields="[&quot;VALUEOUT&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="114" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="114" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="126" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="114" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="126" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="114" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="126" class="wf-scan">#2</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><text x="182" y="86.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 0)" title="Cliquer pour basculer Courbe / Chiffres">VALUEOUT</text><g class="wf-numeric-group" data-row="0"><g class="wf-analog-view"><text x="194" y="72" class="wf-scale">8.75</text><text x="194" y="98" class="wf-scale">5.00</text><path d="M200,96.0L256,96.0L256,77.3L312,77.3L312,68.0L368,68.0" class="wf-line" stroke="#2563eb" stroke-width="2.2"/><circle cx="256" cy="77.3" r="2.5" fill="#2563eb"/><circle cx="312" cy="68.0" r="2.5" fill="#2563eb"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="219.0" y="68.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><rect x="273.5" y="68.0" width="21" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="284.0" y="77.0" class="wf-num-changed">7.5</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="326.0" y="68.0" width="28" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">8.75</text></g></g></svg></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (3 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'Reponse PT1 : convergence progressive vers un echelon, pas instantanee')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>VALUEOUT</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell' title='TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5'><span class='chrono-note-chip'>TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5</span></td><td>5</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell' title='TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5'><span class='chrono-note-chip'>TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5</span></td><td class='changed'>7.500</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='chrono-note-cell' title='TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5'><span class='chrono-note-chip'>TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5</span></td><td class='changed'>8.750</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (5)</summary>
+        <table class="static-table"><tbody><tr><td><code>ALPHA</code></td><td>0.500</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.100</td></tr><tr><td><code>T</code></td><td>0.100</td></tr><tr><td><code>TIMECONST</code></td><td>100000000</td></tr><tr><td><code>VALUEIN</code></td><td>10</td></tr></tbody></table>
+    </details>
+    </div>
         </article>
         </div>
     </details>
