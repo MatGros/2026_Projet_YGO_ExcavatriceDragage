@@ -103,7 +103,7 @@ def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_n
     scan_notes = scan_notes or {}
     has_notes = any(bool(scan_notes.get(s["scan"])) for s in scans)
 
-    note_th = "<th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>💬 Étape / Contexte</span><div class='col-resizer'></div></th>" if has_notes else ""
+    note_th = "<th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th>" if has_notes else ""
     header = "".join(f"<th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>{_html.escape(f)}</span><div class='col-resizer'></div></th>" for f in field_names)
     rows = []
     prev = None
@@ -121,7 +121,7 @@ def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_n
         if has_notes:
             note = scan_notes.get(s["scan"], "")
             if note:
-                note_td = f"<td class='chrono-note-cell' title='{_html.escape(note)}'><span class='chrono-note-chip'>💬 {_html.escape(note)}</span></td>"
+                note_td = f"<td class='chrono-note-cell' title='{_html.escape(note)}'><span class='chrono-note-chip'>{_html.escape(note)}</span></td>"
             else:
                 note_td = "<td class='chrono-note-cell' style='color:var(--muted);'>—</td>"
 
