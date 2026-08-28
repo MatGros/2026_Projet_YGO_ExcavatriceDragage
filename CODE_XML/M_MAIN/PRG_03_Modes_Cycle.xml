@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:54:48.655607" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:54:48.655607">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:59:16.314404" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:59:16.314404">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1582,12 +1582,14 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.Fault.Error            := instDiveSearch.Fault.Error OR instExtractionSequence.Fault.Error;
     IF instDiveSearch.Fault.Error THEN
         Data.SequenceState.Fault.ErrorId      := instDiveSearch.Fault.ErrorId;
+        Data.SequenceState.Fault.Latched      := instDiveSearch.Fault.Latched;
     ELSIF instExtractionSequence.Fault.Error THEN
         Data.SequenceState.Fault.ErrorId      := instExtractionSequence.Fault.ErrorId;
+        Data.SequenceState.Fault.Latched      := instExtractionSequence.Fault.Latched;
     ELSE
         Data.SequenceState.Fault.ErrorId      := 0;
+        Data.SequenceState.Fault.Latched      := FALSE;
     END_IF;
-    Data.SequenceState.Fault.Latched          := instDiveSearch.Fault.Latched OR instExtractionSequence.Fault.Latched;
     Data.SequenceState.Step                   := E_CycleStep.X0_PREPARATION;
     Data.SequenceState.StepStr                := 'ASSIST_MODE';
     Data.SequenceState.StepAtFault            := E_CycleStep.X0_PREPARATION;

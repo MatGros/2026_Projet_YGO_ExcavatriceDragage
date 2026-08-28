@@ -144,24 +144,9 @@ END_VAR
 {region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE & ASSISTANTS ===
 
-IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    // Direction déjà mise à l'échelle (-1/0/+1) par le joystick (miroir DirectionY,
-    // dérivé des bits DirectionPositive/Negative du struct ST_fbJoystick_AxisCmd).
-    CoupledUserRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
-    CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
-                                     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0);
-
-ELSE
-    IF GVL_IHM.Commun.BtnWinchBothUp THEN
-        CoupledUserRequestDirection := 1;
-    ELSIF GVL_IHM.Commun.BtnWinchBothDown THEN
-        CoupledUserRequestDirection := -1;
-    ELSE
-        CoupledUserRequestDirection := 0;
-    END_IF;
-    CoupledUserRequestActive := (CoupledUserRequestDirection <> 0);
-
-END_IF;
+// Consommation de l'intention couplée calculée au même scan par PRG_03_Modes_Cycle (cerveau unique)
+CoupledUserRequestActive    := PRG_03_Modes_Cycle.Data.SequenceState.RequestActive;
+CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedDirection;
 
 // mode "vidage à la trémie" (verrouillage). Périmètre identique
 // à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.

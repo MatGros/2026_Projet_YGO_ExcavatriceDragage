@@ -1,32 +1,74 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+
 contract:
-  task_id: T167-C_REFONTE_EXTRACTION
+  task_id: T167-C
   criticality: C4
-  strategy: patch
+  strategy: rebuild
+
   objective: >
-    Refondre le code ST de FB_ExtractionSequence selon la spécification de T167-A :
+    Refondre le code ST de FB_ExtractionSequence selon la spécification validée en T167-A :
     gestion étagée de la fermeture benne, phase de décollage matière sous vitesse
-    lente contrôlée, capture de ExtractionStateAtError, passage de témoin fluide
+    lente contrôlée (Palier 1 forcé), capture de ExtractionStateAtError, passage de témoin fluide
     vers la montée nominale et timeouts de garde d'étape.
+
   acceptance:
     - id: AC1
       statement: "FB_ExtractionSequence gère la séquence : Attente fond -> Fermeture benne -> Décollage contrôlé -> Fin d'assistance."
       verified_by: "Revue ST et validation G200."
     - id: AC2
       statement: "L'effacement de BottomPositionConfirmed est verrouillé et confirmé consommé (BottomConfirmationConsumed)."
-      verified_by: "Revue ST."
+      verified_by: "Revue ST et tests unitaires."
     - id: AC3
-      statement: "Neutralisation déterministe sur NOT Enable et capture ExtractionStateAtError sur tout blocage."
+      statement: "Neutralisation déterministe sur NOT Enable et capture ExtractionStateAtError sur tout blocage sans réarmement automatique."
       verified_by: "Gate G127 PASS et revue logique."
+    - id: AC4
+      statement: "L'orchestrateur lit, vérifie et valide le git diff réel ligne par ligne."
+      verified_by: "Visa formel de l'orchestrateur"
+
   scope:
     allowed:
       - CODE/G_CYCLE/FB_ExtractionSequence.st
-      - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ExtractionSequenceState.st
+      - CODE_XML/CODE_Bundle.xml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml
     forbidden:
-      - PRJ_CODESYS/**
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
   conservation:
     must_survive:
-      - "Interface consommée par PRG_03.Data."
+      - "Interface consommée par PRG_03.Data (BucketCloseRequest, ForceMinSpeedStep)."
+      - "Plafonnement au Palier 1 pendant l'extraction."
+    dropped_on_purpose:
+      - "None"
+
   evidence_required:
     - check_linkage
     - run_all_gates
-status: READY_FOR_EXECUTION
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "antigravity"
+
+  alert_duty: >
+    Tout comportement non linéaire sur l'extraction ou le forçage de vitesse doit être
+    remonté immédiatement.
+
+status: PENDING
+
+execution:
+  executed_by: "À déléguer"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
