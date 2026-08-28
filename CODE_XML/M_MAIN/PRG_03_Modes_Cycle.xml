@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:45:31.708602" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:45:31.708602">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T12:52:33.839410" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T12:52:33.839410">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1205,13 +1205,12 @@ ELSE
     Data.SequenceState.Ready                   := FALSE;
     Data.SequenceState.Lifecycle.Busy          := FALSE;
     Data.SequenceState.Lifecycle.Done          := FALSE;
-    Data.SequenceState.Lifecycle.Waiting       := FALSE;
     Data.SequenceState.Fault.Error             := FALSE;
     Data.SequenceState.Fault.ErrorId           := 0;
     Data.SequenceState.Fault.Latched           := FALSE;
-    Data.SequenceState.Step                    := E_CycleStep.STEP_00_INIT;
-    Data.SequenceState.StepStr                 := 'INIT';
-    Data.SequenceState.StepAtFault             := E_CycleStep.STEP_00_INIT;
+    Data.SequenceState.Step                    := E_CycleStep.X0_PREPARATION;
+    Data.SequenceState.StepStr                 := 'X0_PREPARATION';
+    Data.SequenceState.StepAtFault             := E_CycleStep.X0_PREPARATION;
     Data.SequenceState.OperatorActionId        := 0;
     Data.SequenceState.OperatorAction          := '';
     Data.SequenceState.ExpectedAxis            := E_OperatorAxis.NONE;
