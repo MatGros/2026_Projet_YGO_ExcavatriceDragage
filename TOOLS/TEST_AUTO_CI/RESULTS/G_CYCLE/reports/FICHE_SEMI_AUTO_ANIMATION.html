@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche de Test Visuelle & Animation Machine — Séquenceur Semi-Automatique</title>
+<style>
+  :root {
+    --bg-main: #0b0f19;
+    --bg-card: #151d30;
+    --bg-panel: #0d1322;
+    --border: #233354;
+    --accent: #38bdf8;
+    --accent-glow: rgba(56, 189, 248, 0.25);
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text: #f8fafc;
+    --text-dim: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background: var(--bg-main); color: var(--text); padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 1360px; }
+  
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .header-title h1 { font-size: 1.3rem; color: #fff; display: flex; align-items: center; gap: 10px; }
+  .header-title p { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
+  .header-badges { display: flex; gap: 8px; }
+  .badge { padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.75rem; border: 1px solid transparent; display: flex; align-items: center; gap: 6px; }
+  .badge-mode { background: rgba(56, 189, 248, 0.15); border-color: var(--accent); color: var(--accent); }
+  .badge-step { background: rgba(34, 197, 94, 0.15); border-color: var(--success); color: var(--success); }
+  .badge-fault { background: rgba(239, 68, 68, 0.15); border-color: var(--danger); color: var(--danger); }
+
+  /* BANNER OPERATEUR */
+  .banner-operator {
+    background: #0284c7;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.3);
+  }
+  .banner-operator.stabilizing { background: #b45309; }
+  .banner-operator.error { background: #b91c1c; }
+
+  /* TOP SECTION : ANIMATION À GAUCHE (840px) + PANNEAU LATÉRAL À DROITE (COMMANDES + TÉLÉMÉTRIE 2 COLONNES) */
+  .top-grid {
+    display: grid;
+    grid-template-columns: 820px 1fr;
+    gap: 12px;
+  }
+
+  /* VISUAL SCENE CARD */
+  .scene-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .scene-container {
+    width: 100%;
+    height: 520px;
+    background: #030712;
+    border-radius: 6px;
+    border: 1px solid #1f2937;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* RIGHT SIDE PANEL */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .panel-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .panel-card h2 { font-size: 0.92rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+
+  /* STEP HERO BOX */
+  .step-hero {
+    background: var(--bg-panel);
+    border: 1px solid #38bdf8;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .step-hero-header { display: flex; justify-content: space-between; align-items: center; }
+  .step-num-badge { background: #0284c7; color: #fff; font-weight: 800; font-size: 0.82rem; padding: 2px 7px; border-radius: 4px; }
+  .step-name-txt { font-weight: 700; color: #38bdf8; font-size: 0.9rem; }
+  .step-desc-txt { font-size: 0.74rem; color: var(--text-dim); line-height: 1.3; }
+
+  /* TELEMETRY 2 COLONNES */
+  .telemetry-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .telemetry-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+  .telemetry-table td { padding: 3.5px 5px; border-bottom: 1px solid #1f293d; }
+  .telemetry-table td:first-child { color: var(--text-dim); }
+  .telemetry-table td:last-child { font-weight: 600; text-align: right; }
+
+  /* BUTTONS & CONTROLS */
+  .btn-group { display: flex; flex-wrap: wrap; gap: 6px; }
+  button {
+    background: #1e293b;
+    color: #fff;
+    border: 1px solid #334155;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+  }
+  button:hover { background: #334155; border-color: var(--accent); }
+  button.btn-primary { background: #0284c7; border-color: #38bdf8; }
+  button.btn-primary:hover { background: #0369a1; }
+  button.btn-danger { background: #991b1b; border-color: #ef4444; }
+  button.btn-danger:hover { background: #7f1d1d; }
+  button.btn-warning { background: #92400e; border-color: #f59e0b; }
+  button.btn-warning:hover { background: #78350f; }
+
+  /* JOYSTICK VIRTUAL */
+  .joystick-zone {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  .slider-box { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .slider-box label { font-size: 0.7rem; color: var(--text-dim); }
+
+  /* BOTTOM SECTION : SCENARIOS DE PANNES + DIAGNOSTIC EN 2 COLONNES */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* DIAGNOSTIC TABLE */
+  .diag-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+  .diag-table td, .diag-table th { padding: 3px 6px; border-bottom: 1px solid #233354; text-align: left; }
+  .diag-table th { color: var(--text-dim); }
+  .val-true { color: var(--success); font-weight: 600; }
+  .val-false { color: var(--text-dim); }
+  .val-alert { color: var(--danger); font-weight: 600; }
+
+  /* CHRONOGRAM CANVAS */
+  .chrono-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .chrono-canvas {
+    width: 100%;
+    height: 150px;
+    background: #030712;
+    border-radius: 6px;
+    border: 1px solid #1f2937;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-title">
+    <h1>🏗️ Fiche de Test Visuelle & Animation — Séquenceur Semi-Auto</h1>
+    <p>Validation Interactive IEC 61131-3 · FB_Cycle · FB_Translation (5 Capteurs Calibrés) · Treuils M1/M2 · Mou de Câble & Diagnostic</p>
+  </div>
+  <div class="header-badges">
+    <div class="badge badge-mode" id="badgeMode">⚙️ MODE: SEMI_AUTO</div>
+    <div class="badge badge-step" id="badgeStep">🔄 ÉTAPE: X0_PREPARATION</div>
+    <div class="badge" id="badgeSafety" style="background: rgba(34,197,94,0.15); border-color:#22c55e; color:#22c55e;">🛡️ SÉCURITÉ: OK</div>
+    <div class="badge" style="background:#1e1b4b; border-color:#818cf8; color:#818cf8;">📦 PRÉLÈVEMENTS: <span id="lblSampleCount">0</span></div>
+  </div>
+</header>
+
+<!-- BANNER INSTRUCTION OPERATEUR -->
+<div class="banner-operator" id="bannerOperator">
+  <span id="txtBannerMsg">ℹ️ X0 - Trémie treuils hauts : donner l ordre Départ Cycle (BtnStart ou armement homme-mort).</span>
+  <span style="font-size:0.8rem; opacity:0.85;" id="txtActionId">ID: 16#0400</span>
+</div>
+
+<!-- ============================================================== -->
+<!-- TOP SECTION : ANIMATION À GAUCHE + COMMANDES & TÉLÉMÉTRIE (2 COL) À DROITE -->
+<!-- ============================================================== -->
+<div class="top-grid">
+  
+  <!-- SCENE ANIMEE (GAUCHE) -->
+  <div class="scene-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="font-size:0.92rem; color:var(--accent);">🎮 Vue Profil Carrière Noyée & Cinématique Machine</h2>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <span style="font-size:0.72rem; color:var(--text-dim);">Vitesse:</span>
+        <button onclick="setSimSpeed(1)" class="btn-primary" style="padding:3px 6px;">x1</button>
+        <button onclick="setSimSpeed(2)" style="padding:3px 6px;">x2</button>
+        <button onclick="setSimSpeed(4)" style="padding:3px 6px;">x4</button>
+        <button onclick="toggleAutoRun()" id="btnAutoRun" class="btn-primary" style="padding:3px 8px; margin-left:4px;">▶️ Run Cycle</button>
+        <button onclick="resetSimulation()" class="btn-danger" style="padding:3px 6px;">🔄 Reset</button>
+      </div>
+    </div>
+
+    <!-- SVG SCENE -->
+    <div class="scene-container">
+      <svg id="svgScene" width="100%" height="100%" viewBox="0 0 820 520">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#090d16"/>
+            <stop offset="100%" stop-color="#141e33"/>
+          </linearGradient>
+          <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(14, 165, 233, 0.35)"/>
+            <stop offset="100%" stop-color="rgba(2, 132, 199, 0.75)"/>
+          </linearGradient>
+          <pattern id="groundPat" width="20" height="20" patternUnits="userSpaceOnUse">
+            <rect width="20" height="20" fill="#1f2430"/>
+            <circle cx="5" cy="5" r="2" fill="#2d3748"/>
+            <circle cx="15" cy="15" r="3" fill="#374151"/>
+          </pattern>
+        </defs>
+
+        <rect x="0" y="0" width="820" height="520" fill="url(#skyGrad)"/>
+
+        <!-- ZONE ÉCHELLE ALTIMÉTRIE (AXE Y À GAUCHE) -->
+        <g opacity="0.65">
+          <line x1="25" y1="70" x2="25" y2="470" stroke="#475569" stroke-width="1.5"/>
+          <line x1="20" y1="120" x2="30" y2="120" stroke="#f59e0b" stroke-width="2"/>
+          <text x="3" y="124" fill="#f59e0b" font-size="8" font-weight="bold">+7.0m</text>
+          
+          <line x1="20" y1="250" x2="30" y2="250" stroke="#38bdf8" stroke-width="2"/>
+          <text x="3" y="254" fill="#38bdf8" font-size="8" font-weight="bold">0.0m</text>
+
+          <line x1="20" y1="450" x2="30" y2="450" stroke="#ef4444" stroke-width="2"/>
+          <text x="2" y="454" fill="#ef4444" font-size="8" font-weight="bold">-10.0m</text>
+
+          <line x1="20" y1="460" x2="30" y2="460" stroke="#dc2626" stroke-width="2" stroke-dasharray="3,2"/>
+          <text x="2" y="472" fill="#dc2626" font-size="7">-10.5m</text>
+        </g>
+
+        <!-- SOL & BERGES -->
+        <polygon points="20,200 135,200 155,310 20,310" fill="url(#groundPat)"/>
+        
+        <!-- Trémie structure -->
+        <polygon points="45,140 115,140 100,220 60,220" fill="#475569" stroke="#64748b" stroke-width="2"/>
+        <text x="80" y="175" fill="#f8fafc" font-size="10" font-weight="bold" text-anchor="middle">TRÉMIE</text>
+        <rect x="68" y="220" width="24" height="40" fill="#334155"/>
+        <line x1="30" y1="260" x2="130" y2="260" stroke="#f59e0b" stroke-width="4" stroke-dasharray="6,4"/>
+        <text x="80" y="275" fill="#f59e0b" font-size="7.5" text-anchor="middle">Convoyeur</text>
+
+        <!-- PLAN D'EAU (Y=250m -> Altimétrie 0.0m) -->
+        <rect x="155" y="250" width="665" height="270" fill="url(#waterGrad)"/>
+        <line x1="155" y1="250" x2="820" y2="250" stroke="#38bdf8" stroke-width="2" stroke-dasharray="8,4"/>
+        <text x="730" y="242" fill="#38bdf8" font-size="9" font-weight="bold">Surface Eau (0.0 m)</text>
+
+        <!-- FOND DE FOUILLE (Y=450 -> Profondeur -10.0m) -->
+        <path d="M 155,310 Q 275,410 425,450 T 820,460 L 820,520 L 155,520 Z" fill="#1c1917" stroke="#44403c" stroke-width="2"/>
+        <text x="680" y="485" fill="#a8a29e" font-size="9">Fond Carrière (-10.0 m)</text>
+
+        <!-- RAIL DU PONT ROULANT -->
+        <line x1="20" y1="55" x2="800" y2="55" stroke="#94a3b8" stroke-width="6"/>
+        <line x1="20" y1="61" x2="800" y2="61" stroke="#475569" stroke-width="2"/>
+
+        <!-- ============================================== -->
+        <!-- 📡 LES 5 CAPTEURS CALIBRÉS DE TRANSLATION -->
+        <!-- ============================================== -->
+        <g transform="translate(40, 42)">
+          <rect x="-8" y="0" width="16" height="12" fill="#334155" stroke="#475569" rx="2"/>
+          <circle id="ledFdcRear" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#94a3b8" font-size="6.5" text-anchor="middle">FDC Arr</text>
+        </g>
+        <g transform="translate(80, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#38bdf8" rx="2"/>
+          <circle id="ledPosTremie" cx="0" cy="6" r="3.5" fill="#22c55e"/>
+          <text x="0" y="-3" fill="#38bdf8" font-size="7" font-weight="bold" text-anchor="middle">TRÉMIE 0m</text>
+        </g>
+        <g transform="translate(190, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#06b6d4" rx="2"/>
+          <circle id="ledPosPV" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#06b6d4" font-size="7" font-weight="bold" text-anchor="middle">PV 5m (Slow)</text>
+        </g>
+        <g transform="translate(410, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#eab308" rx="2"/>
+          <circle id="ledPosP2" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#eab308" font-size="7" font-weight="bold" text-anchor="middle">P2 15m</text>
+        </g>
+        <g transform="translate(520, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#f59e0b" rx="2"/>
+          <circle id="ledPosP1" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#f59e0b" font-size="7" font-weight="bold" text-anchor="middle">P1 20m</text>
+        </g>
+        <g transform="translate(720, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#a855f7" rx="2"/>
+          <circle id="ledPosMaint" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#a855f7" font-size="7" font-weight="bold" text-anchor="middle">MAINT 30m</text>
+        </g>
+        <g transform="translate(765, 42)">
+          <rect x="-8" y="0" width="16" height="12" fill="#334155" stroke="#475569" rx="2"/>
+          <circle id="ledFdcFront" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#94a3b8" font-size="6.5" text-anchor="middle">FDC Avt</text>
+        </g>
+
+        <!-- ============================================== -->
+        <!-- 🏗️ CHARIOT / PONT ROULANT + HUD MOTEURS -->
+        <!-- ============================================== -->
+        <g id="gantryGroup" transform="translate(80, 36)">
+          <g transform="translate(0, -32)">
+            <rect x="-95" y="0" width="190" height="18" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="#38bdf8" stroke-width="1.2"/>
+            <text id="hudM3" x="-60" y="12" fill="#38bdf8" font-size="7.5" font-weight="bold" text-anchor="middle">M3: ■</text>
+            <text id="hudM1" x="0" y="12" fill="#f59e0b" font-size="7.5" font-weight="bold" text-anchor="middle">M1: ■</text>
+            <text id="hudM2" x="60" y="12" fill="#22c55e" font-size="7.5" font-weight="bold" text-anchor="middle">M2: ■</text>
+          </g>
+
+          <rect x="-48" y="0" width="96" height="28" rx="4" fill="#0369a1" stroke="#38bdf8" stroke-width="2"/>
+          <circle cx="-38" cy="0" r="5" fill="#e2e8f0"/>
+          <circle cx="38" cy="0" r="5" fill="#e2e8f0"/>
+          <text x="0" y="14" fill="#fff" font-size="8.5" font-weight="bold" text-anchor="middle">PONT M3</text>
+          
+          <g transform="translate(-24, 20)">
+            <circle cx="0" cy="0" r="11" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+            <text x="0" y="3" fill="#f59e0b" font-size="7.5" font-weight="bold" text-anchor="middle">M1</text>
+          </g>
+          
+          <g transform="translate(24, 20)">
+            <circle cx="0" cy="0" r="11" fill="#1e293b" stroke="#22c55e" stroke-width="2"/>
+            <text x="0" y="3" fill="#22c55e" font-size="7.5" font-weight="bold" text-anchor="middle">M2</text>
+          </g>
+        </g>
+
+        <!-- ============================================== -->
+        <!-- ➰ CÂBLES M1 & M2 (DÉFORMABLES AVEC MOU) -->
+        <!-- ============================================== -->
+        <path id="cablePathM1" d="M 56,56 L 80,120" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+        <path id="cablePathM2" d="M 104,56 L 80,120" stroke="#22c55e" stroke-width="2.5" fill="none"/>
+
+        <!-- ============================================== -->
+        <!-- 🪨 BENNE PRENEUSE SUSPENDUE (Articulée) -->
+        <!-- ============================================== -->
+        <g id="bucketGroup" transform="translate(80, 120)">
+          <rect x="-18" y="-14" width="36" height="14" rx="2" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+          <circle cx="0" cy="-7" r="3" fill="#94a3b8"/>
+
+          <g id="grpSlackBadge" transform="translate(0, -28)" opacity="0">
+            <rect x="-45" y="0" width="90" height="13" rx="3" fill="#b45309" stroke="#f59e0b"/>
+            <text x="0" y="9.5" fill="#fff" font-size="7.5" font-weight="bold" text-anchor="middle">⚠️ Mou de Câble (~1.5m)</text>
+          </g>
+
+          <g transform="translate(20, -16)">
+            <rect x="0" y="0" width="14" height="18" rx="2" fill="#0f172a" stroke="#38bdf8" stroke-width="1.2"/>
+            <circle id="koboldLed" cx="7" cy="6" r="3" fill="#475569"/>
+            <line x1="7" y1="18" x2="7" y2="34" stroke="#e2e8f0" stroke-width="2"/>
+            <circle cx="7" cy="34" r="2.5" fill="#f59e0b"/>
+            <text x="20" y="10" fill="#38bdf8" font-size="7" font-weight="bold">KOBOLD</text>
+          </g>
+
+          <path id="bucketGravel" d="M -16,10 Q 0,28 16,10 Q 0,-2 -16,10 Z" fill="#78716c" opacity="0"/>
+
+          <!-- MÂCHOIRES BENNE -->
+          <g id="jawLeftGroup" transform="rotate(0, -14, 0)">
+            <path d="M -14,0 C -26,10 -22,32 0,35 C -8,22 -12,12 -14,0 Z" fill="#b45309" stroke="#d97706" stroke-width="1.5"/>
+            <polygon points="-2,34 0,36 -2,38" fill="#f59e0b"/>
+          </g>
+
+          <g id="jawRightGroup" transform="rotate(0, 14, 0)">
+            <path d="M 14,0 C 26,10 22,32 0,35 C 8,22 12,12 14,0 Z" fill="#d97706" stroke="#b45309" stroke-width="1.5"/>
+            <polygon points="2,34 0,36 2,38" fill="#f59e0b"/>
+          </g>
+
+          <circle cx="0" cy="35" r="2" fill="#f8fafc"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 🕹️ DROITE : COMMANDES OPERATEUR + TÉLÉMÉTRIE 2 COLONNES COMPACTE -->
+  <!-- ============================================================== -->
+  <div class="right-panel">
+    
+    <!-- 1. COMMANDES OPERATEUR & IHM (À SA PLACE D'ORIGINE) -->
+    <div class="panel-card">
+      <h2>🕹️ Commandes Opérateur & IHM</h2>
+      <div class="joystick-zone">
+        <div class="slider-box">
+          <label>JOYSTICK Y (Levage / Descente)</label>
+          <input type="range" id="joyY" min="-1" max="1" step="1" value="0" style="width:110px;" oninput="updateJoystick()">
+          <span id="lblJoyY" style="font-size:0.75rem; font-weight:bold;">0 (Neutre)</span>
+        </div>
+        <div class="slider-box">
+          <label>HOMME-MORT (3s)</label>
+          <button id="btnDeadman" onclick="toggleDeadman()" style="background:#1e293b; border-color:#64748b; font-size:0.75rem;">⚪ Inactif</button>
+        </div>
+      </div>
+      <div class="btn-group" style="margin-top:4px;">
+        <button onclick="sendStartCycle()" class="btn-primary">🟢 Start Cycle</button>
+        <button onclick="sendAbortCycle()" class="btn-danger">🛑 Abort</button>
+        <button onclick="sendResetFault()" class="btn-warning">🔑 Reset Défaut</button>
+        <button onclick="toggleMaintenanceMode()" id="btnModeToggle">🔧 Mode Maint</button>
+      </div>
+    </div>
+
+    <!-- 2. ÉTATS & TÉLÉMÉTRIE EN 2 COLONNES COMPACTES -->
+    <div class="panel-card" style="flex:1;">
+      <h2>📊 États & Télémétrie en Direct</h2>
+
+      <!-- TÉLÉMÉTRIE 2 COLONNES -->
+      <div class="telemetry-2col">
+        
+        <!-- COLONNE GAUCHE : POSITIONS & GRANDEURS D'AXE -->
+        <table class="telemetry-table">
+          <tr>
+            <td>Pont M3 :</td>
+            <td><span id="lblPosBridge" style="color:var(--accent);">0.00 m</span> <span id="lblBridgeFdc" style="color:var(--success); font-size:0.68rem;">(TRÉMIE)</span></td>
+          </tr>
+          <tr>
+            <td>Alti. Benne :</td>
+            <td id="lblPosBucket" style="color:#f59e0b;">+7.00 m</td>
+          </tr>
+          <tr>
+            <td>Câble M1 :</td>
+            <td id="lblPosM1">+7.00 m</td>
+          </tr>
+          <tr>
+            <td>Mou Câble :</td>
+            <td id="lblCableSlack" style="color:var(--success);">0.00 m (Tendu)</td>
+          </tr>
+          <tr>
+            <td>Écart &Delta;(M1,M2) :</td>
+            <td id="lblDeltaM1M2">0.00 m</td>
+          </tr>
+          <tr>
+            <td>Ouverture Benne :</td>
+            <td id="lblBucketState" style="color:var(--success);">0% (Fermée)</td>
+          </tr>
+          <tr>
+            <td>FDC Logiciels :</td>
+            <td id="lblSoftLimits" style="color:var(--success);">OK (Sûr)</td>
+          </tr>
+        </table>
+
+        <!-- COLONNE DROITE : ACTIONNEURS, MOTEURS & CAPTEURS -->
+        <table class="telemetry-table">
+          <tr>
+            <td>Mode :</td>
+            <td id="lblTeleMode" style="color:var(--accent);">SEMI_AUTO</td>
+          </tr>
+          <tr>
+            <td>Sens Pont M3 :</td>
+            <td id="lblBridgeDir">■ Arrêt</td>
+          </tr>
+          <tr>
+            <td>Treuil M1 :</td>
+            <td id="lblM1Action" style="color:#f59e0b;">■ Arrêt</td>
+          </tr>
+          <tr>
+            <td>Treuil M2 :</td>
+            <td id="lblM2Action" style="color:#22c55e;">■ Arrêt</td>
+          </tr>
+          <tr>
+            <td>Palier Vitesse :</td>
+            <td id="lblSpeedStep">0 (Arrêt)</td>
+          </tr>
+          <tr>
+            <td>Alim Kobold :</td>
+            <td id="lblKoboldPower">OFF (Coupé)</td>
+          </tr>
+          <tr>
+            <td>Signal Fond :</td>
+            <td id="lblKoboldSignal">0 (Hors eau)</td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- BOTTOM SECTION : SCÉNARIOS DE PANNES + DIAGNOSTIC (2 COLONNES) -->
+<!-- ============================================================== -->
+<div class="bottom-grid">
+  
+  <!-- 1. INJECTION DE DEFAILLANCES & SCENARIOS REELS -->
+  <div class="panel-card">
+    <h2>⚠️ Scénarios d'Aléas & Pannes en Carrière</h2>
+    <div style="display:flex; flex-direction:column; gap:5px;">
+      <button onclick="injectSyncDeviation()" class="btn-danger">⚡ 1. Désynchronisation Treuils (|M1-M2| > 0.50m &rarr; STABILIZING)</button>
+      <button onclick="injectPalier5UnderKobold()" class="btn-danger">⚡ 2. Forçage Palier 5 sous Kobold (Saturation/Interdit)</button>
+      <button onclick="injectMancheRelease()" class="btn-warning">✋ 3. Relâchement Manche en Plein Mouvement</button>
+      <button onclick="injectModeSwitchMidDive()" class="btn-warning">🔄 4. Bascule Maintenance en Cours de Plongée (PausedState)</button>
+      <button onclick="injectKoboldSensorFault()" class="btn-danger">❌ 5. Capteur Kobold Défaillant au Fond</button>
+    </div>
+  </div>
+
+  <!-- 2. DIAGNOSTIC TROUBLESHOOTING IEC 61131-3 -->
+  <div class="panel-card">
+    <h2>🩺 Diagnostic Chronologique (ST_ChainCycleSemiAuto)</h2>
+    <table class="diag-table">
+      <tr><th>Index</th><th>Observable</th><th>Valeur</th></tr>
+      <tr><td>Idx101</td><td>Mode Semi-Auto Actif</td><td id="d101" class="val-true">TRUE</td></tr>
+      <tr><td>Idx104</td><td>Homme-Mort Armé</td><td id="d104" class="val-false">FALSE</td></tr>
+      <tr><td>Idx105</td><td>Manche Défléchi</td><td id="d105" class="val-false">FALSE</td></tr>
+      <tr><td>Idx206</td><td>Étape Active (Step)</td><td id="d206" style="font-weight:bold; color:var(--accent);">X0_PREPARATION</td></tr>
+      <tr><td>Idx209</td><td>Attente Opérateur</td><td id="d209" class="val-true">TRUE</td></tr>
+      <tr><td>Idx210</td><td>Attente Procédé</td><td id="d210" class="val-false">FALSE</td></tr>
+      <tr><td>Idx215</td><td>En Pause (WaitingResume)</td><td id="d215" class="val-false">FALSE</td></tr>
+      <tr><td>Idx303</td><td>Contact Fond Kobold</td><td id="d303" class="val-false">FALSE</td></tr>
+      <tr><td>Idx306</td><td>Défaut Synchro Treuils</td><td id="d306" class="val-false">FALSE</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<!-- ============================================================== -->
+<!-- OSCILLOSCOPE MULTI-SIGNAUX (BAS DE PAGE) -->
+<!-- ============================================================== -->
+<div class="chrono-card">
+  <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+    <h2 style="font-size:0.9rem; color:var(--accent);">📈 Oscilloscope Multi-Signaux & Tracés Synchronisés</h2>
+    <div style="font-size:0.7rem; color:var(--text-dim); display:flex; gap:14px;">
+      <span style="color:#38bdf8;">■ Étape Grafcet (0..14)</span>
+      <span style="color:#f59e0b;">■ Pos Câble M1 (m)</span>
+      <span style="color:#22c55e;">■ Pos Benne Réelle (m)</span>
+      <span style="color:#a855f7;">■ Pos Pont X (0..30m)</span>
+      <span style="color:#ec4899;">■ Ouverture Benne (%)</span>
+      <span style="color:#ef4444;">■ Défaut</span>
+    </div>
+  </div>
+  <canvas id="chronoCanvas" class="chrono-canvas" width="1320" height="150"></canvas>
+</div>
+
+<script>
+// === CONSTANTES CALIBRÉES DU RAIL TRANSLATION ===
+const SCALE_X_PIXELS_PER_METER = 21.33; // 0m -> 80px, 30m -> 720px
+const X_TREMIE_PX = 80;
+const X_PV_PX = 190;
+const X_P2_PX = 410;
+const X_P1_PX = 520;
+const X_MAINT_PX = 720;
+
+// === ETAT MACHINE & SIMULATION ===
+const STATE = {
+  mode: 'SEMI_AUTO', // SEMI_AUTO, MAINT_N1
+  step: 0, // 0: X0_PREPARATION .. 13: X13_DONE_SYNC, 14: STABILIZING
+  pausedStep: null,
+  waitingResume: false,
+  sampleCount: 0,
+  speedMultiplier: 1,
+  autoRun: false,
+  fault: false,
+  faultReason: '',
+
+  // Cinématique & Physique
+  bridgeX: 80,
+  cablePosM1: 7.0,
+  cablePosM2: 7.0,
+  bucketPhysPosM: 7.0,
+  cableSlackM: 0.0,
+  bucketOpenPct: 0.0,
+  hasGravel: false,
+
+  // Commandes & Moteurs
+  joyY: 0,
+  deadman: false,
+  koboldPower: false,
+  koboldSignal: 0,
+  speedStep: 0,
+
+  // Mouvements Moteurs (-1, 0, +1)
+  m1Dir: 0,
+  m2Dir: 0,
+  bridgeDir: 0,
+
+  // Scénarios d'anomalies
+  injectedSyncFault: false,
+  injectedKoboldFault: false,
+};
+
+const STEP_NAMES = [
+  'X0_PREPARATION', 'X1_HOMING', 'X2_WORK_POS_SELECT', 'X3_OPEN_BUCKET',
+  'X4_DESCEND_OPEN', 'X5_BOTTOM_CONFIRMED', 'X6_CLOSE_BUCKET', 'X7_CTRL_ASCENT',
+  'X8_ASCENT_LOADED', 'X9_DRAIN_PAUSE', 'X10_TRANSLATE_DUMP', 'X11_OPEN_DUMP',
+  'X12_RESERVED', 'X13_DONE_SYNC', 'STABILIZING'
+];
+
+const STEP_MESSAGES = {
+  0: { id: '16#0400', msg: 'X0 - Trémie (0.0m) treuils hauts : donner l ordre Départ Cycle (BtnStart ou Homme-mort).' },
+  1: { id: '16#0401', msg: 'X1 - Référencement codeurs M1/M2 validé.' },
+  2: { id: '16#0402', msg: 'X2 - Translation vers P1 (20.0m) : passage PV (5.0m), ralentissement à P2 (15.0m) et arrêt à P1.' },
+  3: { id: '16#0403', msg: 'X3 - Maintenir joystick : ouverture complète des mâchoires de la benne.' },
+  4: { id: '16#0404', msg: 'X4 - Maintenir descente : plongée synchro et auto-test Kobold 4 temps (Palier <= 4).' },
+  5: { id: '16#0405', msg: 'X5 - Fond détecté (-10m) : benne posée au sol, déroulage mou de câble (~1.5m), coupure Kobold.' },
+  6: { id: '16#0406', msg: 'X6 - Maintenir montée : fermeture des mâchoires de la benne au fond de la fosse.' },
+  7: { id: '16#0407', msg: 'X7 - Retension des câbles mous -> Décollage et remontée lente de contrôle (palier 1).' },
+  8: { id: '16#0408', msg: 'X8 - Remontée nominale synchro jusqu à la limite haute (+7.0m).' },
+  9: { id: '16#0409', msg: 'X9 - Égouttage temporisé de la benne chargée.' },
+  10: { id: '16#0410', msg: 'X10 - Translation vers Trémie (0.0m) : passage P2/PV (5.0m) avec ralentissement d approche.' },
+  11: { id: '16#0411', msg: 'X11 - Ouverture de la benne et déversement du granulat en trémie.' },
+  13: { id: '16#0413', msg: 'X13 - Cycle achevé avec succès : incrémentation prélèvement et rebouclage.' },
+  14: { id: '16#0480', msg: 'STABILIZING - Hold sécurisé : Cause à corriger + Reset + Nouvel ordre requis.' }
+};
+
+// === CHRONO DATA BUFFER ===
+const CHRONO_BUFFER = [];
+const MAX_CHRONO_POINTS = 320;
+
+function initChrono() {
+  for (let i = 0; i < MAX_CHRONO_POINTS; i++) {
+    CHRONO_BUFFER.push({ step: 0, m1: 7, bucketPos: 7, bridge: 0, bucket: 0, fault: 0 });
+  }
+}
+initChrono();
+
+// === BOUCLE PRINCIPALE SIMULATION (50ms) ===
+function simStep() {
+  if (STATE.fault) {
+    STATE.step = 14;
+    STATE.m1Dir = 0;
+    STATE.m2Dir = 0;
+    STATE.bridgeDir = 0;
+    STATE.speedStep = 0;
+  } else if (STATE.autoRun) {
+    executeAutoSequence();
+  }
+
+  updatePhysics();
+  renderScene();
+  recordChrono();
+  renderChrono();
+  updateHmi();
+}
+setInterval(simStep, 50);
+
+// === LOGIQUE DE SÉQUENCE GRAFCET ===
+function executeAutoSequence() {
+  STATE.deadman = true;
+
+  switch (STATE.step) {
+    case 0:
+      STATE.m1Dir = 0; STATE.m2Dir = 0; STATE.bridgeDir = 0;
+      break;
+
+    case 1:
+      STATE.step = 2;
+      break;
+
+    case 2: // Translation vers P1 (520px / 20.0m)
+      if (STATE.bridgeX < X_P1_PX) {
+        STATE.bridgeDir = 1;
+        const speed = (STATE.bridgeX >= X_P2_PX) ? 2.0 : 4.5;
+        STATE.bridgeX += speed * STATE.speedMultiplier;
+      } else {
+        STATE.bridgeX = X_P1_PX;
+        STATE.bridgeDir = 0;
+        STATE.step = 3;
+      }
+      break;
+
+    case 3: // Ouverture mâchoires benne
+      if (STATE.bucketOpenPct < 1.0) {
+        STATE.bucketOpenPct += 0.08 * STATE.speedMultiplier;
+        STATE.m2Dir = -1;
+        STATE.cablePosM2 += 0.04 * STATE.speedMultiplier;
+      } else {
+        STATE.bucketOpenPct = 1.0;
+        STATE.m2Dir = 0;
+        STATE.step = 4;
+      }
+      break;
+
+    case 4: // Plongée Kobold
+      STATE.koboldPower = true;
+      STATE.speedStep = 4;
+      STATE.m1Dir = -1;
+      STATE.m2Dir = -1;
+
+      if (STATE.cablePosM1 > 0.0) {
+        STATE.koboldSignal = 0;
+      } else if (STATE.cablePosM1 <= 0.0 && STATE.cablePosM1 > -9.5) {
+        STATE.koboldSignal = 1;
+      } else if (STATE.cablePosM1 <= -9.5) {
+        if (!STATE.injectedKoboldFault) {
+          STATE.koboldSignal = 0;
+          STATE.koboldPower = false;
+          STATE.cableSlackM = Math.min(1.5, STATE.cableSlackM + 0.15 * STATE.speedMultiplier);
+          if (STATE.cableSlackM >= 1.5) {
+            STATE.m1Dir = 0; STATE.m2Dir = 0;
+            STATE.step = 5;
+          }
+        } else {
+          if (STATE.cablePosM1 <= -10.5) {
+            triggerFault('Défaut Kobold : contact fond non détecté à la profondeur limite');
+          }
+        }
+      }
+
+      if (STATE.injectedSyncFault) {
+        STATE.cablePosM1 -= 0.12 * STATE.speedMultiplier;
+        STATE.cablePosM2 -= 0.04 * STATE.speedMultiplier;
+        if (Math.abs(STATE.cablePosM1 - STATE.cablePosM2) > 0.5) {
+          triggerFault('Erreur synchronisme treuils M1/M2 (> 0.50m)');
+        }
+      } else {
+        STATE.cablePosM1 -= 0.12 * STATE.speedMultiplier;
+        STATE.cablePosM2 = STATE.cablePosM1;
+      }
+      break;
+
+    case 5: // Fond confirmé
+      STATE.koboldPower = false;
+      STATE.m1Dir = 0; STATE.m2Dir = 0;
+      STATE.speedStep = 0;
+      STATE.step = 6;
+      break;
+
+    case 6: // Fermeture benne au fond
+      if (STATE.bucketOpenPct > 0.0) {
+        STATE.bucketOpenPct -= 0.08 * STATE.speedMultiplier;
+        STATE.m2Dir = 1;
+        STATE.cablePosM2 -= 0.04 * STATE.speedMultiplier;
+      } else {
+        STATE.bucketOpenPct = 0.0;
+        STATE.m2Dir = 0;
+        STATE.hasGravel = true;
+        STATE.step = 7;
+      }
+      break;
+
+    case 7: // Retension du mou de câble puis Décollage lent
+      STATE.speedStep = 1;
+      STATE.m1Dir = 1; STATE.m2Dir = 1;
+      
+      if (STATE.cableSlackM > 0.0) {
+        STATE.cableSlackM = Math.max(0.0, STATE.cableSlackM - 0.1 * STATE.speedMultiplier);
+        STATE.cablePosM1 += 0.1 * STATE.speedMultiplier;
+        STATE.cablePosM2 = STATE.cablePosM1;
+      } else {
+        STATE.cablePosM1 += 0.06 * STATE.speedMultiplier;
+        STATE.cablePosM2 = STATE.cablePosM1;
+        if (STATE.cablePosM1 >= -7.5) {
+          STATE.step = 8;
+        }
+      }
+      break;
+
+    case 8: // Remontée nominale (+7.0m)
+      STATE.speedStep = 4;
+      STATE.m1Dir = 1; STATE.m2Dir = 1;
+      STATE.cablePosM1 += 0.14 * STATE.speedMultiplier;
+      STATE.cablePosM2 = STATE.cablePosM1;
+      if (STATE.cablePosM1 >= 7.0) {
+        STATE.cablePosM1 = 7.0;
+        STATE.cablePosM2 = 7.0;
+        STATE.m1Dir = 0; STATE.m2Dir = 0;
+        STATE.speedStep = 0;
+        STATE.step = 9;
+      }
+      break;
+
+    case 9: // Égouttage
+      STATE.m1Dir = 0; STATE.m2Dir = 0;
+      STATE.step = 10;
+      break;
+
+    case 10: // Translation vers Trémie
+      if (STATE.bridgeX > X_TREMIE_PX) {
+        STATE.bridgeDir = -1;
+        const speed = (STATE.bridgeX <= X_PV_PX) ? 2.0 : 4.5;
+        STATE.bridgeX -= speed * STATE.speedMultiplier;
+      } else {
+        STATE.bridgeX = X_TREMIE_PX;
+        STATE.bridgeDir = 0;
+        STATE.step = 11;
+      }
+      break;
+
+    case 11: // Vidage benne
+      if (STATE.bucketOpenPct < 1.0) {
+        STATE.bucketOpenPct += 0.1 * STATE.speedMultiplier;
+        STATE.m2Dir = -1;
+      } else {
+        STATE.hasGravel = false;
+        STATE.m2Dir = 0;
+        STATE.step = 13;
+      }
+      break;
+
+    case 13: // Fin de cycle
+      STATE.sampleCount++;
+      STATE.step = 0;
+      STATE.autoRun = false;
+      break;
+  }
+}
+
+// === MISE A JOUR PHYSIQUE ===
+function updatePhysics() {
+  STATE.cablePosM1 = Math.max(-11.5, Math.min(7.5, STATE.cablePosM1));
+  STATE.cablePosM2 = Math.max(-11.5, Math.min(7.5, STATE.cablePosM2));
+  STATE.bucketOpenPct = Math.max(0.0, Math.min(1.0, STATE.bucketOpenPct));
+
+  if (STATE.cablePosM1 <= -10.0 || STATE.cableSlackM > 0.0) {
+    STATE.bucketPhysPosM = -10.0;
+  } else {
+    STATE.bucketPhysPosM = STATE.cablePosM1;
+  }
+}
+
+// === RENDU VISUEL SCENE SVG ===
+function renderScene() {
+  const gantry = document.getElementById('gantryGroup');
+  gantry.setAttribute('transform', `translate(${STATE.bridgeX}, 36)`);
+
+  const hudM3 = document.getElementById('hudM3');
+  if (STATE.bridgeDir === 1) {
+    hudM3.textContent = 'M3: ▶ AV (P1)'; hudM3.setAttribute('fill', '#22c55e');
+  } else if (STATE.bridgeDir === -1) {
+    hudM3.textContent = 'M3: ◀ AR (Trémie)'; hudM3.setAttribute('fill', '#f59e0b');
+  } else {
+    hudM3.textContent = 'M3: ■ Arrêt'; hudM3.setAttribute('fill', '#94a3b8');
+  }
+
+  const hudM1 = document.getElementById('hudM1');
+  if (STATE.m1Dir === 1) {
+    hudM1.textContent = 'M1: ▲ Enroule'; hudM1.setAttribute('fill', '#22c55e');
+  } else if (STATE.m1Dir === -1) {
+    hudM1.textContent = 'M1: ▼ Déroule'; hudM1.setAttribute('fill', '#f59e0b');
+  } else {
+    hudM1.textContent = 'M1: ■ Arrêt'; hudM1.setAttribute('fill', '#94a3b8');
+  }
+
+  const hudM2 = document.getElementById('hudM2');
+  if (STATE.m2Dir === 1) {
+    hudM2.textContent = 'M2: ▲ Ferme'; hudM2.setAttribute('fill', '#22c55e');
+  } else if (STATE.m2Dir === -1) {
+    hudM2.textContent = 'M2: ▼ Ouvre'; hudM2.setAttribute('fill', '#f59e0b');
+  } else {
+    hudM2.textContent = 'M2: ■ Arrêt'; hudM2.setAttribute('fill', '#94a3b8');
+  }
+
+  document.getElementById('ledFdcRear').setAttribute('fill', STATE.bridgeX <= 45 ? '#ef4444' : '#475569');
+  document.getElementById('ledPosTremie').setAttribute('fill', Math.abs(STATE.bridgeX - X_TREMIE_PX) <= 15 ? '#22c55e' : '#475569');
+  document.getElementById('ledPosPV').setAttribute('fill', Math.abs(STATE.bridgeX - X_PV_PX) <= 15 ? '#06b6d4' : '#475569');
+  document.getElementById('ledPosP2').setAttribute('fill', Math.abs(STATE.bridgeX - X_P2_PX) <= 15 ? '#eab308' : '#475569');
+  document.getElementById('ledPosP1').setAttribute('fill', Math.abs(STATE.bridgeX - X_P1_PX) <= 15 ? '#f59e0b' : '#475569');
+  document.getElementById('ledPosMaint').setAttribute('fill', Math.abs(STATE.bridgeX - X_MAINT_PX) <= 15 ? '#a855f7' : '#475569');
+  document.getElementById('ledFdcFront').setAttribute('fill', STATE.bridgeX >= 755 ? '#ef4444' : '#475569');
+
+  const bucketY = 250 - (STATE.bucketPhysPosM * 20);
+  const bucket = document.getElementById('bucketGroup');
+  bucket.setAttribute('transform', `translate(${STATE.bridgeX}, ${bucketY})`);
+
+  document.getElementById('grpSlackBadge').setAttribute('opacity', STATE.cableSlackM > 0.1 ? '1' : '0');
+
+  const xM1_top = STATE.bridgeX - 24;
+  const y_top = 56;
+  const xM1_bot = STATE.bridgeX - 10;
+  const y_bot = bucketY - 14;
+
+  const xM2_top = STATE.bridgeX + 24;
+  const xM2_bot = STATE.bridgeX + 10;
+
+  const cablePathM1 = document.getElementById('cablePathM1');
+  const cablePathM2 = document.getElementById('cablePathM2');
+
+  if (STATE.cableSlackM > 0.05) {
+    const slackOffset = STATE.cableSlackM * 20;
+    const midY = (y_top + y_bot) / 2;
+    cablePathM1.setAttribute('d', `M ${xM1_top},${y_top} Q ${xM1_top - slackOffset},${midY} ${xM1_bot},${y_bot}`);
+    cablePathM2.setAttribute('d', `M ${xM2_top},${y_top} Q ${xM2_top + slackOffset},${midY} ${xM2_bot},${y_bot}`);
+  } else {
+    cablePathM1.setAttribute('d', `M ${xM1_top},${y_top} L ${xM1_bot},${y_bot}`);
+    cablePathM2.setAttribute('d', `M ${xM2_top},${y_top} L ${xM2_bot},${y_bot}`);
+  }
+
+  const openAngle = STATE.bucketOpenPct * 52;
+  document.getElementById('jawLeftGroup').setAttribute('transform', `rotate(${openAngle}, -14, 0)`);
+  document.getElementById('jawRightGroup').setAttribute('transform', `rotate(${-openAngle}, 14, 0)`);
+
+  document.getElementById('bucketGravel').setAttribute('opacity', STATE.hasGravel && STATE.bucketOpenPct < 0.5 ? '1' : '0');
+
+  const led = document.getElementById('koboldLed');
+  if (!STATE.koboldPower) {
+    led.setAttribute('fill', '#475569');
+  } else if (STATE.koboldSignal === 1) {
+    led.setAttribute('fill', '#22c55e');
+  } else {
+    led.setAttribute('fill', '#ef4444');
+  }
+}
+
+// === RENDU CHRONOGRAMME ===
+function recordChrono() {
+  CHRONO_BUFFER.shift();
+  const currentPosM = (STATE.bridgeX - X_TREMIE_PX) / SCALE_X_PIXELS_PER_METER;
+  CHRONO_BUFFER.push({
+    step: STATE.step,
+    m1: STATE.cablePosM1,
+    bucketPos: STATE.bucketPhysPosM,
+    bridge: currentPosM,
+    bucket: STATE.bucketOpenPct * 10,
+    fault: STATE.fault ? 1 : 0
+  });
+}
+
+function renderChrono() {
+  const canvas = document.getElementById('chronoCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.fillStyle = '#030712';
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1;
+  for (let y = 25; y < h; y += 25) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+  }
+
+  // 1. Étape Grafcet (bleu ciel)
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i < CHRONO_BUFFER.length; i++) {
+    const x = (i / CHRONO_BUFFER.length) * w;
+    const y = h - 12 - (CHRONO_BUFFER[i].step * 8.5);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // 2. Pos Câble M1 (Orange)
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < CHRONO_BUFFER.length; i++) {
+    const x = (i / CHRONO_BUFFER.length) * w;
+    const y = 60 - (CHRONO_BUFFER[i].m1 * 4.5);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // 3. Pos Benne Réelle (Vert)
+  ctx.strokeStyle = '#22c55e';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < CHRONO_BUFFER.length; i++) {
+    const x = (i / CHRONO_BUFFER.length) * w;
+    const y = 60 - (CHRONO_BUFFER[i].bucketPos * 4.5);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // 4. Pos Pont (Violet)
+  ctx.strokeStyle = '#a855f7';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < CHRONO_BUFFER.length; i++) {
+    const x = (i / CHRONO_BUFFER.length) * w;
+    const y = h - 18 - (CHRONO_BUFFER[i].bridge * 3.5);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // 5. Défaut (Rouge)
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i < CHRONO_BUFFER.length; i++) {
+    const x = (i / CHRONO_BUFFER.length) * w;
+    const y = CHRONO_BUFFER[i].fault ? 18 : h - 6;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+
+// === MISE A JOUR IHM & TEXTES ===
+function updateHmi() {
+  const posM = (STATE.bridgeX - X_TREMIE_PX) / SCALE_X_PIXELS_PER_METER;
+  document.getElementById('lblPosBridge').innerText = posM.toFixed(2) + ' m';
+  
+  const bFdc = document.getElementById('lblBridgeFdc');
+  if (Math.abs(STATE.bridgeX - X_TREMIE_PX) <= 15) {
+    bFdc.innerText = '(TRÉMIE 0m)'; bFdc.style.color = '#38bdf8';
+  } else if (Math.abs(STATE.bridgeX - X_PV_PX) <= 15) {
+    bFdc.innerText = '(PV 5m)'; bFdc.style.color = '#06b6d4';
+  } else if (Math.abs(STATE.bridgeX - X_P2_PX) <= 15) {
+    bFdc.innerText = '(P2 15m)'; bFdc.style.color = '#eab308';
+  } else if (Math.abs(STATE.bridgeX - X_P1_PX) <= 15) {
+    bFdc.innerText = '(P1 20m)'; bFdc.style.color = '#f59e0b';
+  } else if (Math.abs(STATE.bridgeX - X_MAINT_PX) <= 15) {
+    bFdc.innerText = '(MAINT 30m)'; bFdc.style.color = '#a855f7';
+  } else {
+    bFdc.innerText = '';
+  }
+
+  const stepName = STEP_NAMES[STATE.step];
+  const info = STEP_MESSAGES[STATE.step] || { id: '16#0000', msg: 'Cycle actif.' };
+  document.getElementById('lblTeleMode').innerText = (STATE.mode === 'SEMI_AUTO') ? 'SEMI_AUTO' : 'MAINT_N1';
+
+  document.getElementById('lblPosBucket').innerText = (STATE.bucketPhysPosM >= 0 ? '+' : '') + STATE.bucketPhysPosM.toFixed(2) + ' m';
+  document.getElementById('lblPosM1').innerText = (STATE.cablePosM1 >= 0 ? '+' : '') + STATE.cablePosM1.toFixed(2) + ' m';
+  
+  const lblSlack = document.getElementById('lblCableSlack');
+  if (STATE.cableSlackM > 0.05) {
+    lblSlack.innerText = STATE.cableSlackM.toFixed(2) + ' m (MOU)';
+    lblSlack.style.color = '#f59e0b';
+  } else {
+    lblSlack.innerText = '0.00 m (Tendu)';
+    lblSlack.style.color = 'var(--success)';
+  }
+
+  const delta = Math.abs(STATE.cablePosM1 - STATE.cablePosM2);
+  const lblDelta = document.getElementById('lblDeltaM1M2');
+  lblDelta.innerText = delta.toFixed(2) + ' m';
+  lblDelta.style.color = delta > 0.5 ? 'var(--danger)' : 'var(--text)';
+
+  document.getElementById('lblBridgeDir').innerText = STATE.bridgeDir === 1 ? '▶ Vers P1' : (STATE.bridgeDir === -1 ? '◀ Vers Trémie' : '■ Arrêt');
+  document.getElementById('lblM1Action').innerText = STATE.m1Dir === 1 ? '▲ Montée' : (STATE.m1Dir === -1 ? '▼ Descente' : '■ Arrêt');
+  document.getElementById('lblM2Action').innerText = STATE.m2Dir === 1 ? '▲ Ferme' : (STATE.m2Dir === -1 ? '▼ Ouvre' : '■ Arrêt');
+
+  const openPct = Math.round(STATE.bucketOpenPct * 100);
+  document.getElementById('lblBucketState').innerText = openPct + '% ' + (openPct >= 90 ? '(Ouverte)' : (openPct <= 10 ? '(Fermée)' : '(Mouv.)'));
+  
+  document.getElementById('lblKoboldPower').innerText = STATE.koboldPower ? 'ON' : 'OFF';
+  document.getElementById('lblKoboldPower').style.color = STATE.koboldPower ? 'var(--success)' : 'var(--text-dim)';
+  
+  document.getElementById('lblKoboldSignal').innerText = STATE.koboldSignal === 1 ? '1 (Eau)' : (STATE.cablePosM1 <= -9.5 ? '0 (FOND)' : '0 (Air)');
+  document.getElementById('lblSpeedStep').innerText = STATE.speedStep > 0 ? ('P' + STATE.speedStep) : '0';
+  document.getElementById('lblSampleCount').innerText = STATE.sampleCount;
+
+  const softLimits = document.getElementById('lblSoftLimits');
+  if (STATE.cablePosM1 >= 7.0) {
+    softLimits.innerText = 'FDC Haut (+7m)';
+    softLimits.style.color = '#f59e0b';
+  } else if (STATE.cablePosM1 <= -10.0) {
+    softLimits.innerText = 'FDC Bas (-10m)';
+    softLimits.style.color = '#ef4444';
+  } else {
+    softLimits.innerText = 'OK (Sûr)';
+    softLimits.style.color = '#22c55e';
+  }
+
+  // Badges Header
+  document.getElementById('badgeMode').innerText = '⚙️ MODE: ' + STATE.mode;
+  document.getElementById('badgeStep').innerText = '🔄 ÉTAPE: ' + stepName;
+  
+  const bSafety = document.getElementById('badgeSafety');
+  if (STATE.fault) {
+    bSafety.innerText = '🚨 SÉCURITÉ: DÉFAUT';
+    bSafety.style.background = 'rgba(239,68,68,0.15)';
+    bSafety.style.borderColor = '#ef4444';
+    bSafety.style.color = '#ef4444';
+  } else {
+    bSafety.innerText = '🛡️ SÉCURITÉ: OK';
+    bSafety.style.background = 'rgba(34,197,94,0.15)';
+    bSafety.style.borderColor = '#22c55e';
+    bSafety.style.color = '#22c55e';
+  }
+
+  // Banner
+  const banner = document.getElementById('bannerOperator');
+  if (STATE.fault) {
+    banner.className = 'banner-operator error';
+    document.getElementById('txtBannerMsg').innerText = '🚨 DÉFAUT : ' + STATE.faultReason;
+    document.getElementById('txtActionId').innerText = 'ID: 16#0180';
+  } else if (STATE.step === 14) {
+    banner.className = 'banner-operator stabilizing';
+    document.getElementById('txtBannerMsg').innerText = info.msg;
+    document.getElementById('txtActionId').innerText = info.id;
+  } else {
+    banner.className = 'banner-operator';
+    document.getElementById('txtBannerMsg').innerText = info.msg;
+    document.getElementById('txtActionId').innerText = info.id;
+  }
+
+  // Diagnostic table
+  document.getElementById('d101').innerText = STATE.mode === 'SEMI_AUTO' ? 'TRUE' : 'FALSE';
+  document.getElementById('d104').innerText = STATE.deadman ? 'TRUE' : 'FALSE';
+  document.getElementById('d105').innerText = STATE.joyY !== 0 ? 'TRUE' : 'FALSE';
+  document.getElementById('d206').innerText = stepName;
+  document.getElementById('d209').innerText = (STATE.step === 0 || STATE.step === 14) ? 'TRUE' : 'FALSE';
+  document.getElementById('d210').innerText = (STATE.step > 0 && STATE.step < 14) ? 'TRUE' : 'FALSE';
+  document.getElementById('d215').innerText = STATE.waitingResume ? 'TRUE' : 'FALSE';
+  document.getElementById('d303').innerText = (STATE.cablePosM1 <= -9.5 && STATE.koboldSignal === 0) ? 'TRUE' : 'FALSE';
+  document.getElementById('d306').innerText = delta > 0.5 ? 'TRUE' : 'FALSE';
+}
+
+// === ACTIONS OPERATEUR ===
+function toggleAutoRun() {
+  if (STATE.fault) return;
+  STATE.autoRun = !STATE.autoRun;
+  document.getElementById('btnAutoRun').innerText = STATE.autoRun ? '⏸️ Pause' : '▶️ Run Cycle';
+  if (STATE.autoRun && STATE.step === 0) {
+    STATE.step = 1;
+  }
+}
+
+function sendStartCycle() {
+  if (STATE.fault) return;
+  if (STATE.waitingResume) {
+    STATE.waitingResume = false;
+    STATE.step = STATE.pausedStep || 0;
+  } else if (STATE.step === 0) {
+    STATE.step = 1;
+  }
+  STATE.autoRun = true;
+  document.getElementById('btnAutoRun').innerText = '⏸️ Pause';
+}
+
+function sendAbortCycle() {
+  STATE.autoRun = false;
+  STATE.step = 0;
+  STATE.cablePosM1 = 7.0;
+  STATE.cablePosM2 = 7.0;
+  STATE.bucketPhysPosM = 7.0;
+  STATE.cableSlackM = 0.0;
+  STATE.bridgeX = X_TREMIE_PX;
+  STATE.bucketOpenPct = 0.0;
+  STATE.koboldPower = false;
+  STATE.koboldSignal = 0;
+  STATE.m1Dir = 0; STATE.m2Dir = 0; STATE.bridgeDir = 0;
+  document.getElementById('btnAutoRun').innerText = '▶️ Run Cycle';
+}
+
+function sendResetFault() {
+  STATE.fault = false;
+  STATE.faultReason = '';
+  STATE.injectedSyncFault = false;
+  STATE.injectedKoboldFault = false;
+  if (STATE.waitingResume) {
+    STATE.step = STATE.pausedStep || 0;
+  } else {
+    STATE.step = 0;
+  }
+}
+
+function toggleDeadman() {
+  STATE.deadman = !STATE.deadman;
+  const btn = document.getElementById('btnDeadman');
+  btn.innerText = STATE.deadman ? '🟢 Actif (3s)' : '⚪ Inactif';
+  btn.style.background = STATE.deadman ? '#166534' : '#1e293b';
+  btn.style.borderColor = STATE.deadman ? '#22c55e' : '#64748b';
+}
+
+function updateJoystick() {
+  STATE.joyY = parseInt(document.getElementById('joyY').value);
+  const lbl = document.getElementById('lblJoyY');
+  lbl.innerText = STATE.joyY === 1 ? '▲ Montée (+1)' : (STATE.joyY === -1 ? '▼ Descente (-1)' : '0 (Neutre)');
+}
+
+function toggleMaintenanceMode() {
+  if (STATE.mode === 'SEMI_AUTO') {
+    STATE.mode = 'MAINT_N1';
+    STATE.waitingResume = true;
+    STATE.pausedStep = STATE.step;
+    STATE.autoRun = false;
+    document.getElementById('btnAutoRun').innerText = '▶️ Run Cycle';
+  } else {
+    STATE.mode = 'SEMI_AUTO';
+  }
+}
+
+function setSimSpeed(mult) {
+  STATE.speedMultiplier = mult;
+}
+
+function resetSimulation() {
+  sendAbortCycle();
+  sendResetFault();
+  STATE.sampleCount = 0;
+}
+
+// === INJECTIONS DE PANNES ===
+function triggerFault(reason) {
+  STATE.fault = true;
+  STATE.faultReason = reason;
+  STATE.autoRun = false;
+  STATE.speedStep = 0;
+  STATE.koboldPower = false;
+  STATE.m1Dir = 0; STATE.m2Dir = 0; STATE.bridgeDir = 0;
+  document.getElementById('btnAutoRun').innerText = '▶️ Run Cycle';
+}
+
+function injectSyncDeviation() {
+  STATE.injectedSyncFault = true;
+  if (STATE.step === 0) STATE.step = 4;
+  STATE.autoRun = true;
+}
+
+function injectPalier5UnderKobold() {
+  if (STATE.step === 4) {
+    triggerFault('Vitesse excessive en recherche Kobold : Palier 5 strictement interdit !');
+  } else {
+    STATE.step = 4;
+    STATE.autoRun = true;
+    setTimeout(() => {
+      triggerFault('Vitesse excessive en recherche Kobold : Palier 5 strictement interdit !');
+    }, 400);
+  }
+}
+
+function injectMancheRelease() {
+  STATE.joyY = 0;
+  document.getElementById('joyY').value = 0;
+  document.getElementById('lblJoyY').innerText = '0 (Neutre)';
+  STATE.autoRun = false;
+  document.getElementById('btnAutoRun').innerText = '▶️ Run Cycle';
+}
+
+function injectModeSwitchMidDive() {
+  if (STATE.step === 0) STATE.step = 4;
+  STATE.autoRun = true;
+  setTimeout(() => {
+    toggleMaintenanceMode();
+  }, 500);
+}
+
+function injectKoboldSensorFault() {
+  STATE.injectedKoboldFault = true;
+  if (STATE.step === 0) STATE.step = 4;
+  STATE.autoRun = true;
+}
+</script>
+
+</body>
+</html>
