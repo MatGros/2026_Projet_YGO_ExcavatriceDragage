@@ -799,16 +799,16 @@ _CSS = """
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
-    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks-details { margin-top: 8px; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; background: rgba(0, 0, 0, 0.015); }
-    .checks-summary { cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; outline: none; user-select: none; }
-    .checks-summary:hover { color: var(--text); }
+    .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
+    .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary:hover { color: var(--accent); }
+    .checks-label { font-size: 12px; font-weight: 600; }
     .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
-    .checks-list li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks-list li { font-size: 12px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
     .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
-    .scenario-list li { font-size: 12.5px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
+    .scenario-list li { font-size: 12px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
     .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
@@ -819,7 +819,7 @@ _CSS = """
     .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
     pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
         overflow-x: auto; }
-    .chronogram-group { margin-top: 12px; }
+    .chronogram-group { margin-top: 10px; }
     .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
         padding: 8px 12px; }
     .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
