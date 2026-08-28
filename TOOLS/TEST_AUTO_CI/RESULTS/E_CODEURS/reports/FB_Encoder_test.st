@@ -197,32 +197,32 @@ TEST 'TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustes
     calib.HomingRefRaw := 100000;
     calib.LastKnownRawPos := 100000;
 
-    (* 🎯 Scan 0 : Repos initial (Position = 0.0 m, Fenêtre vide) *)
+    (* 🎯 Repos initial (Position = 0.0 m, Fenêtre vide) *)
     fb(Enable := TRUE, Reset := FALSE, PointsPerRev := 4096, CableM_PerRev := 0.5,
        PositionMinM := -50.0, PositionMaxM := 50.0, HwIn := hwIn, Calib := calib);
     ASSERT_FALSE(fb.Measurement.SpeedValid, 'Echantillon 1 : Fenetre 50ms pas encore remplie');
 
-    (* 🚀 Scan 1 : Montée idéale (+15 mm / 10 ms) — Remplissage 1/5 *)
+    (* 🚀 Montée idéale (+15 mm / 10 ms) — Remplissage 1/5 *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 100123;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
-    (* 🚀 Scan 2 : Montée idéale (+15 mm / 10 ms) — Remplissage 2/5 *)
+    (* 🚀 Montée idéale (+15 mm / 10 ms) — Remplissage 2/5 *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 100246;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
-    (* 🚀 Scan 3 : Montée idéale (+15 mm / 10 ms) — Remplissage 3/5 *)
+    (* 🚀 Montée idéale (+15 mm / 10 ms) — Remplissage 3/5 *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 100369;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
-    (* 🚀 Scan 4 : Montée idéale (+15 mm / 10 ms) — Remplissage 4/5 *)
+    (* 🚀 Montée idéale (+15 mm / 10 ms) — Remplissage 4/5 *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 100492;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
-    (* 🚀 Scan 5 : 50 ms atteintes ➔ Fenêtre pleine & Validée *)
+    (* 🚀 50 ms atteintes ➔ Fenêtre pleine & Validée *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 100614;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
@@ -230,52 +230,52 @@ TEST 'TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustes
     ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.05, 'Vitesse nominale filtree = 1.50 m/s');
     ASSERT_NEAR(fb.Measurement.SignedSpeed_Mps, 1.50, 0.05, 'Vitesse signee montee = +1.50 m/s');
 
-    (* 🎯 Scan 6 : Palier vitesse nominale stabilisée à 1.50 m/s *)
+    (* 🎯 Palier vitesse nominale stabilisée à 1.50 m/s *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 100737;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
     ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.05, 'Palier stable 1.50 m/s');
 
-    (* 🎯 Scan 7 : Palier vitesse nominale stabilisée à 1.50 m/s *)
+    (* 🎯 Palier vitesse nominale stabilisée à 1.50 m/s *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 100860;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
     ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.05, 'Palier stable 1.50 m/s');
 
-    (* 🌊 Scan 8 : Vibration câble (-3 mm) ➔ Filtre absorbe le creux *)
+    (* 🌊 Vibration câble (-3 mm) ➔ Filtre absorbe le creux *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 100958;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
-    (* 🌊 Scan 9 : Sursaut instantané (+18 mm) ➔ Pic neutralisé par le buffer *)
+    (* 🌊 Sursaut instantané (+18 mm) ➔ Pic neutralisé par le buffer *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 101106;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
     ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.10, 'Bruit filtre : vitesse reste stable a 1.50 m/s');
 
-    (* 🌊 Scan 10 : Ondulation mécanique (-2 mm) ➔ Mesure stabilisée *)
+    (* 🌊 Ondulation mécanique (-2 mm) ➔ Mesure stabilisée *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 101212;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
-    (* 🌊 Scan 11 : Rebond élastique (+17 mm) ➔ Vitesse filtrée amortie *)
+    (* 🌊 Rebond élastique (+17 mm) ➔ Vitesse filtrée amortie *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 101351;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
     ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.10, 'Ondulation absorbee');
 
-    (* 📉 Scan 12 : Inversion de marche ➔ Début descente treuil *)
+    (* 📉 Inversion de marche ➔ Début descente treuil *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 101228;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
-    (* 📉 Scan 13 : Descente stabilisée à -1.50 m/s (SignedSpeed négatif) *)
+    (* 📉 Descente stabilisée à -1.50 m/s (SignedSpeed négatif) *)
     ADVANCE_TIME(50000000);
     hwIn.RawPosIn := 100613;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
     ASSERT_TRUE(fb.Measurement.SignedSpeed_Mps < 0.0, 'Descente : SignedSpeed negatif');
 
-    (* ⚡ Scan 14 : Rupture bus terrain ➔ Purge atomique de sécurité *)
+    (* ⚡ Rupture bus terrain ➔ Purge atomique de sécurité *)
     hwIn.SlaveOperational := FALSE;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
     ASSERT_FALSE(fb.Measurement.SpeedValid, 'Perte bus -> SpeedValid retombe immediatement a FALSE');
