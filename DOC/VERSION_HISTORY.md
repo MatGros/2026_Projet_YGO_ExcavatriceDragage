@@ -4,6 +4,13 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `T166_T170_REFONTE_CYCLES_ET_DIAGNOSTICS` — 2026-08-28 — refonte unifiée cycles, assistances & projection diagnostic
+- **Architecture Décision/Muscle** : Centralisation stricte de toutes les machines d'état de cycles (`FB_Cycle`, `FB_DiveSearch`, `FB_ExtractionSequence`, `DumpAtTremie`) dans `PRG_03_Modes_Cycle`. `PRG_04` allégé en muscle exécutif et garant de la sécurité physique des treuils.
+- **Intention Opérateur Découplée (R3-ter)** : DUT `ST_OperatorCoupledIntent` à la racine de `ST_ProgramRequest`, publication inconditionnelle par `PRG_03` pour l'arbitrage physique dans `PRG_04`. Préservation stricte de la synoptique IHM.
+- **Sécurisation Plongée / Extraction (T167)** : Vitesse bridée Palier $\le 4$ sous Kobold (défaut `16#0008`), coupure contacteur anti-chauffe sur détection fond, extraction séquentielle sans à-coup au Palier 1 forcé, exclusion formelle Option 2 Kobold.
+- **Vidage Trémie & Supervision (T168)** : `DumpAtTremie` centralisé dans `PRG_03`, projection exclusive vers `GVL_IHM.DredgingAssist.State` et `GVL_IHM.Cycle.State` depuis `PRG_07_Supervision` (zéro écriture directe dans `PRG_03`/`PRG_04`).
+- **Campagne de Tests & Validation (T169/T170)** : **27/27 suites CI PASS (100%)**, G200 Linkage PASS (0 erreur), **22/22 Gates mécaniques PASS (6.80s)**.
+
 ### `T164-6_RENOMMAGE_DUT_NC110` — 2026-08-27 — 11 DUT propriétaires renommés ST_fb<Fb>_<Role>
 - **Renommage NC-110** : `ST_Modes_Autorisations`→`ST_fbModes_Autorisations`, `ST_{Bucket,Winch,Translation}CmdDemand`→`ST_fbCycle_*CmdDemand`, `ST_Bucket{Config,State}`→`ST_fbBucket_*`, `ST_WinchLoadEstimateTable`/`ST_WinchSpeedConfig`→`ST_fbWinchLoadEstimator_*`, `ST_Winch_Symmetry{cfg,Data}`→`ST_fbWinch_Symmetry_*`, `ST_EncoderMeasurement`→`ST_fbEncoder_Measurement` (`ST_EncoderMeasurements` pluriel préservé).
 - **Validation mécanique** : Bundle régénéré, G200 liaison PASS (0 erreur), **22/22 gates PASS**, **CI 27/27 suites (100%)**, G120 NC-110 : 15 conformes / 0 à migrer.
