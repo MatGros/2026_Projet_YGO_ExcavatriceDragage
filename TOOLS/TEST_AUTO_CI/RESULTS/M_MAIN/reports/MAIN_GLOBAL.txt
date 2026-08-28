@@ -1,12 +1,6 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_wxwdlbao\strucpp-test-9RqDFx\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_03::operator()()':
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_wxwdlbao\strucpp-test-9RqDFx\generated.cpp:17486:35: error: 'class strucpp::FB_CYCLE' has no member named 'BUSY'
-17486 |     CYCLEBUSY = INSTCYCLESEMIAUTO.BUSY;
-      |                                   ^~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_wxwdlbao\strucpp-test-9RqDFx\generated.cpp:17487:35: error: 'class strucpp::FB_CYCLE' has no member named 'DONE'
-17487 |     CYCLEDONE = INSTCYCLESEMIAUTO.DONE;
-      |                                   ^~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_wxwdlbao\strucpp-test-9RqDFx\generated.cpp:17488:36: error: 'class strucpp::FB_CYCLE' has no member named 'ERROR'
-17488 |     CYCLEERROR = INSTCYCLESEMIAUTO.ERROR;
-      |                                    ^~~~~
+Error compiling source files:
+
+ST_ProgramRequest.st:13:29: error: Undefined type 'ST_OPERATORCOUPLEDINTENT' in STRUCT 'ST_PROGRAMREQUEST'
+  13 |     OperatorCoupledIntent : ST_OperatorCoupledIntent;     // Intention couplée continue opérateur (joystick/boutons), TOUS modes
+     |                             ^
 
