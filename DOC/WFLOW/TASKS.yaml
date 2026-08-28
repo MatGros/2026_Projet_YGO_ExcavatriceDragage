@@ -249,19 +249,6 @@ tasks:
   contrat: ''
   objectifs: []
   bloque_par: []
-- id: T001
-  parent_id: ''
-  statut: ⏸️
-  criticite: C2
-  domaine: GÉNÉRAL
-  agent: —
-  date: '2026-07-20T08:00:00'
-  titre: Détail séquence INIT (sous-vérifications position/cohérence)
-  contexte: ''
-  description: AF_Partie-04 §2, D22
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_REVIEW_T123_STANDARDISATION.yaml
-  objectifs: []
-  bloque_par: []
 - id: T015
   parent_id: ''
   statut: ⏸️
@@ -275,155 +262,38 @@ tasks:
   contrat: ''
   objectifs: []
   bloque_par: []
-- id: T020
-  parent_id: ''
-  statut: 🔍
-  criticite: C2
-  domaine: TREUILS
-  agent: —
-  titre: 'Sélecteur treuil IHM : widget visu physique restant...'
-  contexte: ''
-  description: AF_Partie-05 §2, AF_Partie-09 §1
-  objectifs: []
-  contrat: ''
-  date: '2026-08-27T12:49:49'
-  bloque_par: []
 - id: T022
   parent_id: ''
   statut: ✅
   criticite: C2
   domaine: TERRAIN
-  agent: AGY-01
-  date: '2026-08-28T09:47:00'
+  agent: —
   titre: Tolérance de calibration TopSensorPositionM à fixer sur site
   contexte: Position capteur physique et cible homing
-  description: Figé par défaut à 8.5m dans GVL_PERSISTENT._WinchM1/M2CfgPersist.CfgTopSensorPos_M (ajustable sur site dans
-    NVRAM si besoin entre 8.0m et 8.5m).
-  contrat: ''
+  description: 'Figé par défaut à 8.5m dans GVL_PERSISTENT._WinchM1/M2CfgPersist.CfgTopSensorPos_M (ajustable sur site dans
+    NVRAM si besoin entre 8.0m et 8.5m). ✅ Validée 2026-08-28 : valeur 8.5m confirmée cohérente code ↔ AF (GVL_PERSISTENT.st:41/49,
+    ST_WinchCfg.st:8, PRG_02_Acquisition.st:374/435, FB_Encoder_Homing.st:25/220, pont IHM PRG_07_Supervision.st:116/121 ;
+    AF_Partie-09 v2.3 §147/183, FB_Encoder_Homing_v1.1 §53/84). Reste une action terrain de mise en service : mesurer la position
+    physique réelle du capteur et confirmer la valeur (8.0–8.5m).'
   objectifs: []
-  bloque_par: []
-- id: T027
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: TREUILS
-  agent: HUM
-  date: '2026-07-20T08:00:00'
-  titre: 'Benne : essais MES terrain (cinématiqu...'
-  contexte: 'Intitulé complet : Benne : essais MES terrain (cinématique, offsets)'
-  description: AF_Partie-11 §6
   contrat: ''
-  objectifs: []
-  bloque_par: []
-- id: T039
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: CODEURS
-  agent: HUM
-  date: '2026-07-20T08:00:00'
-  titre: Interfaces Homing nominale et unitaire
-  contexte: 'Intitulé complet : Interfaces Homing nominale et unitaire : essais opérateur CODESYS'
-  description: AF_Partie-10
-  contrat: ''
-  objectifs: []
-  bloque_par: []
-- id: T043
-  parent_id: ''
-  statut: ⏸️
-  criticite: C2
-  domaine: GÉNÉRAL
-  agent: —
-  date: '2026-07-20T08:00:00'
-  titre: 'Comparaison vitesse M1/M2 remontée : régler seuils/tempo (inac...'
-  contexte: 'Intitulé complet : Comparaison vitesse M1/M2 remontée : régler seuils/tempo (inactif à 0)'
-  description: AF_Partie-04 §3quater, FB_Cycle
-  contrat: ''
-  objectifs: []
-  bloque_par: []
-- id: T047
-  parent_id: ''
-  statut: ⏳
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: HUM
-  date: '2026-07-20T08:00:00'
-  titre: 'Garde-fou palier vitesse treuils : documenter métier, calibrer...'
-  contexte: 'Intitulé complet : Garde-fou palier vitesse treuils : documenter métier, calibrer et activer'
-  description: FB_SpeedStep, GVL_PERSISTENT._WinchSpeedConfig
-  contrat: ''
-  objectifs: []
-  bloque_par: []
-- id: T048
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: TREUILS
-  agent: HUM
-  date: '2026-07-20T08:00:00'
-  titre: Matrice validation pannes treuils V1–V7 en simulation/terrain
-  contexte: ''
-  description: REGISTRE_Suivi_MiseEnService.md
-  contrat: ''
-  objectifs: []
-  bloque_par: []
-- id: T052
-  parent_id: ''
-  statut: ⏳
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: HUM
-  date: '2026-07-20T08:00:00'
-  titre: Valider chaîne PowerCutOff physique et temps coupure réel
-  contexte: ''
-  description: PRG_06_Outputs.st
-  contrat: ''
-  objectifs: []
+  date: '2026-08-28T21:05:00+02:00'
   bloque_par: []
 - id: T054
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C4
   domaine: SÉCURITÉ
-  agent: DSH-02
-  date: '2026-08-24T05:05:00'
+  agent: —
   titre: Intégrer latence boucle automate (~10 ms) au calcul temps d'arrêt
   contexte: ''
   description: '✅ **Étude livrée** (`DOC/WFLOW/AUDITS/ETUDE_T54_LATENCE_BOUCLE_v0.1.md`) : audit archivé AUDIT_Winch §3.2
     (P1.2) confirme le retard d''un scan ~10ms → sous-estime la distance d''arrêt. Design : CST_ScanLatencyMs:=T#10ms à ajouter
     au CALCUL de distance (pas aux timeouts de coupure Méca). ⏳ **Implémentation en attente** : emplacement injection, tâche
     référence, impact seuils Méca, validation humaine.'
-  contrat: ''
   objectifs: []
-  bloque_par: []
-- id: T055
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: TREUILS
-  agent: DSH-02
-  date: '2026-08-24T03:00:00'
-  titre: Stratégie synchronisme unique (info / mineur / majeur / critique)
-  contexte: ''
-  description: '✅ **Étude de conception livrée + corrigée après revue indépendante** (`DOC/WFLOW/AUDITS/DESIGN_SYNCHRONISME_UNIQUE_4NIVEAUX_v0.2.md`)
-    : échelle unique info/mineur/majeur/critique, valeurs vérifiées code (Warn instantané+latch, Fault 800ms, Mismatch 500ms,
-    Méca E 2.5m), E_SyncSeverity **diag-only** (ne pilote aucune coupure), TC renumérotés P10-037..039b (collisions ID résolues).
-    ⏳ **Implémentation en attente** de décisions (remplacement vs addition, périmètre critique Méca E, variables mortes ProcessPermit*_Ascent).'
   contrat: ''
-  objectifs: []
-  bloque_par: []
-- id: T056
-  parent_id: ''
-  statut: ⏳
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: HUM
-  date: '2026-07-20T08:00:00'
-  titre: Caractériser seuils sécurité terrain (0,02 m/s, 2 m, 3 s, 800 ...
-  contexte: 'Intitulé complet : Caractériser seuils sécurité terrain (0,02 m/s, 2 m, 3 s, 800 ms, 500 ms)'
-  description: FB_Safety_Winch
-  contrat: ''
-  objectifs: []
+  date: '2026-08-28T20:59:12'
   bloque_par: []
 - id: T081
   parent_id: ''
@@ -431,38 +301,12 @@ tasks:
   criticite: C2
   domaine: CYCLE
   agent: PI-01
-  date: '2026-08-12T09:00:00'
   titre: Séquence détection fond Kobold à 4 étapes
   contexte: ''
   description: AF_Partie-04, FB_DiveSearch (codé, attente essais)
-  contrat: ''
   objectifs: []
-  bloque_par: []
-- id: T082
-  parent_id: ''
-  statut: ⏳
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: PI-01
-  date: '2026-08-12T09:00:00'
-  titre: Arrêt sécurisé si séquence Kobold invalide
-  contexte: ''
-  description: FB_ExtractionSequence (codé, attente essais)
   contrat: ''
-  objectifs: []
-  bloque_par: []
-- id: T083
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: IHM
-  agent: HUM
-  date: '2026-08-12T09:00:00'
-  titre: Repasser ST_BypassNetwork.IhmHeartbeat à FALSE dès visu opérat...
-  contexte: 'Intitulé complet : Repasser ST_BypassNetwork.IhmHeartbeat à FALSE dès visu opérationnelle'
-  description: ST_BypassNetwork.st
-  contrat: ''
-  objectifs: []
+  date: '2026-08-28T21:00:16'
   bloque_par: []
 - id: T084
   parent_id: ''
@@ -506,31 +350,18 @@ tasks:
   bloque_par: []
 - id: T088
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C2
   domaine: CYCLE
-  agent: DSH-02
-  date: '2026-08-24T04:00:00'
+  agent: —
   titre: Bouclage TIME() (49,7j) dans FB_CycleTime
   contexte: 'Intitulé complet : Bouclage TIME() (49,7j) dans FB_CycleTime : garde-fou DeltaTimeMs > 1000'
   description: '✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_FB_CYCLETIME_GARDE_FOU_WRAP_v0.1.md`) : le code actuel
     n''accepte que DeltaTimeMs>0 (pas de plafond haut) → au wrap 49,7j un CycleTimeS aberrant peut être publié. Garde-fou
     proposé : secours si DeltaTimeMs>1000 (constante CST_). ⏳ **Implémentation en attente** (code, validation humaine).'
-  contrat: ''
   objectifs: []
-  bloque_par: []
-- id: T089
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: TREUILS
-  agent: HUM
-  date: '2026-08-12T09:00:00'
-  titre: Valider sur site offset benne fermée ≈ 15 m (grandeur d'état m...
-  contexte: 'Intitulé complet : Valider sur site offset benne fermée ≈ 15 m (grandeur d''état mécanique)'
-  description: MES-010
   contrat: ''
-  objectifs: []
+  date: '2026-08-28T21:01:29'
   bloque_par: []
 - id: T090
   parent_id: ''
@@ -546,34 +377,18 @@ tasks:
   contrat: ''
   objectifs: []
   bloque_par: []
-- id: T091
-  parent_id: ''
-  statut: ⏳
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: DSH-02
-  date: '2026-08-24T05:00:00'
-  titre: 'ÉTUDE : Séquence frein/puissance asymé...'
-  contexte: 'Intitulé complet : ÉTUDE : Séquence frein/puissance asymétrique (montée frein d''abord / descente immédiat)'
-  description: '✅ **Étude livrée** (`DOC/WFLOW/AUDITS/ETUDE_T91_SEQ_FREIN_PUISSANCE_v0.1.md`) : FB_Brake a une séquence actuelle
-    (montée=puissance avant relâche frein, descente=fermeture immédiate) mais ne prend pas le sens (montée/descente) pour
-    l''asymétrie. Cible : montée frein collé→puissance→relâche ; descente coupure immédiate. ⏳ **Implémentation en attente**
-    (nécessite sens en entrée + validation humaine, MES-006).'
-  contrat: ''
-  objectifs: []
-  bloque_par: []
 - id: T092
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C4
   domaine: SÉCURITÉ
   agent: HUM
-  date: '2026-08-12T09:00:00'
   titre: Qualification terrain persistance bypass RETAIN et homing à 0 m
   contexte: ''
   description: MES-002
-  contrat: ''
   objectifs: []
+  contrat: ''
+  date: '2026-08-28T21:02:53'
   bloque_par: []
 - id: T093
   parent_id: ''
@@ -588,44 +403,18 @@ tasks:
   contrat: ''
   objectifs: []
   bloque_par: []
-- id: T094
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: IHM
-  agent: PI-01
-  date: '2026-08-12T09:00:00'
-  titre: Rendre SpeedGuardEnable persistant et exposé IHM MAINT_N2
-  contexte: ''
-  description: PRG_04_Treuils_Benne, GVL_PERSISTENT
-  contrat: ''
-  objectifs: []
-  bloque_par: []
-- id: T095
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: TREUILS
-  agent: PI-01
-  date: '2026-08-12T09:00:00'
-  titre: Table VitesseMax[1..5] de calibration dans FB_Winch_Symmetry
-  contexte: ''
-  description: FB_Winch_Symmetry.st
-  contrat: ''
-  objectifs: []
-  bloque_par: []
 - id: T096
   parent_id: ''
-  statut: ⏸️
+  statut: 🔍
   criticite: C4
   domaine: SÉCURITÉ
   agent: —
-  date: '2026-08-12T09:00:00'
   titre: Mode apprentissage automatique des bandes de vitesse à vide et...
   contexte: 'Intitulé complet : Mode apprentissage automatique des bandes de vitesse à vide et en charge'
   description: AF_Partie-10_v2.0 §9bis.3
-  contrat: ''
   objectifs: []
+  contrat: ''
+  date: '2026-08-28T21:03:37'
   bloque_par: []
 - id: T098
   parent_id: ''
@@ -645,11 +434,10 @@ tasks:
   bloque_par: []
 - id: T108
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C2
   domaine: TRANSLATION
-  agent: DSH-02
-  date: '2026-08-24T04:30:00'
+  agent: —
   titre: Interlock Translation M3 si Trémie pleine (TremieFull_OR_GateR...
   contexte: 'Intitulé complet : Interlock Translation M3 si Trémie pleine (TremieFull_OR_GateRaised_DI)'
   description: '✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T108_INTERLOCK_TREMIE_v0.1.md`) : constat vérifié — TremieFull_OR_GateRaised_DI
@@ -657,8 +445,9 @@ tasks:
     si trémie pleine/grille levée, sortie libre (Direction=-1). ⏳ **Implémentation en attente** : choix injection A/B, impact
     cycle semi-auto (SelTarget=1), câblage électrique réel, validation humaine. (Signal renommé HopperFull→TremieFull_OR_GateRaised
     par T162, 2026-08-26.)'
-  contrat: ''
   objectifs: []
+  contrat: ''
+  date: '2026-08-28T21:04:16'
   bloque_par: []
 - id: T109
   parent_id: ''
@@ -680,34 +469,16 @@ tasks:
   statut: ⏳
   criticite: C4
   domaine: SÉCURITÉ
-  agent: DSH-02
-  date: '2026-08-24T04:50:00'
-  titre: Clarifier sémantique DriveStatusWord.0 AC600 (\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Power
-    Ready\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-    vs...
-  contexte: 'Intitulé complet : Clarifier sémantique DriveStatusWord.0 AC600 (\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Power
-    Ready\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-    vs \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Mouvement\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-    Méca B)'
+  agent: —
+  titre: Clarifier sémantique DriveStatusWord.0 AC600
+  contexte: 'Intitulé complet : Clarifier sémantique DriveStatusWord.0 AC600'
   description: '✅ **Fiche de clarification livrée** (`DOC/WFLOW/AUDITS/CLARIFICATION_T110_DRIVESTATUSWORD_v0.1.md`) : DriveStatusWord.0
     utilisé comme preuve de mouvement (Méca B, FB_Safety_Translation L180-182) mais sémantique AC600 ambiguë (Power Ready
     vs mouvement). Proposition : baser Méca B sur ABS(DriveActualFreqHz)>0.5 (meilleure preuve). ⏳ **Résolution en attente**
     : doc AC600 du bit 0 + validation humaine (C4).'
-  contrat: ''
   objectifs: []
-  bloque_par: []
-- id: T115
-  parent_id: ''
-  statut: ⏸️
-  criticite: C2
-  domaine: CYCLE
-  agent: —
-  date: '2026-08-12T09:00:00'
-  titre: 'Bandeau IHM champ 2 « Cycle » : CycleStep non alimenté → affic...'
-  contexte: 'Intitulé complet : Bandeau IHM champ 2 « Cycle » : CycleStep non alimenté → affiche INIT'
-  description: PRG_07_Supervision.st, lié au lot Cycle Auto
   contrat: ''
-  objectifs: []
+  date: '2026-08-28T21:04:52'
   bloque_par: []
 - id: T116
   parent_id: ''
@@ -761,19 +532,6 @@ tasks:
   contrat: ''
   objectifs: []
   bloque_par: []
-- id: T120
-  parent_id: ''
-  statut: ⏸️
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: DSH-02
-  date: '2026-08-18T10:00:00'
-  titre: Autoriser SEMI_AUTO même si prérequis non prêts (attente expli...
-  contexte: 'Intitulé complet : Autoriser SEMI_AUTO même si prérequis non prêts (attente explicite cycle)'
-  description: FB_Modes.st, PRG_03_Modes_Cycle.st, FB_Cycle.st — agent échoue (C4), différé
-  contrat: ''
-  objectifs: []
-  bloque_par: []
 - id: T121
   parent_id: ''
   statut: ✅
@@ -811,22 +569,6 @@ tasks:
   contexte: ''
   description: FB_TroubleshootingView.st, ST_ChainWinch.st, GVL_Troubleshooting.st
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_REVIEW_T123_STANDARDISATION.yaml
-  objectifs: []
-  bloque_par: []
-- id: T124
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: IHM
-  agent: DSH-01
-  date: '2026-08-18T12:00:00'
-  titre: FB_Hmi_BannerFormatter
-  contexte: 'Intitulé complet : FB_Hmi_BannerFormatter — suivi revue expert anti-clignotement'
-  description: '**Implémenté 2026-08-18** : (1) DirectionBlocked tranché en CriticalActionActive (interlock = affichage immédiat)
-    ; (2) doublon anti-flicker refactoré → FB_AntiFlickerText (DRY, 2 instances) ; (3) préfixe CST_ documenté dans NAMING_CONVENTION.
-    + régions {region §N} + renvois formats AF dans le FB. AF-07 §4.3 mis à jour. Gates G405 (ASCII) + G200 (liaison) **PASS**
-    ; bundle régénéré. ⏳ Validation CODESYS (banc) à faire'
-  contrat: ''
   objectifs: []
   bloque_par: []
 - id: T125
@@ -875,8 +617,10 @@ tasks:
   date: '2026-08-28T16:01:00'
   completed_at: '2026-08-28T16:01:30'
   titre: Implémentation et validation complète du cycle semi-auto (séquenceur Grafcet)
-  contexte: 'Séquenceur de dragage X0..X13 + STABILIZING, conformité GUIDE_SEQUENCEUR_v1.2, sous-cycles Dive/Extraction, bascule sans à-coup Semi-Auto/Maintenance et raccordement PRG_03.'
-  description: 'Validé : Parent des lots T127-A -> T127-F. 100% tests CI G_CYCLE et M_MAIN PASS, G200 PASS, 22/22 Gates PASS, compilation CODESYS 0 erreur.'
+  contexte: Séquenceur de dragage X0..X13 + STABILIZING, conformité GUIDE_SEQUENCEUR_v1.2, sous-cycles Dive/Extraction, bascule
+    sans à-coup Semi-Auto/Maintenance et raccordement PRG_03.
+  description: 'Validé : Parent des lots T127-A -> T127-F. 100% tests CI G_CYCLE et M_MAIN PASS, G200 PASS, 22/22 Gates PASS,
+    compilation CODESYS 0 erreur.'
   contrat: ''
   objectifs:
   - Figer une interface standard AF-03 §3 avec socle FB_FaultCore et ST_Lifecycle
@@ -893,8 +637,10 @@ tasks:
   date: '2026-08-28T12:35:00'
   completed_at: '2026-08-28T13:05:00'
   titre: Types G_CYCLE et normalisation profil standard AF-03 de FB_Cycle
-  contexte: 'Définition des types contractuels E_OperatorAxis/E_ProgramSequence et mise à niveau interface FB_Cycle.st (Ready, Fault: ST_Fault, Lifecycle: ST_Lifecycle, OperatorActionId).'
-  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-A_TYPES_INTERFACE.yaml. Préservation des sorties nécessaires aux consommateurs actuels et aux tests STruCpp.'
+  contexte: 'Définition des types contractuels E_OperatorAxis/E_ProgramSequence et mise à niveau interface FB_Cycle.st (Ready,
+    Fault: ST_Fault, Lifecycle: ST_Lifecycle, OperatorActionId).'
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-A_TYPES_INTERFACE.yaml. Préservation des sorties nécessaires
+    aux consommateurs actuels et aux tests STruCpp.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-A_TYPES_INTERFACE.yaml
   objectifs:
   - Définir E_OperatorAxis et E_ProgramSequence dans CODE/G_CYCLE/_TYPES/
@@ -911,8 +657,10 @@ tasks:
   locked_at: '2026-08-28T13:05:00'
   completed_at: '2026-08-28T13:08:00'
   titre: Logique Grafcet X0..X13, bascules de mode, sécurités et sous-cycles Dive/Extraction
-  contexte: 'Implémentation des transitions continues, séquence Kobold 4 temps à la volée, enchaînement fluide extraction avec maintien joystick, bridage Palier 4, repli et tests automatisés STruCpp.'
-  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-B_GRAFCET_LOGIC.yaml. Suite de tests unitaires automatisés STruCpp / TEST_AUTO_CI couvrant TC-P04-001 à TC-P04-021.'
+  contexte: Implémentation des transitions continues, séquence Kobold 4 temps à la volée, enchaînement fluide extraction avec
+    maintien joystick, bridage Palier 4, repli et tests automatisés STruCpp.
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-B_GRAFCET_LOGIC.yaml. Suite de tests unitaires automatisés
+    STruCpp / TEST_AUTO_CI couvrant TC-P04-001 à TC-P04-021.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-B_GRAFCET_LOGIC.yaml
   objectifs:
   - Valider la séquence Kobold en 4 temps à la volée sans rupture de mouvement
@@ -933,8 +681,10 @@ tasks:
   locked_at: '2026-08-28T13:08:00'
   completed_at: '2026-08-28T13:11:00'
   titre: Diagnostic Troubleshooting, Bannières IHM et Documentation AF_Partie-04 v2.3 / AF_Partie-14
-  contexte: 'Enrichissement des structures ST_ChainCycleSemiAuto, FB_TroubleshootingView, FB_Hmi_BannerFormatter et mise à jour de la spec AF_Partie-04_Mode_SemiAuto_Sequenceur (v2.2 -> v2.3) et AF_Partie-14.'
-  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-C_DIAG_DOC.yaml. Validation G340, bannières dynamiques et vue chronologique de dépannage.'
+  contexte: Enrichissement des structures ST_ChainCycleSemiAuto, FB_TroubleshootingView, FB_Hmi_BannerFormatter et mise à
+    jour de la spec AF_Partie-04_Mode_SemiAuto_Sequenceur (v2.2 -> v2.3) et AF_Partie-14.
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-C_DIAG_DOC.yaml. Validation G340, bannières dynamiques et
+    vue chronologique de dépannage.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-C_DIAG_DOC.yaml
   objectifs:
   - Enrichir ST_ChainCycleSemiAuto avec les attentes opérateur, étapes chronologiques et blocages
@@ -952,8 +702,10 @@ tasks:
   date: '2026-08-28T16:00:00'
   completed_at: '2026-08-28T16:01:00'
   titre: Raccordement final PRG_03 et encapsulation privée de instCycleSemiAuto
-  contexte: 'Raccordement des sorties FB_Cycle sur le bus PRG_03.Data.ReqProgram et PRG_03.Data.SequenceState, suppression des accès externes à instCycleSemiAuto.'
-  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml. Validé : raccordement et encapsulation consolidés suite aux lots T165 et T127.'
+  contexte: Raccordement des sorties FB_Cycle sur le bus PRG_03.Data.ReqProgram et PRG_03.Data.SequenceState, suppression
+    des accès externes à instCycleSemiAuto.
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml. Validé : raccordement et encapsulation
+    consolidés suite aux lots T165 et T127.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml
   objectifs:
   - Éliminer tout accès externe direct à instCycleSemiAuto
@@ -971,8 +723,10 @@ tasks:
   locked_at: '2026-08-28T13:12:00'
   completed_at: '2026-08-28T13:16:30'
   titre: Campagne de tests automatisés STruCpp CI & Validation non-régression G_CYCLE
-  contexte: 'Délégation à un agent pour l''exécution récurrente de la suite de tests unitaires STruCpp (TEST_AUTO_CI) sur G_CYCLE et génération des artefacts de test.'
-  description: 'Exécution commandée de python TOOLS/TEST_AUTO_CI/run_tests.py --domain G_CYCLE, contrôle des rapports HTML et vérification de la couverture des cas TC-P04-001 à TC-P04-021.'
+  contexte: Délégation à un agent pour l'exécution récurrente de la suite de tests unitaires STruCpp (TEST_AUTO_CI) sur G_CYCLE
+    et génération des artefacts de test.
+  description: Exécution commandée de python TOOLS/TEST_AUTO_CI/run_tests.py --domain G_CYCLE, contrôle des rapports HTML
+    et vérification de la couverture des cas TC-P04-001 à TC-P04-021.
   contrat: ''
   objectifs:
   - Exécuter la suite complète STruCpp sur G_CYCLE
@@ -990,12 +744,16 @@ tasks:
   locked_at: '2026-08-28T13:15:00'
   completed_at: '2026-08-28T13:16:00'
   titre: Fiche de test CI visuelle & Animation machine séquence Grafcet Semi-Auto
-  contexte: 'Conception d''une fiche de test visuelle interactive avec animation machine de dragage (treuils M1/M2, benne, Kobold, translation pont, trémie), cycle nominal complet et scénarios d''anomalies.'
-  description: 'Génération d''une animation cinématique interactive (SVG/HTML) couplée à un banc de test étendu reproduisant le cycle nominal de dragage jusqu''au déversement en trémie, avec injection de défaillances (désynchro treuils -> STABILIZING, Palier 5 sous Kobold, lâcher de manche, bascule maintenance).'
+  contexte: Conception d'une fiche de test visuelle interactive avec animation machine de dragage (treuils M1/M2, benne, Kobold,
+    translation pont, trémie), cycle nominal complet et scénarios d'anomalies.
+  description: Génération d'une animation cinématique interactive (SVG/HTML) couplée à un banc de test étendu reproduisant
+    le cycle nominal de dragage jusqu'au déversement en trémie, avec injection de défaillances (désynchro treuils -> STABILIZING,
+    Palier 5 sous Kobold, lâcher de manche, bascule maintenance).
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-F_VISUAL_CI.yaml
   objectifs:
   - Définir le scénario nominal de bout en bout (X0 -> X13) avec simulation de la matière et du fond
-  - Intégrer les cas d''anomalie (désynchro treuils, violation séquence/vitesse Kobold, relâchement de manche, bascule de mode)
+  - Intégrer les cas d''anomalie (désynchro treuils, violation séquence/vitesse Kobold, relâchement de manche, bascule de
+    mode)
   - Développer l''animation machine interactive (vue profil carrière noyée, treuils, câbles, benne, nappe d''eau, fond, trémie)
   - Intégrer les chronogrammes interactifs synchronisés avec l''animation cinématique
   bloque_par:
@@ -1074,45 +832,20 @@ tasks:
   - T165-A
 - id: T132
   parent_id: ''
-  statut: ⏳
+  statut: ⬜
   criticite: C4
   domaine: SÉCURITÉ
-  agent: DSH-02
-  date: '2026-08-24T04:45:00'
-  titre: 'Référencement benne fermée : étape cycle + mise à jour AF P...'
+  agent: —
+  titre: 'Référencement benne fermée : étape cycle + mise à jour AF P...   avec option config IHM possibilité homing benne
+    ouverte  dans le cas d''un changement d''avis'
   contexte: 'Intitulé complet : Référencement benne fermée : étape cycle + mise à jour AF P09 §5'
   description: '✅ **AF P09 §5 corrigée (2026-08-24)** : §5 étape 1 « Confirmation visuelle benne ouverte » → **benne fermée**
     (mâchoires tendues sur câbles), conforme T132. ⚠️ Pas de bump v2.2 (≈120 refs CODE/bundle/Device.export → refactor disproportionné)
     — correction gardée dans la v2.1 active, à valider utilisateur. ⏳ **Étape cycle** (opérateur ferme/valide benne dans le
     grafcet) reste à implémenter (code, validation humaine).'
-  contrat: ''
   objectifs: []
-  bloque_par: []
-- id: T133
-  parent_id: ''
-  statut: ⬜
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: —
-  date: '2026-08-19T12:00:00'
-  titre: 'Refactor X2 : translate vers trémie / positi...'
-  contexte: 'Intitulé complet : Refactor X2 : translate vers trémie / position travail, retirer maintenance du semi-auto'
-  description: Session 2026-08-19 — FB_Cycle.st X2 — semi-auto ne va jamais en maintenance ; flux trémie → P1 → plongée
   contrat: ''
-  objectifs: []
-  bloque_par: []
-- id: T134
-  parent_id: ''
-  statut: ⬜
-  criticite: C2
-  domaine: GÉNÉRAL
-  agent: —
-  date: '2026-08-19T12:00:00'
-  titre: Mise à jour AF P04 (graphe) pour le nouveau flux
-  contexte: ''
-  description: Session 2026-08-19 — AF_Partie-04 — aligner le grafcet sur le flux validé
-  contrat: ''
-  objectifs: []
+  date: '2026-08-28T21:08:44'
   bloque_par: []
 - id: T135
   parent_id: ''
@@ -1258,64 +991,31 @@ tasks:
   contrat: ''
   objectifs: []
   bloque_par: []
-- id: T143
-  parent_id: ''
-  statut: ⬜
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: —
-  date: '2026-08-20T12:00:00'
-  titre: Meca DriftGuard se déclenche au référencement sans mouvement
-  contexte: 'Identification (2026-08-20) : à l''appui du bouton de référencement M2 (benne ouverte/fermée) ou M1 (codeur),
-    sans mouvement, MecaA se déclenche via DriftGuardA.Violation → PowerCutOff → contacteur coupé → mode DISABLE. Le bypass
-    MecaA (IHM) permet le référencement. '
-  description: '**Cause probable** : InReferencingMode := instHomingM2.Busy (PRG_04 l.736) mal synchronisé — DriftGuardA armé
-    (NOT InReferencingMode, FB_Safety_Winch l.283) au moment de l''appui → détecte une dérive transitoire. **L''ErrorId n''est
-    pas conservé** (défaut de conception) → cause invisible au snapshot. <br>**Solution proposée** : ① vérifier/corriger la
-    synchro InReferencingMode pendant le référencement ; ② conserver l''ErrorId (latch cause) jusqu''au Reset pour rendre
-    la cause visible. <br>🔗 **Intégré à T137 (2026-08-20)** : le correctif définitif (conservation ErrorId + interface ST_FbStatus)
-    sera porté par la migration FB_Safety_Winch/FB_Safety_Translation→ST_FbStatus. Correctif minimal proposé : Enable := TRUE
-    (surveillance permanente) sur les 3 FB safety. <br>**Session 2026-08-21 — cause racine CONFIRMÉE** : le « Meca à l''arrêt
-    » (M1/M2) vient d''une **course temporelle** entre l''**armement instantané** (contacts/frein échos de commande sim) et
-    la **fenêtre de mesure vitesse 50 ms** (FB_Encoder_SpeedMeasure) → MeasuredSpeedMps > 0,02 ~50 ms après l''arrêt → faux
-    Meca bit7. Même famille pour NoMovement (bit15, vitesse < 0,02 pendant commande). **Correctifs appliqués & commités**
-    : ① TON arrêt confirmé 100 ms avant d''armer la détection de vitesse Meca (FB_Safety_Winch) ; ② Reset effectif en DISABLE
-    (efface la cause même en mode neutre → réarmement) ; ③ SimulationBypassActive étendu aux bypass **Safety+Process** M1/M2
-    (banc). ⏳ **Référencement toujours à investiguer** (synchro InReferencingMode).'
-  contrat: ''
-  objectifs:
-  - vérifier/corriger la synchro InReferencingMode pendant le référencement ;
-  - conserver l'ErrorId (latch cause) jusqu'au Reset pour rendre la cause visible.
-  - TON arrêt confirmé 100 ms avant d'armer la détection de vitesse Meca (FB_Safety_Winch) ;
-  - Reset effectif en DISABLE (efface la cause même en mode neutre → réarmement) ;
-  - SimulationBypassActive étendu aux bypass Safety+Process M1/M2 (banc). ⏳ Référencement toujours à investiguer (synchro
-    InReferencingMode).
-  bloque_par: []
 - id: T144
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C2
   domaine: TRANSLATION
-  agent: DSH-02
-  date: '2026-08-24T04:35:00'
+  agent: —
   titre: Assainir l'interface de PRG_06_Outputs (conformité esprit bus/...
   contexte: 'Intitulé complet : Assainir l''interface de PRG_06_Outputs (conformité esprit bus/encapsulation T142 + sorties
     M3 mortes) | Signalé 2026-08-20 (revue sim M3) : PRG_06 ne respecte pas l''esprit bus (T142). Faits vérifiés : ① M3_DriveControlWord/M3_DriveFreqRefWord
     (VAR_OUTPUT l.43-44) jamais assignés (morts, toujours 0) ; ② M3_CommandWord/M3_SetpointFrequencyHz (assignés l.215-216)
     non déclarés dans les .st (globals uniquement dans Device.export) → source non auto-consistant ; ③ la commande drive M3
     n''est PAS dans le bus Data (ST_OutputsInterPrg ne porte que TranslationBrakeCmd) ; ④ diag plats en VAR_OUTPUT (M3BlockedBySafetyInfo,
-    EmergencyState, EmergencyDiag…) au lieu d''un struct/bus diag propre. '
+    EmergencyState, EmergencyDiag…) au lieu d''un struct/bus diag propre.'
   description: '✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T144_ASSAINIR_PRG06_v0.1.md`) : 4 faits confirmés (sorties
     mortes L51-52, globals non déclarés L270-271, commande M3 absente du bus Data, diag plats). Plan : ① supprimer/réassigner
     mortes, ② déclarer globals .st, ③ étendre ST_OutputsInterPrg (commande drive M3, producteur unique), ④ struct ST_OutputsDiag.
     ⏳ **Implémentation en attente** : choix supprimer/réassigner, impact sim, validation humaine.'
-  contrat: ''
   objectifs:
   - M3_DriveControlWord/M3_DriveFreqRefWord (VAR_OUTPUT l.43-44) jamais assignés (morts, toujours 0) ;
   - M3_CommandWord/M3_SetpointFrequencyHz (assignés l.215-216) non déclarés dans les .st (globals uniquement dans Device.export)
     → source non auto-consistant ;
   - la commande drive M3 n'est PAS dans le bus Data (ST_OutputsInterPrg ne porte que TranslationBrakeCmd) ;
   - diag plats en VAR_OUTPUT (M3BlockedBySafetyInfo, EmergencyState, EmergencyDiag…) au lieu d'un struct/bus diag propre.
+  contrat: ''
+  date: '2026-08-28T21:07:19'
   bloque_par: []
 - id: T145
   parent_id: ''
@@ -1407,45 +1107,6 @@ tasks:
     : conclusion non reproductible + test de verrou TC-P03-014 à ajouter (devrait déjà passer). **Aucun code C4 à écrire.**'
   contrat: ''
   objectifs: []
-  bloque_par: []
-- id: T149
-  parent_id: ''
-  statut: 🔍
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: DSH-02
-  date: '2026-08-22T12:00:00'
-  titre: État des lieux & reliquats Joystick (première étape d'intentio...
-  contexte: 'Intitulé complet : État des lieux & reliquats Joystick (première étape d''intention utilisateur) — point de référence
-    du domaine joystick, prélude à l''intention de mouvement (T130/T135) | Session 2026-08-22 — assainissement + dynamique
-    du joystick simulé. Accompli (commit) : ① FB_Joystick migré contrat standard → Status : ST_FbStatus (socle FB_FbStatus),
-    retrait PowerContactorEngaged (device, pas d''organe), retrait FB_Filter_PT1 (joystick stable → FB_Filter A_COMMUN), RawOutOfRangeMargin
-    en paramètre [CFG], surveillance capteur continue + Enable:=FALSE sur défaut capteur, perte bus → ErrorId bit2 auto-effacé.
-    ② Simulation : FB_Sim_Joystick dynamique (montée progressive 1-2s + pseudo-aléatoire, retombée 200ms, bagotement SimJoystickBagotement_Active,
-    overshoot SimJoystickOvershoot_Active) ; correctif gating FB_SimBench (retombée/bagotement masqués après relâchement)
-    validé par test CI ad hoc (4/4) + trace CODESYS. ③ Outillage : dossier _TROUBLESHOOTING/ (test CI ad hoc hors registry)
-    + méthode skill troubleshooting (§4ter + orientation). '
-  description: '**Reliquats joystick** : ① décision **désarmer homme-mort sur défaut capteur** (P1 sécurité, AF §5bis non
-    tranché — attente utilisateur) ; ② architecture FB_FbStatus/ST_FbStatus enrichi (Warning/textes) vs 6 membres historiques
-    (impact 16 FB, T137) ; ③ fiabiliser gate homme-mort au niveau des FB aval (T130/T135) ; ④ IHM ErrorIdTxt/WarningIdTxt
-    si enrichissement adopté ; ⑤ **T130** standardiser décodage d''intention → {Direction, Palier} (étape d''intention de
-    mouvement, après l''intention de geste validée ici). <br>⚠️ **Rappel sécurité** : bypass commun de sécurité doivent rester
-    OFF en exploitation (RETAIN).'
-  contrat: ''
-  objectifs:
-  - 'FB_Joystick migré contrat standard → Status : ST_FbStatus (socle FB_FbStatus), retrait PowerContactorEngaged (device,
-    pas d''organe), retrait FB_Filter_PT1 (joystick stable → FB_Filter A_COMMUN), RawOutOfRangeMargin en paramètre [CFG],
-    surveillance capteur continue + Enable:=FALSE sur défaut capteur, perte bus → ErrorId bit2 auto-effacé.'
-  - 'Simulation : FB_Sim_Joystick dynamique (montée progressive 1-2s + pseudo-aléatoire, retombée 200ms, bagotement SimJoystickBagotement_Active,
-    overshoot SimJoystickOvershoot_Active) ; correctif gating FB_SimBench (retombée/bagotement masqués après relâchement)
-    validé par test CI ad hoc (4/4) + trace CODESYS.'
-  - 'Outillage : dossier _TROUBLESHOOTING/ (test CI ad hoc hors registry) + méthode skill troubleshooting (§4ter + orientation).'
-  - décision désarmer homme-mort sur défaut capteur (P1 sécurité, AF §5bis non tranché — attente utilisateur) ;
-  - architecture FB_FbStatus/ST_FbStatus enrichi (Warning/textes) vs 6 membres historiques (impact 16 FB, T137) ;
-  - fiabiliser gate homme-mort au niveau des FB aval (T130/T135) ;
-  - IHM ErrorIdTxt/WarningIdTxt si enrichissement adopté ;
-  - T130 standardiser décodage d'intention → {Direction, Palier} (étape d'intention de mouvement, après l'intention de geste
-    validée ici).
   bloque_par: []
 - id: T150
   parent_id: ''
@@ -2392,7 +2053,8 @@ tasks:
   agent: AGY-01
   titre: Audit et visa architecture PRG_02/PRG_03
   contexte: Cadrage documentaire, contrats inter-PRG, registre de conservation, test design et décisions humaines.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml. Validé suite au visa humain sur D-01, D-05 et DataValid.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml. Validé suite au visa humain
+    sur D-01, D-05 et DataValid.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
   objectifs:
   - Valider responsabilités, structures proposées et anti-débordement
@@ -2408,7 +2070,8 @@ tasks:
   date: '2026-08-28T11:51:18+02:00'
   titre: PRG_02 — compléter la publication Data sans changer les consommateurs
   contexte: 'Checkpoint producteur : joystick X/Y complet, états codeur et diagnostics réseau déjà calculés.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml. Validé : publication complète Data.Joystick, Data.Network, Data.EncoderM1/M2 et Data.DataValid.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml. Validé : publication complète
+    Data.Joystick, Data.Network, Data.EncoderM1/M2 et Data.DataValid.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml
   objectifs:
   - Publier les faits existants dans des sous-DUT structurés sans second calcul
@@ -2424,7 +2087,8 @@ tasks:
   date: '2026-08-28T11:51:18+02:00'
   titre: PRG_02 — migrer tous les consommateurs vers Data/HwIn
   contexte: Remappage conservatif PRG_03/04/05/07 ; aucun changement de logique métier.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml. Validé : 0 accès direct à PRG_02_Acquisition.inst*, 22/22 gates PASS.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml. Validé : 0 accès direct à PRG_02_Acquisition.inst*,
+    22/22 gates PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml
   objectifs:
   - Obtenir zéro accès externe à PRG_02.inst*
@@ -2440,7 +2104,8 @@ tasks:
   date: '2026-08-28T11:51:18+02:00'
   titre: Revue indépendante read-only des lots PRG_02
   contexte: Contrôle du diff réel, des consommateurs, de la matrice manuelle et des faits safety qualifiés.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml. Validé : revue indépendante Ollama concluante avec verdict PASS et 22/22 gates PASS.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml. Validé : revue indépendante Ollama
+    concluante avec verdict PASS et 22/22 gates PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml
   objectifs:
   - Vérifier indépendamment B1/B2 et les preuves CP0→CP2
@@ -2457,7 +2122,8 @@ tasks:
   titre: Réconcilier l'interface réelle FB_Cycle avec T164-5
   contexte: 'Audit read-only préalable : le catalogue annonce T164-5 terminé mais FB_Cycle expose encore Busy/Done/Error/ErrorId
     à plat.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml. Validé : FB_Cycle conforme profil AF-03 (Ready, Fault, Lifecycle, CycleStepAtError), aucune reconstruction locale.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml. Validé : FB_Cycle conforme
+    profil AF-03 (Ready, Fault, Lifecycle, CycleStepAtError), aucune reconstruction locale.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml
   objectifs:
   - Empêcher PRG_03 de fabriquer Fault/Lifecycle/OperatorActionId localement
@@ -2473,7 +2139,9 @@ tasks:
   date: '2026-08-28T14:43:30+02:00'
   titre: PRG_03 — publier Data(Auth, ReqProgram, SequenceState)
   contexte: Checkpoint producteur PRG_03 ; aucune migration des consommateurs ni modification GRAFCET.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml. Validé : bus public PRG_03.Data créé (Auth, ReqProgram, SequenceState), 7 DUTs, neutralisation déterministe hors SEMI_AUTO, revue Ollama PASS, CI 7/7 PASS, 22/22 gates PASS.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml. Validé : bus public PRG_03.Data
+    créé (Auth, ReqProgram, SequenceState), 7 DUTs, neutralisation déterministe hors SEMI_AUTO, revue Ollama PASS, CI 7/7
+    PASS, 22/22 gates PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml
   objectifs:
   - Créer un bus public minimal et lisible sans safety ni sortie physique
@@ -2489,7 +2157,9 @@ tasks:
   date: '2026-08-28T14:46:00+02:00'
   titre: PRG_03 — migrer consommateurs et rendre le cycle privé
   contexte: Remappage PRG_02/04/05/07 vers PRG_03.Data et retours aval publics N-1.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml. Validé : 100% des consommateurs remappés vers PRG_03.Data, 0 accès direct résiduel, instCycleSemiAuto encapsulée en VAR interne, CI 7/7 PASS, G200 PASS, 22/22 gates PASS.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml. Validé : 100% des consommateurs
+    remappés vers PRG_03.Data, 0 accès direct résiduel, instCycleSemiAuto encapsulée en VAR interne, CI 7/7 PASS, G200 PASS,
+    22/22 gates PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml
   objectifs:
   - Obtenir zéro accès à instCycleSemiAuto et aux internals PRG_04/05
@@ -2505,7 +2175,8 @@ tasks:
   date: '2026-08-28T14:47:55+02:00'
   titre: Revue indépendante read-only des lots PRG_03
   contexte: Contrôle architecture, ordre de scan, chaîne Req→Tgt→Cmd→Act, conservation et diagnostic opérateur.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml. Validé : revue indépendante Ollama concluante avec verdict PASS sur le diff réel et l''absence de régression.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml. Validé : revue indépendante Ollama
+    concluante avec verdict PASS sur le diff réel et l''absence de régression.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml
   objectifs:
   - Vérifier indépendamment C1/C2 et les preuves CP4→CP5
@@ -2520,8 +2191,11 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T16:35:00+02:00'
   titre: Centralisation des Cycles et Assistants dans PRG_03_Modes_Cycle
-  contexte: Déplacement architectural de FB_DiveSearch et FB_ExtractionSequence de PRG_04 vers PRG_03, décharge de PRG_04 en muscle physique, remappage PRG_07 et alignement AF.
-  description: Famille T166 — Refactor architectural pour centraliser toutes les décisions et machines d'état de cycles dans PRG_03, préserver PRG_04 pour l'application mécanique/safety, éliminer les accès directs de PRG_07 et aligner la documentation AF-02/04/10.
+  contexte: Déplacement architectural de FB_DiveSearch et FB_ExtractionSequence de PRG_04 vers PRG_03, décharge de PRG_04
+    en muscle physique, remappage PRG_07 et alignement AF.
+  description: Famille T166 — Refactor architectural pour centraliser toutes les décisions et machines d'état de cycles dans
+    PRG_03, préserver PRG_04 pour l'application mécanique/safety, éliminer les accès directs de PRG_07 et aligner la documentation
+    AF-02/04/10.
   contrat: ''
   objectifs:
   - Centraliser 100% des machines d'état de cycles (FB_Cycle, FB_DiveSearch, FB_ExtractionSequence) dans PRG_03
@@ -2539,7 +2213,8 @@ tasks:
   date: '2026-08-28T16:20:00+02:00'
   titre: Contrats de flux et enrichissement des bus publics inter-PRG
   contexte: Enrichissement ST_WinchInterPrg, ST_TranslationInterPrg et remappage PRG_07.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-A_CONTRACTS_ET_FLUX.yaml. Validé : publication complète PRG_04/05, suppression des accès directs dans PRG_07 (instWinchSync remappé vers Data), 0 erreur G200.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-A_CONTRACTS_ET_FLUX.yaml. Validé : publication complète PRG_04/05,
+    suppression des accès directs dans PRG_07 (instWinchSync remappé vers Data), 0 erreur G200.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-A_CONTRACTS_ET_FLUX.yaml
   objectifs:
   - Finaliser PRG_04.Data et PRG_05.Data
@@ -2555,7 +2230,9 @@ tasks:
   date: '2026-08-28T16:26:00+02:00'
   titre: Migration et instanciation de DiveSearch et ExtractionSequence dans PRG_03
   contexte: Cerveau décisionnel unique dans PRG_03, intention couplée et production continue de SequenceState.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-B_MIGRATION_CYCLES_PRG03.yaml. Validé : instDiveSearch et instExtractionSequence déclarées et exécutées en VAR interne de PRG_03, intention CoupledUserRequest calculée au même scan, Data.SequenceState produit en continu.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-B_MIGRATION_CYCLES_PRG03.yaml. Validé : instDiveSearch et
+    instExtractionSequence déclarées et exécutées en VAR interne de PRG_03, intention CoupledUserRequest calculée au même
+    scan, Data.SequenceState produit en continu.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-B_MIGRATION_CYCLES_PRG03.yaml
   objectifs:
   - Instancier DiveSearch et ExtractionSequence dans PRG_03
@@ -2572,7 +2249,9 @@ tasks:
   date: '2026-08-28T16:29:00+02:00'
   titre: Allègement de PRG_04_Treuils_Benne et préservation de la sécurité physique
   contexte: Retrait des instances cycles de PRG_04 et consommation de PRG_03.Data.ReqProgram.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-C_ALLEVIATION_PRG04.yaml. Validé : PRG_04 ne contient plus aucune instance de cycle, raccordement de CmdBucketCloseArbitrated et KoboldContactorCmdArbitrated sur le bus ReqProgram, sécurité locale 100% préservée.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-C_ALLEVIATION_PRG04.yaml. Validé : PRG_04 ne contient plus
+    aucune instance de cycle, raccordement de CmdBucketCloseArbitrated et KoboldContactorCmdArbitrated sur le bus ReqProgram,
+    sécurité locale 100% préservée.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-C_ALLEVIATION_PRG04.yaml
   objectifs:
   - Supprimer instDiveSearch et instExtractionSequence de PRG_04
@@ -2589,7 +2268,9 @@ tasks:
   date: '2026-08-28T16:32:00+02:00'
   titre: Alignement documentaire des analyses fonctionnelles AF-02, AF-04, AF-10
   contexte: Formalisation de la nouvelle architecture et des responsabilités PRG_03/PRG_04.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-DOC_ALIGNEMENT_AF.yaml. Validé : rédaction des amendements par sous-agent Ollama et intégration dans AF-02 (responsabilités), AF-04 (rattachement cycles) et AF-10 (muscle/sécurité PRG_04).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-DOC_ALIGNEMENT_AF.yaml. Validé : rédaction des amendements
+    par sous-agent Ollama et intégration dans AF-02 (responsabilités), AF-04 (rattachement cycles) et AF-10 (muscle/sécurité
+    PRG_04).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-DOC_ALIGNEMENT_AF.yaml
   objectifs:
   - Mettre à jour AF-02 avec le tableau des 7 PRG
@@ -2605,7 +2286,9 @@ tasks:
   date: '2026-08-28T16:30:15+02:00'
   titre: Revue indépendante Ollama du diff réel et arbitrage des points de garde
   contexte: Audit du diff réel sur l'ordre de scan, l'encapsulation, les write-backs et la safety.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-CR_REVIEW_OLLAMA.yaml. Validé : rapport d''audit Ollama analysant le diff, confirmation de l''absence de retard sur l''intention, validation du retard N-1 mécanique admissible et levée de tous les points de garde.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-CR_REVIEW_OLLAMA.yaml. Validé : rapport d''audit Ollama analysant
+    le diff, confirmation de l''absence de retard sur l''intention, validation du retard N-1 mécanique admissible et levée
+    de tous les points de garde.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-CR_REVIEW_OLLAMA.yaml
   objectifs:
   - Audit indépendant du diff réel par modèle local
@@ -2614,15 +2297,19 @@ tasks:
   - T166-DOC
 - id: T167
   parent_id: null
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: MODES_CYCLE
   agent: ORCHESTRATEUR
   date: '2026-08-28T16:38:00+02:00'
-  updated_at: '2026-08-28T22:45:00+02:00'
+  updated_at: '2026-08-28T23:30:00+02:00'
+  completed_at: '2026-08-28T23:30:00+02:00'
   titre: Refonte & Unification du Grafcet Plongée / Recherche Fond / Extraction
-  contexte: 'A figee, B+C codees/testees/CODESYS OK (contrats IN_REVIEW, visa humain a poser), CR certifiee (Ollama deepseek-v4-flash + orchestrateur). Reste : visa humain B/C. Items durcissement D1/D2 (recovery reset FB_ExtractionSequence, garde position basse FB_DiveSearch) -> DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md §4, tache a planifier.'
-  description: Famille T167 — Unification des séquences, traitement guard sur le bypass Kobold, gestion des time-outs et capture StepAtFault.
+  contexte: 'A/B/C/CR toutes ✅. B+C VALIDATED (visa humain 2026-08-28, CODESYS OK) apres 3 revues independantes et 2 passes
+    de durcissement (H1-H5 puis F1-F3). Items D1/D2 (recovery reset FB_ExtractionSequence, garde position basse FB_DiveSearch)
+    = hors scope -> DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md §4, a planifier.'
+  description: Famille T167 — Unification des séquences, traitement guard sur le bypass Kobold, gestion des time-outs et capture
+    StepAtFault.
   contrat: ''
   objectifs:
   - Définir le Grafcet unifié cible
@@ -2647,15 +2334,18 @@ tasks:
   - T167
 - id: T167-B
   parent_id: T167
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: MODES_CYCLE
   agent: CC
   date: '2026-08-28T16:38:00+02:00'
-  updated_at: '2026-08-28T19:45:00+02:00'
+  updated_at: '2026-08-28T23:30:00+02:00'
+  completed_at: '2026-08-28T23:30:00+02:00'
   titre: Durcissement FB_DiveSearch (timers de garde anti-blocage + StepAtFault, bypass Kobold gelé)
-  contexte: Patch additif sur la machine d'état existante ; timeouts runtime depuis params site ; bypass Kobold gelé (T167-A §3bis).
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml. Code + tests verts (7/7), G200 PASS, gates C 16/16, revue Ollama PASS avec réserve levée. Attend visa humain + T167-CR.'
+  contexte: Patch additif sur la machine d'état existante ; timeouts runtime depuis params site ; bypass Kobold gelé (T167-A
+    §3bis).
+  description: 'Contrat VALIDATED (visa humain 2026-08-28, CODESYS 3.5 OK). FB_DiveSearch 8/8. 3 revues indépendantes
+    (deepseek-v4-flash / gpt-5.6-terra-high / gpt-5.6-sol-max), 2 passes durcissement H1-H5 puis F1-F3. G200 + gates + doc-links PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml
   objectifs:
   - Timers de garde par étape (SEARCHING_IMMERSION / SEARCHING_BOTTOM) calculés au runtime
@@ -2665,15 +2355,18 @@ tasks:
   - T167-A
 - id: T167-C
   parent_id: T167
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: MODES_CYCLE
   agent: CC
   date: '2026-08-28T16:38:00+02:00'
-  updated_at: '2026-08-28T20:30:00+02:00'
+  updated_at: '2026-08-28T23:30:00+02:00'
+  completed_at: '2026-08-28T23:30:00+02:00'
   titre: Durcissement FB_ExtractionSequence (backstop fermeture benne + timeout décollage runtime + StepAtFault)
-  contexte: Patch additif ; backstop CfgBucketCloseTimeout verrouillé > BucketMoveTimeout (watchdog benne), timeout CONTROL_ASCENT runtime depuis ControlAscentDistance_M.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml. Code + tests verts (6/6), G200 PASS, gates C 16/16. Revue Ollama PASS avec 3 réserves — toutes traitées (contrôle runtime ordre watchdogs, garde CycleTime, StepAtFault Reset conditionné). Attend visa humain + T167-CR.'
+  contexte: Patch additif ; backstop CfgBucketCloseTimeout verrouillé > BucketMoveTimeout (watchdog benne), timeout CONTROL_ASCENT
+    runtime depuis ControlAscentDistance_M.
+  description: 'Contrat VALIDATED (visa humain 2026-08-28, CODESYS 3.5 OK). FB_ExtractionSequence 8/8. 3 revues indépendantes,
+    2 passes durcissement H1-H5 puis F1-F3 (ForceMinSpeedStep suit permis, Reset gardé sur cause physique, backstop borné). G200 + gates + doc-links PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml
   objectifs:
   - Backstop fermeture benne verrouillé pour ne jamais masquer BucketError
@@ -2691,8 +2384,12 @@ tasks:
   updated_at: '2026-08-28T22:45:00+02:00'
   completed_at: '2026-08-28T22:45:00+02:00'
   titre: Revue de Code & Certification Indépendante T167 (Ollama deepseek-v4-flash, par brique)
-  contexte: 'DiveSearch : MAJEUR Ollama = faux positif prouve (TC-P04-015 etendu) + garde-fou defense-en-profondeur. Extraction : MAJEUR Ollama = pre-existant baseline hors scope T167-C ; mineurs = non-defauts verifies. 2 briques CERTIFIEES pour le perimetre T167. Items durcissement D1/D2 -> tache T172.'
-  description: 'Resultats : DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md (+ rapport brut T167-CR_ollama_FB_ExtractionSequence.md). Garde-fou IF Fault.Error OR Fault.Latched ajoute aux 2 FB. FB_DiveSearch 7/7, FB_ExtractionSequence 6/6, G200 PASS, run_all_gates PASS.'
+  contexte: 'DiveSearch : MAJEUR Ollama = faux positif prouve (TC-P04-015 etendu) + garde-fou defense-en-profondeur. Extraction
+    : MAJEUR Ollama = pre-existant baseline hors scope T167-C ; mineurs = non-defauts verifies. 2 briques CERTIFIEES pour
+    le perimetre T167. Items durcissement D1/D2 -> tache T172.'
+  description: 'Resultats : DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md (+ rapport brut T167-CR_ollama_FB_ExtractionSequence.md).
+    Garde-fou IF Fault.Error OR Fault.Latched ajoute aux 2 FB. FB_DiveSearch 7/7, FB_ExtractionSequence 6/6, G200 PASS, run_all_gates
+    PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-CR_REVIEW_CYCLES.yaml
   objectifs:
   - Certifier securite ISO 13849, non-redemarrage auto, ordre de scan
@@ -2739,8 +2436,11 @@ tasks:
   date: '2026-08-28T16:38:00+02:00'
   updated_at: '2026-08-28T21:15:00+02:00'
   titre: Intégration du diagnostic unifié dans PRG_07_Supervision (+ StepAtFault assistants)
-  contexte: 'Projection exclusive vers GVL_IHM.DredgingAssist.State. Complété après T167-B/C : DiveStepAtFault / ExtractionStepAtFault (etape figee au defaut, l''etat vivant ExtractionState/DiveState valant ERROR_HOLD apres faute) desormais projetes jusqu''a FB_TroubleshootingView (Idx208 / Idx307).'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml. Chaine PRG_03.Data.SequenceState -> PRG_07 -> GVL_IHM.DredgingAssist.State -> GVL_Troubleshooting.AssistanceDragage. G200 PASS, gates C 16/16, PRG_07 3/3.'
+  contexte: 'Projection exclusive vers GVL_IHM.DredgingAssist.State. Complété après T167-B/C : DiveStepAtFault / ExtractionStepAtFault
+    (etape figee au defaut, l''etat vivant ExtractionState/DiveState valant ERROR_HOLD apres faute) desormais projetes jusqu''a
+    FB_TroubleshootingView (Idx208 / Idx307).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml. Chaine PRG_03.Data.SequenceState
+    -> PRG_07 -> GVL_IHM.DredgingAssist.State -> GVL_Troubleshooting.AssistanceDragage. G200 PASS, gates C 16/16, PRG_07 3/3.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml
   objectifs:
   - Éliminer 100% des écritures directes dans PRG_03 et PRG_04
@@ -2774,7 +2474,7 @@ tasks:
   titre: Qualification Automatisée des Scénarios de Dragage (CI)
   contexte: Écriture et exécution de la suite de tests automatisés STruCpp / ST2C.
   description: Famille T169 — Validation des scénarios nominaux, limites et dégradés en simulation CI.
-  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml
   objectifs:
   - 100% des tests unitaires de cycle verts en CI
   bloque_par:
@@ -2803,9 +2503,12 @@ tasks:
   date: '2026-08-28T16:38:00+02:00'
   updated_at: '2026-08-28T22:00:00+02:00'
   titre: Clôture d'Ingénierie & Revue Globale du Système
-  contexte: 'Audit T170-A produit : DOC/WFLOW/T170-A_AUDIT_RELEASE_T166_T170.md. Release NON gelee. Blocages : T167-CR Extraction (serveur Ollama timeout x5), visa humain T167-B/C (IN_REVIEW), T168-CR a re-verifier, T169-A scenarios end-to-end manquants (mode/puissance/synchro), guard-fou CI --all non deterministe Windows.'
-  description: G200 PASS, run_all_gates PASS (tout), CODESYS 3.5 OK. Tests STruCpp verts en sequentiel (le mode --all est flaky sous Windows, WinError 193/32).
-  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T170-A_AUDIT_RELEASE_ET_CLOTURE.yaml'
+  contexte: 'Audit T170-A produit : DOC/WFLOW/T170-A_AUDIT_RELEASE_T166_T170.md. Release NON gelee. Blocages : T167-CR Extraction
+    (serveur Ollama timeout x5), visa humain T167-B/C (IN_REVIEW), T168-CR a re-verifier, T169-A scenarios end-to-end manquants
+    (mode/puissance/synchro), guard-fou CI --all non deterministe Windows.'
+  description: G200 PASS, run_all_gates PASS (tout), CODESYS 3.5 OK. Tests STruCpp verts en sequentiel (le mode --all est
+    flaky sous Windows, WinError 193/32).
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T170-A_AUDIT_RELEASE_ET_CLOTURE.yaml
   objectifs:
   - Clôturer le grand chantier des cycles
   bloque_par:
@@ -2819,7 +2522,8 @@ tasks:
   date: '2026-08-28T17:56:00+02:00'
   titre: Animation Visuelle Pilotée par le Code Compilé FB_Cycle
   contexte: Raccordement de l'animation Canvas à la trace d'exécution scan-par-scan du binaire compilé STruCpp (Worktree isolé).
-  description: Famille T171 — Éradication de la simulation JS fictive et pilotage cinématique 100% basé sur le code ST IEC compilé.
+  description: Famille T171 — Éradication de la simulation JS fictive et pilotage cinématique 100% basé sur le code ST IEC
+    compilé.
   contrat: ''
   objectifs:
   - Développer le harnais de simulation dynamique de cycle complet
@@ -2837,7 +2541,7 @@ tasks:
   titre: Harnais ST de simulation dynamique & génération de trace scan-par-scan
   contexte: Exécution de FB_Cycle compilé sur un cycle complet X0..X13 étendant test_fb_cycle.st.
   description: Création du test ST dynamique produisant trace_semi_auto_cycle.json selon le Grafcet AF-04.
-  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE.yaml
   objectifs:
   - Traversée séquentielle ordonnée X0 à X13 sous stimuli réalistes
   bloque_par:
@@ -2852,7 +2556,7 @@ tasks:
   titre: Raccordement de l'animation Canvas sur les sorties du code compilé
   contexte: Éradication du moteur JS fictif dans FICHE_SEMI_AUTO_ANIMATION.html et consommation de la trace JSON compilée.
   description: Adaptation du visualiseur interactif Canvas avec scrub par scan, window.__traceScan et lecture temps-réel.
-  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE.yaml
   objectifs:
   - Animer la cinématique machine d'après les consignes réelles du binaire compilé
   bloque_par:
@@ -2880,14 +2584,12 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T20:45:00+02:00'
   titre: Conformité AF-06 v2.4 — écarts audit (CSV, cadence, table TOR, NC-110)
-  contexte: 'Audit indépendant AF_Partie-06_Acquisition_Qualification_IO_v2.4.md (2026-08-28) : 7 écarts
-    standards/AF/CODE identifiés. Le P0 EncoderIncoherent reste tracké séparément (T158, C4, arbitrage
-    humain). Cette famille traite les écarts documentaires et de cohérence matérielle, sans toucher
-    au code safety.'
-  description: 'Famille T172 — Mise en conformité documentaire et cohérence matérielle de AF-06 v2.4.
-    Sous-tâches : T172-A (réf CSV + cadence), T172-B (table TOR 22→24 + polarité freins), T172-C
-    (NC-110 ST_EncoderMeasurements), T172-D (contradiction CSV/code TremieFull), T172-E (ST_InputsQualified
-    archivé). Chaque sous-tâche a son contrat C2 dans DOC/WFLOW/CONTRACTS/.'
+  contexte: 'Audit indépendant AF_Partie-06_Acquisition_Qualification_IO_v2.4.md (2026-08-28) : 7 écarts standards/AF/CODE
+    identifiés. Le P0 EncoderIncoherent reste tracké séparément (T158, C4, arbitrage humain). Cette famille traite les écarts
+    documentaires et de cohérence matérielle, sans toucher au code safety.'
+  description: 'Famille T172 — Mise en conformité documentaire et cohérence matérielle de AF-06 v2.4. Sous-tâches : T172-A
+    (réf CSV + cadence), T172-B (table TOR 22→24 + polarité freins), T172-C (NC-110 ST_EncoderMeasurements), T172-D (contradiction
+    CSV/code TremieFull), T172-E (ST_InputsQualified archivé). Chaque sous-tâche a son contrat C2 dans DOC/WFLOW/CONTRACTS/.'
   contrat: ''
   objectifs:
   - Aligner AF-06 v2.4 sur la réalité matérielle (CSV 20260826) et le code
@@ -2902,12 +2604,10 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T20:45:00+02:00'
   titre: AF-06 — corriger référence CSV (20260814→20260826) et cadence (T01_Acquisition→MainTask)
-  contexte: 'Audit AF-06 v2.4 : §5 cite Device_IO_20260814.csv (n''existe plus, seul 20260826.csv est
-    présent) ; §3ter cite une tâche T01_Acquisition qui n''existe nulle part (ni CODE ni AF02) — la
-    cadence réelle est MainTask 10 ms.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-A_CSV_CADENCE.yaml. Correction
-    documentaire pure (C1/C2 doc) : nom du CSV source de vérité et nom de tâche de cadence dans
-    AF-06 v2.4.'
+  contexte: 'Audit AF-06 v2.4 : §5 cite Device_IO_20260814.csv (n''existe plus, seul 20260826.csv est présent) ; §3ter cite
+    une tâche T01_Acquisition qui n''existe nulle part (ni CODE ni AF02) — la cadence réelle est MainTask 10 ms.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-A_CSV_CADENCE.yaml. Correction documentaire pure (C1/C2 doc)
+    : nom du CSV source de vérité et nom de tâche de cadence dans AF-06 v2.4.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-A_CSV_CADENCE.yaml
   objectifs:
   - Remplacer Device_IO_20260814.csv par Device_IO_20260826.csv dans AF-06 §5
@@ -2921,17 +2621,15 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T20:45:00+02:00'
   titre: AF-06 — table TOR exhaustive (22→24) et polarité freins corrigée
-  contexte: 'Audit AF-06 v2.4 §5 : la table liste 22 TOR mais le CSV 20260826 en porte 24 sur les 3
-    modules DI (VH_0800END:8, VH_0808ETP:8, Local_Digital_IO:8) — manquent TremieFull_OR_GateRaised_DI
-    et une voie VH_0800END Bit5 sans nom. La note freins « TRUE=serré » est fausse (le code et le CSV
-    confirment TRUE=ouvert).'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-B_TABLE_TOR.yaml. Mise à jour de la
-    table §5 : ajout des 2 TOR manquantes, correction de la note de polarité freins, signalement de la
-    voie VH_0800END Bit5 non nommée.'
+  contexte: 'Audit AF-06 v2.4 §5 : la table liste 22 TOR mais le CSV 20260826 en porte 24 sur les 3 modules DI (VH_0800END:8,
+    VH_0808ETP:8, Local_Digital_IO:8) — manquent TremieFull_OR_GateRaised_DI et une voie VH_0800END Bit5 sans nom. La note
+    freins « TRUE=serré » est fausse (le code et le CSV confirment TRUE=ouvert).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-B_TABLE_TOR.yaml. Mise à jour de la table §5 : ajout des
+    2 TOR manquantes, correction de la note de polarité freins, signalement de la voie VH_0800END Bit5 non nommée.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-B_TABLE_TOR.yaml
   objectifs:
-  - Table §5 exhaustive : 24 TOR réelles documentées (22 existantes + TremieFull + voie vide signalée)
-  - Note polarité freins corrigée : TRUE = frein ouvert (pas « serré »)
+  - Table §5 exhaustive: 24 TOR réelles documentées (22 existantes + TremieFull + voie vide signalée)
+  - Note polarité freins corrigée: TRUE = frein ouvert (pas « serré »)
   bloque_par: []
 - id: T172-C
   parent_id: T172
@@ -2941,16 +2639,15 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T20:45:00+02:00'
   titre: NC-110 vs ST_EncoderMeasurements — trancher la convention (dérogation ou renommage)
-  contexte: 'Audit AF-06 v2.4 §3ter : ST_EncoderMeasurements est produit par PRG_02 (un PROGRAM, pas
-    un FB) mais NC-110 impose ST_fb<NomFb>_* pour tout DUT produit/échangé par une seule instance de
-    FB. Le nom actuel est un DUT de domaine public — cas que NC-110 voulait démarquer. Décision
-    requise : dérogation écrite ou renommage.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-C_NC110.yaml. Décision de convention
-    tracée : soit dérogation documentée dans NAMING_CONVENTION (DUT produit par PROGRAM = domaine
-    public), soit renommage planifié. Aucun code touché sans décision.'
+  contexte: 'Audit AF-06 v2.4 §3ter : ST_EncoderMeasurements est produit par PRG_02 (un PROGRAM, pas un FB) mais NC-110 impose
+    ST_fb<NomFb>_* pour tout DUT produit/échangé par une seule instance de FB. Le nom actuel est un DUT de domaine public
+    — cas que NC-110 voulait démarquer. Décision requise : dérogation écrite ou renommage.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-C_NC110.yaml. Décision de convention tracée : soit dérogation
+    documentée dans NAMING_CONVENTION (DUT produit par PROGRAM = domaine public), soit renommage planifié. Aucun code touché
+    sans décision.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-C_NC110.yaml
   objectifs:
-  - Décision humaine tracée : dérogation NC-110 documentée OU plan de renommage
+  - Décision humaine tracée: dérogation NC-110 documentée OU plan de renommage
   - NAMING_CONVENTION.md mis à jour en conséquence (si dérogation)
   bloque_par: []
 - id: T172-D
@@ -2961,13 +2658,12 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T20:45:00+02:00'
   titre: Contradiction CSV/code TremieFull_OR_GateRaised_DI (câblé vs non câblé)
-  contexte: 'Audit AF-06 v2.4 §5 : le CSV Device_IO_20260826.csv:456 déclare TremieFull_OR_GateRaised_DI
-    câblé à %IX224.5 (VH_0808ETP Bit5) alors que le code (PRG_02_Acquisition.st:159, ST_HwMachine.st:15)
-    dit « pas encore câblé électriquement ». Contradiction matérielle à lever avec l''humain avant
-    toute décision d''interlock (lié à T108).'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-D_TREMIEFULL.yaml. Levée de
-    contradiction : confirmer l''état réel du câblage (export CODESYS frais + terrain), puis aligner
-    CSV/code/doc. Ne pas implémenter l''interlock (T108) — juste lever l''ambiguïté matérielle.'
+  contexte: 'Audit AF-06 v2.4 §5 : le CSV Device_IO_20260826.csv:456 déclare TremieFull_OR_GateRaised_DI câblé à %IX224.5
+    (VH_0808ETP Bit5) alors que le code (PRG_02_Acquisition.st:159, ST_HwMachine.st:15) dit « pas encore câblé électriquement
+    ». Contradiction matérielle à lever avec l''humain avant toute décision d''interlock (lié à T108).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-D_TREMIEFULL.yaml. Levée de contradiction : confirmer l''état
+    réel du câblage (export CODESYS frais + terrain), puis aligner CSV/code/doc. Ne pas implémenter l''interlock (T108) —
+    juste lever l''ambiguïté matérielle.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-D_TREMIEFULL.yaml
   objectifs:
   - État réel du câblage TremieFull confirmé (câblé ou non) par preuve terrain/export frais
@@ -2981,14 +2677,14 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T20:45:00+02:00'
   titre: AF-06 — ST_InputsQualified déjà archivé (mise à jour §3ter)
-  contexte: 'Audit AF-06 v2.4 §3ter : le doc décrit ST_InputsQualified comme « hérités de l''ancienne
-    architecture » à retirer quand zéro consommateur. Or ces types sont déjà dans ARCHIVES/ (plus dans
-    CODE/) — la condition est satisfaite, le doc est en retard.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-E_INPUTSQUALIFIED.yaml. Mise à jour
-    documentaire §3ter : signaler que ST_InputsQualified* est déjà archivé (ARCHIVES/Code/SUPERVISION/_TYPES/),
-    retrait effectif, conserver la règle de non-réintroduction.'
+  contexte: 'Audit AF-06 v2.4 §3ter : le doc décrit ST_InputsQualified comme « hérités de l''ancienne architecture » à retirer
+    quand zéro consommateur. Or ces types sont déjà dans ARCHIVES/ (plus dans CODE/) — la condition est satisfaite, le doc
+    est en retard.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-E_INPUTSQUALIFIED.yaml. Mise à jour documentaire §3ter :
+    signaler que ST_InputsQualified* est déjà archivé (ARCHIVES/Code/SUPERVISION/_TYPES/), retrait effectif, conserver la
+    règle de non-réintroduction.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-E_INPUTSQUALIFIED.yaml
   objectifs:
-  - §3ter reflète l'état réel : ST_InputsQualified* archivé, zéro consommateur
+  - §3ter reflète l'état réel: ST_InputsQualified* archivé, zéro consommateur
   - Règle de non-réintroduction conservée
   bloque_par: []
