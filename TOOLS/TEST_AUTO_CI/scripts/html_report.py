@@ -201,12 +201,22 @@ def _render_static_table(scans: list, field_names: list, field_types: dict) -> s
     </details>"""
 
 
+def _fmt_scale(v: float) -> str:
+    if abs(v) >= 1000:
+        return f"{v:.0f}"
+    elif abs(v) >= 10:
+        return f"{v:.1f}"
+    elif abs(v) == 0.0:
+        return "0"
+    else:
+        return f"{v:.2f}"
+
+
 def _render_waveform(scans: list, field_names: list, field_types: dict, fail_scan_num=None) -> str:
     """Chronogramme graphique SVG : 1 ligne par variable, temps en abscisse (par index de
     scan -- espacement uniforme pour rester lisible meme quand les t_ns reels sont tres
     inegaux -- le temps simule reel est annote sous chaque colonne). BOOL = creneau
-    (analyseur logique) ; numerique = valeur affichee, ligne plate entre transitions.
-    is_bool = vrai type IEC_BOOL declare (jamais deduit des valeurs observees)."""
+    (analyseur logique) ; numerique = courbe analogique auto-scalee avec bascule en puces texte au clic."""
     if not scans or not field_names:
         return ""
     col_w = 56
@@ -221,19 +231,11 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
         return field_types.get(f, all(scans[i]["fields"].get(f) in ("0", "1") for i in range(n)))
 
     OTHER_PALETTE = ["#2563eb", "#059669", "#0891b2", "#65a30d", "#0d9488", "#1d4ed8"]
-    RED_PALETTE = ["#dc2626", "#b91c1c", "#f43f5e", "#e11d48"]  # nuances distinctes -- plusieurs
-    # signaux "erreur" proches (ERROR, DIAG.ERROR, REDUNDANCYTESTFAILED...) ne doivent PAS
-    # partager exactement la meme couleur, sinon impossible de les distinguer piste a piste
+    RED_PALETTE = ["#dc2626", "#b91c1c", "#f43f5e", "#e11d48"]
     _other_colors: dict = {}
     _red_colors: dict = {}
 
     def wf_color(f: str) -> str:
-        """Couleur semantique par type de signal -- RESET toujours noir, LOCKOUT toujours
-        orange (fixes, reconnaissables d'un rapport a l'autre). Tout ce qui touche a un defaut
-        (ERROR/FAILED/FAIL) reste dans la famille rouge mais avec une nuance differente par
-        signal (sinon 2 pistes "erreur" adjacentes sont indiscernables a l'oeil). Le reste
-        tourne dans une palette bleu/vert, assignee dans l'ordre d'apparition et stable pour
-        tout le chronogramme (memes couleurs table/waveform)."""
         upper = f.upper()
         if "RESET" in upper:
             return "#111827"
@@ -272,12 +274,12 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
         y_lane = top_margin + row * lane_h
         y_mid = y_lane + lane_h / 2
         color = wf_color(f)
-        svg_parts.append(f'<text x="{left_margin - 18}" y="{y_mid + 4}" class="wf-label">{_html.escape(f)}</text>')
         svg_parts.append(f'<circle cx="{left_margin - 8}" cy="{y_mid}" r="4" fill="{color}"/>')
 
         if is_bool(f):
+            svg_parts.append(f'<text x="{left_margin - 18}" y="{y_mid + 4}" class="wf-label">{_html.escape(f)}</text>')
             y_hi, y_lo = y_lane + 6, y_lane + lane_h - 8
-            # echelle 0/1 sur la 1ere ligne uniquement (evite de repeter sur chaque piste)
+            # echelle 0/1 sur la 1ere ligne uniquement
             if row == 0:
                 svg_parts.append(f'<text x="{left_margin - 6}" y="{y_hi + 3}" class="wf-scale">1</text>')
                 svg_parts.append(f'<text x="{left_margin - 6}" y="{y_lo + 3}" class="wf-scale">0</text>')
@@ -295,23 +297,80 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
                 prev_v = v
             svg_parts.append(f'<path d="{"".join(path)}" class="wf-line" stroke="{color}"/>')
         else:
+            svg_parts.append(f'<text x="{left_margin - 18}" y="{y_mid + 4}" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, {row})" title="Cliquer pour basculer Courbe / Chiffres">{_html.escape(f)}</text>')
+
+            vals = []
+            for s in scans:
+                raw_v = s["fields"].get(f, "")
+                try:
+                    vals.append(float(raw_v))
+                except (ValueError, TypeError):
+                    vals.append(0.0)
+
+            vmin = min(vals)
+            vmax = max(vals)
+            vrange = vmax - vmin if vmax > vmin else 1.0
+
+            y_top = y_lane + 6
+            y_bot = y_lane + lane_h - 6
+            h_avail = lane_h - 12
+
+            def to_y(val):
+                if vmax == vmin:
+                    return y_mid
+                return y_bot - ((val - vmin) / vrange) * h_avail
+
+            # Vue Analogique
+            analog_parts = []
+            analog_parts.append(f'<text x="{left_margin - 6}" y="{y_top + 4}" class="wf-scale">{_fmt_scale(vmax)}</text>')
+            analog_parts.append(f'<text x="{left_margin - 6}" y="{y_bot + 2}" class="wf-scale">{_fmt_scale(vmin)}</text>')
+            
+            analog_path = []
+            for i in range(n):
+                x0 = left_margin + i * col_w
+                x1 = left_margin + (i + 1) * col_w
+                y = to_y(vals[i])
+                if i == 0:
+                    analog_path.append(f"M{x0},{y:.1f}")
+                else:
+                    prev_y = to_y(vals[i-1])
+                    if abs(y - prev_y) > 0.1:
+                        analog_path.append(f"L{x0},{y:.1f}")
+                analog_path.append(f"L{x1},{y:.1f}")
+            analog_parts.append(f'<path d="{"".join(analog_path)}" class="wf-line" stroke="{color}" stroke-width="2.2"/>')
+
+            for i in range(n):
+                if i > 0 and vals[i] != vals[i-1]:
+                    cx = left_margin + i * col_w
+                    cy = to_y(vals[i])
+                    analog_parts.append(f'<circle cx="{cx}" cy="{cy:.1f}" r="2.5" fill="{color}"/>')
+
+            # Vue Digitale (Puces texte)
+            digital_parts = []
             prev_v = None
             for i, s in enumerate(scans):
                 v = s["fields"].get(f, "")
                 x0, x1 = left_margin + i * col_w, left_margin + (i + 1) * col_w
                 changed = prev_v is not None and v != prev_v
-                svg_parts.append(f'<line x1="{x0}" y1="{y_mid}" x2="{x1}" y2="{y_mid}" class="wf-num-line"/>')
+                digital_parts.append(f'<line x1="{x0}" y1="{y_mid}" x2="{x1}" y2="{y_mid}" class="wf-num-line"/>')
                 if changed or prev_v is None:
                     cx, cy = (x0 + x1) / 2, y_mid - 6
                     chip_w = max(18, len(v) * 7)
-                    svg_parts.append(
+                    digital_parts.append(
                         f'<rect x="{cx - chip_w/2}" y="{cy - 8}" width="{chip_w}" height="13" rx="3" '
                         f'fill="{color}" class="wf-chip"/>'
                     )
-                    svg_parts.append(f'<text x="{cx}" y="{cy + 1}" class="wf-num-changed">{_html.escape(v)}</text>')
+                    digital_parts.append(f'<text x="{cx}" y="{cy + 1}" class="wf-num-changed">{_html.escape(v)}</text>')
                 else:
-                    svg_parts.append(f'<text x="{(x0+x1)/2}" y="{y_mid - 6}" class="wf-num">{_html.escape(v)}</text>')
+                    digital_parts.append(f'<text x="{(x0+x1)/2}" y="{y_mid - 6}" class="wf-num">{_html.escape(v)}</text>')
                 prev_v = v
+
+            svg_parts.append(
+                f'<g class="wf-numeric-group" data-row="{row}">'
+                f'<g class="wf-analog-view">{"".join(analog_parts)}</g>'
+                f'<g class="wf-digital-view" style="display:none;">{"".join(digital_parts)}</g>'
+                f'</g>'
+            )
 
     svg_parts.append("</svg>")
     return "".join(svg_parts)
@@ -375,7 +434,14 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
     <div class="chronogram-group">
         {fail_note}
         <details {"open" if not test_passed else ""}>
-            <summary>📊 Chronogramme graphique ({len(scans)} scans, {len(changed_fields)} variables actives)</summary>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique ({len(scans)} scans, {len(changed_fields)} variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
             <div class="wf-scroll">{_render_waveform(scans, changed_fields, field_types, fail_scan_num)}</div>
         </details>
         <details {"open" if not test_passed else ""}>
@@ -985,13 +1051,18 @@ _CSS = """
     .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
     .wf-scan { font-size: 9px; fill: var(--muted); opacity: 0.7; text-anchor: middle; font-family: monospace; }
     .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; font-weight: 600; }
+    .wf-label.wf-clickable { cursor: pointer; transition: fill 0.15s; }
+    .wf-label.wf-clickable:hover { fill: var(--accent); font-weight: 700; text-decoration: underline; }
+    .wf-label.active-curve { fill: #38bdf8; font-weight: 700; }
+    [data-theme="light"] .wf-label.active-curve { fill: #0284c7; }
     .wf-line { fill: none; stroke-width: 2.2; }
     .wf-num-line { stroke: var(--border); stroke-width: 1; }
     .wf-num { font-size: 10.5px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
     .wf-num-changed { font-size: 10.5px; fill: #ffffff; font-weight: 700; text-anchor: middle; font-family: monospace; }
     .wf-chip { opacity: 0.95; }
     .wf-legend { font-size: 10px; fill: var(--muted); }
-    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; font-family: monospace; font-weight: 600; }
+    [data-theme="light"] .wf-scale { fill: #64748b; }
     .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
         border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
     .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
@@ -1167,6 +1238,56 @@ function toggleVerticalHeaders(btn) {
     } else {
         btn.classList.remove('btn-copied');
     }
+}
+
+function toggleWfLane(textEl, rowIdx) {
+    var svg = textEl.closest('svg');
+    if (!svg) return;
+    var group = svg.querySelector('.wf-numeric-group[data-row="' + rowIdx + '"]');
+    if (!group) return;
+    var analog = group.querySelector('.wf-analog-view');
+    var digital = group.querySelector('.wf-digital-view');
+    if (!analog || !digital) return;
+
+    var isAnalog = analog.style.display !== 'none';
+    if (isAnalog) {
+        analog.style.display = 'none';
+        digital.style.display = '';
+        textEl.classList.remove('active-curve');
+    } else {
+        analog.style.display = '';
+        digital.style.display = 'none';
+        textEl.classList.add('active-curve');
+    }
+}
+
+function toggleAllWaveforms(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var svg = details.querySelector('svg.waveform');
+    if (!svg) return;
+
+    var groups = svg.querySelectorAll('.wf-numeric-group');
+    if (!groups.length) return;
+
+    var firstAnalog = groups[0].querySelector('.wf-analog-view');
+    var currentlyAnalog = firstAnalog && firstAnalog.style.display !== 'none';
+    var targetAnalog = !currentlyAnalog;
+
+    groups.forEach(function(g) {
+        var a = g.querySelector('.wf-analog-view');
+        var d = g.querySelector('.wf-digital-view');
+        if (a) a.style.display = targetAnalog ? '' : 'none';
+        if (d) d.style.display = targetAnalog ? 'none' : '';
+    });
+
+    var labels = svg.querySelectorAll('.wf-label.wf-clickable');
+    labels.forEach(function(lbl) {
+        if (targetAnalog) lbl.classList.add('active-curve');
+        else lbl.classList.remove('active-curve');
+    });
+
+    btn.innerHTML = targetAnalog ? "🔢 Vue Chiffres" : "📈 Vue Courbes";
 }
 
 function toggleTheme() {
