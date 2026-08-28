@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """Serveur du banc de test web interactif FB_Cycle (T173).
 
-Spawn le moteur compilé (cycle_engine.exe) en processus persistant et expose :
+Spawn le moteur compilÃ© (cycle_engine.exe) en processus persistant et expose :
   GET  /            -> page HTML du banc
-  POST /scan        -> {stimuli:{...}} -> exécute UN scan du binaire, renvoie {outputs:{...}}
-  POST /reset       -> relance le moteur (état FB remis à zéro)
+  POST /scan        -> {stimuli:{...}} -> exÃ©cute UN scan du binaire, renvoie {outputs:{...}}
+  POST /reset       -> relance le moteur (Ã©tat FB remis Ã  zÃ©ro)
 
-Le JS navigateur n'envoie que des stimuli et affiche les sorties — AUCUNE logique
-métier en JS. Le binaire compilé (WORKING_COPY) décide.
+Le JS navigateur n'envoie que des stimuli et affiche les sorties â€” AUCUNE logique
+mÃ©tier en JS. Le binaire compilÃ© (WORKING_COPY) dÃ©cide.
 
 Usage :
-    python TOOLS/TEST_AUTO_CI/scripts/cycle_bench_server.py [--port 8080]
+    python TOOLS/TEST_AUTO_CI/anim_bench/cycle_bench_server.py [--port 8080]
 """
 
 import argparse
@@ -60,7 +60,7 @@ def _run_scan(stimuli: dict) -> dict:
         _proc.stdin.flush()
         out = _proc.stdout.readline()
     if not out:
-        raise RuntimeError("moteur sans réponse (processus mort ?)")
+        raise RuntimeError("moteur sans rÃ©ponse (processus mort ?)")
     outputs = {}
     for tok in out.strip().split():
         if "=" in tok:
@@ -141,7 +141,7 @@ def main() -> int:
     args = parser.parse_args()
 
     if not ENGINE.exists():
-        print(f"[ERREUR] Moteur introuvable : {ENGINE} — lancer build_cycle_engine.py d'abord")
+        print(f"[ERREUR] Moteur introuvable : {ENGINE} â€” lancer build_cycle_engine.py d'abord")
         return 1
     if not BENCH_HTML.exists():
         print(f"[ERREUR] Page banc introuvable : {BENCH_HTML}")
@@ -149,7 +149,7 @@ def main() -> int:
 
     from http.server import ThreadingHTTPServer
     _start_engine()
-    # Port bloqué (ex. WinError 10013 sur 8080) ? On tente les suivants et on affiche l'URL réelle.
+    # Port bloquÃ© (ex. WinError 10013 sur 8080) ? On tente les suivants et on affiche l'URL rÃ©elle.
     httpd = None
     port = args.port
     for attempt in range(20):
@@ -157,14 +157,14 @@ def main() -> int:
             httpd = ThreadingHTTPServer(("127.0.0.1", port), _serve(None))
             break
         except OSError as exc:
-            print(f"[INFO] Port {port} refusé ({exc}) — essai port {port+1}")
+            print(f"[INFO] Port {port} refusÃ© ({exc}) â€” essai port {port+1}")
             port += 1
     if httpd is None:
-        print("[ERREUR] Aucun port libre trouvé (blocage réseau ?)")
+        print("[ERREUR] Aucun port libre trouvÃ© (blocage rÃ©seau ?)")
         return 1
-    print(f"✅ Banc de test web : http://127.0.0.1:{port}")
-    print(f"   moteur = {ENGINE.name} (WORKING_COPY/FB_Cycle.st compilé)")
-    print("   Ctrl+C pour arrêter")
+    print(f"âœ… Banc de test web : http://127.0.0.1:{port}")
+    print(f"   moteur = {ENGINE.name} (WORKING_COPY/FB_Cycle.st compilÃ©)")
+    print("   Ctrl+C pour arrÃªter")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
