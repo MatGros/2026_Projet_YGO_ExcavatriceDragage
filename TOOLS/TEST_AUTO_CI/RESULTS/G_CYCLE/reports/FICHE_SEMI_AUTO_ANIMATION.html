@@ -9,6 +9,7 @@
     --bg-main: #0b0f19; --bg-card: #151d30; --bg-panel: #0d1322;
     --border: #233354; --accent: #38bdf8; --success: #22c55e;
     --warning: #f59e0b; --danger: #ef4444; --text: #f8fafc; --text-dim: #94a3b8;
+    --purple: #a855f7; --cyan: #06b6d4;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
   body { background: var(--bg-main); color: var(--text); padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 1360px; }
@@ -21,6 +22,8 @@
   .banner-operator { background: #0284c7; color: #fff; padding: 10px 16px; border-radius: 6px; font-size: 0.88rem; font-weight: 600; }
   .banner-operator.stabilizing { background: #b45309; }
   .banner-operator.error { background: #b91c1c; }
+  .banner-transition { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-size: 0.78rem; color: var(--text-dim); }
+  .banner-transition b { color: var(--accent); }
   .top-grid { display: grid; grid-template-columns: 820px 1fr; gap: 12px; }
   .scene-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
   .scene-container { width: 100%; height: 520px; background: #030712; border-radius: 6px; border: 1px solid #1f2937; position: relative; overflow: hidden; }
@@ -39,9 +42,16 @@
   button:hover { background: #334155; }
   button.btn-primary { background: #0284c7; border-color: #38bdf8; }
   .scrub { width: 100%; margin-top: 6px; }
-  .legend { font-size: 0.7rem; color: var(--text-dim); display: flex; gap: 14px; margin-top: 4px; }
+  .legend { font-size: 0.7rem; color: var(--text-dim); display: flex; gap: 14px; margin-top: 4px; flex-wrap: wrap; }
   .src-note { font-size: 0.72rem; color: var(--text-dim); background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
   .src-note code { color: var(--accent); }
+  .sensor-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .sensor-chip { font-size: 0.68rem; padding: 3px 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-dim); }
+  .sensor-chip.on { border-color: var(--success); color: var(--success); background: rgba(34,197,94,0.12); }
+  .sensor-chip.alert { border-color: var(--danger); color: var(--danger); background: rgba(239,68,68,0.12); }
+  .sensor-chip.warn { border-color: var(--warning); color: var(--warning); background: rgba(245,158,11,0.12); }
+  .fdc-chip { font-size: 0.68rem; padding: 3px 8px; border-radius: 4px; border: 1px dashed var(--purple); color: var(--purple); background: rgba(168,85,247,0.08); }
+  .fdc-chip.on { border-color: var(--danger); color: var(--danger); background: rgba(239,68,68,0.12); }
 </style>
 </head>
 <body>
@@ -58,6 +68,7 @@
 </header>
 
 <div class="banner-operator" id="bannerOperator">ℹ️ Chargement de la trace…</div>
+<div class="banner-transition" id="bannerTransition">➡️ Conditions de transition : —</div>
 
 <div class="top-grid">
   <div class="scene-card">
@@ -78,17 +89,79 @@
             <stop offset="0%" stop-color="rgba(14,165,233,0.35)"/>
             <stop offset="100%" stop-color="rgba(2,132,199,0.75)"/>
           </linearGradient>
+          <pattern id="groundPat" width="20" height="20" patternUnits="userSpaceOnUse">
+            <rect width="20" height="20" fill="#1f2430"/>
+            <circle cx="5" cy="5" r="2" fill="#2d3748"/>
+            <circle cx="15" cy="15" r="3" fill="#374151"/>
+          </pattern>
         </defs>
         <rect x="0" y="0" width="820" height="520" fill="#090d16"/>
+
+        <!-- ZONE ÉCHELLE ALTIMÉTRIE -->
+        <g opacity="0.65">
+          <line x1="25" y1="70" x2="25" y2="470" stroke="#475569" stroke-width="1.5"/>
+          <line x1="20" y1="120" x2="30" y2="120" stroke="#f59e0b" stroke-width="2"/>
+          <text x="3" y="124" fill="#f59e0b" font-size="8" font-weight="bold">+7.0m</text>
+          <line x1="20" y1="250" x2="30" y2="250" stroke="#38bdf8" stroke-width="2"/>
+          <text x="3" y="254" fill="#38bdf8" font-size="8" font-weight="bold">0.0m</text>
+          <line x1="20" y1="450" x2="30" y2="450" stroke="#ef4444" stroke-width="2"/>
+          <text x="2" y="454" fill="#ef4444" font-size="8" font-weight="bold">-10.0m</text>
+        </g>
+
+        <!-- SOL & BERGES -->
+        <polygon points="20,200 135,200 155,310 20,310" fill="url(#groundPat)"/>
+
+        <!-- TRÉMIE (redessinée) -->
+        <g id="tremieGroup">
+          <polygon points="45,140 115,140 100,220 60,220" fill="#475569" stroke="#64748b" stroke-width="2"/>
+          <text x="80" y="175" fill="#f8fafc" font-size="10" font-weight="bold" text-anchor="middle">TRÉMIE</text>
+          <rect x="68" y="220" width="24" height="40" fill="#334155"/>
+          <line x1="30" y1="260" x2="130" y2="260" stroke="#f59e0b" stroke-width="4" stroke-dasharray="6,4"/>
+          <text x="80" y="275" fill="#f59e0b" font-size="7.5" text-anchor="middle">Convoyeur</text>
+          <circle id="ledTremie" cx="80" cy="135" r="4" fill="#475569"/>
+        </g>
+
         <!-- Plan d'eau (Y=250 -> 0.0m) -->
-        <rect x="0" y="250" width="820" height="270" fill="url(#waterGrad)"/>
-        <line x1="0" y1="250" x2="820" y2="250" stroke="#38bdf8" stroke-width="2" stroke-dasharray="8,4"/>
+        <rect x="155" y="250" width="665" height="270" fill="url(#waterGrad)"/>
+        <line x1="155" y1="250" x2="820" y2="250" stroke="#38bdf8" stroke-width="2" stroke-dasharray="8,4"/>
         <text x="700" y="242" fill="#38bdf8" font-size="9" font-weight="bold">Surface Eau (0.0 m)</text>
+
         <!-- Fond (Y=450 -> -10m) -->
-        <path d="M 0,310 Q 275,410 425,450 T 820,460 L 820,520 L 0,520 Z" fill="#1c1917" stroke="#44403c" stroke-width="2"/>
+        <path d="M 155,310 Q 275,410 425,450 T 820,460 L 820,520 L 155,520 Z" fill="#1c1917" stroke="#44403c" stroke-width="2"/>
         <text x="620" y="485" fill="#a8a29e" font-size="9">Fond Carrière (-10.0 m)</text>
+
         <!-- Rail pont roulant -->
-        <line x1="0" y1="55" x2="820" y2="55" stroke="#94a3b8" stroke-width="6"/>
+        <line x1="20" y1="55" x2="800" y2="55" stroke="#94a3b8" stroke-width="6"/>
+
+        <!-- CAPTEURS TRANSLATION -->
+        <g transform="translate(190, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#06b6d4" rx="2"/>
+          <circle id="ledPV" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#06b6d4" font-size="7" font-weight="bold" text-anchor="middle">PV 5m</text>
+        </g>
+        <g transform="translate(410, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#eab308" rx="2"/>
+          <circle id="ledP2" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#eab308" font-size="7" font-weight="bold" text-anchor="middle">P2 15m</text>
+        </g>
+        <g transform="translate(520, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#f59e0b" rx="2"/>
+          <circle id="ledP1" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#f59e0b" font-size="7" font-weight="bold" text-anchor="middle">P1 20m</text>
+        </g>
+        <g transform="translate(720, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#a855f7" rx="2"/>
+          <circle id="ledMaint" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#a855f7" font-size="7" font-weight="bold" text-anchor="middle">MAINT 30m</text>
+        </g>
+
+        <!-- CAPTEUR TOP HAUT -->
+        <g transform="translate(80, 42)">
+          <rect x="-10" y="0" width="20" height="12" fill="#1e293b" stroke="#38bdf8" rx="2"/>
+          <circle id="ledTop" cx="0" cy="6" r="3.5" fill="#475569"/>
+          <text x="0" y="-3" fill="#38bdf8" font-size="7" font-weight="bold" text-anchor="middle">TOP HAUT</text>
+        </g>
+
         <!-- Pont M3 -->
         <g id="gantryGroup" transform="translate(80, 36)">
           <rect x="-48" y="0" width="96" height="28" rx="4" fill="#0369a1" stroke="#38bdf8" stroke-width="2"/>
@@ -96,14 +169,20 @@
           <g transform="translate(-24, 20)"><circle cx="0" cy="0" r="11" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/><text x="0" y="3" fill="#f59e0b" font-size="7.5" font-weight="bold" text-anchor="middle">M1</text></g>
           <g transform="translate(24, 20)"><circle cx="0" cy="0" r="11" fill="#1e293b" stroke="#22c55e" stroke-width="2"/><text x="0" y="3" fill="#22c55e" font-size="7.5" font-weight="bold" text-anchor="middle">M2</text></g>
         </g>
+
         <!-- Câbles -->
         <path id="cablePathM1" d="M 56,56 L 80,120" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
         <path id="cablePathM2" d="M 104,56 L 80,120" stroke="#22c55e" stroke-width="2.5" fill="none"/>
+
         <!-- Benne -->
         <g id="bucketGroup" transform="translate(80, 120)">
           <rect x="-18" y="-14" width="36" height="14" rx="2" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
           <g id="jawLeftGroup" transform="rotate(0, -14, 0)"><path d="M -14,0 C -26,10 -22,32 0,35 C -8,22 -12,12 -14,0 Z" fill="#b45309" stroke="#d97706" stroke-width="1.5"/></g>
           <g id="jawRightGroup" transform="rotate(0, 14, 0)"><path d="M 14,0 C 26,10 22,32 0,35 C 8,22 12,12 14,0 Z" fill="#d97706" stroke="#b45309" stroke-width="1.5"/></g>
+          <g id="grpSlackBadge" transform="translate(0, -28)" opacity="0">
+            <rect x="-45" y="0" width="90" height="13" rx="3" fill="#b45309" stroke="#f59e0b"/>
+            <text x="0" y="9.5" fill="#fff" font-size="7.5" font-weight="bold" text-anchor="middle">⚠️ Mou de Câble</text>
+          </g>
         </g>
       </svg>
     </div>
@@ -111,6 +190,7 @@
       <span>🟢 <span class="prov-compiled">COMPILED</span> = calculé par le binaire ST</span>
       <span>🟡 <span class="prov-harness">HARNESS_STIMULUS</span> = injecté par le harnais (simulé)</span>
       <span>🔵 <span class="prov-config">CONFIG</span> = constante de configuration</span>
+      <span>🟣 <span class="fdc-chip">FDC logiciel</span> = limite logicielle (distincte des capteurs)</span>
     </div>
   </div>
 
@@ -135,6 +215,13 @@
         <tr><td>SampleCount</td><td id="lblSample">—</td></tr>
       </table>
     </div>
+
+    <div class="panel-card">
+      <h2>📡 Capteurs & FDC</h2>
+      <div class="sensor-row" id="sensorRow"></div>
+      <div class="sensor-row" id="fdcRow"></div>
+    </div>
+
     <div class="src-note">
       <strong>🔬 Provenance & sémantique</strong><br>
       Cette animation est un <strong>pur lecteur</strong> de la trace scan-par-scan produite par le
@@ -4818,6 +4905,24 @@ const STEP_NAMES = {
   13:'X13_DONE_SYNC',14:'STABILIZING'
 };
 
+// Conditions de transition vers le step suivant (dérivées des champs de la trace)
+const TRANSITIONS = {
+  0: { next: 'X1_HOMING', cond: 'StartCycle (front) OU DeadmanArmed (front), et pas de défaut' },
+  1: { next: 'X2_WORK_POS_SELECT', cond: 'HomedM1 ET HomedM2 (ou HomingRequest si non homé)' },
+  2: { next: 'X3_OPEN_BUCKET', cond: 'SelTarget valide ET Translation_At_* atteint' },
+  3: { next: 'X4_DESCEND_OPEN', cond: 'Benne_IsOpen (ou Benne_Done ET Benne_IsOpen)' },
+  4: { next: 'X5_BOTTOM_CONFIRMED', cond: 'KoboldContactFond (contact fond)' },
+  5: { next: 'X6_CLOSE_BUCKET', cond: 'M1 ET M2 >= RaiseTargetM' },
+  6: { next: 'X7_CTRL_ASCENT', cond: 'Benne_Done ET (Benne_IsClosed OU Benne_IsRoughlyClosed)' },
+  7: { next: 'X8_ASCENT_LOADED', cond: 'M1 ET M2 >= TouchPositionM + CtrlAscentDistM, écart <= tolérance' },
+  8: { next: 'X9_DRAIN_PAUSE', cond: 'M1 >= CableLimitM1AscentM (limite haute)' },
+  9: { next: 'X10_TRANSLATE_DUMP', cond: 'DrainingTimer.Q (égouttage terminé)' },
+  10: { next: 'X11_OPEN_DUMP', cond: 'Translation_At_Tremie' },
+  11: { next: 'X13_DONE_SYNC', cond: 'Benne_Done ET Benne_IsOpen (ouverture vidage)' },
+  13: { next: 'X0_PREPARATION', cond: 'StartCycle (front) — rebouclage' },
+  14: { next: 'X0_PREPARATION', cond: 'Reset (front) — sortie STABILIZING' }
+};
+
 function field(scan, name) {
   const f = scan && scan.fields ? scan.fields[name] : null;
   return f ? f.value : null;
@@ -4826,6 +4931,7 @@ function prov(scan, name) {
   const f = scan && scan.fields ? scan.fields[name] : null;
   return f ? f.provenance : '';
 }
+function isOn(scan, name) { return field(scan, name) === '1'; }
 
 function render() {
   const scan = SCANS[currentScan];
@@ -4841,7 +4947,7 @@ function render() {
   document.getElementById('scrub').max = SCANS.length - 1;
   document.getElementById('scrub').value = currentScan;
 
-  // Télémétrie (lecture trace + provenance)
+  // Télémétrie
   setLbl('lblM1', field(scan,'M1_CABLEPOSM'), prov(scan,'M1_CABLEPOSM'));
   setLbl('lblM2', field(scan,'M2_CABLEPOSM'), prov(scan,'M2_CABLEPOSM'));
   setLbl('lblM1SS', field(scan,'WINCHM1CMD.STARTSTOP'), prov(scan,'WINCHM1CMD.STARTSTOP'));
@@ -4851,14 +4957,54 @@ function render() {
   setLbl('lblKobold', field(scan,'KOBOLDCONTACTFOND'), prov(scan,'KOBOLDCONTACTFOND'));
   setLbl('lblSample', field(scan,'SAMPLECOUNT'), prov(scan,'SAMPLECOUNT'));
 
-  // Bannière
+  // Bannière étape
   const banner = document.getElementById('bannerOperator');
   if (step === 14) { banner.className = 'banner-operator stabilizing'; banner.innerText = 'STABILIZING — cycle en attente'; }
-  else if (field(scan,'FAULT.ERROR') === '1') { banner.className = 'banner-operator error'; banner.innerText = 'DÉFAUT actif'; }
+  else if (isOn(scan,'FAULT.ERROR')) { banner.className = 'banner-operator error'; banner.innerText = 'DÉFAUT actif'; }
   else { banner.className = 'banner-operator'; banner.innerText = 'Étape ' + stepName + ' — lecture trace scan ' + currentScan; }
 
-  // Cinématique (rendu géométrique, PAS de calcul de mouvement)
+  // Bannière conditions de transition
+  const tr = TRANSITIONS[step] || { next: '—', cond: '—' };
+  let transHtml = '➡️ <b>Transition vers ' + tr.next + '</b> : ' + tr.cond;
+
+  // Indication homing (si non référencé, état non représentable)
+  const homedM1 = isOn(scan,'HOMEDM1');
+  const homedM2 = isOn(scan,'HOMEDM2');
+  const top = isOn(scan,'TOPPOSITIONSENSOR');
+  if (!homedM1 || !homedM2) {
+    transHtml += ' &nbsp;|&nbsp; ⚠️ <b>Codeurs non référencés</b> (HomedM1=' + (homedM1?'1':'0') +
+      ', HomedM2=' + (homedM2?'1':'0') + ') — position benne non représentable';
+  }
+  document.getElementById('bannerTransition').innerHTML = transHtml;
+
+  // Capteurs (sensorRow)
+  const sensors = [
+    { label: 'Kobold Fond', on: isOn(scan,'KOBOLDCONTACTFOND'), cls: 'on' },
+    { label: 'Top Haut', on: isOn(scan,'TOPPOSITIONSENSOR'), cls: 'on' },
+    { label: 'Translation P1', on: isOn(scan,'TRANSLATION_AT_P1'), cls: 'on' },
+    { label: 'Translation Trémie', on: isOn(scan,'TRANSLATION_AT_TREMIE'), cls: 'on' },
+    { label: 'Translation Maint', on: isOn(scan,'TRANSLATION_AT_MAINTENANCE'), cls: 'on' },
+    { label: 'Benne Ouverte', on: isOn(scan,'BENNE_ISOPEN'), cls: 'on' },
+    { label: 'Benne Fermée', on: isOn(scan,'BENNE_ISCLOSED'), cls: 'on' },
+    { label: 'Benne ~Fermée', on: isOn(scan,'BENNE_ISROUGHLYCLOSED'), cls: 'warn' }
+  ];
+  document.getElementById('sensorRow').innerHTML = sensors.map(s =>
+    '<span class="sensor-chip ' + (s.on ? s.cls : '') + '">' + (s.on ? '●' : '○') + ' ' + s.label + '</span>'
+  ).join('');
+
+  // FDC logiciels (distincts des capteurs)
   const m1 = parseFloat(field(scan,'M1_CABLEPOSM')) || 0;
+  const limitHigh = parseFloat(field(scan,'CABLELIMITM1ASCENTM')) || 7.0;
+  const limitLow = parseFloat(field(scan,'LIMITLEGALDEPTHM')) || -10.5;
+  const fdcs = [
+    { label: 'FDC Haut (+' + limitHigh + 'm)', on: m1 >= limitHigh },
+    { label: 'FDC Bas (' + limitLow + 'm)', on: m1 <= limitLow }
+  ];
+  document.getElementById('fdcRow').innerHTML = fdcs.map(f =>
+    '<span class="fdc-chip ' + (f.on ? 'on' : '') + '">' + (f.on ? '⚠️' : '▫') + ' ' + f.label + '</span>'
+  ).join('');
+
+  // Cinématique (rendu géométrique, PAS de calcul de mouvement)
   const bucketY = 250 - (m1 * 20);
   const gantry = document.getElementById('gantryGroup');
   gantry.setAttribute('transform', 'translate(80, 36)');
@@ -4868,11 +5014,28 @@ function render() {
   const cableM2 = document.getElementById('cablePathM2');
   cableM1.setAttribute('d', 'M 56,56 L 70,' + (bucketY - 14));
   cableM2.setAttribute('d', 'M 104,56 L 90,' + (bucketY - 14));
-  // Ouverture benne (état discret capté : Benne_IsOpen)
-  const open = field(scan,'BENNE_ISOPEN') === '1';
+  // Ouverture benne (état discret capté)
+  const open = isOn(scan,'BENNE_ISOPEN');
   const angle = open ? 52 : 0;
   document.getElementById('jawLeftGroup').setAttribute('transform', 'rotate(' + angle + ', -14, 0)');
   document.getElementById('jawRightGroup').setAttribute('transform', 'rotate(' + (-angle) + ', 14, 0)');
+  // Mou de câble (dérivé : écart M1/M2)
+  const m2 = parseFloat(field(scan,'M2_CABLEPOSM')) || 0;
+  const slack = Math.abs(m1 - m2) > 0.05;
+  document.getElementById('grpSlackBadge').setAttribute('opacity', slack ? '1' : '0');
+
+  // LEDs capteurs SVG
+  setLed('ledTop', top);
+  setLed('ledPV', isOn(scan,'TRANSLATION_AT_P1') || isOn(scan,'TRANSLATION_AT_TREMIE'));
+  setLed('ledP1', isOn(scan,'TRANSLATION_AT_P1'));
+  setLed('ledP2', false);
+  setLed('ledMaint', isOn(scan,'TRANSLATION_AT_MAINTENANCE'));
+  setLed('ledTremie', isOn(scan,'TRANSLATION_AT_TREMIE'));
+}
+
+function setLed(id, on) {
+  const el = document.getElementById(id);
+  if (el) el.setAttribute('fill', on ? '#22c55e' : '#475569');
 }
 
 function setLbl(id, val, p) {
