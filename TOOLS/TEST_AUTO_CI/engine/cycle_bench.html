@@ -10,9 +10,10 @@
   body { background:var(--bg); color:var(--text); padding:16px; }
   h1 { font-size:1.1rem; margin-bottom:4px; }
   .sub { color:var(--dim); font-size:0.78rem; margin-bottom:14px; }
-  .grid { display:grid; grid-template-columns: 1fr 400px; gap:14px; }
-  .grid > .card:first-child { grid-column: 2; }  /* commandes -> droite */
-  .grid > .card:nth-child(2) { grid-column: 1; } /* sorties -> gauche */
+  .grid { display:grid; grid-template-columns: 1fr 400px; grid-template-areas:"outputs commands"; gap:14px; min-width:0; }
+  .grid > .card:first-child { grid-area: commands; }  /* carte commandes -> droite */
+  .grid > .card:nth-child(2) { grid-area: outputs; }  /* carte sorties -> gauche */
+  .scene-wrap { min-width:0; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px; }
   .card h2 { font-size:0.85rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:10px; }
   .row { display:flex; align-items:center; gap:8px; margin-bottom:7px; font-size:0.8rem; }
