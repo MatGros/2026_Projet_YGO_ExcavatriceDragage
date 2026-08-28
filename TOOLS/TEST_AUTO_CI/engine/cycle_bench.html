@@ -56,6 +56,14 @@
   .banner-offline { background:#7f1d1d; border:1px solid #ef4444; color:#fff; padding:8px 14px; border-radius:6px; font-size:0.78rem; font-weight:600; margin-bottom:12px; }
   .legend-prov { display:flex; gap:14px; flex-wrap:wrap; font-size:0.72rem; color:var(--dim); margin-bottom:10px; }
   .badge-sha { background:#0c4a6e; color:#7dd3fc; border:1px solid #38bdf8; padding:2px 8px; border-radius:12px; font-size:0.66rem; font-family:monospace; }
+  /* Schéma de flux ENTRÉES -> FB_Cycle -> SORTIES (lisible, 3 blocs alignés) */
+  .flow { display:flex; align-items:stretch; gap:6px; margin-bottom:12px; }
+  .flow-box { flex:1; background:var(--bg-panel); border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:0.78rem; min-width:0; }
+  .flow-box .flow-title { font-weight:700; }
+  .flow-box .flow-sub { color:var(--dim); font-size:0.7rem; margin-top:3px; line-height:1.5; }
+  .flow-arrow { display:flex; align-items:center; color:var(--accent); font-size:1.4rem; padding:0 4px; }
+  @media (max-width:900px) { .flow { flex-direction:column; } .flow-arrow { transform:rotate(90deg); justify-content:center; } }
+
 
 </style>
 </head>
@@ -70,13 +78,21 @@
 </div>
 <div class="sub">Pousse le joystick + homme-mort → le <b>binaire FB_Cycle compilé</b> décide → la position simulée évolue → les transitions se déclenchent quand TU atteins les conditions. Zéro logique métier en JS.</div>
 
-<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;padding:9px 12px;margin-bottom:12px;font-size:0.8rem;color:var(--text-dim);text-align:center;line-height:1.6;">
-  <span class="prov-inj">🟠 ENTRÉES du séquenceur</span>
-  (mode, Enable, positions M1/M2, capteurs, StartCycle/Reset, homme-mort, CycleMotionPermit…)
-  &nbsp;➜&nbsp; <b style="color:var(--accent);">FB_Cycle</b>
-  <span style="font-size:0.7rem;">(séquenceur compilé = étape courante X_x)</span> &nbsp;➜&nbsp;
-  <span class="prov-bin">🟢 SORTIES de l'étape</span>
-  (CycleStep + OperatorAction + demandes WinchM1/M2, Translation, Benne + état Fault/Lifecycle)
+<div class="flow">
+  <div class="flow-box">
+    <div class="flow-title prov-inj">🟠 ENTRÉES du séquenceur</div>
+    <div class="flow-sub">mode, Enable, positions M1/M2, capteurs, StartCycle/Reset, homme-mort, CycleMotionPermit…</div>
+  </div>
+  <div class="flow-arrow">➜</div>
+  <div class="flow-box" style="border-color:var(--accent);">
+    <div class="flow-title" style="color:var(--accent);">FB_Cycle</div>
+    <div class="flow-sub">séquenceur compilé — étape courante X_x</div>
+  </div>
+  <div class="flow-arrow">➜</div>
+  <div class="flow-box">
+    <div class="flow-title prov-bin">🟢 SORTIES de l'étape</div>
+    <div class="flow-sub">CycleStep + OperatorAction + demandes WinchM1/M2, Translation, Benne + état Fault/Lifecycle</div>
+  </div>
 </div>
 
 <div class="grid">
