@@ -89,6 +89,56 @@ def _fmt_val(v: str, is_bool: bool = True) -> str:
     return _html.escape(v)
 
 
+def _sort_fields_for_chronogram(field_names: list) -> list:
+    """Trie les colonnes du chronogramme selon l'ergonomie de test industriel :
+    1. Résultats de mesures & grandeurs testées (Gauche) : MEASUREMENT, OUT, CMD, READY, BUSY, DONE, SPEED, POSITION, FAULT
+    2. Ordres de marche & consignes d'entrées (Centre) : ENABLE, STARTSTOP, SAFESTOP, RESET, TARGET, REQ, SETPOINT
+    3. Signaux matériels bruts, config et diag (Droite) : HWIN, HWOUT, CFG, CALIB, RAW, INTERNAL, PARAMS"""
+    def _field_priority(name: str) -> tuple:
+        u = name.upper()
+        # 1. RÉSULTATS DE MESURES & SORTIES PRINCIPALES (Priorité 10..19)
+        if "MEASUREMENT.SPEED" in u or "SPEED_MPS" in u or "SIGNEDSPEED" in u:
+            return (10, u)
+        if "MEASUREMENT.POS" in u or "CABLEPOSM" in u or "POSITIONM" in u or "POS_M" in u:
+            return (11, u)
+        if "MEASUREMENT.SPEEDVALID" in u or "MEASUREMENT.POSITIONVALID" in u:
+            return (12, u)
+        if "MEASUREMENT.HOMED" in u or "HOMED" in u:
+            return (13, u)
+        if u.startswith("MEASUREMENT."):
+            return (14, u)
+        if u.startswith("OUT.") or u.startswith("CMD."):
+            return (15, u)
+        if u in ("READY", "BUSY", "DONE", "ACTIVE", "ERROR", "FAULT.ERROR", "FAULT.ERRORID") or u.startswith("FAULT."):
+            return (16, u)
+        if u.startswith("STATUS.") or u.startswith("LIFECYCLE."):
+            return (17, u)
+
+        # 2. ORDRES DE MARCHE & CONSIGNES ENTRÉES (Priorité 20..29)
+        if u in ("ENABLE", "STARTSTOP", "SAFESTOP", "RESET"):
+            return (20, u)
+        if u.startswith("TARGET.") or u.startswith("REQ.") or u.startswith("SET_"):
+            return (21, u)
+        if "HOMING" in u and not u.startswith("HW"):
+            return (22, u)
+
+        # 3. ENTRÉES BRUTES, CONFIGURATION & MATÉRIEL (Priorité 30..39)
+        if u.startswith("HWOUT."):
+            return (30, u)
+        if u.startswith("HWIN.RAW") or "RAWPOS" in u or "RAW" in u:
+            return (35, u)
+        if u.startswith("HWIN."):
+            return (34, u)
+        if u.startswith("CFG.") or u.startswith("CALIB.") or "POINTSPERREV" in u or "CABLEM_PERREV" in u:
+            return (36, u)
+        if u.startswith("INTERNAL.") or u.startswith("DIAG."):
+            return (38, u)
+
+        return (25, u)
+
+    return sorted(field_names, key=_field_priority)
+
+
 def _split_static_fields(scans: list, field_names: list) -> tuple:
     """Separe les champs qui changent au moins une fois de ceux qui restent constants sur
     toute la sequence -- ces derniers n'apportent rien a une lecture temporelle."""
@@ -96,7 +146,7 @@ def _split_static_fields(scans: list, field_names: list) -> tuple:
     for f in field_names:
         values = {s["fields"].get(f, "") for s in scans}
         (changed if len(values) > 1 else static).append(f)
-    return changed, static
+    return _sort_fields_for_chronogram(changed), _sort_fields_for_chronogram(static)
 
 
 def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_num=None, scan_notes=None) -> str:
