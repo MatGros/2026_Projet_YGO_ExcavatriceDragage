@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Runner isolé des TESTS NÉGATIFS sur le code ORIGINAL CODE/G_CYCLE/FB_Cycle.st.
+"""Runner isolÃ© des TESTS NÃ‰GATIFS sur le code ORIGINAL CODE/G_CYCLE/FB_Cycle.st.
 
-Exigence T3/T4 (plan T171) : prouver que le source historique CODE/ contient les défauts
-F1 (X11 ouverture), F2 (SampleCount par scan) et F6 (reprise auto) — ces tests doivent
-ÉCHOUER sur l'original. Ils sont EXCLUS de la suite verte (tests négatifs).
+Exigence T3/T4 (plan T171) : prouver que le source historique CODE/ contient les dÃ©fauts
+F1 (X11 ouverture), F2 (SampleCount par scan) et F6 (reprise auto) â€” ces tests doivent
+Ã‰CHOUER sur l'original. Ils sont EXCLUS de la suite verte (tests nÃ©gatifs).
 
 Usage :
-    python TOOLS/TEST_AUTO_CI/scripts/run_negative_tests.py
-    python TOOLS/TEST_AUTO_CI/scripts/run_negative_tests.py --debug
+    python TOOLS/TEST_AUTO_CI/anim_bench/run_negative_tests.py
+    python TOOLS/TEST_AUTO_CI/anim_bench/run_negative_tests.py --debug
 
-Retour : 0 si les tests négatifs échouent comme attendu (preuve des défauts),
-         1 si un test négatif passe (défaut absent → à signaler).
+Retour : 0 si les tests nÃ©gatifs Ã©chouent comme attendu (preuve des dÃ©fauts),
+         1 si un test nÃ©gatif passe (dÃ©faut absent â†’ Ã  signaler).
 """
 
 import argparse
@@ -39,10 +39,10 @@ STRUCPP = COMPILER_DIR / "bin" / "win32-x64" / "strucpp.exe"
 RUNTIME_INCLUDE = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "include"
 RUNTIME_TEST = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "test"
 
-# Source ORIGINALE (lecture seule) — celle qui doit contenir les défauts
+# Source ORIGINALE (lecture seule) â€” celle qui doit contenir les dÃ©fauts
 ORIGINAL_SOURCE = REPO_ROOT / "CODE" / "G_CYCLE" / "FB_Cycle.st"
 
-# Fermeture de types complète de FB_Cycle (ordre = registry.yaml)
+# Fermeture de types complÃ¨te de FB_Cycle (ordre = registry.yaml)
 SOURCES = [
     "CODE/A_COMMUN/_TYPES/E_State.st",
     "CODE/A_COMMUN/_TYPES/ST_Fault.st",
@@ -59,7 +59,7 @@ SOURCES = [
     "CODE/G_CYCLE/FB_Cycle.st",
 ]
 
-# Harnais de tests négatifs : chaque test DOIT échouer sur l'original
+# Harnais de tests nÃ©gatifs : chaque test DOIT Ã©chouer sur l'original
 NEGATIVE_TEST_FILE = TEST_AUTO_CI / "WORKING_COPY" / "tests" / "test_fb_cycle_negative.st"
 
 
@@ -99,7 +99,7 @@ def main() -> int:
         print(f"[ERREUR] Source originale introuvable : {ORIGINAL_SOURCE}")
         return 1
     if not NEGATIVE_TEST_FILE.exists():
-        print(f"[ERREUR] Harnais de tests négatifs introuvable : {NEGATIVE_TEST_FILE}")
+        print(f"[ERREUR] Harnais de tests nÃ©gatifs introuvable : {NEGATIVE_TEST_FILE}")
         return 1
 
     _ensure_gpp_in_path()
@@ -120,7 +120,7 @@ def main() -> int:
         result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8",
                                 creationflags=subproc_flags)
         if result.returncode != 0:
-            print("[ERREUR] Conversion échouée")
+            print("[ERREUR] Conversion Ã©chouÃ©e")
             print(result.stderr)
             return 1
 
@@ -144,8 +144,8 @@ def main() -> int:
                 print(text_report[-3000:])
             return 1
 
-        # Compiler manuellement test_main.cpp + generated.cpp (le strucpp --test peut échouer
-        # dans certains environnements à l'étape g++ interne, mais les fichiers sont générés).
+        # Compiler manuellement test_main.cpp + generated.cpp (le strucpp --test peut Ã©chouer
+        # dans certains environnements Ã  l'Ã©tape g++ interne, mais les fichiers sont gÃ©nÃ©rÃ©s).
         test_runner = strucpp_temp_dir / "test_runner.exe"
         if not test_runner.exists():
             manual_exe = strucpp_temp_dir / "manual_test.exe"
@@ -157,7 +157,7 @@ def main() -> int:
             cresult = subprocess.run(compile_cmd, capture_output=True, text=True, encoding="utf-8",
                                      cwd=str(strucpp_temp_dir), creationflags=subproc_flags)
             if cresult.returncode != 0:
-                print("[ERREUR] Compilation manuelle échouée")
+                print("[ERREUR] Compilation manuelle Ã©chouÃ©e")
                 print(cresult.stderr[-2000:])
                 return 1
             test_runner = manual_exe
@@ -173,23 +173,23 @@ def main() -> int:
             return 1
 
         results = data.get("results", [])
-        print(f"=== TESTS NÉGATIFS sur CODE/G_CYCLE/FB_Cycle.st (original) ===")
+        print(f"=== TESTS NÃ‰GATIFS sur CODE/G_CYCLE/FB_Cycle.st (original) ===")
         print(f"Source : {ORIGINAL_SOURCE}")
         all_expected_fail = True
         for r in results:
             name = r.get("name", "")
             passed = r.get("passed", False)
-            # Un test négatif DOIT échouer (passed=False) pour prouver le défaut
-            status = "✅ ÉCHEC ATTENDU (défaut prouvé)" if not passed else "❌ PASSE (défaut absent!)"
+            # Un test nÃ©gatif DOIT Ã©chouer (passed=False) pour prouver le dÃ©faut
+            status = "âœ… Ã‰CHEC ATTENDU (dÃ©faut prouvÃ©)" if not passed else "âŒ PASSE (dÃ©faut absent!)"
             if passed:
                 all_expected_fail = False
             print(f"  {status}  {name}")
 
         if all_expected_fail:
-            print("\n✅ Tous les tests négatifs échouent comme attendu — défauts F1/F2/F6 prouvés sur l'original.")
+            print("\nâœ… Tous les tests nÃ©gatifs Ã©chouent comme attendu â€” dÃ©fauts F1/F2/F6 prouvÃ©s sur l'original.")
             return 0
         else:
-            print("\n❌ Au moins un test négatif PASSE — un défaut est absent de l'original (à signaler).")
+            print("\nâŒ Au moins un test nÃ©gatif PASSE â€” un dÃ©faut est absent de l'original (Ã  signaler).")
             return 1
     finally:
         try:

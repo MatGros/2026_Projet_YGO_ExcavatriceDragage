@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
-"""Runner unifié des tests FB_Cycle sur la COPIE DE TRAVAIL (WORKING_COPY).
+"""Runner unifiÃ© des tests FB_Cycle sur la COPIE DE TRAVAIL (WORKING_COPY).
 
-Valide RÉELLEMENT les assertions : parse le JSON de test et échoue si une assertion échoue.
-Contrairement à strucpp --test (qui échoue à l'étape g++ interne dans certains environnements),
-ce runner compile manuellement test_main.cpp + generated.cpp avec g++ puis exécute.
+Valide RÃ‰ELLEMENT les assertions : parse le JSON de test et Ã©choue si une assertion Ã©choue.
+Contrairement Ã  strucpp --test (qui Ã©choue Ã  l'Ã©tape g++ interne dans certains environnements),
+ce runner compile manuellement test_main.cpp + generated.cpp avec g++ puis exÃ©cute.
 
-Preuve qualifiée : « C++ généré par STruCpp, compilé/exécuté manuellement par g++ » — PAS
-« test STruCpp PASS » (strucpp --test ne retourne pas 0 ici).
+Preuve qualifiÃ©e : Â« C++ gÃ©nÃ©rÃ© par STruCpp, compilÃ©/exÃ©cutÃ© manuellement par g++ Â» â€” PAS
+Â« test STruCpp PASS Â» (strucpp --test ne retourne pas 0 ici).
 
-⚠️ CONVENTION VAR_IN_OUT (REX 2026-08-28, TC-P04-105) : le codegen STruCpp génère les
+âš ï¸ CONVENTION VAR_IN_OUT (REX 2026-08-28, TC-P04-105) : le codegen STruCpp gÃ©nÃ¨re les
 VAR_IN_OUT en COPY-IN SEUL (`s.FB.X = s.X;` avant l'appel, pas de copy-out), alors que
-CODESYS 3.5 passe le IN_OUT par référence. Toute variable IN_OUT lue sur PLUSIEURS scans
-consécutifs doit donc être resynchronisée dans le test après chaque appel susceptible de
-la modifier : `X := FB.X;` (émulation copy-out). Sans cela, le copy-in du scan suivant
-ré-écrase la valeur incrémentée par le FB avec la locale périmée — artefact harnais,
+CODESYS 3.5 passe le IN_OUT par rÃ©fÃ©rence. Toute variable IN_OUT lue sur PLUSIEURS scans
+consÃ©cutifs doit donc Ãªtre resynchronisÃ©e dans le test aprÃ¨s chaque appel susceptible de
+la modifier : `X := FB.X;` (Ã©mulation copy-out). Sans cela, le copy-in du scan suivant
+rÃ©-Ã©crase la valeur incrÃ©mentÃ©e par le FB avec la locale pÃ©rimÃ©e â€” artefact harnais,
 PAS un bug du FB. Voir test_fb_cycle_full.st / TC-P04-105 (SampleCount).
 
 Usage :
-    python TOOLS/TEST_AUTO_CI/scripts/run_cycle_tests.py            # copie corrigée
-    python TOOLS/TEST_AUTO_CI/scripts/run_cycle_tests.py --original # CODE/ original
-    python TOOLS/TEST_AUTO_CI/scripts/run_cycle_tests.py --negative # tests négatifs sur original
+    python TOOLS/TEST_AUTO_CI/anim_bench/run_cycle_tests.py            # copie corrigÃ©e
+    python TOOLS/TEST_AUTO_CI/anim_bench/run_cycle_tests.py --original # CODE/ original
+    python TOOLS/TEST_AUTO_CI/anim_bench/run_cycle_tests.py --negative # tests nÃ©gatifs sur original
 """
 
 import argparse
@@ -97,7 +97,7 @@ def _find_new_strucpp_dir(before: set, tmp_root: pathlib.Path) -> pathlib.Path |
 
 
 def run_tests(src_root: pathlib.Path, test_file: pathlib.Path, label: str) -> int:
-    """Compile et exécute les tests. Retourne 0 si toutes les assertions passent."""
+    """Compile et exÃ©cute les tests. Retourne 0 si toutes les assertions passent."""
     _ensure_gpp_in_path()
     src_paths = [src_root / s for s in SOURCES]
     tmp_root = TEST_AUTO_CI / ".tmp_run"
@@ -114,7 +114,7 @@ def run_tests(src_root: pathlib.Path, test_file: pathlib.Path, label: str) -> in
         result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8",
                                 creationflags=subproc_flags)
         if result.returncode != 0:
-            print(f"[ERREUR] Conversion échouée ({label})")
+            print(f"[ERREUR] Conversion Ã©chouÃ©e ({label})")
             print(result.stderr[-2000:])
             return 1
 
@@ -122,7 +122,7 @@ def run_tests(src_root: pathlib.Path, test_file: pathlib.Path, label: str) -> in
         out_cpp = work_dir / "FB_Cycle.cpp"
         before = {p for p in sys_tmp_root.glob("strucpp-test-*") if p.is_dir()}
 
-        # 2. strucpp --test (génère test_main.cpp ; peut échouer à l'étape g++ interne)
+        # 2. strucpp --test (gÃ©nÃ¨re test_main.cpp ; peut Ã©chouer Ã  l'Ã©tape g++ interne)
         strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "-O", "0",
                        "--cxx-flags", "-O0 -pipe", "--test", str(test_file)]
         proc = subprocess.Popen(strucpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -146,11 +146,11 @@ def run_tests(src_root: pathlib.Path, test_file: pathlib.Path, label: str) -> in
         cresult = subprocess.run(compile_cmd, capture_output=True, text=True, encoding="utf-8",
                                  cwd=str(strucpp_dir), creationflags=subproc_flags)
         if cresult.returncode != 0:
-            print(f"[ERREUR] Compilation manuelle échouée ({label})")
+            print(f"[ERREUR] Compilation manuelle Ã©chouÃ©e ({label})")
             print(cresult.stderr[-2000:])
             return 1
 
-        # 4. Exécution + parse JSON
+        # 4. ExÃ©cution + parse JSON
         run_result = subprocess.run([str(exe), "--json"], capture_output=True,
                                     text=True, encoding="utf-8", creationflags=subproc_flags)
         try:
@@ -165,19 +165,19 @@ def run_tests(src_root: pathlib.Path, test_file: pathlib.Path, label: str) -> in
         n_total = len(results)
         print(f"=== {label} ===")
         print(f"Source : {src_root / 'CODE/G_CYCLE/FB_Cycle.st'}")
-        print(f"Preuve : C++ généré par STruCpp, compilé/exécuté manuellement par g++ "
+        print(f"Preuve : C++ gÃ©nÃ©rÃ© par STruCpp, compilÃ©/exÃ©cutÃ© manuellement par g++ "
               f"(strucpp --test RC={strucpp_rc})")
         for r in results:
             name = r.get("name", "")
             passed = r.get("passed", False)
             detail = r.get("failure", {}).get("detail", "") if not passed else ""
-            print(f"  {'✅' if passed else '❌'}  {name[:70]}" + (f"  | {detail[:80]}" if detail else ""))
-        print(f"Résultat : {n_pass}/{n_total} PASS")
+            print(f"  {'âœ…' if passed else 'âŒ'}  {name[:70]}" + (f"  | {detail[:80]}" if detail else ""))
+        print(f"RÃ©sultat : {n_pass}/{n_total} PASS")
 
         if n_pass == n_total:
-            print(f"✅ {label} : toutes les assertions passent")
+            print(f"âœ… {label} : toutes les assertions passent")
             return 0
-        print(f"❌ {label} : {n_total - n_pass} assertion(s) échouée(s)")
+        print(f"âŒ {label} : {n_total - n_pass} assertion(s) Ã©chouÃ©e(s)")
         return 1
     finally:
         try:
@@ -192,7 +192,7 @@ def main() -> int:
     parser.add_argument("--original", action="store_true",
                         help="Tester CODE/ original (au lieu de WORKING_COPY)")
     parser.add_argument("--negative", action="store_true",
-                        help="Utiliser le harnais de tests négatifs (NEG-F1/F2/F6)")
+                        help="Utiliser le harnais de tests nÃ©gatifs (NEG-F1/F2/F6)")
     args = parser.parse_args()
 
     if args.original:
@@ -202,7 +202,7 @@ def main() -> int:
 
     if args.negative:
         test_file = NEGATIVE_TEST
-        label = "TESTS NÉGATIFS (doivent échouer sur original)"
+        label = "TESTS NÃ‰GATIFS (doivent Ã©chouer sur original)"
     else:
         test_file = FULL_TEST
         label = "HARNAIS COMPLET (TC-P04-100..105)"
