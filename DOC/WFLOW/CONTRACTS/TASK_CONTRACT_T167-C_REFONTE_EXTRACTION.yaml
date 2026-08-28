@@ -67,12 +67,12 @@ contract:
     Tout comportement non linéaire sur l'extraction ou le forçage de vitesse doit être
     remonté immédiatement.
 
-status: IN_REVIEW   # code + tests verts ; attend visa humain final + T167-CR
+status: VALIDATED   # visa humain 2026-08-28 (CODESYS OK) ; 3 revues indépendantes + 2 passes durcissement
 
 execution:
   executed_by: "CC (orchestrateur, mandat autonomie T167)"
-  completed_at: "2026-08-28T20:30:00+02:00"
-  status: DONE_PENDING_REVIEW
+  completed_at: "2026-08-28T22:30:00+02:00"
+  status: DONE
   summary: >
     Backstop CfgBucketCloseTimeout (defaut T#75s) verrouille au runtime : ErrorCausePresent si
     <= BucketMoveTimeout (ref FB_Bucket.CfgTimeoutDuration cable depuis PRG_03) ou <= T#0ms, idem CycleTime.
@@ -81,13 +81,14 @@ execution:
     ERROR_HOLD, Reset du StepAtFault conditionne aux memes gardes que le reset du latch.
     AF_Partie-04 §3bis points 3-4 corriges (watchdog benne reel = T#60s, pas T#6s ; backstop, pas seuil primaire).
   evidence_submitted:
-    - "FB_ExtractionSequence 6/6 PASS (TC-P04-022 timeout decollage, -023 backstop benne, -024 latch survit Enable)"
-    - "Non-regression : FB_DiveSearch 7/7, FB_Cycle 7/7, PRG_03 5/5, PRG_07 3/3"
-    - "G200 PASS (0 erreur), gates palier C 16/16 PASS, bundle frais"
-    - "Revue Ollama deepseek-v4-flash : PASS AVEC RESERVES -> 3 reserves toutes traitees"
+    - "FB_ExtractionSequence 8/8 PASS (TC-P04-022 timeout, -023 backstop, -024 latch Enable, -025 coupure meme-scan, -026 F1/F2)"
+    - "Non-regression : FB_DiveSearch 8/8, FB_Cycle 7/7, PRG_03 5/5, PRG_07 3/3"
+    - "G200 PASS (0 erreur), run_all_gates PASS, G340 doc-links PASS, bundle frais"
+    - "T167-CR : 3 revues independantes (deepseek-v4-flash, gpt-5.6-terra-high, gpt-5.6-sol-max)"
+    - "2 passes de durcissement : H1-H5 puis F1-F3 (voir DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md)"
 
 validation:
-  status: PENDING
-  validated_by: ""
-  validated_at: ""
-  notes: "Visa humain + T167-CR (revue independante DiveSearch et ExtractionSequence separement)"
+  status: VALIDATED
+  validated_by: "HUM (visa 2026-08-28, compilation CODESYS 3.5 OK)"
+  validated_at: "2026-08-28"
+  notes: "3 revues independantes + 2 passes durcissement. Items D1/D2 (recovery reset, garde position basse) = hors scope, planifies §4."
