@@ -1,4 +1,4 @@
-﻿contract:
+contract:
   task_id: T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE
   parent_id: T171
   criticality: C2
@@ -41,4 +41,15 @@
     - html_report_pass
     - zero_fictitious_logic_proof
 
-status: READY_FOR_EXECUTION
+status: VALIDATED
+
+execution:
+  completed_at: "2026-08-28T22:40:00+02:00"
+  status: SUCCESS
+  summary: >
+    Guard animation_no_business_logic.py : PASS (pur lecteur, 0 logique métier JS, 0 sink
+    hors trace). Chaîne SHA complète certifiée : HTML == trace_semi_auto_cycle.json ==
+    WORKING_COPY/FB_Cycle.st (source_sha256). Embed frais 15 scans via
+    embed_trace_in_animation.py. Contrôles utilisateur 2026-08-28 intégrés : bannière
+    ANIMATION NON FIABLE (homing absent), treuil 8.5 m sur capteur top en X1, gravier benne
+    X6-X10, glyphe GRAFCET industriel, POSITION NON LOCALISÉE si 0 ou >=2 Translation_At_*.

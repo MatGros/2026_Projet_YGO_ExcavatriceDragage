@@ -1,4 +1,4 @@
-﻿contract:
+contract:
   task_id: T171-CR_REVUE_ANIMATION_COMPILED_CODE
   parent_id: T171
   criticality: C2
@@ -28,4 +28,13 @@
   evidence_required:
     - audit_report_pass
 
-status: READY_FOR_EXECUTION
+status: VALIDATED
+
+execution:
+  completed_at: "2026-08-28T23:55:00+02:00"
+  status: SUCCESS
+  summary: >
+    Audit Ollama qwen3.8:27b : verdict CONFORME — pur lecteur, aucun finding MAJOR/BLOCK,
+    tous INFO/MINOR (dérivations d'affichage, pas de décision). Rapport :
+    DOC/WFLOW/AUDIT_T171-CR_ANIMATION_TRACE_20260828.md. 3 itérations techniques
+    (timeout 180s / num_predict / num_ctx) résolues via ollama_query_long.py — REX 20260828.
