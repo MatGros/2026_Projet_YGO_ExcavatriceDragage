@@ -98,7 +98,35 @@ déjà fermée après `CLOSING_BUCKET` → fast-forward vers `CONTROL_ASCENT` �
 
 ---
 
-## 4. Items de durcissement identifiés (hors scope T167 — tâches dédiées)
+## 4bis. 2ᵉ avis indépendant — `codex/gpt-5.6-terra-high` (omniroute, 2026-08-28)
+
+> Endpoint `deepseek-v4-flash` étant lent sur gros prompts, 2ᵉ revue via le gateway `omniroute`
+> (`omniroute_subagent.py`, `http://localhost:20128/v1`) sur un modèle plus capable.
+> Rapports bruts : `T167-CR_omniroute_FB_DiveSearch.md`, `T167-CR_omniroute_FB_ExtractionSequence.md`.
+> **Verdict des 2 : REJETÉ** — findings triés ci-dessous.
+
+### Findings retenus → passe de durcissement appliquée (les 2 FB)
+
+| # | Constat | Correctif appliqué | Test |
+|---|---|---|---|
+| **H1** | `KoboldContactorCmd`/`KoboldMeasureEnable`/`DescendPermit` inconditionnels en `SEARCHING_*` : contacteur alimenté indéfiniment si l'opérateur relâche la descente (timer gelé, pas de timeout). Anti-chauffe violé. | Gate sur `DescentActive` (mouvement + sens + mode + `NOT Palier5` + `NOT SeqError`) | `TC-P04-016` |
+| **H2** | Latence 1 scan sur sorties `[ACT]` après défaut **détecté dans le `CASE`** (Palier5/SeqError ; `BucketError`/synchro). `instFault` tourne en §1 avant. | `DescendPermit`/`KoboldContactorCmd` et `BucketCloseRequest`/`AscentPermit` gardés sur `NOT <entrée défaut>` **même scan** | `TC-P04-025`, `TC-P04-016` |
+| **H3** | REALs de config non bornés avant `REAL_TO_UDINT` → overflow possible du timeout de garde (`CQS §6`). | `LIMIT(plancher, val, plafond)` + `CST_*Max*` | couvert TC timeouts |
+| **H4** | `StepAtFault` capturait l'étape **post-transition** pour un défaut CASE + une transition au même scan. D2 non satisfait. | Capture **au site du latch** dans le `CASE` + mutex `StepAtFaultCaptured` (effacé au seul Reset) | `TC-P04-012`, `TC-P04-025` |
+| **H5** | `Mode : E_Mode` = `VAR_INPUT` **mort** dans les 2 FB (MISRA `CQS §4`). | Double garde : permis conditionnés à `Mode = MAINT_N1/N2` | tous les TC (Mode ajouté) |
+| **C3** | `StepAtFault` remis à WAIT dans le gate `NOT Enable` → étape du défaut perdue sur cycle Enable. | Ne plus réinitialiser `StepAtFault`/`StepAtFaultCaptured` dans le gate (seul `Reset` les efface) | `TC-P04-015`, `TC-P04-024` |
+
+### Findings écartés (vérifiés orchestrateur)
+- « Non-redémarrage non garanti / `Fault.Latched` » : **déjà** couvert par `IF Fault.Error OR Fault.Latched THEN ERROR_HOLD` (commit `75ceba26`, prompt de revue antérieur). TC-P04-015/024 le prouvent (`DiveState`/`ExtractionState = ERROR_HOLD` au retour `Enable`).
+- « Reset conditionné » : l'acquittement du latch `FB_FaultCore` reçoit `Reset` **brut** (`CQS §3bis`) ; seul le reset de la machine d'état est gardé (pattern projet `CQS §9`).
+- « Câblage `BucketMoveTimeout` non prouvé » : `PRG_03` L131 = `GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration`, même source que `instBucket`.
+- « `Mode` doit gater / certification ISO 13849 système » : hors scope FB (analyse de risque / PLr / architecture SRP/CS = niveau système).
+
+**Résultat de la passe** : `FB_DiveSearch` **8/8**, `FB_ExtractionSequence` **7/7**, non-régression complète, `G200` PASS, `run_all_gates` PASS (TOUT).
+
+---
+
+## 4. Items de durcissement résiduels (hors scope T167 — tâches dédiées)
 
 | # | Brique | Constat | Décision |
 |---|---|---|---|

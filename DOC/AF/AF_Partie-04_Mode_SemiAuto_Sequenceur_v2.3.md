@@ -123,8 +123,16 @@ Toutes les temporisations de garde constituent un **plafond anti-blocage** (surv
 #### 4. Mécanique interne d'acquisition & Capture d'étape (D1 / D2)
 - **Anti-pompage homme-mort (D1)** : L'intégration temporelle s'effectue via un accumulateur de temps de mouvement effectif (`ImmersionTimerAcc`/`BottomTimerAcc += CycleTime`), le cumul n'avançant que sous descente réellement demandée (`MotionRequestActive AND MotionDirection = -1`). `CycleTime` est la période de tâche `MainTask` passée en `VAR_INPUT` (`T#10ms`, valeur câblée dans `PRG_03_Modes_Cycle`). Le cumul est réarmé à zéro dans la transition d'entrée d'étape et sur front montant de `Reset`.
 - **Défaut latché survivant au cycle `Enable`** : les latches timeout (`TimeoutImmersionFault`/`TimeoutBottomFault`, `Latching:=TRUE`) ne sont **pas** effacés à `Enable=FALSE` — seul un front `Reset` conscient les acquitte. Si `Enable` repasse à `TRUE` avec un défaut déjà latché, `Fault.Latched` reste actif (pas de front `Fault.Error` → `StepAtFault` conserve la valeur figée au premier déclenchement, ou `WAIT_PRECONDITIONS` si le gate a été traversé entre-temps).
-- **Capture ordonnée `StepAtFault` (D2)** : Mémorisation de `PrevState := State` en fin de scan. À l'instant du latch d'erreur (front montant `Fault.Error`), `StepAtFault := PrevState` est figé **avant** le basculement vers `ERROR_HOLD`.
+- **Capture ordonnée `StepAtFault` (D2)** : deux chemins complémentaires, mutex par `StepAtFaultCaptured` (effacé au seul front `Reset`) :
+  - défauts détectés en **§1** (timeouts, backstop, paramétrage) → `StepAtFault := PrevState` sur front `Fault.Error` (l'étape est encore correcte à ce stade) ;
+  - défauts levés **dans le `CASE`** (Palier 5, incohérence séquence, `BucketError`, synchro/capteurs) → `StepAtFault := <état courant>` **au site même du latch**, avant toute transition d'étape possible dans le même scan.
+  `StepAtFault` / `StepAtFaultCaptured` **survivent** au cycle `Enable OFF→ON` (lisibles IHM/diagnostic) ; seul un front `Reset` les réinitialise.
 
+#### 5. Durcissements de revue indépendante (revue `codex/gpt-5.6-terra-high`)
+- **H1 — anti-chauffe contacteur Kobold** : `KoboldContactorCmd` / `KoboldMeasureEnable` / `DescendPermit` sont conditionnés à `DescentActive` (descente réellement demandée). Un relâchement de la demande coupe le contacteur **le scan même**, sans défaut ; plus de contacteur alimenté indéfiniment hors mouvement.
+- **H2 — coupure même-scan sur entrée `[SAFE]`** : les sorties `[ACT]` chutent dès l'apparition de l'entrée de défaut, **avant** que `Fault.Error` ne bascule (`KoboldContactorCmd`/`DescendPermit` gardés sur `NOT (CurrentSpeedStep > 4)` et `NOT SeqErrorFault` ; `BucketCloseRequest` sur `NOT BucketError` ; `AscentPermit` sur `AscentControlSafe`/`AscentNominalSafe`).
+- **H3 — bornage numérique** : la course/distance de config est passée en `LIMIT(plancher, valeur, plafond)` (`CST_*MaxCourse_M` / `CST_TimeoutMaxDistance_M`) avant `REAL_TO_UDINT` → aucun overflow silencieux du timeout de garde sur valeur IHM aberrante (`CQS §6`).
+- **H5 — double garde mode** : `Mode` (jusque-là `VAR_INPUT` non consommé) gate les permis via `Mode = MAINT_N1/N2`, en plus de l'`Enable` mode-conditionné par `PRG_03`.
 
 ---
 

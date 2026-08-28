@@ -25,11 +25,15 @@
     {
       "name": "TC-P04-024 : Latch timeout extraction survit au cycle Enable OFF/ON, acquitte seulement sur front Reset",
       "passed": true
+    },
+    {
+      "name": "TC-P04-025 : Defaut benne coupe BucketCloseRequest le meme scan (H2), avant ERROR_HOLD",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 6,
-    "passed": 6,
+    "total": 7,
+    "passed": 7,
     "failed": 0
   }
 }

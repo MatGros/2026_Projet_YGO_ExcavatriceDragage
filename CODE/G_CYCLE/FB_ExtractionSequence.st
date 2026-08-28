@@ -75,6 +75,10 @@ VAR
     SyncOrSpeedErrorFault       : BOOL;     // . [LOC] Latch erreur synchro/vitesse
     TimeoutBucketCloseFault     : BOOL;     // . [LOC] Latch backstop fermeture benne
     TimeoutControlAscentFault   : BOOL;     // . [LOC] Latch timeout decollage controle
+    StepAtFaultCaptured         : BOOL;     // . [LOC] StepAtFault deja fige pour l'episode de defaut courant
+    AssistPermit                : BOOL;     // . [LOC] Montee assistee reellement demandee (sens + mode)
+    AscentControlSafe           : BOOL;     // . [LOC] Entrees [SAFE] saines pour le decollage controle
+    AscentNominalSafe           : BOOL;     // . [LOC] Entrees [SAFE] saines pour la remontee nominale
 
     // === SOCLE DEFAUT ===
     instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
@@ -85,6 +89,7 @@ VAR CONSTANT
     CST_MinSpeed_Mps            : REAL := 0.15;   // Vitesse Palier 1 mini sous charge/mou (m/s)
     CST_ControlAscentMargin     : REAL := 2.0;    // Facteur de marge sur la course de decollage
     CST_TimeoutMinDistance_M    : REAL := 0.1;    // Plancher de distance pour le calcul (evite timeout degenere)
+    CST_TimeoutMaxDistance_M    : REAL := 20.0;   // Plafond de distance : borne le calcul avant REAL_TO_UDINT (anti-overflow)
     CST_SecToMs                 : REAL := 1000.0; // Conversion secondes -> millisecondes
 END_VAR
 
@@ -100,9 +105,11 @@ ErrorCausePresent := (ControlAscentDistance_M <= 0.0)
                   OR (CycleTime <= T#0ms)
                   OR (CfgBucketCloseTimeout <= BucketMoveTimeout);
 
-// ⏱️ Plafond anti-blocage decollage calcule au runtime : course de controle / vitesse Palier 1 mini x marge.
+// ⏱️ Plafond anti-blocage decollage calcule au runtime : course de controle bornee [plancher..plafond]
+// avant conversion REAL->UDINT->TIME (anti-overflow sur valeur IHM aberrante, CQS §6).
 CalculatedControlAscentTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
-    MAX(CST_TimeoutMinDistance_M, ControlAscentDistance_M) / CST_MinSpeed_Mps * CST_ControlAscentMargin * CST_SecToMs));
+    LIMIT(CST_TimeoutMinDistance_M, ControlAscentDistance_M, CST_TimeoutMaxDistance_M)
+    / CST_MinSpeed_Mps * CST_ControlAscentMargin * CST_SecToMs));
 
 // ⏱️ Integrateurs de temps de montee effective (anti-pompage homme-mort)
 IF (ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET) AND MotionRequestActive AND (MotionDirection = 1) THEN
@@ -126,6 +133,7 @@ IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
     TimeoutControlAscentFault := FALSE;
     BucketCloseTimerAcc       := T#0ms;
     ControlAscentTimerAcc     := T#0ms;
+    StepAtFaultCaptured       := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
 END_IF;
 
@@ -153,10 +161,13 @@ instCauses[5].Texte    := 'Depassement tempo decollage controle';
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
 
-// 📸 Capture ordonnee de StepAtFault sur front montant de defaut, avant bascule ERROR_HOLD
+// 📸 Capture ordonnee de StepAtFault (D2). Les defauts leves dans le CASE se figent au site du
+// latch (voir §3) ; ce bloc ne couvre que les defauts detectes en §1 (backstop, timeout, parametrage),
+// ou ExtractionState/PrevState sont encore l'etape reelle. StepAtFaultCaptured evite l'ecrasement.
 ErrorEdge(CLK := Fault.Error);
-IF ErrorEdge.Q THEN
+IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
     StepAtFault := PrevState;
+    StepAtFaultCaptured := TRUE;
 ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
     StepAtFault := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
 END_IF;
@@ -173,7 +184,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     ForceMinSpeedStep := FALSE;
     BottomConfirmationConsumed := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-    StepAtFault := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
+    // lisible pour l'IHM/diagnostic apres un cycle Enable OFF->ON ; seul un front Reset l'efface.
     PrevState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
     BucketCloseTimerAcc := T#0ms;
     ControlAscentTimerAcc := T#0ms;
@@ -192,6 +204,13 @@ ForceMinSpeedStep := FALSE;
 BottomConfirmationConsumed := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
+
+// Montee assistee reellement demandee : sens montee + mode maintenance (H5, double garde vs Enable PRG_03).
+AssistPermit := MotionRequestActive AND (MotionDirection = 1)
+            AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2);
+// Entrees [SAFE] saines : coupure meme-scan des permis si defaut treuil/synchro (H2), avant meme le latch.
+AscentControlSafe := NOT WinchSyncError AND PositionsValid AND M1MeasuredSpeedValid AND M2MeasuredSpeedValid;
+AscentNominalSafe := NOT WinchSyncError AND PositionsValid;
 
 // Garde-fou non-redemarrage auto : un defaut latche non acquitte verrouille la machine
 // d'etat en ERROR_HOLD, meme si la vue live Fault.Error retombe (cause disparue).
@@ -221,10 +240,14 @@ ELSE
 
         E_ExtractionSequenceState.CLOSING_BUCKET:
             Lifecycle.Busy := TRUE;
-            BucketCloseRequest := MotionRequestActive AND (MotionDirection = 1);
+            BucketCloseRequest := AssistPermit AND NOT BucketError; // coupure meme-scan sur defaut benne (H2)
             OperatorActionId := 16#0202;
             OperatorAction := 'Maintenir la montée : fermeture de la benne en cours.';
             IF BucketError THEN
+                IF NOT StepAtFaultCaptured THEN
+                    StepAtFault := ExtractionState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
                 BucketErrorFault := TRUE;
             ELSIF BucketIsClosed AND NOT BucketBusy THEN
                 ControlStartM1Position_M := M1Position_M;
@@ -235,11 +258,15 @@ ELSE
 
         E_ExtractionSequenceState.CONTROL_ASCENT:
             Lifecycle.Busy := TRUE;
-            AscentPermit := MotionRequestActive AND (MotionDirection = 1);
+            AscentPermit := AssistPermit AND AscentControlSafe; // coupure meme-scan sur defaut synchro/capteurs (H2)
             ForceMinSpeedStep := TRUE;
             OperatorActionId := 16#0203;
             OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
-            IF WinchSyncError OR NOT PositionsValid OR NOT M1MeasuredSpeedValid OR NOT M2MeasuredSpeedValid THEN
+            IF NOT AscentControlSafe THEN
+                IF NOT StepAtFaultCaptured THEN
+                    StepAtFault := ExtractionState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
                 SyncOrSpeedErrorFault := TRUE;
             ELSIF (M1Position_M >= (ControlStartM1Position_M + ControlAscentDistance_M))
                AND (M2Position_M >= (ControlStartM2Position_M + ControlAscentDistance_M)) THEN
@@ -248,10 +275,14 @@ ELSE
 
         E_ExtractionSequenceState.NOMINAL_ASCENT:
             Lifecycle.Busy := TRUE;
-            AscentPermit := MotionRequestActive AND (MotionDirection = 1);
+            AscentPermit := AssistPermit AND AscentNominalSafe; // coupure meme-scan sur defaut synchro/position (H2)
             OperatorActionId := 16#0204;
             OperatorAction := 'Maintenir la montée : extraction en cours.';
-            IF WinchSyncError OR NOT PositionsValid THEN
+            IF NOT AscentNominalSafe THEN
+                IF NOT StepAtFaultCaptured THEN
+                    StepAtFault := ExtractionState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
                 SyncOrSpeedErrorFault := TRUE;
             END_IF;
 

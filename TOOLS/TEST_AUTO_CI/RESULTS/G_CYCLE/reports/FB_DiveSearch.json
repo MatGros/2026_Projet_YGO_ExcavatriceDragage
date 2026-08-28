@@ -29,11 +29,15 @@
     {
       "name": "TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seulement sur front Reset",
       "passed": true
+    },
+    {
+      "name": "TC-P04-016 : Contacteur Kobold coupe des le relachement de la descente (anti-chauffe, H1)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 7,
-    "passed": 7,
+    "total": 8,
+    "passed": 8,
     "failed": 0
   }
 }
