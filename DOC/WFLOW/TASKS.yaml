@@ -2619,8 +2619,9 @@ tasks:
   domaine: MODES_CYCLE
   agent: ORCHESTRATEUR
   date: '2026-08-28T16:38:00+02:00'
+  updated_at: '2026-08-28T22:45:00+02:00'
   titre: Refonte & Unification du Grafcet Plongée / Recherche Fond / Extraction
-  contexte: Refonte fonctionnelle des briques FB_DiveSearch et FB_ExtractionSequence selon les exigences des audits.
+  contexte: 'A figee, B+C codees/testees/CODESYS OK (contrats IN_REVIEW, visa humain a poser), CR certifiee (Ollama deepseek-v4-flash + orchestrateur). Reste : visa humain B/C. Items durcissement D1/D2 (recovery reset FB_ExtractionSequence, garde position basse FB_DiveSearch) -> DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md §4, tache a planifier.'
   description: Famille T167 — Unification des séquences, traitement guard sur le bypass Kobold, gestion des time-outs et capture StepAtFault.
   contrat: ''
   objectifs:
@@ -2682,19 +2683,19 @@ tasks:
   - T167-B
 - id: T167-CR
   parent_id: T167
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: REVIEW
   agent: OLLAMA
   date: '2026-08-28T16:38:00+02:00'
-  updated_at: '2026-08-28T21:15:00+02:00'
-  titre: Revue de Code & Certification Indépendante T167 (Ollama, par brique)
-  contexte: Revue independante deepseek-v4-flash par brique. DiveSearch fait (MAJEUR = faux positif prouve + garde-fou ajoute). Extraction Ollama en timeout x3 -> revue orchestrateur substituee, meme garde-fou, TC-P04-024 etendu ; a rejouer avant T170.
-  description: 'Résultats : DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md. Garde-fou non-redemarrage IF Fault.Error OR Fault.Latched ajoute aux 2 FB. Tests : FB_DiveSearch 7/7, FB_ExtractionSequence 6/6.'
+  updated_at: '2026-08-28T22:45:00+02:00'
+  completed_at: '2026-08-28T22:45:00+02:00'
+  titre: Revue de Code & Certification Indépendante T167 (Ollama deepseek-v4-flash, par brique)
+  contexte: 'DiveSearch : MAJEUR Ollama = faux positif prouve (TC-P04-015 etendu) + garde-fou defense-en-profondeur. Extraction : MAJEUR Ollama = pre-existant baseline hors scope T167-C ; mineurs = non-defauts verifies. 2 briques CERTIFIEES pour le perimetre T167. Items durcissement D1/D2 -> tache T172.'
+  description: 'Resultats : DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md (+ rapport brut T167-CR_ollama_FB_ExtractionSequence.md). Garde-fou IF Fault.Error OR Fault.Latched ajoute aux 2 FB. FB_DiveSearch 7/7, FB_ExtractionSequence 6/6, G200 PASS, run_all_gates PASS.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-CR_REVIEW_CYCLES.yaml
   objectifs:
   - Certifier securite ISO 13849, non-redemarrage auto, ordre de scan
-  - Rejouer la revue Ollama independante FB_ExtractionSequence (serveur indispo)
   bloque_par:
   - T167-C
 - id: T168
@@ -2738,7 +2739,7 @@ tasks:
   date: '2026-08-28T16:38:00+02:00'
   updated_at: '2026-08-28T21:15:00+02:00'
   titre: Intégration du diagnostic unifié dans PRG_07_Supervision (+ StepAtFault assistants)
-  contexte: Projection exclusive vers GVL_IHM.DredgingAssist.State. Complété après T167-B/C : DiveStepAtFault / ExtractionStepAtFault (etape figee au defaut, l'etat vivant ExtractionState/DiveState valant ERROR_HOLD apres faute) desormais projetes jusqu'a FB_TroubleshootingView (Idx208 / Idx307).
+  contexte: 'Projection exclusive vers GVL_IHM.DredgingAssist.State. Complété après T167-B/C : DiveStepAtFault / ExtractionStepAtFault (etape figee au defaut, l''etat vivant ExtractionState/DiveState valant ERROR_HOLD apres faute) desormais projetes jusqu''a FB_TroubleshootingView (Idx208 / Idx307).'
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml. Chaine PRG_03.Data.SequenceState -> PRG_07 -> GVL_IHM.DredgingAssist.State -> GVL_Troubleshooting.AssistanceDragage. G200 PASS, gates C 16/16, PRG_07 3/3.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml
   objectifs:
@@ -2871,3 +2872,123 @@ tasks:
   - Vérifier l'asservissement exclusif du Canvas aux données réelles de la trace JSON
   bloque_par:
   - T171-B
+- id: T172
+  parent_id: null
+  statut: ⬜
+  criticite: C2
+  domaine: ACQUISITION
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T20:45:00+02:00'
+  titre: Conformité AF-06 v2.4 — écarts audit (CSV, cadence, table TOR, NC-110)
+  contexte: 'Audit indépendant AF_Partie-06_Acquisition_Qualification_IO_v2.4.md (2026-08-28) : 7 écarts
+    standards/AF/CODE identifiés. Le P0 EncoderIncoherent reste tracké séparément (T158, C4, arbitrage
+    humain). Cette famille traite les écarts documentaires et de cohérence matérielle, sans toucher
+    au code safety.'
+  description: 'Famille T172 — Mise en conformité documentaire et cohérence matérielle de AF-06 v2.4.
+    Sous-tâches : T172-A (réf CSV + cadence), T172-B (table TOR 22→24 + polarité freins), T172-C
+    (NC-110 ST_EncoderMeasurements), T172-D (contradiction CSV/code TremieFull), T172-E (ST_InputsQualified
+    archivé). Chaque sous-tâche a son contrat C2 dans DOC/WFLOW/CONTRACTS/.'
+  contrat: ''
+  objectifs:
+  - Aligner AF-06 v2.4 sur la réalité matérielle (CSV 20260826) et le code
+  - Lever les ambiguïtés standards (NC-110, polarité freins) par décision tracée
+  - Ne pas dupliquer le P0 EncoderIncoherent (T158)
+  bloque_par: []
+- id: T172-A
+  parent_id: T172
+  statut: ⬜
+  criticite: C2
+  domaine: ACQUISITION
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T20:45:00+02:00'
+  titre: AF-06 — corriger référence CSV (20260814→20260826) et cadence (T01_Acquisition→MainTask)
+  contexte: 'Audit AF-06 v2.4 : §5 cite Device_IO_20260814.csv (n''existe plus, seul 20260826.csv est
+    présent) ; §3ter cite une tâche T01_Acquisition qui n''existe nulle part (ni CODE ni AF02) — la
+    cadence réelle est MainTask 10 ms.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-A_CSV_CADENCE.yaml. Correction
+    documentaire pure (C1/C2 doc) : nom du CSV source de vérité et nom de tâche de cadence dans
+    AF-06 v2.4.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-A_CSV_CADENCE.yaml
+  objectifs:
+  - Remplacer Device_IO_20260814.csv par Device_IO_20260826.csv dans AF-06 §5
+  - Remplacer T01_Acquisition par MainTask dans AF-06 §3ter (2 occurrences)
+  bloque_par: []
+- id: T172-B
+  parent_id: T172
+  statut: ⬜
+  criticite: C2
+  domaine: ACQUISITION
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T20:45:00+02:00'
+  titre: AF-06 — table TOR exhaustive (22→24) et polarité freins corrigée
+  contexte: 'Audit AF-06 v2.4 §5 : la table liste 22 TOR mais le CSV 20260826 en porte 24 sur les 3
+    modules DI (VH_0800END:8, VH_0808ETP:8, Local_Digital_IO:8) — manquent TremieFull_OR_GateRaised_DI
+    et une voie VH_0800END Bit5 sans nom. La note freins « TRUE=serré » est fausse (le code et le CSV
+    confirment TRUE=ouvert).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-B_TABLE_TOR.yaml. Mise à jour de la
+    table §5 : ajout des 2 TOR manquantes, correction de la note de polarité freins, signalement de la
+    voie VH_0800END Bit5 non nommée.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-B_TABLE_TOR.yaml
+  objectifs:
+  - Table §5 exhaustive : 24 TOR réelles documentées (22 existantes + TremieFull + voie vide signalée)
+  - Note polarité freins corrigée : TRUE = frein ouvert (pas « serré »)
+  bloque_par: []
+- id: T172-C
+  parent_id: T172
+  statut: ⬜
+  criticite: C2
+  domaine: STANDARDS
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T20:45:00+02:00'
+  titre: NC-110 vs ST_EncoderMeasurements — trancher la convention (dérogation ou renommage)
+  contexte: 'Audit AF-06 v2.4 §3ter : ST_EncoderMeasurements est produit par PRG_02 (un PROGRAM, pas
+    un FB) mais NC-110 impose ST_fb<NomFb>_* pour tout DUT produit/échangé par une seule instance de
+    FB. Le nom actuel est un DUT de domaine public — cas que NC-110 voulait démarquer. Décision
+    requise : dérogation écrite ou renommage.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-C_NC110.yaml. Décision de convention
+    tracée : soit dérogation documentée dans NAMING_CONVENTION (DUT produit par PROGRAM = domaine
+    public), soit renommage planifié. Aucun code touché sans décision.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-C_NC110.yaml
+  objectifs:
+  - Décision humaine tracée : dérogation NC-110 documentée OU plan de renommage
+  - NAMING_CONVENTION.md mis à jour en conséquence (si dérogation)
+  bloque_par: []
+- id: T172-D
+  parent_id: T172
+  statut: ⬜
+  criticite: C2
+  domaine: ACQUISITION
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T20:45:00+02:00'
+  titre: Contradiction CSV/code TremieFull_OR_GateRaised_DI (câblé vs non câblé)
+  contexte: 'Audit AF-06 v2.4 §5 : le CSV Device_IO_20260826.csv:456 déclare TremieFull_OR_GateRaised_DI
+    câblé à %IX224.5 (VH_0808ETP Bit5) alors que le code (PRG_02_Acquisition.st:159, ST_HwMachine.st:15)
+    dit « pas encore câblé électriquement ». Contradiction matérielle à lever avec l''humain avant
+    toute décision d''interlock (lié à T108).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-D_TREMIEFULL.yaml. Levée de
+    contradiction : confirmer l''état réel du câblage (export CODESYS frais + terrain), puis aligner
+    CSV/code/doc. Ne pas implémenter l''interlock (T108) — juste lever l''ambiguïté matérielle.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-D_TREMIEFULL.yaml
+  objectifs:
+  - État réel du câblage TremieFull confirmé (câblé ou non) par preuve terrain/export frais
+  - CSV, code et AF-06 §5 alignés sur l'état réel
+  bloque_par: []
+- id: T172-E
+  parent_id: T172
+  statut: ⬜
+  criticite: C1
+  domaine: DOCUMENTATION
+  agent: ORCHESTRATEUR
+  date: '2026-08-28T20:45:00+02:00'
+  titre: AF-06 — ST_InputsQualified déjà archivé (mise à jour §3ter)
+  contexte: 'Audit AF-06 v2.4 §3ter : le doc décrit ST_InputsQualified comme « hérités de l''ancienne
+    architecture » à retirer quand zéro consommateur. Or ces types sont déjà dans ARCHIVES/ (plus dans
+    CODE/) — la condition est satisfaite, le doc est en retard.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-E_INPUTSQUALIFIED.yaml. Mise à jour
+    documentaire §3ter : signaler que ST_InputsQualified* est déjà archivé (ARCHIVES/Code/SUPERVISION/_TYPES/),
+    retrait effectif, conserver la règle de non-réintroduction.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-E_INPUTSQUALIFIED.yaml
+  objectifs:
+  - §3ter reflète l'état réel : ST_InputsQualified* archivé, zéro consommateur
+  - Règle de non-réintroduction conservée
+  bloque_par: []

@@ -13,7 +13,7 @@
 | **T167-A** | Spec AF-04 §3bis : dérivations timeout runtime, matrice état sûr, gel bypass Kobold | ✅ figé (itéré 4×). Watchdog benne corrigé (60 s réel, pas 6 s). |
 | **T167-B** | `FB_DiveSearch` : timers de garde runtime, `StepAtFault`, latch survivant Enable, garde-fou non-redémarrage | ✅ code + 7/7 tests + CODESYS OK. **Contrat `IN_REVIEW`** — visa humain final non posé. |
 | **T167-C** | `FB_ExtractionSequence` : backstop fermeture benne verrouillé > `BucketMoveTimeout`, timeout décollage runtime, `StepAtFault` | ✅ code + 6/6 tests + CODESYS OK. **Contrat `IN_REVIEW`**. |
-| **T167-CR** | Revue indépendante Ollama, par brique | ⏳ **DiveSearch fait** (MAJEUR = faux positif prouvé + garde-fou défense en profondeur). **Extraction : serveur Ollama en timeout ×4 → revue orchestrateur substituée, à rejouer.** |
+| **T167-CR** | Revue indépendante Ollama `deepseek-v4-flash`, par brique | ✅ **DiveSearch** : MAJEUR = faux positif prouvé (TC-P04-015 étendu) + garde-fou défense en profondeur. **Extraction** : MAJEUR = pré-existant baseline, **hors scope T167-C** ; mineurs = non-défauts. 2 briques **certifiées** pour le périmètre T167. Items durcissement D1/D2 → tâche à planifier. |
 | **T168-A** | DumpAtTremie : décision PRG_03 / muscle PRG_04 | ✅ relu, correct (gate mode devient structurel via la branche). |
 | **T168-B** | Projection diagnostic unique PRG_07 + `StepAtFault` assistants jusqu'à `FB_TroubleshootingView` (`Idx208`/`Idx307`) | ✅ complété `75ceba26`. |
 | **T168-CR** | Revue Ollama diagnostic | ⚠️ marquée ✅ par agent précédent — **non re-vérifiée** après ajout `StepAtFault` assistants. |
@@ -36,10 +36,12 @@
 
 ## 4. Blocages avant gel de release
 
-1. **T167-CR Extraction** : revue Ollama indépendante non aboutie (serveur). À rejouer.
+1. ~~T167-CR Extraction~~ ✅ **levé** (revue Ollama faite après relance endpoint ; MAJEUR pré-existant hors scope).
 2. **T167-B / T167-C** : contrats `IN_REVIEW` — visa humain final à poser (CODESYS OK acquis).
 3. **T168-CR** : re-vérifier après ajout `StepAtFault` assistants.
 4. **T169-A** : compléter les 3 scénarios end-to-end manquants (mode / puissance / synchro).
 5. **Guard-fou CI `--all`** : ouvrir la tâche outillage.
+6. **Items durcissement D1/D2** (recovery reset `FB_ExtractionSequence`, garde position basse
+   `FB_DiveSearch`) — non bloquants T170, à planifier (voir `T167-CR_REVUE_INDEPENDANTE_CYCLES.md §4`).
 
-**T170 reste `⏳`.** Gel possible une fois 1–4 levés (5 en parallèle, non bloquant fonctionnel).
+**T170 reste `⏳`.** Gel possible une fois 2–4 levés (5–6 en parallèle, non bloquant fonctionnel).
