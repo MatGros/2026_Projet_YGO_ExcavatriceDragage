@@ -10,7 +10,7 @@ Le JS navigateur n'envoie que des stimuli et affiche les sorties — AUCUNE logi
 métier en JS. Le binaire compilé (WORKING_COPY) décide.
 
 Usage :
-    python TOOLS/TEST_AUTO_CI/anim_bench/cycle_bench_server.py [--port 8080]
+    python TOOLS/TEST_AUTO_CI/anim_bench/cycle_bench_server.py [--port 8090]
 """
 
 import argparse
@@ -138,7 +138,8 @@ def _serve(handler):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--port", type=int, default=8080)
+    parser.add_argument("--port", type=int, default=8090,
+                        help="Port de depart (defaut 8090 - evite 8080/8081 souvent occupes)")
     args = parser.parse_args()
 
     if not ENGINE.exists():
@@ -150,7 +151,7 @@ def main() -> int:
 
     from http.server import ThreadingHTTPServer
     _start_engine()
-    # Port bloqué (ex. WinError 10013 sur 8080) ? On tente les suivants et on affiche l'URL réelle.
+    # Port bloqué / occupé ? On tente les suivants et on affiche l'URL réelle.
     httpd = None
     port = args.port
     for attempt in range(20):
