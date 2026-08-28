@@ -100,6 +100,44 @@
 
   <div class="card out">
     <h2>📤 Sorties du binaire + simulation position</h2>
+
+    <!-- Scène machine SVG live (le monde que tu conduis au joystick) -->
+    <div style="background:#030712;border-radius:6px;border:1px solid #1f2937;margin-bottom:10px;">
+      <svg id="svgb" width="100%" height="360" viewBox="0 0 500 360">
+        <rect x="0" y="0" width="500" height="360" fill="#090d16"/>
+        <!-- échelle altimétrie -->
+        <line x1="18" y1="58" x2="18" y2="350" stroke="#475569" stroke-width="1.5"/>
+        <text x="2" y="62" fill="#f59e0b" font-size="8" font-weight="bold">+8.5m</text>
+        <text x="2" y="204" fill="#38bdf8" font-size="8" font-weight="bold">0m</text>
+        <text x="1" y="354" fill="#ef4444" font-size="8" font-weight="bold">-10.5m</text>
+        <!-- eau (surface à y=180 = 0m) -->
+        <rect x="40" y="180" width="460" height="180" fill="rgba(14,165,233,0.35)"/>
+        <line x1="40" y1="180" x2="500" y2="180" stroke="#38bdf8" stroke-dasharray="6,4"/>
+        <text x="452" y="174" fill="#38bdf8" font-size="9" font-weight="bold">Eau 0m</text>
+        <!-- fond carrière -->
+        <path d="M 40,215 Q 200,320 350,350 L 500,362 L 40,362 Z" fill="#1c1917" stroke="#44403c" stroke-width="1.5"/>
+        <text x="430" y="330" fill="#a8a29e" font-size="8">Fond</text>
+        <!-- rail pont -->
+        <line x1="20" y1="46" x2="480" y2="46" stroke="#94a3b8" stroke-width="5"/>
+        <!-- pont M3 -->
+        <g id="benchGantry" transform="translate(55,36)">
+          <rect x="-42" y="0" width="84" height="20" rx="4" fill="#0369a1" stroke="#38bdf8" stroke-width="1.5"/>
+          <text x="0" y="13" fill="#fff" font-size="7" font-weight="bold" text-anchor="middle">PONT M3</text>
+        </g>
+        <!-- cable + benne -->
+        <path id="benchCable" d="M 55,56 L 55,210" stroke="#f59e0b" stroke-width="2" fill="none"/>
+        <g id="benchBucket" transform="translate(55,210)">
+          <rect x="-15" y="-12" width="30" height="12" rx="2" fill="#334155" stroke="#64748b"/>
+          <g id="benchGravel" opacity="0">
+            <path d="M -11,0 L 11,0 L 8,14 L -8,14 Z" fill="#8a9a76" stroke="#6b7b5a"/>
+            <circle cx="-5" cy="4" r="2" fill="#a3b193"/><circle cx="3" cy="6" r="2.4" fill="#9aa98a"/><circle cx="7" cy="3" r="1.8" fill="#b5c2a4"/>
+          </g>
+          <path id="benchJawL" d="M -15,0 C -23,8 -21,24 0,26 C -8,17 -11,9 -15,0 Z" fill="#b45309" stroke="#d97706"/>
+          <path id="benchJawR" d="M 15,0 C 23,8 21,24 0,26 C 8,17 11,9 15,0 Z" fill="#d97706" stroke="#b45309"/>
+        </g>
+      </svg>
+    </div>
+
     <div class="posbar" id="posBar">
       <div class="marker" style="left:2%;"></div>
       <div class="marker" style="left:98%;"></div>
@@ -218,6 +256,27 @@ function updatePosBar() {
   document.getElementById('posVal').textContent = simM1.toFixed(1) + ' m';
 }
 
+// Scène machine SVG : dérivée du MONDE (position simulée + capteurs) et des sorties binaire.
+function updateScene(o) {
+  // Pont M3 horizontal (capteurs translation fournis par le binaire)
+  const p1 = o['TRANSLATION_AT_P1']==='1', tr = o['TRANSLATION_AT_TREMIE']==='1', mt = o['TRANSLATION_AT_MAINTENANCE']==='1';
+  const n = (p1?1:0)+(tr?1:0)+(mt?1:0);
+  let gx = 200; // non localisé
+  if (n === 1) gx = p1 ? 330 : (tr ? 55 : 455);
+  document.getElementById('benchGantry').setAttribute('transform', 'translate(' + gx + ', 36)');
+  // Benne verticale d'après simM1 (le monde) : m -10.5 -> px 350, +8.5 -> px 58
+  const bucky = 58 + (8.5 - simM1) / 19.0 * 292;
+  document.getElementById('benchBucket').setAttribute('transform', 'translate(' + gx + ', ' + bucky.toFixed(1) + ')');
+  document.getElementById('benchCable').setAttribute('d', 'M ' + gx + ',56 L ' + gx + ',' + (bucky - 12).toFixed(1));
+  // Benne ouverte
+  const a = o['BENNE_ISOPEN']==='1' ? 45 : 0;
+  document.getElementById('benchJawL').setAttribute('transform', 'rotate(' + a + ', -8, 0)');
+  document.getElementById('benchJawR').setAttribute('transform', 'rotate(' + (-a) + ', 8, 0)');
+  // Gravier chargé (étape 6..10, dérivé du binaire)
+  const step = parseInt(o.CYCLESTEP, 10);
+  document.getElementById('benchGravel').setAttribute('opacity', (step >= 6 && step <= 10) ? '1' : '0');
+}
+
 function fmtAct(ss, dir, spd) {
   const on = ss === '1';
   const d = dir === '1' ? '▲ montée' : (dir === '-1' ? '▼ descente' : '—');
@@ -240,6 +299,7 @@ function render(o) {
   document.getElementById('oSample').innerHTML = o.SAMPLECOUNT;
   document.getElementById('oWait').innerHTML = o.WAITINGFOROPERATOR==='1' ? '<span class="warn">⏸ attente opérateur</span>' : '<span class="off">non</span>';
   document.getElementById('oRaw').textContent = JSON.stringify(o, null, 1);
+  updateScene(o);
 }
 updatePosBar();
 </script>
