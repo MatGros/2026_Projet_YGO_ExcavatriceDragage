@@ -9,6 +9,7 @@ Usage :
 """
 
 import argparse
+import json
 import pathlib
 import subprocess
 import sys
@@ -126,6 +127,22 @@ def main() -> int:
 
     print(f"✅ Moteur compilé : {exe}")
     print(f"   source = WORKING_COPY/FB_Cycle.st (jamais CODE/)")
+
+    # Traçabilité (REX audit 2026-08-28) : manifest source/build pour prouver quel ST le binaire exécute
+    try:
+        import hashlib
+        import datetime
+        fb_src = TEST_AUTO_CI / "WORKING_COPY" / "CODE" / "G_CYCLE" / "FB_Cycle.st"
+        with open(exe.parent / "build_manifest.json", "w", encoding="utf-8") as f:
+            json.dump({
+                "source_path": "WORKING_COPY/CODE/G_CYCLE/FB_Cycle.st",
+                "source_sha256": hashlib.sha256(fb_src.read_bytes()).hexdigest() if fb_src.exists() else "?",
+                "build_time": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+                "exe": exe.name,
+            }, f, ensure_ascii=False, indent=2)
+        print(f"   manifest : {exe.parent / 'build_manifest.json'}")
+    except Exception as exc:
+        print(f"[WARN] manifest non écrit : {exc}")
     return 0
 
 
