@@ -23,6 +23,11 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 DEFAULT_MODEL = "deepseek-v4-flash:cloud"
+# num_ctx par defaut d'Ollama ~= 4k tokens : il TRONQUE SILENCIEUSEMENT le prompt d'entree (REX 2026-08-28
+# B3). Fenetre par defaut relevee a 8192 ; ajuster --num-ctx pour un gros contrat/diff.
+DEFAULT_NUM_CTX = int(os.environ.get("OLLAMA_NUM_CTX", "8192"))
+DEFAULT_NUM_PREDICT = int(os.environ.get("OLLAMA_NUM_PREDICT", "-1"))   # -1 = remplit le contexte restant (B2)
+DEFAULT_TIMEOUT_S = int(os.environ.get("OLLAMA_TIMEOUT_S", "300"))       # B1
 PREAMBLE_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "subagent_preamble.md")
 
 
@@ -42,29 +47,42 @@ def list_models():
         print(f"[ERREUR] Impossible de joindre Ollama sur {url} : {e}")
 
 
-def query_ollama(prompt, model=DEFAULT_MODEL, system_prompt=None, output_file=None):
+def query_ollama(prompt, model=DEFAULT_MODEL, system_prompt=None, output_file=None,
+                 num_ctx=DEFAULT_NUM_CTX, num_predict=DEFAULT_NUM_PREDICT, timeout_s=DEFAULT_TIMEOUT_S):
     full_system = ""
     if os.path.exists(PREAMBLE_PATH):
         with open(PREAMBLE_PATH, "r", encoding="utf-8") as f:
             full_system += f.read() + "\n\n"
-    
+
     if system_prompt:
         full_system += system_prompt
 
     url = f"{OLLAMA_HOST}/api/generate"
+    options = {"num_ctx": num_ctx}
+    if num_predict and num_predict > 0:
+        options["num_predict"] = num_predict
     payload = {
         "model": model,
         "prompt": prompt,
         "system": full_system,
-        "stream": False
+        "stream": False,
+        "options": options,
     }
-    
+
+    # Garde-fou troncature silencieuse : ~4 caracteres/token. Si l'entree depasse ~90% de num_ctx,
+    # une partie du prompt sera perdue cote Ollama -> avertir et suggerer --num-ctx.
+    approx_in_tokens = (len(prompt) + len(full_system)) // 4
+    if approx_in_tokens > int(num_ctx * 0.9):
+        print(f"[ATTENTION] Entree ~{approx_in_tokens} tokens > 90% de num_ctx ({num_ctx}) : "
+              f"risque de TRONCATURE du prompt. Relancer avec --num-ctx {((approx_in_tokens // 2048) + 2) * 2048}.")
+
     req_data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=req_data, headers={"Content-Type": "application/json"})
-    
-    print(f"[OLLAMA] Envoi de la requête au modèle '{model}' ({len(prompt)} caractères)...")
+
+    print(f"[OLLAMA] Envoi de la requête au modèle '{model}' ({len(prompt)} caractères, "
+          f"num_ctx={num_ctx}, timeout={timeout_s}s)...")
     try:
-        with urllib.request.urlopen(req, timeout=180) as resp:
+        with urllib.request.urlopen(req, timeout=timeout_s) as resp:
             data = json.loads(resp.read().decode('utf-8'))
             response_text = data.get("response", "")
             
@@ -94,7 +112,12 @@ def main():
     parser.add_argument("--system", "-s", help="Prompt système additionnel")
     parser.add_argument("--output", "-o", help="Fichier de sortie où enregistrer la réponse")
     parser.add_argument("--list-models", "-l", action="store_true", help="Lister les modèles Ollama installés")
-    
+    parser.add_argument("--num-ctx", type=int, default=DEFAULT_NUM_CTX,
+                        help=f"Fenêtre de contexte Ollama (défaut {DEFAULT_NUM_CTX} ; le défaut Ollama ~4k tronque le prompt)")
+    parser.add_argument("--num-predict", type=int, default=DEFAULT_NUM_PREDICT,
+                        help="Longueur max de sortie (-1 = remplit le contexte restant)")
+    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_S, help=f"Timeout requête en s (défaut {DEFAULT_TIMEOUT_S})")
+
     args = parser.parse_args()
     
     if args.list_models:
@@ -111,7 +134,8 @@ def main():
         print("Erreur : Spécifiez --prompt '...' ou --file chemin/vers/fichier.md")
         sys.exit(1)
         
-    query_ollama(prompt=prompt_text, model=args.model, system_prompt=args.system, output_file=args.output)
+    query_ollama(prompt=prompt_text, model=args.model, system_prompt=args.system, output_file=args.output,
+                 num_ctx=args.num_ctx, num_predict=args.num_predict, timeout_s=args.timeout)
 
 
 if __name__ == "__main__":
