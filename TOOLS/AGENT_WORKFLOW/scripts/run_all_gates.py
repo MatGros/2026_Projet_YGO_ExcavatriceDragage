@@ -106,6 +106,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
                                                                      "TOOLS/AGENT_WORKFLOW/tests", "-q"]),
     ("C", "430", "G430 — Commentaires REX (Zéro journal intime, §2ter)", [sys.executable, f"{S}/G430_check_comments_rex.py", "."]),
     ("C", "440", "G440 — Skills agents (stub + canonique, anti-derive)", [sys.executable, f"{S}/check_skill_stubs.py", "."]),
+    ("C", "450", "G450 — Couverture AF → TC → TEST_AUTO_CI (informatif)", [sys.executable, f"{S}/G450_check_af_ci_coverage.py", ".", "--report"]),
     ("C", "460", "G460 — Tests CI TEST_AUTO_CI (harnais STruCpp + négatifs + garde animation/fraîcheur, REX 2026-08-28)", [sys.executable, "TOOLS/TEST_AUTO_CI/anim_bench/run_ci_gates.py"]),
     # Palier D — sur demande (G500)
     ("D", "500", "G500 — Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
