@@ -242,37 +242,140 @@ TEST 'TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustes
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
     ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.05, 'Palier stable 1.50 m/s');
 
-    (* 🌊 Vibration câble (-3 mm) ➔ Filtre absorbe le creux *)
+    (* 🌊 Ondulation câble (+11 mm au lieu de +15 mm) *)
     ADVANCE_TIME(10000000);
-    hwIn.RawPosIn := 100958;
+    hwIn.RawPosIn := 100950;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
-    (* 🌊 Sursaut instantané (+18 mm) ➔ Pic neutralisé par le buffer *)
+    (* 🌊 Ondulation câble (+19 mm au lieu de +15 mm) *)
     ADVANCE_TIME(10000000);
     hwIn.RawPosIn := 101106;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
-    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.10, 'Bruit filtre : vitesse reste stable a 1.50 m/s');
 
-    (* 🌊 Ondulation mécanique (-2 mm) ➔ Mesure stabilisée *)
+    (* 🌊 V_inst saute à 1.80 m/s ➔ Mesure stabilisée à 1.500 m/s *)
     ADVANCE_TIME(10000000);
-    hwIn.RawPosIn := 101212;
+    hwIn.RawPosIn := 101253;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.10, 'Pic neutralise');
+
+    (* 🌊 V_inst chute à 1.30 m/s ➔ Mesure amortie à 1.460 m/s *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 101360;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
-    (* 🌊 Rebond élastique (+17 mm) ➔ Vitesse filtrée amortie *)
+    (* 🌊 V_inst saute à 1.70 m/s ➔ Mesure amortie à 1.580 m/s *)
     ADVANCE_TIME(10000000);
-    hwIn.RawPosIn := 101351;
+    hwIn.RawPosIn := 101499;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
-    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.10, 'Ondulation absorbee');
 
-    (* 📉 Inversion de marche ➔ Début descente treuil *)
+    (* 🌊 V_inst chute à 1.10 m/s ➔ Mesure amortie à 1.420 m/s *)
     ADVANCE_TIME(10000000);
-    hwIn.RawPosIn := 101228;
+    hwIn.RawPosIn := 101589;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 🌊 V_inst bondit à 1.90 m/s ➔ Mesure amortie à 1.560 m/s *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 101745;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.10, 'Ondulations absorbees');
+
+    (* 🎯 Retour régime stable (1.50 m/s) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 101868;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 🎯 Palier nominal stabilisé (1.50 m/s) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 101983;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 🎯 Palier nominal stabilisé (1.50 m/s) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102114;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 🚀 Sursaut mécanique (+24 mm) amorti par le filtre ! *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102311;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* ⚡ Régime 2.00 m/s perturbé (+18 mm) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102458;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* ⚡ Régime 2.00 m/s perturbé (+22 mm) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102638;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* ⚡ Régime 2.00 m/s perturbé (+19 mm) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102794;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* ⚡ Régime 2.00 m/s stabilisé (2.00 m/s) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102966;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 2.00, 0.15, 'Regime 2.00 m/s');
+
+    (* 🛑 Arrêt mécanique sec (frein serré) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102991;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 🛑 Rebond élastique câble arrière (-2 mm) absorbé ! *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102975;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 🛑 Stabilisation finale (+2 mm) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102991;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 🛑 Immobilisation treuil (vidage de la fenêtre 50 ms) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102991;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 🛑 Immobilisation treuil (vidage de la fenêtre 50 ms) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102991;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 🛑 Arrêt complet stabilisé à 0.000 m/s *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102991;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_EQ(fb.Measurement.Speed_Mps, 0.0, 'Arret complet = 0.0 m/s');
+
+    (* 📉 Inversion de sens : Début descente treuil (-15 mm) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102868;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 📉 Descente treuil (-1.50 m/s) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102745;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 📉 Descente treuil (-1.50 m/s) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102622;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* 📉 Descente treuil (-1.50 m/s) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102499;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
 
     (* 📉 Descente stabilisée à -1.50 m/s (SignedSpeed négatif) *)
-    ADVANCE_TIME(50000000);
-    hwIn.RawPosIn := 100613;
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 102376;
     fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.05, 'Descente nominale 1.50 m/s');
     ASSERT_TRUE(fb.Measurement.SignedSpeed_Mps < 0.0, 'Descente : SignedSpeed negatif');
 
     (* ⚡ Rupture bus terrain ➔ Purge atomique de sécurité *)
