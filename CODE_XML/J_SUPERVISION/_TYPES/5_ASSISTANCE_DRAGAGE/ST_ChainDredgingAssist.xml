@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:15:59.443614" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:15:59.443614">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T18:13:55.278371" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T18:13:55.278371">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -106,6 +106,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Contact Fond Confirmé (Kobold ou manuel) | 0 = Non Confirmé</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx208_DiveStepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape figée à l'apparition du défaut plongée (ERROR_HOLD masque l'état vivant)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Idx301_ExtractionReady">
               <type>
                 <BOOL />
@@ -152,6 +160,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: fond absent, bit1: fermeture, bit2: contrôle remontée, bit3: config</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx307_ExtractionStepAtFault">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape figée à l'apparition du défaut extraction (ERROR_HOLD masque l'état vivant)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_OperatorActionId">

@@ -219,10 +219,13 @@ TEST 'TC-P04-024 : Latch timeout extraction survit au cycle Enable OFF/ON, acqui
     FB(Enable := FALSE, Reset := FALSE, PowerContactorEngaged := TRUE, ControlAscentDistance_M := 2.0);
     ASSERT_TRUE(FB.Fault.Latched, 'Latch conserve sous Enable=FALSE');
 
-    // Enable ON sans Reset : defaut toujours latche
+    // Enable ON sans Reset : defaut toujours latche ET automate verrouille en ERROR_HOLD
+    //    (garde-fou non-redemarrage auto : IF Fault.Error OR Fault.Latched THEN ERROR_HOLD).
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       ControlAscentDistance_M := 2.0, MotionRequestActive := FALSE);
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE, MotionRequestActive := FALSE);
     ASSERT_TRUE(FB.Fault.Latched, 'Latch toujours actif sans acquittement');
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.ERROR_HOLD, 'Verrouille ERROR_HOLD, aucun redemarrage vers READY_TO_CLOSE');
+    ASSERT_FALSE(FB.AscentPermit, 'Aucun permis montee au retour Enable sans reset');
 
     // Front Reset : acquittement effectif
     FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,

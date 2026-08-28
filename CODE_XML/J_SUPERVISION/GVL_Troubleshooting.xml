@@ -727,6 +727,14 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Contact Fond Confirmé (Kobold ou manuel) | 0 = Non Confirmé</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx208_DiveStepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape figée à l'apparition du défaut plongée (ERROR_HOLD masque l'état vivant)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Idx301_ExtractionReady">
               <type>
                 <BOOL />
@@ -773,6 +781,14 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: fond absent, bit1: fermeture, bit2: contrôle remontée, bit3: config</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx307_ExtractionStepAtFault">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape figée à l'apparition du défaut extraction (ERROR_HOLD masque l'état vivant)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_OperatorActionId">

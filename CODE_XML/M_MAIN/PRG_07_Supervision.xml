@@ -10268,6 +10268,7 @@ GVL_Troubleshooting.AssistanceDragage.Idx204_DiveState                := Dredgin
 GVL_Troubleshooting.AssistanceDragage.Idx205_DiveError                := DredgingAssist.State.DiveError;
 GVL_Troubleshooting.AssistanceDragage.Idx206_DiveErrorId              := DredgingAssist.State.DiveErrorId;
 GVL_Troubleshooting.AssistanceDragage.Idx207_BottomTouchConfirmed    := DredgingAssist.State.BottomTouchConfirmed;
+GVL_Troubleshooting.AssistanceDragage.Idx208_DiveStepAtFault          := DredgingAssist.State.DiveStepAtFault;
 
 GVL_Troubleshooting.AssistanceDragage.Idx301_ExtractionReady          := DredgingAssist.State.ExtractionReady;
 GVL_Troubleshooting.AssistanceDragage.Idx302_ExtractionBusy           := DredgingAssist.State.ExtractionBusy;
@@ -10275,6 +10276,7 @@ GVL_Troubleshooting.AssistanceDragage.Idx303_ExtractionDone           := Dredgin
 GVL_Troubleshooting.AssistanceDragage.Idx304_ExtractionState          := DredgingAssist.State.ExtractionState;
 GVL_Troubleshooting.AssistanceDragage.Idx305_ExtractionError          := DredgingAssist.State.ExtractionError;
 GVL_Troubleshooting.AssistanceDragage.Idx306_ExtractionErrorId        := DredgingAssist.State.ExtractionErrorId;
+GVL_Troubleshooting.AssistanceDragage.Idx307_ExtractionStepAtFault    := DredgingAssist.State.ExtractionStepAtFault;
 
 GVL_Troubleshooting.AssistanceDragage.Idx401_OperatorActionId        := DredgingAssist.State.OperatorActionId;
 GVL_Troubleshooting.AssistanceDragage.Idx402_OperatorAction          := DredgingAssist.State.OperatorAction;

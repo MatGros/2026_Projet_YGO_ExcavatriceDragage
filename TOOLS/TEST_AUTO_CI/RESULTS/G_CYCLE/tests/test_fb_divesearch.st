@@ -239,10 +239,17 @@ TEST 'TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seuleme
     FB(Enable := FALSE, Reset := FALSE, PowerContactorEngaged := TRUE);
     ASSERT_TRUE(FB.Fault.Latched, 'Latch conserve sous Enable=FALSE (pas de redemarrage auto)');
 
-    // 3. Enable ON sans Reset : defaut toujours latche
+    // 3. Enable ON sans Reset : defaut toujours latche ET l'automate reste verrouille en ERROR_HOLD
+    //    (garde-fou non-redemarrage auto : le latch interne TimeoutImmersionFault realimente Fault.Error).
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       BucketIsOpen := TRUE, PositionsValid := TRUE, KoboldImmersed := FALSE,
+       M1Position_M := 20.0, M2Position_M := 20.0,
+       DiveStartMin_M := 15.0, ImmersionUpper_M := 10.0, ImmersionLower_M := 5.0,
        MotionRequestActive := FALSE);
     ASSERT_TRUE(FB.Fault.Latched, 'Latch toujours actif sur retour Enable=TRUE sans acquittement');
+    ASSERT_TRUE(FB.Fault.Error, 'Cause interne realimente Fault.Error au retour Enable');
+    ASSERT_EQ(FB.DiveState, E_DiveSearchState.ERROR_HOLD, 'Verrouille ERROR_HOLD, aucun redemarrage vers READY_TO_DESCEND');
+    ASSERT_FALSE(FB.DescendPermit, 'Aucun permis descente au retour Enable sans reset');
 
     // 4. Front Reset (conditions de garde reunies) : acquittement effectif
     FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,

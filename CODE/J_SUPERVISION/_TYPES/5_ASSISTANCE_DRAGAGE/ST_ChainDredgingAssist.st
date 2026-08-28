@@ -11,6 +11,7 @@ STRUCT
     Idx205_DiveError                 : BOOL; // 0 = Sain | 1 = Défaut Plongée
     Idx206_DiveErrorId                : WORD; // bit0: préconditions, bit1: séquence Kobold, bit2: config seuils
     Idx207_BottomTouchConfirmed      : BOOL; // 1 = Contact Fond Confirmé (Kobold ou manuel) | 0 = Non Confirmé
+    Idx208_DiveStepAtFault           : E_DiveSearchState; // Étape figée à l'apparition du défaut plongée (ERROR_HOLD masque l'état vivant)
 
     Idx301_ExtractionReady           : BOOL; // 1 = Assistance Extraction Prête | 0 = Non Prête
     Idx302_ExtractionBusy            : BOOL; // 1 = Séquence Extraction En Cours | 0 = Repos
@@ -18,6 +19,7 @@ STRUCT
     Idx304_ExtractionState           : E_ExtractionSequenceState; // État interne séquenceur extraction
     Idx305_ExtractionError           : BOOL; // 0 = Sain | 1 = Défaut Extraction
     Idx306_ExtractionErrorId          : WORD; // bit0: fond absent, bit1: fermeture, bit2: contrôle remontée, bit3: config
+    Idx307_ExtractionStepAtFault     : E_ExtractionSequenceState; // Étape figée à l'apparition du défaut extraction (ERROR_HOLD masque l'état vivant)
 
     Idx401_OperatorActionId          : WORD;       // Identifiant consigne opérateur conduite (0 = aucune)
     Idx402_OperatorAction            : STRING(120); // Texte consigne opérateur (secours affichage)
