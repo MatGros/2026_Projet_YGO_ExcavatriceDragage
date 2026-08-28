@@ -1,0 +1,140 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T168-D
+# Harmoniser le type de OperatorActionId sur WORD dans toute la chaine de
+# diagnostic (elimine 3 conversions implicites UINT<->WORD)
+# ═══════════════════════════════════════════════════════════════════════════
+# Origine : audit T168-B (2026-08-29), defaut C confirme par 2 revues
+#   independantes. Sorti du scope T168-C (micro-lot dedie).
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T168-D_OPERATORACTIONID_WORD
+  parent_id: T168
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Le champ OperatorActionId (identifiant d'action operateur, valeurs bit-codees
+    en hexadecimal 16#0100..16#0480) doit etre type WORD partout dans la chaine
+    de diagnostic, comme il l'est deja cote assistants (FB_DiveSearch,
+    FB_ExtractionSequence, ST_DredgingAssistState, ST_ChainDredgingAssist). But :
+    supprimer les 3 conversions implicites UINT<->WORD du chemin vivant
+    (PRG_03:304/308 sur les sources WORD des assistants, PRG_07:452 sur la cible
+    WORD ST_DredgingAssistState) qui produisent des warnings de compilation
+    CODESYS 3.5. Aucun changement de comportement : les valeurs (<= 16#0480) sont
+    identiques en UINT et en WORD, et il n'existe aucune comparaison ni CASE sur
+    ce champ (verifie : tous les usages sont des affectations).
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Les 4 declarations suivantes passent de UINT a WORD :
+        CODE/G_CYCLE/FB_Cycle.st (VAR_OUTPUT OperatorActionId),
+        CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st (OperatorActionId),
+        CODE/J_SUPERVISION/FB_TroubleshootingView.st (VAR_INPUT CycleOperatorActionId),
+        CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st (Idx211_OperatorActionId).
+      verified_by: >
+        grep -rnE "OperatorActionId\s*:\s*UINT|CycleOperatorActionId\s*:\s*UINT|Idx211_OperatorActionId\s*:\s*UINT"
+        CODE/ retourne 0 resultat ; grep de la meme famille en WORD retourne 8 resultats
+        (4 preexistants + 4 bascules).
+    - id: AC2
+      statement: >
+        Aucune autre ligne modifiee : pas de changement de valeur affectee, pas de
+        cast explicite ajoute (WORD_TO_UINT / UINT_TO_WORD), pas de modification de
+        PRG_03_Modes_Cycle.st, PRG_04_Treuils_Benne.st ni PRG_07_Supervision.st
+        (les affectations y deviennent WORD := WORD, plus aucune conversion).
+      verified_by: >
+        git diff : seules les 4 lignes de declaration changent (UINT -> WORD),
+        + le bundle regenere. Zero occurrence de _TO_UINT / _TO_WORD ajoutee.
+    - id: AC3
+      statement: >
+        Garde-fou : un gate mecanique verifie que tout champ de la famille
+        OperatorActionId / CycleOperatorActionId / Idx*_OperatorActionId dans
+        CODE/**/*.st est declare WORD (jamais UINT / INT), pour empecher la
+        reintroduction d'une conversion implicite. Vert sur le code corrige.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G347_check_actionid_type.py (nom
+        indicatif) en PASS, et integration dans run_all_gates.py palier C
+        (present dans le resume). Test negatif : le gate echoue si on remet une
+        des 4 declarations en UINT.
+    - id: AC4
+      statement: >
+        Non-regression : G200 liaison PASS 0 erreur, palier C 100% PASS, et les
+        verdicts TEST_AUTO_CI des FB de cycle (FB_Cycle, FB_DiveSearch,
+        FB_ExtractionSequence) sont inchanges par rapport a la baseline pre-T168-D.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report ;
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C ;
+        python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Cycle --fast (idem DiveSearch,
+        ExtractionSequence).
+    - id: AC5
+      statement: >
+        Controle structurel du bundle apres edition : le nom de fichier FB_Cycle /
+        FB_TroubleshootingView correspond au nom du POU declare, et le suffixe de
+        langage correspond au langage genere dans le bundle PLCopenXML.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C
+        (G300 structure du depot, G310 structure CODE : POU, suffixe, ordre) en PASS,
+        et python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report en PASS.
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G347_check_actionid_type.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - CODE_XML/CODE_Bundle.xml
+    forbidden:
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/G_CYCLE/FB_DiveSearch.st
+      - CODE/G_CYCLE/FB_ExtractionSequence.st
+      - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/
+      - PRJ_CODESYS/
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Valeurs d'OperatorActionId inchangees (16#0100..16#0480, 0 = aucune action)."
+      - "Aucune comparaison / CASE introduite : le champ reste un identifiant projete, jamais teste dans une condition."
+      - "Chaine de projection T168-B/T168-C intacte (FB -> PRG_03.Data.SequenceState -> PRG_07 -> GVL_IHM / GVL_Troubleshooting)."
+    dropped_on_purpose:
+      - "Le type UINT sur ce champ (n'a jamais eu de justification : identifiant bit-code -> WORD)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "auto/best-coding"
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Si un usage d'OperatorActionId autre qu'une affectation est decouvert
+    (comparaison, CASE, passage a une FC attendant UINT, arithmetique), ou si la
+    bascule casse un test CI -> STOP et remonter a l'orchestrateur avant d'aller
+    plus loin. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    (a remplir par l'agent executant)
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    (visa orchestrateur apres relecture du git diff reel)

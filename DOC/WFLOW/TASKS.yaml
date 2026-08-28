@@ -1490,9 +1490,9 @@ tasks:
   criticite: C1
   domaine: OUTILLAGE
   agent: Codex
-  date: '2026-08-29T00:40:00+02:00'
-  updated_at: '2026-08-29T00:40:00+02:00'
-  completed_at: '2026-08-29T00:40:00+02:00'
+  date: '2026-08-29T01:10:00+02:00'
+  updated_at: '2026-08-29T01:10:00+02:00'
+  completed_at: '2026-08-29T01:10:00+02:00'
   titre: Gate de couverture Fonctions/TC ↔ TEST_AUTO_CI via af_traceability_matrix.yaml
   contexte: 'Intitulé complet : lors d''un futur lot sur les tests CI (TEST_AUTO_CI), exploiter TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml
     (produit par extract_functions_matrix.py, T153-C) pour un contrôle de couverture automatisé — vérifier que chaque fonction
@@ -1500,7 +1500,7 @@ tasks:
     ou dans un gate dédié (ex. G375 pour les TC de type GATE). Idée remontée par l''utilisateur (2026-08-25) : la matrice
     consolidée rend ce contrôle possible sans parser 14 fichiers AF à la main. À FAIRE PLUS TARD — pas de contrat détaillé
     ni d''implémentation dans ce lot, juste le repère de tâche.'
-  description: "✅ Mode DOC-only validé : matrice fraîche et rapport AF → fonctions → TC → titres TEST déclarés, sous DOC/WFLOW/AUDITS/. Le rapport expose les fonctions sans TC, les TC sans test CI déclaré et les exceptions hors CI du registre, sans prétendre prouver l'exécution. Promotion ultérieure possible en gate TOOLS dédié."
+  description: "✅ G450 informatif intégré au palier C : matrice fraîche AF → fonctions → TC → titres TEST déclarés, exceptions af_ignore avec provenance, chemins registre manquants signalés. --strict est prêt pour rendre les écarts bloquants après assainissement CI."
   contrat: ''
   objectifs:
   - Charger af_traceability_matrix.yaml et croiser, pour chaque domaine AF (domains.<AF-NN>), functions.<ID>.tc_couvrants
