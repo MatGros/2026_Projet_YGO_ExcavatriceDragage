@@ -149,8 +149,20 @@ def main() -> int:
 
     from http.server import ThreadingHTTPServer
     _start_engine()
-    httpd = ThreadingHTTPServer(("127.0.0.1", args.port), _serve(None))
-    print(f"✅ Banc de test web : http://127.0.0.1:{args.port}")
+    # Port bloqué (ex. WinError 10013 sur 8080) ? On tente les suivants et on affiche l'URL réelle.
+    httpd = None
+    port = args.port
+    for attempt in range(20):
+        try:
+            httpd = ThreadingHTTPServer(("127.0.0.1", port), _serve(None))
+            break
+        except OSError as exc:
+            print(f"[INFO] Port {port} refusé ({exc}) — essai port {port+1}")
+            port += 1
+    if httpd is None:
+        print("[ERREUR] Aucun port libre trouvé (blocage réseau ?)")
+        return 1
+    print(f"✅ Banc de test web : http://127.0.0.1:{port}")
     print(f"   moteur = {ENGINE.name} (WORKING_COPY/FB_Cycle.st compilé)")
     print("   Ctrl+C pour arrêter")
     try:
