@@ -186,3 +186,93 @@ TEST 'TC-P09-018 Fault live : incoherence mesure (Cause 1)'
     ASSERT_TRUE((fb.Fault.ErrorId AND 16#0002) <> 0, 'bit1 = cause incoherence');
     ASSERT_FALSE(fb.Fault.Latched, 'cause live non latchee');
 END_TEST
+
+TEST 'TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)'
+    (* 1. Initialisation chaine codeur *)
+    hwIn.SlaveOperational := TRUE;
+    hwIn.PresetStatusBit := FALSE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    (* Scan 0 : Repos initial (Position = 0.0 m) *)
+    fb(Enable := TRUE, Reset := FALSE, PointsPerRev := 4096, CableM_PerRev := 0.5,
+       PositionMinM := -50.0, PositionMaxM := 50.0, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.Measurement.SpeedValid, 'Echantillon 1 : Fenetre 50ms pas encore remplie');
+
+    (* Scans 1..5 : Montee ideale a 1.50 m/s (+123 pts = +15mm par 10ms) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 100123;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 100246;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 100369;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 100492;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 100614;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    (* Scan 6 : 50ms atteintes -> Valid=TRUE et Vitesse = 1.50 m/s *)
+    ASSERT_TRUE(fb.Measurement.SpeedValid, '50ms atteintes -> SpeedValid=TRUE');
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.05, 'Vitesse nominale filtree = 1.50 m/s');
+    ASSERT_NEAR(fb.Measurement.SignedSpeed_Mps, 1.50, 0.05, 'Vitesse signee montee = +1.50 m/s');
+
+    (* Scans 7..10 : Palier stable 1.50 m/s *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 100737;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.05, 'Palier stable 1.50 m/s');
+
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 100860;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.05, 'Palier stable 1.50 m/s');
+
+    (* Scans 11..15 : Perturbations dynamiques / vibrations cable (+/- 4mm d ondulation) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 100958; (* +98 pts = +12mm au lieu de +15mm *)
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 101106; (* +148 pts = +18mm -> saut instantane *)
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.10, 'Bruit filtre : vitesse reste stable a 1.50 m/s');
+
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 101212; (* +106 pts = +13mm *)
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 101351; (* +139 pts = +17mm *)
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.10, 'Ondulation absorbee');
+
+    (* Scan 16 : Descente treuil -1.50 m/s (-123 pts) *)
+    ADVANCE_TIME(10000000);
+    hwIn.RawPosIn := 101228;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+
+    ADVANCE_TIME(50000000); (* 50ms de descente *)
+    hwIn.RawPosIn := 100613;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.SignedSpeed_Mps < 0.0, 'Descente : SignedSpeed negatif');
+
+    (* Scan 17 : Rupture de confiance codeur (perte bus) -> Purge immediate *)
+    hwIn.SlaveOperational := FALSE;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.Measurement.SpeedValid, 'Perte bus -> SpeedValid retombe immediatement a FALSE');
+    ASSERT_EQ(fb.Measurement.Speed_Mps, 0.0, 'Purge vitesse -> Speed_Mps=0.0');
+    ASSERT_EQ(fb.Measurement.SignedSpeed_Mps, 0.0, 'Purge vitesse signee -> SignedSpeed_Mps=0.0');
+END_TEST
+
