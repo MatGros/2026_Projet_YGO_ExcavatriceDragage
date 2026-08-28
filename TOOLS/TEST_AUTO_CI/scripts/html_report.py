@@ -329,7 +329,13 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
             <div class="wf-scroll">{_render_waveform(scans, changed_fields, field_types, fail_scan_num)}</div>
         </details>
         <details {"open" if not test_passed else ""}>
-            <summary>📋 Chronogramme tableau ({len(scans)} scans)</summary>
+            <summary style="display:flex; justify-content:space-between; align-items:center;">
+                <span>📋 Chronogramme tableau ({len(scans)} scans)</span>
+                <span class="table-export-actions" onclick="event.stopPropagation();">
+                    <button type="button" class="btn-export" onclick="exportTableCSV(this, '{_html.escape(test_name)}')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                    <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                </span>
+            </summary>
             {_render_table(scans, changed_fields, field_types, fail_scan_num, scan_notes=scan_notes)}
         </details>
         {_render_static_table(scans, static_fields, field_types)}
@@ -788,7 +794,7 @@ _CSS = """
     .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
 
     details { margin-bottom: 20px; }
-    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: text; }
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -802,7 +808,7 @@ _CSS = """
     .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
     .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
     .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.02); }
-    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: none; }
+    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: text; }
     .checks-summary:hover { color: var(--accent); }
     .checks-label { font-size: 12px; font-weight: 600; }
     .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
@@ -810,6 +816,10 @@ _CSS = """
     .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
     .scenario-list li { font-size: 12px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
     .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
+    .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
+    .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
     .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
         border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
     .failure-head { color: var(--red-text); font-weight: 600; }
@@ -822,7 +832,7 @@ _CSS = """
     .chronogram-group { margin-top: 10px; }
     .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
         padding: 8px 12px; }
-    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); user-select: text; }
     .chrono-scroll { overflow-x: auto; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border);
         scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
     .chrono-scroll::-webkit-scrollbar, .wf-scroll::-webkit-scrollbar { display: block !important; height: 8px !important; width: 8px !important; }
@@ -831,7 +841,7 @@ _CSS = """
     .chrono-scroll::-webkit-scrollbar-thumb:hover, .wf-scroll::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
     .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; }
     .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; }
-    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; cursor: pointer; user-select: none; transition: max-width 0.2s, min-width 0.2s, padding 0.2s; }
+    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; cursor: pointer; user-select: text; transition: max-width 0.2s, min-width 0.2s, padding 0.2s; }
     .chrono-table th:hover { color: var(--accent); }
     .chrono-table th.col-collapsed,
     .chrono-table td.col-collapsed {
@@ -897,7 +907,7 @@ _CSS = """
     .af-warning-banner li { margin: 3px 0; }
     .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
-    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
@@ -969,6 +979,87 @@ function copyPinExpr(el) {
     document.body.removeChild(ta);
     el.classList.add('pin-copied');
     setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
+
+function exportTableCSV(btn, testName) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var rows = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return '"' + th.textContent.replace(/"/g, '""').trim() + '"';
+    });
+    rows.push(headers.join(';'));
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return '"' + td.textContent.replace(/"/g, '""').trim() + '"';
+        });
+        rows.push(cells.join(';'));
+    });
+
+    var csvContent = "\\uFEFF" + rows.join('\\r\\n');
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var safeName = (testName || 'chronogram').replace(/[^a-zA-Z0-9_\\-]+/g, '_').substring(0, 50);
+    a.href = url;
+    a.download = safeName + '_chronogram.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📥 Téléchargé !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function copyTableMarkdown(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var lines = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return th.textContent.trim();
+    });
+    lines.push('| ' + headers.join(' | ') + ' |');
+    lines.push('| ' + headers.map(function() { return '---'; }).join(' | ') + ' |');
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return td.textContent.trim().replace(/\\|/g, '\\\\|');
+        });
+        lines.push('| ' + cells.join(' | ') + ' |');
+    });
+
+    var md = lines.join('\\n');
+    var ta = document.createElement('textarea');
+    ta.value = md;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📋 Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
 }
 
 function toggleTheme() {
