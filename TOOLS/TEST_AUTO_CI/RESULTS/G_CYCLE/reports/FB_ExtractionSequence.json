@@ -9,11 +9,15 @@
     {
       "name": "TC-P04-020 Extraction : mise en service sequence extraction",
       "passed": true
+    },
+    {
+      "name": "TC-P04-021 : Sequence extraction complete et continue avec maintien constant du joystick operateur",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 3,
+    "passed": 3,
     "failed": 0
   }
 }

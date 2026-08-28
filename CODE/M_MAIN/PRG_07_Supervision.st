@@ -409,10 +409,10 @@ GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputMo
 
 // ---------- §3g. État cycle semi-auto & bandeau ----------
 GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready;
-GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy;
-GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Done;
-GVL_IHM.Cycle.State.Error                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Error;
-GVL_IHM.Cycle.State.ErrorId                := PRG_03_Modes_Cycle.instCycleSemiAuto.ErrorId;
+GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Busy;
+GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Done;
+GVL_IHM.Cycle.State.Error                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.Error;
+GVL_IHM.Cycle.State.ErrorId                := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.ErrorId;
 GVL_IHM.Cycle.State.CycleStep              := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep;
 GVL_IHM.Cycle.State.CycleStateStr          := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStateStr;
 GVL_IHM.Cycle.State.CycleStepAtError       := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError;
@@ -441,7 +441,7 @@ instHmiBannerFormatter(
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     CycleStep             := GVL_IHM.Cycle.State.CycleStep,
     CycleStateStr         := GVL_IHM.Cycle.State.CycleStateStr,
-    CycleErrorId          := PRG_03_Modes_Cycle.instCycleSemiAuto.ErrorId,
+    CycleErrorId          := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.ErrorId,
     CycleStepAtError      := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError,
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
@@ -471,7 +471,7 @@ instHmiBannerFormatter(
     CycleRequestDirection       := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction,
     DeadmanArmed                := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.instJoystick.AtNeutralXY,
-    CycleAutoBusy               := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy,
+    CycleAutoBusy               := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Busy,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
@@ -507,7 +507,7 @@ instTroubleshootingView(
     M2LogicRequestDirection := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
     CoupledUserRequestActive := PRG_04_Treuils_Benne.CoupledUserRequestActive,
-    CycleAutoBusy := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy,
+    CycleAutoBusy := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Busy,
     CycleM1SpeedTgt_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct,
     CycleM2SpeedTgt_Pct := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct,
     CycleBucketOpen := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Open,
@@ -532,12 +532,18 @@ instTroubleshootingView(
     MaintainAActive      := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     MaintainBActive      := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
     CycleReady           := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready,
-    CycleDone            := PRG_03_Modes_Cycle.instCycleSemiAuto.Done,
-    CycleError           := PRG_03_Modes_Cycle.instCycleSemiAuto.Error,
-    CycleErrorId         := PRG_03_Modes_Cycle.instCycleSemiAuto.ErrorId,
+    CycleDone            := PRG_03_Modes_Cycle.instCycleSemiAuto.Lifecycle.Done,
+    CycleError           := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.Error,
+    CycleErrorId         := PRG_03_Modes_Cycle.instCycleSemiAuto.Fault.ErrorId,
     CycleStep            := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep,
     CycleStepStr         := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStateStr,
     CycleStepAtError     := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError,
+    CycleWaitingForOperator := PRG_03_Modes_Cycle.instCycleSemiAuto.WaitingForOperator,
+    CycleWaitingForProcess := PRG_03_Modes_Cycle.instCycleSemiAuto.WaitingForProcess,
+    CycleOperatorActionId := PRG_03_Modes_Cycle.instCycleSemiAuto.OperatorActionId,
+    CycleOperatorAction := PRG_03_Modes_Cycle.instCycleSemiAuto.OperatorAction,
+    CycleExpectedAxis := PRG_03_Modes_Cycle.instCycleSemiAuto.ExpectedAxis,
+    CycleExpectedDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.ExpectedDirection,
     CycleStartRequest    := GVL_IHM.Cycle.Cmd.BtnStart,
     CycleAbortRequest    := GVL_IHM.Cycle.Cmd.BtnAbort,
     CycleTargetDepth_M   := GVL_IHM.Cycle.Cfg.SetDepth_M,

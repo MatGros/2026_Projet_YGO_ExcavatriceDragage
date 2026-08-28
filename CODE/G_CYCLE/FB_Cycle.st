@@ -4,7 +4,7 @@
    🎯 Rôle : Automate de cycle automatique de dragage (X0 à X13 + STABILIZING)
    🔒 Sécurité : Gating par mode et homme-mort, repli STABILIZING sur défaut
    🔌 Interface : Demandes de mouvements (treuils, translation, benne)
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Cycle
@@ -64,10 +64,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
     Ready                   : BOOL;         // <-- [STAT] Sequenceur disponible
-    Busy                    : BOOL;         // <-- [STAT] Cycle automatique actif
-    Done                    : BOOL;         // <-- [STAT] Cycle automatique complete
-    Error                   : BOOL;         // <-- [STAT] Defaut cycle
-    ErrorId                 : WORD;         // <-- [DIAG] Code erreur bitmask
+    Fault                   : ST_Fault;     // <-- [SAFE] Socle defaut transverse (live + latche)
+    Lifecycle               : ST_Lifecycle; // <-- [STAT] Cycle de vie (Busy, Done, Waiting)
     SpeedMismatchMps        : REAL;         // <-- [DIAG] Ecart absolu vitesse M1/M2 (m/s)
     SpeedMismatchActive     : BOOL;         // <-- [DIAG] Seuil vitesse depasse sur cycle courant
     SpeedMismatchConfirmed  : BOOL;         // <-- [DIAG] Ecart vitesse confirme pendant timeout
@@ -79,9 +77,16 @@ VAR_OUTPUT
     BucketCmd               : ST_fbCycle_BucketCmdDemand;       // <-- [ACT] Demande benne
 
     // === METADONNEES & SYNOPTIQUE ===
-    CycleStep               : E_CycleStep;  // <-- [STAT] Etape active du Grafcet
-    CycleStateStr           : STRING(80);   // <-- [STAT] Libelle en clair de l'etape
-    CycleStepAtError        : E_CycleStep;  // <-- [DIAG] Etape specifique au moment du defaut
+    CycleStep               : E_CycleStep;          // <-- [STAT] Etape active du Grafcet
+    CycleStateStr           : STRING(80);           // <-- [STAT] Libelle en clair de l'etape
+    CycleStepAtError        : E_CycleStep;          // <-- [DIAG] Etape specifique au moment du defaut
+    OperatorActionId        : UINT;                 // <-- [DIAG] ID action operateur requise
+    OperatorAction          : STRING(120);          // <-- [DIAG] Message explicatif pour l'IHM
+    ExpectedAxis            : E_OperatorAxis;       // <-- [STAT] Organe joystick/bouton attendu
+    ExpectedDirection       : INT;                  // <-- [STAT] Sens attendu (-1, 0, +1)
+    WaitingForOperator      : BOOL;                 // <-- [STAT] En attente d'une action operateur
+    WaitingForProcess       : BOOL;                 // <-- [STAT] En attente d'une condition procede
+    RequestActive           : BOOL;                 // <-- [STAT] Demande de mouvement active
 END_VAR
 VAR_IN_OUT
     // === STRUCTURES PARTAGEES & COMPTEURS ===
@@ -94,10 +99,13 @@ VAR
     DeadmanArmedEdge        : R_TRIG;       // . [LOC] Detecteur front montant DeadmanArmed (demarrage joystick)
     AbortEdge               : R_TRIG;       // . [LOC] Detecteur front montant AbortCycle
     ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
+    EnableEdge              : R_TRIG;       // . [LOC] Detecteur front montant Enable (retour en semi-auto)
 
     // === ETATS INTERNES ===
     State                   : E_CycleStep := E_CycleStep.X0_PREPARATION; // . [LOC] Etape courante machine d'etat
     SavedState              : E_CycleStep := E_CycleStep.X0_PREPARATION; // . [LOC] Etape memorisee
+    PausedState             : E_CycleStep := E_CycleStep.X0_PREPARATION; // . [LOC] Etape en pause lors de la bascule hors auto
+    WaitingResume           : BOOL := FALSE;                             // . [LOC] En attente de validation consciente pour reprendre
 
     // === MEMORISATIONS & REGISTRES INTERNES ===
     TouchPositionM          : REAL;         // . [LOC] Position M1 memorisee lors du contact fond
@@ -116,57 +124,21 @@ VAR
     CtrlAscentTimeout       : TIME := T#30s;    // . [LOC] Temps max pour zone de stabilisation
     DrainingTime            : TIME := T#5s;     // . [LOC] Temps d'egouttage par defaut
     StepMaxTimeout          : TIME := T#60s;    // . [LOC] Tempo max d'etape
+
+    // === SOCLE DEFAUT TRANSVERSE ===
+    instFault               : FB_FaultCore;                  // * [INST] Socle defaut transverse
+    instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes de defaut
 END_VAR
 
 // === IMPLEMENTATION ===
 
-{region "§1 Gate securite"}
-// 🛑 1. GATES DE SÉCURITÉ ET BLOCAGE (R8)
-IF NOT Enable OR NOT PowerContactorEngaged THEN
-    WinchM1Cmd.StartStop   := FALSE;
-    WinchM1Cmd.Direction   := 0;
-    WinchM1Cmd.SpeedPct    := 0.0;
-
-    WinchM2Cmd.StartStop   := FALSE;
-    WinchM2Cmd.Direction   := 0;
-    WinchM2Cmd.SpeedPct    := 0.0;
-
-    TranslationCmd.Start   := FALSE;
-    TranslationCmd.Target  := 0;
-
-    BucketCmd.Open         := FALSE;
-    BucketCmd.Close        := FALSE;
-    BucketCmd.KoboldContactorCmd := FALSE;
-
-    State                := E_CycleStep.X0_PREPARATION;   // retour à la PREMIÈRE étape (R8)
-    CycleStep            := E_CycleStep.X0_PREPARATION;
-    CycleStateStr        := 'X0 - Désactivé : sécurité absente ou auto désactivé';
-    Ready                := FALSE;
-    Busy                 := FALSE;
-    Done                 := FALSE;
-    SpeedMismatchTimer(IN := FALSE, PT := SpeedMismatchTimeout);
-    SpeedMismatchMps := 0.0;             // 📊 Neutralisation : aucun calcul d'écart vitesse hors Enable
-    SpeedMismatchActive := FALSE;        // 📊 Neutralisation : surveillance désynchro inactive hors Enable
-    SpeedMismatchConfirmed := FALSE;     // 📊 Neutralisation : confirmation désynchro inactive hors Enable
-    // 🔒 Sorties de diagnostic et latches de défaut VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
-    // - Error & ErrorId : latch défaut cycle préservé (effacé uniquement sur front Reset conscient)
-    // - CycleStepAtError : étape du cycle au moment du défaut préservée pour diagnostic IHM
-    RETURN;
-END_IF;
-{endregion}
-
-{region "§2 Preparation surveillance et commandes cycle"}
-Ready := TRUE;
+{region "§1 Causes & Socle Défaut"}
+// 🔑 1. FRONTS ET CAUSES
 ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
 DeadmanArmedEdge(CLK := DeadmanArmed);
 AbortEdge(CLK := AbortCycle);
-ErrorEdge(CLK := Error);
-
-// 🧊 R9 — capture l'étape spécifique AVANT la bascule vers STABILIZING
-IF ErrorEdge.Q THEN
-    CycleStepAtError := State;
-END_IF;
+EnableEdge(CLK := Enable);
 
 // ⏱️ Surveillance indépendante de la remontée lente
 StabilizationTimer(IN := (State = E_CycleStep.X7_CTRL_ASCENT), PT := CtrlAscentTimeout);
@@ -187,46 +159,107 @@ StepMaxTimer(IN := CycleMotionPermit AND (State <> E_CycleStep.X0_PREPARATION)
                   AND (State <> E_CycleStep.STABILIZING),
              PT := StepMaxTimeout);
 
+// Table des causes de défaut
+instCauses[0].Active   := LimitLegalReached AND (State = E_CycleStep.X4_DESCEND_OPEN);
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Limite legale de profondeur atteinte pendant descente';
+
+instCauses[1].Active   := WinchSyncError AND (State <> E_CycleStep.X0_PREPARATION) AND (State <> E_CycleStep.STABILIZING);
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := 'Desynchronisme treuils M1/M2 bloquant';
+
+instCauses[2].Active   := SpeedMismatchConfirmed AND (State <> E_CycleStep.X0_PREPARATION) AND (State <> E_CycleStep.STABILIZING);
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := 'Ecart de vitesse M1/M2 confirme en montee';
+
+instCauses[3].Active   := NOT HeartbeatIhmOk AND (State <> E_CycleStep.X0_PREPARATION) AND (State <> E_CycleStep.STABILIZING);
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := 'Perte communication IHM pendant cycle';
+
+instCauses[4].Active   := StepMaxTimer.Q AND (State <> E_CycleStep.STABILIZING);
+instCauses[4].Latching := TRUE;
+instCauses[4].Texte    := 'Depassement tempo maximale d etape (blocage mouvement)';
+
+instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(M1_CablePosM - M2_CablePosM) > CtrlAscentToleranceM))
+                          AND (State = E_CycleStep.X7_CTRL_ASCENT);
+instCauses[5].Latching := TRUE;
+instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+ErrorEdge(CLK := Fault.Error);
+{endregion}
+
+{region "§2 Gate securite & Bascule Mode"}
+// 🛑 2. GATES DE SÉCURITÉ ET NEUTRALISATION
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    WinchM1Cmd.StartStop   := FALSE;
+    WinchM1Cmd.Direction   := 0;
+    WinchM1Cmd.SpeedPct    := 0.0;
+
+    WinchM2Cmd.StartStop   := FALSE;
+    WinchM2Cmd.Direction   := 0;
+    WinchM2Cmd.SpeedPct    := 0.0;
+
+    TranslationCmd.Start   := FALSE;
+    TranslationCmd.Target  := 0;
+
+    BucketCmd.Open         := FALSE;
+    BucketCmd.Close        := FALSE;
+    BucketCmd.KoboldContactorCmd := FALSE;
+
+    // Si on quitte le semi-auto alors qu'un cycle était en cours, on mémorise l'étape pour la pause
+    IF (State <> E_CycleStep.X0_PREPARATION) AND (State <> E_CycleStep.X13_DONE_SYNC) AND (State <> E_CycleStep.STABILIZING) THEN
+        PausedState := State;
+        WaitingResume := TRUE;
+    END_IF;
+
+    CycleStep            := State;
+    CycleStateStr        := 'Cycle desactive : securite absente ou mode hors semi-auto';
+    Ready                := FALSE;
+    Lifecycle.Busy       := FALSE;
+    Lifecycle.Done       := FALSE;
+    SpeedMismatchTimer(IN := FALSE, PT := SpeedMismatchTimeout);
+    SpeedMismatchMps := 0.0;
+    SpeedMismatchActive := FALSE;
+    SpeedMismatchConfirmed := FALSE;
+    OperatorActionId := 0;
+    OperatorAction := 'Passer en mode Semi-Auto et engager la securite pour activer le cycle.';
+    ExpectedAxis := E_OperatorAxis.NONE;
+    ExpectedDirection := 0;
+    WaitingForOperator := FALSE;
+    WaitingForProcess := FALSE;
+    RequestActive := FALSE;
+    RETURN;
+END_IF;
+
+Ready := Enable AND NOT Fault.Latched;
+
+// Au retour en Semi-Auto (front montant Enable), si une étape était en cours, on exige une reprise consciente
+IF EnableEdge.Q AND WaitingResume THEN
+    // Sécurité anti-redémarrage automatique : reste en attente de StartCycle
+    ;
+END_IF;
+
+// 🧊 R9 — capture l'étape spécifique AVANT la bascule vers STABILIZING
+IF ErrorEdge.Q THEN
+    CycleStepAtError := State;
+    State := E_CycleStep.STABILIZING;
+END_IF;
+
 IF ResetEdge.Q THEN
-    Error := FALSE;
-    ErrorId := 16#0000;
     SavedState := E_CycleStep.X0_PREPARATION;
     IF State = E_CycleStep.STABILIZING THEN
         State := E_CycleStep.X0_PREPARATION;
     END_IF;
 END_IF;
 
-// 💓 Perte IHM : repli mémorisé. La reconnexion seule ne relance jamais le cycle.
-IF NOT HeartbeatIhmOk AND State <> E_CycleStep.STABILIZING THEN
-    Error := TRUE;
-    ErrorId := ErrorId OR 16#0020;
-    State := E_CycleStep.STABILIZING;
-END_IF;
-
-// Défaut de synchronisme : arrêt sûr et acquittement obligatoire.
-IF WinchSyncError AND State <> E_CycleStep.STABILIZING THEN
-    Error := TRUE;
-    ErrorId := ErrorId OR 16#0002;
-    State := E_CycleStep.STABILIZING;
-END_IF;
-
-// 🛡️ Écart de vitesse confirmé : arrêt du cycle et STABILIZING.
-IF SpeedMismatchConfirmed AND State <> E_CycleStep.STABILIZING THEN
-    Error := TRUE;
-    ErrorId := ErrorId OR 16#0010;
-    State := E_CycleStep.STABILIZING;
-END_IF;
-
-// Tempo max d'étape dépassée (blocage probable) → défaut
-IF StepMaxTimer.Q AND State <> E_CycleStep.STABILIZING THEN
-    Error := TRUE;
-    ErrorId := ErrorId OR 16#0040;
-    State := E_CycleStep.STABILIZING;
-END_IF;
-
-// Gestion de l'Abandon (D3 — pas de Pause)
+// Gestion de l'Abandon explicite
 IF AbortEdge.Q THEN
     State := E_CycleStep.X0_PREPARATION;
+    WaitingResume := FALSE;
+    PausedState := E_CycleStep.X0_PREPARATION;
 END_IF;
 {endregion}
 
@@ -236,25 +269,38 @@ CASE State OF
 
     E_CycleStep.X0_PREPARATION:
         CycleStep := E_CycleStep.X0_PREPARATION;
-        CycleStateStr := 'X0 - Vérification cohérence système';
+        CycleStateStr := 'X0 - Verification coherence systeme';
         WinchM1Cmd.StartStop := FALSE; WinchM1Cmd.Direction := 0; WinchM1Cmd.SpeedPct := 0.0;
         WinchM2Cmd.StartStop := FALSE; WinchM2Cmd.Direction := 0; WinchM2Cmd.SpeedPct := 0.0;
         TranslationCmd.Start := FALSE; TranslationCmd.Target := 0;
         BucketCmd.Open := FALSE; BucketCmd.Close := FALSE; BucketCmd.KoboldContactorCmd := FALSE;
-        Busy := FALSE; Done := FALSE;
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.BUTTON;
+        ExpectedDirection := 0;
+        WaitingForOperator := TRUE;
+        WaitingForProcess := FALSE;
+        OperatorActionId := 16#0400;
+        OperatorAction := 'Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
 
         // Transition si système sain et réarmé (front reset ou démarrage).
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
-        // (DeadmanArmedEdge) — l'opérateur peut lancer depuis l'IHM ou le joystick.
-        // La continuité des mouvements ne dépend que de CycleMotionPermit (manche défléchi).
-        IF StartEdge.Q OR DeadmanArmedEdge.Q THEN
+        IF (StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Error THEN
+            WaitingResume := FALSE;
             State := E_CycleStep.X1_HOMING;
         END_IF;
 
     E_CycleStep.X1_HOMING:
         CycleStep := E_CycleStep.X1_HOMING;
-        CycleStateStr := 'X1 - Référencement codeurs (vitesses lentes)';
-        Busy := TRUE;
+        CycleStateStr := 'X1 - Referencement codeurs (vitesses lentes)';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := 1;
+        WaitingForOperator := NOT CycleMotionPermit;
+        WaitingForProcess := CycleMotionPermit;
+        OperatorActionId := 16#0401;
+        OperatorAction := 'Maintenir la montee lente vers les capteurs de referencement.';
 
         // Vitesses lentes pour chercher capteur top + référencement
         IF NOT HomedM1 OR NOT HomedM2 THEN
@@ -265,7 +311,6 @@ CASE State OF
             WinchM2Cmd.Direction := 1;
             WinchM2Cmd.SpeedPct := 10.0;
             IF HomingRequest THEN
-                // déclenche le référencement (via FB_Encoder_Homing en aval)
                 State := E_CycleStep.X2_WORK_POS_SELECT;
             END_IF;
         ELSE
@@ -275,18 +320,21 @@ CASE State OF
 
     E_CycleStep.X2_WORK_POS_SELECT:
         CycleStep := E_CycleStep.X2_WORK_POS_SELECT;
-        CycleStateStr := 'X2 - Sélection position travail';
-        Busy := TRUE;
+        CycleStateStr := 'X2 - Selection position travail';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
+        ExpectedDirection := 0;
+        WaitingForOperator := (SelTarget = 0) OR NOT CycleMotionPermit;
+        WaitingForProcess := (SelTarget <> 0) AND CycleMotionPermit;
+        OperatorActionId := 16#0402;
+        OperatorAction := 'Selectionner la cible et maintenir la translation vers la position de travail.';
 
-        // Destinations sélectionnables : Trémie(1), P1(3), Maintenance(4).
-        // P2(2) n'est PAS une destination — capteur de passage en petite vitesse (PV).
-        // Si aucune cible valide n'est sélectionnée, on ATTEND à X2 (pas de défaut) :
-        // l'opérateur choisit la position de travail via l'IHM (SelTarget).
         IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
             SelectedWorkTarget := SelTarget;
             TranslationCmd.Target := SelTarget;
             TranslationCmd.Start := CycleMotionPermit;
-            // Arrivée à la cible (Trémie/P1/Maintenance) — capteurs PV/PVP2/P2 = ralentissement
+            // Arrivée à la cible (Trémie/P1/Maintenance)
             IF CycleMotionPermit AND (
                 (SelTarget = 1 AND Translation_At_Tremie) OR
                 (SelTarget = 3 AND Translation_At_P1) OR
@@ -299,9 +347,15 @@ CASE State OF
     E_CycleStep.X3_OPEN_BUCKET:
         CycleStep := E_CycleStep.X3_OPEN_BUCKET;
         CycleStateStr := 'X3 - Ouverture benne';
-        Busy := TRUE;
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := 0;
+        WaitingForOperator := NOT CycleMotionPermit;
+        WaitingForProcess := CycleMotionPermit;
+        OperatorActionId := 16#0403;
+        OperatorAction := 'Maintenir le joystick : ouverture complete de la benne.';
 
-        // Ouverture benne ; si déjà ouverte → passe vite
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
         ELSE
@@ -314,7 +368,15 @@ CASE State OF
 
     E_CycleStep.X4_DESCEND_OPEN:
         CycleStep := E_CycleStep.X4_DESCEND_OPEN;
-        CycleStateStr := 'X4 - Plongée benne ouverte (synchro)';
+        CycleStateStr := 'X4 - Plongee benne ouverte (synchro)';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT CycleMotionPermit;
+        WaitingForProcess := CycleMotionPermit;
+        OperatorActionId := 16#0404;
+        OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
         WinchM1Cmd.StartStop := CycleMotionPermit;
@@ -337,18 +399,19 @@ CASE State OF
                 RaiseTargetM := TouchPositionM + 0.5;
             END_IF;
             State := E_CycleStep.X5_BOTTOM_CONFIRMED;
-        ELSIF LimitLegalReached THEN
-            Error := TRUE;
-            ErrorId := ErrorId OR 16#0001;
-            WinchM1Cmd.StartStop := FALSE;
-            WinchM2Cmd.StartStop := FALSE;
-            BucketCmd.KoboldContactorCmd := FALSE;
-            State := E_CycleStep.STABILIZING;
         END_IF;
 
     E_CycleStep.X5_BOTTOM_CONFIRMED:
         CycleStep := E_CycleStep.X5_BOTTOM_CONFIRMED;
-        CycleStateStr := 'X5 - Fond confirmé : remontée sécurisée';
+        CycleStateStr := 'X5 - Fond confirme : remontee securisee';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := 1;
+        WaitingForOperator := NOT CycleMotionPermit;
+        WaitingForProcess := CycleMotionPermit;
+        OperatorActionId := 16#0405;
+        OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
         WinchM1Cmd.StartStop := CycleMotionPermit;
         WinchM1Cmd.Direction := 1;
@@ -357,7 +420,6 @@ CASE State OF
         WinchM2Cmd.Direction := 1;
         WinchM2Cmd.SpeedPct := 20.0;
 
-        // Les deux treuils restent synchronisés jusqu'au-dessus de la limite légale.
         IF CycleMotionPermit AND (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
             WinchM1Cmd.StartStop := FALSE;
             WinchM2Cmd.StartStop := FALSE;
@@ -366,12 +428,19 @@ CASE State OF
 
     E_CycleStep.X6_CLOSE_BUCKET:
         CycleStep := E_CycleStep.X6_CLOSE_BUCKET;
-        CycleStateStr := 'X6 - Fermeture benne (tolérance à peu près fermé)';
+        CycleStateStr := 'X6 - Fermeture benne (tolerance a peu pres ferme)';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := 1;
+        WaitingForOperator := NOT CycleMotionPermit;
+        WaitingForProcess := CycleMotionPermit;
+        OperatorActionId := 16#0406;
+        OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
         WinchM1Cmd.StartStop := FALSE;
         BucketCmd.Close := TRUE;
 
-        // Tolérance : si benne « à peu près fermée » (matière/objet), on remonte et on contrôle
         IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.Close := FALSE;
             State := E_CycleStep.X7_CTRL_ASCENT;
@@ -379,7 +448,15 @@ CASE State OF
 
     E_CycleStep.X7_CTRL_ASCENT:
         CycleStep := E_CycleStep.X7_CTRL_ASCENT;
-        CycleStateStr := 'X7 - Remontée lente de contrôle';
+        CycleStateStr := 'X7 - Remontee lente de controle';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := 1;
+        WaitingForOperator := NOT CycleMotionPermit;
+        WaitingForProcess := CycleMotionPermit;
+        OperatorActionId := 16#0407;
+        OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
         WinchM1Cmd.StartStop := CycleMotionPermit;
         WinchM1Cmd.Direction := 1;
@@ -388,25 +465,24 @@ CASE State OF
         WinchM2Cmd.Direction := 1;
         WinchM2Cmd.SpeedPct  := 20.0;
 
-        // Contrôle des deux codeurs
-        IF WinchSyncError OR (ABS(M1_CablePosM - M2_CablePosM) > CtrlAscentToleranceM) THEN
-            Error := TRUE;
-            ErrorId := ErrorId OR 16#0008;
-            State := E_CycleStep.STABILIZING;
-        ELSIF CycleMotionPermit
+        IF CycleMotionPermit
            AND (M1_CablePosM >= (TouchPositionM + CtrlAscentDistM))
            AND (M2_CablePosM >= (TouchPositionM + CtrlAscentDistM))
            AND (ABS(M1_CablePosM - M2_CablePosM) <= CtrlAscentToleranceM) THEN
             State := E_CycleStep.X8_ASCENT_LOADED;
-        ELSIF StabilizationTimer.Q THEN
-            Error := TRUE;
-            ErrorId := ErrorId OR 16#0008;
-            State := E_CycleStep.STABILIZING;
         END_IF;
 
     E_CycleStep.X8_ASCENT_LOADED:
         CycleStep := E_CycleStep.X8_ASCENT_LOADED;
-        CycleStateStr := 'X8 - Remontée en charge';
+        CycleStateStr := 'X8 - Remontee en charge';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := 1;
+        WaitingForOperator := NOT CycleMotionPermit;
+        WaitingForProcess := CycleMotionPermit;
+        OperatorActionId := 16#0408;
+        OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
         WinchM1Cmd.StartStop := CycleMotionPermit;
         WinchM1Cmd.Direction := 1;
@@ -415,7 +491,6 @@ CASE State OF
         WinchM2Cmd.Direction := 1;
         WinchM2Cmd.SpeedPct  := 70.0;
 
-        // Transition alignée sur la limite haute d'exploitation
         IF CycleMotionPermit AND M1_CablePosM >= CableLimitM1AscentM THEN
             WinchM1Cmd.StartStop := FALSE;
             WinchM2Cmd.StartStop := FALSE;
@@ -424,12 +499,19 @@ CASE State OF
 
     E_CycleStep.X9_DRAIN_PAUSE:
         CycleStep := E_CycleStep.X9_DRAIN_PAUSE;
-        CycleStateStr := 'X9 - Égouttage du godet en cours';
+        CycleStateStr := 'X9 - Egouttage du godet en cours';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.NONE;
+        ExpectedDirection := 0;
+        WaitingForOperator := FALSE;
+        WaitingForProcess := TRUE;
+        OperatorActionId := 16#0409;
+        OperatorAction := 'Egouttage du godet en cours (temporisation).';
         WinchM1Cmd.StartStop := FALSE;
         WinchM2Cmd.StartStop := FALSE;
 
         DrainingTimer(IN := TRUE, PT := DrainingTime);
-        // Temps écoulé affiché IHM (CycleStateStr + champ dédié)
         IF CycleMotionPermit AND DrainingTimer.Q THEN
             DrainingTimer(IN := FALSE);
             State := E_CycleStep.X10_TRANSLATE_DUMP;
@@ -437,15 +519,19 @@ CASE State OF
 
     E_CycleStep.X10_TRANSLATE_DUMP:
         CycleStep := E_CycleStep.X10_TRANSLATE_DUMP;
-        CycleStateStr := 'X10 - Déplacement vers trémie (grille/crible libres)';
+        CycleStateStr := 'X10 - Deplacement vers tremie (grille/crible libres)';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT CycleMotionPermit;
+        WaitingForProcess := CycleMotionPermit;
+        OperatorActionId := 16#040A;
+        OperatorAction := 'Maintenir la translation vers la tremie de dechargement.';
 
         TranslationCmd.Target := 1; // Trémie
         TranslationCmd.Start := CycleMotionPermit;
 
-        // Avertissement IHM : grille abaissée/libre, crible libre pour réceptionner la charge
-        // (porté par CycleStateStr + OperatorAction côté supervision)
-
-        // Transition si translation arrivé à la trémie
         IF CycleMotionPermit AND Translation_At_Tremie THEN
             TranslationCmd.Start := FALSE;
             State := E_CycleStep.X11_OPEN_DUMP;
@@ -453,10 +539,16 @@ CASE State OF
 
     E_CycleStep.X11_OPEN_DUMP:
         CycleStep := E_CycleStep.X11_OPEN_DUMP;
-        CycleStateStr := 'X11 - Vidange / ouverture du godet (montée possible, descente ouvre)';
+        CycleStateStr := 'X11 - Vidange / ouverture du godet (montee possible, descente ouvre)';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT CycleMotionPermit;
+        WaitingForProcess := CycleMotionPermit;
+        OperatorActionId := 16#040B;
+        OperatorAction := 'Deflechir vers le bas pour ouvrir la benne et vider la charge.';
 
-        // Montée possible (treuils vers le haut) ; descente fait ouvrir la benne.
-        // Montée : on laisse l'opérateur remonter les 2 treuils en synchro si besoin.
         WinchM1Cmd.StartStop := CycleMotionPermit AND (WinchM1Cmd.Direction = 1);
         WinchM1Cmd.Direction := 1;
         WinchM1Cmd.SpeedPct  := 20.0;
@@ -464,12 +556,8 @@ CASE State OF
         WinchM2Cmd.Direction := 1;
         WinchM2Cmd.SpeedPct  := 20.0;
 
-        // Descente → ouverture benne (vidage)
         BucketCmd.Open := CycleMotionPermit AND (WinchM1Cmd.Direction = -1);
 
-        // Contrôle convoyeurs par MESSAGE utilisateur (pas encore câblé) :
-        // CycleStateStr + OperatorAction côté supervision demandent de vérifier
-        // que les convoyeurs sont en route avant/au lâcher.
         IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.Open := FALSE;
             State := E_CycleStep.X13_DONE_SYNC;
@@ -477,19 +565,24 @@ CASE State OF
 
     E_CycleStep.X13_DONE_SYNC:
         CycleStep := E_CycleStep.X13_DONE_SYNC;
-        CycleStateStr := 'X13 - Cycle automatique complété - prêt';
+        CycleStateStr := 'X13 - Cycle automatique complete - pret';
         WinchM1Cmd.StartStop := FALSE;
         WinchM2Cmd.StartStop := FALSE;
         TranslationCmd.Start := FALSE;
-        Done := TRUE;
-        Busy := FALSE;
+        Lifecycle.Done := TRUE;
+        Lifecycle.Busy := FALSE;
+        ExpectedAxis := E_OperatorAxis.BUTTON;
+        ExpectedDirection := 0;
+        WaitingForOperator := TRUE;
+        WaitingForProcess := FALSE;
+        OperatorActionId := 16#040D;
+        OperatorAction := 'Cycle termine avec succes. Relancer un nouveau cycle.';
 
-        // Compteur de prélèvements (RETAIN, Q3bis) — compte inconditionnellement
+        // Compteur de prélèvements (RETAIN)
         SampleCount := SampleCount + 1;
 
-        // Rebouclage sur X0_PREPARATION (trémie, treuils hauts) — pas de retour P1
         IF StartEdge.Q THEN
-            Done := FALSE;
+            Lifecycle.Done := FALSE;
             State := E_CycleStep.X0_PREPARATION;
         END_IF;
 
@@ -501,14 +594,21 @@ CASE State OF
         TranslationCmd.Start := FALSE;
         BucketCmd.Open := FALSE;
         BucketCmd.Close := FALSE;
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.BUTTON;
+        ExpectedDirection := 0;
+        WaitingForOperator := TRUE;
+        WaitingForProcess := FALSE;
+        OperatorActionId := 16#0480;
+        OperatorAction := 'Cycle stabilise sur anomalie : acquitter le defaut pour reinitialiser.';
 
 END_CASE;
 {endregion}
 
-{region "§4 Repli homme mort"}
-// 🛑 Relâchement du manche (retour au centre) : aucune demande d'actionneur ne reste active.
-// L'étape est mémorisée et reprend au prochain appui valide (D2).
-IF Busy AND NOT CycleMotionPermit THEN
+{region "§4 Repli homme mort & Syntheses"}
+// 🛑 Relâchement du manche (retour au centre) : neutralisation des demandes actives
+IF Lifecycle.Busy AND NOT CycleMotionPermit THEN
     WinchM1Cmd.StartStop := FALSE;
     WinchM2Cmd.StartStop := FALSE;
     TranslationCmd.Start := FALSE;
@@ -516,6 +616,8 @@ IF Busy AND NOT CycleMotionPermit THEN
     BucketCmd.Close := FALSE;
     BucketCmd.KoboldContactorCmd := FALSE;
 END_IF;
+
+RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.Start OR BucketCmd.Open OR BucketCmd.Close;
 {endregion}
 
 END_FUNCTION_BLOCK

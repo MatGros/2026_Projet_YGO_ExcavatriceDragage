@@ -263,7 +263,7 @@ avant validation finale.
 | Doc | Rôle |
 |---|---|
 | `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` | Spec métier M3, §5 alertes détaillées |
-| `DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.3.md` | Table générique transverse (acquisition DI) |
+| `DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md` | Table générique transverse (acquisition DI) |
 | `DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md` | FB de recopie IHM (`GVL_Troubleshooting`) |
 | `CHECKLIST_MiseEnService_Translation` (PLAN_TASK T26) | Checklist de recette terrain — **référencée mais pas encore rédigée** dans `DOC/CHECKLISTS/`, exécution/verdict signé restants |
 | `DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_M4_TRANSLATION_SAFETY.yaml` | Contrat agent — ✅ exécuté (prérequis #2 résolu) |

@@ -57,3 +57,57 @@ TEST 'TC-P04-020 Extraction : mise en service sequence extraction'
        MotionRequestActive := TRUE, MotionDirection := 1, BucketIsClosed := TRUE);
     ASSERT_TRUE(FB.AscentPermit, 'Permis montee actif en remontee controlee');
 END_TEST
+
+TEST 'TC-P04-021 : Sequence extraction complete et continue avec maintien constant du joystick operateur'
+    // 1. Position au fond, pret a fermer
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0);
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.READY_TO_CLOSE, 'Pret a fermer');
+
+    // 2. Operateur tire le joystick (Scan 1: transition -> CLOSING_BUCKET, Scan 2: execution)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0,
+       MotionRequestActive := TRUE, MotionDirection := 1);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0,
+       MotionRequestActive := TRUE, MotionDirection := 1);
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.CLOSING_BUCKET, 'Fermeture benne');
+    ASSERT_TRUE(FB.BucketCloseRequest, 'Ordre fermeture actif');
+
+    // 3. Benne fermee confirmee -> Transition directe vers palier de controle (Scan 1: transition, Scan 2: execution)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1);
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.CONTROL_ASCENT, 'Enchaîne sur palier de controle');
+    ASSERT_TRUE(FB.ForceMinSpeedStep, 'Vitesse bridee au palier de controle');
+    ASSERT_TRUE(FB.AscentPermit, 'Permis montee actif');
+
+    // 4. Franchissement distance de controle (Scan 1: transition -> NOMINAL_ASCENT, Scan 2: execution)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -7.5, M2Position_M := -7.5, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -7.5, M2Position_M := -7.5, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1);
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.NOMINAL_ASCENT, 'Transition vers remontee nominale');
+    ASSERT_FALSE(FB.ForceMinSpeedStep, 'Liberation de la vitesse nominale');
+    ASSERT_TRUE(FB.AscentPermit, 'Maintien continu du permis de montee');
+END_TEST
+

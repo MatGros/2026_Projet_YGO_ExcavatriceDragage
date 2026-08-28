@@ -161,6 +161,8 @@ FB_Cycle:
     - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+    - CODE/G_CYCLE/_TYPES/E_OperatorAxis.st
+    - CODE/G_CYCLE/_TYPES/E_ProgramSequence.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st
     - CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st

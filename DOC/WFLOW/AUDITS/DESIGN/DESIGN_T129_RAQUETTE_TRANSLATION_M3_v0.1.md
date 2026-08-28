@@ -63,4 +63,4 @@ GVL_Troubleshooting.TranslationPontM3.Control_400.Idx408_DirectionActive := Tran
 | Tâche | T129 |
 | Câblage | `CODE/J_SUPERVISION/FB_TroubleshootingView.st` (région §5) · `PRG_05_Translation.st` (L472, L393) |
 | Structs | `ST_Chain_Translation_Safety.st` · `ST_Chain_Translation_Control.st` |
-| Spec raquette | `DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.3.md` |
+| Spec raquette | `DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md` |

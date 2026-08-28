@@ -868,18 +868,132 @@ tasks:
   bloque_par: []
 - id: T127
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C4
   domaine: SÉCURITÉ
-  agent: —
-  date: '2026-08-18T12:00:00'
-  titre: Implémentation + tests du cycle semi-auto (grafcet séquence)
-  contexte: 'Intitulé complet : Implémentation + tests du cycle semi-auto (grafcet séquence) — valider les nouveaux standards
-    grafcet, figer les sous-séquences réutilisables en MAINT, puis intégration version aboutie en MAINT'
-  description: 'Session 2026-08-18, AF_Partie-04, FB_Cycle — prérequis : revue T125 + essais'
+  agent: AGY-01
+  date: '2026-08-28T12:35:00'
+  titre: Implémentation et validation complète du cycle semi-auto (séquenceur Grafcet)
+  contexte: 'Séquenceur de dragage X0..X13 + STABILIZING, conformité GUIDE_SEQUENCEUR_v1.2, sous-cycles Dive/Extraction, bascule sans à-coup Semi-Auto/Maintenance et raccordement PRG_03.'
+  description: 'Parent des lots T127-A (Types & Interface AF-03) -> T127-B (Logique Grafcet & Tests STruCpp) -> T127-C (Documentation AF-04 v2.3) -> T127-D (Interconnexion PRG_03 post-T165).'
   contrat: ''
-  objectifs: []
+  objectifs:
+  - Figer une interface standard AF-03 §3 avec socle FB_FaultCore et ST_Lifecycle
+  - Valider unitairement par tests STruCpp les 12 cas TC-P04-001..012
+  - Garantir l'absence totale de redémarrage intempestif lors des bascules Semi-Auto <-> Maintenance
+  - Préparer le raccordement sans régression vers le bus PRG_03.Data
   bloque_par: []
+- id: T127-A
+  parent_id: T127
+  statut: ✅
+  criticite: C2
+  domaine: MODES_CYCLE
+  agent: AGY-01
+  date: '2026-08-28T12:35:00'
+  completed_at: '2026-08-28T13:05:00'
+  titre: Types G_CYCLE et normalisation profil standard AF-03 de FB_Cycle
+  contexte: 'Définition des types contractuels E_OperatorAxis/E_ProgramSequence et mise à niveau interface FB_Cycle.st (Ready, Fault: ST_Fault, Lifecycle: ST_Lifecycle, OperatorActionId).'
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-A_TYPES_INTERFACE.yaml. Préservation des sorties nécessaires aux consommateurs actuels et aux tests STruCpp.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-A_TYPES_INTERFACE.yaml
+  objectifs:
+  - Définir E_OperatorAxis et E_ProgramSequence dans CODE/G_CYCLE/_TYPES/
+  - Normaliser FB_Cycle avec FB_FaultCore et ST_Lifecycle
+  - Compiler avec succès sous STruCpp et valider la liaison G200
+  bloque_par: []
+- id: T127-B
+  parent_id: T127
+  statut: ✅
+  criticite: C4
+  domaine: SÉCURITÉ
+  agent: AGY-01
+  date: '2026-08-28T13:05:00'
+  locked_at: '2026-08-28T13:05:00'
+  completed_at: '2026-08-28T13:08:00'
+  titre: Logique Grafcet X0..X13, bascules de mode, sécurités et sous-cycles Dive/Extraction
+  contexte: 'Implémentation des transitions continues, séquence Kobold 4 temps à la volée, enchaînement fluide extraction avec maintien joystick, bridage Palier 4, repli et tests automatisés STruCpp.'
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-B_GRAFCET_LOGIC.yaml. Suite de tests unitaires automatisés STruCpp / TEST_AUTO_CI couvrant TC-P04-001 à TC-P04-021.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-B_GRAFCET_LOGIC.yaml
+  objectifs:
+  - Valider la séquence Kobold en 4 temps à la volée sans rupture de mouvement
+  - Valider l''enchaînement fluide de l''extraction (fermeture -> décollage -> accélération) avec maintien joystick
+  - Valider le bridage strict Palier <= 4 pour mesure Kobold
+  - Valider l''arrêt en pause sans perte d''étape lors d''une bascule en Maintenance
+  - Valider l''obligation d''un ordre explicite de reprise (anti-redémarrage auto)
+  - 100% de réussite sur la suite de tests automatisés STruCpp
+  bloque_par:
+  - T127-A
+- id: T127-C
+  parent_id: T127
+  statut: ✅
+  criticite: C2
+  domaine: STANDARDS
+  agent: AGY-01
+  date: '2026-08-28T13:08:00'
+  locked_at: '2026-08-28T13:08:00'
+  completed_at: '2026-08-28T13:11:00'
+  titre: Diagnostic Troubleshooting, Bannières IHM et Documentation AF_Partie-04 v2.3 / AF_Partie-14
+  contexte: 'Enrichissement des structures ST_ChainCycleSemiAuto, FB_TroubleshootingView, FB_Hmi_BannerFormatter et mise à jour de la spec AF_Partie-04_Mode_SemiAuto_Sequenceur (v2.2 -> v2.3) et AF_Partie-14.'
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-C_DIAG_DOC.yaml. Validation G340, bannières dynamiques et vue chronologique de dépannage.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-C_DIAG_DOC.yaml
+  objectifs:
+  - Enrichir ST_ChainCycleSemiAuto avec les attentes opérateur, étapes chronologiques et blocages
+  - Raccorder FB_TroubleshootingView et FB_Hmi_BannerFormatter aux métadonnées enrichies
+  - Mettre à jour AF_Partie-04 v2.3 et AF_Partie-14
+  - Valider tous les liens via G340 et exécuter les gates mécaniques
+  bloque_par:
+  - T127-B
+- id: T127-D
+  parent_id: T127
+  statut: ⬜
+  criticite: C4
+  domaine: MODES_CYCLE
+  agent: —
+  date: '2026-08-28T12:35:00'
+  titre: Raccordement final PRG_03 et encapsulation privée de instCycleSemiAuto
+  contexte: 'Raccordement des sorties FB_Cycle sur le bus PRG_03.Data.ReqProgram et PRG_03.Data.SequenceState, suppression des accès externes à instCycleSemiAuto.'
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml. Dépendant de la livraison de T165-C2.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml
+  objectifs:
+  - Éliminer tout accès externe direct à instCycleSemiAuto
+  - Raccorder PRG_03.Data de bout en bout
+  bloque_par:
+  - T127-B
+  - T165-C2
+- id: T127-E
+  parent_id: T127
+  statut: ⬜
+  criticite: C1
+  domaine: VALIDATION
+  agent: —
+  date: '2026-08-28T13:12:00'
+  titre: Campagne de tests automatisés STruCpp CI & Validation non-régression G_CYCLE
+  contexte: 'Délégation à un agent pour l''exécution récurrente de la suite de tests unitaires STruCpp (TEST_AUTO_CI) sur G_CYCLE et génération des artefacts de test.'
+  description: 'Exécution commandée de python TOOLS/TEST_AUTO_CI/run_tests.py --domain G_CYCLE, contrôle des rapports HTML et vérification de la couverture des cas TC-P04-001 à TC-P04-021.'
+  contrat: ''
+  objectifs:
+  - Exécuter la suite complète STruCpp sur G_CYCLE
+  - Vérifier 100% de réussite sur l''ensemble des cas de test
+  - Produire les rapports d''exécution et chronogrammes
+  bloque_par:
+  - T127-B
+- id: T127-F
+  parent_id: T127
+  statut: ⬜
+  criticite: C2
+  domaine: VALIDATION
+  agent: —
+  date: '2026-08-28T13:13:00'
+  titre: Fiche de test CI visuelle & Animation machine séquence Grafcet Semi-Auto
+  contexte: 'Conception d''une fiche de test visuelle interactive avec animation machine de dragage (treuils M1/M2, benne, Kobold, translation pont, trémie), cycle nominal complet et scénarios d''anomalies.'
+  description: 'Génération d''une animation cinématique interactive (SVG/HTML) couplée à un banc de test étendu reproduisant le cycle nominal de dragage jusqu''au déversement en trémie, avec injection de défaillances (désynchro treuils -> STABILIZING, Palier 5 sous Kobold, lâcher de manche, bascule maintenance).'
+  contrat: ''
+  objectifs:
+  - Définir le scénario nominal de bout en bout (X0 -> X13) avec simulation de la matière et du fond
+  - Intégrer les cas d''anomalie (désynchro treuils, violation séquence/vitesse Kobold, relâchement de manche, bascule de mode)
+  - Développer l''animation machine interactive (vue profil carrière noyée, treuils, câbles, benne, nappe d''eau, fond, trémie)
+  - Intégrer les chronogrammes interactifs synchronisés avec l''animation cinématique
+  bloque_par:
+  - T127-B
 - id: T128
   parent_id: ''
   statut: ✅

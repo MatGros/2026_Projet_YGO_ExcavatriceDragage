@@ -1,0 +1,13 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Cycle_g6_genef\strucpp-test-oKHWaS\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Cycle_g6_genef\strucpp-test-oKHWaS\test_main.cpp:294:29: error: 'MAINTENANCE' is not a member of 'strucpp::E_MODE'
+  294 |         s.FB.MODE = E_MODE::MAINTENANCE;
+      |                             ^~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Cycle_g6_genef\strucpp-test-oKHWaS\generated.cpp: In member function 'void strucpp::FB_CYCLE::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Cycle_g6_genef\strucpp-test-oKHWaS\generated.cpp:12645:19: error: 'struct strucpp::ST_LIFECYCLE' has no member named 'WAITING'
+12645 |         LIFECYCLE.WAITING = (STATE != E_CYCLESTEP::X0_PREPARATION);
+      |                   ^~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Cycle_g6_genef\strucpp-test-oKHWaS\generated.cpp:13003:15: error: 'struct strucpp::ST_LIFECYCLE' has no member named 'WAITING'
+13003 |     LIFECYCLE.WAITING = ((((STATE == E_CYCLESTEP::STABILIZING)) | ((STATE == E_CYCLESTEP::X0_PREPARATION))) | (((LIFECYCLE.BUSY) & (!CYCLEMOTIONPERMIT)))) | (WAITINGRESUME);
+      |               ^~~~~~~
+

@@ -4,7 +4,7 @@
    🎯 Rôle : Qualification du capteur Kobold et autorisation de descente
    🛡️ Sécurité : Verrouillage si séquence d'immersion 0->1->0 invalide
    🔌 Interface : Intention de descente et mesures vers permis de descente
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 FUNCTION_BLOCK FB_DiveSearch
 VAR_INPUT
@@ -22,6 +22,7 @@ VAR_INPUT
     M1Position_M            : REAL;         // --> [HW] Position codeur treuil M1 (m)
     M2Position_M            : REAL;         // --> [HW] Position codeur treuil M2 (m)
     PositionsValid          : BOOL;         // --> [HW] Validite des mesures de position
+    CurrentSpeedStep        : INT;          // --> [HW] Palier de vitesse actuel (1..5)
 
     // === CONFIGURATION & SEUILS ===
     DiveStartMin_M          : REAL;         // --> [CFG] Seuil position min pour debut plongee (m)
@@ -40,6 +41,7 @@ VAR_OUTPUT
     // === PERMIS & AUTORISATIONS ===
     DescendPermit           : BOOL;         // <-- [ACT] Autorisation de descente assistee
     KoboldMeasureEnable     : BOOL;         // <-- [ACT] Activation mesure/acquisition Kobold
+    KoboldContactorCmd      : BOOL;         // <-- [ACT] Commande alimentation contacteur Kobold (anti-chauffe)
     BottomTouchConfirmed    : BOOL;         // <-- [STAT] Contact fond valide et confirme
 
     // === DIAGNOSTIC IHM ===
@@ -56,6 +58,7 @@ VAR
     ImmersionConfirmed      : BOOL;         // . [LOC] Immersion dans la fenetre d'eau validee
     ErrorCausePresent       : BOOL;         // . [LOC] Presence d'une cause de defaut parametrage
     SeqErrorFault           : BOOL;         // . [LOC] Latch erreur séquence immersion
+    Palier5ForbiddenFault   : BOOL;         // . [LOC] Latch tentative descente en Palier 5 sous Kobold
 
     // === SOCLE DEFAUT ===
     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
@@ -75,6 +78,7 @@ ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M < ImmersionUpp
 
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
     SeqErrorFault := FALSE;
+    Palier5ForbiddenFault := FALSE;
     ImmersionConfirmed := FALSE;
     BottomTouchConfirmed := FALSE;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
@@ -87,6 +91,10 @@ instCauses[0].Texte    := 'Incoherence sequence immersion Kobold';
 instCauses[2].Active   := ErrorCausePresent;
 instCauses[2].Latching := TRUE;
 instCauses[2].Texte    := 'Parametrage invalide des seuils de plongee';
+
+instCauses[3].Active   := Palier5ForbiddenFault;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := 'Mesure Kobold impossible : vitesse trop elevee (Palier 5 interdit)';
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -101,6 +109,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Lifecycle.Done := FALSE;
     DescendPermit := FALSE;
     KoboldMeasureEnable := FALSE;
+    KoboldContactorCmd := FALSE;
     BottomTouchConfirmed := FALSE;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
     OperatorActionId := 0;
@@ -115,16 +124,19 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Machine etat plongee recherche fond"}
 DescendPermit := FALSE;
 KoboldMeasureEnable := FALSE;
+KoboldContactorCmd := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
 
 IF Fault.Error THEN
     DiveState := E_DiveSearchState.ERROR_HOLD;
+    KoboldContactorCmd := FALSE;
     OperatorActionId := 16#0180;
     OperatorAction := 'Vérifier les conditions puis réarmer avant une nouvelle plongée.';
 ELSE
     CASE DiveState OF
         E_DiveSearchState.WAIT_PRECONDITIONS:
+            KoboldContactorCmd := FALSE;
             IF NOT BypassPreconditions
                AND (NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
                     OR (M1Position_M < DiveStartMin_M) OR (M2Position_M < DiveStartMin_M)) THEN
@@ -136,6 +148,7 @@ ELSE
 
         E_DiveSearchState.READY_TO_DESCEND:
             Ready := TRUE;
+            KoboldContactorCmd := FALSE;
             OperatorActionId := 16#0101;
             OperatorAction := 'Demander une descente pour rechercher le fond.';
             IF MotionRequestActive AND (MotionDirection = -1) THEN
@@ -146,8 +159,15 @@ ELSE
             Lifecycle.Busy := TRUE;
             DescendPermit := MotionRequestActive AND (MotionDirection = -1);
             KoboldMeasureEnable := TRUE;
+            KoboldContactorCmd := TRUE; // Alimentation contacteur Kobold activée à la volée
             OperatorActionId := 16#0102;
             OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
+
+            // 🛑 Interdiction du Palier 5 pendant la détection Kobold
+            IF CurrentSpeedStep > 4 THEN
+                Palier5ForbiddenFault := TRUE;
+            END_IF;
+
             IF KoboldRiseEdge.Q THEN
                 IF (M1Position_M <= ImmersionUpper_M) AND (M1Position_M >= ImmersionLower_M)
                    AND (M2Position_M <= ImmersionUpper_M) AND (M2Position_M >= ImmersionLower_M) THEN
@@ -164,21 +184,30 @@ ELSE
             Lifecycle.Busy := TRUE;
             DescendPermit := MotionRequestActive AND (MotionDirection = -1);
             KoboldMeasureEnable := TRUE;
+            KoboldContactorCmd := TRUE; // Alimentation maintenue pendant la descente
             OperatorActionId := 16#0103;
             OperatorAction := 'Maintenir la descente : immersion validée, recherche du fond.';
+
+            // 🛑 Interdiction du Palier 5 pendant la détection Kobold
+            IF CurrentSpeedStep > 4 THEN
+                Palier5ForbiddenFault := TRUE;
+            END_IF;
+
             IF KoboldFallEdge.Q AND ImmersionConfirmed THEN
                 BottomTouchConfirmed := TRUE;
                 ImmersionConfirmed := FALSE;
+                KoboldContactorCmd := FALSE; // Coupure immédiate à la détection pour éviter surchauffe
                 DiveState := E_DiveSearchState.BOTTOM_CONFIRMED;
             END_IF;
 
         E_DiveSearchState.BOTTOM_CONFIRMED:
             Lifecycle.Done := TRUE;
+            KoboldContactorCmd := FALSE; // Coupure anti-chauffe
             OperatorActionId := 16#0104;
             OperatorAction := 'Fond détecté : demander la fermeture ou l extraction.';
 
         E_DiveSearchState.ERROR_HOLD:
-            ;
+            KoboldContactorCmd := FALSE;
     END_CASE;
 END_IF;
 {endregion}

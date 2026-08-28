@@ -23,16 +23,14 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="E_ExtractionSequenceState">
+      <dataType name="E_ProgramSequence">
         <baseType>
           <enum>
             <values>
-              <value name="WAIT_BOTTOM_CONFIRMATION" value="0" />
-              <value name="READY_TO_CLOSE" value="1" />
-              <value name="CLOSING_BUCKET" value="2" />
-              <value name="CONTROL_ASCENT" value="3" />
-              <value name="NOMINAL_ASCENT" value="4" />
-              <value name="ERROR_HOLD" value="5" />
+              <value name="NONE" value="0" />
+              <value name="MAIN_CYCLE" value="1" />
+              <value name="DIVE_SEARCH" value="2" />
+              <value name="EXTRACTION" value="3" />
             </values>
           </enum>
         </baseType>
@@ -40,39 +38,27 @@
           <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
             <EnumValueDocumentation>
               <EnumValue>
-                <Name>WAIT_BOTTOM_CONFIRMATION</Name>
+                <Name>NONE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente fond Kobold ou attestation opérateur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucune séquence active</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>READY_TO_CLOSE</Name>
+                <Name>MAIN_CYCLE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à fermer la benne</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle principal automatique de dragage X0..X13</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>CLOSING_BUCKET</Name>
+                <Name>DIVE_SEARCH</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Bucket ferme M2 seul</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sous-séquence de plongée / recherche de fond</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>CONTROL_ASCENT</Name>
+                <Name>EXTRACTION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">M1/M2 synchronisés au palier sans contacteur vitesse</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>NOMINAL_ASCENT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montée couplée avec vitesse demandée opérateur</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>ERROR_HOLD</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut extraction, reprise interdite avant reset</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sous-séquence d'extraction et fermeture</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -84,7 +70,7 @@
             </Attributes>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6ae0d8f0-4bfe-5792-a167-697e4476a91d</ObjectId>
+            <ObjectId>e8e8ebc2-bfbe-517a-8c98-48abc432cba8</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -99,7 +85,7 @@
       <ProjectStructure>
         <Folder Name="G_CYCLE">
           <Folder Name="_TYPES">
-            <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+            <Object Name="E_ProgramSequence" ObjectId="e8e8ebc2-bfbe-517a-8c98-48abc432cba8" />
           </Folder>
         </Folder>
       </ProjectStructure>

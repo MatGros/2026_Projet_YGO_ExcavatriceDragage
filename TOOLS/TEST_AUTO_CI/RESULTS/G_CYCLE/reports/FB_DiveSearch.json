@@ -9,11 +9,19 @@
     {
       "name": "TC-P04-010 DiveSearch : mise en service recherche de couche",
       "passed": true
+    },
+    {
+      "name": "TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 4,
+    "passed": 4,
     "failed": 0
   }
 }
