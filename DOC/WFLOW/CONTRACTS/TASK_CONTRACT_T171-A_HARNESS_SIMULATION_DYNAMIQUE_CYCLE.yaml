@@ -1,0 +1,28 @@
+﻿contract:
+  task_id: T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE
+  parent_id: T171
+  criticality: C3
+  strategy: new_feature
+  objective: >
+    Développer un scénario de simulation dynamique complet en ST (test_fb_cycle_dynamic_sim.st)
+    exécutant le binaire C++ compilé de FB_Cycle.st sur un cycle complet (X0 à X13),
+    afin de produire une trace chronologique scan par scan (trace_semi_auto_cycle.json).
+  acceptance:
+    - id: AC1
+      statement: "Le test unitaire ST compile avec COMPILER_ST2C_STruCpp et s'exécute avec 100% de succès."
+      verified_by: "Exécution sous run_tests.py --fb FB_Cycle."
+    - id: AC2
+      statement: "La trace JSON exportée contient l'intégralité des signaux E/S, l'étape active CycleStep et les consignes treuils/benne/translation sur chaque scan."
+      verified_by: "Validation de structure du fichier JSON généré."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/**
+    forbidden:
+      - CODE/**
+      - PRJ_CODESYS/**
+  conservation:
+    must_survive:
+      - "Intégrité des tests existants dans test_fb_cycle.st."
+  evidence_required:
+    - test_suite_pass
+status: READY_FOR_EXECUTION
