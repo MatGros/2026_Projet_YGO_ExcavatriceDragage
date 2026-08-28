@@ -65,7 +65,7 @@
   - Même émulation dans `test_fb_cycle_negative.st` (NEG-F2) → le défaut F2 redevient
     **détectable** sur l'original (3/3 ÉCHEC ATTENDU).
 - **Incident B** : nouveau wrapper zone TEST_AUTO_CI
-  `TOOLS/TEST_AUTO_CI/scripts/ollama_query_long.py` — `--timeout` (défaut 900 s),
+  `TOOLS/TEST_AUTO_CI/anim_bench/ollama_query_long.py` — `--timeout` (défaut 900 s),
   `--num-predict` (défaut 2048), `--num-ctx` (défaut 8192), même injection
   `subagent_preamble.md`, zéro quota cloud.
 
