@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compile le moteur interactif FB_Cycle (T173) depuis WORKING_COPY (jamais CODE/).
 
-ChaÃ®ne : convert_codesys_to_iec.py -> strucpp (generated.hpp/cpp) -> g++ (cycle_engine).
+Chaîne : convert_codesys_to_iec.py -> strucpp (generated.hpp/cpp) -> g++ (cycle_engine).
 
 Usage :
     python TOOLS/TEST_AUTO_CI/anim_bench/build_cycle_engine.py
@@ -86,7 +86,7 @@ def main() -> int:
     convert_cmd = [sys.executable, str(CONVERTER), *[str(s) for s in src_paths], "--out", str(work_dir)]
     r = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8", creationflags=subproc_flags)
     if r.returncode != 0:
-        print("[ERREUR] Conversion Ã©chouÃ©e")
+        print("[ERREUR] Conversion échouée")
         print(r.stderr[-2000:])
         return 1
 
@@ -101,7 +101,7 @@ def main() -> int:
     lines = list(proc.stdout)
     proc.wait()
     if proc.returncode != 0:
-        print("[ERREUR] strucpp Ã©chouÃ©")
+        print("[ERREUR] strucpp échoué")
         print("".join(lines)[-3000:])
         return 1
 
@@ -120,11 +120,11 @@ def main() -> int:
                    str(ENGINE_CPP), str(gen_cpp), "-o", str(exe)]
     c = subprocess.run(compile_cmd, capture_output=True, text=True, encoding="utf-8", creationflags=subproc_flags)
     if c.returncode != 0:
-        print("[ERREUR] Compilation g++ Ã©chouÃ©e")
+        print("[ERREUR] Compilation g++ échouée")
         print(c.stderr[-3000:])
         return 1
 
-    print(f"âœ… Moteur compilÃ© : {exe}")
+    print(f"✅ Moteur compilé : {exe}")
     print(f"   source = WORKING_COPY/FB_Cycle.st (jamais CODE/)")
     return 0
 
