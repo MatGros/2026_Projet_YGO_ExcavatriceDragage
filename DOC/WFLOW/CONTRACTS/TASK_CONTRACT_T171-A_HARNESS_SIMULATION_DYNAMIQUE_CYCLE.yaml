@@ -3,26 +3,47 @@
   parent_id: T171
   criticality: C3
   strategy: new_feature
+
+  depends_on:
+    - T167-B
+    - T167-C
+    - T168-A
+    - T168-B
+
   objective: >
-    Développer un scénario de simulation dynamique complet en ST (test_fb_cycle_dynamic_sim.st)
-    exécutant le binaire C++ compilé de FB_Cycle.st sur un cycle complet (X0 à X13),
-    afin de produire une trace chronologique scan par scan (trace_semi_auto_cycle.json).
+    Étendre le harnais de test canonique (TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cycle.st)
+    avec un scénario complet et réaliste de cycle semi-auto (TC-P04-100), appliquant la séquence
+    de stimuli fidèles à la physique (enfoncement homme-mort, commutation Kobold sous eau/fond,
+    rampes codeurs M1/M2, position chariot M3, vidage trémie).
+    Exécuter le binaire compilé FB_Cycle via STruCpp et extraire la trace scan-par-scan
+    (trace_semi_auto_cycle.json) traçant rigoureusement la traversée ordonnée X0->X13.
+
   acceptance:
     - id: AC1
-      statement: "Le test unitaire ST compile avec COMPILER_ST2C_STruCpp et s'exécute avec 100% de succès."
-      verified_by: "Exécution sous run_tests.py --fb FB_Cycle."
+      statement: "Le scénario de test étendu dans test_fb_cycle.st parcourt séquentiellement et sans saut anormal les étapes X0 à X13 selon le Grafcet AF_Partie-04 §3."
+      verified_by: "Validation des assertions de transition d'étape sous STruCpp (run_tests.py --fb FB_Cycle)."
     - id: AC2
-      statement: "La trace JSON exportée contient l'intégralité des signaux E/S, l'étape active CycleStep et les consignes treuils/benne/translation sur chaque scan."
-      verified_by: "Validation de structure du fichier JSON généré."
+      statement: "La trace JSON extraite reflète exactement la traversée X0->X13 avec l'état de chaque réceptivité et des sorties (WinchM1/M2, Translation, Bucket) à chaque scan."
+      verified_by: "Contrôle sémantique automatisé de la séquence des valeurs de CycleStep dans trace_semi_auto_cycle.json."
+    - id: AC3
+      statement: "L'orchestrateur lit, vérifie et valide le git diff réel (visa P5)."
+      verified_by: "Visa formel de l'orchestrateur."
+
   scope:
     allowed:
-      - TOOLS/TEST_AUTO_CI/**
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cycle.st
+      - TOOLS/TEST_AUTO_CI/scripts/**
     forbidden:
       - CODE/**
       - PRJ_CODESYS/**
+
   conservation:
     must_survive:
-      - "Intégrité des tests existants dans test_fb_cycle.st."
+      - "100% des tests unitaires existants (TC-P03-001, TC-P04-001..013) dans test_fb_cycle.st."
+      - "Compatibilité avec run_all_gates.py et le compilateur STruCpp."
+
   evidence_required:
     - test_suite_pass
+    - trace_json_validated
+
 status: READY_FOR_EXECUTION
