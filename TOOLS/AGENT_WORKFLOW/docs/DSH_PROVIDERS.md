@@ -76,6 +76,18 @@ python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "Analyse de séc
 python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file CONTRAT.md --output RESULTAT.md
 ```
 
+### Outil `omniroute_subagent.py` (Fallback — gateway OpenAI-compatible `omniroute`)
+
+Même rôle, mais via le gateway `omniroute` (`http://localhost:20128/v1`, API OpenAI `chat/completions`).
+À utiliser quand `ollama_subagent.py` (endpoint natif `/api/generate`) échoue ou timeout, ou pour un
+modèle non-Ollama (`codex/gpt-5.6-*`, `ollamacloud/glm-5.2`, `auto/best-reasoning`, `claude/claude-sonnet-5`).
+```bash
+set OMNIROUTE_API_KEY=sk-...            # jamais en dur dans le repo (cf. ~/.dsh/.credentials.yaml)
+python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --list-models
+python TOOLS/AGENT_WORKFLOW/scripts/omniroute_subagent.py --file CONTRAT.md --model codex/gpt-5.6-terra-high --output RESULTAT.md
+```
+Timeout via `OMNIROUTE_TIMEOUT_S` (défaut 300). Injecte `subagent_preamble.md` comme les autres runners.
+
 ---
 
 ## ✅ Vérifié (REX 2026-08-16)
