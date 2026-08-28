@@ -23,5 +23,10 @@ STRUCT
     SpeedMismatchMps    : REAL;             // Écart absolu vitesse M1/M2 (m/s)
     SpeedMismatchActive : BOOL;             // Seuil vitesse dépassé
     SpeedMismatchConfirmed : BOOL;          // Écart vitesse confirmé pendant timeout
+
+    // === 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
+    DiveState           : E_DiveSearchState;       // Phase interne de recherche fond Kobold
+    BottomTouchConfirmed: BOOL;                    // Contact fond Kobold confirmé
+    ExtractionState     : E_ExtractionSequenceState;// Phase interne séquence extraction
 END_STRUCT
 END_TYPE

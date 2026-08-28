@@ -8795,6 +8795,31 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant timeout</xhtml>
               </documentation>
             </variable>
+            <variable name="DiveState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
+Phase interne de recherche fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomTouchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact fond Kobold confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionState">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne séquence extraction</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -9754,6 +9779,47 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat capteurs M3</xhtml>
               </documentation>
             </variable>
+            <variable name="TranslationBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚙️ États dynamiques &amp; positions stables translation M3 ===
+⚙️ Translation M3 en mouvement effectif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Cible translation atteinte et confirmee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtTremieStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable a la Tremie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtP1Stable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable au Point 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtMaintenanceStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable en zone Maintenance</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -10583,6 +10649,22 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
 🔄 Etat synchronisation treuils M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Defaut de desynchronisme treuils M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSyncSignedDeltaPosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Ecart signe M2 - M1 (m)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BucketState">
               <type>
                 <derived name="ST_BucketHMIState" />
@@ -10598,6 +10680,30 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🏗️ Benne consideree fermee (tolerance matiere)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Mouvement d'ouverture/fermeture benne en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Mouvement benne termine avec succes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur sous-systeme benne</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -34905,6 +35011,7 @@ Data.DataValid := NOT Data.InputModuleFault
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE ===
+{region "§1 Modes machine"}
 
 instModes(
     Enable                  := TRUE,
@@ -34920,13 +35027,13 @@ instModes(
     SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess
 );
 
+{endregion}
+
 
 // === 🔄 §2 SÉQUENCEUR DE CYCLE SEMI-AUTOMATIQUE ===
+{region "§2 Séquenceur de cycle"}
 // 🕹️ CycleMotionPermit = manche défléchi (non centré) — D2
-// ⚠️ Entrées sans source définie câblées en fail-safe documenté :
-//    - SpeedMismatchThresholdMps := 0 / SpeedMismatchTimeout := T#0ms (contrôle désactivé)
-//    - Benne_IsRoughlyClosed := Benne_IsClosed (fallback sûr : exige fermé)
-//    - HomingRequest := bouton homing IHM (BtnHome M1 OU M2)
+// ⚠️ Entrées consommées sur les bus publics Data (retard N-1 admis AF-02) :
 
 instCycleSemiAuto(
     Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
@@ -34944,8 +35051,8 @@ instCycleSemiAuto(
     KoboldContactFond       := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     LimitLegalReached       := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
-    WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Fault.Error,
-    WinchSyncDeltaM         := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM,
+    WinchSyncError          := PRG_04_Treuils_Benne.Data.WinchSyncError,
+    WinchSyncDeltaM         := PRG_04_Treuils_Benne.Data.WinchSyncSignedDeltaPosM,
     M1_CablePosM            := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     M2_CablePosM            := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
@@ -34953,13 +35060,13 @@ instCycleSemiAuto(
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
-    Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
-    Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
-    Translation_At_Maintenance := PRG_05_Translation.M3_AtMaintenanceStable,
-    Translation_Busy        := (ABS(PRG_05_Translation.instTranslationM3.RequestedDriveFreqHz) &gt; 0.1),
-    Translation_Done        := PRG_05_Translation.instTranslationM3.TargetReached,
-    Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Lifecycle.Busy,
-    Benne_Done              := PRG_04_Treuils_Benne.instBucket.Lifecycle.Done,
+    Translation_At_P1       := PRG_05_Translation.Data.M3_AtP1Stable,
+    Translation_At_Tremie   := PRG_05_Translation.Data.M3_AtTremieStable,
+    Translation_At_Maintenance := PRG_05_Translation.Data.M3_AtMaintenanceStable,
+    Translation_Busy        := PRG_05_Translation.Data.TranslationBusy,
+    Translation_Done        := PRG_05_Translation.Data.TranslationDone,
+    Benne_Busy              := PRG_04_Treuils_Benne.Data.BucketBusy,
+    Benne_Done              := PRG_04_Treuils_Benne.Data.BucketDone,
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
@@ -34970,8 +35077,11 @@ instCycleSemiAuto(
     SampleCount            := _CycleSampleCount
 );
 
+{endregion}
+
 
 // === 📤 §3 PUBLICATION DU BUS INTER-PRG &amp; AUTORISATIONS ===
+{region "§3 Publication bus public"}
 
 // 1. Autorisations machine
 Data.Auth := instModes.Auth;
@@ -35057,6 +35167,8 @@ ELSE
     Data.SequenceState.SpeedMismatchActive     := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
 END_IF;
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -36657,8 +36769,13 @@ Data.WinchM2State                 := WinchM2State;
 Data.WinchM1Safety                := WinchM1Safety;
 Data.WinchM2Safety                := WinchM2Safety;
 Data.SyncState                    := SyncState;
+Data.WinchSyncError               := instWinchSync.Fault.Error;
+Data.WinchSyncSignedDeltaPosM     := instWinchSync.SignedDeltaPosM;
 Data.BucketState                  := BucketState;
 Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
+Data.BucketBusy                   := instBucket.Lifecycle.Busy;
+Data.BucketDone                   := instBucket.Lifecycle.Done;
+Data.BucketError                  := instBucket.Fault.Error;
 
 {endregion}
 </xhtml>
@@ -37292,6 +37409,11 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
 Data.TranslationFinalInterlockRequest := TranslationFinalInterlockRequest;
 Data.TranslationState                 := TranslationState;
 Data.TranslationSafety                := TranslationSafety;
+Data.TranslationBusy                  := (ABS(instTranslationM3.RequestedDriveFreqHz) &gt; 0.1);
+Data.TranslationDone                  := instTranslationM3.TargetReached;
+Data.M3_AtTremieStable                := M3_AtTremieStable;
+Data.M3_AtP1Stable                    := M3_AtP1Stable;
+Data.M3_AtMaintenanceStable           := M3_AtMaintenanceStable;
 
 {endregion}
 </xhtml>

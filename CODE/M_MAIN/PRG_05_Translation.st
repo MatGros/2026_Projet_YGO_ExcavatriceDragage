@@ -477,6 +477,11 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
 Data.TranslationFinalInterlockRequest := TranslationFinalInterlockRequest;
 Data.TranslationState                 := TranslationState;
 Data.TranslationSafety                := TranslationSafety;
+Data.TranslationBusy                  := (ABS(instTranslationM3.RequestedDriveFreqHz) > 0.1);
+Data.TranslationDone                  := instTranslationM3.TargetReached;
+Data.M3_AtTremieStable                := M3_AtTremieStable;
+Data.M3_AtP1Stable                    := M3_AtP1Stable;
+Data.M3_AtMaintenanceStable           := M3_AtMaintenanceStable;
 
 {endregion}
 END_PROGRAM

@@ -29,9 +29,14 @@ STRUCT
 
     // === 🔄 État synchronisation ===
     SyncState                    : ST_SyncState; // 🔄 Etat synchronisation treuils M1/M2
+    WinchSyncError               : BOOL;         // 🚨 Defaut de desynchronisme treuils M1/M2
+    WinchSyncSignedDeltaPosM     : REAL;         // 📏 Ecart signe M2 - M1 (m)
 
     // === 🏗️ État benne ===
     BucketState                  : ST_BucketHMIState; // 🏗️ Etat de fonctionnement benne
     Benne_IsRoughlyClosed        : BOOL;               // 🏗️ Benne consideree fermee (tolerance matiere)
+    BucketBusy                   : BOOL;               // ⚙️ Mouvement d'ouverture/fermeture benne en cours
+    BucketDone                   : BOOL;               // ✅ Mouvement benne termine avec succes
+    BucketError                  : BOOL;               // ❌ Defaut sur sous-systeme benne
 END_STRUCT
 END_TYPE
