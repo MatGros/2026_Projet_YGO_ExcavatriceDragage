@@ -30,10 +30,10 @@
   .btn-active { background:#b45309; border-color:#f59e0b; }
   .btn-row { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
   /* Joystick */
-  .joy { width:170px; height:170px; margin:0 auto; position:relative; background:radial-gradient(circle, #1e293b 0%, #0f172a 100%); border:1px solid var(--border); border-radius:50%; touch-action:none; }
-  .joy-knob { width:56px; height:56px; background:#334155; border:2px solid var(--accent); border-radius:50%; position:absolute; top:57px; left:57px; box-shadow:0 2px 8px rgba(0,0,0,.5); }
-  .joy-y { position:absolute; left:0; right:0; height:40%; top:0; display:flex; align-items:center; justify-content:center; color:var(--dim); font-size:1.4rem; pointer-events:none; }
-  .joy-x { position:absolute; top:0; bottom:0; width:40%; left:0; display:flex; align-items:center; justify-content:center; color:var(--dim); font-size:1.4rem; pointer-events:none; }
+  .joy { width:170px; height:170px; margin:0 auto; position:relative; background:radial-gradient(circle, #1e293b 0%, #0f172a 100%); border:1px solid var(--border); border-radius:50%; touch-action:none; user-select:none; -webkit-user-select:none; }
+  .joy-wrap { position:relative; width:170px; height:170px; margin:0 auto; }
+  .joy-knob { width:56px; height:56px; background:#334155; border:2px solid var(--accent); border-radius:50%; position:absolute; top:57px; left:57px; box-shadow:0 2px 8px rgba(0,0,0,.5); pointer-events:none; }
+  .joy-arrow { position:absolute; color:var(--dim); font-size:1.2rem; user-select:none; -webkit-user-select:none; pointer-events:none; }
   .joy-label { text-align:center; color:var(--dim); font-size:0.7rem; margin-top:4px; }
   .out { font-size:0.8rem; }
   .out .step { font-size:1.05rem; font-weight:700; color:var(--accent); margin-bottom:8px; }
@@ -82,12 +82,14 @@
 <div class="grid">
   <div class="card">
     <h2>🟠 ENTRÉES du séquenceur — ce qui entre dans FB_Cycle</h2>
-    <div class="joy" id="joy">
-      <div class="joy-y" style="top:0;">▲</div>
-      <div class="joy-y" style="top:60%;">▼</div>
-      <div class="joy-x" style="left:0;">◀</div>
-      <div class="joy-x" style="left:60%;">▶</div>
-      <div class="joy-knob" id="joyKnob"></div>
+    <div class="joy-wrap">
+      <div class="joy" id="joy">
+        <div class="joy-knob" id="joyKnob"></div>
+      </div>
+      <div class="joy-arrow" style="top:-24px;left:50%;transform:translateX(-50%);">▲</div>
+      <div class="joy-arrow" style="bottom:-24px;left:50%;transform:translateX(-50%);">▼</div>
+      <div class="joy-arrow" style="top:50%;left:-16px;transform:translateY(-50%);">◀</div>
+      <div class="joy-arrow" style="top:50%;right:-16px;transform:translateY(-50%);">▶</div>
     </div>
     <div class="joy-label" id="joyLabel">Neutre (relâché)</div>
 
