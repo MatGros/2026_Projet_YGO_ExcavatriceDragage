@@ -292,3 +292,16 @@ remapper** ; `Fault` est un **nouveau diagnostic** (brique socle `FB_FaultCore`)
 | `FB_Encoder.Fault` | Brique défaut socle (`ST_Fault` : vue live `Error`/`ErrorId` + vue latchée `Latched`/`LatchedId`) | produit par `FB_Encoder` via `instFault:FB_FaultCore` + `instCauses` (3 causes : perte matériel live, incohérence live, échec preset latched). Texte IHM dérivé côté IHM depuis `ErrorId`/`LatchedId` (non stocké dans `ST_Fault`). |
 | `FB_Encoder.Ready` | `Enable AND NOT Fault.Latched` | produit par `FB_Encoder` ; non consommé actuellement. |
 | `FB_Encoder.Status` | **supprimé** (fusion OR des `ErrorId` sous-FB abandonnée, contrat AC1) | aucun consommateur → suppression sans remappage. |
+
+---
+
+## 🆕 Lot T166 / T167-R3-ter — Intention Couplée Opérateur (Cerveau unique PRG_03)
+
+Découplage strict entre les champs synoptiques IHM / Diagnostic de séquence et l'intention de commande opérateur continue :
+
+| Fait / Variable | Rôle | Source d'ownership & Évolution |
+|---|---|---|
+| `PRG_03.Data.ReqProgram.OperatorCoupledIntent` | `ST_OperatorCoupledIntent` (`Active : BOOL; Direction : INT`) | **Nouveau champ dédié** calculé inconditionnellement par `PRG_03` (tous modes) et consommé par `PRG_04` pour l'arbitrage treuils / benne. |
+| `PRG_03.Data.SequenceState.RequestActive` | Synoptique IHM / Diagnostic attente séquence | **Rôle clarifié** : ne sert plus de canal de commande pour `PRG_04`. Représente l'état synoptique de la séquence (en `SEMI_AUTO`, porte `instCycleSemiAuto.RequestActive` ; en `MAINT`, reflète l'intention opérateur). |
+| `PRG_03.Data.SequenceState.ExpectedDirection` | Synoptique IHM / Diagnostic direction attendue | **Rôle clarifié** : direction attendue par le séquenceur ou intention courante en maintenance. |
+

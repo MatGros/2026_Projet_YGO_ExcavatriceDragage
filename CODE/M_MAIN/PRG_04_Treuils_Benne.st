@@ -144,9 +144,9 @@ END_VAR
 {region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE & ASSISTANTS ===
 
-// Consommation de l'intention couplée calculée au même scan par PRG_03_Modes_Cycle (cerveau unique)
-CoupledUserRequestActive    := PRG_03_Modes_Cycle.Data.SequenceState.RequestActive;
-CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedDirection;
+// Consommation de l'intention couplée continue opérateur (cerveau unique PRG_03, tous modes)
+CoupledUserRequestActive    := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Active;
+CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Direction;
 
 // mode "vidage à la trémie" (verrouillage). Périmètre identique
 // à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.

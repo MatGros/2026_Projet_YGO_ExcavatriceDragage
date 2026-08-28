@@ -7506,6 +7506,42 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_OperatorCoupledIntent">
+        <baseType>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention couplée active (JoyBtnRaw + Select=0 OU boutons BothUp/BothDown)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descente, 0: Neutre, +1: Montée)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ebcc0c47-ef53-54b6-9967-6c3fa0d26f58</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🎮 ST_OperatorCoupledIntent — Intention couplée continue de l'opérateur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Transmet l'intention de mouvement couplé (homme-mort / boutons)
+      produite inconditionnellement par PRG_03 vers PRG_04 (tous modes).
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_OutputsInterPrg">
         <baseType>
           <struct>
@@ -7805,6 +7841,14 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorCoupledIntent">
+              <type>
+                <derived name="ST_OperatorCoupledIntent" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention couplée continue opérateur (joystick/boutons), TOUS modes</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -35274,6 +35318,10 @@ instCycleSemiAuto(
 // 1. Autorisations machine
 Data.Auth := instModes.Auth;
 
+// 1bis. Intention couplée continue opérateur (inconditionnelle, TOUS modes)
+Data.ReqProgram.OperatorCoupledIntent.Active    := CoupledUserRequestActive;
+Data.ReqProgram.OperatorCoupledIntent.Direction := CoupledUserRequestDirection;
+
 // 2. Demandes programme et état public de séquence
 IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Demandes treuils M1 / M2
@@ -36019,9 +36067,9 @@ front descendant Kobold</xhtml>
 {region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
-// Consommation de l'intention couplée calculée au même scan par PRG_03_Modes_Cycle (cerveau unique)
-CoupledUserRequestActive    := PRG_03_Modes_Cycle.Data.SequenceState.RequestActive;
-CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedDirection;
+// Consommation de l'intention couplée continue opérateur (cerveau unique PRG_03, tous modes)
+CoupledUserRequestActive    := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Active;
+CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Direction;
 
 // mode "vidage à la trémie" (verrouillage). Périmètre identique
 // à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.
@@ -39848,6 +39896,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
               <Object Name="ST_ModesCycleInterPrg" ObjectId="c66e2ea9-61f6-5705-86e7-b9f19e28d4f1" />
               <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
               <Object Name="ST_ModesState" ObjectId="607d2d07-1efc-59e2-9ca9-53d413d7cf77" />
+              <Object Name="ST_OperatorCoupledIntent" ObjectId="ebcc0c47-ef53-54b6-9967-6c3fa0d26f58" />
               <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
               <Object Name="ST_ProgramRequest" ObjectId="a28c1dba-faf7-5919-ab72-3a069b551a0d" />
               <Object Name="ST_ProgramTranslationRequest" ObjectId="478a938b-bb21-5d74-8556-79842696e566" />

@@ -222,6 +222,10 @@ instCycleSemiAuto(
 // 1. Autorisations machine
 Data.Auth := instModes.Auth;
 
+// 1bis. Intention couplée continue opérateur (inconditionnelle, TOUS modes)
+Data.ReqProgram.OperatorCoupledIntent.Active    := CoupledUserRequestActive;
+Data.ReqProgram.OperatorCoupledIntent.Direction := CoupledUserRequestDirection;
+
 // 2. Demandes programme et état public de séquence
 IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Demandes treuils M1 / M2
