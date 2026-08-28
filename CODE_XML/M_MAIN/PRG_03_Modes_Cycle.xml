@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T17:53:32.226803" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T17:53:32.226803">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T18:30:18.301764" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T18:30:18.301764">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1882,6 +1882,7 @@ ELSE
     Data.SequenceState.RequestActive           := FALSE;
     Data.SequenceState.SpeedMismatchMps        := 0.0;
     Data.SequenceState.SpeedMismatchActive     := FALSE;
+    Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
     Data.SequenceState.DiveReady                  := FALSE;
     Data.SequenceState.DiveBusy                   := FALSE;
     Data.SequenceState.DiveDone                   := FALSE;

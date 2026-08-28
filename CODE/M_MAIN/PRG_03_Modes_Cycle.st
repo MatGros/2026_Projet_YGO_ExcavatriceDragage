@@ -399,6 +399,7 @@ ELSE
     Data.SequenceState.RequestActive           := FALSE;
     Data.SequenceState.SpeedMismatchMps        := 0.0;
     Data.SequenceState.SpeedMismatchActive     := FALSE;
+    Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
     Data.SequenceState.DiveReady                  := FALSE;
     Data.SequenceState.DiveBusy                   := FALSE;
     Data.SequenceState.DiveDone                   := FALSE;
