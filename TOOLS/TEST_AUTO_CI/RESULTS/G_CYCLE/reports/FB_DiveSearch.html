@@ -301,7 +301,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 21:33:59</div>
+    <div class="exec-time">2026-08-28 22:36:49</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (8 tests)</summary>
@@ -1515,7 +1515,7 @@ IF (DiveState = E_DiveSearchState.SEARCHING_BOTTOM) AND MotionRequestActive AND 
     END_IF;
 END_IF;
 
-IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
     SeqErrorFault         := FALSE;
     Palier5ForbiddenFault := FALSE;
     TimeoutImmersionFault := FALSE;
@@ -1559,7 +1559,7 @@ ErrorEdge(CLK := Fault.Error);
 IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
     StepAtFault := PrevState;
     StepAtFaultCaptured := TRUE;
-ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
     StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 {endregion}

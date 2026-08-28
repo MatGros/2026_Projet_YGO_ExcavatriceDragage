@@ -135,7 +135,7 @@ IF (DiveState = E_DiveSearchState.SEARCHING_BOTTOM) AND MotionRequestActive AND 
     END_IF;
 END_IF;
 
-IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep > 4) THEN
     SeqErrorFault         := FALSE;
     Palier5ForbiddenFault := FALSE;
     TimeoutImmersionFault := FALSE;
@@ -179,7 +179,7 @@ ErrorEdge(CLK := Fault.Error);
 IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
     StepAtFault := PrevState;
     StepAtFaultCaptured := TRUE;
-ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep > 4) THEN
     StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 {endregion}

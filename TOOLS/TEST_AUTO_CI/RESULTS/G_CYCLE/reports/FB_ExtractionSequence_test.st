@@ -267,3 +267,67 @@ TEST 'TC-P04-025 : Defaut benne coupe BucketCloseRequest le meme scan (H2), avan
     ASSERT_TRUE(FB.Fault.Error, 'Defaut benne latche');
     ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.ERROR_HOLD, 'Verrouille en ERROR_HOLD');
 END_TEST
+
+TEST 'TC-P04-026 : Reset refuse tant que la cause physique persiste, ForceMinSpeedStep suit le permis (F1/F2)'
+    // Mise en CONTROL_ASCENT
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0, MotionRequestActive := TRUE, MotionDirection := 1);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -10.0, M2Position_M := -10.0, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -9.5, M2Position_M := -9.5, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -9.5, M2Position_M := -9.5, BucketIsClosed := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1);
+    ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.CONTROL_ASCENT, 'En decollage controle');
+    ASSERT_TRUE(FB.ForceMinSpeedStep, 'Bridage actif sous permis positif');
+
+    // Relachement de la demande : F1 -> ForceMinSpeedStep suit AscentPermit (tombe), sans defaut
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -9.5, M2Position_M := -9.5, BucketIsClosed := TRUE,
+       MotionRequestActive := FALSE, MotionDirection := 0);
+    ASSERT_FALSE(FB.AscentPermit, 'Permis coupe au relachement');
+    ASSERT_FALSE(FB.ForceMinSpeedStep, 'ForceMinSpeedStep suit le permis (F1), jamais actif sans montee autorisee');
+
+    // Defaut synchro persistant -> latch
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       M1Position_M := -9.5, M2Position_M := -9.5, BucketIsClosed := TRUE,
+       WinchSyncError := TRUE, MotionRequestActive := TRUE, MotionDirection := 1);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       WinchSyncError := TRUE, MotionRequestActive := TRUE, MotionDirection := 1);
+    ASSERT_TRUE(FB.Fault.Latched, 'Latch synchro arme');
+
+    // Front Reset AVEC cause encore presente (WinchSyncError=TRUE) -> refuse (F2)
+    FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       WinchSyncError := TRUE, MotionRequestActive := FALSE);
+    ASSERT_TRUE(FB.Fault.Latched, 'Reset refuse tant que WinchSyncError persiste (F2)');
+
+    // Cause disparue + nouveau front Reset -> acquittement effectif
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       WinchSyncError := FALSE, MotionRequestActive := FALSE);
+    FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
+       ControlAscentDistance_M := 2.0,
+       PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
+       WinchSyncError := FALSE, MotionRequestActive := FALSE);
+    ASSERT_FALSE(FB.Fault.Latched, 'Cause disparue + front Reset -> latch acquitte');
+END_TEST

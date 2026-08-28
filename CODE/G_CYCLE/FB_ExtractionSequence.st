@@ -79,6 +79,7 @@ VAR
     AssistPermit                : BOOL;     // . [LOC] Montee assistee reellement demandee (sens + mode)
     AscentControlSafe           : BOOL;     // . [LOC] Entrees [SAFE] saines pour le decollage controle
     AscentNominalSafe           : BOOL;     // . [LOC] Entrees [SAFE] saines pour la remontee nominale
+    CausesPhysiquesEffacees     : BOOL;     // . [LOC] Toutes les entrees defaut treuil/benne revenues a l'etat sain
 
     // === SOCLE DEFAUT ===
     instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
@@ -90,6 +91,7 @@ VAR CONSTANT
     CST_ControlAscentMargin     : REAL := 2.0;    // Facteur de marge sur la course de decollage
     CST_TimeoutMinDistance_M    : REAL := 0.1;    // Plancher de distance pour le calcul (evite timeout degenere)
     CST_TimeoutMaxDistance_M    : REAL := 20.0;   // Plafond de distance : borne le calcul avant REAL_TO_UDINT (anti-overflow)
+    CST_BackstopMax             : TIME := T#600s; // Plafond du backstop fermeture benne : au-dela, risque d'overflow de l'accumulateur
     CST_SecToMs                 : REAL := 1000.0; // Conversion secondes -> millisecondes
 END_VAR
 
@@ -103,7 +105,8 @@ ResetEdge(CLK := Reset);
 ErrorCausePresent := (ControlAscentDistance_M <= 0.0)
                   OR (CfgBucketCloseTimeout <= T#0ms)
                   OR (CycleTime <= T#0ms)
-                  OR (CfgBucketCloseTimeout <= BucketMoveTimeout);
+                  OR (CfgBucketCloseTimeout <= BucketMoveTimeout)
+                  OR (CfgBucketCloseTimeout > CST_BackstopMax);  // borne haute : evite l'overflow de BucketCloseTimerAcc (F3)
 
 // ⏱️ Plafond anti-blocage decollage calcule au runtime : course de controle bornee [plancher..plafond]
 // avant conversion REAL->UDINT->TIME (anti-overflow sur valeur IHM aberrante, CQS §6).
@@ -126,15 +129,22 @@ IF (ExtractionState = E_ExtractionSequenceState.CONTROL_ASCENT) AND MotionReques
     END_IF;
 END_IF;
 
+// Etat physique des causes treuil/benne : conditionne l'acquittement des latches a cause persistante (F2).
+CausesPhysiquesEffacees := NOT BucketError AND NOT WinchSyncError
+                        AND PositionsValid AND M1MeasuredSpeedValid AND M2MeasuredSpeedValid;
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
-    BucketErrorFault          := FALSE;
-    SyncOrSpeedErrorFault     := FALSE;
+    // Latches sans cause physique persistante (timeouts, backstop) : acquittables sur simple front Reset.
     TimeoutBucketCloseFault   := FALSE;
     TimeoutControlAscentFault := FALSE;
     BucketCloseTimerAcc       := T#0ms;
     ControlAscentTimerAcc     := T#0ms;
     StepAtFaultCaptured       := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    // Latches de cause physique : acquittables SEULEMENT si l'entree de defaut est revenue saine (F2).
+    IF CausesPhysiquesEffacees THEN
+        BucketErrorFault      := FALSE;
+        SyncOrSpeedErrorFault := FALSE;
+    END_IF;
 END_IF;
 
 instCauses[1].Active   := BucketErrorFault;
@@ -259,7 +269,7 @@ ELSE
         E_ExtractionSequenceState.CONTROL_ASCENT:
             Lifecycle.Busy := TRUE;
             AscentPermit := AssistPermit AND AscentControlSafe; // coupure meme-scan sur defaut synchro/capteurs (H2)
-            ForceMinSpeedStep := TRUE;
+            ForceMinSpeedStep := AscentPermit;                  // bridage suit le permis (F1), jamais actif sans montee autorisee
             OperatorActionId := 16#0203;
             OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
             IF NOT AscentControlSafe THEN

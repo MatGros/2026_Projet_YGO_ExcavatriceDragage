@@ -122,7 +122,25 @@ déjà fermée après `CLOSING_BUCKET` → fast-forward vers `CONTROL_ASCENT` �
 - « Câblage `BucketMoveTimeout` non prouvé » : `PRG_03` L131 = `GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration`, même source que `instBucket`.
 - « `Mode` doit gater / certification ISO 13849 système » : hors scope FB (analyse de risque / PLr / architecture SRP/CS = niveau système).
 
-**Résultat de la passe** : `FB_DiveSearch` **8/8**, `FB_ExtractionSequence` **7/7**, non-régression complète, `G200` PASS, `run_all_gates` PASS (TOUT).
+**Résultat passe H1-H5** : `FB_DiveSearch` **8/8**, `FB_ExtractionSequence` **7/7**, `G200` PASS, `run_all_gates` PASS.
+
+### 3ᵉ revue — `codex/gpt-5.6-sol-max` sur le code **durci** (2026-08-28)
+
+> Rapport brut : `T167-CR_omniroute_FB_ExtractionSequence_v2.md` (DiveSearch : timeout serveur, non abouti).
+> **Confirme H1-H5 landés** (« `BucketCloseRequest`/`AscentPermit` chutent le scan même », « captures `StepAtFault`
+> au site », « calcul borné avant `REAL_TO_UDINT` », critère `StepAtFault` = PASS). **3 items restants → corrigés :**
+
+| # | Constat | Correctif appliqué | Test |
+|---|---|---|---|
+| **F1** | `ForceMinSpeedStep := TRUE` inconditionnel en `CONTROL_ASCENT` → `[ACT]` actif sans permis positif. | `ForceMinSpeedStep := AscentPermit` (suit le permis) | `TC-P04-026` |
+| **F2** | Garde de Reset ne vérifiait pas les entrées défaut **vives** (`BucketError`/`WinchSyncError`/`PositionsValid`/vitesses) → latch acquittable + `Ready:=TRUE` alors que la cause physique persiste. | Latches de cause physique (`BucketErrorFault`/`SyncOrSpeedErrorFault`) acquittés **seulement si** `CausesPhysiquesEffacees` ; latches timeout acquittables sur simple Reset ; DiveSearch : `NOT (CurrentSpeedStep > 4)` ajouté aux 2 gardes Reset. | `TC-P04-026` |
+| **F3** | `BucketCloseTimerAcc += CycleTime` sans plafond : `CfgBucketCloseTimeout` `[CFG]` borné **seulement par le bas** → overflow possible de l'accumulateur `TIME` → backstop jamais déclenché. | `ErrorCausePresent` si `CfgBucketCloseTimeout > CST_BackstopMax` (`T#600s`). `ControlAscentTimerAcc` déjà borné (`LIMIT` sur la distance). | couvert par `ErrorCausePresent` |
+
+**Résultat passe F1-F3** : `FB_DiveSearch` **8/8**, `FB_ExtractionSequence` **8/8** (`+TC-P04-026`), non-régression complète (`FB_Cycle` 7/7, `PRG_03` 5/5, `PRG_07` 3/3), `G200` PASS, `run_all_gates` PASS, `G340` doc-links PASS.
+
+**Fin de la boucle de revue** : 2 rounds de findings réels traités (H1-H5 puis F1-F3), rendement décroissant.
+Les rejets « ISO 13849 » résiduels des reviewers portent sur le **niveau système** (PLr, architecture SRP/CS,
+MTTFd/DCavg/CCF, matériel, essais) — hors périmètre d'un FB séquenceur. Contrat logiciel du FB : **conforme**.
 
 ---
 

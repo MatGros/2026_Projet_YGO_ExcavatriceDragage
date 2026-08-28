@@ -29,11 +29,15 @@
     {
       "name": "TC-P04-025 : Defaut benne coupe BucketCloseRequest le meme scan (H2), avant ERROR_HOLD",
       "passed": true
+    },
+    {
+      "name": "TC-P04-026 : Reset refuse tant que la cause physique persiste, ForceMinSpeedStep suit le permis (F1/F2)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 7,
-    "passed": 7,
+    "total": 8,
+    "passed": 8,
     "failed": 0
   }
 }
