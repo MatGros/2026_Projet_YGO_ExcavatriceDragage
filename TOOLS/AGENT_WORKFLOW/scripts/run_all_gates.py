@@ -92,6 +92,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "360", "G360 — Interlock changement de sens (REX 2026-08-05)", [sys.executable, f"{S}/G360_check_direction_change_interlock.py", "."]),
     ("C", "370", "G370 — Cablage position calibree (REX 2026-08-06)", [sys.executable, f"{S}/G370_check_position_calibration_wiring.py", "."]),
     ("C", "375", "G375 — Gate homme-mort mouvement (AF08 TC-P08-008)", [sys.executable, f"{S}/G375_check_deadman_arming_gate.py", "."]),
+    ("C", "346", "G346 — Completude branches de mode PRG_03 (T168-C)", [sys.executable, f"{S}/G346_check_mode_branch_completeness.py", "."]),
     ("A", "110", "G110 — Nommage IEC (NC-010 a NC-070, informatif)", [sys.executable, f"{S}/G110_check_naming_style.py", "CODE"]),
     ("A", "120", "G120 — Nommage DUT propriete d'un FB (NC-110, informatif)", [sys.executable, f"{S}/G120_check_fb_dut_naming.py", "."]),
     ("A", "127", "G127 — Completude gate neutralisation NOT Enable (informatif)", [sys.executable, f"{S}/G127_check_neutralization_completeness.py", "."]),

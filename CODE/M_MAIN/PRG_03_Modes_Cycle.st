@@ -270,6 +270,26 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.ExtractionState        := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
     Data.SequenceState.ExtractionStepAtFault  := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
 
+    // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
+    // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
+    Data.SequenceState.DiveReady                  := FALSE;
+    Data.SequenceState.DiveBusy                   := FALSE;
+    Data.SequenceState.DiveDone                   := FALSE;
+    Data.SequenceState.DiveError                  := FALSE;
+    Data.SequenceState.DiveErrorId                := 0;
+    Data.SequenceState.ExtractionReady             := FALSE;
+    Data.SequenceState.ExtractionBusy              := FALSE;
+    Data.SequenceState.ExtractionDone              := FALSE;
+    Data.SequenceState.ExtractionError             := FALSE;
+    Data.SequenceState.ExtractionErrorId           := 0;
+    Data.SequenceState.DumpAtTremieArmed           := FALSE;
+    Data.SequenceState.DumpAtTremieAssistActive      := FALSE;
+    Data.SequenceState.DumpAtTremieAtTremie          := FALSE;
+    Data.SequenceState.DumpAtTremieBucketOpenArmed   := FALSE;
+    Data.SequenceState.DumpAtTremieDescentLocked     := FALSE;
+    Data.SequenceState.BypassDiveActive            := FALSE;
+    Data.SequenceState.BypassKoboldBottomTouched   := FALSE;
+
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
     Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
