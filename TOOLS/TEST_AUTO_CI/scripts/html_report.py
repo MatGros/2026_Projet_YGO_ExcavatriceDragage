@@ -878,6 +878,14 @@ _CSS = """
         text-align: center;
     }
     /* Mode Titres Verticaux (Compact) */
+    .chrono-table.headers-vertical {
+        width: max-content !important;
+    }
+    .chrono-table.headers-vertical th.note-th,
+    .chrono-table.headers-vertical td.chrono-note-cell {
+        max-width: 280px !important;
+        width: 280px !important;
+    }
     .chrono-table.headers-vertical th.var-th {
         height: 155px;
         vertical-align: bottom;
@@ -885,6 +893,7 @@ _CSS = """
         padding-top: 10px;
         max-width: 36px;
         min-width: 30px;
+        width: 34px;
     }
     .chrono-table.headers-vertical th.var-th .th-content {
         writing-mode: vertical-rl;
