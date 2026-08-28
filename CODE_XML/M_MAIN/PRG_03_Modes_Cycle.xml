@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T15:07:22.246063" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T15:07:22.246063">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T15:22:26.492835" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T15:22:26.492835">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1328,6 +1328,30 @@ Phase interne de recherche fond Kobold</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Détecteur front descendant Kobold sous bypass</xhtml>
               </documentation>
             </variable>
+            <variable name="DumpAtTremieActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Option vidage à la trémie activée IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAssistActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Assistance vidage trémie active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Armement ouverture benne à la trémie</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -1599,7 +1623,17 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
 
     // Requêtes benne et assistants
-    Data.ReqProgram.ReqBucket.ReqOpen                     := FALSE;
+    DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
+    DumpAtTremieAssistActive := DumpAtTremieActive;
+    DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
+
+    GVL_IHM.DredgingAssist.State.DumpAtTremieArmed             := DumpAtTremieActive;
+    GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
+    GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
+    GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed   := DumpAtTremieBucketOpenArmed;
+    GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked     := DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
+
+    Data.ReqProgram.ReqBucket.ReqOpen                     := DumpAtTremieBucketOpenArmed;
     Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionSequence.BucketCloseRequest;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.KoboldMeasureEnable
                                                             OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence

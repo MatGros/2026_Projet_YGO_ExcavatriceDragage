@@ -42,12 +42,6 @@ VAR
     ManualBottomPositionConfirmed  : BOOL;
     BottomPositionConfirmed        : BOOL;
     CmdBucketCloseArbitrated       : BOOL;
-    // mode "vidage à la trémie" — verrouille descente treuils (P1/Maintenance
-    // uniquement) et pilote l'ouverture benne quand on demande DOWN à la trémie (MAINT_N1/N2
-    // uniquement, même périmètre que instDiveSearch/instExtractionSequence).
-    DumpAtTremieActive             : BOOL;
-    DumpAtTremieAssistActive       : BOOL; // Sous-condition Mode MAINT_N1/N2 (assist réellement active)
-    DumpAtTremieBucketOpenArmed    : BOOL; // CmdOpen_IHM déclenché par ce mode (diagnostic)
 
     // Séquencement automatique benne en pilotage couplé (both) normal --
     // descente uniquement benne ouverte, montée uniquement benne
@@ -148,15 +142,6 @@ END_VAR
 CoupledUserRequestActive    := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Active;
 CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Direction;
 
-// mode "vidage à la trémie" (verrouillage). Périmètre identique
-// à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.
-DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
-DumpAtTremieAssistActive := DumpAtTremieActive
-    AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
-GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
-GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
-GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.Data.M3_AtTremieStable;
-
 // Récupération de l'état fond synthétisé par PRG_03
 BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
 
@@ -188,21 +173,13 @@ KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.Req
 {region "§2 Commande benne"}
 // === 🏗️ §2 COMMANDE DU BENNE (FB_Bucket) ===
 
-// en mode "vidage à la trémie" (MAINT_N1/N2, bit armé), une demande DOWN à
-// la trémie arme l'ouverture benne au lieu de faire descendre M2 — le mouvement réel reste
-// gouverné par MotionRequestActive/MotionDirection ci-dessous (rien ne bouge tant que
-// l'opérateur ne pousse pas réellement DOWN) ; instBucket.Busy prend alors la main sur
-// l'arbitrage M2 normal (voir §3bis plus bas).
-DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
-GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed := DumpAtTremieBucketOpenArmed;
-
 instBucket(
     Enable              := NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
-    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR DumpAtTremieBucketOpenArmed OR CoupledDiveBucketOpenArmed
-                           OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen),
+    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR CoupledDiveBucketOpenArmed
+                           OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection     := CoupledUserRequestDirection,
