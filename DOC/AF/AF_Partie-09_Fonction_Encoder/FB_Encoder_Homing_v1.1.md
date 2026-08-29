@@ -8,7 +8,7 @@
 ## 🧭 Sommaire
 
 1. 🎯 Rôle et profil
-2. 🧪 Points de validation (détail)
+2. 🧪 Table des points de validation (détail)
 3. 🔌 Interface
 4. 📍 Séquence homing (3 modes)
 5. 🔍 Cohérence au redémarrage
@@ -23,7 +23,7 @@ la RETAIN `ST_Encoder_Calib` (via `IN_OUT`). Ne lit pas le bus lui-même (reçoi
 `EncoderAvailable` déjà acquis par `FB_Encoder_Abs`) et ne met pas à l'échelle (`FB_Encoder_Scale`
 consomme `HomingRefRaw` produit ici).
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 Décline `TC-P09-020` (chapô) :
 
@@ -43,7 +43,7 @@ Décline `TC-P09-020` (chapô) :
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

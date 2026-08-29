@@ -14,7 +14,9 @@
 4. ⚠️ Piège opérateur — latches AU non liés à la simulation
 5. Documents liés
 
-## 🧪 Points de validation (`TC-P13-020...` — propriétaire unique)
+## 🧪 Table des points de validation (détail)
+
+> Propriétaire unique du catalogue détaillé de la plage indiquée (`TC-P13-020...`) — ce catalogue fait foi ; le chapô AF ne le recopie pas.
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
@@ -30,7 +32,7 @@
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
       <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

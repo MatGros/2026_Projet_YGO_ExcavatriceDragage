@@ -8,7 +8,7 @@
 ## 🧭 Sommaire
 
 1. 🎯 Rôle et profil
-2. 🧪 Points de validation (détail)
+2. 🧪 Table des points de validation (détail)
 3. 🔌 Interface
 4. 🔒 Les 2 gates
 5. ⚠️ Alertes et écarts
@@ -26,7 +26,7 @@ correspond au profil `🔧 Brique technique` d'AF03 §2 (« contrat minimal prop
 mais AF03 §2 dit aussi que *« tout FB relève de l'un des 2 contrats socle light/standard »* —
 ces deux passages ne sont pas réconciliés dans AF03 lui-même. Voir §5.
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 Décline `TC-P09-040` (chapô) :
 
@@ -46,7 +46,7 @@ Décline `TC-P09-040` (chapô) :
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

@@ -148,7 +148,7 @@
 
 ---
 
-## 2 · 🧪 Table des points de validation
+## 🧪 2 · Table des points de validation
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 

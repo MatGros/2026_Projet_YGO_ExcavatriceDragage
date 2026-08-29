@@ -11,7 +11,7 @@
 ## 🧭 Sommaire
 
 1. [🎯 Rôle et profil](#1--rôle-et-profil)
-2. [🧪 Points de validation (détail)](#2--points-de-validation-détail)
+2. [🧪 Table des points de validation (détail)](#2--table-des-points-de-validation-détail)
 3. [🔌 Interface](#3--interface)
 4. [⚙️ Formule — mise à l'échelle asymétrique](#4--formule--mise-à-léchelle-asymétrique)
 5. [📚 Documents liés](#5--documents-liés)
@@ -28,7 +28,7 @@ BusLost` → `RETURN` avant même l'appel à `ScaleX`/`ScaleY`, voir `FB_Joystic
 technique de ce type (AF03 §3 « Brique technique ») ne reçoit pas artificiellement un cycle de vie
 dont elle n'a pas l'usage.
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 > Décline `TC-P08-010` (macro chapô, partagé `F08.01`+`F08.02`) en étapes numérotées — pas de
 > nouvel identifiant racine (`GUIDE_EDITION_AF_v1.0.md` §4, `FB_SPEC_TEMPLATE.md` §2).
@@ -49,7 +49,7 @@ dont elle n'a pas l'usage.
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

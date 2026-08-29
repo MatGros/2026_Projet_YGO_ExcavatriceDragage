@@ -41,7 +41,7 @@
 - `ArmingPermit := TRUE` est un stub 🔴 C4. Son unique TBD est AF‑08 §10 Q1 ; ne pas le considérer
   comme une permission système réelle.
 
-## 🧪 Tests associés
+## 🧪 Table des points de validation
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
 > non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
@@ -56,7 +56,7 @@
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
       <th style="padding: 4px 8px;">Vérifie</th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

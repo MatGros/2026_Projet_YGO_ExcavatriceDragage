@@ -8,7 +8,7 @@
 ## 🧭 Sommaire
 
 1. 🎯 Rôle et profil
-2. 🧪 Points de validation (détail)
+2. 🧪 Table des points de validation (détail)
 3. 🔌 Interface
 4. ⚙️ Séquence preset SDO
 5. 🔒 Gel sur doute
@@ -22,7 +22,7 @@ Contrat `standard` (AF03) — remonte défaut bus/preset. Sous-instance privée 
 appelée directement par un PRG. Ne décide rien : lit le bus EtherCAT, gèle la position sur perte
 de disponibilité, exécute une séquence de preset sur demande (venant de `FB_Encoder_Homing`).
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 Décline `TC-P09-010` (chapô) :
 
@@ -42,7 +42,7 @@ Décline `TC-P09-010` (chapô) :
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

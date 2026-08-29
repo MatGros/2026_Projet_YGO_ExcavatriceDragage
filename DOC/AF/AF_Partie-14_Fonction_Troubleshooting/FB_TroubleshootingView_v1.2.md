@@ -163,7 +163,7 @@ Ce FB ne doit pas être bloqué par ces 4 points : ils sont publiés à `0`/`FAL
   (§6), jamais recalculé ici.
 - `GVL_Troubleshooting` n'est jamais relue par un FB métier — seule l'IHM/Watch CODESYS la lit.
 
-## 8. Tests de contrat
+## 8. 🧪 Table des points de validation (détail)
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
 > non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
@@ -180,7 +180,7 @@ Ce FB ne doit pas être bloqué par ces 4 points : ils sont publiés à `0`/`FAL
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
       <th style="padding: 4px 8px;">Attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Vérification</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

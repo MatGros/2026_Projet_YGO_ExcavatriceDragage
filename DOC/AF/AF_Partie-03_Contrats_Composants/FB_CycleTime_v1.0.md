@@ -10,7 +10,7 @@
 ## 🧭 Sommaire
 
 1. [🎯 Rôle et profil](#1--rôle-et-profil)
-2. [🧪 Points de validation (détail)](#2--points-de-validation-détail)
+2. [🧪 Table des points de validation (détail)](#2--table-des-points-de-validation-détail)
 3. [🔌 Interface](#3--interface)
 4. [⚙️ Comportement — mesure du dt et double bornage](#4--comportement--mesure-du-dt-et-double-bornage)
 5. [📜 Suivi historique](#5--suivi-historique)
@@ -28,7 +28,7 @@ de position, accumulateur).
 Ce **n'est pas** un FB métier : pas de `Enable`/`Reset`, pas de `Ready`, pas de `Fault`. Une seule
 entrée de configuration (`DefaultValueS`, valeur de secours) et une seule sortie (`CycleTimeS`).
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 > Décline le TC macro `TC-P03-014` du chapô (`AF_Partie-03_Contrats_Composants_v2.3.md` §1) en
 > étapes numérotées — **jamais** un nouvel identifiant racine (`CODE_QUALITY_STANDARDS.md §0`).
@@ -51,7 +51,7 @@ entrée de configuration (`DefaultValueS`, valeur de secours) et une seule sorti
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

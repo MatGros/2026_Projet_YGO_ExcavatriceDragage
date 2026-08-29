@@ -8,7 +8,7 @@
 ## 🧭 Sommaire
 
 1. 🎯 Rôle et profil
-2. 🧪 Points de validation (détail)
+2. 🧪 Table des points de validation (détail)
 3. 🔌 Interface
 4. ⚙️ Formule de conversion
 5. 📚 Documents liés
@@ -18,7 +18,7 @@
 Contrat `light` (AF03) — pas de cycle de vie, pas de `Reset`, pas de remontée de défaut : pur
 calcul arithmétique sans état. Convertisseur unitaire, aucune décision.
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 Décline `TC-P09-030` (chapô) :
 
@@ -38,7 +38,7 @@ Décline `TC-P09-030` (chapô) :
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

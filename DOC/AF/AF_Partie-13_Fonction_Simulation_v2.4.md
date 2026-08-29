@@ -114,7 +114,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 
 ---
 
-## 2. 🧪 Table des points de validation (non détaillé)
+## 🧪 2. Table des points de validation (non détaillé)
 
 > Catalogue détaillé et propriété unique dans chaque fiche FB (§3). Cette macro-table condense
 > les points clés — **ne pas dupliquer les libellés exacts** ici, se référer à la fiche pour le TC complet.

@@ -12,7 +12,7 @@
 ## 🧭 Sommaire
 
 1. [🎯 Rôle et profil](#1--rôle-et-profil)
-2. [🧪 Points de validation (détail)](#2--points-de-validation-détail)
+2. [🧪 Table des points de validation (détail)](#2--table-des-points-de-validation-détail)
 3. [🔌 Interface](#3--interface)
 4. [⚙️ Comportement — vue live, armement du latch, acquittement](#4--comportement--vue-live-armement-du-latch-acquittement)
 5. [🚨 Changement de convention fail-safe (ex-`IsWarning` → `Latching`)](#5--changement-de-convention-fail-safe-ex-iswarning--latching)
@@ -43,7 +43,7 @@ cycle** (organe, séquenceur), il ajoute `Lifecycle : ST_Lifecycle` (`Busy` / `D
 distincte, remplie par le FB porteur lui-même, **hors périmètre de FB_FaultCore**. Un FB synchrone
 (conditionneur, filtre, joystick) ne porte pas `Lifecycle`.
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 > Catalogue `TC-P03-008` à `TC-P03-013` — **propriétaire unique de cette fiche**, pas dupliqué dans
 > le chapô AF03 (`GUIDE_EDITION_AF_v1.0.md` §4, pattern déjà appliqué par `FB_Bucket` sur AF10).
@@ -66,7 +66,7 @@ distincte, remplie par le FB porteur lui-même, **hors périmètre de FB_FaultCo
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
