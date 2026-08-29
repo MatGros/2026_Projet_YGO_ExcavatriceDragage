@@ -12,7 +12,7 @@
 - **Type de composant** : Domaine autonome Mouvement & Safety M3 (`PRG_05_Translation`) —
   Fonction métier.
 
-### Table des fonctions
+### 🎯 Table des fonctions
 
 > ⚠️ Corrigée 2026-08-26 (review sous-agent expert automatisme) : la version précédente listait des
 > IDs `TC-P11-010`…`060` **inventés**, ne correspondant à aucun test réel des fiches FB (chacune

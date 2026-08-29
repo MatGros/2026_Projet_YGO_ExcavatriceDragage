@@ -39,7 +39,7 @@
   tolérée jusqu'à T164-5, AF03 §3 point 4) ; la télémétrie fine reste exposée via
   `Measurement.AbsStatus` / `Measurement.HomingStatus`.
 
-### Table des fonctions
+### 🎯 Table des fonctions
 
 > **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
 

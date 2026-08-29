@@ -8,27 +8,124 @@
 - **Périmètre** : automatisme et contrat PLC-IHM ; graphisme et ergonomie IHM hors périmètre.
 - **Type de composant** : `FB_Safety_EmergencyManagement` (contrat AF03 `standard` — voir sous-fiche) pour §7 ; le reste (§3-6, §8) est méta (pas de FB unique).
 
-### Table des fonctions
+### 🎯 Table des fonctions
 
 > Catalogue propre à la chaîne AU/réarmement (§7) — les tables §4 (Fonctions métier/transverses)
 > sont un **index** vers d'autres AF, pas un catalogue `F<NN>.<seq>` de cette partie.
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
-|---|---|---|---|---|---|---|---|
-| `F01.01` | Couper la puissance (AU) | Boucle AU physique ouverte ➔ coupure matérielle des moteurs/actionneurs, indépendante du PLC | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-001</code></nobr> | ✅ | `NV-I` |
-| `F01.02` | Maintenir 2 canaux fail-safe | Perte de maintien A **ou** B ➔ ouvre la boucle AU | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-002</code></nobr> | ✅ | `NV-I` |
-| `F01.03` | Réarmer sur demande explicite | Front `ArmRequest` + boucle saine ➔ séquence de réarmement ; jamais automatique | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-003</code></nobr>, <nobr><code>TC-P01-005</code></nobr> | ✅ | `NV-I` |
-| `F01.04` | Acquitter sans lever l'interlock | `Reset` efface l'affichage (pattern Cause/Ack) sans jamais ouvrir l'interlock de sécurité | `FB_Safety_EmergencyManagement` | 🟠 C3 | <nobr><code>TC-P01-004</code></nobr>, <nobr><code>TC-P01-009</code></nobr> | ✅ | `NV-I` |
-| `F01.05` | Auto-tester la redondance A/B | Test croisé des 2 canaux à chaque réarmement (preuve runtime, pas de procédure manuelle séparée) | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-006</code></nobr> | ✅ | `NV-I` |
-| `F01.06` | Verrouiller après échec | Non-confirmation contacteur après pulse ➔ lockout 5s avant nouvel essai | `FB_Safety_EmergencyManagement` | 🟠 C3 | <nobr><code>TC-P01-007</code></nobr> | ✅ | `NV-I` |
-| `F01.07` | Couper sur demande safety métier | `PowerCutOffRequest` (agrégat M1/M2/M3) ➔ coupe A et B sans déclencher d'armement | `FB_Safety_EmergencyManagement` | 🔴 C4 | <nobr><code>TC-P01-008</code></nobr> | ✅ | `NV-I` |
-| `F01.08` | Cohérence coupure IHM / réarmement | `BtnEmergencyCutOff` pendant le pulse de réarmement | `FB_Safety_EmergencyManagement` | 🟠 C3 | <nobr><code>TC-P01-010</code></nobr> | ⚠️ écart relevé, non corrigé (audit 2026-08-22) | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: calc(100% - 520px);">
+    <col style="width: 110px;">
+    <col style="width: 50px;">
+    <col style="width: 90px;">
+    <col style="width: 50px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Fonction</small></th>
+      <th style="padding: 4px 8px;">Description</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réalisée par</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Criticité</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>TC couvrants</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Statut</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F01.01</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Couper la puissance (AU)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Boucle AU physique ouverte ➔ coupure matérielle des moteurs/actionneurs, indépendante du PLC</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F01.02</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Maintenir 2 canaux fail-safe</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Perte de maintien A <b>ou</b> B ➔ ouvre la boucle AU</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-002</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F01.03</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Réarmer sur demande explicite</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Front <code>ArmRequest</code> + boucle saine ➔ séquence de réarmement ; jamais automatique</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-003, TC-P01-005</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F01.04</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquitter sans lever l'interlock</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Reset</code> efface l'affichage (pattern Cause/Ack) sans jamais ouvrir l'interlock de sécurité</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-004, TC-P01-009</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F01.05</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Auto-tester la redondance A/B</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Test croisé des 2 canaux à chaque réarmement (preuve runtime, pas de procédure manuelle séparée)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-006</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F01.06</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Verrouiller après échec</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Non-confirmation contacteur après pulse ➔ lockout 5s avant nouvel essai</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-007</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F01.07</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Couper sur demande safety métier</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>PowerCutOffRequest</code> (agrégat M1/M2/M3) ➔ coupe A et B sans déclencher d'armement</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-008</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F01.08</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Cohérence coupure IHM / réarmement</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>BtnEmergencyCutOff</code> pendant le pulse de réarmement</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ écart relevé, non corrigé (audit 2026-08-22)</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 📑 Sommaire
 
-1. [🧪 Points de validation](#1--points-de-validation)
+1. [🧪 Table des points de validation (non détaillé)](#1--table-des-points-de-validation-non-détaillé)
 2. [🔄 Architecture & Flux Général Machine](#2--architecture--flux-général-machine)
 3. [🏗️ Équipements principaux](#3--équipements-principaux)
 4. [🧩 Fonctions](#4--fonctions)
@@ -39,7 +136,7 @@
 9. [📜 Suivi historique](#9--suivi-historique)
 10. [📚 Documents liés](#10--documents-liés)
 
-## 🧪 1 · Points de validation
+## 🧪 1 · Table des points de validation (non détaillé)
 
 > Table macro — la fiche `FB_Safety_EmergencyManagement` est **propriétaire unique** du détail
 > (`TC-P01-001`…`010`, steps/timing/formules). Le chapô ne recopie **pas** ces 10 descriptions
@@ -47,15 +144,71 @@
 > intention, au même niveau de synthèse que la Table des fonctions ci-dessus :
 > [`FB_Safety_EmergencyManagement_v1.2.md §2`](AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.2.md).
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| Groupe | IDs couverts | Comportement Attendu (synthèse) | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
-|---|---|---|---|---|---|
-| Coupure de puissance | <nobr><code>TC-P01-001</code></nobr>, <nobr><code>TC-P01-008</code></nobr> | AU physique et demande safety métier agrégée coupent A+B, sans passer par une séquence d'armement | <nobr><code>🟢 SITE+AUTO</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV` |
-| Redondance A/B | <nobr><code>TC-P01-002</code></nobr>, <nobr><code>TC-P01-006</code></nobr> | Perte d'un canal ouvre la boucle ; auto-test croisé des 2 canaux prouvé à chaque réarmement | <nobr><code>⚡ SITE+AUTO_PLC</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV-I` |
-| Réarmement | <nobr><code>TC-P01-003</code></nobr>, <nobr><code>TC-P01-005</code></nobr>, <nobr><code>TC-P01-007</code></nobr> | Front explicite requis, jamais automatique ; acquittement et réarmement = 2 actions distinctes ; échec de confirmation ➔ lockout 5s | <nobr><code>⚡ AUTO_PLC</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV-I` |
-| Acquittement (Cause/Ack) | <nobr><code>TC-P01-004</code></nobr>, <nobr><code>TC-P01-009</code></nobr> | `Reset` efface l'affichage sans jamais lever l'interlock de sécurité ; re-latch si nouvel échec | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV-I` |
-| Cohérence coupure IHM | <nobr><code>TC-P01-010</code></nobr> | Coupure IHM maintenue pendant le pulse de réarmement — écart connu, non corrigé (audit 2026-08-22) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Safety_EmergencyManagement</code></small> | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 140px;">
+    <col style="width: 150px;">
+    <col style="width: calc(100% - 590px);">
+    <col style="width: 110px;">
+    <col style="width: 140px;">
+    <col style="width: 50px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-001, TC-P01-008</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Coupure de puissance</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">AU physique et demande safety métier agrégée coupent A+B, sans passer par une séquence d'armement</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>🟢 SITE+AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-002, TC-P01-006</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Redondance A/B</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Perte d'un canal ouvre la boucle ; auto-test croisé des 2 canaux prouvé à chaque réarmement</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ SITE+AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-003, TC-P01-005, TC-P01-007</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Réarmement</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Front explicite requis, jamais automatique ; acquittement et réarmement = 2 actions distinctes ; échec de confirmation ➔ lockout 5s</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-004, TC-P01-009</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquittement (Cause/Ack)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Reset</code> efface l'affichage sans jamais lever l'interlock de sécurité ; re-latch si nouvel échec</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Cohérence coupure IHM</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Coupure IHM maintenue pendant le pulse de réarmement — écart connu, non corrigé (audit 2026-08-22)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 🔄 2 · Architecture & Flux Général Machine
 

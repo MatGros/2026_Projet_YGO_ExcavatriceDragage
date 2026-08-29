@@ -4,7 +4,7 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Points de validation](#1--points-de-validation)
+1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
 2. [🧱 Principes d'architecture](#2--principes-darchitecture)
 3. [🗺️ Organisation cible](#3--organisation-cible)
 4. [🚌 Contrats de flux](#4--contrats-de-flux)
@@ -30,28 +30,163 @@
 
 ### 🎯 Table des fonctions
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
-|---|---|---|---|---|---|---|---|
-| `F02.01` | Ordonner le cycle applicatif | Exécute les six PRG dans l'ordre Acquisition → Modes/Cycle → Treuils/Benne → Translation → Outputs → Supervision. | `MainTask` + `PRG_02` à `PRG_07` | 🔵 C2 | <nobr><code>TC-P02-004</code></nobr> | ⚠️ revue MainTask manuelle | `NV` |
-| `F02.02` | Encapsuler l'orchestration ST | Les PRG rendent visibles leurs instances, flux et arbitrages ; calculs et machines d'état résident dans les FB. | `PRG_02` à `PRG_07` | ⚪ C1 | <nobr><code>TC-P02-002</code></nobr> | ✅ | `NV-I` |
-| `F02.03` | Garantir un producteur unique | Chaque image, bus, commande et état public a un propriétaire unique, identifié avant tout raccordement. | Contrats `ST_*` + PRG producteurs | 🟠 C3 | <nobr><code>TC-P02-001</code></nobr> | ⚠️ gate à fiabiliser (TBD §8) | `NV` |
-| `F02.04` | Isoler la barrière de sortie | Seul `PRG_06_Outputs` applique les interlocks finaux et écrit les Q/PDO des actionneurs. | `PRG_06_Outputs` | 🔴 C4 | <nobr><code>TC-P02-003</code></nobr> | ✅ | `NV-I` |
-| `F02.05` | Rendre explicites les retards de scan | Toute donnée consommée avant son producteur est interdite, sauf retard d'un scan nommé et justifié. | Ordonnancement `MainTask` | 🟠 C3 | <nobr><code>TC-P02-004</code></nobr> | ⚠️ revue MainTask manuelle | `NV` |
-| `F02.06` | Séparer supervision et commande métier | La vue troubleshooting observe seulement ; `PRG_07` porte distinctement reset IHM, persistance et bypass autorisés. | `PRG_07_Supervision` + `FB_TroubleshootingView` | 🔵 C2 | <nobr><code>TC-P02-005</code></nobr> | ✅ | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: calc(100% - 520px);">
+    <col style="width: 110px;">
+    <col style="width: 50px;">
+    <col style="width: 90px;">
+    <col style="width: 50px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Fonction</small></th>
+      <th style="padding: 4px 8px;">Description</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réalisée par</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Criticité</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>TC couvrants</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Statut</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F02.01</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Ordonner le cycle applicatif</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Exécute les six PRG dans l'ordre Acquisition → Modes/Cycle → Treuils/Benne → Translation → Outputs → Supervision.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>MainTask</code> + <code>PRG_02</code> à <code>PRG_07</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔵 C2</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-004</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ revue MainTask manuelle</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F02.02</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Encapsuler l'orchestration ST</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Les PRG rendent visibles leurs instances, flux et arbitrages ; calculs et machines d'état résident dans les FB.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>PRG_02</code> à <code>PRG_07</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚪ C1</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-002</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F02.03</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Garantir un producteur unique</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Chaque image, bus, commande et état public a un propriétaire unique, identifié avant tout raccordement.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Contrats <code>ST_*</code> + PRG producteurs</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ gate à fiabiliser (TBD §8)</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F02.04</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Isoler la barrière de sortie</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Seul <code>PRG_06_Outputs</code> applique les interlocks finaux et écrit les Q/PDO des actionneurs.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>PRG_06_Outputs</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-003</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F02.05</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Rendre explicites les retards de scan</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Toute donnée consommée avant son producteur est interdite, sauf retard d'un scan nommé et justifié.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Ordonnancement <code>MainTask</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-004</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ revue MainTask manuelle</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F02.06</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Séparer supervision et commande métier</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">La vue troubleshooting observe seulement ; <code>PRG_07</code> porte distinctement reset IHM, persistance et bypass autorisés.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>PRG_07_Supervision</code> + <code>FB_TroubleshootingView</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔵 C2</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-005</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
-## 🧪 1 · Points de validation
+## 🧪 1 · Table des points de validation
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Intention | Preuve | Type | Réf | Etat |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P02-001</code></nobr> | Un seul producteur par donnée | Aucun écouteur/écrivain multiple sur un contrat *(⚠️ `G200_check_linkage.py` L10 remonte des faux positifs intra-POU — voir TBD §8)* | `💻 AUTO` | <small>§2</small> | `NV` |
-| <nobr><code>TC-P02-002</code></nobr> | Programme d'orchestration ST sans logique métier cachée | Les calculs et machines d'état résident dans les FB ; le PRG rend ses arbitrages et flux explicitement lisibles | `💻 AUTO` | <small>§2</small> | `NV` |
-| <nobr><code>TC-P02-003</code></nobr> | Sorties physiques via `PRG_06_Outputs` | Aucun autre POU n'écrit les Q/PDO finaux | `💻 AUTO` | <small>§3</small> | `NV` |
-| <nobr><code>TC-P02-004</code></nobr> | Ordre d'exécution MainTask conforme | Tâche CODESYS + `G200_check_linkage.py` PASS *(⚠️ ne vérifie pas l'ordre inter-POU — revue manuelle à ce jour, voir TBD §8)* | `⚡ SITE+AUTO` | <small>§5</small> | `NV` |
-| <nobr><code>TC-P02-005</code></nobr> | Vue troubleshooting en lecture seule | `FB_TroubleshootingView` ne produit aucune commande, configuration ni interlock | `💻 AUTO` | <small>§3</small> | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Un seul producteur<br>par donnée</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Aucun écouteur/écrivain multiple sur un contrat <i>(⚠️ <code>G200_check_linkage.py</code> L10 remonte des faux positifs intra-POU — voir TBD §8)</i></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-002</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Orchestration ST<br>sans logique cachée</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Les calculs et machines d'état résident dans les FB ; le PRG rend ses arbitrages et flux explicitement lisibles</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-003</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Sorties physiques<br>via PRG_06</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Aucun autre POU n'écrit les Q/PDO finaux</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-004</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Ordre MainTask<br>conforme</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Tâche CODESYS + <code>G200_check_linkage.py</code> PASS <i>(⚠️ ne vérifie pas l'ordre inter-POU — revue manuelle à ce jour, voir TBD §8)</i></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ SITE+AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-005</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Troubleshooting<br>lecture seule</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>FB_TroubleshootingView</code> ne produit aucune commande, configuration ni interlock</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 

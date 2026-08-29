@@ -32,7 +32,7 @@
 - **Contrat AF03** : `standard` (remonte défaut capteur/calibration/bus via `Fault : ST_Fault`,
   rempli par une instance `FB_FaultCore` — AF03 §3 / §4.1). Pas de `Lifecycle` (FB synchrone).
 
-### Table des fonctions
+### 🎯 Table des fonctions
 
 > **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
 
