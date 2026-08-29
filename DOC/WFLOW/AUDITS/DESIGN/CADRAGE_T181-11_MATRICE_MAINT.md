@@ -102,19 +102,19 @@ Un bypass IHM activé alors que `Mode ≠ MAINT_N2` est **ignoré** (pas d'erreu
 
 ### 3.1 Comportement cible
 
-| Contexte | `DriveRequest.TopLimitEff_M` (calculé `PRG_04`) | Butée physique |
+| Contexte | `DriveRequest.TopLimitM` (calculé `PRG_04`) | Butée physique |
 |---|---|---|
 | Fonctionnement normal (SEMI_AUTO, N1 sans override, N2 sans override) | **7,5 m** (`_CommunCfgPersist.CfgCableLimitAscent_M`) | capteur `TopPositionSensor` ≈ 8,5 m (jamais atteint en nominal) |
 | **N1 + bouton IHM « autoriser dépassement FDC » MAINTENU** | **8,5 m** (borne physique = valeur du capteur homing haut) | capteur `TopPositionSensor` — **jamais dépassé** (`BypassTopLimitSwitch` reste FALSE) |
 | **N2 + bypass `TopLimitSoftware` latché** | 8,5 m | capteur `TopPositionSensor` (sauf si `TopLimitSwitch` aussi bypassé — acte N2 séparé) |
 
-- **N1 momentané** : `OverrideTopSoftwareN1 := (Mode = MAINT_N1) AND GVL_IHM.<axe>.Cmd.BtnOverrideTopSoftware` (bouton, pas toggle). Relâche → `TopLimitEff_M` **repasse à 7,5 m au cycle suivant**, le FDC logiciel redevient actif immédiatement.
+- **N1 momentané** : `OverrideTopSoftwareN1 := (Mode = MAINT_N1) AND GVL_IHM.<axe>.Cmd.BtnOverrideTopSoftware` (bouton, pas toggle). Relâche → `TopLimitM` **repasse à 7,5 m au cycle suivant**, le FDC logiciel redevient actif immédiatement.
 - **La butée physique 8,5 m n'est jamais franchie en N1** : `BypassTopLimitSwitch` n'est **pas** ouvert par cet override. Si le capteur `TopPositionSensor` retombe (position atteinte), `AscentPermit` tombe (`FB_Safety_Winch.st:382-383`) → arrêt matériel.
 - **N2 latché** : `TopLimitSoftware` classique (§2), RETAIN, débit assumé jusqu'à sortie de N2.
 
 ### 3.2 Nouveau champ / bouton IHM
 - `GVL_IHM.M1TreuilRetenue.Cmd.BtnOverrideTopSoftware : BOOL` (+ M2) — **bouton momentané** (préfixe `Btn`, NC-060). Pas dans `ST_BypassWinch` (ce n'est pas un bypass latché).
-- `PRG_04` : `M1_TopLimitEff_M := SEL(OverrideTopSoftwareN1 OR (BypassTopLimitSoftwareEff), CfgCableLimitAscent_M, CfgHomingSensorTop_M)` avec `CfgHomingSensorTop_M ≈ 8.5` (nouvelle constante persistante ou dérivée).
+- `PRG_04` : `M1_TopLimitM := SEL(OverrideTopSoftwareN1 OR (BypassTopLimitSoftwareEff), CfgCableLimitAscent_M, CfgHomingSensorTop_M)` avec `CfgHomingSensorTop_M ≈ 8.5` (nouvelle constante persistante ou dérivée).
 
 ---
 
@@ -192,7 +192,7 @@ T175 AC4 : *« FB_Bucket confirme/ouvre sous MAINT_N1 ET N2 comme décrit (TC-P1
 ## 9 · Livrables aval (T181-14, sur validation de ce cadrage)
 
 - `FB_Modes` : calcul `BasculeModeAutorisee`, drapeau `HomingRequired` par axe, gate SEMI_AUTO.
-- `PRG_04` : `bypass_effectif := bypass_IHM AND (Mode = MAINT_N2)` pour les 25 bascules ; `TopLimitEff_M` (7,5 / 8,5) ; retrait de la propagation `Safety`/`Process`/`Global`.
+- `PRG_04` : `bypass_effectif := bypass_IHM AND (Mode = MAINT_N2)` pour les 25 bascules ; `TopLimitM` (7,5 / 8,5) ; retrait de la propagation `Safety`/`Process`/`Global`.
 - DUT : retrait `Safety`/`Process`/`Global` de `ST_BypassWinch`/`ST_BypassCommun`/`ST_BypassBucket` (sur décision §2-3) ; ajout `BtnOverrideTopSoftware` dans `ST_WinchHMI.Cmd` ; éventuel `BypassSlackCable` (§7-c).
 - `FB_Bucket` : gate confirm/ouvre sur `Mode IN {MAINT_N1, MAINT_N2}`.
 - Gate : `G4xx_check_bypass_matrix_mode_gated.py` — aucun `Bypass*` propagé sans `AND (Mode = MAINT_N2)` (sauf l'override FDC N1 explicitement listé).

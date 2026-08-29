@@ -34,8 +34,8 @@
 | `MaxStepUp` | INT | 0..5 | Plafond palier montée (MIN des sources) |
 | `MinStepDown` | INT | 0..5 | Plancher palier descente — **plongée Kobold 3-4** |
 | `MaxStepDown` | INT | 0..5 | Plafond palier descente |
-| `TopLimitEff_M` | REAL | m | Limite haute effective ce cycle : **7,5 m** normal / **8,5 m** si override maintenance N1 |
-| `BottomLimitEff_M` | REAL | m | **MIN**(limite câble physique, limite légale) — calculé `PRG_04` |
+| `TopLimitM` | REAL | m | Limite haute effective ce cycle : **7,5 m** normal / **8,5 m** si override maintenance N1 |
+| `BottomLimitM` | REAL | m | **MIN**(limite câble physique, limite légale) — calculé `PRG_04` |
 | `SyncCoupled` | BOOL | — | **Diag strict** — `FB_Winch` ne le lit jamais en logique (garde de revue) |
 
 > Retiré vs maquette précédente : `SpeedTgt_Pct` (→ `SpeedStepReq`).

@@ -21,7 +21,7 @@ Nommage : DUT propriété de `FB_Winch` selon **NC-110** (`ST_fbWinch_*`) ; `Req
 | `SpeedStepReq` | `INT`, 0..5 | cible décodée en amont |
 | `MinStepUp`, `MaxStepUp` | `INT`, 0..5 | bornes montée agrégées |
 | `MinStepDown`, `MaxStepDown` | `INT`, 0..5 | bornes descente agrégées |
-| `TopLimitEff_M`, `BottomLimitEff_M` | `REAL`, m | limites effectives du cycle, calculées dans `PRG_04` |
+| `TopLimitM`, `BottomLimitM` | `REAL`, m | limites effectives du cycle, calculées dans `PRG_04` |
 | `SyncCoupled` | `BOOL` | diag : jamais lu par la logique `FB_Winch` |
 
 ### `ST_fbWinch_Sensors` — producteur acquisition/PRG_04, consommateur `FB_Winch`
