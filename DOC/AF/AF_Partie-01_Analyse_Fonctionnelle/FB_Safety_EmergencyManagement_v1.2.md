@@ -115,7 +115,8 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 
 | ID | Scénario / Intention | Comportement attendu | Preuve | Type | Réf | Etat |
 |---|---|---|---|---|---|---|
-| <nobr><code>TC-P01-SCEN-NOM</code></nobr> | **Scénario Nominal Réarmement** | `ArmRequest` ➔ Auto-test A/B (800ms) ➔ Pulse (1s) ➔ Contacteur collé ➔ `Done=TRUE` | Chronogramme nominal complet | `⚡ AUTO_PLC` | §4.3 | `V-I` |
+| <nobr><code>TC-P01-SCEN-NOM</code></nobr> | **Scénario Nominal Réarmement** | `ArmRequest` ➔ Auto-test A/B (800ms) ➔ Pulse (1s) ➔ Contacteur collé ➔ `Done=TRUE` | Chronogramme nominal complet | `⚡ AUTO_PLC` | §4.3ter | `V-I` |
+| <nobr><code>TC-P01-SCEN-DYN</code></nobr> | **Scénario Dynamique Perturbations** | Nominal ➔ Coupure métier ➔ Blocage ➔ Reset ➔ Échec contacteur + Lockout 5s ➔ Reprise | Chronogramme multi-perturbations | `💻 AUTO` | §4.3ter | `V-I` |
 | <nobr><code>TC-P01-001</code></nobr> | Coupure AU physique | Coupe la boucle matérielle, contacteur retombe, API vivant | `Contacteur=FALSE` | `🟢 SITE` | §6.1 | `V-I` |
 | <nobr><code>TC-P01-002</code></nobr> | Perte maintien A/B | Perte canal A ou B ouvre la boucle AU | `MaintainA/B_RQ=FALSE` | `⚡ SITE+AUTO` | §5 | `V-I` |
 | <nobr><code>TC-P01-003</code></nobr> | Impulsion de réarmement | Front `ArmRequest` + préconditions OK ➔ pulse 1s (Step 5) | `Cmd.ArmPulse_Cmd=TRUE` | `⚡ AUTO_PLC` | §4.3 | `V-I` |
