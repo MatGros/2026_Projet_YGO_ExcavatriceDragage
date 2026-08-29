@@ -23,20 +23,96 @@
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Intention / Comportement attendu | Type | Etat |
-|---|---|---|---|
-| <nobr><code>TC-P10-023</code></nobr> | Fermeture seulement si `MotionDirection=1` ET `MotionRequestActive` | `💻 AUTO` | `NV-I` |
-| <nobr><code>TC-P10-024</code></nobr> | Ouverture seulement si `MotionDirection=-1` ET `MotionRequestActive` | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-025</code></nobr> | Demande refusée si `M1_Busy OR M2_Busy` à l'entrée | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-026</code></nobr> | Glissement M1>1.0m pendant BUSY ➔ bit4 + `M1SlipDetected` + coupe M2 | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-027</code></nobr> | `M1SlipDetected` force `SafeStop` sur M1 côté Treuils | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-028</code></nobr> | Couche 2 (Méca C) : dérive M1>2.0m ➔ `PowerCutOff` | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-029</code></nobr> | Recul (sens inverse) borné à la position de départ, jamais au-delà | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-030</code></nobr> | `ConfirmOpen/ClosePosition` : effet seulement MAINT_N1/N2 arrêtés | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-031</code></nobr> | Codeur(s) non référencé(s) ➔ bit3 permanent, indépendant de `Reset` | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-032</code></nobr> | `FB_ExtractionSequence.Busy` préserve l'armement joystick en fin benne | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-033</code></nobr> | Butée haute M2 décalée de `OffsetCloseM` si fermé/en fermeture | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P10-034</code></nobr> | Terrain : cinématique réelle en charge, amplitude offset validée | `🟢 SITE` | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: calc(100% - 170px);">
+    <col style="width: 90px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-023</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Fermeture seulement si <code>MotionDirection=1</code> ET <code>MotionRequestActive</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-024</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Ouverture seulement si <code>MotionDirection=-1</code> ET <code>MotionRequestActive</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-025</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Demande refusée si <code>M1_Busy OR M2_Busy</code> à l'entrée</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-026</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Glissement M1>1.0m pendant BUSY ➔ bit4 + <code>M1SlipDetected</code> + coupe M2</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-027</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>M1SlipDetected</code> force <code>SafeStop</code> sur M1 côté Treuils</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-028</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Couche 2 (Méca C) : dérive M1>2.0m ➔ <code>PowerCutOff</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-029</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Recul (sens inverse) borné à la position de départ, jamais au-delà</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-030</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>ConfirmOpen/ClosePosition</code> : effet seulement MAINT_N1/N2 arrêtés</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-031</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Codeur(s) non référencé(s) ➔ bit3 permanent, indépendant de <code>Reset</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-032</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>FB_ExtractionSequence.Busy</code> préserve l'armement joystick en fin benne</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-033</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Butée haute M2 décalée de <code>OffsetCloseM</code> si fermé/en fermeture</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-034</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Terrain : cinématique réelle en charge, amplitude offset validée</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>🟢 SITE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
