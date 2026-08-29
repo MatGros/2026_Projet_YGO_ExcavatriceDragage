@@ -281,16 +281,20 @@ tasks:
   bloque_par: []
 - id: T054
   parent_id: ''
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
   agent: —
+  date: '2026-08-29T16:35:00'
+  completed_at: '2026-08-29T16:35:00'
   titre: Intégrer latence boucle automate (~10 ms) au calcul temps d'arrêt
   contexte: ''
-  description: '✅ **Étude livrée** (`DOC/WFLOW/AUDITS/ETUDE_T54_LATENCE_BOUCLE_v0.1.md`) : audit archivé AUDIT_Winch §3.2
-    (P1.2) confirme le retard d''un scan ~10ms → sous-estime la distance d''arrêt. Design : CST_ScanLatencyMs:=T#10ms à ajouter
-    au CALCUL de distance (pas aux timeouts de coupure Méca). ⏳ **Implémentation en attente** : emplacement injection, tâche
-    référence, impact seuils Méca, validation humaine.'
+  description: 'ABSORBÉE (décision 2026-08-29, voir T178). Étude livrée
+    (`DOC/WFLOW/AUDITS/ETUDE_T54_LATENCE_BOUCLE_v0.1.md`) : la latence scan 10 ms sous-estime la
+    distance d''arrêt de ~2-3 cm à vitesse max (2-3 m/s) — négligeable devant le coast-down freinage
+    réel (1-2 m au relâcher joystick). Pas d''implémentation `CST_ScanLatencyMs` : la correction
+    rentre dans la marge fixe de sécurité. Le vrai paramètre à sécuriser (déplacement toléré après
+    retombée contacteurs) est porté par T178.'
   objectifs: []
   contrat: ''
   date: '2026-08-28T20:59:12'
