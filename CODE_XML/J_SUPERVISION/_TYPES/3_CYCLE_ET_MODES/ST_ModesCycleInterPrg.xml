@@ -178,7 +178,7 @@
             </variable>
             <variable name="OperatorActionId">
               <type>
-                <UINT />
+                <WORD />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant action opérateur requise</xhtml>

@@ -2717,7 +2717,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
             </variable>
             <variable name="Idx211_OperatorActionId">
               <type>
-                <UINT />
+                <WORD />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant numérique de l'action attendue</xhtml>
@@ -8795,7 +8795,7 @@ TRUE = Défaut sécurité actif</xhtml>
             </variable>
             <variable name="OperatorActionId">
               <type>
-                <UINT />
+                <WORD />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant action opérateur requise</xhtml>
@@ -15058,7 +15058,7 @@ END_IF;
             </variable>
             <variable name="OperatorActionId">
               <type>
-                <UINT />
+                <WORD />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ID action operateur requise</xhtml>
@@ -31761,7 +31761,7 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
             </variable>
             <variable name="CycleOperatorActionId">
               <type>
-                <UINT />
+                <WORD />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] ID action attendue</xhtml>

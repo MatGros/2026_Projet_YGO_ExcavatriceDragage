@@ -122,19 +122,42 @@ contract:
 # ═══════════════════════════════════════════════════════════════════════════
 # 🚦 SUIVI
 # ═══════════════════════════════════════════════════════════════════════════
-status: PENDING
+status: VALIDATED
 
 execution:
-  executed_by: "..."
-  completed_at: "..."
-  status: PENDING
+  executed_by: "Sous-agent Claude Code (general-purpose)"
+  completed_at: "2026-08-29T02:10:00+02:00"
+  status: COMPLETED
   summary: >
-    (a remplir par l'agent executant)
-  evidence_submitted: []
+    4 declarations OperatorActionId basculees UINT -> WORD : FB_Cycle.st (VAR_OUTPUT),
+    ST_SequencePublicState.st, FB_TroubleshootingView.st (VAR_INPUT CycleOperatorActionId),
+    ST_ChainCycleSemiAuto.st (Idx211). Une seule chose changee par ligne (type), commentaires
+    et alignement conserves. Aucun cast ajoute. PRG_03/PRG_04/PRG_07 .st non modifies : leurs
+    affectations deviennent WORD := WORD (3 conversions implicites eliminees). Nouveau gate
+    G347_check_actionid_type.py (tout champ *OperatorActionId* doit etre WORD dans CODE/**/*.st),
+    cable run_all_gates palier C. Bundle regenere : propagation type-only dans CODE_XML/
+    (21 swaps <UINT/> -> <WORD/>, dont 3 dans les vues STRUCT/interface embarquees de
+    PRG_03_Modes_Cycle.xml et PRG_07_Supervision.xml ; zero changement de logique).
+  evidence_submitted:
+    - "grep OperatorActionId:UINT sur CODE/ : 4 -> 0 ; famille WORD : 8"
+    - "G347: PASS (8 declarations verifiees) ; test negatif : FAIL 2 sur UINT/INT"
+    - "G200 linkage: PASS (0 erreur)"
+    - "run_all_gates --palier C: ALL PASS (G346 + G347 inclus)"
+    - "CI TEST_AUTO_CI: FB_Cycle 7/7, FB_DiveSearch 8/8, FB_ExtractionSequence 8/8 (inchanges)"
+    - "CODE_XML diff: 21 insertions / 21 deletions, 100% <UINT/> -> <WORD/> + timestamps de regen"
 
 validation:
-  status: PENDING
-  validated_by: "..."
-  validated_at: "..."
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — relecture du git diff reel (4 .st + G347 + bundle) + verification que CODE_XML est 100% type-only"
+  validated_at: "2026-08-29T02:15:00+02:00"
   notes: >
-    (visa orchestrateur apres relecture du git diff reel)
+    AC1..AC5 satisfaits. Diff .st = 4 lignes, UINT -> WORD strict, rien d'autre. CODE_XML
+    verifie exhaustivement : toute ligne -/+ hors en-tete de regen est un swap <UINT/> -> <WORD/>
+    (y compris PRG_03_Modes_Cycle.xml et PRG_07_Supervision.xml, dont les sources .st ne sont
+    pas touchees). G347 est un garde-fou correct (regex sur nom de champ, exige WORD, echoue au
+    test negatif en pointant la ligne). Non-regression : G200 0 erreur, palier C ALL PASS, 3 FB
+    de cycle inchanges. Defaut C de l'audit T168-B clos. Pas de 4e revue LLM : le defaut C avait
+    deja ete confirme par 3 revues independantes et le changement est mecanique (4 swaps de type,
+    zero comparaison / CASE sur le champ dans tout CODE/).
+    Entree TASKS.yaml T168-D : reportee (fichier en cours de re-flow YAML massif par un travail
+    humain concurrent, ne pas y toucher tant qu'il n'est pas stabilise).

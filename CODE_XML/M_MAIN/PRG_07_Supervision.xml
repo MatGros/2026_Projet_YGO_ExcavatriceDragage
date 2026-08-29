@@ -9865,7 +9865,7 @@ Prev := Hmi;
             </variable>
             <variable name="CycleOperatorActionId">
               <type>
-                <UINT />
+                <WORD />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] ID action attendue</xhtml>
