@@ -71,7 +71,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F13.01</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Enveloppe unique de simulation</b></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Enveloppe unique de simulation — composition des 4 sous-modèles, décalage 1 scan</b></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_SimBench</code></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-13_Fonction_Simulation/FB_SimBench_v1.0.md"><code>FB_SimBench_v1.0.md</code></a></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-010..013</span></td>
@@ -87,7 +87,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F13.03</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Position codeurs M1/M2 simulée</b></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Position codeurs M1/M2 simulée, persistance reset froid</b></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Encoder</code></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.0.md"><code>FB_Sim_Encoder_v1.0.md</code></a></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-030..033</span></td>
@@ -95,7 +95,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F13.04</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>5 capteurs M3 simulés</b></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>5 capteurs M3 simulés par progression continue</b></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Translation</code></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md"><code>FB_Sim_Translation_v1.0.md</code></a></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-040..043</span></td>
@@ -103,7 +103,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F13.05</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Entrées joystick brutes</b></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Entrées joystick brutes, homme-mort jamais contourné</b></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Joystick</code></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-13_Fonction_Simulation/FB_Sim_Joystick_v1.0.md"><code>FB_Sim_Joystick_v1.0.md</code></a></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-050..052</span></td>

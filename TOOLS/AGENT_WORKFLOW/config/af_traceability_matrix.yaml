@@ -1290,7 +1290,7 @@ domains:
         statut: ✅
         etat: NV-I
       F11.05:
-        fonction: Anti-télescopage hauteur M1/M2
+        fonction: Anti-télescopage hauteur M1/M2 (collision benne/translation)
         description: Bloque translation si câbles M1/M2 sous hauteur mini, sauf Bypass.MinHeight
           conscient (jamais via BypassGlobal)
         realisee_par: PRG_05_Translation §0 (câblage direct, hors FB dédié)
@@ -1323,7 +1323,7 @@ domains:
         type: ⚡ AUTO_PLC
         ref: FB_TranslationOutputInterlock
         etat: NV
-      —:
+      — (aucun TC):
         intention: Translation bloquée si CablePosM1 ou CablePosM2 sous _TranslationMinHeightM1M2_M,
           sauf Bypass.MinHeight conscient. ⚠️ Câblé directement dans PRG_05_Translation.st
           §0, hors FB_Safety_Translation — pas de test dédié aujourd'hui

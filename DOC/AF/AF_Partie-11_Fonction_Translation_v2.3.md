@@ -87,7 +87,7 @@
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F11.05</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Anti-télescopage hauteur M1/M2</b></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Anti-télescopage hauteur M1/M2 (collision benne/translation)</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">Bloque translation si câbles M1/M2 sous hauteur mini, sauf <code>Bypass.MinHeight</code> conscient (jamais via <code>BypassGlobal</code>)</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>PRG_05_Translation</code> §0 (câblage direct, hors FB dédié)</small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
@@ -169,7 +169,7 @@
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>—</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>— (aucun TC)</small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Anti-télescopage hauteur M1/M2</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">Translation bloquée si <code>CablePosM1</code> ou <code>CablePosM2</code> sous <code>_TranslationMinHeightM1M2_M</code>, sauf <code>Bypass.MinHeight</code> conscient. ⚠️ Câblé directement dans <code>PRG_05_Translation.st</code> §0, hors <code>FB_Safety_Translation</code> — pas de test dédié aujourd'hui</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚠️ manquant</code></small></td>
