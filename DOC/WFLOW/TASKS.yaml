@@ -306,7 +306,7 @@ tasks:
   contexte: 'Intitulé complet : Validation CODESYS/terrain mesure vitesse 50 ms (FB_Encoder_SpeedMeasure)'
   description: Validé par qualification CI (10/10 PASS sous STruCpp) et antériorité v0.5.25 (mesure fenêtre glissante 50ms
     éprouvée pour 1 à 2 m/s lors des déplacements treuils).
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T084_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T085
@@ -332,7 +332,7 @@ tasks:
   titre: Validation blocage déterministe si Enable=FALSE (FB_Safety_Winch)
   contexte: ''
   description: FB_Safety_Winch.st
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T086_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T088
@@ -346,8 +346,8 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T088_CYCLETIME_WRAP_GUARD.yaml. Recherche menée (CmpIecTask /
     LTIME() / SysTimeGetNs sans équivalent exploitable ; soustraction TIME modulo 2^32 correcte pour un rollover simple).
     fix : VAR CONSTANT CST_MaxCycleDeltaMs := 1000 + §4 borné IF (DeltaTimeMs > 0) AND (DeltaTimeMs <= CST_MaxCycleDeltaMs)
-    sinon DefaultValueS ; commentaire §4 détaillé ; interface inchangée. +3 TC CI. Livré commit f874b8cb. Preuves : CI
-    FB_CycleTime 4/4, G200 PASS 0 err, palier C ALL PASS, consommateurs (FB_Winch/FB_Translation/FB_Ramp/FB_Filter) inchangés.'
+    sinon DefaultValueS ; commentaire §4 détaillé ; interface inchangée. +3 TC CI. Livré commit f874b8cb. Preuves : CI FB_CycleTime
+    4/4, G200 PASS 0 err, palier C ALL PASS, consommateurs (FB_Winch/FB_Translation/FB_Ramp/FB_Filter) inchangés.'
   objectifs:
   - Borner le dt de cycle (0 < dt <= plafond) sinon valeur de secours, sans redémarrage auto
   - Couvrir les artefacts de reprise (online-change, point d'arrêt) et la fenêtre de rebouclage TIME()
@@ -366,7 +366,7 @@ tasks:
   contexte: 'Intitulé complet : Valider sur site cote capteur haut 8.0 m et limite 7.5 m au premier homing'
   description: Figé à 8.5m pour le capteur physique et 7.5m pour la limite logicielle haute CfgCableLimitAscent_M dans GVL_PERSISTENT
     (validé utilisateur 2026-08-28, ajustable sur place).
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T090_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T092
@@ -521,7 +521,7 @@ tasks:
   titre: Analyse comportement Dive / référencement benne dans le cycle ...
   contexte: 'Intitulé complet : Analyse comportement Dive / référencement benne dans le cycle semi-auto'
   description: Reliquat session 2026-08-16, lié à T118
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T119_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T121
@@ -534,7 +534,7 @@ tasks:
   titre: Audit & élimination des constantes magiques (<> 8 → symboles D...
   contexte: 'Intitulé complet : Audit & élimination des constantes magiques (<> 8 → symboles DUT/enums)'
   description: CODE/ (grep), NAMING_CONVENTION.md
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T121_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T122
@@ -547,7 +547,7 @@ tasks:
   titre: Renommage flux joystick → actionneurs (CoupledUserRequest / Lo...
   contexte: 'Intitulé complet : Renommage flux joystick → actionneurs (CoupledUserRequest / LogicRequest)'
   description: PRG_04_Treuils_Benne.st (Phases 1-2 faites, phase 3 différée)
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T122_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T123
@@ -613,7 +613,7 @@ tasks:
     sans à-coup Semi-Auto/Maintenance et raccordement PRG_03.
   description: 'Validé : Parent des lots T127-A -> T127-F. 100% tests CI G_CYCLE et M_MAIN PASS, G200 PASS, 22/22 Gates PASS,
     compilation CODESYS 0 erreur.'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127_RETRO.yaml
   objectifs:
   - Figer une interface standard AF-03 §3 avec socle FB_FaultCore et ST_Lifecycle
   - Valider unitairement par tests STruCpp les 12 cas TC-P04-001..012
@@ -919,7 +919,7 @@ tasks:
   contexte: 'Intitulé complet : Dédup. documentaire AF_Partie-03 ↔ CODE_QUALITY_STANDARDS : §6 Ladder → pointeur vers CQS
     §11 · renuméroter le double 2bis de CQS'
   description: Traité et intégré dans le cadre de T136 (AC4 & AC5)
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T138_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T139
@@ -949,7 +949,7 @@ tasks:
   description: '**Implémenté & Validé 2026-08-19** : Purge GVL_Global, PRG_06 conforme CQS §2 (tags [ACT], [SAFE], [CMD] et
     flèches ASCII <--), câblage direct PRG_02_Acquisition, bundle fresh, 15/15 gates PASS (run_all_gates.py --palier C), G200
     PASS. Contrat validé.'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T140_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T141
@@ -1080,7 +1080,7 @@ tasks:
     que le code n''implémente pas (§3bis, à corriger ou implémenter), Busy/Done \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"hors
     socle\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
     non documenté dans le standard, WarningIdCause cité dans le standard mais absent de l''interface réelle (coquille).'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T147_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T148
@@ -1097,7 +1097,7 @@ tasks:
   description: '✅ **Clôturé 2026-08-24 (revue experte)** : faille **NON REPRODUCTIBLE** — Latch est une VAR retenue entre
     scans, Error reste TRUE (pas d''acquittement silencieux). Le correctif v0.1 était un no-op. Fiche `DESIGN_T148_FBFSTATUS_RESET_MAINTENU_v0.2.md`
     : conclusion non reproductible + test de verrou TC-P03-014 à ajouter (devrait déjà passer). **Aucun code C4 à écrire.**'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T148_RETRO.yaml
   objectifs: []
   bloque_par: []
 - id: T150
@@ -1889,7 +1889,7 @@ tasks:
   description: 'NE PAS déléguer T164-4 directement : elle est remplacée par T164-4A, T164-4B, T164-4C et T164-4D. Le contrat
     initial TASK_CONTRACT_ENCODER_INTERFACE_CONFORMANCE.yaml est conservé comme historique de cadrage, non comme autorisation
     d''implémentation. Chaque sous-tâche possède son contrat propre et une revue orchestrateur obligatoire.'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4_RETRO.yaml
   objectifs:
   - T164-4A fixe explicitement les propriétaires de configuration, les invariants et le contrat d''exécution
   - T164-4B établit la persistance après visa de T164-4A
@@ -2191,7 +2191,7 @@ tasks:
   description: Famille T166 — Refactor architectural pour centraliser toutes les décisions et machines d'état de cycles dans
     PRG_03, préserver PRG_04 pour l'application mécanique/safety, éliminer les accès directs de PRG_07 et aligner la documentation
     AF-02/04/10.
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166_RETRO.yaml
   objectifs:
   - Centraliser 100% des machines d'état de cycles (FB_Cycle, FB_DiveSearch, FB_ExtractionSequence) dans PRG_03
   - Décharger PRG_04 des assistants et conserver son rôle souverain de muscle et sécurité physique
@@ -2305,7 +2305,7 @@ tasks:
     = hors scope -> DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md §4, a planifier.
   description: Famille T167 — Unification des séquences, traitement guard sur le bypass Kobold, gestion des time-outs et capture
     StepAtFault.
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167_RETRO.yaml
   objectifs:
   - Définir le Grafcet unifié cible
   - Arbitrer / Refondre FB_DiveSearch avec fix+guard sur le bypass Kobold
@@ -2401,7 +2401,7 @@ tasks:
   titre: Harmonisation DumpAtTremie & Diagnostic Troubleshooting
   contexte: Intégration de l'assistance trémie et projection des diagnostics opérateurs.
   description: Famille T168 — Cadrage du vidage trémie sur le modèle Décision PRG_03 / Muscle PRG_04-05, et raccordement supervision.
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168_RETRO.yaml
   objectifs:
   - Centraliser DumpAtTremie dans PRG_03
   - Connecter le diagnostic dans PRG_07
@@ -2446,21 +2446,6 @@ tasks:
   - T168-A
   - T167-B
   - T167-C
-- id: T168-CR
-  parent_id: T168
-  statut: ✅
-  criticite: C3
-  domaine: REVIEW
-  agent: OLLAMA
-  date: '2026-08-28T16:38:00+02:00'
-  titre: Revue indépendante Ollama du diagnostic et trémie
-  contexte: Audit de cohérence des données supervisions.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-CR_REVIEW_DIAGNOSTIC.yaml.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-CR_REVIEW_DIAGNOSTIC.yaml
-  objectifs:
-  - Audit de l'isolation des données
-  bloque_par:
-  - T168-B
 - id: T168-C
   parent_id: T168
   statut: ✅
@@ -2568,7 +2553,7 @@ tasks:
   - Développer le harnais de simulation dynamique de cycle complet
   - Raccorder l'animation Canvas à la trace JSON du code compilé
   - Audit indépendant par sous-agent Ollama
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171_RETRO.yaml
   date: '2026-08-28T23:36:41'
   bloque_par: []
 - id: T171-A

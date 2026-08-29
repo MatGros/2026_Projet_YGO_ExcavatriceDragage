@@ -129,7 +129,8 @@
       "Bash(python3 *)",
       "Bash(cd *)",
       "Bash(git --no-pager diff --cached --stat)",
-      "Bash(git -c core.hooksPath=/dev/null commit -q -m ' *)"
+      "Bash(git -c core.hooksPath=/dev/null commit -q -m ' *)",
+      "Bash(git --no-pager diff --cached -- DOC/WFLOW/TASKS.yaml)"
     ],
     "ask": [
       "Bash(git reset *)",
