@@ -11,7 +11,7 @@
 ## 🧭 Sommaire
 
 1. [🎯 Rôle et périmètre](#1--rôle-et-périmètre)
-2. [🧪 Points de validation](#2--points-de-validation-tc-p14---propriétaire-fiche-fb)
+2. [🧪 Table des points de validation (non détaillé)](#2--table-des-points-de-validation-non-détaillé)
 3. [🧱 Composition](#3--composition)
 4. [🔄 Flux d'observation & Supervision](#4--flux-dobservation--supervision)
 5. [🛡️ Invariant opposable](#5-️-invariant-opposable)
@@ -39,17 +39,75 @@ machine, organisées dans `GVL_Troubleshooting` :
 
 ### 🎯 Table des fonctions
 
-| F-code | Fonction | FB propriétaire | Fiche | TC associés | État |
-|---|---|---|---|---|---|
-| F14.01 | Recopie passive de l'état machine vers `GVL_Troubleshooting`, aucun calcul ni décision | `FB_TroubleshootingView` | [FB_TroubleshootingView_v1.2.md](AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md) | <nobr><code>TC-P14-TSV-01..05</code></nobr> | `V-I` |
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: 120px;">
+    <col style="width: calc(100% - 430px);">
+    <col style="width: 90px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>F-code</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Fonction</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>FB propriétaire</small></th>
+      <th style="padding: 4px 8px;">Fiche</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>TC associés</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F14.01</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Recopie passive de l'état machine vers <code>GVL_Troubleshooting</code>, aucun calcul ni décision</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_TroubleshootingView</code></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md"><code>FB_TroubleshootingView_v1.2.md</code></a></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P14-TSV-01..05</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>V-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
-## 2. 🧪 Points de validation (`TC-P14-*` — propriétaire fiche FB)
+## 2. 🧪 Table des points de validation (non détaillé)
 
-| Bloc | Plage TC | Points clés | État |
-|---|---|---|---|
-| `FB_TroubleshootingView` | <nobr><code>TC-P14-TSV-01..05</code></nobr> | Zéro `VAR_OUTPUT` de commande, chaque champ a un producteur réel documenté, aucun TBD affiché comme mesure réelle, instance unique dans `PRG_07_Supervision`, zéro régression gates | `V-I` |
+> Catalogue détaillé et **propriété unique** dans la fiche
+> [`FB_TroubleshootingView_v1.2.md`](AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md) —
+> ce chapô ne recopie que la synthèse.
+
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 130px;">
+    <col style="width: 100px;">
+    <col style="width: calc(100% - 280px);">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>Bloc</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Plage TC</small></th>
+      <th style="padding: 4px 8px;">Points clés</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_TroubleshootingView</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>TC-P14-TSV-01..05</code></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Zéro <code>VAR_OUTPUT</code> de commande, chaque champ a un producteur réel documenté, aucun TBD affiché comme mesure réelle, instance unique dans <code>PRG_07_Supervision</code>, zéro régression gates</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 

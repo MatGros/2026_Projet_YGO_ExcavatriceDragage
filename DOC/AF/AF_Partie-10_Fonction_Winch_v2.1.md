@@ -14,23 +14,128 @@
 
 ### 🎯 Table des fonctions
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
-|---|---|---|---|---|---|---|---|
-| `F10.01` | Piloter le mouvement treuil par palier | 5 paliers vitesse, sens, tempo asymétrique montée/descente | `FB_Winch` | 🟠 C3 | <nobr><code>TC-P10-011</code></nobr>, 017-019 | ✅ | `NV-I` |
-| `F10.02` | Protéger le treuil (défense en profondeur) | 7 mécanismes A-G (safety métier), masques, bypass | `FB_Safety_Winch` | 🔴 C4 | <nobr><code>TC-P10-001</code></nobr>-010 | ✅ | `NV-I` |
-| `F10.03` | Synchroniser M1/M2 (3 zones) | Nominal / dégradé palier 1 / SafeStop selon écart | `FB_WinchSync` | 🔴 C4 | <nobr><code>TC-P10-014</code></nobr>-016 | ✅ | `NV-I` |
-| `F10.04` | Barrière finale sorties + watchdog frein | Contacteurs + frein couplé direct, anti-redémarrage | `FB_WinchOutputInterlock` | 🔴 C4 | <nobr><code>TC-P10-012</code></nobr>, 013, 020-022 | ✅ | `NV-I` |
-| `F10.05` | Piloter la benne (désynchro M1/M2) | Ouverture/fermeture, glissement, assistants Dive/Extraction | `FB_Bucket` | 🟠 C3 | <nobr><code>TC-P10-023</code></nobr>-034 | ✅ | `NV-I` |
-| `F10.06` | Diagnostiquer la symétrie M1/M2 | Écarts démarrage/frein/arrêt/position, passif | `FB_Winch_Symmetry` | ⚪ C1 | — | ✅ | `NV-I` |
-| `F10.07` | Décoder consigne % → contacteurs | Palier 1-5 + garde-fou vitesse mesurée | `FB_SpeedStep` | 🟠 C3 | — | ✅ | `NV-I` |
-| `F10.08` | Estimer la charge 2D (palier × vitesse) | Diagnostic, pas d'action sécurité | `FB_WinchLoadEstimator` | ⚪ C1 | — | ✅ | `NV-I` |
-| `F10.09` | Surveiller la dérive sous frein serré | Capture position, alerte si dérive | `FB_DriftGuard` | 🟠 C3 | — | ✅ | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: calc(100% - 520px);">
+    <col style="width: 110px;">
+    <col style="width: 50px;">
+    <col style="width: 90px;">
+    <col style="width: 50px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Fonction</small></th>
+      <th style="padding: 4px 8px;">Description</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réalisée par</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Criticité</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>TC couvrants</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Statut</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F10.01</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Piloter le mouvement treuil par palier</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">5 paliers vitesse, sens, tempo asymétrique montée/descente</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Winch</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-011, 017-019</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F10.02</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Protéger le treuil (défense en profondeur)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">7 mécanismes A-G (safety métier), masques, bypass</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_Winch</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-001-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F10.03</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Synchroniser M1/M2 (3 zones)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Nominal / dégradé palier 1 / SafeStop selon écart</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_WinchSync</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-014-016</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F10.04</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Barrière finale sorties + watchdog frein</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Contacteurs + frein couplé direct, anti-redémarrage</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_WinchOutputInterlock</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-012, 013, 020-022</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F10.05</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Piloter la benne (désynchro M1/M2)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Ouverture/fermeture, glissement, assistants Dive/Extraction</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Bucket</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-023-034</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F10.06</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Diagnostiquer la symétrie M1/M2</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Écarts démarrage/frein/arrêt/position, passif</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Winch_Symmetry</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚪ C1</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">—</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F10.07</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Décoder consigne % → contacteurs</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Palier 1-5 + garde-fou vitesse mesurée</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_SpeedStep</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">—</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F10.08</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Estimer la charge 2D (palier × vitesse)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Diagnostic, pas d'action sécurité</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_WinchLoadEstimator</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚪ C1</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">—</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F10.09</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Surveiller la dérive sous frein serré</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Capture position, alerte si dérive</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_DriftGuard</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">—</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 📑 Sommaire
 
-1. [🧪 Points de validation](#1--points-de-validation)
+1. [🧪 Table des points de validation (non détaillé)](#1--table-des-points-de-validation-non-détaillé)
 2. [🧱 Composition — fiches FB dédiées](#2--composition--fiches-fb-dédiées)
    - [2bis. Frein — couplage direct](#2bis-frein--couplage-direct-🔧-2026-08-06-demande-client)
    - [2ter. Tempo de reprise basée sur l'état frein](#2ter-tempo-de-reprise-basée-sur-létat-frein-pas-le-centre-joystick-🔧-2026-08-07)
@@ -50,24 +155,107 @@
 9. [❓ TBD](#9--tbd)
 10. [📚 Documents liés](#10--documents-liés)
 
-## 🧪 1 · Points de validation
+## 🧪 1 · Table des points de validation (non détaillé)
 
 Catalogue `TC-P10-*` **réparti dans les fiches FB** (propriétaire unique par fiche, pas
 dupliqué ici) :
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| Fiche | TC couverts | Etat |
-|---|---|---|
-| [`FB_Winch`](AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md) | <nobr><code>TC-P10-011</code></nobr>, 017, 018, 019 | `NV-I` |
-| [`FB_Safety_Winch`](AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md) | <nobr><code>TC-P10-001</code></nobr> à 010 | `NV-I` |
-| [`FB_WinchSync`](AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md) | <nobr><code>TC-P10-014</code></nobr>, 015, 016 | `NV` |
-| [`FB_WinchOutputInterlock`](AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md) | <nobr><code>TC-P10-012</code></nobr>, 013, 020, 021, 022 | `NV` |
-| [`FB_Bucket`](AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md) | <nobr><code>TC-P10-023</code></nobr> à 034 | `NV-I` |
-| [`FB_Winch_Symmetry`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.1.md) | Diagnostic MES-008, symétrie | `NV` |
-| [`FB_SpeedStep`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | Décodage paliers 1..5 & garde-fou | `NV` |
-| [`FB_WinchLoadEstimator`](AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md) | Diagnostic charge 2D | `NV` |
-| [`FB_DriftGuard`](AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md) | Dérive position sous frein | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-011, 017, 018, 019</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_Winch</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md">FB_Winch_v1.0.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-001 à 010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_Safety_Winch</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md">FB_Safety_Winch_v1.0.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-014, 015, 016</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_WinchSync</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md">FB_WinchSync_v1.1.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-012, 013, 020, 021, 022</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_WinchOutputInterlock</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md">FB_WinchOutputInterlock_v1.0.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-023 à 034</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_Bucket</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md">FB_Bucket_v1.0.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">Diagnostic MES-008, symétrie</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_Winch_Symmetry</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.1.md">FB_Winch_Symmetry_v1.1.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">Décodage paliers 1..5 &amp; garde-fou</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_SpeedStep</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md">FB_SpeedStep_v1.0.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">Diagnostic charge 2D</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_WinchLoadEstimator</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md">FB_WinchLoadEstimator_v1.0.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">Dérive position sous frein</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_DriftGuard</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md">FB_DriftGuard_v1.0.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 

@@ -41,17 +41,104 @@
 
 ### 🎯 Table des fonctions
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
-|---|---|---|---|---|---|---|---|
-| `F09.01` | Acquérir position brute + gérer le preset SDO | Lit `RawPosIn`/`AlarmsIn`/`SlaveOperational` (EtherCAT), séquence l'écriture preset (déclenchement, tolérance, timeout) | `FB_Encoder_Abs` | 🟠 C3 | <nobr><code>TC-P09-010</code></nobr> | ✅ | `NV-I` |
-| `F09.02` | Référencer l'axe (homing) | 3 modes : nominal (capteur haut, front), unitaire (cible libre `CfgHomingTargetM`), dynamique (cible calculée par l'appelant, ex. benne) | `FB_Encoder_Homing` | 🟠 C3 | <nobr><code>TC-P09-020</code></nobr> | ✅ | `NV-I` |
-| `F09.03` | Détecter une incohérence codeur au redémarrage | Écart entre position au boot et dernière position connue (RETAIN) > tolérance → `HomingSuspect`, levé par `BtnConfirmCoherence` | `FB_Encoder_Homing` | 🟠 C3 | <nobr><code>TC-P09-020</code></nobr> | ✅ | `NV-I` |
-| `F09.04` | Mettre à l'échelle points → mètres | `CablePosM := (RawPos - HomingRefRaw) × CableM_PerRev / PointsPerRev` | `FB_Encoder_Scale` | 🔵 C2 | <nobr><code>TC-P09-030</code></nobr> | ✅ | `NV-I` |
-| `F09.05` | Borner physiquement + relayer l'incohérence | Hors `[PositionMinM;PositionMaxM]` (déf. ±99m) OU `HomingSuspect` → `EncoderIncoherent=TRUE` | `FB_Encoder_Safety` | 🟠 C3 | <nobr><code>TC-P09-030</code></nobr> | ✅ | `NV-I` |
-| `F09.06` | Synthétiser les gates de fiabilité | `EncoderFault := NOT Available OR Incoherent` (sans Homed) ; `HomedAndReliable := Available AND Homed AND NOT Incoherent` (gate stricte M3) | `FB_EncoderReliability` | 🟠 C3 | <nobr><code>TC-P09-040</code></nobr> | ✅ | `NV-I` |
-| `F09.07` | Mesurer la vitesse câble | Fenêtre glissante horodatée (6 échantillons, ≥50ms), signée (+ montée) | `FB_Encoder_SpeedMeasure` | 🔵 C2 | <nobr><code>TC-P09-050</code></nobr> | ✅ | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: calc(100% - 520px);">
+    <col style="width: 110px;">
+    <col style="width: 50px;">
+    <col style="width: 90px;">
+    <col style="width: 50px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Fonction</small></th>
+      <th style="padding: 4px 8px;">Description</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réalisée par</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Criticité</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>TC couvrants</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Statut</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F09.01</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquérir position brute + gérer le preset SDO</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Lit <code>RawPosIn</code>/<code>AlarmsIn</code>/<code>SlaveOperational</code> (EtherCAT), séquence l'écriture preset (déclenchement, tolérance, timeout)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Encoder_Abs</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F09.02</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Référencer l'axe (homing)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">3 modes : nominal (capteur haut, front), unitaire (cible libre <code>CfgHomingTargetM</code>), dynamique (cible calculée par l'appelant, ex. benne)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Encoder_Homing</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F09.03</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Détecter une incohérence codeur au redémarrage</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Écart entre position au boot et dernière position connue (RETAIN) &gt; tolérance → <code>HomingSuspect</code>, levé par <code>BtnConfirmCoherence</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Encoder_Homing</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F09.04</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Mettre à l'échelle points → mètres</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>CablePosM := (RawPos - HomingRefRaw) × CableM_PerRev / PointsPerRev</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Encoder_Scale</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔵 C2</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F09.05</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Borner physiquement + relayer l'incohérence</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Hors <code>[PositionMinM;PositionMaxM]</code> (déf. ±99m) OU <code>HomingSuspect</code> → <code>EncoderIncoherent=TRUE</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Encoder_Safety</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F09.06</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Synthétiser les gates de fiabilité</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>EncoderFault := NOT Available OR Incoherent</code> (sans Homed) ; <code>HomedAndReliable := Available AND Homed AND NOT Incoherent</code> (gate stricte M3)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_EncoderReliability</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-040</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F09.07</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Mesurer la vitesse câble</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Fenêtre glissante horodatée (6 échantillons, ≥50ms), signée (+ montée)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Encoder_SpeedMeasure</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔵 C2</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-050</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 > `F09.08` (détection de variation brusque, `FB_Encoder_SpeedMonitor`) **retiré** — legacy, jamais
 > instancié, fait doublon avec `F09.07` déjà en place ; voir §10 Suivi historique. ID non réattribué.
@@ -63,16 +150,78 @@
 
 ## 2 · 🧪 Table des points de validation
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P09-010</code></nobr> | **Acquisition & preset** | Bus/esclave KO → `EncoderAvailable=FALSE`, `RawPos` gelé ; preset hors tolérance après timeout → `PresetNak` + Fault | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Abs</code></small> | `NV-I` |
-| <nobr><code>TC-P09-020</code></nobr> | **Homing & cohérence** | 3 modes homing bornent la cible `[-99;+99]m` avant écriture ; écart au boot > tolérance → `HomingSuspect`, levé par confirmation explicite | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Homing</code></small> | `NV` |
-| <nobr><code>TC-P09-030</code></nobr> | **Échelle & bornage** | Conversion signée exacte ; hors bornes ou suspect → `EncoderIncoherent=TRUE` | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_Scale</code><br><code>FB_Encoder_Safety</code></small> | `NV` |
-| <nobr><code>TC-P09-040</code></nobr> | **Fiabilité** | `EncoderFault` ne dépend pas de `Homed` (non-référencé ≠ incohérent) ; `HomedAndReliable` exige les 3 conditions | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_EncoderReliability</code></small> | `NV` |
-| <nobr><code>TC-P09-050</code></nobr> | **Vitesse & dynamique** | `Valid=TRUE` après 6 échantillons (≥50ms) ; absorption des perturbations mécaniques câble & vibrations ; purge sur perte validité amont | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Encoder_SpeedMeasure</code></small> | `V-I` |
-| <nobr><code>TC-P09-060</code></nobr> | ⛔ **RETIRÉ (v2.2)** — testait `FB_Encoder_SpeedMonitor`, FB legacy jamais instancié, retiré du code (voir §10). ID non réattribué (immutabilité `CODE_QUALITY_STANDARDS.md §0`). | — | — | — | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquisition &amp; preset</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Bus/esclave KO → <code>EncoderAvailable=FALSE</code>, <code>RawPos</code> gelé ; preset hors tolérance après timeout → <code>PresetNak</code> + Fault</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>FB_Encoder_Abs</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homing &amp; cohérence</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">3 modes homing bornent la cible <code>[-99;+99]m</code> avant écriture ; écart au boot &gt; tolérance → <code>HomingSuspect</code>, levé par confirmation explicite</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>FB_Encoder_Homing</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Échelle &amp; bornage</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Conversion signée exacte ; hors bornes ou suspect → <code>EncoderIncoherent=TRUE</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>FB_Encoder_Scale<br>FB_Encoder_Safety</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-040</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Fiabilité</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>EncoderFault</code> ne dépend pas de <code>Homed</code> (non-référencé ≠ incohérent) ; <code>HomedAndReliable</code> exige les 3 conditions</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>FB_EncoderReliability</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-050</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Vitesse &amp; dynamique</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Valid=TRUE</code> après 6 échantillons (≥50ms) ; absorption des perturbations mécaniques câble &amp; vibrations ; purge sur perte validité amont</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>FB_Encoder_SpeedMeasure</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-060</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⛔ <b>RETIRÉ (v2.2)</b> — testait <code>FB_Encoder_SpeedMonitor</code>, FB legacy jamais instancié, retiré du code (voir §10). ID non réattribué (immutabilité <code>CODE_QUALITY_STANDARDS.md §0</code>).</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">—</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>—</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
