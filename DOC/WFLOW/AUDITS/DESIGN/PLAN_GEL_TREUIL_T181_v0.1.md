@@ -22,6 +22,7 @@
 - [10 · Ordre d'application manuelle CODESYS](#10--ordre-dapplication-manuelle-codesys)
 - [11 · Rollback & non-régression](#11--rollback--non-régression)
 - [12 · Risques résiduels & validations humaines](#12--risques-résiduels--validations-humaines)
+- [13 · Corrections à intégrer — challenge B2](#13--corrections-à-intégrer--challenge-b2-2026-08-29)
 
 ---
 
@@ -349,8 +350,54 @@ Checklist import CODESYS · essai à vide paliers 1→5 M1/M2/couplé · essai c
 
 ---
 
+## 13 · Corrections à intégrer — challenge B2 (2026-08-29)
+
+> 3ᵉ challenge indépendant (subagent Claude, accès dépôt). Rapport complet :
+> `BRIEFS_T181/RESULTS/B2_challenge3_resultat.md`. Verdict : *« proche, mais ne donne pas encore
+> un winch qui fonctionne du premier coup »*. À intégrer avant le lancement de Phase 0.
+
+### Écarts sécurité relevés en passant
+
+| # | Fait | Emplacement | Suite |
+|---|---|---|---|
+| **S1** | L'interlock de cadence dans la barrière finale **n'existe pas** (`StepDelay` TON câblé `IN:=FALSE`). T181-01 le **crée**, ne le fiabilise pas. | `FB_WinchOutputInterlock.st:213…246` | Reformuler T181-01 (fait) |
+| **S2** | Garde-fou survitesse **neutralisé** et le reste jusqu'à T181-16 (Phase B) — donc pendant les 1ᵉʳˢ essais site. | `PRG_04:682,718` ; `FB_Winch.st:264-269` | Acter le risque au plan de tir |
+| **S3** 🚨 | **Nouveau — D18** : temps mort directionnel **bypassé au redémarrage à chaud** (`FirstScanDone` non ré-init + branche neutre→sens immédiate + `DeadTimePending:=FALSE` au gate barrière). | `FB_Winch.st:141-168,211` ; `FB_WinchOutputInterlock.st:97-116` | **D18** ajouté (ci-dessous) → T181-05 |
+| S4 | `SpeedGuardReady := NOT instWinchSync.Fault.Error` — câblage sémantiquement faux, deviendra actif avec T181-16. | `PRG_04:684,720` | À corriger dans T181-16 |
+| S5 | `FB_WinchOutputInterlock` ne réagit pas à un `SafeStop` amont tant que la demande métier ne retombe pas seule (volontaire, l.118-122). | `FB_WinchOutputInterlock.st:118-122` | À confirmer humain (hors périmètre) |
+
+### D18 (ajout au registre §1)
+
+| ID | Défaut | Preuve | Crit. | Critère de sortie | Porté par |
+|---|---|---|---|---|---|
+| **D18** | Temps mort directionnel bypassé au redémarrage à chaud (`FirstScanDone`) | `FB_Winch.st:141-168,211` ; `FB_WinchOutputInterlock.st:97-116` | C4 | Hot-restart avec `Direction ≠ 0` maintenu → temps mort appliqué par **au moins un** des deux niveaux (TC harnais + TC unitaire) | T181-05 (+ garde T181-01) |
+
+### Les 5 changements structurants
+
+| # | Changement | Cible |
+|---|---|---|
+| **1** | **Scinder T181-08** → **T181-08a** (plomberie struct pure, comportement bit-identique, shadow-equal, `MinStepNumber` câblé mais `= 1` partout) + **T181-08b** (bascule du calcul clamp vers l'agrégateur `PRG_04`, fin du shadow). **Oracle shadow redéfini** : « égalité **sauf** cas où un plancher / une précédence est active, comparés à un attendu écrit à la main ». `N` = « 100 % des vecteurs du harnais T181-00, chacun rejoué jusqu'à convergence » (pas un compteur). Fermer le shadow **avant** T181-10. | §7, §8, §11 + bloc TASKS |
+| **2** | **Requalifier Phase 0/0b** : « interface `FB_Winch` **en réduction / additive contrôlée uniquement**, les 2 sites `PRG_04` édités au même commit » — **pas** « inchangée ». Tracer explicitement : D07 (`ContactorsCheck.StuckClosed` est une **sortie publique** consommée IHM/Troubleshooting) · D09/T181-05 (`Mode` est `VAR_INPUT` → retrait ⇒ édition `PRG_04`) · D01/T181-01 (ajout d'un `Config` de seuils de cadence, le FB n'en a aucun aujourd'hui). | §7 + bloc TASKS T181-01/05 |
+| **3** | **Ajouter D18** (ci-dessus) → rattaché à **T181-05** (interne `FB_Winch`) avec garde côté **T181-01**. | §1 + bloc TASKS |
+| **4** | **Renforcer §5** (preuve `FinalInterlockGoverned = FALSE`) : ajouter 4 exigences — (a) **indépendance** des 2 jeux de seuils (sources de config distinctes, zéro variable / GVL partagée) ; (b) **non-bypassabilité** de l'instance interne `FB_Winch` par `GVL_IHM.MxTreuil*.Bypass.Global` ; (c) **argument PLr** documenté (fonction de sécurité, PLr visé, catégorie d'archi) ; (d) **critère site chiffré** (cadence 1→5 chronométrée, la barrière ne mord pas). Écrire noir sur blanc : **la signature sécurité finale exige l'essai site — la CI ne la délivre pas.** | §5 + contrat T181-01 |
+| **5** | **Corriger les arêtes `bloque_par`** : `T181-00 bloque_par: [T169-A]` (T169-A ⏳ AGY-01 modifie le même `FB_Main_EndToEnd`) · `T181-01 bloque_par: [T181-00, T175]` (T175 AC2 = source unique du temps mort directionnel). **Compléter le contrat T181-06** : place de l'override `instBucket.Busy` (reste `PRG_04` §3, écrit `DriveRequest.{StartStop,Direction}` de M2) · le `15.0` magique → `Config.BucketJogSpeedPct` · **décision D13** (garder / supprimer la table `PRG_04:405-429`) remontée en **arrêt de validation humaine** de T181-06, pas enterrée dans T181-10. Étendre les `objectifs` de **T181-00** à la modélisation frein + contacteurs retombés (croisements T178 / T180 CAS-001). | bloc TASKS + contrats T181-06 / T181-01 |
+
+### Corrections de justification (pas de changement de tâche)
+
+- **§4.1 (flux `MinStepDescent`)** : la prémisse « 3 POU / 3 tâches, latence » est **fausse** — `PRG_02…07` s'exécutent **séquentiellement dans la même MainTask 10 ms**, `FB_DiveSearch` est instancié dans `PRG_03` → flux `FB_DiveSearch → PRG_03.ReqProgram → PRG_04` **intra-cycle, zéro latence**. Le vrai point : gating sur `DescentActive` (front de sortie) + cas « maintien descente joystick post-fond » (`KoboldBottomTouchLatched` coupe `StartStop`). TC front + TC maintien post-fond dans T181-12.
+- **T130/T131/T135 (⏸️) et T096** : « supersédées / absorbée » mais **jamais clôturées** dans `TASKS.yaml`. Housekeeping : passer ❌ avec renvoi T181-06/07/13/15 lors de l'insertion du bloc.
+
+### Découpage (§6 de B2, à appliquer à l'insertion)
+
+- Scinder **T181-14** → 14a (matrice bypass ~20 `Bypass*`) + 14b (override FDC N1 borné 8,5 m + re-homing).
+- Critères non mesurables à réécrire : T181-08 « ≥ N cycles » → « 100 % vecteurs à convergence » ; T181-00 « modèle physique minimal » → fidélité chiffrée ; T181-13 « acceptable pour l'opérateur » → « relâche → palier 0 au cycle N+1 » + « ΔStepNumber ≤ +1/cycle ».
+- Fusions optionnelles (coordination) : T181-02 + T181-03 ; T181-18 + T181-19.
+
+---
+
 ## Suivi historique
 
 | Version | Date | Changement |
 |---|---|---|
 | v0.1 | 2026-08-29 | Première version formatée. Consolidation 6 sources. Réconciliation T175/T176/T177/T178/T169/T180 (T181-04 et T181-17 retirées, `bloque_par: T177` ajouté). 20 tâches + 3 contrats de cadrage. |
+| v0.1 + §13 | 2026-08-29 | Challenge B2 (3ᵉ passe indépendante). §13 = 5 changements structurants + D18 + 5 écarts sécurité S1–S5 + corrections de justification. À intégrer dans le corps du plan (v0.2) avant lancement Phase 0. |

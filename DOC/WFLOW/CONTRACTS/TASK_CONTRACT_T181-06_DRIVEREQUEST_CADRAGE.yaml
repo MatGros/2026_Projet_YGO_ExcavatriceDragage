@@ -33,8 +33,14 @@ contract:
       statement: "Matrice d'interconnexion producteur → DriveRequest pour les 8 producteurs (Cycle, PRG_03, DiveSearch, ExtractionSequence, Joystick, Modes, IHM, Bucket) : mapping OK / gap sémantique / impossible, avec commentaire par ligne."
       verified_by: "note de cadrage : matrice 8 lignes"
     - id: AC7
-      statement: "Point d'arbitrage unique confirmé : StartStop/Direction/SpeedTgt_Pct restent arbitrés dans PRG_04 §3, jamais dans FB_Winch. L'override benne (instBucket.Busy) a une place définie dans la construction du DriveRequest."
-      verified_by: "note de cadrage : localisation de l'arbitrage + place de l'override benne"
+      statement: "Point d'arbitrage unique confirmé : StartStop/Direction/SpeedTgt_Pct restent arbitrés dans PRG_04 §3, jamais dans FB_Winch."
+      verified_by: "note de cadrage : localisation de l'arbitrage"
+    - id: AC7b
+      statement: "Override benne tranché : la branche IF instBucket.Busy de PRG_04 §3 écrit DriveRequest.{StartStop,Direction} de M2 (reste en §3) ; la vitesse benne 15.0 codée en dur (PRG_04:288) devient Config.BucketJogSpeedPct ; M2_ForceSlowSpeed (renommé M2_BucketJogLimit) va dans l'agrégateur de clamp, branche M2-only."
+      verified_by: "note de cadrage : tableau override benne (3 lignes) + grep 15.0 dans PRG_04 = 0 après T181-10"
+    - id: AC7c
+      statement: "Décision D13 tranchée dans CE cadrage (arrêt humain), pas dans T181-10 : la reconstruction de table PRG_04:405-429 (M2_SpeedStepTableActive) est supprimée si MaxStepDescent:=1 de l'agrégateur suffit, sinon conservation motivée en clair."
+      verified_by: "note de cadrage : décision D13 explicite, signée humain"
     - id: AC8
       statement: "Section AF-10 (interface + rôle FB_Winch cible) rédigée et cohérente avec la note."
       verified_by: "diff AF-10 relu par l'humain"
