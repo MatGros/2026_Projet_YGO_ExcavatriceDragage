@@ -29,7 +29,7 @@ Il ne choisit jamais le producteur, le mode ou la synchronisation. Ces responsab
 <tr><td>IN</td><td><code>Config : ST_fbWinch_Cfg</code></td><td>configuration statique seulement</td></tr>
 <tr><td>IN</td><td><code>SafeStop, PermitUp, PermitDown</code></td><td>sorties déjà arbitrées de <code>FB_Safety_Winch</code></td></tr>
 <tr><td>OUT</td><td><code>RelayFwd_Up, RelayRev_Down, Contactor1..4</code></td><td>commandes envoyées à la barrière finale</td></tr>
-<tr><td>OUT</td><td><code>StepReq_Decoded, StepNumber, StepRampElapsed</code></td><td>cible clampée et palier temporisé</td></tr>
+<tr><td>OUT</td><td><code>SpeedStepReq_Decoded, StepNumber, StepRampElapsed</code></td><td>cible clampée et palier temporisé</td></tr>
 <tr><td>OUT</td><td><code>ContactorsCheck, Fault, Ready</code></td><td>diagnostic ; <code>StuckClosed</code> publié mais produit par Safety</td></tr>
 </tbody></table>
 

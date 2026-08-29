@@ -29,7 +29,7 @@
 |---|---|---|---|
 | `StartStop` | BOOL | — | Ordre marche / arrêt |
 | `Direction` | INT | −1 / 0 / +1 | Sens : −1 descente · 0 stop · +1 montée |
-| `StepReq` | INT | 0..5 | **Palier demandé** (décodé en amont — joystick % ou étape de cycle) |
+| `SpeedStepReq` | INT | 0..5 | **Palier demandé** (décodé en amont — joystick % ou étape de cycle) |
 | `MinStepUp` | INT | 0..5 | Plancher palier montée (agrégé `PRG_04`) |
 | `MaxStepUp` | INT | 0..5 | Plafond palier montée (MIN des sources) |
 | `MinStepDown` | INT | 0..5 | Plancher palier descente — **plongée Kobold 3-4** |
@@ -38,7 +38,7 @@
 | `BottomLimitEff_M` | REAL | m | **MIN**(limite câble physique, limite légale) — calculé `PRG_04` |
 | `SyncCoupled` | BOOL | — | **Diag strict** — `FB_Winch` ne le lit jamais en logique (garde de revue) |
 
-> Retiré vs maquette précédente : `SpeedTgt_Pct` (→ `StepReq`).
+> Retiré vs maquette précédente : `SpeedTgt_Pct` (→ `SpeedStepReq`).
 
 ### `ST_fbWinch_Sensors`
 
@@ -100,7 +100,7 @@ Producteur `PRG_04`, consommateur `PRG_06`. **Le nom de la struct porte le rôle
 |---|---|
 | État | `Ready`, `Fault : ST_Fault` |
 | Actionneurs | `RelayFwd_Up`, `RelayRev_Down`, `Contactor1` .. `Contactor4` |
-| Diag | `StepReq_Decoded` (palier après clamp), `StepNumber` (palier temporisé actif), `StepRampElapsed`, `ContactorsCheck : ST_ContactorCheck` *(sans `StuckClosed` — propriétaire = `FB_Safety_Winch`, voir note)*, `InTopSlowdownZone`, `InBottomSlowdownZone`, `CommandedDirection`, `DirectionChangePending`, `DirectionChangeElapsed` |
+| Diag | `SpeedStepReq_Decoded` (palier après clamp), `StepNumber` (palier temporisé actif), `StepRampElapsed`, `ContactorsCheck : ST_ContactorCheck` *(sans `StuckClosed` — propriétaire = `FB_Safety_Winch`, voir note)*, `InTopSlowdownZone`, `InBottomSlowdownZone`, `CommandedDirection`, `DirectionChangePending`, `DirectionChangeElapsed` |
 
 > **D07 / `ContactorsCheck.StuckClosed`** : la *détection* passe dans `FB_Safety_Winch`. Le *champ* `ContactorsCheck.StuckClosed` reste publié (consommé IHM/Troubleshooting) mais **ré-alimenté depuis `FB_Safety_Winch`** via `PRG_04` — pas supprimé. La cause de défaut interne `instCauses[1]` de `FB_Winch` est retirée en parallèle.
 
@@ -112,7 +112,7 @@ Producteur `PRG_04`, consommateur `PRG_06`. **Le nom de la struct porte le rôle
 |---|---|---|---|
 | **`FB_WinchDirectionInterlock`** | à créer (extraction `FB_Winch §5`) | IN: `Enable`, `ReqDirection:INT`, `ChangeDelayUp:TIME`, `ChangeDelayDown:TIME`, `EnableRising:BOOL` — OUT: `CommandedDirection:INT`, `ChangePending:BOOL`, `DelayElapsed:TIME` | **D18** : sur `EnableRising` (front montant `Enable`), **ne pas** adopter `ReqDirection` immédiatement — armer le temps mort. Cible = front `Enable`, **pas** `FirstScanDone`. |
 | **`FB_WinchStepShaper`** | **PAS un FB séparé** | — | La tempo de rampe palier reste un `TON` inline dans `FB_Winch` (ex-`BusinessStepDelay`). Seule action : le piloter par `Config.StepRampDelay` (paramètre dédié), plus par les délais d'interlock direction. Économie de cérémonie (B4). |
-| **`FB_WinchRateInterlock`** | à créer | IN: `Enable`, `Reset`, `StepReq:INT`, `CurrentStep:INT`, `MeasuredSpeedMps:REAL`, `MeasuredSpeedValid:BOOL`, `RefSpeedMps:REAL`, `Bypass:BOOL` — OUT: `AuthorizedStep:INT`, `RateLimited:BOOL`, `Governed:BOOL`, `Reason:enum` | **Seuils = 2 CONSTANTES en dur**, pas des entrées : instance `FB_Winch` = `RefSpeed + marge` ; instance `PRG_06` = `RefSpeed` nu. Constantes ≠ corruptibles → renforce l'indépendance (B4). `Governed` de l'instance `PRG_06` = `FinalInterlockGoverned`, DOIT rester FALSE en nominal. |
+| **`FB_WinchRateInterlock`** | à créer | IN: `Enable`, `Reset`, `SpeedStepReq:INT`, `CurrentStep:INT`, `MeasuredSpeedMps:REAL`, `MeasuredSpeedValid:BOOL`, `RefSpeedMps:REAL`, `Bypass:BOOL` — OUT: `AuthorizedStep:INT`, `RateLimited:BOOL`, `Governed:BOOL`, `Reason:enum` | **Seuils = 2 CONSTANTES en dur**, pas des entrées : instance `FB_Winch` = `RefSpeed + marge` ; instance `PRG_06` = `RefSpeed` nu. Constantes ≠ corruptibles → renforce l'indépendance (B4). `Governed` de l'instance `PRG_06` = `FinalInterlockGoverned`, DOIT rester FALSE en nominal. |
 | **`FB_WinchSpeedLearning`** | à créer | IN: `Enable`, `LearnStart:BOOL` (1 bit IHM), `WinchId:INT`, `Direction:INT`, `StepNumber:INT`, `MeasuredSpeedMps:REAL`, `MeasuredSpeedValid:BOOL`, `LoadPresent:BOOL`, `StableForLearn:BOOL` — IN_OUT: `Table : ST_WinchSpeedLearnTable` (RETAIN) — OUT: `Learning:BOOL`, `TableComplete:BOOL`, `LampLearn:BOOL`, `CellsFilled:INT`, `CellsTotal:INT` | Collecteur **passif** (jamais de commande moteur). RETAIN : garde-fou de plausibilité obligatoire (borne min/max par palier ; valeur hors borne → cellule invalidée, pas d'armement survitesse). Emplacement RETAIN dans `GVL_PERSISTENT` en **fin** de zone (l'ajout ne décale pas les champs existants). |
 
 ---

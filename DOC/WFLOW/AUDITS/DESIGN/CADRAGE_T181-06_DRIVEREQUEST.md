@@ -18,7 +18,7 @@ Nommage : DUT propriété de `FB_Winch` selon **NC-110** (`ST_fbWinch_*`) ; `Req
 |---|---|---|
 | `StartStop` | `BOOL` | TRUE = mouvement demandé |
 | `Direction` | `INT`, -1/0/+1 | descente / stop / montée |
-| `StepReq` | `INT`, 0..5 | cible décodée en amont |
+| `SpeedStepReq` | `INT`, 0..5 | cible décodée en amont |
 | `MinStepUp`, `MaxStepUp` | `INT`, 0..5 | bornes montée agrégées |
 | `MinStepDown`, `MaxStepDown` | `INT`, 0..5 | bornes descente agrégées |
 | `TopLimitEff_M`, `BottomLimitEff_M` | `REAL`, m | limites effectives du cycle, calculées dans `PRG_04` |
@@ -73,7 +73,7 @@ Nommage : DUT propriété de `FB_Winch` selon **NC-110** (`ST_fbWinch_*`) ; `Req
 MaxStepClamped := MIN(AllMaxSources);
 MinStepRaw     := MAX(AllMinSources);
 MinClamped     := LIMIT(1, MinStepRaw, MaxStepClamped);
-RequestedStep  := MAX(StepReqAfterHysteresis, MinClamped);
+RequestedStep  := MAX(SpeedStepReqAfterHysteresis, MinClamped);
 ```
 
 La garde est dans `FB_SpeedStep`, après le plafond et avant le `CASE`. Cas imposé : `MinStepDown=3`, `MaxStepDown=1` donne **1** ; le plafond safety gagne. `MinStepNumber` agit uniquement sur `RequestedStep`, jamais par `StepNumber := MinStepNumber`. Le `TON` inline de rampe, piloté par `Config.StepRampDelay`, conserve l'accostage d'un palier par période ; relâche `StartStop=FALSE` donne 0 immédiatement.
@@ -89,7 +89,7 @@ Ce chemin est **intra-cycle, zéro latence** : `PRG_02…07` sont séquentiels d
 
 | Producteur | Mapping vers `DriveRequest` | Verdict |
 |---|---|---|
-| `FB_Cycle` | `StartStop`, `Direction`, `StepReq` | OK ; ne pas fusionner sa demande existante |
+| `FB_Cycle` | `StartStop`, `Direction`, `SpeedStepReq` | OK ; ne pas fusionner sa demande existante |
 | `PRG_03` | sélection mode, requêtes cycle et `MinStepDown` | OK |
 | `FB_DiveSearch` | `MinStepDown`, inhibition palier 5 | gap traité T181-12 |
 | `FB_ExtractionSequence` | `MaxStepUp:=1` via `ExtractionControlActive` | OK après renommage |
