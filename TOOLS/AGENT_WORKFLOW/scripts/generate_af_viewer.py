@@ -133,18 +133,28 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <style>
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
-  --bg:#f6f7f9;--panel:#ffffff;--ink:#1f2430;--muted:#5b6472;--line:#dfe3e9;
-  --accent:#2a5db0;--row-alt:#f2f4f7;
-  --ok:#2e7d32;--ok-bg:#e6f4ea;--warn:#b5651d;--warn-bg:#fbeee0;
-  --info:#1565c0;--info-bg:#e4eefb;--none:#6b7280;--none-bg:#eceef1;
-  --green:#2e7d32;--orange:#c77700;--red:#c62828;
+  color-scheme:dark;
+  --bg:#1e1e2e;--panel:#282a36;--ink:#f8f8f2;--muted:#9aa3c4;--line:#44475a;
+  --accent:#bd93f9;--row-alt:#21222c;--th-bg:#191a21;--th-hover:#2a2c3a;
+  --ok:#50fa7b;--ok-bg:#1c3a26;--warn:#ffb86c;--warn-bg:#3d2e18;
+  --info:#8be9fd;--info-bg:#123039;--none:#9aa3c4;--none-bg:#2a2c3a;
+  --green:#50fa7b;--orange:#ffb86c;--red:#ff5555;
 }}
 html,body{{background:var(--bg);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   font-size:13px;line-height:1.45}}
 body{{padding:16px;max-width:1500px;margin:0 auto}}
 h1{{font-size:18px;color:var(--accent);margin-bottom:2px}}
-h2{{font-size:15px;margin:22px 0 8px;color:var(--ink);display:flex;align-items:center;gap:8px}}
+h2{{font-size:15px;color:var(--ink)}}
+details.sec{{margin:18px 0}}
+details.sec>summary{{font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;
+  list-style:none;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;
+  background:var(--panel);border:1px solid var(--line);user-select:none}}
+details.sec>summary:hover{{background:var(--th-hover)}}
+details.sec>summary::-webkit-details-marker{{display:none}}
+details.sec>summary::before{{content:"\\25B8";color:var(--accent);font-size:12px;transition:transform .12s}}
+details.sec[open]>summary::before{{transform:rotate(90deg)}}
+details.sec>.body{{padding-top:8px}}
 .sub{{color:var(--muted);font-size:12px;margin-bottom:14px}}
 .panel{{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:14px}}
 .statgrid{{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}}
@@ -166,16 +176,18 @@ h2{{font-size:15px;margin:22px 0 8px;color:var(--ink);display:flex;align-items:c
 .fresh{{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:help}}
 .dot{{width:9px;height:9px;border-radius:50%;background:var(--none);flex:none}}
 .dot.g{{background:var(--green)}} .dot.o{{background:var(--orange)}} .dot.r{{background:var(--red)}}
-.warnbadge{{background:var(--warn-bg);color:var(--warn);border:1px solid #e6c9a8;border-radius:6px;
+.warnbadge{{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:6px;
   padding:2px 8px;font-size:11px;font-weight:600}}
 .controls{{margin:6px 0 4px}}
-.controls input{{width:280px;max-width:100%;padding:6px 9px;border:1px solid var(--line);border-radius:6px;font-size:12px}}
+.controls input{{width:280px;max-width:100%;padding:6px 9px;border:1px solid var(--line);border-radius:6px;
+  font-size:12px;background:var(--bg);color:var(--ink)}}
+.controls input:focus{{outline:none;border-color:var(--accent)}}
 .count{{color:var(--muted);font-size:11px;margin-left:8px}}
 .tablewrap{{overflow-x:auto;border:1px solid var(--line);border-radius:8px}}
 table{{border-collapse:collapse;width:100%;font-size:12px}}
 th,td{{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line);vertical-align:top}}
-th{{background:#eef1f5;position:sticky;top:0;cursor:pointer;white-space:nowrap;font-weight:600}}
-th:hover{{background:#e3e8ef}}
+th{{background:var(--th-bg);position:sticky;top:0;cursor:pointer;white-space:nowrap;font-weight:600;color:var(--ink)}}
+th:hover{{background:var(--th-hover)}}
 th .ar{{color:var(--accent);font-size:10px}}
 tbody tr:nth-child(even){{background:var(--row-alt)}}
 td.mono,span.mono{{font-family:"SF Mono",SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;font-size:11px}}
@@ -198,28 +210,34 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 <div class="panel" id="stats"></div>
 <div class="panel freshbar" id="fresh"></div>
 
-<h2>1 &middot; Fonctions par AF <span class="count" id="c-fn"></span></h2>
+<details class="sec" open><summary>1 &middot; Fonctions par AF <span class="count" id="c-fn"></span></summary>
+<div class="body">
 <div class="controls"><input type="text" id="f-fn" placeholder="filtre texte (AF, fonction, FB, criticite\u2026)" autocomplete="off"></div>
 <div class="tablewrap"><table id="t-fn"><thead><tr>
 <th data-k="af">AF</th><th data-k="id">ID</th><th data-k="fonction">Fonction</th>
 <th data-k="realisee_par">Realisee par</th><th data-k="criticite">Crit.</th>
 <th data-k="tcs">TC couvrants</th><th data-k="etat">Etat</th>
 </tr></thead><tbody></tbody></table></div>
+</div></details>
 
-<h2>2 &middot; TC par AF <span class="count" id="c-tc"></span></h2>
+<details class="sec" open><summary>2 &middot; TC par AF <span class="count" id="c-tc"></span></summary>
+<div class="body">
 <div class="controls"><input type="text" id="f-tc" placeholder="filtre texte (AF, ID, intention, type\u2026)" autocomplete="off"></div>
 <div class="tablewrap"><table id="t-tc"><thead><tr>
 <th data-k="af">AF</th><th data-k="id">ID</th><th data-k="intention">Intention</th>
 <th data-k="preuve">Preuve</th><th data-k="type">Type</th><th data-k="ref">Ref</th><th data-k="etat">Etat</th>
 </tr></thead><tbody></tbody></table></div>
+</div></details>
 
-<h2>3 &middot; Sync cartouches FB <span class="count" id="c-sy"></span></h2>
+<details class="sec" open><summary>3 &middot; Sync cartouches FB <span class="count" id="c-sy"></span></summary>
+<div class="body">
 <div class="controls"><input type="text" id="f-sy" placeholder="filtre texte (FB, statut, pointeur\u2026)" autocomplete="off"></div>
 <div class="tablewrap"><table id="t-sy"><thead><tr>
 <th data-k="pou_name">FB</th><th data-k="statut">Statut</th><th data-k="stref">.st:ligne</th>
 <th data-k="role">Role (.st)</th><th data-k="docref">Pointeur doc:ligne</th>
 <th data-k="nom_match">nom_match</th><th data-k="role_match">role_match</th>
 </tr></thead><tbody></tbody></table></div>
+</div></details>
 
 <footer id="foot"></footer>
 
