@@ -277,10 +277,9 @@ Consommateurs : `FB_Translation_PositionEstimator` (odométrie + recalage), `FB_
 
 ## ❓ 6 · TBD
 
-- ⛔ **F11.05 (anti-télescopage hauteur M1/M2) n'a aucun `TC-P11-*` dédié** (trouvé 2026-08-26,
-  review sous-agent) — fonction C4 câblée dans `PRG_05_Translation.st` §0, jamais testée
-  formellement à ce jour. Créer un TC (root ID, propriétaire à désigner : ce chapô ou une fiche
-  dédiée) avant tout futur refactor de ce câblage.
+- ✅ **F11.05 (anti-télescopage hauteur M1/M2) : couvert** — 🆕 `TC-P11-015` créé 2026-08-29 (audit
+  P3-1, `PRG_05_Translation.st:105-110`, état `NV-I`) : voir §1, ligne anti-télescopage. Sous-cas
+  bypass (`TC-P11-015.1` fusionné dans la Séquence) : seul `Bypass.MinHeight` lève l'interlock, `BypassGlobal` non.
 - Le reste du détail (formules, seuils, ErrorId) vit dans les 4 fiches FB dédiées (§2), qui
   portent leurs propres TBD le cas échéant.
 
