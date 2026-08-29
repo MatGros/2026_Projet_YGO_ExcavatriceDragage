@@ -1,7 +1,7 @@
 # ↔️ T108 — Interlock Translation M3 si Trémie pleine / grille levée
 
 > 📄 **ÉTUDE / DESIGN (zéro code)** · 📅 2026-08-24 · 🎯 T108 — interdire la Translation M3 vers
-> la **Trémie** quand `HopperFull_OR_GateRaised_DI` est actif (trémie pleine OU grille levée).
+> la **Trémie** quand `TremieFull_OR_GateRaised_DI` est actif (trémie pleine OU grille levée).
 > Source : `PRG_05_Translation.st`, `PRG_02_Acquisition.st`, `FB_Translation.st`.
 > 🔗 Tâche : [`../TASKS.yaml`](../TASKS.yaml) → T108.
 
@@ -11,7 +11,7 @@
 
 | Élément | État actuel |
 |---|---|
-| **Signal** `HopperFull_OR_GateRaised_DI` | **Déclaré** (`ST_HwMachine.st:15`) + **qualifié** (`PRG_02_Acquisition.st:160` `HwReal.Machine.HopperFull_OR_GateRaised_DI := ...`) + simulé `FALSE` (`FB_SimBench.st:342`) — mais **PAS consommé** (commentaire : « pas encore câblé électriquement, l'interdiction translation M3→Trémie est une tâche à part ») |
+| **Signal** `TremieFull_OR_GateRaised_DI` | **Déclaré** (`ST_HwMachine.st:15`) + **qualifié** (`PRG_02_Acquisition.st:160` `HwReal.Machine.TremieFull_OR_GateRaised_DI := ...`) + simulé `FALSE` (`FB_SimBench.st:342`) — mais **PAS consommé** (commentaire : « pas encore câblé électriquement, l'interdiction translation M3→Trémie est une tâche à part ») |
 | Sens M3 | `Direction = +1` = **vers Trémie** (Fwd), `-1` = vers Maintenance (voir FB_Sim_Translation) |
 | Arrêt Trémie | `M3_AtTremieStable` (`PRG_05:123`), cible `SelTarget=1` |
 
@@ -22,7 +22,7 @@ causer un débordement ou une collision → il faut **bloquer la marche avant ve
 
 ## 2. Interlock proposé
 
-**Règle** : `HopperFull_OR_GateRaised_DI = TRUE` → **interdire la Translation M3 vers Trémie**
+**Règle** : `TremieFull_OR_GateRaised_DI = TRUE` → **interdire la Translation M3 vers Trémie**
 (Direction = +1 / Fwd), en gardant la sortie de Trémie autorisée (Direction = -1 / Rev, pour
 dégager).
 
@@ -34,12 +34,12 @@ Le blocage doit agir **en amont de la demande de mouvement**, dans `PRG_05_Trans
 
 | Option | Injection | Effet |
 |---|---|---|
-| **A (recommandé)** | Forcer `M3_Direction_Active` vers 0 quand `HopperFull_OR_GateRaised_DI` ET direction demandée = +1 (vers Trémie) | blocage directionnel « vers Trémie » seul, sortie libre |
+| **A (recommandé)** | Forcer `M3_Direction_Active` vers 0 quand `TremieFull_OR_GateRaised_DI` ET direction demandée = +1 (vers Trémie) | blocage directionnel « vers Trémie » seul, sortie libre |
 | B | Ajouter un interlock dans la chaîne final (comme `HeightInterlockBlocking`) | blocage global M3 (plus large) |
 
 > ⚠️ **Cohérence** : le blocage doit être **directionnel** (vers Trémie uniquement), pas un blocage
 > total de M3 — pour pouvoir quitter la trémie si on y est déjà. Polarité positive (NC-100) :
-> `HopperFull_OR_GateRaised_DI = TRUE` = bloqué vers Trémie.
+> `TremieFull_OR_GateRaised_DI = TRUE` = bloqué vers Trémie.
 
 ### Propagation diagnostic
 Exposer l'interlock dans la raquette `TranslationPontM3` (comme `HeightInterlockBlocking`,
