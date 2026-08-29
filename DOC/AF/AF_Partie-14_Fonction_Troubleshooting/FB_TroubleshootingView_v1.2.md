@@ -165,7 +165,7 @@ Ce FB ne doit pas être bloqué par ces 4 points : ils sont publiés à `0`/`FAL
 
 ## 8. Tests de contrat
 
-> **Etat** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
 > non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 | ID | Attendu | Vérification | Etat |
