@@ -208,7 +208,7 @@
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-050</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Gate consommateurs</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Translation refuse tout ordre sans <code>DeadmanArmed</code> (tous modes) ; Treuils <b>seulement</b> en mode Joystick Maître (asymétrie non tranchée, §7/Q2)</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Translation refuse tout ordre sans <code>DeadmanArmed</code> (tous modes) ; Treuils <b>seulement</b> en mode Joystick Maître (arbitré 2026-08-29, §10 Q2 — interlock directionnel par technologie, voir §7)</td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>🔒 GATE</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>G375_check_deadman_arming_gate.py</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
@@ -439,10 +439,11 @@ Neutre persistant (`NeutralXMem`/`NeutralYMem`), survit au redémarrage PLC.
 | Translation (M3) | **Tous les modes**, y compris boutons IHM | `PRG_05_Translation.st:186-187` — condition tautologique par construction |
 | Treuils (M1/M2) | **Seulement** en mode Joystick Maître (`TglJoystickMaster=TRUE`) | `(NOT TglJoystickMaster OR JoystickDeadmanArmed)`, `PRG_04_Treuils_Benne.st:442,486` |
 
-⚠️ **Asymétrie réelle, non tranchée** (F08.07 partiel sur treuils) : en pilotage boutons IHM
+⚠️ **Arbitré 2026-08-29** (F08.07 partiel sur treuils) : en pilotage boutons IHM
 (`TglJoystickMaster=FALSE`), les treuils ne requièrent **pas** le homme-mort — contrairement à la
-Translation. Bug à corriger ou comportement voulu (bouton IHM = geste conscient équivalent) ?
-Arbitrage humain requis avant toute modification de `PRG_04` — voir §10 Q2.
+Translation. **Voulu** (décision humaine, §10 Q2) : l'**armement** est du ressort du joystick ;
+le mode boutons IHM est un geste conscient équivalent supervisé par ses propres interlocks
+directionnels (§7), propre à chaque technologie. Aucune modification de `PRG_04` associée.
 
 F08.08 (`ArmingPermitDenied`) est un warning diagnostic pur (visibilité IHM d'un armement refusé),
 sans effet sur le gate ci-dessus.
@@ -514,8 +515,13 @@ y est un `BOOL` "au neutre", vs `INT` valeur réelle dans `ST_JoystickState`) �
   `DOC/WFLOW/AUDITS/PRG02_20260824/PROPOSITION_ArmingPermit_Cablage_v0.1.md`. Arbitrage humain
   requis, ne pas refermer sans décision — voir
   `DOC/WFLOW/AUDITS/PRG02_20260824/QUESTIONS_OUVERTES_PRG02_v0.1.md`.
-- **Q2 — Homme-mort treuils en mode boutons IHM** (🔴 sécurité) : voir §7 — asymétrie
-  Treuils/Translation, bug ou voulu ? Arbitrage humain requis avant de modifier `PRG_04`.
+- ✅ **Q2 — arbitré 2026-08-29** (validation humaine) : **ne pas confondre**. L'**armement** homme-mort
+  (front bouton + 100ms + `ArmingPermit`) est géré par le **joystick** — c'est sa responsabilité,
+  un seul principe, aucun domaine ne l'implémente lui-même. La **différence de comportement**
+  entre domaines (translation accepte l'inversion via ses rampes ; treuils M1/M2 exigent l'arrêt
+  avant inversion) relève de l'**interlock directionnel propre à chaque technologie**, pas de
+  l'armement : pas de bug, voulu. Les TC-P08-020.1..4 (armement) restent la seule référence
+  du principe homme-mort ; les contraintes interlock vivent dans les fiches de domaine (§7).
 - Filtre par défaut et double rampe Joystick↔FB mouvement : non tranché, pas d'autorisation de
   coder (risque interférence rampe si réintroduite côté joystick).
 - Présence bouton `Calibrate` sur écran HMI réel : non vérifiée terrain.

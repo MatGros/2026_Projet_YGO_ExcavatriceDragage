@@ -2808,3 +2808,24 @@ tasks:
   - TC-P01-005 traité (test logique minimal ou justification datée dans registry.yaml)
   - Aucun état de TC modifié dans DOC/AF (preuve: git diff -- DOC/AF vide)
   bloque_par: []
+- id: T177
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T15:58:10'
+  titre: SpeedGuardEnable activé par défaut (décision D5)
+  contexte: 'Décision D5 (2026-08-29) : le garde vitesse de FB_Winch (SpeedGuardEnable, actuellement
+    FALSE par défaut, FB_Winch.st) doit être ACTIVÉ par défaut — sauf bypass safety — et un défaut
+    doit se déclencher si la vitesse excède l atteinte attendue (contrôle D5 humain). TC-P10-052.1
+    (audit P3-1a) devient exécutable.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T177.yaml — SpeedGuardEnable := TRUE
+    par défaut (FB_Winch), TC-P10-052.1 exécutable (G460), zéro régression TC 011/017..019,
+    fiche FB_Winch mise à jour sur preuve.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T177.yaml
+  objectifs:
+  - SpeedGuardEnable = TRUE par défaut (au lieu de FALSE)
+  - TC-P10-052.1 exécutable et PASS (G460)
+  - Zéro régression TC treuils existants + gates palier C
+  - Fiche FB_Winch alignée au code (note 🆕 activation par défaut)
+  bloque_par: []
