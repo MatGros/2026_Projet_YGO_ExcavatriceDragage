@@ -1,9 +1,10 @@
 {
-  "generated_at": "2026-08-29T12:42:10+02:00",
-  "source_head": "bdaa47ba",
+  "generated_at": "2026-08-29T15:43:12+02:00",
+  "source_head": "2cafa75e",
   "counts": {
     "synced": 1,
-    "drift": 55,
+    "covered": 42,
+    "drift": 13,
     "no_fiche": 0,
     "no_pointer": 3
   },
@@ -21,8 +22,9 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/A_COMMUN/FB_Brake.st",
@@ -36,8 +38,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/A_COMMUN/FB_CycleTime.st",
@@ -51,6 +54,7 @@
       "doc_line": 8,
       "fiche_existe": true,
       "nom_match": true,
+      "nom_in_body": true,
       "role_match": true,
       "statut": "synced"
     },
@@ -66,8 +70,9 @@
       "doc_line": 18,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/A_COMMUN/FB_Filter.st",
@@ -81,6 +86,7 @@
       "doc_line": null,
       "fiche_existe": null,
       "nom_match": null,
+      "nom_in_body": null,
       "role_match": null,
       "statut": "no_pointer"
     },
@@ -96,8 +102,9 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st",
@@ -111,8 +118,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st",
@@ -126,6 +134,7 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -141,6 +150,7 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -156,8 +166,9 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st",
@@ -171,8 +182,9 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/C_DIAG_RESEAUX/FB_Diag_IhmHeartbeat.st",
@@ -186,8 +198,9 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/D_JOYSTICK/FB_AxisScale.st",
@@ -201,8 +214,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/D_JOYSTICK/FB_Joystick.st",
@@ -216,8 +230,9 @@
       "doc_line": 17,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/E_CODEURS/FB_Encoder.st",
@@ -231,8 +246,9 @@
       "doc_line": 14,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/E_CODEURS/FB_EncoderReliability.st",
@@ -246,8 +262,9 @@
       "doc_line": 12,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/E_CODEURS/FB_Encoder_Abs.st",
@@ -261,8 +278,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/E_CODEURS/FB_Encoder_Homing.st",
@@ -276,8 +294,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/E_CODEURS/FB_Encoder_Safety.st",
@@ -291,8 +310,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/E_CODEURS/FB_Encoder_Scale.st",
@@ -306,8 +326,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st",
@@ -321,8 +342,9 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/F_MODES/FB_Modes.st",
@@ -336,8 +358,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/G_CYCLE/FB_Cycle.st",
@@ -351,8 +374,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/G_CYCLE/FB_DiveSearch.st",
@@ -366,8 +390,9 @@
       "doc_line": 7,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/G_CYCLE/FB_ExtractionSequence.st",
@@ -381,8 +406,9 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st",
@@ -396,8 +422,9 @@
       "doc_line": 5,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_DriftGuard.st",
@@ -411,8 +438,9 @@
       "doc_line": 5,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_Safety_Winch.st",
@@ -426,8 +454,9 @@
       "doc_line": 5,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_SpeedStep.st",
@@ -441,8 +470,9 @@
       "doc_line": 5,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_SyncContactor.st",
@@ -456,6 +486,7 @@
       "doc_line": 9,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -471,6 +502,7 @@
       "doc_line": 11,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -486,8 +518,9 @@
       "doc_line": 5,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st",
@@ -501,8 +534,9 @@
       "doc_line": 5,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st",
@@ -516,8 +550,9 @@
       "doc_line": 5,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_WinchSync.st",
@@ -531,8 +566,9 @@
       "doc_line": 10,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st",
@@ -546,8 +582,9 @@
       "doc_line": 5,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/I_TRANSLATION/FB_Safety_Translation.st",
@@ -561,8 +598,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/I_TRANSLATION/FB_Translation.st",
@@ -576,8 +614,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
@@ -591,8 +630,9 @@
       "doc_line": 5,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st",
@@ -606,8 +646,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st",
@@ -621,8 +662,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/J_SUPERVISION/FB_AntiFlickerText.st",
@@ -636,8 +678,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st",
@@ -651,8 +694,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/J_SUPERVISION/FB_MirrorBypassRetain.st",
@@ -666,6 +710,7 @@
       "doc_line": 10,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -681,8 +726,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": true,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/J_SUPERVISION/_BRIDGES/FB_CfgPersistBridge_BucketCfg.st",
@@ -696,6 +742,7 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -711,6 +758,7 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -726,6 +774,7 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -741,6 +790,7 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -756,6 +806,7 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -771,6 +822,7 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -786,6 +838,7 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -801,8 +854,9 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/J_SUPERVISION/_BRIDGES/FB_CfgPersistBridge_fbJoystick_Cfg.st",
@@ -816,6 +870,7 @@
       "doc_line": 6,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": false,
       "role_match": false,
       "statut": "drift"
     },
@@ -831,8 +886,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/L_SIMULATION/FB_Sim_Encoder.st",
@@ -846,8 +902,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/L_SIMULATION/FB_Sim_Joystick.st",
@@ -861,8 +918,9 @@
       "doc_line": 4,
       "fiche_existe": true,
       "nom_match": false,
+      "nom_in_body": true,
       "role_match": false,
-      "statut": "drift"
+      "statut": "covered"
     },
     {
       "file": "CODE/L_SIMULATION/FB_Sim_Safety.st",
@@ -876,6 +934,7 @@
       "doc_line": null,
       "fiche_existe": null,
       "nom_match": null,
+      "nom_in_body": null,
       "role_match": null,
       "statut": "no_pointer"
     },
@@ -891,6 +950,7 @@
       "doc_line": null,
       "fiche_existe": null,
       "nom_match": null,
+      "nom_in_body": null,
       "role_match": null,
       "statut": "no_pointer"
     }

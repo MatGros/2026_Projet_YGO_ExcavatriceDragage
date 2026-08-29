@@ -1,23 +1,19 @@
 {
   "version": 1,
-  "file": "test_fb_winch.st",
+  "file": "test_fb_simbench.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse",
+      "name": "TC-P13-001 Sim_Safety : neutralisation sans Enable",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 2,
+    "passed": 2,
     "failed": 0
   }
 }

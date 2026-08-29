@@ -182,17 +182,34 @@ def test_counts_consistent(fake_repo):
     not (REPO_ROOT / "CODE" / "A_COMMUN" / "FB_CycleTime.st").is_file(),
     reason="repo reel indisponible",
 )
-def test_real_repo_cycletime_is_drift(tmp_path, monkeypatch):
-    """AC1 : sur le repo reel, FB_CycleTime ressort en drift (pointeur -> chapo, pas la sous-fiche)."""
+def test_real_repo_cycletime_is_synced(tmp_path, monkeypatch):
+    """FB_CycleTime : cartouche corrige (T088) -> pointeur vers la sous-fiche dediee,
+    nom + role verbatim -> statut synced (seul FB en synchronisation stricte du repo)."""
     out = tmp_path / "fb_cartouche_sync.json"
     monkeypatch.setattr(mod, "OUT_PATH", out)
     rc = mod.main()
     assert rc == 0
     payload = json.loads(out.read_text(encoding="utf-8"))
     e = _by_name(payload, "FB_CycleTime")
-    assert e["doc_pointer"].endswith("AF_Partie-03_Contrats_Composants_v2.3.md")
-    assert e["statut"] == "drift"
-    assert e["role_match"] is False
+    assert e["doc_pointer"].endswith("AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md")
+    assert e["statut"] == "synced"
+    assert e["nom_match"] is True and e["role_match"] is True
+
+
+def test_real_repo_has_covered_and_drift_buckets(tmp_path, monkeypatch):
+    """Le relachement introduit le statut 'covered' (FB nomme dans un chapo de domaine)
+    et reserve 'drift' aux vrais pointeurs suspects (fiche qui ne nomme jamais le FB)."""
+    out = tmp_path / "fb_cartouche_sync.json"
+    monkeypatch.setattr(mod, "OUT_PATH", out)
+    assert mod.main() == 0
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    statuts = {f["statut"] for f in payload["fb"]}
+    assert "covered" in statuts
+    covered = [f for f in payload["fb"] if f["statut"] == "covered"]
+    assert covered and all(f["nom_in_body"] for f in covered)
+    for f in payload["fb"]:
+        if f["statut"] == "drift":
+            assert f["fiche_existe"] and not f["nom_in_body"]
 
 
 if __name__ == "__main__":

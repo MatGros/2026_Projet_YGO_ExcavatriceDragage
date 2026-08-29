@@ -1107,7 +1107,9 @@ domains:
         type: 💻 AUTO
         etat: NV
       TC-P10-025:
-        intention: Demande refusée si M1_Busy OR M2_Busy à l'entrée
+        intention: 'Demande benne (CmdOpen/CmdClose) refusée si M1_Busy OR M2_Busy
+          à l''entrée (READY). ⚠️ État code : M1_Busy/M2_Busy déclarés (FB_Bucket.st:29-30)
+          mais NON utilisés — anti-traversée non câblée (T175).'
         type: 💻 AUTO
         etat: NV
       TC-P10-026:
@@ -1148,8 +1150,34 @@ domains:
         intention: 'Terrain : cinématique réelle en charge, amplitude offset validée'
         type: 🟢 SITE
         etat: NV
+      TC-P10-045.1:
+        intention: 'Benne partiellement fermée → remontée palier 1 seul : NOT IsClosed
+          + demande montée → paliers 2-5 verrouillés.'
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-046.1:
+        intention: Timeout mouvement T#60s pendant BUSY → bit timeout + latch (CfgTimeoutDuration=60s,
+          code réel — corrige le 30s documenté).
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-047.1:
+        intention: 'Incohérence boot : 1er cycle avec ni IsOpen ni IsClosed → StateIncoherent=TRUE,
+          ActiveOffsetValid=FALSE.'
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-048.1:
+        intention: 'Offset RETAIN : OffsetCloseM=15.0 persiste après power cycle (_BucketCfgPersist
+          en VAR_GLOBAL PERSISTENT).'
+        type: 💻 AUTO
+        etat: NV-I
       TC-P10-001:
-        intention: 'Méca A (bit7) : dérive>2m ou v>0.02m/s arrêt ➔ SafeStop+PowerCutOff'
+        intention: 'Armer Méca A (contacteurs+frein coupés, joystick neutre, hors
+          homing). Injecter dérive position >2.0m (canal position) → SafeStop+PowerCutOff.
+          Injecter vitesse mesurée >0.02m/s (canal vitesse) → SafeStop+PowerCutOff.
+          Vérifier le croisement Cat.3 : chaque canal déclenche indépendamment. ⚠️
+          État code : seul le canal position (DriftGuardA) est implémenté ; le canal
+          vitesse (UncommandedSpeedThresholdMps) est déclaré mais non utilisé — à
+          implémenter (T175).'
         type: 💻 AUTO
         etat: NV-I
       TC-P10-002:
@@ -1188,8 +1216,33 @@ domains:
         intention: SafeStop exclut bit3 (mou câble) si SyncEnable=FALSE
         type: 💻 AUTO
         etat: NV
+      TC-P10-036.1:
+        intention: 'Warmup 3s : après Enable, perte com opérateur (cause 0) ne déclenche
+          PAS pendant les 3 premières s (TonStartupWarmup) ; après 3s → SafeStop.'
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-037.1:
+        intention: 'Gate Enable=FALSE : SafeStop/Permit/PowerCutOff forcés FALSE,
+          Ready=FALSE, mais latches (MecaAFaultLatched…) préservés ; re-Enable exige
+          Reset front.'
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-044.1:
+        intention: 'Mou câble : SyncEnable=FALSE → DescendPermit=FALSE (blocage descente)
+          mais AscentPermit autorisé palier 1 ; dès M2_TensionedCable_DI=TRUE, blocage
+          levé.'
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-051.1:
+        intention: 'Chaîne PowerCutOff bout-en-bout : demande PRG_04 → agrégation
+          PRG_06 → coupure AU (bout-en-bout, pas seulement le masque 16#2F84).'
+        type: ⚡ AUTO
+        etat: NV
       TC-P10-011:
-        intention: Interlock sens & temporisations d'inversion / redémarrage 1s
+        intention: 'Inversion Fwd↔Rev en descente exige DirectionInterlockDelayDescent=400ms
+          (+100ms palier=500ms) ; en montée DirectionInterlockDelayAscent=900ms (+100ms=1000ms).
+          Neutre↔sens = immédiat. DirectionChangePending force la rampe à 0.0 pendant
+          l''attente. Redémarrage même sens / inversion : temps mort 1s.'
         type: 💻 AUTO
         etat: NV-I
       TC-P10-017:
@@ -1204,12 +1257,32 @@ domains:
         intention: 'Ordre MainTask : Safety ➔ WinchControl ➔ PRG_06_Outputs'
         type: ⚡ SITE+AUTO
         etat: NV
+      TC-P10-042.1:
+        intention: 'Plafonds dynamiques palier par contexte : descente max 3, montée
+          max 5, approche capteur haut=1, zones ralentissement haut/bas capent le
+          palier.'
+        type: 💻 AUTO
+        etat: NV-I
+      TC-P10-052.1:
+        intention: 'Garde-fou vitesse (SpeedGuardEnable, désactivé par défaut) : vitesse
+          non-stable → palier 1 ; MeasuredSpeedBand < StepNumber → bride. Testable
+          après activation.'
+        type: 💻 AUTO
+        etat: NV-I
       TC-P10-012:
-        intention: Watchdog frein barrière 500ms sans confirmation ➔ FAULT + Inhibit
+        intention: 'Armer le watchdog sur BrakeCmd (BrakeCmd=TRUE, BrakeFeedback=FALSE,
+          RestartInhibit=FALSE). Maintenir 500ms sans confirmation → bit0 ErrorId,
+          RestartInhibit:=TRUE, Reason:=BRAKE_COMMAND_NOT_CONFIRMED, FAULT. Vérifier
+          l''absence de faux défaut au RestartRequired : BrakeCmd retenu par RestartRequired
+          (jusqu''à 1000ms) ne doit PAS armer le watchdog (armé sur BrakeCmd final,
+          jamais sur RequestedRelayFwd/Rev).'
         type: ⚡ AUTO_PLC
         etat: NV
       TC-P10-013:
-        intention: 'Anti-redémarrage : Cause + Reset + Neutre ➔ réautorisation'
+        intention: 'Provoquer un défaut (timeout frein) → ErrorId/RestartInhibit/ResetRequired
+          latches. Couper Enable (ou AU) → sorties FALSE MAIS ErrorId, RestartInhibit,
+          ResetRequired préservés. Réautorisation : cause disparue + front Reset +
+          demande neutre observée + nouvelle demande distincte → RestartInhibit:=FALSE.'
         type: ⚡ AUTO_PLC
         etat: NV
       TC-P10-020:
@@ -1224,9 +1297,16 @@ domains:
         intention: 'Temps mort inversion : 1s après arrêt + inversion sens'
         type: 💻 AUTO
         etat: NV
+      TC-P10-039.1:
+        intention: 'Frein couplé direct : pour tout état (Error/RestartInhibit/RestartRequired),
+          BrakeCmd := RelayFwd OR RelayRev — jamais de divergence frein/mouvement.'
+        type: 💻 AUTO
+        etat: NV-I
       TC-P10-014:
-        intention: Sync bit0 (écart > 0.10 m, instantané + latch, sans timer) ➔ SyncWarn
-          IHM seul
+        intention: 'Écart M1/M2 > seuil Warn (_SyncCfgPersist.CfgSyncTolerance_M=0.8m,
+          GVL_PERSISTENT — corrige le 0.10m documenté) → SyncWarn IHM instantané +
+          latch, sans timer. Zone 2 : SyncDeviationWarn force le palier 1 sur M1/M2
+          SANS coupure (pas de SafeStop sur simple écart).'
         type: 💻 AUTO
         etat: NV
       TC-P10-015:
@@ -1234,7 +1314,10 @@ domains:
         type: 💻 AUTO
         etat: NV
       TC-P10-016:
-        intention: 'Couplage croisé : SyncActive ➔ arrêt d''un treuil coupe l''autre'
+        intention: SyncActive=TRUE, arrêt sur M1 → M2 coupé au MÊME scan (SafeStopM2_Active
+          := SafeStopM2_Raw OR (SyncActive AND SafeStopM1_Raw)), sans attendre le
+          filtre 500/800ms. Symétrique M2→M1. Suspendu pendant BenneBusy et en butée
+          normale.
         type: 💻 AUTO
         etat: NV
   AF-11:

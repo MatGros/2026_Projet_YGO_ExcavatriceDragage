@@ -62,17 +62,24 @@ dont elle n'a pas l'usage.
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010.2</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Deadband ADC centrée sur le neutre : <code>|RawIn-Neutral| &lt;= DeadbandRaw</code> ⇒ <code>OutPct=0.0</code></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Deadband centrée sur le neutre : <code>|RawIn−Neutral| ≤ DeadbandRaw</code> ⇒ <code>OutPct=0.0</code> ; borne exacte : <code>RawIn=Neutral±DeadbandRaw</code> → 0.0, <code>RawIn=Neutral±(DeadbandRaw+1)</code> → <code>|OutPct|&gt;0</code></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010.3</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Saturation stricte : toute sortie de plage <code>RawIn</code> (hors <code>[0;10000]</code>) ne produit jamais <code>|OutPct| &gt; 100.0</code></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Saturation stricte : <code>RawIn=10000</code> (neutre 5000) → +100.0 ; <code>RawIn=0</code> → −100.0 ; toute sortie de plage <code>RawIn</code> ne produit jamais <code>|OutPct|&gt;100.0</code> (<code>LIMIT(−100,OutPct,100)</code>)</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010.4</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Échelle asymétrique neutre≠5000 : normalisation indépendante de chaque demi-plage</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

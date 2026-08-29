@@ -60,24 +60,30 @@
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease, padding 0.2s ease; }
     .test-card:hover { transform: translateY(-1px); }
     .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    .test-card-collapsed { padding: 10px 18px !important; }
+    .test-card-collapsed .test-card-body { display: none !important; }
+    .test-card-collapsed .test-card-header { margin-bottom: 0 !important; }
+    .test-card-collapsed .test-card-toggle { transform: rotate(-90deg); }
+    .test-card-toggle { transition: transform 0.2s ease; display: inline-block; }
     /* Style distinct pour les tests de contrat et d'interface socle */
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
     .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.02); }
-    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: text; }
+    .checks-details { margin-top: 10px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 13.5px; color: var(--text); font-weight: 700; outline: none; user-select: text; }
     .checks-summary:hover { color: var(--accent); }
-    .checks-label { font-size: 12px; font-weight: 600; }
-    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
-    .checks-list li { font-size: 12px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
-    .scenario-list li { font-size: 12px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
-    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
+    .checks-label { font-size: 13.5px; font-weight: 700; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 12px 0 6px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 5px 0 5px 26px; position: relative; line-height: 1.5; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 2px; color: var(--green-text); font-weight: bold; font-size: 14px; }
+    .scenario-list li { font-size: 14px; color: #f1f5f9; padding: 7px 0 7px 28px; position: relative; line-height: 1.6; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-weight: 500; }
+    .scenario-list li:last-child { border-bottom: none; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 12px; opacity: 0.9; top: 8px; }
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
@@ -301,7 +307,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 19:35:27</div>
+    <div class="exec-time">2026-08-29 15:41:18</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (11 tests)</summary>
@@ -560,23 +566,26 @@
         <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-brake-0" class="test-card test-card-pass test-card-contract">
-            <header>
+        <article id="test-fb-brake-0" class="test-card test-card-pass test-card-collapsed test-card-contract">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3 style="flex: 1;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
                 <ul class="scenario-list"><li>Scan 0 : Enable=FALSE -&gt; Neutralisation standard</li><li>Scan 1 : Enable=TRUE -&gt; Prete en service</li><li>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>Enable=FALSE : FB non pret (neutralise)</li><li>Enable=TRUE : FB pret</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul>
             </details>
-            
-            
+                
+                
+            </div>
         </article>
         </div>
     </details>
@@ -585,105 +594,135 @@
         <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 10 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-brake-1" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-1" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-010 Acquisition codeur : mise en service nominale </h3>
+                <h3 style="flex: 1;">TC-P09-010 Acquisition codeur : mise en service nominale </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-brake-2" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-2" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms </h3>
+                <h3 style="flex: 1;">TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-brake-3" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-3" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider </h3>
+                <h3 style="flex: 1;">TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-brake-4" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-4" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation </h3>
+                <h3 style="flex: 1;">TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-brake-5" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-5" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction </h3>
+                <h3 style="flex: 1;">TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-brake-6" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-6" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-015 Reset conscient : acquitte le latch sans valider le preset </h3>
+                <h3 style="flex: 1;">TC-P09-015 Reset conscient : acquitte le latch sans valider le preset </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-brake-7" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-7" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-016 Fault live : perte materiel codeur (Cause 0) </h3>
+                <h3 style="flex: 1;">TC-P09-016 Fault live : perte materiel codeur (Cause 0) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-brake-8" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-8" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2) </h3>
+                <h3 style="flex: 1;">TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-brake-9" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-9" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-018 Fault live : incoherence mesure (Cause 1) </h3>
+                <h3 style="flex: 1;">TC-P09-018 Fault live : incoherence mesure (Cause 1) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-brake-10" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-brake-10" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations) </h3>
+                <h3 style="flex: 1;">TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
         </div>
     </details>
@@ -1303,15 +1342,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clic simple sur colonne repliee pour la reouvrir
     document.addEventListener('click', function(e) {
         var th = e.target.closest('.chrono-table th.col-collapsed');
-        if (!th) return;
-        var table = th.closest('.chrono-table');
-        if (!table) return;
-        var colIdx = Array.from(th.parentNode.children).indexOf(th);
-        th.classList.remove('col-collapsed');
-        table.querySelectorAll('tbody tr').forEach(function(row) {
-            var cell = row.children[colIdx];
-            if (cell) cell.classList.remove('col-collapsed');
-        });
+        if (th) {
+            var table = th.closest('.chrono-table');
+            if (table) {
+                var colIdx = Array.from(th.parentNode.children).indexOf(th);
+                th.classList.remove('col-collapsed');
+                table.querySelectorAll('tbody tr').forEach(function(row) {
+                    var cell = row.children[colIdx];
+                    if (cell) cell.classList.remove('col-collapsed');
+                });
+            }
+            return;
+        }
+
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        var testHeader = e.target.closest('.test-card-header');
+        if (testHeader) {
+            var card = testHeader.closest('.test-card');
+            if (card) {
+                card.classList.toggle('test-card-collapsed');
+            }
+        }
     });
 
     // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique
