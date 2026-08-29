@@ -56,6 +56,14 @@ TEST 'TC-P03-008 Cumul de 2 causes latchees apparues a des instants differents, 
     ASSERT_EQ(fb.FAULT.LATCHEDID, 36, 'Cumul bit 2 (4) + bit 5 (32) = 36');
     ASSERT_TRUE(fb.FAULT.ERROR, 'Cause 5 active -> vue LIVE en erreur');
 
+    (* Les 2 causes se relâchent SANS Reset (ré-armement fail-safe : le bit reste tant
+       que la cause est active — il faut désactiver AVANT d'asserter le clear) *)
+    fb.CAUSES[5].ACTIVE := FALSE;
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 36, 'Causes relâchées sans Reset : les 2 latches (36) restent');
+    ASSERT_FALSE(fb.FAULT.ERROR, 'Vue LIVE retombée (aucune cause active)');
+
     (* Un seul front Reset les acquitte ensemble *)
     fb(ENABLE := TRUE, RESET := TRUE);
     ADVANCE_TIME(10000000);
@@ -77,23 +85,31 @@ TEST 'TC-P03-009 Cause live + cause latchee simultanees : live retombe seule, la
     ADVANCE_TIME(10000000);
     fb(ENABLE := TRUE, RESET := FALSE);
 
-    (* Cause 0 latchee + cause 3 live simultanees *)
-    fb.CAUSES[0].ACTIVE := TRUE;
-    fb.CAUSES[0].LATCHING := TRUE;
+    (* Cause 1 live + cause 3 latchee simultanees (aligne sur la fiche TC-P03-009) *)
+    fb.CAUSES[1].ACTIVE := TRUE;
+    fb.CAUSES[1].LATCHING := FALSE;
     fb.CAUSES[3].ACTIVE := TRUE;
-    fb.CAUSES[3].LATCHING := FALSE;
+    fb.CAUSES[3].LATCHING := TRUE;
     fb(ENABLE := TRUE, RESET := FALSE);
-    ASSERT_EQ(fb.FAULT.ERRORID, 9, 'ErrorId LIVE = bit 0 (1) + bit 3 (8) = 9');
+    ASSERT_EQ(fb.FAULT.ERRORID, 10, 'ErrorId LIVE = bit 1 (2) + bit 3 (8) = 10');
     ASSERT_TRUE(fb.FAULT.ERROR, 'Deux causes actives -> Error=TRUE');
-    ASSERT_EQ(fb.FAULT.LATCHEDID, 1, 'LatchedId = bit 0 (1) seul (cause 3 non latchee)');
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 8, 'LatchedId = bit 3 (8) seul (cause 1 non latchee)');
 
-    (* La cause live retombe seule : ErrorId retombe, LatchedId conserve *)
+    (* La cause live retombe seule : elle quitte ErrorId (bit 3 reste : cause 3 ENCORE active) *)
+    fb.CAUSES[1].ACTIVE := FALSE;
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_EQ(fb.FAULT.ERRORID, 8, 'Cause 1 inactive -> ErrorId = bit 3 seul (cause 3 encore active)');
+    ASSERT_TRUE(fb.FAULT.ERROR, 'Cause 3 toujours active -> Error=TRUE');
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 8, 'Latche conservee apres retombee de la live');
+
+    (* La latchee se relache elle aussi SANS Reset : latches conservees (fail-safe),
+       MAIS ErrorId retombe (plus aucune cause active) *)
     fb.CAUSES[3].ACTIVE := FALSE;
     ADVANCE_TIME(10000000);
     fb(ENABLE := TRUE, RESET := FALSE);
-    ASSERT_EQ(fb.FAULT.ERRORID, 0, 'Cause live inactive -> ErrorId retombe a 0 sans Reset');
-    ASSERT_FALSE(fb.FAULT.ERROR, 'Vue LIVE retombee (fail-safe : elle redevient visible si recurrence)');
-    ASSERT_EQ(fb.FAULT.LATCHEDID, 1, 'Latche conservee apres retombee de la live');
+    ASSERT_EQ(fb.FAULT.ERRORID, 0, 'Cause 3 inactive -> ErrorId = 0 sans Reset');
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 8, 'Latche conservee apres disparition de la cause');
 
     (* Front Reset : la latchee est acquitte *)
     fb(ENABLE := TRUE, RESET := TRUE);
@@ -102,8 +118,8 @@ TEST 'TC-P03-009 Cause live + cause latchee simultanees : live retombe seule, la
     ASSERT_EQ(fb.FAULT.LATCHEDID, 0, 'Reset front efface la latchee');
 
     (* Nettoyage *)
-    fb.CAUSES[0].ACTIVE := FALSE;
-    fb.CAUSES[0].LATCHING := FALSE;
+    fb.CAUSES[1].ACTIVE := FALSE;
+    fb.CAUSES[1].LATCHING := FALSE;
     fb(ENABLE := TRUE, RESET := FALSE);
 END_TEST
 
@@ -121,6 +137,14 @@ TEST 'TC-P03-010 Bornes de la liste Causes : bit 0 et bit 15 correctement mappes
     fb(ENABLE := TRUE, RESET := FALSE);
     ASSERT_EQ(fb.FAULT.LATCHEDID, 32769, 'Bit 0 (1) + bit 15 (32768) = 32769, pas d off-by-one');
     ASSERT_EQ(fb.FAULT.ERRORID, 32769, 'Vue LIVE identique : SHL(1, i) aux bornes');
+
+    (* Les 2 causes se relachent SANS Reset : les latches (32769) restent (fail-safe) *)
+    fb.CAUSES[0].ACTIVE := FALSE;
+    fb.CAUSES[15].ACTIVE := FALSE;
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 32769, 'Causes relachees sans Reset : latches conservees');
+    ASSERT_EQ(fb.FAULT.ERRORID, 0, 'Vue LIVE retombee : ErrorId = 0 sans Reset');
 
     (* Front Reset *)
     fb(ENABLE := TRUE, RESET := TRUE);
