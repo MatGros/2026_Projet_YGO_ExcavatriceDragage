@@ -210,7 +210,7 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 <div class="panel" id="stats"></div>
 <div class="panel freshbar" id="fresh"></div>
 
-<details class="sec" open><summary>1 &middot; Fonctions par AF <span class="count" id="c-fn"></span></summary>
+<details class="sec"><summary>1 &middot; Fonctions par AF <span class="count" id="c-fn"></span></summary>
 <div class="body">
 <div class="controls"><input type="text" id="f-fn" placeholder="filtre texte (AF, fonction, FB, criticite\u2026)" autocomplete="off"></div>
 <div class="tablewrap"><table id="t-fn"><thead><tr>
@@ -220,7 +220,7 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 </tr></thead><tbody></tbody></table></div>
 </div></details>
 
-<details class="sec" open><summary>2 &middot; TC par AF <span class="count" id="c-tc"></span></summary>
+<details class="sec"><summary>2 &middot; TC par AF <span class="count" id="c-tc"></span></summary>
 <div class="body">
 <div class="controls"><input type="text" id="f-tc" placeholder="filtre texte (AF, ID, intention, type\u2026)" autocomplete="off"></div>
 <div class="tablewrap"><table id="t-tc"><thead><tr>
@@ -229,7 +229,7 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 </tr></thead><tbody></tbody></table></div>
 </div></details>
 
-<details class="sec" open><summary>3 &middot; Sync cartouches FB <span class="count" id="c-sy"></span></summary>
+<details class="sec"><summary>3 &middot; Sync cartouches FB <span class="count" id="c-sy"></span></summary>
 <div class="body">
 <div class="controls"><input type="text" id="f-sy" placeholder="filtre texte (FB, statut, pointeur\u2026)" autocomplete="off"></div>
 <div class="tablewrap"><table id="t-sy"><thead><tr>
