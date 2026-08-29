@@ -1,0 +1,68 @@
+# Contrat T176 — ArmingPermit câblé en dur TRUE (C4, sécurité) — fix + guard
+# Source : audit expert P3-1c (2026-08-29) + décision humaine "Tâche CODE ouverte"
+
+contract:
+  task_id: T176
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    ArmingPermit ne doit plus être un TRUE littéral : il reflète l'état réel du permis
+    d'armer du domaine homme-mort (source à définir : IHM/Modes), avec garde anti-régression.
+
+  acceptance:
+    - id: AC1
+      statement: "ArmingPermit n'est plus affecté par un littéral TRUE en dur : sa valeur provient d'une entrée/var de statut traçable (producteur documenté dans la fiche AF08 §10)."
+      verified_by: "grep du FB concerné : zéro constante TRUE ; fiche mise à jour avec le producteur"
+    - id: AC2
+      statement: "Question de design résolue AVANT la ligne de code : qui produit légitimement ArmingPermit (IHM Modes ? état séquenceur ? niveau d'accès opérateur ?) — note de design annexée au rapport."
+      verified_by: "note de design dans execution.summary + visa orchestrateur"
+    - id: AC3
+      statement: "Garde automatique (fix:+guard:) : un check refuse tout code d'armement homme-mort dont le permis est un littéral constant."
+      verified_by: " nouveau gate TOOLS/AGENT_WORKFLOW/scripts/ + inclusion run_all_gates.py"
+    - id: AC4
+      statement: "Les tests TC-P08-020.1 (armement hors neutre) et .2 (désarmement perte ArmingPermit) deviennent exécutables."
+      verified_by: "run harnais TEST_AUTO_CI (G460)"
+    - id: AC5
+      statement: "Preuves structurelles CODE/MAIN : le nom de fichier est identique au nom de POU qu'il contient, et le suffixe est egal au langage du bundle généré."
+      verified_by: "G300 + G310 (structure POU/suffixe) sur le bundle régénéré"
+
+  scope:
+    allowed:
+      - CODE/H_JOYSTICK/**
+      - CODE/M_MAIN/**
+      - TOOLS/AGENT_WORKFLOW/scripts/** (nouveau gate)
+      - TOOLS/TEST_AUTO_CI/TESTS/**
+    forbidden:
+      - DOC/AF/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/TASKS.yaml
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - nouveau_gate_garde
+
+  alert_duty: >
+    Si le producteur légitime d'ArmingPermit n'existe pas dans IHM/Modes (aucune source
+    câblée), l'alerte est levée immédiatement : le fix devient un choix de conception
+    humain (ajouter un niveau d'accès ? un interlock séquenceur ?) - jamais inventé par agent.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Question P3-1c Q2 (asymétrie homme-mort treuils/translation) reste ouverte et
+    indépendante de ce fix.
