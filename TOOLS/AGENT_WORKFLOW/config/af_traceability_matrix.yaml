@@ -377,14 +377,19 @@ domains:
       TC-P03-008:
         intention: 'Cumul de plusieurs causes latchées : 2 Causes[i] distincts (Active
           AND Latching) apparus à des instants différents s''accumulent dans LatchedId
-          ; un seul front Reset les acquitte ensemble'
+          ; un seul front Reset les acquitte ensemble. Cas concret : 2 causes (Causes[2]
+          puis Causes[5], Active AND Latching) à scans différents → LatchedId=0x0024
+          ; relâcher sans Reset → reste 0x0024 ; un front Reset → LatchedId=0, Latched=FALSE.'
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P03-009:
         intention: 'Cause live (Latching=FALSE) + cause latchée (Latching=TRUE) simultanées
           : la live alimente ErrorId et retombe seule quand Active repasse FALSE ;
-          la latchée arme LatchedId et reste jusqu''au front Reset'
+          la latchée arme LatchedId et reste jusqu''au front Reset. Cas concret :
+          cause live (Causes[1], Latching=FALSE) → ErrorId bit1, retombe seule ; cause
+          latchée (Causes[3]) → LatchedId bit3, reste ; front Reset → LatchedId=0.
+          Indépendance des vues live/latchée.'
         type: 💻 AUTO
         ref: §4
         etat: NV-I
@@ -554,7 +559,11 @@ domains:
         intention: 'Sans front Execute, PreflightDone reste FALSE (aucun verdict au
           démarrage). Sur front Execute, tant que la machine n''est pas immobile :
           PreflightBusy=TRUE et aucun verdict final. Une fois immobile, les 16 bits
-          sont agrégés et PreflightOk=(PreflightErrorId=0).'
+          sont agrégés et PreflightOk=(PreflightErrorId=0). Sur front Execute + MachineIsStill=TRUE,
+          injecter chaque défaut E/S un à un (freins M1/M2/M3, contacteurs, thermiques,
+          phases, câble, M3, contacteur sans chaîne, codeurs, homing/position) → vérifier
+          le bit PreflightErrorId correspondant (bit0..15) ; suite bit-à-bit (bits
+          8..15) ; tous à 0 → PreflightOk=TRUE, chaque bit posé → PreflightOk=FALSE.'
         type: 💻 AUTO_PLC
         ref: FB_Acquisition_Preflight PRG_07_Supervision
         etat: NV-I
@@ -723,6 +732,30 @@ domains:
         type: ⬜ GAP
         ref: FB_Joystick
         etat: NV
+      TC-P08-020.1:
+        intention: 'Homme-mort : armement hors neutre — front bouton + maintien 100ms
+          + ArmingPermit → DeadmanArmed=TRUE même axes déviés (FB_Joystick.st:172)'
+        type: 💻 AUTO
+        ref: FB_Joystick
+        etat: NV-I
+      TC-P08-020.2:
+        intention: 'Désarmement perte ArmingPermit : ArmingPermit=FALSE → DeadmanArmed=FALSE
+          immédiat, SpeedTgt=0 (FB_Joystick.st:180-183)'
+        type: 💻 AUTO
+        ref: FB_Joystick
+        etat: NV-I
+      TC-P08-020.3:
+        intention: 'Pas de réarmement auto : retour ArmingPermit ne réarme pas ; exige
+          nouveau front + maintien 100ms (FB_Joystick.st:167-176)'
+        type: 💻 AUTO
+        ref: FB_Joystick
+        etat: NV-I
+      TC-P08-020.4:
+        intention: 'Bornes temporelles : armement 100ms, grâce 3s, neutre 100ms (ST_fbJoystick_Cfg.st:15-17
+          ; FB_Joystick.st:172,189-191)'
+        type: 💻 AUTO
+        ref: FB_Joystick
+        etat: NV-I
       TC-P08-010.1:
         intention: 'Échelle proportionnelle asymétrique : RawX=9000 (neutre 5000)
           → 80% ; RawY=300 (neutre 5000) → -94% — pas seulement aux bornes'
@@ -730,17 +763,25 @@ domains:
         ref: §4
         etat: NV
       TC-P08-010.2:
-        intention: 'Deadband ADC centrée sur le neutre : |RawIn-Neutral| <= DeadbandRaw
-          ⇒ OutPct=0.0'
+        intention: 'Deadband centrée sur le neutre : |RawIn−Neutral| ≤ DeadbandRaw
+          ⇒ OutPct=0.0 ; borne exacte : RawIn=Neutral±DeadbandRaw → 0.0, RawIn=Neutral±(DeadbandRaw+1)
+          → |OutPct|>0'
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P08-010.3:
-        intention: 'Saturation stricte : toute sortie de plage RawIn (hors [0;10000])
-          ne produit jamais |OutPct| > 100.0'
+        intention: 'Saturation stricte : RawIn=10000 (neutre 5000) → +100.0 ; RawIn=0
+          → −100.0 ; toute sortie de plage RawIn ne produit jamais |OutPct|>100.0
+          (LIMIT(−100,OutPct,100))'
         type: 💻 AUTO
         ref: §4
         etat: NV
+      TC-P08-010.4:
+        intention: 'Échelle asymétrique neutre≠5000 : normalisation indépendante de
+          chaque demi-plage'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
   AF-09:
     file: AF_Partie-09_Fonction_Encoder_v2.3.md
     functions:
@@ -850,9 +891,22 @@ domains:
         etat: NV
       TC-P09-010.1:
         intention: AlarmsIn≠0 OU NOT SlaveOperational → EncoderAvailable=FALSE, RawPos/AngleRaw/TurnCount
-          gelés (dernière valeur)
+          gelés (dernière valeur) ; le gel persiste sur plusieurs scans tant que la
+          cause reste active
         type: 💻 AUTO
         ref: §5
+        etat: NV-I
+      TC-P09-010.3:
+        intention: 'Acquisition nominale : bus OK → RawPos=RawPosIn, AngleRaw=MOD,
+          TurnCount=division (FB_Encoder_Abs.st:116-120)'
+        type: 💻 AUTO
+        ref: §3
+        etat: NV-I
+      TC-P09-010.4:
+        intention: Front PresetRequest + EncoderAvailable → PresetSeqStep=1, PresetTriggerCmd=2
+          (FB_Encoder_Abs.st:128,134)
+        type: 💻 AUTO
+        ref: §4
         etat: NV-I
       TC-P09-010.2:
         intention: 'Preset : écart abs(RawPos - PresetValueOut) ≤ PresetTolerancePts
@@ -879,11 +933,29 @@ domains:
         ref: §4
         etat: NV
       TC-P09-020.4:
-        intention: Toute cible hors [-99;+99]m → homing refusé, ErrorId bit4, pas
-          d'écriture RETAIN
+        intention: 'Toute cible hors [-99;+99]m → homing refusé, ErrorId bit4, pas
+          d''écriture RETAIN ; borne exacte : cible=±99.0m acceptée, ±99.1m refusée'
         type: 💻 AUTO
         ref: §4
         etat: NV
+      TC-P09-020.6:
+        intention: 'TopPositionSensor absent : sans capteur haut, mode nominal ne
+          déclenche pas ; seuls unitaire/dynamique (FB_Encoder_Homing.st:206-207)'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P09-020.7:
+        intention: 'Homing sans permit : front Home sans HomingPermit → HomingModeError
+          (bit0), pas d''écriture (FB_Encoder_Homing.st:202-204)'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P09-020.8:
+        intention: 'HomingSuspect RETAIN : stocké dans Calib RETAIN → persiste après
+          redémarrage (FB_Encoder_Homing.st:185)'
+        type: 💻 AUTO
+        ref: §5
+        etat: NV-I
       TC-P09-020.5:
         intention: Écart RawPos/Calib.LastKnownRawPos au boot > tolérance → HomingSuspect=TRUE,
           Homed=FALSE ; levé uniquement par front BtnConfirmCoherence ET HomingPermit=TRUE
@@ -891,8 +963,8 @@ domains:
         ref: §5
         etat: NV
       TC-P09-030.4:
-        intention: CablePosM hors [PositionMinM;PositionMaxM] (déf. ±99m) → EncoderIncoherent=TRUE,
-          bit0, auto-effacé au retour en plage
+        intention: 'CablePosM hors [PositionMinM;PositionMaxM] → EncoderIncoherent=TRUE,
+          bit0, auto-effacé au retour ; borne haute : PositionMaxM accepté, +ε → incohérent'
         type: 💻 AUTO
         ref: §4
         etat: NV
@@ -903,7 +975,8 @@ domains:
         ref: §4
         etat: NV
       TC-P09-030.6:
-        intention: BypassGlobal=TRUE → neutralise les 2 causes (mise en service)
+        intention: BypassGlobal=TRUE → neutralise bornage + cohérence boot ; retour
+          FALSE → les 2 causes redeviennent actives au scan suivant
         type: 💻 AUTO
         ref: §4
         etat: NV
@@ -930,6 +1003,17 @@ domains:
         type: 💻 AUTO
         ref: §4
         etat: NV
+      TC-P09-030.8:
+        intention: 'Garde dépassement DINT : conversion DINT avant soustraction →
+          pas de dépassement (FB_Encoder_Scale.st:34)'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P09-030.9:
+        intention: RawPos=HomingRefRaw → CablePosM=0.0 (FB_Encoder_Scale.st:34,38)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
       TC-P09-050.1:
         intention: Valid=TRUE seulement après 6 échantillons couvrant WindowElapsed
           ≥ T#50ms
@@ -953,6 +1037,17 @@ domains:
         type: 💻 AUTO
         ref: §4
         etat: NV
+      TC-P09-050.5:
+        intention: Fenêtre <50ms → Valid=FALSE sans purge (buffer conservé) (FB_Encoder_SpeedMeasure.st:128-132)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P09-050.6:
+        intention: 'Vitesse exacte : SignedSpeed_Mps=(P[5]−P[0])/WindowElapsed ; Speed_Mps=ABS
+          (FB_Encoder_SpeedMeasure.st:124-126)'
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
       TC-P09-040.1:
         intention: EncoderAvailable=TRUE, Homed=FALSE, EncoderIncoherent=FALSE → EncoderFault=FALSE
           (non-référencé ≠ incohérent)
@@ -969,6 +1064,17 @@ domains:
         type: 💻 AUTO
         ref: §4
         etat: NV
+      TC-P09-040.4:
+        intention: Table de vérité exhaustive des 2 gates sur 8 combos (FB_EncoderReliability.st:30,34)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
+      TC-P09-040.5:
+        intention: EncoderIncoherent → EncoderFault=TRUE et HomedAndReliable=FALSE
+          (FB_EncoderReliability.st:30,34)
+        type: 💻 AUTO
+        ref: §4
+        etat: NV-I
   AF-10:
     file: AF_Partie-10_Fonction_Winch_v2.1.md
     functions:
@@ -1374,8 +1480,9 @@ domains:
           conscient (jamais via BypassGlobal)
         realisee_par: PRG_05_Translation §0 (câblage direct, hors FB dédié)
         criticite: 🔴 C4
-        tc_couvrants: []
-        statut: ⚠️ non testé (TC- manquant)
+        tc_couvrants:
+        - TC-P11-015
+        statut: ✅
         etat: NV
     validation_points:
       TC-P11-001/002:
@@ -1402,13 +1509,16 @@ domains:
         type: ⚡ AUTO_PLC
         ref: FB_TranslationOutputInterlock
         etat: NV
-      — (aucun TC):
-        intention: Translation bloquée si CablePosM1 ou CablePosM2 sous _TranslationMinHeightM1M2_M,
-          sauf Bypass.MinHeight conscient. ⚠️ Câblé directement dans PRG_05_Translation.st
-          §0, hors FB_Safety_Translation — pas de test dédié aujourd'hui
-        type: ⚠️ manquant
+      TC-P11-015:
+        intention: Translation bloquée si CablePosM1 ou CablePosM2 sous _TranslationMinHeightM1M2_M
+          (6.0m) → M3_HeightInterlockOk=FALSE, translation bloquée (PRG_05:105-110).
+          Bypass.MinHeight (dédié) lève l'anti-collision ; BypassGlobal ne le lève
+          pas (PRG_05:102-105). MinHeight=TRUE → autorisé sous hauteur mini ; BypassGlobal
+          seul → toujours bloqué. ⚠️ Câblé directement dans PRG_05_Translation.st
+          §0, hors FB_Safety_Translation
+        type: 💻 AUTO
         ref: PRG_05_Translation
-        etat: NV
+        etat: NV-I
       TC-P11-002:
         intention: Mot incohérent ➔ Incoherent=TRUE ➔ bit7 Safety ➔ SafeStop+PowerCutOff
         type: ⚡ AUTO_PLC
@@ -1417,10 +1527,22 @@ domains:
         intention: 'Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff'
         type: ⚡ AUTO_PLC
         etat: NV-I
+      TC-P11-010.1:
+        intention: 'Absence redémarrage auto : Méca A → latch MecaAFault (FB_Safety_Translation.st:81,95-99,175).
+          Après disparition, défaut reste latché, aucun redémarrage auto — Reset front
+          + nouvelle demande requis'
+        type: 💻 AUTO
+        etat: NV-I
       TC-P11-011:
         intention: 'Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff'
         type: ⚡ AUTO_PLC
         etat: NV
+      TC-P11-011.1:
+        intention: 'Méca B variante perte IHM : HeartbeatIhmOk=FALSE → condition élargie
+          : ABS(freq)>0.5 OR DriveStatusWord.0 OR NOT BrakeFeedback (FB_Safety_Translation.st:151-152)
+          → SafeStop+PowerCutOff'
+        type: 💻 AUTO
+        etat: NV-I
       TC-P11-014:
         intention: BypassGlobal efface ErrorId, coupe TONs, Reset fonctionnel
         type: ⚡ AUTO_PLC
@@ -1446,12 +1568,17 @@ domains:
         type: ⚡ AUTO_PLC
         etat: NV
       TC-P11-006:
-        intention: Watchdog frein 500ms sans confirmation ➔ FAULT + Inhibit
+        intention: 'Watchdog 500ms armé si BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed
+          AND NOT RestartInhibit (FB_TranslationOutputInterlock.st:85-86). Frontière
+          : confirmation à 499ms → pas de défaut ; à 500ms → bit0, RestartInhibit,
+          FAULT'
         type: ⚡ AUTO_PLC
         etat: NV
       TC-P11-007:
-        intention: 'Réautorisation post-timeout : Cause + Reset + Mot 0 + Nouvelle
-          demande'
+        intention: 'Après timeout frein : RestartInhibit:=TRUE. Acquittement : ResetEdge.Q
+          AND BrakeCommandOpenConfirmed → efface bit0. Réautorisation : NOT Error
+          AND NOT ResetRequired + mot 0 vu (NeutralRequestSeen) puis nouvelle demande
+          1/2 (FB_TranslationOutputInterlock.st:99-125)'
         type: ⚡ AUTO_PLC
         etat: NV
       TC-P11-008:
@@ -1502,14 +1629,15 @@ domains:
       TC-P12-010:
         intention: 'Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur
           M2) : StateRaw≠RUNNING/ACTIVE ➔ Online=FALSE, Operational=FALSE, State=INIT,
-          sans effet sur les autres devices'
+          sans effet sur les autres devices — indépendance inter-devices'
         type: 💻 AUTO
         ref: FB_Diag_CanOpen FB_Diag_Ethercat
         etat: NV-I
       TC-P12-020:
         intention: Défaut isolé sur un seul device ➔ ErrorId de ce device porte exactement
           son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices
-          (Joystick bit0/1, Variateur bit4, M1 bit5, M2 bit6)
+          (Joystick bit0/1, Variateur bit4, M1 bit5, M2 bit6). ⚠️ M2 porte 16#0030
+          (bug T159, pas 16#0040)
         type: 💻 AUTO
         ref: FB_Diag_CanOpen FB_Diag_Ethercat
         etat: NV-I
@@ -1527,9 +1655,10 @@ domains:
         ref: FB_Diag_CanOpen FB_Diag_Ethercat
         etat: NV
       TC-P12-050:
-        intention: Absence de front TglHeartbeatIhm pendant IhmTimeout ➔ HeartbeatIhmTimeout=TRUE/HeartbeatIhmOk=FALSE
-          ; TglHeartbeatPlc bascule toutes les PlcTogglePeriod indépendamment de l'IHM
-          ; nouveau front après timeout ➔ HeartbeatIhmOk restauré immédiatement
+        intention: Absence de front TglHeartbeatIhm pendant IhmTimeout ➔ HeartbeatIhmTimeout=TRUE/HeartbeatIhmOk=FALSE,
+          TimeSinceIhmEdge=IhmTimeout ; TglHeartbeatPlc bascule toutes les PlcTogglePeriod
+          indépendamment de l'IHM ; nouveau front après timeout ➔ HeartbeatIhmOk restauré
+          immédiatement, TimeSinceIhmEdge repart de 0
         type: 💻 AUTO
         etat: NV
   AF-13:
@@ -1610,14 +1739,15 @@ domains:
         type: 💻 AUTO
         etat: NV
       TC-P13-023:
-        intention: 🆕 Un défaut AU réel latché (RedundancyTestFailedCause/EmergencyArmingFailedCause
-          dans FB_Safety_EmergencyManagementLogic) survit à un cycle Reset/Restart
-          de ce modèle simulé — voir §4
+        intention: En simulation, provoquer un défaut AU réel → latch conservé malgré
+          la sim (FB_Sim_Safety §4). Déblocage uniquement par front Reset en runtime
+          (jamais par la sim seule)
         type: 👁️ MANUEL
         etat: NV
       TC-P13-040:
-        intention: Ne publie que les 6 mots thermomètre valides de FB_Translation_PositionDecoder
-          (11111→00000)
+        intention: 'Progression Trémie→Maintenance : chaque intervalle [0;5[, [5;15[,
+          [15;20[, [20;30[ publie un seul mot thermomètre valide (11111→00000), aucune
+          zone transitoire à cheval sur deux mots (FB_Sim_Translation.st:104-124)'
         type: 💻 AUTO
         etat: NV
       TC-P13-041:
@@ -1659,9 +1789,11 @@ domains:
     functions: {}
     validation_points:
       TC-P14-TSV-01..05:
-        intention: Zéro VAR_OUTPUT de commande, chaque champ a un producteur réel
-          documenté, aucun TBD affiché comme mesure réelle, instance unique dans PRG_07_Supervision,
-          zéro régression gates
+        intention: Zéro VAR_OUTPUT de commande — seule sortie Ready:BOOL (SafeStop,
+          Enable, Cmd, Bypass, Config absents), toute publication passe par GVL_Troubleshooting
+          (lecture seule) ; chaque champ a un producteur réel documenté, aucun TBD
+          affiché comme mesure réelle, instance unique dans PRG_07_Supervision, zéro
+          régression gates
         type: 👁️ REVUE+🔒 GATE
         ref: FB_TroubleshootingView
         etat: NV
