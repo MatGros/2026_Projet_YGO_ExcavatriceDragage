@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.545783" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.545783">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T14:08:34.277617" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T14:08:34.277617">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -980,7 +980,7 @@ IF FirstCycle THEN
 END_IF;
 
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
-IF ConfirmOpenEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
+IF ConfirmOpenEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
@@ -988,7 +988,7 @@ IF ConfirmOpenEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
 END_IF;
 
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
-IF ConfirmCloseEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
+IF ConfirmCloseEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
@@ -1008,11 +1008,12 @@ IF SevereError THEN
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
 ELSE
-    // Prise en compte des demandes IHM
-    IF CmdOpen_IHM AND NOT Lifecycle.Busy THEN
+    // Prise en compte des demandes IHM — anti-traversée (TC-P10-025) :
+    // demande benne refusée si un treuil agit (M1_Busy OR M2_Busy) à l'entrée READY.
+    IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         OpenReq := TRUE;
         CloseReq := FALSE;
-    ELSIF CmdClose_IHM AND NOT Lifecycle.Busy THEN
+    ELSIF CmdClose_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         CloseReq := TRUE;
         OpenReq := FALSE;
     END_IF;
