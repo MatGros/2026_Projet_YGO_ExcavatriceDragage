@@ -39,7 +39,7 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-001</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Armer Méca A (contacteurs+frein coupés, joystick neutre, hors homing). Injecter dérive position >2.0m (canal position) → <code>SafeStop</code>+<code>PowerCutOff</code>. Injecter vitesse mesurée >0.02m/s (canal vitesse) → <code>SafeStop</code>+<code>PowerCutOff</code>. Vérifier le croisement Cat.3 : chaque canal déclenche indépendamment. ⚠️ État code : seul le canal position (<code>DriftGuardA</code>) est implémenté ; le canal vitesse (<code>UncommandedSpeedThresholdMps</code>) est déclaré mais non utilisé — à implémenter (T175).</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Armer Méca A (contacteurs+frein coupés, joystick neutre, hors homing). Injecter dérive position >2.0m (canal position, <code>DriftGuardA</code>) → <code>SafeStop</code>+<code>PowerCutOff</code>. 🆕 <b>Mono-canal assumé</b> (décision 2026-08-29) : la détection s'appuie sur le canal position seul ; le seuil vitesse (<code>UncommandedSpeedThresholdMps</code>) reste déclaré mais non utilisé et <b>n'est plus exigé</b> — pas de croisement Cat.3 logiciel sur ce socle.</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
@@ -160,7 +160,7 @@ mesures surveillées (codeurs, contacteurs restent produits ailleurs).
 
 | Méca | Bit | Armement | Déclenchement | Conséquence | Seuils |
 |---|---|---|---|---|---|
-| **A** Roue libre | 7 (0080) | contacteurs+frein confirmés coupés, hors homing | dérive>tolérance OU vitesse>seuil | SafeStop+**PowerCutOff** | `UncommandedDriftToleranceM`=2.0m, `UncommandedSpeedThresholdMps`=0.02 |
+| **A** Roue libre | 7 (0080) | contacteurs+frein confirmés coupés, hors homing | dérive>tolérance (mono-canal 🆕) | SafeStop+**PowerCutOff** | `UncommandedDriftToleranceM`=2.0m (`UncommandedSpeedThresholdMps`=0.02 déclaré, non branché — mono-canal assumé) |
 | **B** Pilotage sans commande | 8 (0100) | perte CAN OU joystick neutre | non confirmé arrêté sous délai | SafeStop+**PowerCutOff** | `PostRampTimeout`=3s |
 | **C** Glissement M1/benne | 9 (0200) | `BenneHoldStillActive` (M1 seul) | dérive M1 > tolérance | SafeStop+**PowerCutOff** | `BenneSlipToleranceM`=2.0m |
 | **D** Capteur haut non confirmé | 11 (0800) | capteur/limite log. atteint, hors homing, montée | non confirmé arrêté sous délai | SafeStop+**PowerCutOff** | `PostRampTimeout`=3s, marge +0.10m |

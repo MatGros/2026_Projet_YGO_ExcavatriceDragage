@@ -1,0 +1,61 @@
+# Contrat T177 — SpeedGuardEnable activé par défaut (D5) + garde vitesse en défaut
+
+contract:
+  task_id: T177
+  criticality: C3            # activation d'un garde-fou vitesse existant (code déjà présent mais OFF)
+  strategy: patch
+
+  objective: >
+    SpeedGuardEnable passe à TRUE par défaut (FB_Winch.st, actuellement FALSE) ;
+    le garde vitesse devient actif : vitesse hors plafond/attendue -> défaut classique,
+    puis selon palier un arrêt / coupure puissance complete (décision D5, 2026-08-29).
+
+  acceptance:
+    - id: AC1
+      statement: "SpeedGuardEnable est initialise TRUE par defaut dans FB_Winch (plus de FALSE par defaut) — le TC-P10-052.1 devient exécutable sans activation manuelle."
+      verified_by: "lecture declaration (FB_Winch) + TC-P10-052.1 exécutable"
+    - id: AC2
+      statement: "Comportement de garde vérifié : vitesse hors bande/palier attendu -> SpeedGuardLimited et action conséquence (defaut), conforme TC-P10-052.1."
+      verified_by: "run harnais TEST_AUTO_CI (G460) : TC-P10-052.1 PASS"
+    - id: AC3
+      statement: "Non-régression : les TC Winch existants (011/017..019) restent verts après activation."
+      verified_by: "run harnais G460 complet domaine treuils + gates palier C"
+    - id: AC4
+      statement: "Fiche FB_Winch / TC-P10-052.1 mise a jour sur preuve : plus de mention 'désactivé par défaut' (note 🆕 2026-08-29, activation par défaut)."
+      verified_by: "diff fiche aligné au code"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/**
+    forbidden:
+      - CODE/A_COMMUN/**
+      - DOC/AF/**             # la fiche ne bouge qu'après le code, sur preuve
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/TASKS.yaml
+
+  evidence_required:
+    - check_linkage          # G200 bloquant sur le bundle
+    - run_all_gates          # palier C
+    - bundle                 # CODE_Bundle.xml régénéré
+
+  alert_duty: >
+    La conséquence au-delà de SpeedGuardLimited (arrêt classique puis coupure) : si le code
+    actuel ne descend pas jusqu'à la coupure attendue par le TC, lever l'alerte IMMÉDIATEMENT
+    — ne pas écrire un TC plus sévère que ce que le code fait.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Question D5 : sauf cas de bypass safety, le garde doit rester actif.

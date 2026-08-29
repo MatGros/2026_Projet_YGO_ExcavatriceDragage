@@ -7,13 +7,15 @@ contract:
   strategy: patch
 
   objective: >
-    Rendre le code conforme aux TC déjà écrits et à la sécurité attendue : 4 mécanismes
+    Rendre le code conforme aux TC déjà écrits et à la sécurité attendue : mécanismes
     documentés mais absents/incohérents dans CODE (vérifiés ligne à ligne le 2026-08-29).
+    ⚠️ Révisé 2026-08-29 (décision D2) : MONO-CANAL assumé — plus aucune demande de canal
+    vitesse DriftGuard ; le lot se réduit aux 3 mécanismes restants.
 
   acceptance:
     - id: AC1
-      statement: "FB_DriftGuard expose une entrée de garde vitesse (ex. CommandedSpeedMps/VelocityMps) et FB_Safety_Winch la câble : TC-P10-001 'dérive >2.0m OU vitesse >0.02m/s' devient exécutable telles qu'écrites."
-      verified_by: "grep des ports + existence du test CI correspondant"
+      statement: "Mono-canal assumé (décision D2, 2026-08-29) : DriftGuard garde sa garde position seule ; le seuil vitesse (UncommandedSpeedThresholdMps) reste déclaré non branché et documenté non-exigé — AUCUNE modification de FB_DriftGuard/FB_Safety_Winch pour un canal vitesse (la fiche FB_Safety_Winch est déjà requalifiée)."
+      verified_by: "cohérence avec la fiche FB_Safety_Winch requalifiée + zéro diff code sur DriftGuard"
     - id: AC2
       statement: "Temps mort directionnel : DeadTimeSameDir/DeadTimeOppositeDir (ou équivalent nommé) distinct de RestartDelay (T#1500ms uniforme) — les TC-P10-021/022 décrivent 1s par direction, la valeur implémentée est tranchée et documentée."
       verified_by: "lecture code + test TC-P10-021/022 exécutables"
