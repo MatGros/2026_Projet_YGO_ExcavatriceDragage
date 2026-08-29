@@ -117,8 +117,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
   <colgroup>
     <col style="width: 28px;">
     <col style="width: 50px;">
-    <col style="width: calc(100% - 233px);">
-    <col style="width: 48px;">
+    <col style="width: calc(100% - 165px);">
     <col style="width: 45px;">
     <col style="width: 26px;">
     <col style="width: 36px;">
@@ -128,7 +127,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
       <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Preuve</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
@@ -148,7 +146,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         ⏱️ <b>Étape 6</b> : Fin impulsion 1s ➔ Attente confirmation contacteur<br>
         ✅ <b>Étape 7</b> : Confirmation collage (<code>PowerContactorEngaged=TRUE</code> ➔ <code>Done=TRUE</code>)
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small>Chrono</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -164,7 +161,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         ⚠️ <b>Phase 5</b> : Nouvel armement avec échec collage contacteur (timeout 2s Step 6 ➔ <code>EmergencyArmingFailed</code> + Lockout 5s)<br>
         🔓 <b>Phase 6</b> : Expiration lockout 5s + <code>Reset</code> (prêt pour nouvel essai)
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small>Chrono</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -177,7 +173,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         🔒 <b>Étape 2</b> : Ouverture matérielle immédiate de la boucle 24V de sécurité<br>
         ⛔ <b>Étape 3</b> : Retombée instantanée du contacteur de puissance ligne (API reste sous tension)
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>Contactor=0</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>🟢 SITE</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§6.1</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -191,7 +186,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         🔍 <b>Étape 3</b> : Vérification réaction boucle ➔ Restauration immédiate canal A<br>
         ⚡ <b>Étape 4</b> : Test de coupure unilatérale du canal B (<code>MaintainB_RQ=FALSE</code>, A maintenu) ➔ Restauration canal B
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>Maintain=0</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ MIXTE</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -204,7 +198,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         ⚡ <b>Étape 2</b> : Auto-tests A/B croisés validés ➔ Génération impulsion collage contacteur 1.0s (<code>ArmPulse_RQ=TRUE</code>)<br>
         ⏱️ <b>Étape 3</b> : Retombée du pulse à 1.0s (<code>ArmPulse_RQ=FALSE</code>) et passage en attente confirmation (Step 6)
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>ArmPulse=1</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -217,7 +210,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         🔄 <b>Étape 2</b> : Front montant sur <code>Reset</code> ➔ Effacement de l'affichage du défaut (<code>Error=FALSE</code>)<br>
         🛡️ <b>Étape 3</b> : Verrouillage maintenu (aucun redémarrage automatique, séquence reste à IDLE Step 0)
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>Reset=OK</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.4</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -229,7 +221,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         🔄 <b>Temps 1</b> : Action 1 = Impulsion <code>Reset</code> opérateur pour acquitter et purger l'état de défaut<br>
         🚀 <b>Temps 2</b> : Action 2 = Impulsion <code>ArmRequest</code> distincte et consciente pour engager l'armement
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small>2 actions</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ MIXTE</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.4</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -242,7 +233,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         ⚠️ <b>Étape 2</b> : Détection canal collé (boucle reste fermée malgré coupure A)<br>
         🚨 <b>Étape 3</b> : Avortement immédiat ➔ Alarme <code>RedundancyTestFailed</code>, maintien neutralisé et retour IDLE Step 0
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small>Steps 1–4</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.3b</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -255,7 +245,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         ⏱️ <b>Étape 2</b> : Écoulement timeout 2.0s sans retour <code>PowerContactorEngaged</code><br>
         🔒 <b>Étape 3</b> : Déclenchement alarme <code>EmergencyArmingFailed</code> + Activation Lockout anti-mitraillage 5.0s
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>Lockout=1</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -268,7 +257,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         ⛔ <b>Étape 2</b> : Retombée immédiate et inconditionnelle des canaux A et B (<code>MaintainA/B_RQ=FALSE</code>)<br>
         🛡️ <b>Étape 3</b> : Verrouillage <code>Armable=FALSE</code> interdisant tout maintien de puissance
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>Maintain=0</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.1</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -281,7 +269,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         🚫 <b>Étape 2</b> : Tentative d'armement <code>ArmRequest</code> ➔ Refus net, interdiction de transition hors Step 0<br>
         🔄 <b>Étape 3</b> : Persistance de l'alarme si <code>Reset</code> sans disparition de la cause brute
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>Armable=0</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.2</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
@@ -294,7 +281,6 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         🛑 <b>Étape 2</b> : Appui volontaire opérateur sur <code>BtnEmergencyCutOff</code> pendant le pulse<br>
         ✅ <b>Étape 3</b> : Coupure immédiate du pulse et du maintien sans lever d'alarme de collage (avortement propre)
       </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>Pulse=0</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
