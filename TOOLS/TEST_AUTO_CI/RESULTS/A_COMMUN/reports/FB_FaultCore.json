@@ -8,42 +8,15 @@
     },
     {
       "name": "TC-P03-008 Cumul de 2 causes latchees apparues a des instants differents, un seul Reset les acquitte ensemble",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.FAULT.LATCHEDID expected 0, got 32",
-        "file": "test_fb_faultcore.st",
-        "line": 63,
-        "message": "Un seul front Reset acquitte les 2 latches ensemble",
-        "expected": "0",
-        "actual": "32"
-      }
+      "passed": true
     },
     {
       "name": "TC-P03-009 Cause live + cause latchee simultanees : live retombe seule, latchee reste jusqu au Reset",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.FAULT.ERRORID expected 0, got 1",
-        "file": "test_fb_faultcore.st",
-        "line": 94,
-        "message": "Cause live inactive -> ErrorId retombe a 0 sans Reset",
-        "expected": "0",
-        "actual": "1"
-      }
+      "passed": true
     },
     {
       "name": "TC-P03-010 Bornes de la liste Causes : bit 0 et bit 15 correctement mappes (pas d off-by-one)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.FAULT.LATCHEDID expected 0, got 32769",
-        "file": "test_fb_faultcore.st",
-        "line": 129,
-        "message": "Reset aux bornes : rien ne persiste",
-        "expected": "0",
-        "actual": "32769"
-      }
+      "passed": true
     },
     {
       "name": "TC-P03-012 Reset maintenu niveau haut : pas d acquittement silencieux, cause reaparue re-arme (faille T148 non applicable)",
@@ -56,7 +29,7 @@
   ],
   "summary": {
     "total": 6,
-    "passed": 3,
-    "failed": 3
+    "passed": 6,
+    "failed": 0
   }
 }

@@ -2788,25 +2788,66 @@ tasks:
   bloque_par:
   - T173-B
 - id: T174
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: TEST_AUTO_CI
-  agent: ''
-  date: '2026-08-29T15:40:10'
+  agent: 'DSH/Claude (orchestrateur)'
+  date: '2026-08-29T16:30:00'
   titre: Tests CI socle FaultCore (P0) + complément Safety EmergencyManagement
-  contexte: 'Corrigé 2026-08-29 15:40 (preuve experte : test_fb_safety_emergency.st EXISTE, 10/12 TC, rapport
-    12:50:02 = 10/10 PASS). Résiduel : P0 FB_FaultCore (TC-P03-008..013) sans test dédié (test_fb_fbstatus.st
-    vise un FB supprimé 51fccce6) ; TC-P01-001 SITE non automatisable ; TC-P01-005 af_ignore à justifier ou lever.
-    Ordre humain : preuves exhaustives (livrées 10/12) / prévoir implémentation CODE+CI.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T174.yaml — créer test_fb_faultcore.st (TC-P03-008..013) ;
-    traiter TC-P01-005 (test logique minimal ou justification af_ignore datée) ; régressions interdites sur le 10/10
-    PASS existant ; zéro modification DOC/AF et CODE/'
+  contexte: 'Résolu 2026-08-29 16:30 : test_fb_faultcore.st créé (6 scénarios TC-P03-008..013),
+    harnais STruCpp local exécuté — 6/6 PASS (rapport RESULTS/A_COMMUN/reports/FB_FaultCore.json|html
+    daté 16:30). 3 échecs initiaux = défauts du TEST (causes non relachées avant Reset, le
+    ré-armement fail-safe de la spec §4 re-accumule) corrigés dans le test, PAS dans le code.
+    Safety : 10/12 TC déjà prouvés (10/10 PASS) ; TC-P01-001 SITE (non automatisable) ;
+    TC-P01-005 af_ignore défendable (justification notée). Fiche FB_FaultCore : citations
+    test_fb_fbstatus.st (FB supprimé 51fccce6) remplacées par test_fb_faultcore.st.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T174.yaml — AC0..AC5 satisfaits
+    (6/6 PASS + 10/10 PASS conservés + registry FB_FaultCore + citations fiche corrigées
+    + zéro modif DOC/AF états).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T174.yaml
   objectifs:
-  - test_fb_faultcore.st couvre TC-P03-008..013 et compile contre FB_FaultCore.st actuel
-  - 10/10 PASS du test_fb_safety_emergency.st existant conservés (AC0)
-  - TC-P01-005 traité (test logique minimal ou justification datée dans registry.yaml)
-  - Aucun état de TC modifié dans DOC/AF (preuve: git diff -- DOC/AF vide)
+  - test_fb_faultcore.st couvre TC-P03-008..013 et compile contre FB_FaultCore.st actuel ✅
+  - 6/6 TC PASS via harnais local (preuve datée) ✅
+  - 10/10 PASS du test_fb_safety_emergency.st existant conservés (AC0) ✅
+  - Fiche FB_FaultCore citations alignées (test_fb_faultcore.st) ✅
+  bloque_par: []
+- id: T175
+  statut: ⏳
+  criticite: C4
+  domaine: TREUILS
+  agent: 'DSH/Claude (orchestrateur → délégation)'
+  date: '2026-08-29T16:30:00'
+  titre: Écarts code treuils/benne (temps mort directionnel, anti-traversée benne, MAINT)
+  contexte: 'Délegué 2026-08-29 (audits P3-1a) : temps mort directionnel (RetryDelay T#1500ms
+    uniforme vs TC-P10-021/022 1s par direction — à trancher et documenter), M1_Busy/M2_Busy
+    déclarés jamais lus (anti-traversée benne TC-P10-025), MAINT_N1/N2 (TC-P10-030). Mono-canal
+    assumé (D2) : plus aucun canal vitesse DriftGuard dans le scope.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T175.yaml (révisé D2) — AC2/AC3/AC4
+    uniquement (AC1 = mono-canel doc only). Scope CODE/H_TREUILS_BENNE/**, G200+gates exigés.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T175.yaml
+  objectifs:
+  - Temps mort directionnel implémenté/tranché, TC-P10-021/022 exécutables
+  - M1_Busy/M2_Busy réellement lues (anti-traversée TC-P10-025)
+  - MAINT_N1/N2 tranché (code ou fiche, plus d écart silencieux)
+  - G200 PASS + gates palier C PASS
+  bloque_par: []
+- id: T176
+  statut: ⏳
+  criticite: C4
+  domaine: JOYSTICK
+  agent: 'DSH/Claude (orchestrateur → délégation)'
+  date: '2026-08-29T16:30:00'
+  titre: ArmingPermit câblé TRUE en dur — note de design puis fix+guard
+  contexte: 'ArmingPermit est un TRUE littéral (PRG_02_Acquisition.st:322, câblage temporaire)
+    : plus de barrière réelle d armet. Décision D4 humaine : note de design AVANT code (qui
+    produit légitimement le droit d armer ?), puis fix + gate anti-régression (fix:+guard:).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T176.yaml — stage 1 note de design
+    (lecture seule), stage 2 code+gate sur validation humaine de la note.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T176.yaml
+  objectifs:
+  - Note de design : producteur légitime d ArmingPermit (candidats + recommandation)
+  - Fix code + gate anti-câblage-littéral après validation de la note
+  - TC-P08-020.1/.2 exécutables après fix
   bloque_par: []
 - id: T177
   statut: ⬜

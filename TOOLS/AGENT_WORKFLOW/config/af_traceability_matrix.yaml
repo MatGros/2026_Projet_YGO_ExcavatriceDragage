@@ -723,7 +723,8 @@ domains:
         etat: NV
       TC-P08-050:
         intention: Translation refuse tout ordre sans DeadmanArmed (tous modes) ;
-          Treuils seulement en mode Joystick Maître (asymétrie non tranchée, §7/Q2)
+          Treuils seulement en mode Joystick Maître (arbitré 2026-08-29, §10 Q2 —
+          interlock directionnel par technologie, voir §7)
         type: 🔒 GATE
         ref: G375_check_deadman_arming_gate.py
         etat: NV
@@ -1278,12 +1279,11 @@ domains:
         etat: NV-I
       TC-P10-001:
         intention: 'Armer Méca A (contacteurs+frein coupés, joystick neutre, hors
-          homing). Injecter dérive position >2.0m (canal position) → SafeStop+PowerCutOff.
-          Injecter vitesse mesurée >0.02m/s (canal vitesse) → SafeStop+PowerCutOff.
-          Vérifier le croisement Cat.3 : chaque canal déclenche indépendamment. ⚠️
-          État code : seul le canal position (DriftGuardA) est implémenté ; le canal
-          vitesse (UncommandedSpeedThresholdMps) est déclaré mais non utilisé — à
-          implémenter (T175).'
+          homing). Injecter dérive position >2.0m (canal position, DriftGuardA) →
+          SafeStop+PowerCutOff. 🆕 Mono-canal assumé (décision 2026-08-29) : la détection
+          s''appuie sur le canal position seul ; le seuil vitesse (UncommandedSpeedThresholdMps)
+          reste déclaré mais non utilisé et n''est plus exigé — pas de croisement
+          Cat.3 logiciel sur ce socle.'
         type: 💻 AUTO
         etat: NV-I
       TC-P10-002:

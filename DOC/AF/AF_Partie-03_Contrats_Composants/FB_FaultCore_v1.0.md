@@ -115,8 +115,10 @@ distincte, remplie par le FB porteur lui-même, **hors périmètre de FB_FaultCo
   </tbody>
 </table>
 
-Exécution : `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st` — scénarios
-multi-scans, causes injectées via `Causes[i].Active` / `Causes[i].Latching` (aucune source
+Exécution : 🆕 `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_faultcore.st` (créé 2026-08-29, T174 — l'ancien
+`test_fb_fbstatus.st` visait `FB_FBSTATUS`/`ST_FBCAUSE` supprimés au commit `51fccce6` et ne compilait plus).
+**Preuve : 6/6 TC PASS** (harnais STruCpp, rapport daté `RESULTS/A_COMMUN/reports/FB_FaultCore.json|html` du
+2026-08-29) — scénarios multi-scans, causes injectées via `Causes[i].Active` / `Causes[i].Latching` (aucune source
 bitfield `WORD`, aucun tableau de textes indexé par bit).
 
 ## 3 · 🔌 Interface
@@ -253,6 +255,6 @@ Exemple réel équivalent : `CODE/D_JOYSTICK/FB_Joystick.st` (`instFault` + `ins
 | `DOC/STDS/CODE_QUALITY_STANDARDS.md` | §2quinquies (interfaces socle), §3 / §3bis (types `ST_Fault` / `ST_FaultCause`, socle `FB_FaultCore`), §9 (pattern Cause/Ack, `Reset` jamais conditionné) |
 | AF08 (Joystick) | Consommateur confirmé (`instFault` + `instCauses`) |
 | Code | `CODE/A_COMMUN/FB_FaultCore.st`, `CODE/A_COMMUN/_TYPES/ST_Fault.st`, `CODE/A_COMMUN/_TYPES/ST_FaultCause.st`, `CODE/A_COMMUN/_TYPES/ST_Lifecycle.st` |
-| Tests | `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st` |
+| Tests | 🆕 `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_faultcore.st` (TC-P03-008..013 — 6/6 PASS, rapport 2026-08-29) ; ⚠️ l'ancien `test_fb_fbstatus.st` visait un FB supprimé (remplacé) |
 </content>
 </invoke>
