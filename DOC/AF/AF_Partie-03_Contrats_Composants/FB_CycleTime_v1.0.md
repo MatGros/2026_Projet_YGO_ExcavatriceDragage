@@ -20,10 +20,10 @@
 
 ## 1 · 🎯 Rôle et profil
 
-Brique technique COMMUN (profil `light` : aucune machine d'état, aucun défaut remonté) qui
-**mesure le temps de cycle réel `dt` de la tâche** entre deux exécutions successives et le publie
-en secondes (`CycleTimeS : REAL`). Utilisée par tout FB qui intègre une grandeur dans le temps
-(rampe, estimateur de position, accumulateur).
+**Calcul du dt réel entre deux exécutions successives** de la tâche, publié en secondes
+(`CycleTimeS : REAL`). Brique technique COMMUN, profil `light` : aucune machine d'état, aucun
+défaut remonté. Utilisée par tout FB qui intègre une grandeur dans le temps (rampe, estimateur
+de position, accumulateur).
 
 Ce **n'est pas** un FB métier : pas de `Enable`/`Reset`, pas de `Ready`, pas de `Fault`. Une seule
 entrée de configuration (`DefaultValueS`, valeur de secours) et une seule sortie (`CycleTimeS`).
