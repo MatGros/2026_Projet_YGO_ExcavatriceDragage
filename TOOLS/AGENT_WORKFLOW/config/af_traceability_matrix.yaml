@@ -283,11 +283,9 @@ domains:
         etat: NV-I
     validation_points:
       TC-P02-001:
-        intention: Aucun écouteur/écrivain multiple sur un contrat (⚠️ G200_check_linkage.py
-          L10 remonte des faux positifs intra-POU — voir TBD §8)
-        type: 💻 AUTO
-        ref: §2
         etat: NV
+        intention: ''
+        type: ''
       TC-P02-002:
         intention: Les calculs et machines d'état résident dans les FB ; le PRG rend
           ses arbitrages et flux explicitement lisibles
@@ -300,11 +298,9 @@ domains:
         ref: §3
         etat: NV
       TC-P02-004:
-        intention: Tâche CODESYS + G200_check_linkage.py PASS (⚠️ ne vérifie pas l'ordre
-          inter-POU — revue manuelle à ce jour, voir TBD §8)
-        type: ⚡ SITE+AUTO
-        ref: §5
         etat: NV
+        intention: ''
+        type: ''
       TC-P02-005:
         intention: FB_TroubleshootingView ne produit aucune commande, configuration
           ni interlock
@@ -1586,3 +1582,23 @@ domains:
         type: 👁️ REVUE+🔒 GATE
         ref: FB_TroubleshootingView
         etat: NV
+      TC-P14-TSV-01:
+        etat: NV
+        intention: ''
+        type: ''
+      TC-P14-TSV-02:
+        etat: NV
+        intention: ''
+        type: ''
+      TC-P14-TSV-03:
+        etat: NV
+        intention: ''
+        type: ''
+      TC-P14-TSV-04:
+        etat: NV
+        intention: ''
+        type: ''
+      TC-P14-TSV-05:
+        etat: NV
+        intention: ''
+        type: ''

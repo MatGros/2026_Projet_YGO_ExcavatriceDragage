@@ -10,7 +10,7 @@
 Publie l'état de communication de chaque esclave EtherCAT.
 Distingue `READY` (bus réel online) de `SIMULATED` (bypass actif).
 
-## 🧪 Points de validation
+## 🧪 Table des points de validation (détail)
 
 > Propriétaire unique de <nobr><code>TC-P12-030</code></nobr> (synthèse `ErrorId` globale par
 > nibble — spécifique à ce FB) — pas dupliqué au chapô. `TC-P12-010`/`020`/`040` restent au chapô
@@ -30,7 +30,7 @@ Distingue `READY` (bus réel online) de `SIMULATED` (bypass actif).
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

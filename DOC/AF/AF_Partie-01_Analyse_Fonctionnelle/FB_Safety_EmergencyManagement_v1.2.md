@@ -10,7 +10,7 @@
 ## 🧭 Sommaire
 
 1. [🎯 Périmètre et composition](#1--périmètre-et-composition)
-2. [🧪 Points de validation (détail)](#2--points-de-validation-détail)
+2. [🧪 Table des points de validation (détail)](#2--table-des-points-de-validation-détail)
 3. [🔌 Contrats d'interface](#3--contrats-dinterface)
 4. [⚙️ Comportement et séquence](#4--comportement-et-séquence)
 5. [📡 Polarités et E/S physiques](#5--polarités-et-es-physiques)
@@ -91,10 +91,12 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 
 ---
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 > Décline la table macro du chapô AF01 (§1, `F01.01`-`F01.08`) — 10 IDs racine, propriétaire
 > unique de ce document (aucune décimale : chaque test est déjà une unité atomique).
+
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 ### Types d'essai
 

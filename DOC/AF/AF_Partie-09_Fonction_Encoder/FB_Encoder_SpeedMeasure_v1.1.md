@@ -9,7 +9,7 @@
 ## 🧭 Sommaire
 
 1. 🎯 Rôle et profil
-2. 🧪 Points de validation (détail)
+2. 🧪 Table des points de validation (détail)
 3. 🔌 Interface
 4. ⚙️ Fenêtre glissante horodatée
 5. 📚 Documents liés
@@ -20,7 +20,7 @@ Contrat `light` (AF03) — pas de remontée de défaut propre (`Valid=FALSE` suf
 l'indisponibilité, pas un `ErrorId`). Calcul pur sur position sûre déjà produite par
 `FB_Encoder_Safety`.
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 Décline `TC-P09-050` (chapô) :
 
@@ -40,7 +40,7 @@ Décline `TC-P09-050` (chapô) :
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

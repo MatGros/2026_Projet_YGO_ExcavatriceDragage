@@ -10,7 +10,7 @@
 Surveille le toggle IHM (inversion attendue toutes les 500 ms), génère un toggle PLC
 et expose un diagnostic de communication opérateur. Ne produit ni SafeStop ni PowerCutOff.
 
-## 🧪 Points de validation
+## 🧪 Table des points de validation (détail)
 
 > Propriétaire unique de <nobr><code>TC-P12-050</code></nobr> — pas dupliqué au chapô.
 
@@ -28,7 +28,7 @@ et expose un diagnostic de communication opérateur. Ne produit ni SafeStop ni P
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

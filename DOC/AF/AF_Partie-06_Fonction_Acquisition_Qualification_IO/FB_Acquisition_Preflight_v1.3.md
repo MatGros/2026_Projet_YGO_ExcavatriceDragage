@@ -9,7 +9,7 @@
 ## 📑 Sommaire
 
 1. [🎯 Table des fonctions](#-1--table-des-fonctions)
-2. [🧪 Points de validation](#-2--points-de-validation)
+2. [🧪 Table des points de validation (détail)](#-2--table-des-points-de-validation-détail)
 3. [🔄 Pipeline et intégration](#-3--pipeline-et-intégration)
 4. [🔌 Interface publique](#-4--interface-publique)
 5. [⚙️ Verdict et masque défaut](#-5--verdict-et-masque-défaut)
@@ -21,11 +21,44 @@
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
-|---|---|---|---|---|---|---|---|
-| `F06.01` | Établir un verdict préflight passif | Sur front `Execute` (demande IHM `GVL_IHM.Commun.Preflight.BtnRun`) uniquement, attend l'immobilité machine, agrège 16 contrôles et publie `PreflightOk`, `PreflightDone`, `PreflightBusy`, `PreflightErrorId`. Aucun verdict automatique au démarrage automate. | `FB_Acquisition_Preflight` + `PRG_07_Supervision` | 🔵 C2 | <nobr><code>TC-P06-007</code></nobr> | ✅ code lu | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: calc(100% - 520px);">
+    <col style="width: 110px;">
+    <col style="width: 50px;">
+    <col style="width: 90px;">
+    <col style="width: 50px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Fonction</small></th>
+      <th style="padding: 4px 8px;">Description</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réalisée par</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Criticité</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>TC couvrants</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Statut</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F06.01</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Établir un verdict préflight passif</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Sur front <code>Execute</code> (demande IHM <code>GVL_IHM.Commun.Preflight.BtnRun</code>) uniquement, attend l'immobilité machine, agrège 16 contrôles et publie <code>PreflightOk</code>, <code>PreflightDone</code>, <code>PreflightBusy</code>, <code>PreflightErrorId</code>. Aucun verdict automatique au démarrage automate.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Acquisition_Preflight</code> + <code>PRG_07_Supervision</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>🔵 C2</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P06-007</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅ code lu</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
-## 🧪 2 · Points de validation
+## 🧪 2 · Table des points de validation (détail)
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
@@ -45,7 +78,7 @@
       <th style="padding: 4px 8px;">Comportement attendu</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf FB</small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>

@@ -75,7 +75,7 @@ machine, organisées dans `GVL_Troubleshooting` :
 
 ---
 
-## 2. 🧪 Table des points de validation (non détaillé)
+## 🧪 2. Table des points de validation (non détaillé)
 
 > Catalogue détaillé et **propriété unique** dans la fiche
 > [`FB_TroubleshootingView_v1.2.md`](AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md) —
