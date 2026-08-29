@@ -1,0 +1,175 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T088
+# Garde-fou plafond haut sur DeltaTimeMs dans FB_CycleTime (bouclage TIME() 49,7j
+# + artefacts de surcharge/gel de tache)
+# ═══════════════════════════════════════════════════════════════════════════
+# Design source : DOC/WFLOW/AUDITS/DESIGN/DESIGN_FB_CYCLETIME_GARDE_FOU_WRAP_v0.1.md
+# Justification orchestrateur (2026-08-29) : CycleTimeS alimente la rampe de
+#   vitesse translation (FB_Ramp via FB_Translation), l'estimateur de position
+#   M3 (FB_Translation_PositionEstimator) et les integrateurs de temps de frein
+#   treuil (FB_Winch_Symmetry). Un delta aberrant (wrap TIME() ~tous les 49,7j
+#   sur machine en service continu, OU surcharge/gel/online-change/point d'arret)
+#   propage un pas d'integration enorme -> saut de vitesse/position. Le code
+#   actuel ne borne que par le bas (DeltaTimeMs > 0), pas par le haut.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T088_CYCLETIME_WRAP_GUARD
+  parent_id: ''
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    FB_CycleTime ne doit jamais publier un CycleTimeS derive d'un delta de temps
+    physiquement impossible. Tout DeltaTimeMs hors de la plage nominale
+    (0 < DeltaTimeMs <= plafond) doit retomber sur la valeur de secours
+    DefaultValueS, sans auto-redemarrage et sans propager l'artefact.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Le calcul du §4 de FB_CycleTime.st publie CycleTimeS := DefaultValueS des
+        que DeltaTimeMs = 0 OU DeltaTimeMs > plafond (constante CST_, valeur
+        1000 ms). Pour 0 < DeltaTimeMs <= plafond, comportement inchange
+        (CycleTimeS := DeltaTimeMs / 1000.0).
+      verified_by: >
+        Relecture du bloc §4 de CODE/A_COMMUN/FB_CycleTime.st + test unitaire
+        TEST_AUTO_CI dedie (cf. AC4).
+    - id: AC2
+      statement: >
+        Le plafond est une constante nommee (VAR CONSTANT locale au FB, prefixe
+        CST_, ex. CST_MaxCycleDeltaMs : UDINT := 1000), jamais un litteral magique
+        dans le corps (regle T121). Le garde-fou bas existant (DeltaTimeMs > 0)
+        est conserve, distinct du garde-fou haut.
+      verified_by: >
+        grep 'CST_' dans FB_CycleTime.st retourne la constante ; le corps §4 ne
+        contient plus de litteral 1000 nu ; G330 / gates informatifs anti-magique PASS.
+    - id: AC3
+      statement: >
+        L'interface publique du FB reste compatible : aucun VAR_INPUT / VAR_OUTPUT
+        existant supprime ou renomme. Ajout AUTORISE et RECOMMANDE d'une sortie
+        booleenne non latchee d'observabilite (ex. DeltaOutOfRange : BOOL,
+        TRUE le scan ou le secours haut s'applique) — les 5 instances existantes
+        (FB_Winch, FB_Winch_Symmetry, FB_Translation, FB_Translation_PositionEstimator,
+        FB_Sim_Translation) ne cablent pas cette sortie et ne doivent PAS etre modifiees.
+      verified_by: >
+        git diff : VAR_INPUT/VAR_OUTPUT existants intacts ; aucune des 5 instances
+        modifiee ; G200 liaison PASS.
+    - id: AC4
+      statement: >
+        Un test unitaire TEST_AUTO_CI couvre : (a) delta nominal (ex. 10 ms) ->
+        CycleTimeS = 0.010 ; (b) delta = 0 -> DefaultValueS ; (c) delta > plafond
+        (ex. 5 000 ms, simulant le wrap / gel) -> DefaultValueS, et DeltaOutOfRange
+        = TRUE si la sortie est ajoutee.
+      verified_by: >
+        python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_CycleTime --fast -> PASS,
+        avec les nouveaux TC visibles dans le rapport.
+    - id: AC5
+      statement: >
+        Non-regression : G200 liaison PASS 0 erreur, run_all_gates palier C
+        100% PASS, et les FB consommateurs de CycleTimeS dont un test CI existe
+        (FB_Winch, FB_Translation, FB_Winch_Symmetry) gardent leurs verdicts.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report ;
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C ;
+        python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Winch --fast (idem
+        FB_Translation, FB_Winch_Symmetry si presents au registre).
+    - id: AC6
+      statement: >
+        Controle structurel du bundle apres edition : le nom de fichier FB_CycleTime
+        correspond au nom du POU declare, et le suffixe de langage correspond au
+        langage genere dans le bundle PLCopenXML.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C
+        (G300 structure du depot, G310 structure CODE : POU, suffixe, ordre) en PASS,
+        et python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report en PASS.
+
+  scope:
+    allowed:
+      - CODE/A_COMMUN/FB_CycleTime.st
+      - CODE_XML/CODE_Bundle.xml
+      - TOOLS/TEST_AUTO_CI/
+    forbidden:
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
+      - CODE/L_SIMULATION/
+      - CODE/A_COMMUN/FB_Ramp.st
+      - CODE/A_COMMUN/FB_Filter.st
+      - PRJ_CODESYS/
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Garde-fou bas existant : DeltaTimeMs = 0 -> DefaultValueS (anti-zero, distinct de l'anti-wrap)."
+      - "Premier cycle : InitDone / RETURN inchanges (CycleTimeS := DefaultValueS au 1er scan)."
+      - "Comportement nominal 0 < DeltaTimeMs <= plafond strictement identique a aujourd'hui."
+      - "Interface : DefaultValueS (VAR_INPUT) et CycleTimeS (VAR_OUTPUT) inchanges."
+    dropped_on_purpose:
+      - "Publication d'un CycleTimeS derive d'un DeltaTimeMs > 1000 ms (artefact wrap/gel) : desormais remplacee par DefaultValueS."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "auto/best-coding"
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Si le comportement de la soustraction TIME - TIME au wrap se revele deja
+    correct par arithmetique modulaire 32 bits (donc garde-fou non necessaire pour
+    le wrap seul), le SIGNALER : le garde-fou reste justifie pour les artefacts de
+    surcharge/gel/online-change, mais l'orchestrateur doit trancher la formulation.
+    Tout autre consommateur de CycleTimeS decouvert, ou tout test CI casse -> STOP
+    et remonter. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — edition directe (hook PreToolUse bloque les sous-agents sur CODE/*.st, voir note)"
+  completed_at: "2026-08-29T03:10:00+02:00"
+  status: COMPLETED
+  summary: >
+    FB_CycleTime.st : ajout d'un bloc VAR CONSTANT (CST_MaxCycleDeltaMs : UDINT := 1000)
+    et resserrement du test §4 en IF (DeltaTimeMs > 0) AND (DeltaTimeMs <= CST_MaxCycleDeltaMs).
+    Tout dt hors plage nominale retombe sur DefaultValueS (branche ELSE existante partagee
+    par l'anti-zero et l'anti-artefact). Commentaire §4 etendu : mecanique du rebouclage
+    TIME() 32 bits (soustraction modulo 2^32 correcte pour un rollover simple), vrai risque
+    = online-change / reprise point d'arret / fenetre de rebouclage, chien de garde tache
+    200 ms sensibilite 1 borne deja les gels en fonctionnement. Interface publique
+    inchangee (pas de sortie DeltaOutOfRange ajoutee : choix minimal, option laissee
+    ouverte). 5 instances existantes non touchees. 3 TC CI ajoutes (delta nominal, delta
+    nul, delta > plafond non latche).
+  evidence_submitted:
+    - "CI FB_CycleTime: 4/4 PASS (2 nouveaux TC garde-fou)"
+    - "G200 linkage: PASS (0 erreur)"
+    - "run_all_gates --palier C: ALL PASS (dont G460 harnais CI complet)"
+    - "Consommateurs CycleTimeS: FB_Winch, FB_Translation, FB_Ramp, FB_Filter -> PASS inchanges (FB_Winch_Symmetry absent du registre CI)"
+    - "CODE_XML: regenere ; toute ligne -/+ hors timestamp = la meme modif FB_CycleTime propagee dans les XML qui l'instancient, zero logique consommateur modifiee"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — relecture git diff reel + recherche web (pas d'equivalent CODESYS exploitable) + contre-analyse sous-agent Ollama local"
+  validated_at: "2026-08-29T03:15:00+02:00"
+  notes: >
+    AC1..AC3, AC5, AC6 satisfaits. AC4 : les 3 cas sont couverts en CI SAUF le rebouclage
+    TIME() 32 bits lui-meme (le harnais STruCpp represente le temps en int64 -> non
+    simulable) ; le TC 5 s exerce la branche haute (artefact gel/reprise), le rebouclage
+    reste couvert par relecture + l'analyse modulaire. Recherche menee : CmpIecTask
+    (IecTaskGetInfo3), LTIME(), SysTimeGetNs() n'apportent rien d'exploitable ici
+    (dependance lib + handle/pointeur + intestable dans le harnais CI), et le rebouclage
+    seul est de toute facon absorbe par l'arithmetique modulaire non signee 32 bits. Le
+    garde-fou plafond reste justifie pour online-change / reprise point d'arret. Sortie de
+    diagnostic DeltaOutOfRange : ecartee pour l'instant (aucun consommateur), reintroductible
+    en une ligne. Fiche AF : a formaliser dans AF_Partie-03 §3 (bloc contrat court + TC-P03),
+    hors de ce lot.
+  followups:
+    - "Bug outillage : hook_pre_edit.py lit le transcript de la session parente, pas le sidechain du sous-agent -> un sous-agent ne peut pas editer CODE/*.st. Candidat fix: + guard:."
+    - "Divergence signalee : G460 (palier C) vert alors qu'un test CI isole peut etre rouge sur le meme fichier -> risque de faux vert, a investiguer."
+    - "AF_Partie-03 §3 : ajouter le bloc contrat FB_CycleTime + TC-P03-xxx."
