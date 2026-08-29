@@ -337,6 +337,8 @@ details.sec>.body{{padding-top:8px}}
 .domchips{{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}}
 .chip{{background:var(--row-alt);border:1px solid var(--line);border-radius:12px;padding:2px 9px;font-size:11px;color:var(--muted)}}
 .chip.zero{{opacity:.55}}
+.chip[data-af]{{cursor:pointer}}
+.chip.active{{background:var(--accent);color:#000;border-color:var(--accent)}}
 .freshbar{{display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:12px}}
 .fresh{{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:help}}
 .dot{{width:9px;height:9px;border-radius:50%;background:var(--none);flex:none}}
@@ -347,6 +349,12 @@ details.sec>.body{{padding-top:8px}}
 .controls input{{width:280px;max-width:100%;padding:6px 9px;border:1px solid var(--line);border-radius:6px;
   font-size:12px;background:var(--bg);color:var(--ink)}}
 .controls input:focus{{outline:none;border-color:var(--accent)}}
+.qbtns{{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}}
+.filter-btn{{padding:4px 10px;background:var(--row-alt);border:1px solid var(--line);border-radius:12px;
+  color:var(--muted);cursor:pointer;font-size:11px;transition:all .15s;white-space:nowrap}}
+.filter-btn.active,.filter-btn:hover{{background:var(--accent);color:#000;font-weight:bold}}
+th[data-k="af"]{{min-width:64px}}
+td.af{{white-space:nowrap}}
 .count{{color:var(--muted);font-size:11px;margin-left:8px}}
 .tablewrap{{overflow-x:auto;border:1px solid var(--line);border-radius:8px}}
 table{{border-collapse:collapse;width:100%;font-size:12px}}
@@ -409,6 +417,7 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 <details class="sec"><summary>1 &middot; Fonctions par AF <span class="count" id="c-fn"></span></summary>
 <div class="body">
 <div class="controls"><input type="text" id="f-fn" placeholder="filtre texte (AF, fonction, FB, criticite\u2026)" autocomplete="off"></div>
+<div class="qbtns" id="qb-fn"></div>
 <div class="tablewrap"><table id="t-fn"><thead><tr>
 <th data-k="af">AF</th><th data-k="id">ID</th><th data-k="fonction">Fonction</th>
 <th data-k="realisee_par">Realisee par</th><th data-k="criticite">Crit.</th>
@@ -419,6 +428,7 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 <details class="sec"><summary>2 &middot; TC par AF <span class="count" id="c-tc"></span></summary>
 <div class="body">
 <div class="controls"><input type="text" id="f-tc" placeholder="filtre texte (AF, ID, intention, type\u2026)" autocomplete="off"></div>
+<div class="qbtns" id="qb-tc"></div>
 <div class="tablewrap"><table id="t-tc"><thead><tr>
 <th data-k="af">AF</th><th data-k="id">ID</th><th data-k="intention">Intention</th>
 <th data-k="preuve">Preuve</th><th data-k="type">Type</th><th data-k="ref">Ref</th><th data-k="etat">Etat</th>
@@ -428,6 +438,7 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 <details class="sec"><summary>3 &middot; Sync cartouches FB <span class="count" id="c-sy"></span></summary>
 <div class="body">
 <div class="controls"><input type="text" id="f-sy" placeholder="filtre texte (FB, statut, pointeur\u2026)" autocomplete="off"></div>
+<div class="qbtns" id="qb-sy"></div>
 <div class="tablewrap"><table id="t-sy"><thead><tr>
 <th data-k="pou_name">FB</th><th data-k="statut">Statut</th><th data-k="stref">.st:ligne</th>
 <th data-k="role">Role (.st)</th><th data-k="docref">Pointeur doc:ligne</th>
@@ -440,6 +451,7 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 <div class="sub">Chaine <span class="mono">Besoin → Fonction (F&lt;NN&gt;.&lt;seq&gt;) → TC certifiant → preuve CI</span>.
 Jointure matrice AF &times; registre <span class="mono">TEST_AUTO_CI</span> &times; rapports JSON — met en evidence les trous.</div>
 <div class="controls"><input type="text" id="f-tr" placeholder="filtre texte (AF, fonction, FB, TC, verdict…)" autocomplete="off"></div>
+<div class="qbtns" id="qb-tr"></div>
 <div class="tablewrap"><table id="t-tr"><thead><tr>
 <th data-k="af">AF</th><th data-k="fonction">Fonction</th><th data-k="criticite">Crit.</th>
 <th data-k="realisee_par">Realisee par</th><th data-k="tc_str">TC (✅ titre TEST / ❌ absent)</th>
@@ -473,7 +485,8 @@ function esc(s){{s=(s==null?"":String(s));return s.replace(/[&<>"]/g,function(c)
   var afWith=DOM.filter(function(d){{return d.has_table_fonctions;}}).length;
   var chips=DOM.map(function(d){{
     var z=(d.n_fonctions===0&&d.n_tc===0)?" zero":"";
-    return '<span class="chip'+z+'">'+esc(d.af)+' &middot; '+d.n_fonctions+' fn / '+d.n_tc+' TC</span>';
+    return '<span class="chip'+z+'" data-af="'+esc(d.af)+'" title="Filtrer sections 1, 2 et 4 sur '+esc(d.af)+' (re-clic = tout reafficher)">'
+      + esc(d.af)+' &middot; '+d.n_fonctions+' fn / '+d.n_tc+' TC</span>';
   }}).join("");
   var partial = afWith<DOM.length
     ? '<span class="warnbadge" title="AF sans section &laquo; Table des fonctions &raquo; : extraction fonctions partielle">extraction partielle : '+afWith+'/'+DOM.length+' AF</span>'
@@ -499,6 +512,18 @@ function esc(s){{s=(s==null?"":String(s));return s.replace(/[&<>"]/g,function(c)
     + '&nbsp;&nbsp;'+partial
     + '</div>'
     + '<div class="domchips">'+chips+'</div>';
+  Array.prototype.forEach.call(document.querySelectorAll(".domchips .chip[data-af]"),function(ch){{
+    ch.addEventListener("click",function(){{
+      var on=!ch.classList.contains("active");
+      Array.prototype.forEach.call(document.querySelectorAll(".domchips .chip[data-af]"),function(x){{x.classList.remove("active");}});
+      ["f-fn","f-tc","f-tr"].forEach(function(id){{
+        var inp=document.getElementById(id); if(!inp) return;
+        inp.value=on?ch.getAttribute("data-af"):"";
+        try{{inp.dispatchEvent(new Event("input"));}}catch(err){{}}
+      }});
+      if(on) ch.classList.add("active");
+    }});
+  }});
 }})();
 
 /* ---------- bandeau fraicheur (badges cote client) ---------- */
@@ -526,9 +551,11 @@ function esc(s){{s=(s==null?"":String(s));return s.replace(/[&<>"]/g,function(c)
 }})();
 
 /* ---------- tables triables + filtrables ---------- */
-function makeTable(tblId, filtId, cntId, rows, cols, defSort){{
+function makeTable(tblId, filtId, cntId, rows, cols, defSort, quicks){{
   var tbl=document.getElementById(tblId), tb=tbl.tBodies[0];
   var state={{key:defSort?defSort.key:cols[0].k, dir:defSort?defSort.dir:1}};
+  var qwrap=document.getElementById(filtId.replace("f-","qb-"));
+  var qstate=null;
   function cellVal(r,k){{
     if(k==="tcs") return (r.tc||[]).join(" ");
     if(k==="stref") return (r.file||r.pou_name||"")+":"+(r.st_line||0)+" "+(r.pou_name||"");
@@ -538,6 +565,7 @@ function makeTable(tblId, filtId, cntId, rows, cols, defSort){{
   function render(){{
     var q=document.getElementById(filtId).value.toLowerCase().trim();
     var list=rows.filter(function(r){{
+      if(qstate&&!qstate.f(r)) return false;
       if(!q) return true;
       return cols.some(function(c){{return String(cellVal(r,c.k)==null?"":cellVal(r,c.k)).toLowerCase().indexOf(q)>=0;}})
         || String(r.af||"").toLowerCase().indexOf(q)>=0;
@@ -569,28 +597,80 @@ function makeTable(tblId, filtId, cntId, rows, cols, defSort){{
     }});
   }});
   document.getElementById(filtId).addEventListener("input",render);
+  if(qwrap&&quicks&&quicks.length){{
+    qwrap.innerHTML=quicks.map(function(q,i){{
+      var n=q.f?rows.filter(q.f).length:rows.length;
+      return '<button type="button" class="filter-btn" data-qi="'+i+'">'+esc(q.label)+" ("+n+")</button>";
+    }}).join("");
+    qwrap.addEventListener("click",function(e){{
+      var b=e.target;
+      while(b&&b!==qwrap&&!(b.tagName==="BUTTON"&&b.hasAttribute("data-qi"))) b=b.parentNode;
+      if(!b||b===qwrap) return;
+      var i=parseInt(b.getAttribute("data-qi"),10);
+      qstate=(i===0)?null:quicks[i];
+      Array.prototype.forEach.call(qwrap.children,function(x){{x.classList.remove("active");}});
+      b.classList.add("active");
+      render();
+    }});
+  }}
   render();
 }}
 
+/* ---------- filtres rapides (boutons, meme pattern que TASK_VIEWER) ---------- */
+var Q_FN=[
+  {{label:"Tous",f:null}},
+  {{label:"🔴 C4",f:function(r){{return String(r.criticite||"").indexOf("C4")>=0;}}}},
+  {{label:"🟠 C3",f:function(r){{return String(r.criticite||"").indexOf("C3")>=0;}}}},
+  {{label:"🟡 C2",f:function(r){{return String(r.criticite||"").indexOf("C2")>=0;}}}},
+  {{label:"⚪ C1",f:function(r){{return String(r.criticite||"").indexOf("C1")>=0;}}}},
+  {{label:"⛔ sans TC",f:function(r){{return !(r.tc||[]).length;}}}}
+];
+var Q_TC=[{{label:"Tous",f:null}}];
+(function(){{
+  var seen={{}};
+  TC.forEach(function(r){{
+    var t=r.type||"";
+    if(seen[t]) return; seen[t]=1;
+    Q_TC.push({{label:t||"(sans type)",f:(function(v){{return v?function(r){{return r.type===v;}}:function(r){{return !r.type;}};}})(t)}});
+  }});
+  Q_TC.push({{label:"⬜ NV",f:function(r){{return String(r.etat||"").indexOf("NV")===0;}}}});
+  Q_TC.push({{label:"✅ V",f:function(r){{return String(r.etat||"").indexOf("V")===0;}}}});
+}})();
+var Q_SY=[
+  {{label:"Tous",f:null}},
+  {{label:"⚠ drift",f:function(r){{return r.statut==="drift";}}}},
+  {{label:"✅ synced",f:function(r){{return r.statut==="synced";}}}},
+  {{label:"🔹 no_fiche",f:function(r){{return r.statut==="no_fiche";}}}},
+  {{label:"○ no_pointer",f:function(r){{return r.statut==="no_pointer";}}}}
+];
+var Q_TR=[
+  {{label:"Tous",f:null}},
+  {{label:"🟢 CI pass",f:function(r){{return (r.ci||{{}}).verdict==="pass";}}}},
+  {{label:"🔴 CI fail",f:function(r){{return (r.ci||{{}}).verdict==="fail";}}}},
+  {{label:"⚪ CI none",f:function(r){{var v=(r.ci||{{}}).verdict;return v!=="pass"&&v!=="fail";}}}},
+  {{label:"⛔ sans TC",f:function(r){{return !(r.tcs||[]).length;}}}},
+  {{label:"❌ TC hors CI",f:function(r){{return (r.tcs||[]).some(function(t){{return !t.in_ci_title;}});}}}}
+];
+
 makeTable("t-fn","f-fn","c-fn",FN,[
-  {{k:"af",fmt:function(r){{return esc(r.af);}}}},
+  {{k:"af",cls:"af",fmt:function(r){{return esc(r.af);}}}},
   {{k:"id",cls:"mono",fmt:function(r){{return esc(r.id);}}}},
   {{k:"fonction",fmt:function(r){{return esc(r.fonction)+(r.description?'<div class="small">'+esc(r.description)+"</div>":"");}}}},
   {{k:"realisee_par",fmt:function(r){{return esc(r.realisee_par);}}}},
   {{k:"criticite",fmt:function(r){{return esc(r.criticite);}}}},
   {{k:"tcs",cls:"mono",fmt:function(r){{return esc((r.tc||[]).join(", "));}}}},
   {{k:"etat",fmt:function(r){{return esc(r.etat);}}}}
-]);
+],null,Q_FN);
 
 makeTable("t-tc","f-tc","c-tc",TC,[
-  {{k:"af",fmt:function(r){{return esc(r.af);}}}},
+  {{k:"af",cls:"af",fmt:function(r){{return esc(r.af);}}}},
   {{k:"id",cls:"mono",fmt:function(r){{return esc(r.id);}}}},
   {{k:"intention",fmt:function(r){{return esc(r.intention);}}}},
   {{k:"preuve",fmt:function(r){{return esc(r.preuve);}}}},
   {{k:"type",fmt:function(r){{return esc(r.type);}}}},
   {{k:"ref",cls:"mono",fmt:function(r){{return esc(r.ref);}}}},
   {{k:"etat",fmt:function(r){{return esc(r.etat);}}}}
-]);
+],null,Q_TC);
 
 var RANK={{drift:0,no_fiche:1,no_pointer:2,synced:3}};
 SY.forEach(function(r){{r._rank=RANK[r.statut]==null?9:RANK[r.statut];}});
@@ -602,7 +682,7 @@ makeTable("t-sy","f-sy","c-sy",SY,[
   {{k:"docref",cls:"mono",fmt:function(r){{return r.doc_pointer?esc(r.doc_pointer)+":"+(r.doc_line||0):'<span class="small">\u2014</span>';}}}},
   {{k:"nom_match",cls:"",fmt:function(r){{return r.nom_match==null?'<span class="b-na">n/a</span>':(r.nom_match?'<span class="b-yes">oui</span>':'<span class="b-no">non</span>');}}}},
   {{k:"role_match",fmt:function(r){{return r.role_match==null?'<span class="b-na">n/a</span>':(r.role_match?'<span class="b-yes">oui</span>':'<span class="b-no">non</span>');}}}}
-],{{key:"_rank",dir:1}});
+],{{key:"_rank",dir:1}},Q_SY);
 
 /* ---------- section 4 : tracabilite Fonction -> TC -> Test CI ---------- */
 (function(){{
@@ -635,14 +715,14 @@ makeTable("t-sy","f-sy","c-sy",SY,[
       : '<span class="small">\\u2014</span>';
   }}
   makeTable("t-tr","f-tr","c-tr",rows,[
-    {{k:"af",fmt:function(r){{return esc(r.af);}}}},
+    {{k:"af",cls:"af",fmt:function(r){{return esc(r.af);}}}},
     {{k:"fonction",fmt:function(r){{return '<span class="mono">'+esc(r.fid)+'</span> '+esc(r.fonction);}}}},
     {{k:"criticite",fmt:function(r){{return esc(r.criticite);}}}},
     {{k:"realisee_par",fmt:function(r){{return esc(r.realisee_par);}}}},
     {{k:"tc_str",fmt:tcCell}},
     {{k:"ci_str",fmt:ciCell}},
     {{k:"rpt_str",fmt:rptCell}}
-  ],{{key:"af",dir:1}});
+  ],{{key:"af",dir:1}},Q_TR);
 
   function gapList(title,items,render){{
     var body=items.length?('<ul>'+items.map(render).join("")+'</ul>'):'<div class="okmsg">aucun</div>';
