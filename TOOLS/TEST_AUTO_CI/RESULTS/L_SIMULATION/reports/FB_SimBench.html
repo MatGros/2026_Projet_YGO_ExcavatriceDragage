@@ -307,11 +307,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 15:43:26</div>
+    <div class="exec-time">2026-08-29 16:36:55</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-simbench-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-1">TC-P13-001 Sim_Safety : neutralisation sans Enable</a></li></ul>
+        <summary>📋 Sommaire (21 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-simbench-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-1">TC-P13-001 Sim_Safety : neutralisation sans Enable</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-2">TC-P13-010 SimBench Enable=FALSE neutralise tout le banc</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-3">TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-4">TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-5">TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-6">TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-7">TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-8">TC-P13-022 Sim_Safety Enable=FALSE neutralise tout</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-9">TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-10">TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-11">TC-P13-031 Sim_Encoder PresetCmd charge PresetValue</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-12">TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-13">TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-14">TC-P13-040 Sim_Translation progression publie des mots thermometre valides</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-15">TC-P13-041 Sim_Translation Direction +1/-1/0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-16">TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance]</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-17">TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-18">TC-P13-050 Sim_Joystick initialise au neutre au premier cycle</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-19">TC-P13-051 Sim_Joystick sorties forçables en instance (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-20">TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,7 +320,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            21/21 vérifications validées
         </div>
     </div>
     
@@ -1925,7 +1925,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 20 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-simbench-1" class="test-card test-card-pass test-card-collapsed">
@@ -1940,6 +1940,374 @@
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
                 <ul class="checks-list"><li>AU non ferme</li><li>Contacteur coupe</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-2" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-010 SimBench Enable=FALSE neutralise tout le banc </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE</li><li>Enable=FALSE -&gt; Busy=FALSE</li><li>Enable=FALSE -&gt; Done=FALSE</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-3" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Stub : TC-P13-011 verifie que FB_SimBench ne lit aucune variable GVL_* en interne
+       (toutes les entrees passees en parametres par PRG_02_Acquisition). Verification
+       statique de code, non automatisable en boite noire. (essai manuel — stub)</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>Stub : verification statique 0 lecture GVL (essai manuel)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-4" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>M1_BrakeCmd=TRUE -&gt; M1_BrakeIsOpen_DI=TRUE (jamais NOT)</li><li>M1_BrakeCmd=FALSE -&gt; M1_BrakeIsOpen_DI=FALSE</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-5" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>M3 en mouvement -&gt; StatusWord 0x0087</li><li>M3 a l arret -&gt; StatusWord 0x0080 (bit0 retombe)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-6" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>A et B maintenus -&gt; SimChainOk=TRUE</li><li>canal A coupe -&gt; SimChainOk=FALSE</li><li>BtnEmergencyStop -&gt; SimChainOk=FALSE</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-7" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>pas encore arme -&gt; contacteur FALSE</li><li>EmergencyArming -&gt; contacteur engage</li><li>auto-maintien : contacteur reste engage</li><li>SimChainOk=FALSE -&gt; contacteur retombe</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-8" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-022 Sim_Safety Enable=FALSE neutralise tout </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>Enable=FALSE -&gt; SimChainOk=FALSE</li><li>Enable=FALSE -&gt; SimContactorOk=FALSE</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-9" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel — stub) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Stub : TC-P13-023 verifie qu un defaut AU reel latche (RedundancyTestFailedCause /
+       EmergencyArmingFailedCause dans FB_Safety_EmergencyManagementLogic) survit a la sim et
+       ne se debloque que par front Reset runtime. Non automatisable en boite noire FB_Sim_Safety
+       (latch dans le FB consommateur). (essai manuel — stub)</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>Stub : latch AU a verifier manuellement (essai manuel)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-10" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>RelayFwd -&gt; RawPos augmente</li><li>RelayFwd -&gt; RawPos augmente depuis 100</li><li>RelayRev -&gt; RawPos diminue</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-11" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-031 Sim_Encoder PresetCmd charge PresetValue </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>Preset applique apres latence</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-12" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0 </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>RawPos=0 + RelayRev -&gt; reste 0 (borne)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-13" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Stub : TC-P13-033 verifie que RawPos (VAR_IN_OUT reference GVL_PERSISTENT) survit a un
+       reset froid. Non automatisable en boite noire (depend de la persistance CODESYS).
+       (essai manuel — stub)</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>Stub : persistance RawPos a verifier manuellement (essai manuel)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-14" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-040 Sim_Translation progression publie des mots thermometre valides </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Direction=0 : reste sur Tremie (11111)</li><li>Direction=-1 : progresse vers Maintenance</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>init Tremie -&gt; PosTremie=TRUE</li><li>init Tremie -&gt; PosMaintenance=TRUE</li><li>pos 6m -&gt; PosTremie=FALSE</li><li>pos 6m -&gt; PosP2=TRUE</li><li>pos 18m -&gt; PosP2=FALSE</li><li>pos 18m -&gt; PosP1=TRUE</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-15" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-041 Sim_Translation Direction +1/-1/0 </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Direction=0 : maintient la position (Tremie)</li><li>Direction=-1 : progresse vers Maintenance</li><li>Direction=+1 : revient vers Tremie</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>Direction=0 -&gt; reste sur Tremie</li><li>Direction=0 -&gt; position maintenue</li><li>Direction=-1 -&gt; quitte Tremie</li><li>Direction=+1 -&gt; retour vers Tremie</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-16" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance] </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Direction=-1 longtemps -&gt; atteint Maintenance et s y bloque (00000)</li><li>Encore des scans -&gt; reste a Maintenance, pas de depassement</li><li>Direction=+1 : revient vers Tremie</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>a Maintenance -&gt; PosMaintenance=FALSE (00000)</li><li>reste a Maintenance, pas de depassement</li><li>retour vers Tremie -&gt; PosMaintenance=TRUE</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-17" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Progresse vers Maintenance</li><li>Enable=FALSE -&gt; reinit interne sur Tremie, sorties neutralisees</li><li>Re-Enable -&gt; demarre proprement sur Tremie (11111)</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>a P2 -&gt; PosTremie=FALSE</li><li>Enable=FALSE -&gt; sorties neutralisees</li><li>re-Enable -&gt; reinit sur Tremie (PosTremie=TRUE)</li><li>re-Enable -&gt; reinit sur Tremie (PosMaintenance=TRUE)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-18" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-050 Sim_Joystick initialise au neutre au premier cycle </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>premier cycle -&gt; RawX=NeutralRaw</li><li>premier cycle -&gt; RawY=NeutralRaw</li><li>premier cycle -&gt; RawButton=FALSE</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-19" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-051 Sim_Joystick sorties forçables en instance (essai manuel — stub) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Stub : TC-P13-051 verifie que RawX/RawY/RawButton restent forçables librement en instance
+       CODESYS apres l&#x27;init (le FB n&#x27;ecrit plus ces sorties apres le premier cycle). Non
+       automatisable en boite noire (depend du forçage CODESYS). (essai manuel — stub)</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>Stub : forçage joystick a verifier manuellement (essai manuel)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-20" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Aucun bouton -&gt; RawButton=FALSE</li><li>Bouton directionnel actif -&gt; RawButton=TRUE (homme-mort inclus)</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>aucun bouton -&gt; RawButton=FALSE</li><li>bouton actif -&gt; RawButton=TRUE</li></ul>
             </details>
                 
                 
@@ -3391,6 +3759,9 @@ STRUCT
     BucketBusy                   : BOOL;               // ⚙️ Mouvement d&#x27;ouverture/fermeture benne en cours
     BucketDone                   : BOOL;               // ✅ Mouvement benne termine avec succes
     BucketError                  : BOOL;               // ❌ Defaut sur sous-systeme benne
+
+    // === 🛡️ Permission d&#x27;armement homme-mort (Option B — combiné interlock benne) ===
+    ArmingPermit                 : BOOL;               // 🛡️ Permission d&#x27;armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)
 END_STRUCT
 END_TYPE
 </pre>
@@ -6078,9 +6449,28 @@ END_FUNCTION_BLOCK
 test_fb_simbench.st
   [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
   [PASS] TC-P13-001 Sim_Safety : neutralisation sans Enable
+  [PASS] TC-P13-010 SimBench Enable=FALSE neutralise tout le banc
+  [PASS] TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)
+  [PASS] TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd
+  [PASS] TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret
+  [PASS] TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop
+  [PASS] TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming
+  [PASS] TC-P13-022 Sim_Safety Enable=FALSE neutralise tout
+  [PASS] TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel — stub)
+  [PASS] TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos
+  [PASS] TC-P13-031 Sim_Encoder PresetCmd charge PresetValue
+  [PASS] TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0
+  [PASS] TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub)
+  [PASS] TC-P13-040 Sim_Translation progression publie des mots thermometre valides
+  [PASS] TC-P13-041 Sim_Translation Direction +1/-1/0
+  [PASS] TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance]
+  [PASS] TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie
+  [PASS] TC-P13-050 Sim_Joystick initialise au neutre au premier cycle
+  [PASS] TC-P13-051 Sim_Joystick sorties forçables en instance (essai manuel — stub)
+  [PASS] TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)
 
 -----------------------------------------
-2 tests, 2 passed, 0 failed
+21 tests, 21 passed, 0 failed
 </pre>
     </details>
 </div>

@@ -239,6 +239,42 @@ FB_Bucket:
     - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
 
+FB_Safety_Winch:
+  domain: H_TREUILS_BENNE
+  af_doc: DOC/AF/AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md
+  sources:
+    - CODE/A_COMMUN/_TYPES/E_State.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/FB_FaultCore.st
+    - CODE/F_MODES/E_Mode.st
+    - CODE/H_TREUILS_BENNE/FB_DriftGuard.st
+    - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_safety_winch.st
+
+FB_WinchOutputInterlock:
+  domain: H_TREUILS_BENNE
+  af_doc: DOC/AF/AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md
+  sources:
+    - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
+    - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
+    - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winchoutputinterlock.st
+
+FB_WinchSync:
+  domain: H_TREUILS_BENNE
+  af_doc: DOC/AF/AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md
+  sources:
+    - CODE/A_COMMUN/_TYPES/E_State.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/FB_FaultCore.st
+    - CODE/F_MODES/E_Mode.st
+    - CODE/H_TREUILS_BENNE/FB_SyncDeviation.st
+    - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+    - CODE/H_TREUILS_BENNE/FB_WinchSync.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winchsync.st
+
 FB_Translation:
   domain: I_TRANSLATION
   sources:
@@ -252,6 +288,7 @@ FB_Translation:
     - CODE/A_COMMUN/FB_Brake.st
     - CODE/F_MODES/E_Mode.st
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
+    - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
     - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
     - CODE/I_TRANSLATION/FB_Safety_Translation.st
     - CODE/I_TRANSLATION/FB_Translation.st
