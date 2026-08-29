@@ -35,9 +35,40 @@ fait pas. Renvoi aux codes `FNN.0X` du chapô, pas de redite du rôle machine d�
 > nouvel identifiant racine (immutabilité, `CODE_QUALITY_STANDARDS.md §0`). Si le chapô n'a pas
 > encore de TC macro pour cette fonction, le signaler plutôt que d'en inventer un ici.
 
-| ID | Comportement attendu | Type | Réf |
-|---|---|---|---|
-| <nobr><code>TC-PNN-0X0.1</code></nobr> | [Comportement précis, 1 phrase] | <nobr><code>💻 AUTO</code></nobr> | §N |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-PNN-0X0.1</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>[Intention<br>courte]</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        ⚡ <b>Étape 1</b> : Stimulus d'entrée ou appel de méthode<br>
+        🔍 <b>Étape 2</b> : Évaluation et calcul interne<br>
+        🛑 <b>Étape 3</b> : Sanction / Résultat attendu sur les sorties
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§N</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 3 · 🔌 Interface
 

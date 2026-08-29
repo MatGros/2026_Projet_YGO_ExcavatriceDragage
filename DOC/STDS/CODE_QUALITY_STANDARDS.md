@@ -35,14 +35,14 @@
 3. **Règle des Identifiants de Validation (`TC-Pxx-nnn`)** :
    - **Format** : `TC-P<Partie>-<Numéro>` (ex: `TC-P01-010`, `TC-P10-010`).
    - **Numérotation par pas de 10** (`010`, `020`, `030`) pour autoriser les insertions sans dénumérotation.
-   - **Immuabilité stricte** : Un identifiant supprimé/obsolète n'est **jamais réattribué** à un nouveau test.
-   - **Formulation synthétique** : Regrouper les sous-conditions logiques par grand test fonctionnel au lieu de multiplier les micro-variables.
-4. **Formatage Ultra-Compact des Tableaux de Validation TC** :
-   - **ID Mono-Ligne** : L'ID doit être encadré par `<nobr><code>TC-Pxx-nnn</code></nobr>` (pas de retour à la ligne sur les tirets).
-   - **Intitulés Denses** : Colonnes compactes (`<nobr>ID Unique</nobr>`, `Groupe`, `Comportement Attendu`, `<nobr>Type</nobr>`, `<nobr>Réf FB</nobr>`).
-   - **Réf FB Compacte** : Utiliser `<small>` avec découpage multi-lignes `<br>` (ex: `<small><code>FB_A</code><br><code>FB_B</code></small>`) pour réduire la largeur.
-   - **Densité Texte** : Descriptions denses et directes (1 à 2 phrases max) pour supprimer les marges et la hauteur inutiles.
-5. **Représentation du Flux de Données & Séquencement FB (Cartes Compactes & Flèches Vectorielles SVG)** :
+4. **Formatage Standard & Optimisation Espace des Tableaux de Validation TC** :
+   - **Contrôle de Largeur Rigide (`table-layout: fixed; width: 100%`)** : Utilisation d'un `<colgroup>` explicite pour forcer 92%+ de la largeur sur le déroulé.
+   - **ID Vertical (`28px`)** : L'ID est orienté verticalement (`writing-mode: vertical-rl; transform: rotate(180deg)`) pour libérer l'espace horizontal, tandis que l'en-tête `ID` reste horizontal.
+   - **Intention Centrée (`50px`)** : Intitulé ultra-compact sur 2 lignes (ex: `Nominal`<br>`Réarm.`), centré horizontalement et verticalement.
+   - **Séquence & Déroulé Étape par Étape (`calc(100% - 165px)`)** : Décomposition chronologique complète par étapes (`💤 Étape 0`, `🚀 Étape 1`, `⚡ Étape 2`, `✅ Étape 3`), mentionnant stimuli, temporisations et sanctions.
+   - **Suppression de la Colonne Preuve** : Le déroulé complet portant déjà les assertions précises et le comportement observable, la colonne `Preuve` est bannie pour éliminer la redondance et laisser 100% de place au texte.
+   - **Colonnes Annexes Compactes** : `Type` (45px), `Réf` (26px), `État` (36px, `V-I`, `NV-I`, `NV`).
+   - **Typographie Uniforme** : Police 13px, interligne 1.55, padding compact (`4px 1px` sur les bords, `6px 8px` dans la séquence).
    - **Combinaison Zéro-Marge & Flèches Vectorielles** : Cartes HTML ultra-compactes (`padding: 6px 10px`) associées à de vraies flèches vectorielles SVG colorées (`<svg>`).
    - **Émoji collé directement à gauche** : Émoji sur la même ligne avec espace fixe devant le nom (`🛡️ &nbsp;<b>FB_Safety_Translation</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Rôle</span>`).
    - **Flèches Vectorielles & Contrats Explicites** : Éléments vectoriels `<svg>` colorés selon le domaine métier et étiquette explicite du signal transmis.
