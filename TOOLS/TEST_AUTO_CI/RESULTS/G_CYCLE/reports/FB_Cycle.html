@@ -301,7 +301,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 01:00:28</div>
+    <div class="exec-time">2026-08-29 01:41:46</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (7 tests)</summary>
@@ -692,7 +692,7 @@
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>OperatorActionId</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">UINT</span></div>
+                <div class="pin-name"><b>OperatorActionId</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">WORD</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
@@ -888,7 +888,7 @@
             <div class="pin-name">CYCLESTEPATERROR <span class="pin-type">IEC_E_CYCLESTEP</span></div>
             <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">OPERATORACTIONID <span class="pin-type">IEC_UINT</span></div>
+            <div class="pin-name">OPERATORACTIONID <span class="pin-type">IEC_WORD</span></div>
             <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">OPERATORACTION <span class="pin-type">IECStringVar&lt;120&gt;</span></div>
@@ -1515,7 +1515,7 @@ VAR_OUTPUT
     CycleStep               : E_CycleStep;          // &lt;-- [STAT] Etape active du Grafcet
     CycleStateStr           : STRING(80);           // &lt;-- [STAT] Libelle en clair de l&#x27;etape
     CycleStepAtError        : E_CycleStep;          // &lt;-- [DIAG] Etape specifique au moment du defaut
-    OperatorActionId        : UINT;                 // &lt;-- [DIAG] ID action operateur requise
+    OperatorActionId        : WORD;                 // &lt;-- [DIAG] ID action operateur requise
     OperatorAction          : STRING(120);          // &lt;-- [DIAG] Message explicatif pour l&#x27;IHM
     ExpectedAxis            : E_OperatorAxis;       // &lt;-- [STAT] Organe joystick/bouton attendu
     ExpectedDirection       : INT;                  // &lt;-- [STAT] Sens attendu (-1, 0, +1)
