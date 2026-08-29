@@ -24,6 +24,8 @@ VAR_INPUT
     RedundancyTestFailed    : BOOL; // --> [DIAG] Miroir RedundancyTestFailed (pour bus Diag)
     ArmFailed               : BOOL; // --> [DIAG] Miroir ArmFailed (pour bus Diag)
     LockoutActive           : BOOL; // --> [DIAG] Miroir LockoutActive (pour bus Diag)
+    LastAbortStep           : INT;  // --> [DIAG] Miroir LastAbortStep (pour bus Diag)
+    LastAbortCause          : WORD; // --> [DIAG] Miroir LastAbortCause (pour bus Diag)
 END_VAR
 VAR_OUTPUT
     // === SORTIES PHYSIQUES TERMINALES ===
@@ -55,6 +57,8 @@ IF NOT Enable THEN
     Diag.RedundancyTestFailed := FALSE;
     Diag.ArmFailed            := FALSE;
     Diag.LockoutActive        := FALSE;
+    Diag.LastAbortStep        := 0;
+    Diag.LastAbortCause       := 16#0000;
     RETURN;
 END_IF;
 {endregion}
@@ -78,4 +82,6 @@ Diag.ErrorId              := ErrorId;
 Diag.RedundancyTestFailed := RedundancyTestFailed;
 Diag.ArmFailed            := ArmFailed;
 Diag.LockoutActive        := LockoutActive;
+Diag.LastAbortStep        := LastAbortStep;
+Diag.LastAbortCause       := LastAbortCause;
 {endregion}

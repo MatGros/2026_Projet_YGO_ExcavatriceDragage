@@ -33,6 +33,8 @@ VAR_OUTPUT
     Armable                      : BOOL; // <-- [STAT] Rearmement possible actuellement
     ArmingBusy                   : BOOL; // <-- [STAT] Sequence ou lockout en cours
     StartupFail                  : BOOL; // <-- [DIAG] Autotest demarrage echoue
+    LastAbortStep                : INT;  // <-- [DIAG] Etape sequence lors du dernier abandon (0 a 6)
+    LastAbortCause               : WORD; // <-- [DIAG] Bitfield cause abandon (16#0001=Cut, 16#0002=Chute chaine pulse/confirm, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=Startup front)
 END_VAR
 VAR
     // === DETECTEURS DE FRONT INTERNES ===
@@ -149,11 +151,13 @@ END_IF;
 
 {region "§4 Acquittement defauts"}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-// ⚠️ Reset acquitte l'affichage (Ack:=TRUE). La cause brute n'est levée que par
-// une nouvelle tentative d'armement réussie (interlock reste sur Cause, AF 3.4bis).
+// ⚠️ Reset acquitte l'affichage (Ack:=TRUE) ET réinitialise les causes d'échec de réarmement.
 IF ResetEdge.Q THEN
+    RedundancyTestFailedCause := FALSE;
     RedundancyTestFailedAck := TRUE;
+    EmergencyArmingFailedCause := FALSE;
     EmergencyArmingFailedAck := TRUE;
+    EmergencyArmingLockoutActive := FALSE;
     StartupFail := FALSE;
     ErrorId := 16#0000;
 END_IF;
@@ -161,12 +165,28 @@ END_IF;
 {endregion}
 
 {region "§5 Sequence rearmement AU"}
-// 🛑 Coupure immédiate de toute séquence en cours si demande de coupure d'urgence
-IF (ArmingSeqStep <> 0) AND (BtnEmergencyCutOff OR PowerCutOffRequest) THEN
-    ArmingSeqStep := 0;
-END_IF;
-IF (ArmingSeqStep = 5 OR ArmingSeqStep = 6) AND NOT EmergencyChainClosed THEN
-    ArmingSeqStep := 0;
+// 🛑 Coupure immédiate de toute séquence en cours
+IF ArmingSeqStep <> 0 THEN
+    IF BtnEmergencyCutOff THEN
+        // Avortement volontaire : pas d'alarme d'échec
+        LastAbortStep := ArmingSeqStep;
+        LastAbortCause := 16#0001; // Bit0: Demande coupure manuelle IHM
+        ArmingSeqStep := 0;
+    ELSIF PowerCutOffRequest THEN
+        // Avortement sécurité d'urgence : alarme d'échec + verrouillage 5s
+        EmergencyArmingFailedCause := TRUE;
+        EmergencyArmingLockoutActive := TRUE;
+        LastAbortStep := ArmingSeqStep;
+        LastAbortCause := 16#0010; // Bit4: Coupure sécurité métier active (PowerCutOff)
+        ArmingSeqStep := 0;
+    ELSIF (ArmingSeqStep = 5 OR ArmingSeqStep = 6) AND NOT EmergencyChainClosed THEN
+        // Chute boucle matérielle : alarme d'échec + verrouillage 5s
+        EmergencyArmingFailedCause := TRUE;
+        EmergencyArmingLockoutActive := TRUE;
+        LastAbortStep := ArmingSeqStep;
+        LastAbortCause := 16#0002; // Bit1: Chute boucle AU pendant impulsion/confirmation
+        ArmingSeqStep := 0;
+    END_IF;
 END_IF;
 
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
@@ -174,7 +194,10 @@ END_IF;
 // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -> Ack remis a FALSE,
 // TC-P01-009). Ceci prouve par le run reel que la cause a disparu, pas juste un Reset optimiste.
 IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed 
+   AND NOT BtnEmergencyCutOff
+   AND NOT PowerCutOffRequest
    AND NOT EmergencyArmingLockoutActive 
+   AND NOT RedundancyTestFailedCause
    AND NOT PowerContactorEngaged THEN
     ArmingSeqStep := 1;
     RedundancyTestFailedCause := FALSE;
@@ -189,6 +212,8 @@ IF ArmingSeqStep = 1 THEN
         ForceTestA := FALSE;
         IF EmergencyChainClosed THEN
             RedundancyTestFailedCause := TRUE;
+            LastAbortStep := 1;
+            LastAbortCause := 16#0020; // Defaut redondance canal A
             ArmingSeqStep := 0;
         ELSE
             ArmingSeqStep := 2;
@@ -204,6 +229,8 @@ IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
     IF EmergencyChainClosed THEN
         ArmingSeqStep := 3;
     ELSE
+        LastAbortStep := 2;
+        LastAbortCause := 16#0004; // Bit2: Timeout restauration canal A (chaine non remontee en 200ms)
         ArmingSeqStep := 0;
     END_IF;
 END_IF;
@@ -216,6 +243,8 @@ IF ArmingSeqStep = 3 THEN
         ForceTestB := FALSE;
         IF EmergencyChainClosed THEN
             RedundancyTestFailedCause := TRUE;
+            LastAbortStep := 3;
+            LastAbortCause := 16#0040; // Defaut redondance canal B
             ArmingSeqStep := 0;
         ELSE
             ArmingSeqStep := 4;
@@ -231,6 +260,8 @@ IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
     IF EmergencyChainClosed THEN
         ArmingSeqStep := 5;
     ELSE
+        LastAbortStep := 4;
+        LastAbortCause := 16#0008; // Bit3: Timeout restauration canal B (chaine non remontee en 200ms)
         ArmingSeqStep := 0;
     END_IF;
 END_IF;
@@ -250,9 +281,21 @@ IF ArmingSeqStep = 6 THEN
         EmergencyArmingLockoutActive := FALSE;
     ELSIF TonArmingConfirm.Q THEN
         EmergencyArmingFailedCause := TRUE;
-        ArmingSeqStep := 0;
         EmergencyArmingLockoutActive := TRUE;
+        LastAbortStep := 6;
+        LastAbortCause := 16#0080; // Defaut confirmation contacteur
+        ArmingSeqStep := 0;
     END_IF;
+END_IF;
+
+// 🛑 Reset immédiat des TON si séquence retombée à 0 (évite le piège IEC des timers qui restent Q=TRUE)
+IF ArmingSeqStep = 0 THEN
+    TonTestA(IN := FALSE);
+    TonRestoreA(IN := FALSE);
+    TonTestB(IN := FALSE);
+    TonRestoreB(IN := FALSE);
+    TonArmingPulse(IN := FALSE);
+    TonArmingConfirm(IN := FALSE);
 END_IF;
 
 // ⏱️ Séquence de verrouillage temporel (5s)
@@ -290,6 +333,8 @@ END_IF;
 
 // 🚦 6. ÉTATS PUBLICS (repris par le composite dans State/Diag) — interlock sur Cause brute
 Armable := EmergencyChainClosed
+           AND NOT BtnEmergencyCutOff
+           AND NOT PowerCutOffRequest
            AND (ArmingSeqStep = 0)
            AND NOT EmergencyArmingLockoutActive
            AND NOT RedundancyTestFailedCause

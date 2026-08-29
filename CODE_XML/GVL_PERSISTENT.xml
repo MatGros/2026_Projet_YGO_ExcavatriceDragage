@@ -1433,9 +1433,7 @@ Seuils de changement de palier (0..100%)</xhtml>
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="">
-          <Object Name="GVL_PERSISTENT" ObjectId="b404450e-105f-5aa6-8c01-cbf582c5f3ce" />
-        </Folder>
+        <Object Name="GVL_PERSISTENT" ObjectId="b404450e-105f-5aa6-8c01-cbf582c5f3ce" />
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
             <Folder Name="1_TREUILS_BENNE">

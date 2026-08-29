@@ -146,7 +146,8 @@ def _find_strucpp_temp_dir(before: set, tmp_root: pathlib.Path) -> pathlib.Path 
 
 
 
-def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = False, enable_chronogram: bool = True) -> dict:
+def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = False,
+            enable_chronogram: bool = True, generate_reports: bool = True) -> dict:
     """Retourne {"ok": bool, "tests": [{"name", "passed", "detail"}, ...], "report": path|None}.
     Le detail par test (pas seulement le statut global du FB) permet a un agent de lire le
     resultat complet depuis le seul stdout, sans devoir ouvrir le rapport HTML. En mode normal
@@ -158,8 +159,9 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
     # Archivage asynchrone immédiat : tourne en tâche de fond pendant que le CPU compile
     reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
-    reports_dir.mkdir(parents=True, exist_ok=True)
-    _archive_previous_async(reports_dir, fb_name)
+    if generate_reports:
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        _archive_previous_async(reports_dir, fb_name)
 
     def _log(*a):
         if debug:
@@ -183,7 +185,9 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
     _log(f"\n=== {fb_name} (domaine {domain}) ===")
 
     t_conv_start = _time.perf_counter()
-    with tempfile.TemporaryDirectory(prefix=f"st2c_{fb_name}_") as tmp:
+    # STruCpp peut conserver brièvement un handle Windows dans le dossier de conversion.
+    # Le résultat compilation/ASSERT fait foi ; un nettoyage différé ne doit pas le masquer.
+    with tempfile.TemporaryDirectory(prefix=f"st2c_{fb_name}_", ignore_cleanup_errors=True) as tmp:
         converted_dir = pathlib.Path(tmp)
         # Flag de priorité basse sous Windows pour préserver 100% de la réactivité du PC
         subproc_flags = subprocess.BELOW_NORMAL_PRIORITY_CLASS if sys.platform == "win32" else 0
@@ -225,7 +229,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         field_types = {}
         t_exec = 0.0
         t_chrono = 0.0
-        if strucpp_temp_dir is not None:
+        if generate_reports and strucpp_temp_dir is not None:
             test_runner = strucpp_temp_dir / "test_runner.exe"
             if test_runner.exists():
                 t_exec_start = _time.perf_counter()
@@ -284,7 +288,8 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             wirings = [{"label": pi.get("label"), "wiring": None} for pi in prod_instances]
         t_wiring = _time.perf_counter() - t_wiring_start
 
-        print(f"\r{_progress_line('rapport')}", end="", flush=True)
+        if generate_reports:
+            print(f"\r{_progress_line('rapport')}", end="", flush=True)
 
         t_af_start = _time.perf_counter()
         af_warnings = []
@@ -301,11 +306,8 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             encapsulation_report = []
         t_af = _time.perf_counter() - t_af_start
 
-        t_rep_start = _time.perf_counter()
-        base = reports_dir / fb_name
-        shutil.copyfile(test_file, reports_dir / f"{fb_name}_test.st")
         report_path = None
-        report_group = entry.get("report_group")
+        report_group = entry.get("report_group") if generate_reports else None
 
         section_kwargs = dict(fb_name=fb_name, domain=domain, sources=entry["sources"],
                                json_data=json_data or {}, text_report=text_report,
@@ -316,26 +318,30 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                                encapsulation_report=encapsulation_report,
                                source_prg=entry.get("source_prg"))
 
-        if json_data is not None:
+        t_rep_start = _time.perf_counter()
+        if generate_reports and json_data is not None:
+            base = reports_dir / fb_name
+            shutil.copyfile(test_file, reports_dir / f"{fb_name}_test.st")
             (base.with_suffix(".json")).write_text(json.dumps(json_data, indent=2), encoding="utf-8")
             html = render_html_report(**section_kwargs, test_file=str(entry["test"]))
             base.with_suffix(".html").write_text(html, encoding="utf-8")
             report_path = base.with_suffix(".html")
-        else:
+        elif generate_reports:
             base.with_suffix(".txt").write_text(text_report, encoding="utf-8")
             report_path = base.with_suffix(".txt")
 
-        # Contrôle de présence et d'intégrité des 3 artefacts de rapport
-        expected_artifacts = [
+        # Contrôle de présence et d'intégrité des artefacts de rapport.
+        if generate_reports:
+          expected_artifacts = [
             report_path,
             reports_dir / f"{fb_name}_test.st"
         ]
-        if json_data is not None:
+          if json_data is not None:
             expected_artifacts.append(base.with_suffix(".json"))
 
-        missing_artifacts = [p.name for p in expected_artifacts if not p.exists() or p.stat().st_size == 0]
-        if missing_artifacts:
-            _log(f"[ERREUR] Artefacts de rapport manquants ou vides pour {fb_name} : {missing_artifacts}")
+          missing_artifacts = [p.name for p in expected_artifacts if not p.exists() or p.stat().st_size == 0]
+          if missing_artifacts:
+              _log(f"[ERREUR] Artefacts de rapport manquants ou vides pour {fb_name} : {missing_artifacts}")
 
         _log(f"Rapport : {report_path}")
         t_rep = _time.perf_counter() - t_rep_start
@@ -390,7 +396,7 @@ def main() -> int:
     parser.add_argument("-j", "--jobs", type=int, default=default_workers,
                         help=f"Nombre d'instances de test en parallele (defaut calibre : {default_workers} threads)")
     parser.add_argument("--fast", "--no-chronogram", dest="fast", action="store_true",
-                        help="Exécution ultra-rapide (skip la 2ème passe g++ du chronogramme, idéal pour Pytest / CI rapide)")
+                        help="CI rapide : simulation/assertions, sans chronogramme ni écriture de rapports")
     parser.add_argument("--debug", action="store_true",
                          help="Affiche tous les logs intermediaires (conversion, sortie brute strucpp). "
                               "Sans cette option : uniquement le resultat final.")
@@ -407,6 +413,7 @@ def main() -> int:
     registry = load_registry()
     cycle_time_ms = load_config().get("cycle_time_ms", 10)
     enable_chronogram = not args.fast
+    generate_reports = not args.fast
 
     start_time = _time.perf_counter()
 
@@ -432,7 +439,7 @@ def main() -> int:
         print(f">> Lancement de {len(targets)} tests en parallele sur {workers} threads CPU...\n")
         with ProcessPoolExecutor(max_workers=workers) as executor:
             future_to_name = {
-                executor.submit(run_one, name, entry, cycle_time_ms, False, enable_chronogram): name
+                executor.submit(run_one, name, entry, cycle_time_ms, False, enable_chronogram, generate_reports): name
                 for name, entry in targets.items()
             }
             completed_count = 0
@@ -454,7 +461,7 @@ def main() -> int:
                                      "report": None, "report_group": None, "section_kwargs": {}}
         print()
     else:
-        results = {name: run_one(name, entry, cycle_time_ms, args.debug, enable_chronogram) for name, entry in targets.items()}
+        results = {name: run_one(name, entry, cycle_time_ms, args.debug, enable_chronogram, generate_reports) for name, entry in targets.items()}
 
     # Fiches de rapport groupees : plusieurs FB independants (compiles/testes separement)
     # partagent UNE seule page HTML -- registry.yaml en decide via "report_group".
@@ -465,6 +472,8 @@ def main() -> int:
             groups.setdefault(rg, []).append(name)
     group_report_paths = {}
     for group_name, members in groups.items():
+        if not generate_reports:
+            continue
         if len(members) > 1 or args.all or args.domain:
             domain = registry[members[0]]["domain"]
             reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
@@ -530,7 +539,7 @@ def main() -> int:
         print(f"Rapport groupe {group_name} : {uri}")
 
     # Génération du dashboard index.html à la racine de TEST_AUTO_CI
-    if len(results) > 1 or args.all or args.domain:
+    if generate_reports and (len(results) > 1 or args.all or args.domain):
         from html_report import render_index_dashboard
         index_html = render_index_dashboard(results, group_report_paths)
         index_path = TEST_AUTO_CI / "index.html"

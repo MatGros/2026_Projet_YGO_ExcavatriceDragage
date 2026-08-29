@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T16:54:31.902117" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T16:54:31.902117">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T07:58:00.076306" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T07:58:00.076306">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -224,6 +224,22 @@ TRUE = Défaut sécurité actif</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Échec de la séquence d'armement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape atteinte lors du dernier abandon de séquence (0..6)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause du dernier abandon (masque bitfield)</xhtml>
               </documentation>
             </variable>
           </struct>

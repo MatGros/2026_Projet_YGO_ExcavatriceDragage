@@ -60,16 +60,21 @@ def take_snapshot():
             f.write(var_path + ";" + str(value) + "\r\n")
     write_time_total = time.time() - t0
 
-    print("Snapshot ecrit : " + output_path)
-    print(str(len(rows)) + " variables lues")
+    status_str = "❌ FAIL ({} ERREURS)".format(error_count) if error_count > 0 else "✅ PASS (0 ERREUR)"
+    print("=" * 60)
+    print("📸 SNAPSHOT TROUBLESHOOTING CODESYS — {}".format(status_str))
+    print("=" * 60)
+    print("📁 Fichier généré   : {}".format(output_path))
+    print("📊 Variables lues   : {} / {}".format(len(rows) - error_count, len(rows)))
     if error_count:
-        print("⚠️ " + str(error_count) + " variable(s) en ERREUR (chemin perime ?) — regenerer la liste :")
-        print("   python TOOLS/PLC_CSV_SNAPSHOT/variable_lists/generate_variable_list_from_code.py")
+        print("⚠️ Variables en KO  : {} (chemins périmés ou non trouvés dans CODESYS)".format(error_count))
+        print("💡 Action requise   : Recompiler le projet CODESYS (Clean & Rebuild) puis ré-exécuter")
     else:
-        print("✅ 0 variable en ERREUR")
-    print("Temps lecture (read_values, " + str(len(variables) // BATCH_SIZE + 1) + " appels groupes) : {:.3f} s".format(read_time_total))
-    print("Temps ecriture fichier : {:.3f} s".format(write_time_total))
-    print("Temps total : {:.3f} s".format(read_time_total + write_time_total))
+        print("✨ Intégrité        : 100% des variables lues avec succès")
+    print("⏱️ Temps total      : {:.3f} s (Lecture: {:.3f}s, Écriture: {:.3f}s)".format(
+        read_time_total + write_time_total, read_time_total, write_time_total
+    ))
+    print("=" * 60)
     return output_path
 
 

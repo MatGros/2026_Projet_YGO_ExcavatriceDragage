@@ -1,0 +1,8 @@
+#!/bin/sh
+# pre-commit scope guard — BLOQUANT sur fichier partagé (versionné, partagé entre agents).
+# Empêche qu'une branche de feature écrase un fichier de coordination (ex. TASKS.yaml)
+# que d'autres ont mis à jour sur main. Ne bloque QUE si main a aussi bougé.
+# Exit 1 = commit refusé. Exit 0 = autorisé.
+
+python "TOOLS/AGENT_WORKFLOW/scripts/pre_commit_scope.py"
+exit $?

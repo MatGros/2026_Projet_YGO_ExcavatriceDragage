@@ -93,17 +93,17 @@ def main() -> int:
         return result_objects.returncode
 
     # Bascule : out_dir n'est jamais laisse vide/absent.
-    if out_dir.exists():
-        shutil.rmtree(out_dir, ignore_errors=True)
     if tmp_dir.exists():
-        if out_dir.exists():
-            shutil.rmtree(out_dir, ignore_errors=True)
-        try:
-            tmp_dir.rename(out_dir)
-        except OSError:
-            # Fallback Windows: copytree + rmtree
-            shutil.copytree(tmp_dir, out_dir, dirs_exist_ok=True)
-            shutil.rmtree(tmp_dir, ignore_errors=True)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for item in tmp_dir.rglob("*"):
+            rel = item.relative_to(tmp_dir)
+            target = out_dir / rel
+            if item.is_dir():
+                target.mkdir(parents=True, exist_ok=True)
+            else:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(item, target)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
     return subprocess.run([sys.executable, str(freshness), str(root)]).returncode
 

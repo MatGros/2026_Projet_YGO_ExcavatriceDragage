@@ -1,0 +1,166 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T089
+# Visualiseur AF read-only : fonctions + TC extraits des AF + état de
+# synchronisation des cartouches FB_*.st <-> fiches AF
+# ═══════════════════════════════════════════════════════════════════════════
+# Besoin utilisateur (2026-08-29) : aucune visibilite sur quand/comment les
+# en-tetes de commentaire des FB sont synchronises avec les fiches AF, ni sur
+# lesquels sont a jour. Meme concept que DOC/WFLOW/TASK_VIEWER.html mais
+# STRICTEMENT en lecture (aucune edition, aucun export vers une source).
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T089_AF_VIEWER_READONLY
+  parent_id: ''
+  criticality: C1
+  strategy: patch
+
+  objective: >
+    Fournir une page HTML autonome, ouvrable au double-clic (aucun serveur, aucune
+    requete reseau, aucune ecriture), qui montre en un coup d'oeil : (1) les
+    fonctions extraites des AF, (2) les TC extraits des AF, classes par domaine,
+    (3) pour chaque CODE/**/FB_*.st, si son cartouche d'en-tete (nom, emoji, 1re
+    phrase de Role, pointeur Doc metier) est synchronise avec la fiche AF qu'il
+    reference — et sinon, lequel a derive.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Un script TOOLS/AGENT_WORKFLOW/scripts/check_fb_cartouche_sync.py produit
+        un fichier de donnees (JSON ou YAML sous TOOLS/AGENT_WORKFLOW/config/ ou
+        DOC/WFLOW/) listant, pour chaque CODE/**/FB_*.st : chemin, nom du POU,
+        emoji du cartouche, 1re phrase de la ligne "Role", pointeur "Doc metier"
+        s'il existe ; et si ce pointeur vise une fiche AF : fiche_existe (bool),
+        nom_match (bool), role_match (bool), statut in
+        {synced, drift, no_pointer, no_fiche}. Le script s'execute seul, code
+        retour 0 (informatif, ne bloque pas).
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/check_fb_cartouche_sync.py -> fichier
+        de donnees ecrit ; relecture manuelle de 3 entrees (dont FB_CycleTime qui
+        DOIT ressortir en "drift" : pointeur vers le chapo et non la sous-fiche).
+    - id: AC2
+      statement: >
+        TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml est regenere a
+        jour via extract_functions_matrix.py (fonctions + points de validation TC
+        par domaine AF, sous-fiches incluses).
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/extract_functions_matrix.py ;
+        git diff sur af_traceability_matrix.yaml montre uniquement une mise a jour
+        de contenu extrait (pas de reformat destructif).
+    - id: AC3
+      statement: >
+        Un script generate_af_viewer.py produit DOC/WFLOW/AF_VIEWER.html
+        AUTO-CONTENU : donnees embarquees dans le HTML au moment de la generation,
+        aucun fetch(), aucun XHR, aucune balise <form> d'edition, aucun bouton
+        d'export/enregistrement vers un fichier source. 3 sections : "Fonctions
+        par AF", "TC par AF", "Sync cartouches FB" (table triable avec colonnes
+        statut visuel, .st:ligne, fiche:ligne).
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/generate_af_viewer.py -> DOC/WFLOW/AF_VIEWER.html ;
+        grep -c "fetch(\|XMLHttpRequest\|<form\|download=" DOC/WFLOW/AF_VIEWER.html -> 0.
+    - id: AC4
+      statement: >
+        AF_VIEWER.html s'ouvre correctement hors-ligne (double-clic, protocole
+        file://), rendu complet des 3 tables, aucune erreur console, aucune
+        requete reseau sortante.
+      verified_by: >
+        Ouverture file:// + inspection console (0 erreur) + onglet reseau (0 requete).
+    - id: AC5
+      statement: >
+        Non-regression : aucun fichier CODE/ ni CODE_XML/ modifie par la tache ;
+        aucune fiche DOC/AF/*.md modifiee (le viewer LIT les AF) ; G340 doc-links
+        PASS ; run_all_gates --palier C inchange.
+      verified_by: >
+        git diff --stat (0 entree sous CODE/ ou CODE_XML/ ou DOC/AF/) ;
+        python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py ;
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C.
+    - id: AC6
+      statement: >
+        La page porte un bandeau de STATISTIQUES en haut : nombre de fonctions AF,
+        nombre de TC AF, repartition des cartouches FB (synced / drift / no_fiche /
+        no_pointer) en compteurs + barre visuelle, nombre d'AF avec / sans "Table
+        des fonctions" (couverture extraction), et par domaine AF un mini-compteur
+        (fonctions, TC). Chiffres derives des donnees embarquees, jamais saisis.
+      verified_by: >
+        Ouverture de AF_VIEWER.html : le bandeau affiche des totaux coherents avec
+        le contenu des 3 tables (recompte manuel d'un domaine).
+    - id: AC7
+      statement: >
+        FRAICHEUR DES DONNEES visible sans rien executer.
+        - fb_cartouche_sync.json (fichier neuf) porte generated_at (ISO 8601) et
+          source_head (git rev-parse --short HEAD au moment de la generation).
+        - Pour af_traceability_matrix.yaml (extracteur NON modifie), la fraicheur
+          est derivee par generate_af_viewer.py de la date du dernier commit du
+          fichier (git log -1 --format=%cI) et de sa mtime disque, la plus recente
+          des deux faisant foi.
+        generate_af_viewer.py embarque ces horodatages + son propre build_at + le
+        SHA HEAD du build. La page affiche : (a) bandeau global "donnees : matrice
+        AF <date> · sync cartouches <date> · page construite le <build_at>
+        (HEAD <sha>)" ; (b) par section, un badge de fraicheur code couleur calcule
+        COTE CLIENT a l'ouverture : vert si age <= 24 h, orange si <= 7 j, rouge si
+        > 7 j ; (c) au survol du badge : horodatage exact + SHA. Aucune requete
+        reseau (age = Date.now() navigateur - horodatage embarque).
+      verified_by: >
+        grep "generated_at\|source_head\|build_at" DOC/WFLOW/AF_VIEWER.html non vide ;
+        ouverture file:// : bandeau + badges couleur visibles, tooltip au survol,
+        0 requete reseau ; remplacer a la main un horodatage embarque par une date
+        ancienne -> le badge correspondant passe rouge a la prochaine ouverture.
+
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/scripts/check_fb_cartouche_sync.py
+      - TOOLS/AGENT_WORKFLOW/scripts/generate_af_viewer.py
+      - TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml
+      - TOOLS/AGENT_WORKFLOW/config/fb_cartouche_sync.json
+      - DOC/WFLOW/AF_VIEWER.html
+      - TOOLS/AGENT_WORKFLOW/tests/test_check_fb_cartouche_sync.py
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - DOC/AF/
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_VIEWER.html
+      - PRJ_CODESYS/
+
+  conservation:
+    must_survive:
+      - "TASK_VIEWER.html inchange (le nouveau viewer est un fichier separe)."
+      - "extract_functions_matrix.py inchange dans sa logique (seul son output YAML est regenere)."
+      - "Aucune fiche AF ni aucun FB_*.st touche : la tache est en pure lecture des sources."
+    dropped_on_purpose:
+      - "Rien."
+
+  evidence_required:
+    - run_all_gates
+
+  models_allowed:
+    - "auto/best-coding"
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Si extract_functions_matrix.py ne capte pas certaines fonctions/TC (ex. AF
+    sans "Table des fonctions"), le SIGNALER comme limite connue dans le viewer
+    (badge "extraction partielle"), ne pas inventer de donnees. Si la
+    comparaison de la 1re phrase de Role est trop fragile (ponctuation, retours
+    ligne), remonter le choix de normalisation a l'orchestrateur plutot que de
+    durcir en silence.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    (a remplir par l'agent executant)
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    (visa orchestrateur apres relecture du git diff reel)

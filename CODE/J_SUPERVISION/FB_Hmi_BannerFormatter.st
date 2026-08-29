@@ -316,12 +316,6 @@ DirectionBlocked := (CurrentDirection < 0 AND NOT DescendPermit)
 
 IF NOT EmergencyChainClosed THEN
     OperatorActionCandidate := '[PUPITRE] Boucle urgence ouverte - réarmer';
-ELSIF RedundancyTestFailed THEN
-    OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer';
-ELSIF EmergencyArmingFailed THEN
-    OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
-ELSIF NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
-    OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid THEN
     OperatorActionCandidate := '[IO] Défaut module E/S - vérifier alimentation/coupleur';
 ELSIF NOT CanBusValid THEN
@@ -334,6 +328,14 @@ ELSIF NOT EncM1Valid OR NOT EncM2Valid THEN
     OperatorActionCandidate := '[ECAT] Codeurs non détectés - vérifier liaison';
 ELSIF NOT VarM3Valid THEN
     OperatorActionCandidate := '[ECAT] Variateur non détecté - vérifier liaison';
+ELSIF PowerCutOffActiveAny THEN
+    OperatorActionCandidate := '[SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont';
+ELSIF RedundancyTestFailed THEN
+    OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';
+ELSIF EmergencyArmingFailed THEN
+    OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
+ELSIF NOT PowerContactorEngaged THEN
+    OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
     OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
 ELSIF DirectionBlocked THEN

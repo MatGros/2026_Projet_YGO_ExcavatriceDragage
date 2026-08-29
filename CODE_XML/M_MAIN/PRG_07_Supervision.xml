@@ -2007,6 +2007,22 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre tentatives de rearmement echouees</xhtml>
               </documentation>
             </variable>
+            <variable name="LastAbortStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape de la sequence AU lors du dernier abandon (0 a 6)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield cause abandon : 16#0001=Cut IHM, 16#0002=Chute chaine pulse/confirm, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=PowerCutOff metier</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -8998,12 +9014,6 @@ DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
 
 IF NOT EmergencyChainClosed THEN
     OperatorActionCandidate := '[PUPITRE] Boucle urgence ouverte - réarmer';
-ELSIF RedundancyTestFailed THEN
-    OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer';
-ELSIF EmergencyArmingFailed THEN
-    OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
-ELSIF NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
-    OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid THEN
     OperatorActionCandidate := '[IO] Défaut module E/S - vérifier alimentation/coupleur';
 ELSIF NOT CanBusValid THEN
@@ -9016,6 +9026,14 @@ ELSIF NOT EncM1Valid OR NOT EncM2Valid THEN
     OperatorActionCandidate := '[ECAT] Codeurs non détectés - vérifier liaison';
 ELSIF NOT VarM3Valid THEN
     OperatorActionCandidate := '[ECAT] Variateur non détecté - vérifier liaison';
+ELSIF PowerCutOffActiveAny THEN
+    OperatorActionCandidate := '[SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont';
+ELSIF RedundancyTestFailed THEN
+    OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';
+ELSIF EmergencyArmingFailed THEN
+    OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
+ELSIF NOT PowerContactorEngaged THEN
+    OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
     OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
 ELSIF DirectionBlocked THEN
@@ -10433,6 +10451,8 @@ GVL_Troubleshooting.Safety.SafetyError          := EmergencyDiag.Error;
 GVL_Troubleshooting.Safety.ArmingErrorId       := EmergencyDiag.ErrorId;
 GVL_Troubleshooting.Safety.RedundancyTestFailed := EmergencyDiag.RedundancyTestFailed;
 GVL_Troubleshooting.Safety.ArmingFailed         := EmergencyDiag.ArmFailed;
+GVL_Troubleshooting.Safety.LastAbortStep        := EmergencyDiag.LastAbortStep;
+GVL_Troubleshooting.Safety.LastAbortCause       := EmergencyDiag.LastAbortCause;
 
 {endregion}
 

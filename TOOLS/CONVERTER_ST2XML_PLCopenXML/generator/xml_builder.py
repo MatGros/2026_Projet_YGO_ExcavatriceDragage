@@ -560,10 +560,8 @@ def build_project_xml(
     folder_elements: dict[tuple[str, ...], ET.Element] = {}
     for folder_path_str, entries in folders.items():
         if not folder_path_str:
-            folder_el = ET.SubElement(project_structure, "Folder")
-            folder_el.set("Name", "")
             for object_name, guid in entries:
-                object_el = ET.SubElement(folder_el, "Object")
+                object_el = ET.SubElement(project_structure, "Object")
                 object_el.set("Name", object_name)
                 object_el.set("ObjectId", guid)
             continue
