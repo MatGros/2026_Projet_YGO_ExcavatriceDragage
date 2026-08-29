@@ -41,7 +41,7 @@ Les DUT et chaque champ sont définis dans le cadrage T181-06 §2. `SyncCoupled`
 |---|---|
 | `FB_SpeedStep` | applique le plafond puis `LIMIT(1, MinStepNumber, MaxStepClamped)` ; `MinStepNumber` modifie `RequestedStep`, pas `StepNumber` |
 | Interlock direction | front montant `Enable` armé avec temps mort ; ne pas capturer une direction au premier scan |
-| Rampe palier | `TON` inline conservé, cadence `Config.StepRampDelay` dédiée |
+| Rampe palier | extrait en `FB_WinchStepShaper` (IN TargetStep/StepRampDelay -> OUT ShapedStep), cadence dédiée, découple D10 |
 | `FB_WinchRateInterlock` | gouverne en nominal ; seuils locaux safety+marge |
 | `FB_Safety_Winch` | propriétaire unique de la détection `StuckClosed`, SafeStop et permis |
 | `PRG_04` | producteur unique de `DriveRequest`, sync, clamp commun et branche M2-only |
