@@ -30,6 +30,75 @@ RE_FUNCTIONS_HEADING = re.compile(r"^#{2,4}\s+.*Table des fonctions", re.IGNOREC
 RE_VALIDATION_HEADING = re.compile(r"^#{2,4}\s+.*Points de validation", re.IGNORECASE)
 RE_ANY_HEADING = re.compile(r"^#{1,4}\s+")
 
+# ── Unicité catalogue TC (REX 2026-08-29 : les TC sont uniques par construction) ──
+TC_TOKEN_RE = re.compile(r"TC-P\d+-\d+")
+VARIANT_RE = re.compile(r"\.\d+\s*$")
+
+
+def is_variant_key(key: str) -> bool:
+    """TC-Pxx-NNN.k = déclinaison déclarée d'un cas parent (famille volontaire)."""
+    return bool(VARIANT_RE.search(key.strip()))
+
+
+def tc_tokens(key: str) -> list[str]:
+    """IDs canoniques TC-Pxx-NNN mentionnés dans une clé (variantes ramenées au parent)."""
+    return TC_TOKEN_RE.findall(VARIANT_RE.sub("", str(key)))
+
+
+def quality_report(matrix: dict[str, Any]) -> dict[str, Any]:
+    """Contrôle qualité du catalogue : unicité canonique des TC + trous de canonisation.
+
+    - recouvrement : un même ID TC-Pxx-NNN est déclaré par >= 2 clés non-variantes
+      (ex. clé composée « TC-P01-001, TC-P01-008 » ET clé simple « TC-P01-001 ») ;
+    - cross_domain : un même ID canonique apparaît dans plusieurs domaines AF ;
+    - non_canonical : clés sans aucun ID TC-Pxx-NNN (intitulés libres, scénarios).
+    """
+    domains = matrix.get("domains", {})
+    canonical_owner: dict[str, list[str]] = {}
+    overlaps: list[dict[str, Any]] = []
+    non_canonical: list[dict[str, str]] = []
+    n_fn = n_pv = 0
+    unique_tc: set[str] = set()
+
+    for dom in sorted(domains):
+        data = domains[dom] or {}
+        n_fn += len(data.get("functions", {}) or {})
+        vps = data.get("validation_points", {}) or {}
+        n_pv += len(vps)
+        non_var_tokens: dict[str, list[str]] = {}
+        for vid in vps:
+            toks = tc_tokens(vid)
+            if not toks:
+                non_canonical.append({"domain": dom, "id": vid})
+                continue
+            unique_tc.update(toks)  # une variante .k prouve l'existence du parent
+            if is_variant_key(vid):
+                continue
+            for t in toks:
+                non_var_tokens.setdefault(t, []).append(vid)
+                if dom not in canonical_owner.setdefault(t, []):
+                    canonical_owner[t].append(dom)
+        for t in sorted(non_var_tokens):
+            keys = non_var_tokens[t]
+            if len(keys) > 1:
+                overlaps.append({"domain": dom, "tc": t, "keys": keys})
+
+    cross_domain = [
+        {"tc": t, "domains": doms} for t, doms in sorted(canonical_owner.items()) if len(doms) > 1
+    ]
+    return {
+        "stats": {
+            "domains": len(domains),
+            "functions": n_fn,
+            "validation_points": n_pv,
+            "unique_tc": len(unique_tc),
+        },
+        "overlaps": overlaps,
+        "cross_domain": cross_domain,
+        "non_canonical": non_canonical,
+        "overwrites": [],
+    }
+
 
 def clean_markdown_cell(cell: str) -> str:
     """Nettoie le texte d'une cellule Markdown (balises HTML, backticks, liens, styles)."""
@@ -310,8 +379,17 @@ def get_active_af_files(doc_af_dir: Path) -> dict[str, dict[str, Any]]:
     return active_af
 
 
-def merge_file_into(dom_data: dict[str, Any], file_path: Path) -> None:
-    """Extrait un fichier AF et fusionne ses fonctions/points de validation dans dom_data."""
+def merge_file_into(
+    dom_data: dict[str, Any],
+    file_path: Path,
+    domain: str = "",
+    report: dict[str, Any] | None = None,
+) -> None:
+    """Extrait un fichier AF et fusionne ses fonctions/points de validation dans dom_data.
+
+    Une clé déjà présente est écrasée (comportement historique : dernier fichier gagne)
+    mais signalée dans ``report["overwrites"]`` — jamais en silence.
+    """
     content = file_path.read_text(encoding="utf-8")
     f_rows, v_rows = extract_sections(content)
 
@@ -319,16 +397,20 @@ def merge_file_into(dom_data: dict[str, Any], file_path: Path) -> None:
         norm_f = normalize_function_item(row)
         fid = norm_f.pop("id", "")
         if fid:
+            if fid in dom_data["functions"] and report is not None:
+                report["overwrites"].append({"domain": domain, "kind": "fonction", "id": fid, "file": file_path.name})
             dom_data["functions"][fid] = norm_f
 
     for row in v_rows:
         norm_v = normalize_validation_item(row)
         vid = norm_v.pop("id", "")
         if vid:
+            if vid in dom_data["validation_points"] and report is not None:
+                report["overwrites"].append({"domain": domain, "kind": "pv", "id": vid, "file": file_path.name})
             dom_data["validation_points"][vid] = norm_v
 
 
-def build_matrix(doc_af_dir: Path) -> dict[str, Any]:
+def build_matrix(doc_af_dir: Path, report: dict[str, Any] | None = None) -> dict[str, Any]:
     """Construit la matrice des fonctions et des points de validation."""
     active_af = get_active_af_files(doc_af_dir)
     matrix: dict[str, Any] = {"domains": {}}
@@ -343,9 +425,9 @@ def build_matrix(doc_af_dir: Path) -> dict[str, Any]:
             "validation_points": {},
         }
 
-        merge_file_into(dom_data, main_file)
+        merge_file_into(dom_data, main_file, f"AF-{dom}", report)
         for sf in sub_files:
-            merge_file_into(dom_data, sf)
+            merge_file_into(dom_data, sf, f"AF-{dom}", report)
 
         matrix["domains"][f"AF-{dom}"] = dom_data
 
@@ -370,6 +452,10 @@ def main() -> int:
 
     parser.add_argument("--root", type=Path, default=default_root, help="Racine du dépôt")
     parser.add_argument("--output", "-o", type=Path, default=default_out, help="Fichier de sortie YAML")
+    parser.add_argument(
+        "--strict", action="store_true",
+        help="Exit 2 si recouvrement / écrasement / doublon inter-domaines (défaut : informatif)",
+    )
     args = parser.parse_args()
 
     doc_af_dir = args.root / "DOC" / "AF"
@@ -377,9 +463,44 @@ def main() -> int:
         print(f"Erreur : répertoire introuvable {doc_af_dir}", file=sys.stderr)
         return 1
 
-    matrix = build_matrix(doc_af_dir)
+    report: dict[str, Any] = {"overwrites": []}
+    matrix = build_matrix(doc_af_dir, report)
     dump_yaml(matrix, args.output)
     print(f"Matrice des fonctions exportée avec succès : {args.output}")
+
+    rep = quality_report(matrix)
+    rep["overwrites"] = report["overwrites"]
+    s = rep["stats"]
+    print(
+        f"  {s['domains']} domaines, {s['functions']} fonctions, "
+        f"{s['validation_points']} PV, {s['unique_tc']} TC uniques"
+    )
+    problems = len(rep["overwrites"]) + len(rep["overlaps"]) + len(rep["cross_domain"])
+    for ow in rep["overwrites"]:
+        print(f"  !! écrasement {ow['domain']} {ow['kind']} {ow['id']} (réapparu dans {ow['file']})")
+    if rep["overlaps"]:
+        by_dom: dict[str, list[str]] = {}
+        for o in rep["overlaps"]:
+            by_dom.setdefault(o["domain"], []).append(o["tc"])
+        for dom, tcs in sorted(by_dom.items()):
+            print(f"  !! recouvrement {dom} : {', '.join(sorted(tcs))} (clé composée/range + clé simple)")
+    for cd in rep["cross_domain"]:
+        print(f"  !! TC non unique inter-domaines : {cd['tc']} -> {', '.join(cd['domains'])}")
+    non_canon = rep["non_canonical"]
+    if non_canon:
+        by_dom2: dict[str, int] = {}
+        for n in non_canon:
+            by_dom2[n["domain"]] = by_dom2.get(n["domain"], 0) + 1
+        detail = ", ".join(f"{d}({c})" for d, c in sorted(by_dom2.items()))
+        print(f"  -- clés sans ID TC canonique : {len(non_canon)} ({detail}) [informatif]")
+
+    if problems:
+        if args.strict:
+            print(f"  !! --strict : {problems} problème(s) d'unicité catalogue TC", file=sys.stderr)
+            return 2
+        print(f"  -- {problems} problème(s) d'unicité (informatif, --strict pour bloquer)")
+    else:
+        print("  unicité catalogue TC : OK (0 écrasement, 0 recouvrement, 0 doublon inter-domaines)")
     return 0
 
 

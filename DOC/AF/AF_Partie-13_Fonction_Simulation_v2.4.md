@@ -17,17 +17,17 @@
 
 ## 🧭 Sommaire
 
-1. [🎯 Rôle et périmètre](#1--rôle-et-périmètre)
-2. [🧪 Table des points de validation (non détaillé)](#2--table-des-points-de-validation-non-détaillé)
-3. [🧱 Composition — fiches FB dédiées](#3--composition--fiches-fb-dédiées)
+1. [🎯 Rôle et périmètre](#1-rôle-et-périmètre)
+2. [🧪 Table des points de validation (non détaillé)](#2-table-des-points-de-validation-non-détaillé)
+3. [🧱 Composition — fiches FB dédiées](#3-composition-fiches-fb-dédiées)
 4. [🏗️ Frontière unique](#4-️-frontière-unique)
 5. [🎛️ Commande de simulation](#5-️-commande-de-simulation)
-6. [🔍 Observation et diagnostic](#6--observation-et-diagnostic)
-7. [🧹 Historique et garde-fous](#7--historique-et-garde-fous)
-8. [📥 Application CODESYS 3.5](#8--application-codesys-35)
-9. [📜 Suivi historique](#9--suivi-historique)
-10. [❓ TBD](#10--tbd)
-11. [📚 Documents liés](#11--documents-liés)
+6. [🔍 Observation et diagnostic](#6-observation-et-diagnostic)
+7. [🧹 Historique et garde-fous](#7-historique-et-garde-fous)
+8. [📥 Application CODESYS 3.5](#8-application-codesys-35)
+9. [📜 Suivi historique](#9-suivi-historique)
+10. [❓ TBD](#10-tbd)
+11. [📚 Documents liés](#11-documents-liés)
 
 ---
 

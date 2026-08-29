@@ -10,17 +10,17 @@
 
 ## 🧭 Sommaire
 
-1. [🎯 Rôle et périmètre](#1--rôle-et-périmètre)
-2. [🧪 Table des points de validation (non détaillé)](#2--table-des-points-de-validation-non-détaillé)
-3. [🧱 Composition](#3--composition)
-4. [🔄 Flux d'observation & Supervision](#4--flux-dobservation--supervision)
+1. [🎯 Rôle et périmètre](#1-rôle-et-périmètre)
+2. [🧪 Table des points de validation (non détaillé)](#2-table-des-points-de-validation-non-détaillé)
+3. [🧱 Composition](#3-composition)
+4. [🔄 Flux d'observation & Supervision](#4-flux-dobservation-supervision)
 5. [🛡️ Invariant opposable](#5-️-invariant-opposable)
-6. [🩺 Table de visu — dépannage de l'acquisition DI](#6--table-de-visu--dépannage-de-lacquisition-di)
-7. [🔒 Diagnostic réarmement AU — checklist chronologique](#7--diagnostic-réarmement-au--checklist-chronologique)
-8. [🔄 Diagnostic Séquenceur Semi-Auto — arbre chronologique](#8--diagnostic-séquenceur-semi-auto--arbre-chronologique)
-9. [📜 Suivi historique](#9--suivi-historique)
-10. [❓ TBD](#10--tbd)
-11. [📚 Documents liés](#11--documents-liés)
+6. [🩺 Table de visu — dépannage de l'acquisition DI](#6-table-de-visu-dépannage-de-lacquisition-di)
+7. [🔒 Diagnostic réarmement AU — checklist chronologique](#7-diagnostic-réarmement-au-checklist-chronologique)
+8. [🔄 Diagnostic Séquenceur Semi-Auto — arbre chronologique](#8-diagnostic-séquenceur-semi-auto-arbre-chronologique)
+9. [📜 Suivi historique](#9-suivi-historique)
+10. [❓ TBD](#10-tbd)
+11. [📚 Documents liés](#11-documents-liés)
 
 ---
 

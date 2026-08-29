@@ -14,16 +14,16 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
-2. [🧱 Règles socle](#2--règles-socle)
-3. [🧩 Profils de composants](#3--profils-de-composants)
-4. [🛑 Cycle de vie, états et défauts](#4--cycle-de-vie-états-et-défauts)
-5. [🚌 Contrats DUT internes](#5--contrats-dut-internes)
-6. [👁️ Règles CFC](#6--règles-cfc)
-7. [📐 Règles de génération Ladder](#7--règles-de-génération-ladder)
-8. [📜 Suivi historique](#8--suivi-historique)
-9. [❓ TBD](#9--tbd)
-10. [📚 Documents liés](#10--documents-liés)
+1. [🧪 Table des points de validation](#1-table-des-points-de-validation)
+2. [🧱 Règles socle](#2-règles-socle)
+3. [🧩 Profils de composants](#3-profils-de-composants)
+4. [🛑 Cycle de vie, états et défauts](#4-cycle-de-vie-états-et-défauts)
+5. [🚌 Contrats DUT internes](#5-contrats-dut-internes)
+6. [👁️ Règles CFC](#6-règles-cfc)
+7. [📐 Règles de génération Ladder](#7-règles-de-génération-ladder)
+8. [📜 Suivi historique](#8-suivi-historique)
+9. [❓ TBD](#9-tbd)
+10. [📚 Documents liés](#10-documents-liés)
 
 ## 🧪 1 · Table des points de validation
 

@@ -8,14 +8,14 @@
 
 ## 📑 Sommaire
 
-1. [🎯 Table des fonctions](#-1--table-des-fonctions)
-2. [🧪 Table des points de validation (détail)](#-2--table-des-points-de-validation-détail)
-3. [🔄 Pipeline et intégration](#-3--pipeline-et-intégration)
-4. [🔌 Interface publique](#-4--interface-publique)
-5. [⚙️ Verdict et masque défaut](#-5--verdict-et-masque-défaut)
-6. [🖥️ IHM, configuration et dépannage](#️-6--ihm-configuration-et-dépannage)
-7. [📜 Suivi historique](#-7--suivi-historique)
-8. [❓ TBD](#-8--tbd)
+1. [🎯 Table des fonctions](#-1-table-des-fonctions)
+2. [🧪 Table des points de validation (détail)](#-2-table-des-points-de-validation-détail)
+3. [🔄 Pipeline et intégration](#-3-pipeline-et-intégration)
+4. [🔌 Interface publique](#-4-interface-publique)
+5. [⚙️ Verdict et masque défaut](#-5-verdict-et-masque-défaut)
+6. [🖥️ IHM, configuration et dépannage](#️-6-ihm-configuration-et-dépannage)
+7. [📜 Suivi historique](#-7-suivi-historique)
+8. [❓ TBD](#-8-tbd)
 
 ## 🎯 1 · Table des fonctions
 

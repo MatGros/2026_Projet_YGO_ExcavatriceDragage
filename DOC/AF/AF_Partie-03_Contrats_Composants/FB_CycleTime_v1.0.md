@@ -9,12 +9,12 @@
 
 ## 🧭 Sommaire
 
-1. [🎯 Rôle et profil](#1--rôle-et-profil)
-2. [🧪 Table des points de validation (détail)](#2--table-des-points-de-validation-détail)
-3. [🔌 Interface](#3--interface)
-4. [⚙️ Comportement — mesure du dt et double bornage](#4--comportement--mesure-du-dt-et-double-bornage)
-5. [📜 Suivi historique](#5--suivi-historique)
-6. [📚 Documents liés](#6--documents-liés)
+1. [🎯 Rôle et profil](#1-rôle-et-profil)
+2. [🧪 Table des points de validation (détail)](#2-table-des-points-de-validation-détail)
+3. [🔌 Interface](#3-interface)
+4. [⚙️ Comportement — mesure du dt et double bornage](#4-comportement-mesure-du-dt-et-double-bornage)
+5. [📜 Suivi historique](#5-suivi-historique)
+6. [📚 Documents liés](#6-documents-liés)
 
 ---
 

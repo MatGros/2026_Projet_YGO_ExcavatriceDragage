@@ -125,16 +125,16 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Table des points de validation (non détaillé)](#1--table-des-points-de-validation-non-détaillé)
-2. [🔄 Architecture & Flux Général Machine](#2--architecture--flux-général-machine)
-3. [🏗️ Équipements principaux](#3--équipements-principaux)
-4. [🧩 Fonctions](#4--fonctions)
-5. [🔄 Finalité opérationnelle](#5--finalité-opérationnelle)
-6. [⏹️ Modèle de commande et d'arrêt](#6--modèle-de-commande-et-darrêt)
-7. [⚡ Sécurité électrique et réarmement](#7--sécurité-électrique-et-réarmement)
-8. [📏 Position et référencement](#8--position-et-référencement)
-9. [📜 Suivi historique](#9--suivi-historique)
-10. [📚 Documents liés](#10--documents-liés)
+1. [🧪 Table des points de validation (non détaillé)](#1-table-des-points-de-validation-non-détaillé)
+2. [🔄 Architecture & Flux Général Machine](#2-architecture-flux-général-machine)
+3. [🏗️ Équipements principaux](#3-équipements-principaux)
+4. [🧩 Fonctions](#4-fonctions)
+5. [🔄 Finalité opérationnelle](#5-finalité-opérationnelle)
+6. [⏹️ Modèle de commande et d'arrêt](#6-modèle-de-commande-et-darrêt)
+7. [⚡ Sécurité électrique et réarmement](#7-sécurité-électrique-et-réarmement)
+8. [📏 Position et référencement](#8-position-et-référencement)
+9. [📜 Suivi historique](#9-suivi-historique)
+10. [📚 Documents liés](#10-documents-liés)
 
 ## 🧪 1 · Table des points de validation (non détaillé)
 

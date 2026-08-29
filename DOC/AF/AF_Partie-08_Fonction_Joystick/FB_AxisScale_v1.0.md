@@ -10,11 +10,11 @@
 
 ## 🧭 Sommaire
 
-1. [🎯 Rôle et profil](#1--rôle-et-profil)
-2. [🧪 Table des points de validation (détail)](#2--table-des-points-de-validation-détail)
-3. [🔌 Interface](#3--interface)
-4. [⚙️ Formule — mise à l'échelle asymétrique](#4--formule--mise-à-léchelle-asymétrique)
-5. [📚 Documents liés](#5--documents-liés)
+1. [🎯 Rôle et profil](#1-rôle-et-profil)
+2. [🧪 Table des points de validation (détail)](#2-table-des-points-de-validation-détail)
+3. [🔌 Interface](#3-interface)
+4. [⚙️ Formule — mise à l'échelle asymétrique](#4-formule-mise-à-léchelle-asymétrique)
+5. [📚 Documents liés](#5-documents-liés)
 
 ## 1 · 🎯 Rôle et profil
 

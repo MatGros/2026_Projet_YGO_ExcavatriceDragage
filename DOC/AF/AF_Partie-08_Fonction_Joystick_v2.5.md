@@ -14,7 +14,7 @@
 5. [🔫 Homme-mort (F08.03, F08.04)](#5-homme-mort-f0803-f0804)
 6. [📡 Calibration et défaut capteur (F08.05, F08.06)](#6-calibration-et-défaut-capteur-f0805-f0806)
 7. [🔒 Interlock consommateurs (F08.07, F08.08)](#7-interlock-consommateurs-f0807-f0808)
-8. [🖥️ IHM, Configuration & Dépannage](#8-ihm-configuration--dépannage)
+8. [🖥️ IHM, Configuration & Dépannage](#8-ihm-configuration-dépannage)
 9. [📜 Suivi historique](#9-suivi-historique)
 10. [❓ TBD](#10-tbd)
 11. [📚 Documents liés](#11-documents-liés)
@@ -508,13 +508,12 @@ y est un `BOOL` "au neutre", vs `INT` valeur réelle dans `ST_JoystickState`) �
 
 ## 10 · ❓ TBD
 
-- **Q1 — `ArmingPermit` non câblé** (🔴 sécurité) : câblé en dur `TRUE` dans
-  `PRG_02_Acquisition.st:322` (« câblage temporaire ») 🆕 2026-08-29, aucun producteur réel. Aucun désarmement
-  automatique n'existe aujourd'hui sur changement de mode ou fin de cycle benne — trou de sécurité
-  non compensé ailleurs. Piste de câblage proposée (non validée) :
-  `DOC/WFLOW/AUDITS/PRG02_20260824/PROPOSITION_ArmingPermit_Cablage_v0.1.md`. Arbitrage humain
-  requis, ne pas refermer sans décision — voir
-  `DOC/WFLOW/AUDITS/PRG02_20260824/QUESTIONS_OUVERTES_PRG02_v0.1.md`.
+- ✅ **Q1 — `ArmingPermit` câblé** (résolu 2026-08-29, T176) : producteur légitime = **PRG_04_Treuils_Benne**
+  (combiné interlock benne : `NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q` — Option B
+  arbitré humain), publié via le bus `Data` et consommé `PRG_02_Acquisition.st` (plus de littéral `TRUE` —
+  gate anti-littéral **G461** en palier C). Délai fin de cycle benne → ré-armement : **1 scan = 10 ms** (prouvé).
+  Le désarmement par changement de mode (`Auth.Mode`, signal 1 de la v0.1) reste un point d'arbitrage ouvert
+  (voir `DOC/WFLOW/AUDITS/PRG02_20260824/`).
 - ✅ **Q2 — arbitré 2026-08-29** (validation humaine) : **ne pas confondre**. L'**armement** homme-mort
   (front bouton + 100ms + `ArmingPermit`) est géré par le **joystick** — c'est sa responsabilité,
   un seul principe, aucun domaine ne l'implémente lui-même. La **différence de comportement**

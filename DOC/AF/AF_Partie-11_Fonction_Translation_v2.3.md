@@ -100,13 +100,13 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Table des points de validation (non détaillé)](#1--table-des-points-de-validation-non-détaillé)
-2. [🧱 Composition — fiches FB dédiées](#2--composition--fiches-fb-dédiées)
-3. [⚙️ Intégration programme & Architecture](#3--intégration-programme--architecture)
-4. [📏 Convention de position M3](#4--convention-de-position-m3)
-5. [📜 Suivi historique](#5--suivi-historique)
-6. [❓ TBD](#6--tbd)
-7. [📚 Documents liés](#7--documents-liés)
+1. [🧪 Table des points de validation (non détaillé)](#1-table-des-points-de-validation-non-détaillé)
+2. [🧱 Composition — fiches FB dédiées](#2-composition-fiches-fb-dédiées)
+3. [⚙️ Intégration programme & Architecture](#3-intégration-programme-architecture)
+4. [📏 Convention de position M3](#4-convention-de-position-m3)
+5. [📜 Suivi historique](#5-suivi-historique)
+6. [❓ TBD](#6-tbd)
+7. [📚 Documents liés](#7-documents-liés)
 
 ## 🧪 1 · Table des points de validation (non détaillé)
 

@@ -11,16 +11,16 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
-2. [🎚️ Modes machine](#2--modes-machine)
-3. [🧩 Fonctions et petits cycles](#3--fonctions-et-petits-cycles)
-4. [🎮 Sélection de commande](#4--sélection-de-commande)
-5. [📐 Bus d'autorisations](#5--bus-dautorisations)
-6. [📏 Limite légale](#6--limite-légale)
-7. [🛡️ Défauts et reprise](#7--défauts-et-reprise)
-8. [📜 Suivi historique](#8--suivi-historique)
-9. [❓ TBD](#9--tbd)
-10. [📚 Documents liés](#10--documents-liés)
+1. [🧪 Table des points de validation](#1-table-des-points-de-validation)
+2. [🎚️ Modes machine](#2-modes-machine)
+3. [🧩 Fonctions et petits cycles](#3-fonctions-et-petits-cycles)
+4. [🎮 Sélection de commande](#4-sélection-de-commande)
+5. [📐 Bus d'autorisations](#5-bus-dautorisations)
+6. [📏 Limite légale](#6-limite-légale)
+7. [🛡️ Défauts et reprise](#7-défauts-et-reprise)
+8. [📜 Suivi historique](#8-suivi-historique)
+9. [❓ TBD](#9-tbd)
+10. [📚 Documents liés](#10-documents-liés)
 
 ## 🧪 1 · Table des points de validation
 
