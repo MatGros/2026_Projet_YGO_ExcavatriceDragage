@@ -54,7 +54,10 @@
 Verdict transversal : 33/33 nominal ✓ ; granulaire quasi absent partout (fronts, bornes, timeouts, latch, Reset front).
 
 - **`TC-P11-015`** (racine nouvelle, F11.05, C4) — Anti-télescopage hauteur M1/M2 : translation bloquée sous hauteur mini, sauf `Bypass.MinHeight` conscient. *(comble le trou nul de couverture)*
-- 10 propositions granulaires suffixées sur P11 (bypass conscient + trace, verrouillage post-échec, PTC-003-005 fronts, positions qualifiées → décodage, sortie front valide) et P13 (Enable=FALSE neutralise en 1 RETURN — déjà TC-P13-010 à étayer fronts, latch contacteur retombe instantané, homme-mort jamais contourné avec RawButton forcé, direction opposée). Détail exact : voir rapport `P3-1b` du 2026-08-29 (conservé à l'identique).
+- 10 propositions granulaires suffixées sur P11 et P13. Détail exact : voir rapport `P3-1b` du 2026-08-29 (conservé à l'identique).
+- **Liste explicite des 11 IDs proposés** : `TC-P11-015` (root, F11.05 anti-télescopage — C4, couverture nulle), `TC-P11-015.1` (bypass MinHeight vs BypassGlobal), `TC-P11-011.1` (Méca B variante perte IHM — §4 L126-129 documentée jamais testée), `TC-P11-010.1` (absence redémarrage auto), `TC-P11-007.1` (verrouillage après échec), `TC-P11-006.1` (watchdog frein 500ms, frontière), `TC-P13-020.1`, `TC-P13-023.1` (latch AU réel survit à la sim — déblocage par front Reset en runtime), `TC-P13-040.1` (transitions mots simulés M3), `TC-P13-032.1` (borne haute codeur), `TC-P13-052.1` (grâce homme-mort 3s).
+- **Risque transversal non-TC à trancher** : `T110` — sémantique réelle de `DriveStatusWord.0` sur AC600 (`FB_SimBench` §4 L146-149) : si le variateur réel garde Power Ready à 1 à l'arrêt, `FB_Safety_Translation.st:181` (Méca B) a la même faille dormante côté réel — à trancher terrain/constructeur.
+- C3 également signalés : ralentissement 3 zones + gate mode Maintenance (`FB_Translation` §4) non couverts.
 
 ### P3-1c — Encoder/Joystick (21)
 
