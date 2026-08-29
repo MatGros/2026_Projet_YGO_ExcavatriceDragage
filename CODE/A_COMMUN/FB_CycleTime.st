@@ -5,7 +5,7 @@
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
    🛡️ Robustesse : dt borné (0 < dt <= CST_MaxCycleDeltaMs) sinon valeur de secours —
       neutralise les artefacts de rebouclage TIME() (49,7 j) et de reprise (online-change, debug)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md
    ======================================================================= *)
 FUNCTION_BLOCK FB_CycleTime
 VAR_INPUT

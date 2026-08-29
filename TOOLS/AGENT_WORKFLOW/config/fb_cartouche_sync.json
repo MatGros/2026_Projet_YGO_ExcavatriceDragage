@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-29T12:12:35+02:00",
-  "source_head": "5c7295d1",
+  "generated_at": "2026-08-29T12:19:36+02:00",
+  "source_head": "c109b109",
   "counts": {
-    "synced": 0,
-    "drift": 56,
+    "synced": 1,
+    "drift": 55,
     "no_fiche": 0,
     "no_pointer": 3
   },
@@ -47,12 +47,12 @@
       "title": "Mesure du temps de cycle réel de la tâche",
       "role": "Calcul du dt réel entre deux exécutions successives",
       "role_label": "Rôle",
-      "doc_pointer": "DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md",
+      "doc_pointer": "DOC/AF/AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md",
       "doc_line": 8,
       "fiche_existe": true,
-      "nom_match": false,
-      "role_match": false,
-      "statut": "drift"
+      "nom_match": true,
+      "role_match": true,
+      "statut": "synced"
     },
     {
       "file": "CODE/A_COMMUN/FB_FaultCore.st",

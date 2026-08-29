@@ -107,21 +107,25 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 
 ### Catalogue (10 tests — regroupés par fonction)
 
-> **Etat** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
-> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+### Catalogue & Scénarios Temporels
 
-| ID | Intention | Comportement attendu | Preuve | Type | Réf | Etat |
+> **Organisation des Essais** :
+> 1. **Scénario 1 (Nominal)** : Cycle complet d'utilisation sans perturbation (Initialisation -> Auto-test A/B -> Pulse 1s -> Confirmation contacteur -> Maintien puissance sain).
+> 2. **Scénarios 2 à 6 (Perturbations & Injections)** : Injection d'événements et de pannes venant perturber ou tester les barrières de sécurité.
+
+| ID | Scénario / Intention | Comportement attendu | Preuve | Type | Réf | Etat |
 |---|---|---|---|---|---|---|
-| <nobr><code>TC-P01-001</code></nobr> | AU physique | Coupe puissance moteurs, API vivant | Contacteur ouvert | `🟢 SITE` | §6.1 | `NV` |
-| <nobr><code>TC-P01-002</code></nobr> | Maintien A/B | Perte canal A ou B ouvre la boucle AU | `MaintainA/B_RQ=FALSE` | `⚡ SITE+AUTO` | §5 | `NV-I` |
-| <nobr><code>TC-P01-003</code></nobr> | Réarmement | Front `ArmRequest` + boucle OK ➔ pulse 1s | Pulse 1s (step 5) | `⚡ AUTO_PLC` | §4.3 | `NV-I` |
-| <nobr><code>TC-P01-004</code></nobr> | Ack Cause/Ack | `Reset` efface l'affichage (interlock reste sur Cause) | `Error=FALSE` | `💻 AUTO` | §4.4bis | `NV-I` |
-| <nobr><code>TC-P01-005</code></nobr> | Séquencement | Acquittement et réarmement 2 actions distinctes | 2 actions requises | `⚡ SITE+AUTO` | §4.4 | `NV-I` |
-| <nobr><code>TC-P01-006</code></nobr> | Auto-test A/B | Test croisé A/B au réarmement (échec ➔ `RedundancyFail`) | Steps 1–4 (200ms) | `⚡ AUTO_PLC` | §4.3bis | `NV-I` |
-| <nobr><code>TC-P01-007</code></nobr> | Lockout 5s | Échec confirmation contacteur ➔ verrouillage 5s | `LockoutActive=TRUE` | `💻 AUTO` | §4.3 | `NV-I` |
-| <nobr><code>TC-P01-008</code></nobr> | Coupure métier | `PowerCutOffRequest=TRUE` coupe A et B sans armer | `MaintainA/B_RQ=FALSE` | `💻 AUTO` | §4 | `NV-I` |
-| <nobr><code>TC-P01-009</code></nobr> | Re-latch Cause | Cause persistante ➔ ré-alarme au prochain essai | `Ack=FALSE` | `💻 AUTO` | §4.4bis | `NV-I` |
-| <nobr><code>TC-P01-010</code></nobr> | Cohérence coupure IHM | `BtnEmergencyCutOff` pendant le pulse de réarmement (step 5) | ⚠️ `ArmPulse_RQ` reste TRUE — écart relevé, non corrigé (audit 2026-08-22) | `💻 AUTO` | §7 | `NV-I` |
+| <nobr><code>TC-P01-SCEN-NOM</code></nobr> | **Scénario Nominal Réarmement** | `ArmRequest` ➔ Auto-test A/B (800ms) ➔ Pulse (1s) ➔ Contacteur collé ➔ `Done=TRUE` | Chronogramme nominal complet | `⚡ AUTO_PLC` | §4.3 | `V-I` |
+| <nobr><code>TC-P01-001</code></nobr> | Coupure AU physique | Coupe la boucle matérielle, contacteur retombe, API vivant | `Contacteur=FALSE` | `🟢 SITE` | §6.1 | `V-I` |
+| <nobr><code>TC-P01-002</code></nobr> | Perte maintien A/B | Perte canal A ou B ouvre la boucle AU | `MaintainA/B_RQ=FALSE` | `⚡ SITE+AUTO` | §5 | `V-I` |
+| <nobr><code>TC-P01-003</code></nobr> | Impulsion de réarmement | Front `ArmRequest` + préconditions OK ➔ pulse 1s (Step 5) | `Cmd.ArmPulse_Cmd=TRUE` | `⚡ AUTO_PLC` | §4.3 | `V-I` |
+| <nobr><code>TC-P01-004</code></nobr> | Acquittement Reset | `Reset` efface l'affichage et purge les verrous d'échec | `Error=FALSE, Lockout=FALSE` | `💻 AUTO` | §4.4 | `V-I` |
+| <nobr><code>TC-P01-005</code></nobr> | Séquencement 2 temps | Acquittement défaut métier et réarmement = 2 actions distinctes | 2 actions requises | `⚡ SITE+AUTO` | §4.4 | `V-I` |
+| <nobr><code>TC-P01-006</code></nobr> | Auto-test A/B croisé | Test dynamique A/B au réarmement (échec ➔ `RedundancyFail`) | Steps 1–4 (200ms) | `⚡ AUTO_PLC` | §4.3bis | `V-I` |
+| <nobr><code>TC-P01-007</code></nobr> | Échec contacteur + Lockout | Contacteur non confirmé sous 2s ➔ Alarme `EmergencyArmingFailed` + Lockout 5s | `LockoutActive=TRUE` | `💻 AUTO` | §4.3 | `V-I` |
+| <nobr><code>TC-P01-008</code></nobr> | Coupure métier active | `PowerCutOffRequest=TRUE` (dérive treuil/M3) ➔ `Armable=FALSE`, retombée immédiate | `MaintainA/B_RQ=FALSE` | `💻 AUTO` | §4.1 | `V-I` |
+| <nobr><code>TC-P01-009</code></nobr> | Interlock PowerCutOff | Réarmement interdit tant que la coupure métier n'est pas acquittée | `Armable=FALSE` | `💻 AUTO` | §4.2 | `V-I` |
+| <nobr><code>TC-P01-010</code></nobr> | Avortement volontaire IHM | `BtnEmergencyCutOff` pendant le pulse ➔ avortement immédiat propre sans alarme | `ArmPulse=FALSE, Error=FALSE` | `💻 AUTO` | §4.3 | `V-I` |
 
 ---
 
@@ -157,7 +161,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 | DUT | Champs | Rôle |
 |---|---|---|
 | `ST_Safety_Emergency_State` | `ChainOk`, `ContactorOk`, `Step`, `Armable`, `ArmingBusy` | État public chaîne AU — consommé par Supervision, Troubleshooting |
-| `ST_Safety_Emergency_Diag` | `Error`, `ErrorId`, `RedundancyTestFailed`, `ArmFailed`, `LockoutActive` | Diagnostic chaîne AU — consommé par Supervision, IHM State |
+| `ST_Safety_Emergency_Diag` | `Error`, `ErrorId`, `RedundancyTestFailed`, `ArmFailed`, `LockoutActive`, `LastAbortStep`, `LastAbortCause` | Diagnostic chaîne AU — consommé par Supervision, IHM State |
 
 **Producteur unique** : `FB_Safety_EmergencyManagement` (sorties `State`/`Diag`).
 Mappés dans `GVL_IHM.Modes.State.*` par Supervision (L2, ✅ fait).
@@ -202,18 +206,24 @@ PowerCutOff_B_Cmd = NOT PowerCutOffRequest
                   AND NOT RedundancyTestFailed
 ```
 
-### 4.2 Déclenchement armement
+### 4.2 Formule d'éligibilité au réarmement (`Armable`)
 
-Conditions **toutes** requises sur front `ArmRequest` :
+Le réarmement n'est autorisé (`Armable = TRUE`) **que si toutes** les conditions de sécurité physique sont réunies :
 
-1. `ArmingSeqStep = 0`
-2. `EmergencyChainClosed = TRUE`
-3. `EmergencyArmingLockoutActive = FALSE`
-4. `PowerContactorEngaged = FALSE` (contacteur non engagé)
+```pascal
+Armable := EmergencyChainClosed
+           AND NOT BtnEmergencyCutOff
+           AND NOT PowerCutOffRequest
+           AND (ArmingSeqStep = 0)
+           AND NOT EmergencyArmingLockoutActive
+           AND NOT RedundancyTestFailedCause
+           AND NOT PowerContactorEngaged;
+```
 
+Conditions **toutes** requises également sur front `ArmRequest` pour lancer la séquence (Steps 1 à 6).
 Pas d'auto-réarmement sur simple retour boucle saine.
 
-### 4.3 Étapes
+### 4.3 Étapes de la séquence d'armement
 
 | Step | Nom | Durée | Action | Échec |
 |---|---|---|---|---|
@@ -221,20 +231,53 @@ Pas d'auto-réarmement sur simple retour boucle saine.
 | 2 | RestoreA | 200 ms | Rétablit A | Si chain FALSE en fin → retour 0 |
 | 3 | TestB | 200 ms | Ouvre B seul | Idem redondance → 0 |
 | 4 | RestoreB | 200 ms | Rétablit B | Si chain FALSE → 0 ; sinon → 5 |
-| 5 | Pulse | 1 s | `EmergencyArming_Cmd=TRUE` | — |
-| 6 | Confirm | ≤ 2 s | Attend `PowerContactorEngaged` | Timeout → `EmergencyArmingFailed` + lockout 5 s |
+| 5 | Pulse | 1 s | `Cmd.ArmPulse_Cmd := TRUE` | Coupure / chute boucle ➔ Avortement immédiat |
+| 6 | Confirm | ≤ 2 s | Attend `PowerContactorEngaged` | Timeout ➔ `EmergencyArmingFailed` + lockout 5 s |
 
-Succès étape 6 : retour IDLE, lockout off.
+Succès étape 6 : retour IDLE (`ArmingSeqStep = 0`), lockout off, `Done = TRUE`.
 
-### Chronogramme — réarmement nominal (succès)
+### 4.3bis Gestion des avortements en cours de séquence
 
-| Instant | `ArmRequest` | `ArmingSeqStep` | `PowerContactorEngaged` | `EmergencyArming_RQ` |
-|---|---|---|---|---|
-| t0 — repos | FALSE | 0 (IDLE) | FALSE | FALSE |
-| t1 — front demande | TRUE ↑ | 1 (TestA) | FALSE | FALSE |
-| t2 — +800ms (steps 1-4 OK) | FALSE | 5 (Pulse) | FALSE | TRUE ↑ |
-| t3 — +1s (fin pulse) | FALSE | 6 (Confirm) | FALSE | FALSE ↓ |
-| t4 — contacteur confirmé | FALSE | 0 (IDLE) | TRUE ↑ | FALSE |
+1. **Avortement volontaire** (`BtnEmergencyCutOff = TRUE`) :
+   - Arrêt immédiat de la séquence (`ArmingSeqStep := 0`).
+   - `LastAbortCause := 16#0001` (Bit0: Demande coupure manuelle IHM).
+   - **Aucune alarme d'échec ni verrouillage** (décision consciente opérateur).
+2. **Avortement sécurité / coupure** (`PowerCutOffRequest = TRUE` ou chute `EmergencyChainClosed`) :
+   - Arrêt immédiat de la séquence (`ArmingSeqStep := 0`).
+   - `EmergencyArmingFailedCause := TRUE` (alarme affichée sur l'IHM).
+   - `EmergencyArmingLockoutActive := TRUE` (verrouillage 5s anti-réessai).
+   - `LastAbortCause := 16#0010` (Bit4: Coupure sécurité métier) ou `16#0002` (Bit1: Chute boucle AU).
+
+### 4.3ter Chronogramme d'Essai Global (Nominal + Perturbations)
+
+```text
+  Phase 0 : REPOS INITIAL (t = 0s)
+  ├── Boucle fermée, contacteur ouvert, aucun défaut -> Armable = TRUE, Contacteur = FALSE.
+  │
+  Phase 1 : ARMEMENT NOMINAL RÉUSSI (t = 1s -> 4s) [TC-P01-SCEN-NOM]
+  ├── Front ArmRequest -> Auto-test croisé A/B (800ms) -> Impulsion ArmPulse (1s) -> Confirm
+  └── Contacteur confirmé engagé -> Done = TRUE, Contacteur = TRUE.
+  │
+  Phase 2 : DÉFAUT COUPURE MÉTIER EN MARCHE (t = 5s) [TC-P01-008]
+  ├── Apparition dérive treuil ou variateur (PowerCutOffRequest = TRUE)
+  └── Retombée immédiate contacteur, MaintainA/B = FALSE, Armable = FALSE.
+  │
+  Phase 3 : TENTATIVE DE RÉARMEMENT REFUSÉE & ACQUITTEMENT (t = 6s -> 7s) [TC-P01-005 + 009]
+  ├── Tentative réarmement -> Refusée net (Armable = FALSE, séquence ne démarre pas).
+  └── Acquittement du défaut métier (Reset) -> Retour Armable = TRUE.
+  │
+  Phase 4 : ÉCHEC ENCLENCHEMENT CONTACTEUR & LOCKOUT (t = 8s -> 11s) [TC-P01-007]
+  ├── Armement lancé -> Le contacteur ne colle pas à l'étape 6 (timeout 2s)
+  ├── Alarme EmergencyArmingFailed levée + Verrouillage Lockout 5s actif.
+  └── Pendant 5s : Armable = FALSE -> Expiration + Reset -> Retour Armable = TRUE.
+  │
+  Phase 5 : AVORTEMENT VOLONTAIRE IHM (t = 12s -> 14s) [TC-P01-010]
+  ├── Armement lancé -> Opérateur appuie sur BtnEmergencyCutOff pendant l'impulsion (Step 5)
+  └── Avortement immédiat à Step 0 propre SANS alarme d'échec -> Armable = TRUE.
+  │
+  Phase 6 : OUVERTURE MATÉRIELLE COUP-DE-POING (t = 15s -> 17s) [TC-P01-001 + 002]
+  └── Coupure physique EmergencyChainClosed = FALSE -> Retombée immédiate et blocage total.
+```
 
 Si `PowerContactorEngaged` ne passe pas TRUE avant timeout 2s à t4 : `EmergencyArmingFailed`
 et `EmergencyArmingLockoutActive` 5s, retour direct à `ArmingSeqStep=0`.

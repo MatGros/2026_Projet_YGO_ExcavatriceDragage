@@ -150,7 +150,7 @@ legacy et publie leur décompte (mesure de l'avancement des migrations).
 | Brique | Rôle | Inst. | Comportement fail-safe notable | Détail |
 |---|---|---|---|---|
 | `FB_FaultCore` | Socle défaut → `Fault : ST_Fault` (vue live + latchée) | 18 | Latch / acquittement **par cause** (`ST_FaultCause.Latching`) | fiche [`FB_FaultCore_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md) (§4.1) |
-| `FB_CycleTime` | `dt` réel de la tâche (s) | 5 | `dt` borné `0 < dt ≤ CST_MaxCycleDeltaMs`, sinon valeur de secours ; pas de redémarrage auto | fiche [`FB_CycleTime_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md) (<nobr><code>TC-P03-014</code></nobr>) |
+| `FB_CycleTime` | Calcul du `dt` réel entre deux exécutions successives (s) | 5 | `dt` borné `0 < dt ≤ CST_MaxCycleDeltaMs`, sinon valeur de secours ; pas de redémarrage auto | fiche [`FB_CycleTime_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md) (<nobr><code>TC-P03-014</code></nobr>) |
 | `FB_Brake` | Frein à manque de courant, temps physiques | 1 | Sécurité positive (`BrakeCmd = FALSE` = frein collé au repos) ; double vérif retour contacteur | résumé `AF_Partie-10_Fonction_Winch_v2.1.md` §3 |
 | `FB_Ramp` | Rampe accel/décel asymétrique (%/s) | 1 | Distingue éloignement / retour à zéro | résumé `AF_Partie-11_Fonction_Translation_v2.3.md` §1 (<nobr><code>TC-P11-040</code></nobr>) |
 | `FB_Acquisition_Preflight` | Verdict passif de qualification E/S machine arrêtée (16 contrôles) | 1 | Observateur pur (aucun `SafeStop` / `PowerCutOff` / ordre machine) | `AF_Partie-06_Acquisition_Qualification_IO_v2.4.md` §6 |
