@@ -365,7 +365,12 @@ GVL_IHM.Modes.State.EmergencyArmable := PRG_06_Outputs.EmergencyState.Armable;
 GVL_IHM.Modes.State.EmergencyArmingBusy := PRG_06_Outputs.EmergencyState.ArmingBusy;
 GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed;
 GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs.EmergencyDiag.ArmFailed;
-GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error OR PRG_02_Acquisition.Data.InputModuleFault;
+// OR avec les défauts d'arbitrage de mode (refus Semi-Auto, bascule de mode refusée) —
+// publiés par PRG_03 : sans eux ces refus restaient silencieux pour l'opérateur.
+GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
+                                      OR PRG_02_Acquisition.Data.InputModuleFault
+                                      OR PRG_03_Modes_Cycle.Data.ModesFault.Error
+                                      OR PRG_03_Modes_Cycle.Data.ModesFault.Latched;
 GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs.PowerCutOffActive;
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
 GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;

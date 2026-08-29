@@ -52,8 +52,8 @@ VAR_INPUT
     M2PositionLimitOverridden : BOOL; // --> [CMD] M2 : limite de position levée (override N1 ou bypass N2 effectif)
 
     // === RESTAURATION BOOT DES DRAPEAUX PERSISTANTS ===
-    HomingRequiredM1Persist   : BOOL; // --> [CFG] M1 : valeur PERSISTENT relue au premier scan
-    HomingRequiredM2Persist   : BOOL; // --> [CFG] M2 : valeur PERSISTENT relue au premier scan
+    BootHomingRequiredM1      : BOOL; // --> [CFG] M1 : valeur PERSISTENT relue au premier scan
+    BootHomingRequiredM2      : BOOL; // --> [CFG] M2 : valeur PERSISTENT relue au premier scan
 END_VAR
 VAR_OUTPUT
     // === ETATS & DIAGNOSTICS IEC ===
@@ -79,11 +79,10 @@ VAR
 
     // === MAINTENANCE : BASCULE DE MODE & RE-HOMING ===
     PrevArbitratedMode      : E_Mode; // . [LOC] Mode arbitré au scan précédent (maintien si bascule refusée)
-    BasculeModeAutorisee    : BOOL;   // . [LOC] Treuils à l'arrêt mécanique confirmé (condition de bascule)
+    ModeChangeAllowed       : BOOL;   // . [LOC] Treuils à l'arrêt mécanique confirmé (condition de bascule)
     MaintHomingRequiredM1   : BOOL;   // . [LOC] M1 : re-homing obligatoire avant tout SEMI_AUTO
     MaintHomingRequiredM2   : BOOL;   // . [LOC] M2 : re-homing obligatoire avant tout SEMI_AUTO
-    MaintOverrideUsedM1     : BOOL;   // . [LOC] M1 : mémoire « override/bypass position utilisé » pendant N1/N2
-    MaintOverrideUsedM2     : BOOL;   // . [LOC] M2 : mémoire « override/bypass position utilisé » pendant N1/N2
+    SemiAutoRefusedHoming   : BOOL;   // . [LOC] Latch refus semi-auto pour re-homing obligatoire
     FirstScanDone           : BOOL;   // . [LOC] Initialisation premier scan (restauration PERSISTENT)
 END_VAR
 
@@ -93,7 +92,8 @@ END_VAR
 // 🔑 1. RESET FRONT
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    SemiAutoRefusedFault := FALSE;
+    SemiAutoRefusedFault  := FALSE;
+    SemiAutoRefusedHoming := FALSE;
 END_IF;
 
 // 🔑 1bis. RESTAURATION BOOT DES DRAPEAUX PERSISTANTS
@@ -101,22 +101,46 @@ END_IF;
 // réécrit chaque scan par PRG_03). Aucune perte du re-homing obligatoire sur coupure.
 IF NOT FirstScanDone THEN
     FirstScanDone         := TRUE;
-    MaintHomingRequiredM1 := HomingRequiredM1Persist;
-    MaintHomingRequiredM2 := HomingRequiredM2Persist;
-    MaintOverrideUsedM1   := FALSE;
-    MaintOverrideUsedM2   := FALSE;
+    MaintHomingRequiredM1 := BootHomingRequiredM1;
+    MaintHomingRequiredM2 := BootHomingRequiredM2;
     PrevArbitratedMode    := E_Mode.DISABLE;
 END_IF;
 
-// Refus semi-auto si défaut codeur OU re-homing obligatoire sur un axe (AF-05 §4bis)
-IF (SelMode = E_Mode.SEMI_AUTO)
-   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
+// 🔑 1ter. RE-HOMING OBLIGATOIRE — ARMEMENT IMMÉDIAT (AF-05 §4bis)
+// Armé AVANT l'arbitrage de mode (§3) et non à la sortie du mode maintenance :
+//   1. pas de fenêtre d'un scan où SEMI_AUTO serait arbitré malgré un re-homing requis ;
+//   2. pas de perte de l'obligation sur coupure / download pendant la maintenance
+//      (la valeur est écrite dans le miroir PERSISTENT dès le scan courant, pas à la sortie).
+IF M1PositionLimitOverridden THEN
+    MaintHomingRequiredM1 := TRUE;
+END_IF;
+IF M2PositionLimitOverridden THEN
+    MaintHomingRequiredM2 := TRUE;
+END_IF;
+
+// Levée : UNIQUEMENT sur cycle de homing complet réussi (Done + Homed + non suspect).
+IF MaintHomingRequiredM1 AND M1HomingDone AND M1Homed AND NOT M1HomingSuspect THEN
+    MaintHomingRequiredM1 := FALSE;
+END_IF;
+IF MaintHomingRequiredM2 AND M2HomingDone AND M2Homed AND NOT M2HomingSuspect THEN
+    MaintHomingRequiredM2 := FALSE;
+END_IF;
+
+// Refus semi-auto — une cause = un fait (AF03 §4) : défaut codeur et re-homing sont distincts.
+IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
     SemiAutoRefusedFault := TRUE;
+END_IF;
+IF (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
+    SemiAutoRefusedHoming := TRUE;
 END_IF;
 
 instCauses[0].Active   := SemiAutoRefusedFault;
 instCauses[0].Latching := TRUE;
 instCauses[0].Texte    := 'Mode Semi-Auto refuse car defaut codeur present';
+
+instCauses[2].Active   := SemiAutoRefusedHoming;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := 'Mode Semi-Auto refuse car re-homing obligatoire (depassement de limite de position)';
 
 // Cause 1 — changement de mode refusé : treuils non à l'arrêt mécanique confirmé.
 // Non latchée (live) : l'information disparaît dès que la condition redevient vraie, sans
@@ -163,10 +187,10 @@ Ready := Enable AND NOT Fault.Latched;
 // 3.1 ARRÊT MÉCANIQUE CONFIRMÉ DES DEUX TREUILS (condition de bascule, AF-05 §4bis)
 // Même composite que l'armement Méca B : contacteurs retombés + frein serré, redondé par
 // la mesure absolue de vitesse. Vaut pour les DEUX treuils (M1 ET M2).
-BasculeModeAutorisee := M1ContactorsReleased AND NOT M1BrakeIsOpen
-                        AND (ABS(M1SpeedAbsMps) < MovementSpeedThresholdMps)
-                        AND M2ContactorsReleased AND NOT M2BrakeIsOpen
-                        AND (ABS(M2SpeedAbsMps) < MovementSpeedThresholdMps);
+ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
+                     AND (ABS(M1SpeedAbsMps) < MovementSpeedThresholdMps)
+                     AND M2ContactorsReleased AND NOT M2BrakeIsOpen
+                     AND (ABS(M2SpeedAbsMps) < MovementSpeedThresholdMps);
 
 // 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
 IF (SelMode = E_Mode.SEMI_AUTO)
@@ -176,7 +200,7 @@ IF (SelMode = E_Mode.SEMI_AUTO)
     Auth.ModeChangePendingBlocked := FALSE;
 ELSIF (SelMode <> PrevArbitratedMode)
       AND (SelMode <> E_Mode.DISABLE) AND (PrevArbitratedMode <> E_Mode.DISABLE)
-      AND NOT BasculeModeAutorisee THEN
+      AND NOT ModeChangeAllowed THEN
     // Bascule N1/N2/SEMI_AUTO refusée : le mode courant est MAINTENU.
     // ⚠️ Exception de sécurité (contrat D2) : une transition vers ou depuis DISABLE n'est
     // JAMAIS bloquée — sortir d'un mode maintenance ne doit jamais dépendre d'un treuil à l'arrêt.
@@ -190,30 +214,10 @@ END_IF;
 PrevArbitratedMode := Auth.Mode;
 {endregion}
 
-{region "§3bis Re-homing obligatoire"}
-// 🧭 3bis. RE-HOMING OBLIGATOIRE APRÈS USAGE EFFECTIF D'UN OVERRIDE/BYPASS DE POSITION
-// Un dépassement des limites de position invalide la confiance dans CablePosM : la re-référence
-// est la seule remise à zéro sûre (AF-05 §4bis).
-IF (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2) THEN
-    // Mémorisation PENDANT la maintenance (l'usage peut être fugace : bouton maintenu 2 s).
-    MaintOverrideUsedM1 := MaintOverrideUsedM1 OR M1PositionLimitOverridden;
-    MaintOverrideUsedM2 := MaintOverrideUsedM2 OR M2PositionLimitOverridden;
-ELSE
-    // Transfert à la SORTIE du mode maintenance (cadrage §5 : « après toute sortie »).
-    MaintHomingRequiredM1 := MaintHomingRequiredM1 OR MaintOverrideUsedM1;
-    MaintHomingRequiredM2 := MaintHomingRequiredM2 OR MaintOverrideUsedM2;
-    MaintOverrideUsedM1 := FALSE;
-    MaintOverrideUsedM2 := FALSE;
-END_IF;
-
-// Levée : UNIQUEMENT sur cycle de homing complet réussi (Done + Homed + non suspect).
-IF MaintHomingRequiredM1 AND M1HomingDone AND M1Homed AND NOT M1HomingSuspect THEN
-    MaintHomingRequiredM1 := FALSE;
-END_IF;
-IF MaintHomingRequiredM2 AND M2HomingDone AND M2Homed AND NOT M2HomingSuspect THEN
-    MaintHomingRequiredM2 := FALSE;
-END_IF;
-
+{region "§3bis Publication du re-homing obligatoire"}
+// 🧭 3bis. PUBLICATION DU RE-HOMING OBLIGATOIRE
+// Armement et levée réalisés en §1ter, AVANT l'arbitrage de mode — voir le commentaire §1ter
+// (pas de fenêtre d'un scan, pas de perte sur coupure en cours de maintenance).
 Auth.HomingRequiredM1 := MaintHomingRequiredM1;
 Auth.HomingRequiredM2 := MaintHomingRequiredM2;
 {endregion}

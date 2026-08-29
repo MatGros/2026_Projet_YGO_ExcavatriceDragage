@@ -9,5 +9,13 @@ STRUCT
     Auth          : ST_fbModes_Autorisations; // Bus d'autorisations machine
     ReqProgram    : ST_ProgramRequest;        // Demandes programme vers PRG_04 / PRG_05
     SequenceState : ST_SequencePublicState;   // État public de la séquence
+    // 🧩 Défaut de l'arbitre de mode (FB_Modes), forme cible ST_Fault (AF03 §3).
+    // Producteur unique : FB_Modes (instancié par PRG_03_Modes_Cycle).
+    // Causes : [0] refus Semi-Auto pour défaut codeur (latchée) ;
+    //          [1] changement de mode refusé, treuils non à l'arrêt confirmé (live) ;
+    //          [2] refus Semi-Auto pour re-homing obligatoire (latchée).
+    // ⚠️ Sans cette publication, les refus de mode restaient invisibles de l'IHM :
+    //    un interlock qu'on ne voit pas est un interlock qu'on contourne.
+    ModesFault    : ST_Fault;                 // 🚨 Défauts d'arbitrage de mode (consommé PRG_07 → IHM)
 END_STRUCT
 END_TYPE

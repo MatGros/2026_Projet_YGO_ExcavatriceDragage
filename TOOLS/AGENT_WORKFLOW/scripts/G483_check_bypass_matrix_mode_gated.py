@@ -8,18 +8,26 @@ le re-homing obligatoire perdrait sa condition de levée.
 
 Contrôles
 ---------
-AC1  Tout `Bypass*` / `EncoderFaultBypass` câblé depuis PRG_04 vers
-     instSafetyWinchM1/M2, instWinchM1/M2, instBucket est gâté par `MaintN2`
-     (directement ou via un local `BypassM?*Eff`).
-AC2  `TopLimitM1_M` / `TopLimitM2_M` = SEL(override, 7,5 m, 8,5 m) — les deux
-     bornes sont la config nominale et la position du capteur de homing haut.
-AC3  L'override N1 n'ouvre jamais `BypassTopLimitSwitch` (butée capteur dure).
-AC4  `BasculeModeAutorisee` = contacteurs retombés ET frein serré ET |v| < seuil,
-     sur M1 ET M2 ; une transition vers/depuis DISABLE reste libre (contrat D2).
-AC6  Transfert `MaintOverrideUsedM?` -> `HomingRequiredM?` à la sortie de N1/N2.
-AC7  Levée de `HomingRequired` sur homing complet réussi uniquement.
-AC8  SEMI_AUTO refusé si `HomingRequiredM1` OU `HomingRequiredM2`.
-AC12 `BtnOverrideTopSoftware` déclaré dans ST_WinchCmd, absent de ST_BypassWinch.
+AC1   Tout `Bypass*` / `EncoderFaultBypass` câblé depuis PRG_04 vers
+      instSafetyWinchM1/M2, instWinchM1/M2, instBucket est gâté par `MaintN2`.
+AC1b  L'ORIGINE du gate est l'arbitrage FB_Modes (`Auth.Mode`), jamais le sélecteur
+      IHM brut (qui autoriserait les bypass dans un mode refusé).
+AC2   `TopLimitM1_M` / `TopLimitM2_M` = MIN(SEL(override, 7,5 m, 8,5 m), bande de
+      ralentissement) — la course supplémentaire reste couverte par le ralentissement.
+AC2b  Invariant de configuration : CfgTopSensorPos_M - CfgCableLimitAscent_M ne doit
+      jamais excéder WinchSlowdownDistance_M (sinon arrivée capteur à pleine vitesse).
+AC3   L'override N1 n'ouvre jamais `BypassTopLimitSwitch` (butée capteur dure).
+AC3b  L'override est conditionné à Homed ET NON HomingSuspect (pas de dépassement
+      contrôlé sans référence de position).
+AC4   `ModeChangeAllowed` = contacteurs retombés ET frein serré ET |v| < seuil,
+      sur M1 ET M2 ; une transition vers/depuis DISABLE reste libre (contrat D2).
+AC5   `FB_Modes.Fault` est publié (Data.ModesFault) et agrégé dans AnyFaultActive :
+      un interlock invisible est un interlock contourné.
+AC6   Armement IMMÉDIAT du re-homing (avant l'arbitrage de mode) sur les DEUX axes.
+AC7   Levée de `HomingRequired` sur homing complet réussi uniquement.
+AC8   SEMI_AUTO refusé si `HomingRequiredM1` OU `HomingRequiredM2`, causes séparées.
+AC9   Câblage inter-PRG complet (PRG_03 ↔ PRG_04 ↔ PRG_07) : aucune fonction morte.
+AC12  `BtnOverrideTopSoftware` déclaré dans ST_WinchCmd, absent de ST_BypassWinch.
 """
 from __future__ import annotations
 
@@ -30,13 +38,30 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 PRG04 = ROOT / "CODE" / "M_MAIN" / "PRG_04_Treuils_Benne.st"
+PRG03 = ROOT / "CODE" / "M_MAIN" / "PRG_03_Modes_Cycle.st"
+PRG07 = ROOT / "CODE" / "M_MAIN" / "PRG_07_Supervision.st"
 FB_MODES = ROOT / "CODE" / "F_MODES" / "FB_Modes.st"
+GVL_PERSISTENT = ROOT / "CODE" / "GVL_PERSISTENT.st"
 ST_WINCH_CMD = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "1_TREUILS_BENNE" / "ST_WinchCmd.st"
 ST_BYPASS_WINCH = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "1_TREUILS_BENNE" / "ST_BypassWinch.st"
+ST_MODES_INTERPRG = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "3_CYCLE_ET_MODES" / "ST_ModesCycleInterPrg.st"
+
+# Tolérances hors matrice, EXPLICITES et BORNÉES (1 occurrence + justification).
+# Un 2e usage non gaté du même nom fait échouer le gate.
+OUT_OF_SCOPE = {
+    "GVL_IHM.M1M2Sync.Bypass.Global": "synchro M1/M2 — hors matrice treuils (contrat D7, AF-05 §9)",
+}
 
 
 def compact(text: str) -> str:
     return re.sub(r"\s+", " ", text)
+
+
+def strip_comments(text: str) -> str:
+    """Retire les commentaires ST — un motif recopié dans un commentaire ne doit pas valider un contrôle."""
+    text = re.sub(r"\(\*.*?\*\)", " ", text, flags=re.DOTALL)
+    text = re.sub(r"//[^\n]*", " ", text)
+    return text
 
 
 def read(path: Path) -> str:
@@ -48,36 +73,21 @@ def read(path: Path) -> str:
 def check_bypass_mode_gated(text: str) -> list[str]:
     """AC1 — toute affectation d'une entrée Bypass* d'instance est gâtée par MaintN2."""
     errors: list[str] = []
-    # Lignes de la forme `  BypassXxx := ...,` ou `  EncoderFaultBypass := ...,`
     pattern = re.compile(
         r"^\s*(EncoderFaultBypass|Bypass[A-Za-z0-9_]*)\s*:=\s*(?P<rhs>.+?),?\s*$",
         re.MULTILINE,
     )
-    eff_locals = {
-        "BypassM1TopLimitSwitchEff",
-        "BypassM1TopLimitSoftwareEff",
-        "BypassM1CableLimitSwitchEff",
-        "BypassM1LimitLegalEff",
-        "BypassM1MecaDEff",
-        "BypassM2TopLimitSwitchEff",
-        "BypassM2TopLimitSoftwareEff",
-        "BypassM2CableLimitSwitchEff",
-        "BypassM2LimitLegalEff",
-        "BypassM2MecaDEff",
-    }
-    # Hors périmètre volontaire (contrat D7) : la synchro M1/M2 n'est pas un bypass de sécurité
-    # treuil — la matrice AF-05 §4bis couvre les treuils M1/M2 + benne. Extension à part
-    # (AF-05 §9). Liste explicite : tout ajout ici doit être justifié et signalé.
-    out_of_scope = {
-        "GVL_IHM.M1M2Sync.Bypass.Global": "synchro M1/M2 — hors matrice treuils (contrat D7)",
-    }
+    eff_locals = {f"BypassM{a}{n}Eff" for a in (1, 2) for n in
+                  ("TopLimitSwitch", "TopLimitSoftware", "CableLimitSwitch", "LimitLegal", "MecaD")}
     found = 0
     for match in pattern.finditer(text):
         name = match.group("rhs").strip()
         if name in eff_locals or name.startswith("MaintN2 AND"):
             found += 1
             continue
-        if name in out_of_scope:
+        if name in OUT_OF_SCOPE:
+            if text.count(name) > 1:
+                errors.append(f"AC1 tolérance hors matrice utilisée {text.count(name)}× : {name}")
             continue
         errors.append(f"AC1 bypass non gaté par MAINT_N2 : {match.group(0).strip()}")
     if found < 30:
@@ -88,18 +98,9 @@ def check_bypass_mode_gated(text: str) -> list[str]:
 def check_eff_locals_are_gated(text: str) -> list[str]:
     """AC1 bis — les locaux `BypassM?*Eff` contiennent bien le gate MaintN2."""
     errors: list[str] = []
-    for name in (
-        "BypassM1TopLimitSwitchEff",
-        "BypassM1TopLimitSoftwareEff",
-        "BypassM1CableLimitSwitchEff",
-        "BypassM1LimitLegalEff",
-        "BypassM1MecaDEff",
-        "BypassM2TopLimitSwitchEff",
-        "BypassM2TopLimitSoftwareEff",
-        "BypassM2CableLimitSwitchEff",
-        "BypassM2LimitLegalEff",
-        "BypassM2MecaDEff",
-    ):
+    names = [f"BypassM{a}{n}Eff" for a in (1, 2) for n in
+             ("TopLimitSwitch", "TopLimitSoftware", "CableLimitSwitch", "LimitLegal", "MecaD")]
+    for name in names:
         match = re.search(rf"^\s*{name}\s*:=\s*(.+?);\s*$", text, re.MULTILINE)
         if match is None:
             errors.append(f"AC1 local effectif absent : {name}")
@@ -108,42 +109,81 @@ def check_eff_locals_are_gated(text: str) -> list[str]:
     return errors
 
 
-def check_top_limit_sel(text: str) -> list[str]:
-    """AC2 / AC3 — bornes de l'override du FDC haut logiciel."""
+def check_gate_origin(text: str) -> list[str]:
+    """AC1b — MaintN1/MaintN2 dérivent de l'arbitrage FB_Modes, pas du sélecteur IHM brut."""
+    errors: list[str] = []
+    body = compact(text)
+    for name, mode in (("MaintN1", "MAINT_N1"), ("MaintN2", "MAINT_N2")):
+        if not re.search(
+            rf"(?:^|\s){name}\s*:=\s*\(\s*PRG_03_Modes_Cycle\.Data\.Auth\.Mode\s*=\s*E_Mode\.{mode}\s*\)\s*;",
+            body,
+        ):
+            errors.append(f"AC1b {name} ne dérive pas de PRG_03_Modes_Cycle.Data.Auth.Mode (= E_Mode.{mode})")
+    return errors
+
+
+def check_top_limit(text: str) -> list[str]:
+    """AC2 / AC2b / AC3 / AC3b — bornes et conditions de l'override du FDC haut logiciel."""
     errors: list[str] = []
     body = compact(text)
     required = {
-        "AC2 SEL M1": (
-            r"TopLimitM1_M\s*:=\s*SEL\s*\(\s*OverrideTopSoftwareN1M1\s+OR\s+BypassM1TopLimitSoftwareEff\s*,"
-            r"\s*_CommunCfgPersist\.CfgCableLimitAscent_M\s*,\s*_WinchM1CfgPersist\.CfgTopSensorPos_M\s*\)"
+        "AC2 plafond borné M1": (
+            r"TopLimitM1_M\s*:=\s*MIN\s*\(\s*SEL\s*\(\s*OverrideTopSoftwareN1M1\s+OR\s+BypassM1TopLimitSoftwareEff\s*,"
+            r"\s*_CommunCfgPersist\.CfgCableLimitAscent_M\s*,"
+            r"\s*_WinchM1CfgPersist\.CfgTopSensorPos_M\s*\)\s*,"
+            r"\s*_CommunCfgPersist\.CfgCableLimitAscent_M\s*\+\s*_CommunCfgPersist\.WinchSlowdownDistance_M\s*\)"
         ),
-        "AC2 SEL M2": (
-            r"TopLimitM2_M\s*:=\s*SEL\s*\(\s*OverrideTopSoftwareN1M2\s+OR\s+BypassM2TopLimitSoftwareEff\s*,"
+        "AC2 plafond borné M2": (
+            r"TopLimitM2_M\s*:=\s*MIN\s*\(\s*SEL\s*\(\s*OverrideTopSoftwareN1M2\s+OR\s+BypassM2TopLimitSoftwareEff\s*,"
             r"\s*_CommunCfgPersist\.CfgCableLimitAscent_M\s*\+\s*M2_LimitShift\s*,"
-            r"\s*_WinchM2CfgPersist\.CfgTopSensorPos_M\s*\+\s*M2_LimitShift\s*\)"
+            r"\s*_WinchM2CfgPersist\.CfgTopSensorPos_M\s*\+\s*M2_LimitShift\s*\)\s*,"
+            r"\s*_CommunCfgPersist\.CfgCableLimitAscent_M\s*\+\s*M2_LimitShift"
+            r"\s*\+\s*_CommunCfgPersist\.WinchSlowdownDistance_M\s*\)"
         ),
-        "AC2 override M1 momentané N1": r"OverrideTopSoftwareN1M1\s*:=\s*MaintN1\s+AND\s+GVL_IHM\.M1TreuilRetenue\.Cmd\.BtnOverrideTopSoftware",
-        "AC2 override M2 momentané N1": r"OverrideTopSoftwareN1M2\s*:=\s*MaintN1\s+AND\s+GVL_IHM\.M2TreuilBenne\.Cmd\.BtnOverrideTopSoftware",
         "AC3 FDC capteur jamais ouvert par l'override": r"BypassTopLimitSwitch\s*:=\s*BypassM[12]TopLimitSwitchEff",
     }
     for label, pattern in required.items():
         if not re.search(pattern, body):
             errors.append(f"{label} — motif introuvable")
 
+    # AC3b — l'override exige une référence de position fiable, sur les DEUX axes.
+    for axis, winch in (("M1", "M1TreuilRetenue"), ("M2", "M2TreuilBenne")):
+        if not re.search(
+            rf"OverrideTopSoftwareN1{axis}\s*:=\s*MaintN1"
+            rf"\s+AND\s+PRG_02_Acquisition\.Data\.Encoder{axis}\.Homed"
+            rf"\s+AND\s+NOT\s+PRG_02_Acquisition\.Data\.Encoder{axis}\.HomingSuspect"
+            rf"\s+AND\s+GVL_IHM\.{winch}\.Cmd\.BtnOverrideTopSoftware",
+            body,
+        ):
+            errors.append(f"AC3b override {axis} non conditionné à Homed AND NOT HomingSuspect")
+
     # AC3 bis — l'override ne doit jamais apparaître dans un BypassTopLimitSwitch.
     for match in re.finditer(r"^\s*BypassTopLimitSwitch\s*:=\s*(.+?);\s*$", text, re.MULTILINE):
         if "OverrideTopSoftwareN1" in match.group(1):
             errors.append("AC3 l'override N1 ouvre BypassTopLimitSwitch (butée physique franchissable)")
+
+    # AC2b — invariant de configuration : la course d'override reste couverte par le ralentissement.
+    cfg = read(GVL_PERSISTENT)
+    def value(name: str, default: float) -> float:
+        found = re.search(rf"{name}\s*:=\s*([0-9]*\.?[0-9]+)", cfg)
+        return float(found.group(1)) if found else default
+    delta = value("CfgTopSensorPos_M", 8.5) - value("CfgCableLimitAscent_M", 7.5)
+    band = value("WinchSlowdownDistance_M", 1.0)
+    if delta > band + 1e-6:
+        errors.append(
+            f"AC2b CfgTopSensorPos_M - CfgCableLimitAscent_M = {delta} m > WinchSlowdownDistance_M = {band} m : "
+            "sous override, le treuil arrive sur le capteur physique sans ralentissement"
+        )
     return errors
 
 
 def check_fb_modes(text: str) -> list[str]:
-    """AC4 / AC6 / AC7 / AC8 — arbitrage de mode et re-homing."""
+    """AC4 / AC5 / AC6 / AC7 / AC8 — arbitrage de mode, publication du défaut, re-homing."""
     errors: list[str] = []
     body = compact(text)
     required = {
         "AC4 contacteurs + frein + vitesse M1": (
-            r"BasculeModeAutorisee\s*:=\s*M1ContactorsReleased\s+AND\s+NOT\s+M1BrakeIsOpen"
+            r"ModeChangeAllowed\s*:=\s*M1ContactorsReleased\s+AND\s+NOT\s+M1BrakeIsOpen"
             r"\s+AND\s*\(\s*ABS\s*\(\s*M1SpeedAbsMps\s*\)\s*<\s*MovementSpeedThresholdMps\s*\)"
         ),
         "AC4 contacteurs + frein + vitesse M2": (
@@ -153,9 +193,17 @@ def check_fb_modes(text: str) -> list[str]:
         "AC4 exemption DISABLE (contrat D2)": (
             r"AND\s*\(\s*SelMode\s*<>\s*E_Mode\.DISABLE\s*\)\s*AND\s*\(\s*PrevArbitratedMode\s*<>\s*E_Mode\.DISABLE\s*\)"
         ),
-        "AC4 maintien du mode + remontée IHM": r"Auth\.Mode\s*:=\s*PrevArbitratedMode\s*;\s*Auth\.ModeChangePendingBlocked\s*:=\s*TRUE",
-        "AC6 transfert en sortie de maintenance": (
-            r"MaintHomingRequiredM1\s*:=\s*MaintHomingRequiredM1\s+OR\s+MaintOverrideUsedM1"
+        "AC4 maintien du mode + remontée IHM": (
+            r"Auth\.Mode\s*:=\s*PrevArbitratedMode\s*;\s*Auth\.ModeChangePendingBlocked\s*:=\s*TRUE"
+        ),
+        "AC6 armement immédiat M1": (
+            r"IF\s+M1PositionLimitOverridden\s+THEN\s+MaintHomingRequiredM1\s*:=\s*TRUE\s*;\s*END_IF"
+        ),
+        "AC6 armement immédiat M2": (
+            r"IF\s+M2PositionLimitOverridden\s+THEN\s+MaintHomingRequiredM2\s*:=\s*TRUE\s*;\s*END_IF"
+        ),
+        "AC6 restauration boot": (
+            r"MaintHomingRequiredM1\s*:=\s*BootHomingRequiredM1"
         ),
         "AC7 levée homing M1": (
             r"IF\s+MaintHomingRequiredM1\s+AND\s+M1HomingDone\s+AND\s+M1Homed\s+AND\s+NOT\s+M1HomingSuspect\s+THEN"
@@ -163,14 +211,52 @@ def check_fb_modes(text: str) -> list[str]:
         "AC7 levée homing M2": (
             r"IF\s+MaintHomingRequiredM2\s+AND\s+M2HomingDone\s+AND\s+M2Homed\s+AND\s+NOT\s+M2HomingSuspect\s+THEN"
         ),
-        "AC8 refus SEMI_AUTO si re-homing requis": (
-            r"IF\s*\(\s*SelMode\s*=\s*E_Mode\.SEMI_AUTO\s*\)\s*AND\s*\(\s*EncoderFaultPresent"
-            r"\s+OR\s+MaintHomingRequiredM1\s+OR\s+MaintHomingRequiredM2\s*\)"
+        "AC8 refus SEMI_AUTO défaut codeur": (
+            r"IF\s*\(\s*SelMode\s*=\s*E_Mode\.SEMI_AUTO\s*\)\s+AND\s+EncoderFaultPresent\s+THEN"
         ),
+        "AC8 refus SEMI_AUTO re-homing (cause distincte)": (
+            r"IF\s*\(\s*SelMode\s*=\s*E_Mode\.SEMI_AUTO\s*\)\s+AND\s*\(\s*MaintHomingRequiredM1"
+            r"\s+OR\s+MaintHomingRequiredM2\s*\)\s+THEN\s+SemiAutoRefusedHoming\s*:=\s*TRUE"
+        ),
+        "AC8 arbres de cause distincts": r"instCauses\[2\]\.Active\s*:=\s*SemiAutoRefusedHoming",
+        "AC5 publication du défaut": r"Auth\.HomingRequiredM1\s*:=\s*MaintHomingRequiredM1",
     }
     for label, pattern in required.items():
         if not re.search(pattern, body):
             errors.append(f"{label} — motif introuvable dans FB_Modes.st")
+
+    # AC6 — l'armement doit précéder l'arbitrage de mode (pas de fenêtre d'un scan).
+    arm_pos = body.find("IF M1PositionLimitOverridden THEN")
+    arb_pos = body.find("IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent")
+    if arm_pos < 0 or arb_pos < 0 or arm_pos > arb_pos:
+        errors.append("AC6 l'armement du re-homing doit précéder l'arbitrage de mode §3")
+    return errors
+
+
+def check_interprg_wiring(prg03: str, prg04: str, prg07: str, interprg: str) -> list[str]:
+    """AC5 / AC9 — câblage inter-PRG complet : aucune fonction morte silencieuse."""
+    errors: list[str] = []
+    c3, c4, c7, cip = (compact(t) for t in (prg03, prg04, prg07, interprg))
+    required = {
+        ("PRG03", c3, r"M1PositionLimitOverridden\s*:=\s*PRG_04_Treuils_Benne\.Data\.PositionLimitOverriddenM1"),
+        ("PRG03", c3, r"M2PositionLimitOverridden\s*:=\s*PRG_04_Treuils_Benne\.Data\.PositionLimitOverriddenM2"),
+        ("PRG03", c3, r"BootHomingRequiredM1\s*:=\s*GVL_PERSISTENT\._MaintM1HomingRequired"),
+        ("PRG03", c3, r"BootHomingRequiredM2\s*:=\s*GVL_PERSISTENT\._MaintM2HomingRequired"),
+        ("PRG03", c3, r"GVL_PERSISTENT\._MaintM1HomingRequired\s*:=\s*instModes\.Auth\.HomingRequiredM1"),
+        ("PRG03", c3, r"GVL_PERSISTENT\._MaintM2HomingRequired\s*:=\s*instModes\.Auth\.HomingRequiredM2"),
+        ("PRG03", c3, r"Data\.ModesFault\s*:=\s*instModes\.Fault"),
+        ("PRG04", c4, r"Data\.PositionLimitOverriddenM1\s*:=\s*PositionLimitOverriddenM1"),
+        ("PRG04", c4, r"Data\.PositionLimitOverriddenM2\s*:=\s*PositionLimitOverriddenM2"),
+        ("PRG07", c7, r"GVL_IHM\.Modes\.State\.ModeChangePendingBlocked\s*:=\s*PRG_03_Modes_Cycle\.Data\.Auth\.ModeChangePendingBlocked"),
+        ("PRG07", c7, r"GVL_IHM\.Modes\.State\.HomingRequiredM1\s*:=\s*PRG_03_Modes_Cycle\.Data\.Auth\.HomingRequiredM1"),
+        ("PRG07", c7, r"GVL_IHM\.Modes\.State\.HomingRequiredM2\s*:=\s*PRG_03_Modes_Cycle\.Data\.Auth\.HomingRequiredM2"),
+        ("PRG07", c7, r"OR\s+PRG_03_Modes_Cycle\.Data\.ModesFault\.Error"),
+        ("PRG07", c7, r"OR\s+PRG_03_Modes_Cycle\.Data\.ModesFault\.Latched"),
+        ("DUT", cip, r"ModesFault\s*:\s*ST_Fault"),
+    }
+    for where, body, pattern in required:
+        if not re.search(pattern, body):
+            errors.append(f"AC9 câblage inter-PRG manquant ({where}) : {pattern}")
     return errors
 
 
@@ -186,11 +272,16 @@ def check_dut(text_cmd: str, text_bypass: str) -> list[str]:
 
 def main() -> int:
     errors: list[str] = []
-    prg04 = read(PRG04)
+    prg04_raw = read(PRG04)
+    prg04 = strip_comments(prg04_raw)
     errors += check_bypass_mode_gated(prg04)
     errors += check_eff_locals_are_gated(prg04)
-    errors += check_top_limit_sel(prg04)
-    errors += check_fb_modes(read(FB_MODES))
+    errors += check_gate_origin(prg04)
+    errors += check_top_limit(prg04)
+    errors += check_fb_modes(strip_comments(read(FB_MODES)))
+    errors += check_interprg_wiring(
+        strip_comments(read(PRG03)), prg04, strip_comments(read(PRG07)), read(ST_MODES_INTERPRG)
+    )
     errors += check_dut(read(ST_WINCH_CMD), read(ST_BYPASS_WINCH))
 
     if errors:
@@ -200,8 +291,8 @@ def main() -> int:
         return 1
 
     print(
-        "[G483] PASS — bypass gatés MAINT_N2 · override FDC borné 7,5/8,5 m · "
-        "bascule subordonnée à l'arrêt confirmé · re-homing obligatoire"
+        "[G483] PASS — bypass gatés MAINT_N2 (origine Auth.Mode) · override FDC borné + conditionné "
+        "Homed · bascule subordonnée à l'arrêt confirmé · re-homing immédiat publié · câblage inter-PRG complet"
     )
     return 0
 

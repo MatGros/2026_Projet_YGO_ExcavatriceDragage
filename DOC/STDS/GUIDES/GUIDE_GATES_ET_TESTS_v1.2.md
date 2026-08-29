@@ -143,7 +143,6 @@ Outils de génération, pas de vérification — pas d'`ID Gate` :
 |---|---|---|
 | <small><code>st_to_pou.py</code></small> | 1 fichier `.st` (FB/PROGRAM) → 1 `<pou>` ST isolé | Choix explicite selon le type réel de l'objet |
 | <small><code>st_to_dut.py</code></small> | 1 fichier `.st` (STRUCT/ENUM) → 1 `<dataType>` isolé | Idem |
-| <small><code>st_to_ld.py</code></small> | 1 fichier `PRG_*_LD.st` → 1 `<pou>` Ladder isolé | Idem — **le suffixe du fichier ne décide pas seul**, l'agent choisit |
 | <small><code>generator.cli --out-dir CODE_XML</code></small> | Régénère le miroir granulaire `CODE_XML/` (1 `.xml` par `.st`, dépendances incluses) | Fin de lot (palier C) |
 | <small><code>build_bundle.py</code></small> | Agrège les XML granulaires en un bundle | Fin de lot (palier C), **cible : lit `CODE_XML/`, écrit `CODE_XML/CODE_Bundle.xml`** |
 | <small><code>codesys_compilation_diag.py</code></small> | Traduit un code d'erreur `C0xxx` en français + correctif suggéré | Sur un log/texte d'erreur, à la demande (palier D) |

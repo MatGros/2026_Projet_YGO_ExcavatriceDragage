@@ -76,14 +76,14 @@ instModes(
     M1PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM1,
     M2PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM2,
     // Restauration boot des drapeaux de re-homing (miroir PERSISTENT)
-    HomingRequiredM1Persist   := GVL_PERSISTENT._MaintHomingRequiredM1,
-    HomingRequiredM2Persist   := GVL_PERSISTENT._MaintHomingRequiredM2
+    BootHomingRequiredM1      := GVL_PERSISTENT._MaintM1HomingRequired,
+    BootHomingRequiredM2      := GVL_PERSISTENT._MaintM2HomingRequired
 );
 
 // Miroir persistant du re-homing obligatoire (pattern FB_MirrorBypassRetain) :
 // FB_Modes est le producteur unique de la décision ; GVL_PERSISTENT n'est que la mémoire.
-GVL_PERSISTENT._MaintHomingRequiredM1 := instModes.Auth.HomingRequiredM1;
-GVL_PERSISTENT._MaintHomingRequiredM2 := instModes.Auth.HomingRequiredM2;
+GVL_PERSISTENT._MaintM1HomingRequired := instModes.Auth.HomingRequiredM1;
+GVL_PERSISTENT._MaintM2HomingRequired := instModes.Auth.HomingRequiredM2;
 
 // Qualification de l'intention opérateur couplée (M1+M2) dans le même scan
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
@@ -240,6 +240,9 @@ instCycleSemiAuto(
 
 // 1. Autorisations machine
 Data.Auth := instModes.Auth;
+// 1bis. Défauts de l'arbitre de mode (refus Semi-Auto, changement de mode refusé) —
+// publiés pour que l'IHM les affiche : un interlock invisible est un interlock contourné.
+Data.ModesFault := instModes.Fault;
 
 // 1bis. Intention couplée continue opérateur (inconditionnelle, TOUS modes)
 Data.ReqProgram.OperatorCoupledIntent.Active    := CoupledUserRequestActive;

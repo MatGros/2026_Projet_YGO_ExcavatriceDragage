@@ -6,7 +6,7 @@
 
 - **Rôle** : définir les contrats publics des FB, des DUT internes et des pages CFC.
 - **Périmètre** : profils de composants, cycle de vie/états/défauts (socle `FB_FaultCore`),
-  contrats DUT, règles CFC/Ladder. Ne définit pas : la chaîne électrique AU et le réarmement
+  contrats DUT, règles CFC. Ne définit pas : la chaîne électrique AU et le réarmement
   (propriétaires de la Partie 01), l'architecture programme/ordonnancement (Partie 02).
 - **Type de composant** : Fondations méta — pas de FB unique porteur. Le socle transverse
   `FB_FaultCore` (implémentation du contrat `standard`) a sa propre fiche détaillée :
@@ -20,7 +20,7 @@
 4. [🛑 Cycle de vie, états et défauts](#4-cycle-de-vie-états-et-défauts)
 5. [🚌 Contrats DUT internes](#5-contrats-dut-internes)
 6. [👁️ Règles CFC](#6-règles-cfc)
-7. [📐 Règles de génération Ladder](#7-règles-de-génération-ladder)
+7. [📐 Règles de génération Ladder — retirées](#7-règles-de-génération-ladder--retirées)
 8. [📜 Suivi historique](#8-suivi-historique)
 9. [❓ TBD](#9-tbd)
 10. [📚 Documents liés](#10-documents-liés)
@@ -354,29 +354,12 @@ Les programmes sont des sources ST ; le générateur produit le bundle PLCopenXM
 (`<ST>`, `<LD>`, `<FBD>` selon le suffixe). La renumérotation 7 POU (`PRG_02`→`PRG_07`)
 est soldée. Historique de la migration : `ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`.
 
-## 📐 7 · Règles de génération Ladder (`_LD.st` → `<LD>`)
+## 📐 7 · Règles de génération Ladder — retirées
 
-> 🚩 Référentiel complet & règles de génération : voir [`DOC/STDS/CODE_QUALITY_STANDARDS.md §11`](../STDS/CODE_QUALITY_STANDARDS.md).
-
-Un programme suffixé `_LD` est une **source ST** convertie en `<LD>` dans le bundle PLCopenXML par `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py`.
-
-### Câblage `FB_Output` et retrait de `FB_Input`
-
-| FB | Statut migration | Règle |
-|---|---|---|
-| `FB_Output` | Actif | `Command` → barrières/interlocks → `.State`/sortie physique |
-| `FB_Input` | Déprécié | Aucun nouveau rung, aucune nouvelle instance ; retrait après remappage acquisition |
-
-Les entrées sont désormais observées et publiées par `PRG_02_Acquisition` en ST via `HwReal`,
-`HwSim` et `HwIn`. La conversion automatique d'un `GetDeviceState()` en `BOOL` dans une page LD
-est interdite : `GetDeviceState()` retourne un `DEVICE_STATE` et le diagnostic module reste
-centralisé dans l'acquisition.
-
-### Tests de régression
-
-```powershell
-python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v
-```
+> 🚩 Le Ladder est **retiré** du projet (2026-08-20) : `PRG_06_Outputs` est migré en ST pur.
+> Aucun POU `_LD` n'existe plus ; le sous-système de génération Ladder du convertisseur
+> (`ld_builder.py`, `st_to_ld.py`) a été supprimé. Les sorties physiques et barrières finales
+> sont en ST.
 
 ## 📜 8 · Suivi historique
 

@@ -13,7 +13,7 @@ TOOLS/
 ├── COMPILER_ST2C_STruCpp/         # Compilation ST → C++17 & tests unitaires boîte noire (STruCpp)
 ├── CONVERTER_ST2XML_PLCopenXML/   # Convertisseur ST → PLCopenXML (autonome)
 │   ├── generator/                 # Code Python du générateur
-│   ├── scripts/                   # Scripts CLI modulaires (st_to_ld, st_to_pou, build_bundle)
+│   ├── scripts/                   # Scripts CLI modulaires (st_to_pou, build_bundle)
 │   ├── tests/                     # Tests Pytest unitaires, intégration, golden files (393 tests)
 │   └── docs/                      # Spécifications format PLCopenXML CODESYS
 ├── LINTER_ST/                     # Linter ST CODESYS 3.5 (STruCpp vendoré, 100% encapsulé)

@@ -4,15 +4,14 @@
 - **Problème résolu** : générer du Ladder Diagram en PLCopen XML à la main (ou via un agent qui
   devine la structure) produit des fichiers non importables dans CODESYS — topologie graphique,
   chaînage `connectionPointIn`/`connectionPointOut` et ordre des `localId` sont des règles
-  strictes, pas des conventions de style (voir REX `ld_builder.py`, `CODE_QUALITY_STANDARDS.md`).
+  strictes, pas des conventions de style (voir `CODE_QUALITY_STANDARDS.md`).
 - **Périmètre strict** : modélisation XML du langage **LD uniquement** — balises, attributs,
   topologie graphique, exemples. Ne couvre pas FBD, SFC, IL (non utilisés sur ce projet) ni les
   sections `<configuration>`/`<resource>`/`<task>`/`<pouInstance>` de la norme (§7 de la spec
   source) : le rattachement des POU aux tâches CODESYS reste câblé **manuellement** par
   l'utilisateur dans CODESYS 3.5, jamais généré par l'outillage — hors périmètre volontaire.
 - **Type de composant** : référence technique normative, source secondaire consommée par
-  `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py` et par tout agent lisant/écrivant du
-  LD en PLCopen XML.
+  tout agent lisant/écrivant du LD en PLCopen XML.
 
 > Origine : extraction agent de la spec officielle **PLCopen Technical Committee 6 — XML Formats
 > for IEC 61131-3, v2.01** (document intégral en français-technique :
@@ -678,4 +677,3 @@ Voici un exemple complet d'une POU en Ladder Diagram comprenant :
 - [`GUIDE_IMPLEMENTATION_ST_PLCOPEN_XML_v1.0.md`](GUIDE_IMPLEMENTATION_ST_PLCOPEN_XML_v1.0.md) — pendant ST de ce guide.
 - [`tc6_xml_v201_technical_doc.md`](tc6_xml_v201_technical_doc.md) — spec source intégrale (PLCopen TC6 XML v2.01), y compris les sections hors périmètre ici (§7 configuration/resource/task).
 - [`CODE_QUALITY_STANDARDS.md`](../CODE_QUALITY_STANDARDS.md) — pourquoi `G200_check_linkage.py` reste la seule preuve de câblage réel, y compris pour du LD généré.
-- `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py` — implémentation Python consommant ces règles (REX 2026-08-04 : génération générique actuellement non fiable, contournée par un oracle dédié `PRG_06_Outputs` — voir `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py`).
