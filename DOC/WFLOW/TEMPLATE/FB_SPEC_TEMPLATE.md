@@ -35,7 +35,7 @@ fait pas. Renvoi aux codes `FNN.0X` du chapô, pas de redite du rôle machine d�
 > nouvel identifiant racine (immutabilité, `CODE_QUALITY_STANDARDS.md §0`). Si le chapô n'a pas
 > encore de TC macro pour cette fonction, le signaler plutôt que d'en inventer un ici.
 
-<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px;">
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
     <col style="width: 28px;">
     <col style="width: 50px;">
@@ -56,7 +56,7 @@ fait pas. Renvoi aux codes `FNN.0X` du chapô, pas de redite du rôle machine d�
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-PNN-0X0.1</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold;">TC-PNN-0X0.1</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>[Intention<br>courte]</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚡ <b>Étape 1</b> : Stimulus d'entrée ou appel de méthode<br>

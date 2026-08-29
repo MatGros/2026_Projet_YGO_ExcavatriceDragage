@@ -42,9 +42,42 @@ historique. État actuel uniquement, 3-4 lignes max.
 
 <!-- [FONCTIONS MÉTIER SEULEMENT] — obligatoire pour cette famille -->
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | État |
-|---|---|---|---|---|---|---|---|
-| `FNN.01` | [Nom court, verbe d'action] | [1-3 phrases, toutes les conditions pertinentes] | `FB_XXX` | `C0`-`C4` | <nobr><code>TC-PNN-001</code></nobr> | ❌ | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: calc(100% - 520px);">
+    <col style="width: 110px;">
+    <col style="width: 50px;">
+    <col style="width: 90px;">
+    <col style="width: 50px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Fonction</small></th>
+      <th style="padding: 4px 8px;">Description</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réalisée par</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Criticité</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>TC couvrants</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Statut</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">FNN.01</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>[Nom court, verbe d'action]</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">[1-3 phrases, toutes les conditions pertinentes]</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_XXX</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>C0</code>-<code>C4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-PNN-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>❌</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 🧪 2. Table des points de validation (Cas de Test — TC)
 
@@ -52,7 +85,7 @@ historique. État actuel uniquement, 3-4 lignes max.
 > - **Séquence & Déroulé** : Décomposition chronologique complète par étapes numérotées (`💤 Étape 0`, `🚀 Étape 1`, `⚡ Étape 2`, `✅ Étape 3`), avec stimuli, temporisations et résultats attendus.
 > - **État** : `V-I` Validé & Implémenté · `V` Validé (non vérifié) · `NV` Non validé · `NV-I` Implémenté non validé · `R` Refusé · `NA` Non applicable.
 
-<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px;">
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
     <col style="width: 28px;">
     <col style="width: 50px;">
@@ -73,7 +106,7 @@ historique. État actuel uniquement, 3-4 lignes max.
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-PNN-SCEN-NOM</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-PNN-SCEN-NOM</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Nominal</b><br>[Fonction]</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Repos initial (conditions nominales saines)<br>
@@ -86,7 +119,7 @@ historique. État actuel uniquement, 3-4 lignes max.
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-PNN-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold;">TC-PNN-001</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>[Intention<br>courte]</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚡ <b>Étape 1</b> : Stimulus initial d'entrée<br>
@@ -111,16 +144,27 @@ historique. État actuel uniquement, 3-4 lignes max.
 %%{init: {'theme':'base', 'themeVariables': {'fontSize':'14px'}}}%%
 flowchart TD
     A["📡 [FB_Entrée]<br/>[rôle]"]
-    B["⚙️ [FB_A]<br/>[rôle]"]
-    C["🔌 [Sortie]<br/>[rôle]"]
+    B["🛡️ [FB_Safety]<br/>[rôle]"]
+    C["⚙️ [FB_Commande]<br/>[rôle]"]
+    D["🔒 [FB_OutputInterlock]<br/>[rôle]"]
 
     A ==>|"[donnée transmise]"| B
-    B ==>|"[donnée transmise]"| C
+    B ==>|"[autorisation transmise]"| C
+    C ==>|"[consigne transmise]"| D
 
     classDef acq fill:#0c1e2e,stroke:#38bdf8,stroke-width:2px,color:#e2e8f0
+    classDef safe fill:#2b0f14,stroke:#f43f5e,stroke-width:2px,color:#e2e8f0
+    classDef cmd fill:#2b230a,stroke:#fbbf24,stroke-width:2px,color:#e2e8f0
     classDef outp fill:#0f2b17,stroke:#4ade80,stroke-width:2px,color:#e2e8f0
+
     class A acq
-    class C outp
+    class B safe
+    class C cmd
+    class D outp
+
+    linkStyle 0 stroke:#38bdf8,stroke-width:3px
+    linkStyle 1 stroke:#f43f5e,stroke-width:3px
+    linkStyle 2 stroke:#fbbf24,stroke-width:3px
 ```
 
 ## 🔌 4. Interface publique
