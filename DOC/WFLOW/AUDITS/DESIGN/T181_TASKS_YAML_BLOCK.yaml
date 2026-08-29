@@ -14,7 +14,15 @@
 #                 (bloque_par), PAS absorbé.
 #   T178 (⬜ C4) : DriftGuard Méca A armé sur « contacteurs-off + frein serré ». A explicitement
 #                 REJETÉ CfgWinchCoastMax_M / RunOn comme redondants (Méca B 3 s). → T181-17 RETIRÉE.
-#   T169 / T169-A (⏳) : Harnais CI scénarios dragage. → T181-00 se GREFFE sur T169-A, ne le double pas.
+#   T169 / T169-A (⏳ AGY-01) : Harnais CI scénarios dragage, modifie LE MÊME FB_Main_EndToEnd.
+#                 → T181-00 bloque_par [T169-A] (arête ajoutée v0.2 après challenge B2 §5).
+#
+# CHANGEMENTS v0.2 (challenge B2, 2026-08-29) :
+#   - T181-08 scindée en T181-08a (plomberie struct, shadow-equal, MinStepNumber=1) + T181-08b
+#     (bascule calcul clamp -> agrégateur PRG_04, fin du shadow). Oracle shadow redéfini.
+#   - T181-00 bloque_par [T169-A] ; T181-01 bloque_par [T181-00, T175].
+#   - D18 (bypass temps mort directionnel au redémarrage à chaud) ajouté au registre -> T181-05.
+#   - Phase 0/0b requalifiée : « interface FB_Winch en réduction / additive contrôlée », pas « inchangée ».
 #   T180 (⬜ C4) : audit 29 cas limites sécurité. → les vecteurs du harnais T181-00 croisent la
 #                 liste CAS-xxx de T180 (CAS-001 retombée contacteur en marche, CAS-012 = T175).
 #
@@ -70,18 +78,22 @@ tasks:
     description: >
       fix: étendre FB_Main_EndToEnd + nouvelle suite test_winch_integ.st (registre MAIN_EndToEnd ou
       entrée dédiée) — passer les boutons IHM/M2/benne/plongée, modèle position câble intégrant la
-      vitesse-cran, injection MeasuredSpeedBand, surfacer FinalInterlockGoverned sur un bus.
+      vitesse-cran, injection MeasuredSpeedBand, modèle retour frein + contacteurs retombés,
+      surfacer FinalInterlockGoverned sur un bus.
       guard: gate « harnais intégration vert » ajouté à run_all_gates (palier C ou D).
       + plan FAT / essais site / rollback Git par phase / ordre d'application manuelle CODESYS.
+      COORDINATION : T169-A (AGY-01) modifie le même FB_Main_EndToEnd — bloque_par: [T169-A].
     contrat: null
     objectifs:
       - FB_Main_EndToEnd étendu accepte boutons IHM M1/M2, commande benne, contexte plongée Kobold
       - Modèle physique minimal paire : position M1/M2 intègre la vitesse-cran, écart = déviation sync
+      - Modèle E/S retour frein (BrakeFeedback) + FwdRevSpeedFeedbackOff (contacteurs retombés) pilotable — requis pour croisements T178 / T180 CAS-001
+      - Fidélité du modèle chiffrée dans le doc : intégration pos = v_palier x 10 ms ; pas de dynamique moteur ; limite explicitée
       - 6 familles de vecteurs exécutables (Grafcet↔Winch, Joystick↔Winch, plongée, régression M1, autorité interlock, sync paire)
       - Gate harnais intégré à run_all_gates, rouge tant que la suite n'est pas verte
       - Document plan de tir livré (FAT, ordre import CODESYS, points de rollback par phase)
       - Liste des vecteurs croisée avec les CAS-xxx de T180 (au moins CAS-001, CAS-012)
-    bloque_par: []
+    bloque_par: [T169-A]
 
   # ── Phase 0 : corrections C4 à INTERFACE FB_Winch INCHANGÉE ─────────────────
 
