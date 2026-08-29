@@ -3032,9 +3032,9 @@ END_IF;
 
 {region "§4 Acquittement defauts"}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-// ⚠️ Reset acquitte l'affichage (Ack:=TRUE) ET réinitialise les causes d'échec de réarmement.
+// ⚠️ Reset acquitte l'affichage (Ack:=TRUE). La cause de redondance reste verrouillée
+// jusqu'au prochain test physique. L'échec d'armement précédent est réinitialisé pour autoriser un réessai.
 IF ResetEdge.Q THEN
-    RedundancyTestFailedCause := FALSE;
     RedundancyTestFailedAck := TRUE;
     EmergencyArmingFailedCause := FALSE;
     EmergencyArmingFailedAck := TRUE;
@@ -3078,7 +3078,6 @@ IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed
    AND NOT BtnEmergencyCutOff
    AND NOT PowerCutOffRequest
    AND NOT EmergencyArmingLockoutActive 
-   AND NOT RedundancyTestFailedCause
    AND NOT PowerContactorEngaged THEN
     ArmingSeqStep := 1;
     RedundancyTestFailedCause := FALSE;
