@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T11:08:09.414126" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T11:08:09.414126">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T23:35:35.707633" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T23:35:35.707633">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -174,7 +174,7 @@
             </variable>
             <variable name="Idx211_OperatorActionId">
               <type>
-                <UINT />
+                <WORD />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant numérique de l'action attendue</xhtml>

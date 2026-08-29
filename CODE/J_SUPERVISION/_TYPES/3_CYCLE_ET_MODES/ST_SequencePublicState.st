@@ -12,7 +12,7 @@ STRUCT
     SequenceId          : E_ProgramSequence;// Identifiant séquence active
     Step                : E_CycleStep;      // Étape active du Grafcet
     StepAtFault         : E_CycleStep;      // Étape mémorisée au défaut
-    OperatorActionId    : UINT;             // Identifiant action opérateur requise
+    OperatorActionId    : WORD;             // Identifiant action opérateur requise
     OperatorAction      : STRING(120);      // Message explicatif pour l'IHM
     ExpectedAxis        : E_OperatorAxis;   // Organe joystick/bouton attendu
     ExpectedDirection   : INT;              // Sens attendu (-1, 0, +1)

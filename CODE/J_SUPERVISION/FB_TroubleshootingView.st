@@ -80,7 +80,7 @@ VAR_INPUT
     CycleStepAtError         : E_CycleStep; (* --> [DIAG] Étape au défaut *)
     CycleWaitingForOperator  : BOOL;        (* --> [STAT] Attente action humaine *)
     CycleWaitingForProcess   : BOOL;        (* --> [STAT] Attente condition procédé *)
-    CycleOperatorActionId    : UINT;        (* --> [DIAG] ID action attendue *)
+    CycleOperatorActionId    : WORD;        (* --> [DIAG] ID action attendue *)
     CycleOperatorAction      : STRING(120); (* --> [DIAG] Consigne explicite *)
     CycleExpectedAxis        : E_OperatorAxis; (* --> [STAT] Organe attendu *)
     CycleExpectedDirection   : INT;         (* --> [STAT] Sens attendu (-1, 0, +1) *)

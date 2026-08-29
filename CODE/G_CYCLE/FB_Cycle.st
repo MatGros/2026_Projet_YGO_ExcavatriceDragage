@@ -80,7 +80,7 @@ VAR_OUTPUT
     CycleStep               : E_CycleStep;          // <-- [STAT] Etape active du Grafcet
     CycleStateStr           : STRING(80);           // <-- [STAT] Libelle en clair de l'etape
     CycleStepAtError        : E_CycleStep;          // <-- [DIAG] Etape specifique au moment du defaut
-    OperatorActionId        : UINT;                 // <-- [DIAG] ID action operateur requise
+    OperatorActionId        : WORD;                 // <-- [DIAG] ID action operateur requise
     OperatorAction          : STRING(120);          // <-- [DIAG] Message explicatif pour l'IHM
     ExpectedAxis            : E_OperatorAxis;       // <-- [STAT] Organe joystick/bouton attendu
     ExpectedDirection       : INT;                  // <-- [STAT] Sens attendu (-1, 0, +1)
