@@ -1,0 +1,98 @@
+# Contrat T181-00 — Harnais d'intégration treuil (paire M1+M2+PRG_04+PRG_06) + plan de tir
+# Source : PLAN_GEL_TREUIL_T181_v0.1.md §7-§9 ; SPEC_HARNESS_INTEG_TREUIL_T181-00_v0.1.md ;
+#          B4_review_independante.md §3.1 (le harnais actuel est un stub à reconstruire).
+
+contract:
+  task_id: T181-00_HARNESS_INTEG
+  criticality: C3            # infra de test ; bloque toute la suite T181, mais ne touche pas le code produit
+  strategy: rebuild         # FB_TestHarness_PRG_04 est reconstruit, pas étendu
+
+  objective: >
+    Disposer d'un harnais STruCpp qui fait tourner la chaîne réelle
+    PRG_03 -> PRG_04 -> FB_Winch x2 -> PRG_06 ensemble, avec un modèle physique minimal de la
+    paire (position, vitesse-palier, écart = déviation sync, retour frein/contacteurs), et une
+    suite de vecteurs Grafcet / joystick / plongée dont les attendus sont écrits à la main —
+    afin d'attraper les défauts d'intégration invisibles au CI unitaire (clamp M1!=M2,
+    anti-traversée benne, FinalInterlockGoverned, temps mort au redémarrage à chaud).
+
+  acceptance:
+    - id: AC1
+      statement: "FB_TestHarness_PRG_04 est reconstruit en miroir FIDELE de PRG_04 §1-§8 : instWinchM2 / instWinchSync / instBucket réellement appelés (aujourd'hui déclarés jamais appelés) ; vrai agrégateur de clamp (commun + M2-propre) ; vrais SEL M1/M2 ; vraie taxonomie de permits §5 ; aucune valeur métier codée en dur (MaxStep, TopLimit)."
+      verified_by: "diff FB_TestHarness_PRG_04.st + revue : chaque instance déclarée est appelée ; grep 'MaxStep.*:= 5' / 'TopLimit.*:= 7.5' = 0"
+    - id: AC2
+      statement: "Un gate mécanique compare la logique du stub à PRG_04 (égalité des expressions clés de §3/§6, ou stub généré depuis PRG_04) et échoue si elles divergent."
+      verified_by: "gate présent dans TOOLS/AGENT_WORKFLOW/scripts/ (ex. G4xx_check_harness_mirrors_prg04.py) + exécution PASS"
+    - id: AC3
+      statement: "FB_Main_EndToEnd (ou une entrée registre dédiée WINCH_INTEG) expose les entrées : boutons IHM M1/M2, commande benne, contexte plongée Kobold, injection cadence hors instance FB_Winch, et les sorties diag : StepNumber M1/M2, position modèle M1/M2, déviation sync, FinalInterlockGoverned M1/M2."
+      verified_by: "lecture VAR_INPUT/VAR_OUTPUT du mégabloc"
+    - id: AC4
+      statement: "Modèle physique minimal implémenté : CablePosM += v_palier(StepNumber, Direction) * 0.010 par instance ; ecart = |M1.pos - M2.pos| ; ContactorsAllOff retardé de ContactorFeedbackTimeout ; BrakeFeedback := RelayFwd_Up OR RelayRev_Down. Aucune dynamique moteur (limite explicitée dans le doc)."
+      verified_by: "lecture du corps du modèle + section 'fidélité' du plan de tir"
+    - id: AC5
+      statement: "Suite test_winch_integ.st : les 6 familles de vecteurs de SPEC §3 (HARN-1x Grafcet, HARN-2x Joystick, HARN-3x Plongée, HARN-4x Régression/asymétrie M1, HARN-5x Autorité interlock, HARN-6x Sync paire) sont écrites et EXECUTABLES (compilent et tournent). L'attendu de chaque vecteur est une valeur écrite à la main (pas de shadow comparison contre l'ancien calcul)."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb WINCH_INTEG (compile et s'execute) et grep des blocs TEST montrant au moins un vecteur par famille HARN-1x a HARN-6x"
+    - id: AC6
+      statement: "Vecteurs de sécurité écrits : HARN-74 (coast-down != faux PowerCutOff, croise T178), HARN-75 (redémarrage à chaud : temps mort directionnel appliqué par au moins un niveau — cible = front montant Enable, PAS FirstScanDone), HARN-80/81 (T180 CAS-001 retombée contacteur en marche, CAS-012 anti-traversée)."
+      verified_by: "présence des TEST correspondants + oracle explicite"
+    - id: AC7
+      statement: "Gate WINCH_INTEG ajouté à run_all_gates.py (palier C ou D), ROUGE tant que la suite cible n'est pas verte (la baseline peut être rouge, elle sert de référence figée)."
+      verified_by: "grep WINCH_INTEG dans run_all_gates.py + exécution"
+    - id: AC8
+      statement: "Document plan de tir livré (DOC/WFLOW/AUDITS/DESIGN/) : ordre d'application manuelle CODESYS INCLUANT PRG_07 et les _TYPES supervision partagés ; points de rollback Git par phase ; checklist essais site avec critères chiffrés (cadence paliers 1->5 chronométrée, la barrière ne mord pas) ; mention explicite 'aucune protection survitesse active à la mise en service' (SEC-1)."
+      verified_by: "lecture du document"
+    - id: AC9
+      statement: "Coordination T169-A tracée : T169-A (AGY-01) modifie le même FB_Main_EndToEnd — le point de départ est rebasé sur un HEAD propre (fichiers M en cours commités ou stashés) et la coordination est notée."
+      verified_by: "git status propre sur la zone au démarrage + note de coordination"
+
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st   # nouveau
+      - TOOLS/TEST_AUTO_CI/registry.yaml                                        # entrée WINCH_INTEG
+      - TOOLS/AGENT_WORKFLOW/scripts/                                           # nouveau gate + run_all_gates.py
+      - DOC/WFLOW/AUDITS/DESIGN/                                                # plan de tir
+    forbidden:
+      - CODE/**                          # T181-00 ne touche AUCUN code produit
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Les 2 scénarios existants de test_main_end_to_end.st (montée couplée, coupure AU) restent verts"
+      - "Le registre MAIN_EndToEnd existant reste fonctionnel"
+    dropped_on_purpose:
+      - "L'ancien FB_TestHarness_PRG_04 stub (M2/sync/bucket déclarés jamais appelés, valeurs en dur) — remplacé"
+      - "Toute idée de shadow comparison comme oracle (remplacé par table d'attendus écrite à la main)"
+
+  evidence_required:
+    - run_all_gates
+    - "sortie run_tests.py --fb WINCH_INTEG"
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si reconstruire le stub en miroir de PRG_04 se révèle impraticable sans dupliquer 400+ lignes,
+    ou si T169-A a déjà modifié FB_Main_EndToEnd de façon incompatible, ou si le modèle physique
+    minimal ne suffit pas à distinguer deux comportements de clamp : REMONTER à l'orchestrateur
+    avant de contourner.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir : reconstruction du stub, modèle physique, suite test_winch_integ.st, gate, plan de tir.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Revue orchestrateur : lecture du git diff réel (stub + suite) + exécution run_tests.py.
+    Point de vigilance : le stub doit rester un miroir de PRG_04, pas une re-conception.
