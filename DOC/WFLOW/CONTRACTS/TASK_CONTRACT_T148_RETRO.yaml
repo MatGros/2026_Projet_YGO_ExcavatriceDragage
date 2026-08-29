@@ -1,0 +1,87 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T148
+# FB_FbStatus : Reset maintenu + disparition de la cause = acquittement silencieux ?
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Faille jugee NON REPRODUCTIBLE apres revue
+# experte : critere de tracabilite vers la revue.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T148_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Verifier qu'un Reset simplement maintenu (sans nouveau front) pendant la
+    disparition de la cause ne produit pas d'acquittement silencieux d'un defaut
+    dans la brique de statut.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        La faille est jugee NON REPRODUCTIBLE par la revue experte du 2026-08-24 :
+        Latch est une VAR retenue entre scans, Error reste TRUE tant que le defaut
+        n'est pas acquitte par un vrai front Reset, donc pas d'acquittement
+        silencieux ; le correctif v0.1 etait un no-op et aucun code C4 n'est a
+        ecrire.
+      verified_by: >
+        fiche DOC/WFLOW/AUDITS DESIGN_T148_FBFSTATUS_RESET_MAINTENU_v0.2.md
+        (conclusion non reproductible) ; entree DOC/WFLOW/TASKS.yaml T148 ;
+        relecture du gate Reset de CODE/A_COMMUN/FB_FaultCore.st (front requis).
+    - id: AC2
+      statement: >
+        Un test de verrou TC-P03-014 est identifie pour couvrir durablement ce
+        scenario (Reset maintenu + cause disparue) et doit passer sur le socle
+        actuel.
+      verified_by: >
+        fiche DESIGN_T148 (item TC-P03-014) ; a l'ajout, python
+        TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_FaultCore.
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - CODE/A_COMMUN/FB_FaultCore.st
+    forbidden:
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Si le scenario Reset maintenu + cause disparue se revele finalement
+    reproductible sur le socle actuel, le SIGNALER immediatement : la conclusion
+    "non reproductible" serait a rouvrir. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-24T05:30:00"
+  status: COMPLETED
+  summary: >
+    Cloture 2026-08-24 par revue experte : faille NON REPRODUCTIBLE (Latch = VAR
+    retenue, Error reste TRUE, pas d'acquittement silencieux). Correctif v0.1 =
+    no-op. Fiche DESIGN_T148_FBFSTATUS_RESET_MAINTENU_v0.2.md : conclusion + test
+    de verrou TC-P03-014 a ajouter (devrait deja passer). Aucun code C4 ecrit.
+  evidence_submitted:
+    - "DESIGN_T148_FBFSTATUS_RESET_MAINTENU_v0.2.md : non reproductible"
+    - "Revue experte 2026-08-24 tracee dans TASKS.yaml T148"
+    - "TC-P03-014 identifie comme test de verrou"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés. AC1 est un critère de
+    traçabilité (renvoi vers la revue experte du 2026-08-24 et la fiche DESIGN
+    v0.2) : la conclusion est un verdict d'analyse, pas un livrable code.

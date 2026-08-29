@@ -1,0 +1,98 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T166
+# Chapo de famille : centralisation des cycles et assistants dans PRG_03
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Sous-taches deja contractualisees :
+# T166-A (contrats de flux), T166-B (migration cycles PRG_03), T166-C, T166-DOC
+# (alignement AF), T166-CR (revue). Ce document acte l'orchestration et le
+# critere d'integration : plus aucun acces direct residuel dans PRG_07.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T166_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Orchestrer les sous-taches T166-A, T166-B, T166-C, T166-DOC et T166-CR pour
+    centraliser toutes les machines d'etat de cycle (FB_Cycle, FB_DiveSearch,
+    FB_ExtractionSequence) dans PRG_03, laisser a PRG_04 le seul role de muscle
+    physique et de securite, et supprimer les acces directs de PRG_07.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Les cinq sous-taches enfants T166-A, T166-B, T166-C, T166-DOC et T166-CR
+        sont marquees terminees (statut cocher vert) dans DOC/WFLOW/TASKS.yaml.
+      verified_by: >
+        grep -n "parent_id: T166$" DOC/WFLOW/TASKS.yaml puis controle du champ
+        statut de chaque bloc enfant (tous en cocher vert).
+    - id: AC2
+      statement: >
+        FB_DiveSearch et FB_ExtractionSequence sont instancies et executes dans
+        PRG_03_Modes_Cycle.st (VAR interne instDiveSearch et instExtractionSequence)
+        et ne sont plus instancies dans PRG_04_Treuils_Benne.st.
+      verified_by: >
+        grep -n "instDiveSearch|instExtractionSequence|FB_DiveSearch|FB_ExtractionSequence"
+        CODE/M_MAIN/PRG_03_Modes_Cycle.st (present, lignes ~30-31 et ~103/130) et
+        CODE/M_MAIN/PRG_04_Treuils_Benne.st (absent).
+    - id: AC3
+      statement: >
+        PRG_07_Supervision.st ne lit plus aucune donnee interne de PRG_03 ou PRG_04
+        en acces direct : il consomme exclusivement les bus publics PRG_04.Data et
+        PRG_03.Data (zero fuite residuelle).
+      verified_by: >
+        grep -n "instWinchSync|PRG_04_Treuils_Benne\.inst|PRG_03_Modes_Cycle\.inst"
+        CODE/M_MAIN/PRG_07_Supervision.st (aucun acces .inst residuel) ; contrat
+        T166-A ("suppression des acces directs dans PRG_07, 0 erreur G200").
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - tasks_yaml_children_status
+    - traceability_grep
+    - check_linkage
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Tout acces direct residuel de PRG_07 vers un interne de PRG_03/PRG_04 non
+    couvert par les sous-contrats, ou tout ecart d'etat des sous-taches T166-*,
+    est remonte immediatement a l'orchestrateur. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-28T16:35:00+02:00"
+  status: COMPLETED
+  summary: >
+    Famille T166 livree via T166-A (bus publics ST_WinchInterPrg / ST_TranslationInterPrg,
+    remappage PRG_07), T166-B (migration instDiveSearch / instExtractionSequence
+    en VAR interne de PRG_03), T166-C, T166-DOC (AF-02/04/10) et T166-CR (revue).
+    Acces directs PRG_07 supprimes, G200 a 0 erreur.
+  evidence_submitted:
+    - "T166-A..T166-CR : statut cocher vert dans TASKS.yaml, sous-contrats propres"
+    - "PRG_03_Modes_Cycle.st : instDiveSearch / instExtractionSequence declarees et executees"
+    - "PRG_07_Supervision.st : instWinchSync remappe vers Data, 0 acces direct"
+    - "G200 linkage : PASS (0 erreur, consigne T166-A)"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés.

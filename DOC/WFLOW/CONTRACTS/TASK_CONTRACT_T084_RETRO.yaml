@@ -1,0 +1,84 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T084
+# Recette : validation CODESYS/terrain de la mesure de vitesse 50 ms
+# (FB_Encoder_SpeedMeasure)
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Tache de recette : la preuve est la
+# qualification CI et l'anteriorite terrain, pas une ecriture de code.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T084_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Certifier que la mesure de vitesse par fenetre glissante de 50 ms de
+    FB_Encoder_SpeedMeasure produit une vitesse exploitable et stable dans la
+    plage d'usage machine (deplacements treuils de 1 a 2 m/s).
+
+  acceptance:
+    - id: AC1
+      statement: >
+        FB_Encoder_SpeedMeasure valide sa sortie de vitesse apres 6 echantillons
+        couvrant au moins 50 ms (WindowTime := T#50MS) et calcule la vitesse sur
+        l'ecart de temps reel de la fenetre.
+      verified_by: >
+        Relecture de CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st (WindowTime ligne
+        ~43, gate Valid ligne ~23, calcul lignes ~122-125).
+    - id: AC2
+      statement: >
+        La suite CI dediee au FB passe a 10 sur 10 sous STruCpp, et la mesure
+        fenetre glissante 50 ms est eprouvee pour 1 a 2 m/s par anteriorite
+        v0.5.25 lors des deplacements treuils.
+      verified_by: >
+        python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Encoder_SpeedMeasure ;
+        entree DOC/WFLOW/TASKS.yaml T084 (description : "10/10 PASS sous STruCpp
+        et anteriorite v0.5.25").
+
+  scope:
+    allowed:
+      - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - run_all_gates
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Si la CI FB_Encoder_SpeedMeasure descend sous 10/10 ou si un essai terrain
+    contredit la plage 1 a 2 m/s, le SIGNALER immediatement a l'orchestrateur.
+    Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-28T09:47:00"
+  status: COMPLETED
+  summary: >
+    Recette certifiee par qualification CI (10/10 PASS sous STruCpp) et anteriorite
+    v0.5.25 : la mesure fenetre glissante 50 ms est eprouvee pour 1 a 2 m/s lors
+    des deplacements treuils. Aucun code touche.
+  evidence_submitted:
+    - "CI FB_Encoder_SpeedMeasure : 10/10 PASS (STruCpp)"
+    - "Anteriorite v0.5.25 : mesure 50 ms eprouvee 1-2 m/s (deplacements treuils)"
+    - "CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st : WindowTime T#50MS, Valid apres 6 ech."
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés.

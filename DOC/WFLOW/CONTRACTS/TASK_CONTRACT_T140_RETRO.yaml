@@ -1,0 +1,106 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T140
+# Purge de GVL_Global et assainissement de la barriere de sorties PRG_06
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Vrai lot code : criteres verifiables
+# aujourd'hui par relecture, grep et gates mecaniques.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T140_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Supprimer le canal cache GVL_Global (18 variables contacteurs) et faire de
+    PRG_06_Outputs le producteur unique des sorties physiques, en VAR_OUTPUT
+    taguees et flechees, cablees en direct sur FB_SimBench et PRG_02_Acquisition.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        CODE/M_MAIN/GVL_Global.st est reduit au strict minimum (une dizaine de
+        lignes, seule subsiste l'horloge systeme BlinkClock) et n'a qu'un seul
+        consommateur .st, PRG_07_Supervision.st.
+      verified_by: >
+        wc -l CODE/M_MAIN/GVL_Global.st (environ 10 lignes) ; grep -rl
+        "GVL_Global\." CODE/ (retourne uniquement CODE/M_MAIN/PRG_07_Supervision.st).
+    - id: AC2
+      statement: >
+        PRG_06_Outputs.st porte les tags [ACT], [SAFE] et [CMD] et des fleches
+        ASCII de sens de flux, en accord avec le CODE_QUALITY_STANDARDS paragraphe 2.
+      verified_by: >
+        grep -n "\[ACT\]|\[SAFE\]|\[CMD\]|<--" CODE/M_MAIN/PRG_06_Outputs.st ;
+        DOC/STDS/CODE_QUALITY_STANDARDS.md paragraphe 2.
+    - id: AC3
+      statement: >
+        Le nom de fichier egale le nom de POU pour chaque unite .st modifiee. Le
+        suffixe de langage egale le langage genere dans le bundle PLCopenXML.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C (G300
+        structure du depot, G310 structure CODE : nom de POU, suffixe, ordre des
+        blocs) en PASS ; python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py
+        --report en PASS.
+
+  scope:
+    allowed:
+      - CODE/M_MAIN/GVL_Global.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "BlinkClock : horloge de clignotement systeme (IHM/diag) conservee dans GVL_Global."
+      - "Toutes les sorties contacteurs restent produites, sur PRG_06_Outputs au lieu de GVL_Global."
+      - "Cablage FB_SimBench : les memes sorties sont lues, en direct au lieu de passer par GVL_Global."
+    dropped_on_purpose:
+      - "Les 18 variables contacteurs de GVL_Global.st : supprimees, remplacees par des VAR_OUTPUT de PRG_06_Outputs."
+      - "L'usage de GVL_Global comme canal de transport de sorties entre POU : abandonne sciemment."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Toute sortie contacteur qui resterait produite ou lue via GVL_Global apres
+    purge, ou tout second consommateur .st de GVL_Global, est remonte
+    immediatement a l'orchestrateur. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-19T12:00:00"
+  status: COMPLETED
+  summary: >
+    GVL_Global purge des 18 variables contacteurs (reste BlinkClock, 10 lignes,
+    1 consommateur PRG_07). PRG_06_Outputs conforme au CQS paragraphe 2 (tags
+    [ACT], [SAFE], [CMD], fleches ASCII <--), cablage direct PRG_02_Acquisition et
+    FB_SimBench. Bundle regenere, 15/15 gates palier C PASS, G200 PASS.
+  evidence_submitted:
+    - "wc -l GVL_Global.st = 10 ; grep GVL_Global. -> PRG_07_Supervision.st uniquement"
+    - "PRG_06_Outputs.st : tags [ACT]/[SAFE]/[CMD] + fleches ASCII <--"
+    - "run_all_gates --palier C : 15/15 PASS"
+    - "G200 linkage : PASS (0 erreur)"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés.

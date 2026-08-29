@@ -1,0 +1,101 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T121
+# Audit et elimination des constantes magiques dans CODE/
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Vrai lot code : audit borne, criteres
+# verifiables par grep et par la convention de nommage anti-magique.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T121_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Rendre lisibles et parametrables les seuils et durees metier du code : chaque
+    valeur significative devient une constante nommee ou un parametre de
+    configuration, jamais un litteral nu enfoui dans une expression.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Les seuils et durees metier de CODE/ sont exprimes par des constantes
+        nommees (bloc VAR CONSTANT, prefixe CST_) ou par des parametres de
+        configuration, et non par des litteraux numeriques nus ; environ 12
+        fichiers FB portent un bloc VAR CONSTANT a l'issue de l'audit.
+      verified_by: >
+        grep -rl "VAR CONSTANT" CODE/ (environ 12 fichiers) ; revue ciblee des
+        litteraux numeriques restants hors VAR CONSTANT et hors index de bit dans
+        CODE/ (audit borne, pas exhaustif).
+    - id: AC2
+      statement: >
+        La regle anti-constante-magique appliquee est celle du
+        NAMING_CONVENTION : nommage PascalCase des constantes, prefixe CST_,
+        pas de valeur metier codee en dur.
+      verified_by: >
+        DOC/STDS/NAMING_CONVENTION.md (regle anti-magique / constantes nommees).
+    - id: AC3
+      statement: >
+        Le nom de fichier egale le nom de POU pour chaque unite .st modifiee. Le
+        suffixe de langage egale le langage genere dans le bundle PLCopenXML.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C (G300
+        structure du depot, G310 structure CODE : nom de POU, suffixe, ordre des
+        blocs) en PASS ; python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py
+        --report en PASS.
+
+  scope:
+    allowed:
+      - CODE/A_COMMUN/
+      - CODE/B_AU_SECURITE/
+      - CODE/E_CODEURS/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/I_TRANSLATION/
+      - CODE/M_MAIN/
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  evidence_required:
+    - run_all_gates
+    - check_linkage
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Tout litteral metier structurant (seuil de securite, duree de rampe, limite
+    de course) encore code en dur apres l'audit est remonte immediatement a
+    l'orchestrateur. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-18T10:00:00"
+  status: COMPLETED
+  summary: >
+    Audit des constantes magiques mene sur CODE/ (grep + revue), remplacement des
+    litteraux metier par des constantes nommees VAR CONSTANT prefixe CST_ ou des
+    parametres de configuration. Environ 12 fichiers FB portent desormais un bloc
+    VAR CONSTANT. Regle de reference : NAMING_CONVENTION.md (anti-magique).
+  evidence_submitted:
+    - "grep -rl 'VAR CONSTANT' CODE/ : ~12 fichiers"
+    - "NAMING_CONVENTION.md : regle constantes nommees appliquee"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés. AC1 est vérifiable de façon
+    bornée (grep + revue ciblée) : l'exhaustivité d'un audit anti-magique sur tout
+    CODE/ n'est pas prouvable à froid, seul l'échantillon VAR CONSTANT l'est.

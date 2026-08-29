@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T122
+# Renommage du flux joystick vers actionneurs (CoupledUserRequest / LogicRequest)
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Vrai lot code : phases 1 et 2 faites,
+# phase 3 differee (decision humaine tracee).
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T122_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Rendre explicite dans le code la semantique du flux joystick vers actionneurs
+    en nommant les intentions CoupledUserRequest (demande operateur couplee) et
+    LogicRequest (demande calculee par la logique) dans PRG_04_Treuils_Benne.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Le vocabulaire CoupledUserRequest et LogicRequest est applique dans
+        CODE/M_MAIN/PRG_04_Treuils_Benne.st pour les phases 1 et 2 du flux
+        joystick vers actionneurs.
+      verified_by: >
+        grep -n "CoupledUserRequest|LogicRequest" CODE/M_MAIN/PRG_04_Treuils_Benne.st.
+    - id: AC2
+      statement: >
+        Le nom de fichier egale le nom de POU pour chaque unite .st modifiee. Le
+        suffixe de langage egale le langage genere dans le bundle PLCopenXML.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C (G300
+        structure du depot, G310 structure CODE : nom de POU, suffixe, ordre des
+        blocs) en PASS ; python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py
+        --report en PASS.
+
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  conservation:
+    must_survive:
+      - "Comportement des treuils et de la benne inchange : renommage semantique, pas de modification de logique."
+      - "Flux joystick vers actionneurs des phases 1 et 2 : memes signaux, noms explicites."
+    dropped_on_purpose:
+      - "Phase 3 du renommage : differee volontairement (mention explicite dans la description TASKS.yaml de T122), hors perimetre de ce contrat retroactif."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Tout renommage qui modifierait un comportement (et pas seulement un nom), ou
+    toute reprise de la phase 3 sans decision d'orchestrateur, est remonte
+    immediatement. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-18T10:00:00"
+  status: COMPLETED
+  summary: >
+    Phases 1 et 2 du renommage appliquees dans PRG_04_Treuils_Benne.st : flux
+    joystick vers actionneurs porte les noms CoupledUserRequest et LogicRequest.
+    Phase 3 differee (decision tracee dans TASKS.yaml). Renommage semantique pur,
+    logique treuils/benne inchangee.
+  evidence_submitted:
+    - "PRG_04_Treuils_Benne.st : CoupledUserRequest / LogicRequest presents (phases 1-2)"
+    - "Phase 3 : differee (description TASKS.yaml T122)"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés.

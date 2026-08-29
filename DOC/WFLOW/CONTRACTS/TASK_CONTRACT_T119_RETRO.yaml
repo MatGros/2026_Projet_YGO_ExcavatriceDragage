@@ -1,0 +1,73 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T119
+# Analyse du comportement Dive / referencement benne dans le cycle semi-auto
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Tache d'analyse sans livrable code propre :
+# critere de tracabilite vers la tache absorbante.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T119_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Analyser le comportement de la phase Dive et le referencement de la benne
+    dans le cycle semi-auto, pour eclairer la refonte du Grafcet de plongee.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        L'analyse est livree comme reliquat de la session 2026-08-16, rattachee a
+        T118, et ses conclusions sont reprises dans la refonte du Grafcet de
+        plongee portee par la famille T167.
+      verified_by: >
+        entree DOC/WFLOW/TASKS.yaml T119 (description : "Reliquat session
+        2026-08-16, lie a T118") ; statut cocher vert de T167 dans le meme fichier.
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Si une conclusion de cette analyse n'a pas ete reprise par T167 et reste sans
+    porteur, le SIGNALER a l'orchestrateur. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-16T12:00:00"
+  status: COMPLETED
+  summary: >
+    Analyse du comportement Dive et du referencement benne livree en reliquat de
+    la session 2026-08-16 (lien T118). Pas de livrable code propre : les
+    conclusions ont alimente la refonte du Grafcet de plongee (famille T167).
+  evidence_submitted:
+    - "TASKS.yaml T119 : reliquat session 2026-08-16, lie T118"
+    - "TASKS.yaml T167 : refonte Grafcet plongee, statut cocher vert"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés. AC1 est un critère de
+    traçabilité (renvoi vers T118 et la famille absorbante T167) : aucune analyse
+    autoportante n'est archivée sous un chemin dédié, seul le chaînage TASKS.yaml
+    est vérifiable aujourd'hui.
