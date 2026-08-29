@@ -29,9 +29,36 @@
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P06-007</code></nobr> | **Preflight passif** | Sans front `Execute`, `PreflightDone` reste `FALSE` (aucun verdict au démarrage). Sur front `Execute`, tant que la machine n'est pas immobile : `PreflightBusy=TRUE` et aucun verdict final. Une fois immobile, les 16 bits sont agrégés et `PreflightOk=(PreflightErrorId=0)`. | <nobr><code>💻 AUTO_PLC</code></nobr> | <small><code>FB_Acquisition_Preflight</code><br><code>PRG_07_Supervision</code></small> | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 140px;">
+    <col style="width: 150px;">
+    <col style="width: calc(100% - 590px);">
+    <col style="width: 110px;">
+    <col style="width: 140px;">
+    <col style="width: 50px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID Unique</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Groupe</small></th>
+      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf FB</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P06-007</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Preflight passif</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Sans front <code>Execute</code>, <code>PreflightDone</code> reste <code>FALSE</code> (aucun verdict au démarrage). Sur front <code>Execute</code>, tant que la machine n'est pas immobile : <code>PreflightBusy=TRUE</code> et aucun verdict final. Une fois immobile, les 16 bits sont agrégés et <code>PreflightOk=(PreflightErrorId=0)</code>.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Acquisition_Preflight</code><br><code>PRG_07_Supervision</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 🔄 3 · Pipeline et intégration
 
