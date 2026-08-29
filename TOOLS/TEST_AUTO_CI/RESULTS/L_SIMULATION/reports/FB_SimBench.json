@@ -9,11 +9,87 @@
     {
       "name": "TC-P13-001 Sim_Safety : neutralisation sans Enable",
       "passed": true
+    },
+    {
+      "name": "TC-P13-010 SimBench Enable=FALSE neutralise tout le banc",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel \u2014 stub)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-022 Sim_Safety Enable=FALSE neutralise tout",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel \u2014 stub)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-031 Sim_Encoder PresetCmd charge PresetValue",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel \u2014 stub)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-040 Sim_Translation progression publie des mots thermometre valides",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-041 Sim_Translation Direction +1/-1/0",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance]",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-050 Sim_Joystick initialise au neutre au premier cycle",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-051 Sim_Joystick sorties for\u00e7ables en instance (essai manuel \u2014 stub)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 21,
+    "passed": 21,
     "failed": 0
   }
 }

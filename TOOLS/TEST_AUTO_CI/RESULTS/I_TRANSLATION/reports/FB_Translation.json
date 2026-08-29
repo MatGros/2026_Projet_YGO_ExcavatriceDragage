@@ -1,23 +1,79 @@
 {
   "version": 1,
-  "file": "test_fb_winch.st",
+  "file": "test_fb_translation.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations",
+      "name": "TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations",
       "passed": true
     },
     {
-      "name": "TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse",
+      "name": "TC-P11-010 Translation : commande variateur nominale",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -> Incoherent",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-002 Safety : mot capteurs incoherent -> bit7 -> SafeStop+PowerCutOff",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-005 Translation interlock sens : inversion Fwd->Rev differee (pas immediate)",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel \u2014 stub)",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-006 Watchdog frein 500ms : frontiere 499/500",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-011 Meca B : incoh\u00e9rence arret >3s -> SafeStop+PowerCutOff",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-011.1 Meca B variante perte IHM : condition elargie",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel \u2014 stub)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 17,
+    "passed": 17,
     "failed": 0
   }
 }
