@@ -128,10 +128,7 @@ cf. audit de session : `RelayFwd`, `Contactor1-4`, `BrakeCmd`, `FinalInterlockSt
 `FinalInterlockReason`, `FinalAuthorizedStep`, `BrakeCommandOpenConfirmed`,
 `FinalBrakeTimeoutElapsed` existent déjà dans `ST_WinchState`).
 
-⚠️ Deux champs bruts n'ont **pas d'équivalent public actuel** et sont hors périmètre sans
-nouveau producteur : `Idx101_EncoderRawPos` (points bruts codeur) et `Idx208/209_Arbitrated*`
-(consigne avant sécurité, aujourd'hui variable interne `PRG_04_Treuils_Benne.M1_SpeedTgt_Active`,
-non publiée en `VAR_OUTPUT`). Ce sont des `TBD` (§6), pas des valeurs à deviner.
+🆕 `Idx101_EncoderRawPos` (points bruts codeur) et `Idx208/209_Arbitrated*` (consigne avant sécurité) sont **résolus dans le code** (audit 2026-08-29) — ils ne sont plus des `TBD` (§6).
 
 ### 5.4 `BenneOuvertureFermeture : ST_ChainBucket`
 
@@ -148,10 +145,11 @@ Recopie depuis `Translation : ST_TranslationHMI` (`Cmd`, `State`, `Safety`).
 |---|---|---|
 | 1 | `Idx103_JoystickCommOk`, `Idx402_CycleAutoBusy` | champ exact à confirmer côté `GVL_IHM.Cycle`/`Network` |
 | 2 | `Idx203_BypassSensorsGlobal` | agrégat multi-domaine à définir (OR simple documenté, pas un nouveau diagnostic) |
-| 3 | `Idx101_EncoderRawPos` (points bruts) | pas de producteur public actuel — publier depuis `PRG_02_Acquisition` si jugé utile, hors périmètre de ce FB |
-| 4 | `Idx208/209_Arbitrated*` (consigne pré-sécurité) | idem, nécessite une nouvelle `VAR_OUTPUT` côté `PRG_04_Treuils_Benne`/`PRG_05_Translation` |
 
-Ce FB ne doit pas être bloqué par ces 4 points : ils sont publiés à `0`/`FALSE` avec commentaire
+> 🆕 `Idx101_EncoderRawPos` et `Idx208/209_Arbitrated*` (ex-points 3 et 4) sont **résolus dans le
+> code** (audit 2026-08-29) — retirés du TBD, voir §5.3.
+
+Ce FB ne doit pas être bloqué par ces 2 points : ils sont publiés à `0`/`FALSE` avec commentaire
 « non câblé, TBD » plutôt que d'inventer un calcul. Aucune valeur affichée ne doit laisser croire
 à une mesure réelle si elle ne l'est pas.
 
@@ -186,7 +184,7 @@ Ce FB ne doit pas être bloqué par ces 4 points : ils sont publiés à `0`/`FAL
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P14-TSV-01</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>FB_TroubleshootingView</code> n'a aucune <code>VAR_OUTPUT</code> de commande</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Interface <code>VAR_OUTPUT</code> de <code>FB_TroubleshootingView</code> : seule sortie <code>Ready:BOOL</code>. Aucune sortie de commande (<code>SafeStop</code>, <code>Enable</code>, <code>Cmd</code>, <code>Bypass</code>, <code>Config</code>). Toute publication passe par <code>GVL_Troubleshooting</code> (lecture seule)</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>Lecture interface</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
@@ -198,7 +196,7 @@ Ce FB ne doit pas être bloqué par ces 4 points : ils sont publiés à `0`/`FAL
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P14-TSV-03</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Aucun champ TBD (§6) n'affiche une valeur laissant croire à une mesure réelle</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Aucun champ TBD (§6) n'affiche une valeur laissant croire à une mesure réelle. Chaque champ TBD publié à sa valeur d'init avec commentaire explicite : <code>Idx203_BypassSensorsGlobal:=FALSE</code>, <code>Idx307_SlackCablePhysical_DI:=FALSE</code>, <code>Idx501_M2_CmdRev_DQ:=FALSE</code>, <code>Idx502_CmdDriveFreq_Hz:=0</code></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>Revue code + commentaire explicite</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>

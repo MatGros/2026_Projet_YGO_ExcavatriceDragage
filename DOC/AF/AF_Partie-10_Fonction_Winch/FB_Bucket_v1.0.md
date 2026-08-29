@@ -55,7 +55,7 @@
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-025</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Demande refusée si <code>M1_Busy OR M2_Busy</code> à l'entrée</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Demande benne (<code>CmdOpen</code>/<code>CmdClose</code>) refusée si <code>M1_Busy</code> OR <code>M2_Busy</code> à l'entrée (READY). ⚠️ État code : <code>M1_Busy</code>/<code>M2_Busy</code> déclarés (<code>FB_Bucket.st</code>:29-30) mais NON utilisés — anti-traversée non câblée (T175).</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
@@ -113,6 +113,30 @@
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>🟢 SITE</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-045.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Benne partiellement fermée → remontée palier 1 seul : NOT <code>IsClosed</code> + demande montée → paliers 2-5 verrouillés.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-046.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Timeout mouvement T#60s pendant <code>BUSY</code> → bit timeout + latch (<code>CfgTimeoutDuration</code>=60s, code réel — corrige le 30s documenté).</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-047.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Incohérence boot : 1er cycle avec ni <code>IsOpen</code> ni <code>IsClosed</code> → <code>StateIncoherent</code>=TRUE, <code>ActiveOffsetValid</code>=FALSE.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-048.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Offset RETAIN : <code>OffsetCloseM</code>=15.0 persiste après power cycle (<code>_BucketCfgPersist</code> en VAR_GLOBAL PERSISTENT).</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
   </tbody>
 </table>
 
@@ -140,7 +164,7 @@ Pas de moteur propre — effet de bord de la désynchronisation M1/M2 :
 | `ConfirmOpenPosition`/`ClosePosition` | BOOL (front) | Référencement manuel MAINT_N1/N2 |
 | `Config` (ST_fbBucket_Config) | — | `OffsetOpenM`, `OffsetCloseM`, `CoherenceLimitM`(0.05m) |
 
-**Sorties** : `Ready/ActiveOffsetValid/Busy/Done/Error`, `ErrorId` (bit0 Timeout 30s, bit1 incohérence boot, bit2 limites dépassées, bit3 codeur non référencé, bit4 glissement M1), `M1SlipDetected`, `ActiveOffsetM`, `DeltaPosition_M`, `RemainingTravelM`, `M2_StartStop`/`Direction`/`ForceSlowSpeed`.
+**Sorties** : `Ready/ActiveOffsetValid/Busy/Done/Error`, `ErrorId` (bit0 Timeout 60s 🆕 correction 2026-08-29, bit1 incohérence boot, bit2 limites dépassées, bit3 codeur non référencé, bit4 glissement M1), `M1SlipDetected`, `ActiveOffsetM`, `DeltaPosition_M`, `RemainingTravelM`, `M2_StartStop`/`Direction`/`ForceSlowSpeed`.
 
 **Machine d'état** :
 - **DISABLED** si `NOT Enable OR NOT PowerContactorEngaged` : neutralisation complète (`Ready := FALSE`, `ActiveOffsetValid := FALSE`, `ActiveOffsetM := 0.0` pour comparaison M1/M2 stricte sans fuite d'offset périmé vers Méca E, `DeltaPosition_M := 0.0`, `RemainingTravelM := 0.0`, `M2_StartStop := FALSE`, `M1SlipDetected := FALSE`, réinitialisation des requêtes).

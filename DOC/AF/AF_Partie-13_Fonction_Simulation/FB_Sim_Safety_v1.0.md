@@ -56,7 +56,7 @@
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-023</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">🆕 Un défaut AU réel latché (<code>RedundancyTestFailedCause</code>/<code>EmergencyArmingFailedCause</code> dans <code>FB_Safety_EmergencyManagementLogic</code>) <b>survit</b> à un cycle Reset/Restart de ce modèle simulé — voir §4</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">En simulation, provoquer un défaut AU réel → latch conservé malgré la sim (FB_Sim_Safety §4). Déblocage uniquement par front <code>Reset</code> en runtime (jamais par la sim seule)</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>👁️ MANUEL</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>

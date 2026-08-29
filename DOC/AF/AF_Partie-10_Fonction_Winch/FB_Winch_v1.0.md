@@ -41,7 +41,7 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-011</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Interlock sens & temporisations d'inversion / redémarrage 1s</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Inversion Fwd↔Rev en descente exige <code>DirectionInterlockDelayDescent</code>=400ms (+100ms palier=500ms) ; en montée <code>DirectionInterlockDelayAscent</code>=900ms (+100ms=1000ms). Neutre↔sens = immédiat. <code>DirectionChangePending</code> force la rampe à 0.0 pendant l'attente. Redémarrage même sens / inversion : temps mort 1s.</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
@@ -62,6 +62,18 @@
       <td style="padding: 6px 8px; line-height: 1.55;">Ordre MainTask : Safety ➔ WinchControl ➔ PRG_06_Outputs</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ SITE+AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-042.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Plafonds dynamiques palier par contexte : descente max 3, montée max 5, approche capteur haut=1, zones ralentissement haut/bas capent le palier.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-052.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Garde-fou vitesse (<code>SpeedGuardEnable</code>, désactivé par défaut) : vitesse non-stable → palier 1 ; <code>MeasuredSpeedBand</code> &lt; <code>StepNumber</code> → bride. Testable après activation.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

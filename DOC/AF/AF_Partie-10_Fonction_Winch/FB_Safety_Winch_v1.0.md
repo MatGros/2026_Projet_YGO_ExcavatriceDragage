@@ -39,7 +39,7 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-001</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca A (bit7) : dérive>2m ou v>0.02m/s arrêt ➔ SafeStop+PowerCutOff</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Armer Méca A (contacteurs+frein coupés, joystick neutre, hors homing). Injecter dérive position >2.0m (canal position) → <code>SafeStop</code>+<code>PowerCutOff</code>. Injecter vitesse mesurée >0.02m/s (canal vitesse) → <code>SafeStop</code>+<code>PowerCutOff</code>. Vérifier le croisement Cat.3 : chaque canal déclenche indépendamment. ⚠️ État code : seul le canal position (<code>DriftGuardA</code>) est implémenté ; le canal vitesse (<code>UncommandedSpeedThresholdMps</code>) est déclaré mais non utilisé — à implémenter (T175).</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
@@ -95,6 +95,30 @@
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-010</span></td>
       <td style="padding: 6px 8px; line-height: 1.55;"><code>SafeStop</code> exclut bit3 (mou câble) si <code>SyncEnable=FALSE</code></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-036.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Warmup 3s : après Enable, perte com opérateur (cause 0) ne déclenche PAS pendant les 3 premières s (<code>TonStartupWarmup</code>) ; après 3s → <code>SafeStop</code>.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-037.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Gate Enable=FALSE : <code>SafeStop</code>/<code>Permit</code>/<code>PowerCutOff</code> forcés FALSE, <code>Ready</code>=FALSE, mais latches (<code>MecaAFaultLatched</code>…) préservés ; re-Enable exige Reset front.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-044.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Mou câble : <code>SyncEnable</code>=FALSE → <code>DescendPermit</code>=FALSE (blocage descente) mais <code>AscentPermit</code> autorisé palier 1 ; dès <code>M2_TensionedCable_DI</code>=TRUE, blocage levé.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-051.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Chaîne <code>PowerCutOff</code> bout-en-bout : demande <code>PRG_04</code> → agrégation <code>PRG_06</code> → coupure AU (bout-en-bout, pas seulement le masque 16#2F84).</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
   </tbody>

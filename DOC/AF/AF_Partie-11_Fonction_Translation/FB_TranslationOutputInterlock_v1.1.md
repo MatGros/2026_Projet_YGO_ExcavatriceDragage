@@ -40,13 +40,13 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-006</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Watchdog frein 500ms sans confirmation ➔ FAULT + Inhibit</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Watchdog 500ms armé si <code>BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed AND NOT RestartInhibit</code> (FB_TranslationOutputInterlock.st:85-86). Frontière : confirmation à 499ms → pas de défaut ; à 500ms → bit0, <code>RestartInhibit</code>, FAULT</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-007</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Réautorisation post-timeout : Cause + Reset + Mot 0 + Nouvelle demande</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Après timeout frein : <code>RestartInhibit:=TRUE</code>. Acquittement : <code>ResetEdge.Q AND BrakeCommandOpenConfirmed</code> → efface bit0. Réautorisation : <code>NOT Error AND NOT ResetRequired</code> + mot 0 vu (<code>NeutralRequestSeen</code>) puis nouvelle demande 1/2 (FB_TranslationOutputInterlock.st:99-125)</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>

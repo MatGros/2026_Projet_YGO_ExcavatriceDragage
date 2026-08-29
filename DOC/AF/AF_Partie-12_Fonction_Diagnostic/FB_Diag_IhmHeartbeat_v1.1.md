@@ -34,7 +34,7 @@ et expose un diagnostic de communication opérateur. Ne produit ni SafeStop ni P
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-050</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Absence de front <code>TglHeartbeatIhm</code> pendant <code>IhmTimeout</code> ➔ <code>HeartbeatIhmTimeout=TRUE</code>/<code>HeartbeatIhmOk=FALSE</code> ; <code>TglHeartbeatPlc</code> bascule toutes les <code>PlcTogglePeriod</code> indépendamment de l'IHM ; nouveau front après timeout ➔ <code>HeartbeatIhmOk</code> restauré immédiatement</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Absence de front <code>TglHeartbeatIhm</code> pendant <code>IhmTimeout</code> ➔ <code>HeartbeatIhmTimeout=TRUE</code>/<code>HeartbeatIhmOk=FALSE</code>, <code>TimeSinceIhmEdge=IhmTimeout</code> ; <code>TglHeartbeatPlc</code> bascule toutes les <code>PlcTogglePeriod</code> indépendamment de l'IHM ; nouveau front après timeout ➔ <code>HeartbeatIhmOk</code> restauré immédiatement, <code>TimeSinceIhmEdge</code> repart de 0</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
