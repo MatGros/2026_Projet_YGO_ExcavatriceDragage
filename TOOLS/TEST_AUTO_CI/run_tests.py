@@ -236,16 +236,18 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
         strucpp_temp_dir = _find_strucpp_temp_dir(before, tmp_root)
         json_data = None
+        test_runner_rc = None
         trace_entries = []
         field_types = {}
         t_exec = 0.0
         t_chrono = 0.0
-        if generate_reports and strucpp_temp_dir is not None:
+        if strucpp_temp_dir is not None:
             test_runner = strucpp_temp_dir / "test_runner.exe"
             if test_runner.exists():
                 t_exec_start = _time.perf_counter()
                 json_result = subprocess.run([str(test_runner), "--json"], capture_output=True, text=True, encoding="utf-8",
                                              creationflags=subproc_flags)
+                test_runner_rc = json_result.returncode
                 t_exec = _time.perf_counter() - t_exec_start
                 try:
                     json_data = json.loads(json_result.stdout)
@@ -373,7 +375,8 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         counter = f" {n_pass}/{len(tests)}" if n_tests_declared else ""
         print(f"\r{f'-> {fb_name} ({domain})...{counter}'.ljust(70)}")
 
-        return {"ok": result.returncode == 0, "tests": tests, "report": report_path,
+        ok = result.returncode == 0 and test_runner_rc == 0 and bool(json_data) and all(t["passed"] for t in tests)
+        return {"ok": ok, "tests": tests, "report": report_path,
                 "af_warnings": af_warnings, "extra_test_warnings": extra_test_warnings,
                 "encapsulation_report": encapsulation_report,
                 "report_group": report_group, "section_kwargs": section_kwargs,

@@ -157,7 +157,7 @@ def grouped_plan(plan: list[tuple[str, str, str, list[str]]]) -> list[tuple[str,
     return groups
 
 
-def select_plan(palier: str | None, with_pytest: bool = False) -> list[tuple[str, str, str, list[str]]]:
+def select_plan(palier: str | None, with_pytest: bool = False, with_full_ci: bool = False) -> list[tuple[str, str, str, list[str]]]:
     if palier is None:
         plan = [g for g in PLANS if g[0] != "D"]
     else:
@@ -169,6 +169,8 @@ def select_plan(palier: str | None, with_pytest: bool = False) -> list[tuple[str
     # Par défaut : G420 (PyTest infrastructure 530 tests) est opt-in via --pytest / --ci
     if not with_pytest:
         plan = [g for g in plan if g[1] != "420"]
+    if not with_full_ci:
+        plan = [g for g in plan if g[1] != "460"]
     return plan
 
 
@@ -179,6 +181,7 @@ def main() -> int:
     parser.add_argument("--codesys-log", type=Path, help="Log de compilation CODESYS (palier D)")
     parser.add_argument("--files", nargs="+", type=Path, help="Cibler un/des fichier(s) .st : seuls les gates applicables à un bloc isolé s'exécutent (G100, G110, G200)")
     parser.add_argument("--pytest", "--ci", dest="with_pytest", action="store_true", help="Inclure G420 PyTest (suite de 530 tests unitaires convertisseur + outillage)")
+    parser.add_argument("--full-ci", action="store_true", help="Inclure G460 : harnais Cycle, négatifs et animation (lent, jalon/demande explicite)")
     parser.add_argument("--skip-codesys", action="store_true", help="Ne pas lancer G500 même si --codesys-log fourni")
     parser.add_argument("--strict", action="store_true", help="Fail on any warning")
     parser.add_argument("--fail-fast", action="store_true", help="S'arrêter au premier gate rouge")
@@ -198,7 +201,7 @@ def main() -> int:
             if not f.is_file():
                 print(f"ERROR: fichier introuvable : {f}", file=sys.stderr)
                 return 2
-        base_plan = select_plan(args.palier, with_pytest=args.with_pytest)
+        base_plan = select_plan(args.palier, with_pytest=args.with_pytest, with_full_ci=args.full_ci)
         plan = [g for g in base_plan if g[1] in FILE_SCOPED_GATES]
         skipped_global = [(g[1], g[2]) for g in base_plan if g[1] not in FILE_SCOPED_GATES]
         rebuilt: list[tuple[str, str, str, list[str]]] = []
@@ -216,7 +219,7 @@ def main() -> int:
                 rebuilt.append(("A", "410x", f"LD convertible + invariants ({f.name})", [sys.executable, f"{S}/check_ld_file.py", str(f)]))
         plan = rebuilt
     else:
-        plan = select_plan(args.palier, with_pytest=args.with_pytest)
+        plan = select_plan(args.palier, with_pytest=args.with_pytest, with_full_ci=args.full_ci)
 
     mode_label = "COMPACT" if args.compact else "DIAGNOSTIC VERBEUX"
     if file_mode:
