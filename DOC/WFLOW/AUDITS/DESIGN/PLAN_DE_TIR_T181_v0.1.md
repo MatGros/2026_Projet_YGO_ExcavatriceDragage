@@ -26,7 +26,7 @@
 
 1. **DUT / enum** — dans l'ordre : `CODE/H_TREUILS_BENNE/_TYPES/*` (`ST_fbWinch_DriveRequest`, `_Sensors`, `_Cfg`,
    `ST_WinchFinalInterlockReq`), puis `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/*` (`ST_WinchState`,
-   `ST_SafetyWinch` incl. champ `StuckClosed`, `ST_WinchInterPrg`), puis `CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/*`
+   `ST_SafetyWinch` incl. champ `ContactorStuck`, `ST_WinchInterPrg`), puis `CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/*`
    (`ST_TranslationFinalInterlockReq` — symétrie M3).
 2. **FB feuilles** — `FB_SpeedStep`, `FB_WinchDirectionInterlock`, `FB_WinchStepShaper` *(non — TON inline)*,
    `FB_WinchRateInterlock`, `FB_WinchSpeedLearning`.

@@ -29,8 +29,8 @@ contract:
       statement: "L'interface de FB_Winch est en REDUCTION / additive contrôlée : l'entrée morte Mode (VAR_INPUT, jamais lue) est retirée et les 2 sites PRG_04 qui passaient Mode:= sont édités au même commit. Aucune entrée nouvelle hors les 3 structs et les seuils de cadence (T181-01)."
       verified_by: "git diff FB_Winch.st (bloc VAR_INPUT) + grep 'Mode ' dans les appels instWinchM1/M2 de PRG_04 = 0"
     - id: AC5
-      statement: "ContactorsCheck.StuckClosed reste publié en sortie de FB_Winch mais n'est plus produit par lui : il est ré-alimenté depuis FB_Safety_Winch via PRG_04 (décision T181-06 #3). La cause de défaut interne StuckClosed de FB_Winch (instCauses) est retirée."
-      verified_by: "grep 'StuckClosed' dans le corps executable de FB_Winch.st = 0 assignation ; lecture PRG_04 (re-alimentation)"
+      statement: "ContactorsCheck.ContactorStuck reste publié en sortie de FB_Winch mais n'est plus produit par lui : il est ré-alimenté depuis FB_Safety_Winch via PRG_04 (décision T181-06 #3). La cause de défaut interne ContactorStuck de FB_Winch (instCauses) est retirée."
+      verified_by: "grep 'ContactorStuck' dans le corps executable de FB_Winch.st = 0 assignation ; lecture PRG_04 (re-alimentation)"
     # ---- Étape 08b : bascule du calcul de clamp ----
     - id: AC6
       statement: "Étape 08b (après T181-10) : FB_Winch/FB_SpeedStep consomment les bornes Min/MaxStep{Up,Down} de DriveRequest calculées par l'agrégateur PRG_04. Le calcul de clamp interne historique de FB_Winch est supprimé."
@@ -51,7 +51,7 @@ contract:
   scope:
     allowed:
       - CODE/H_TREUILS_BENNE/_TYPES/**            # 3 DUT ST_fbWinch_* + ST_WinchFinalInterlockReq
-      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/**   # ST_WinchFinalInterlockReq cote supervision + ST_SafetyWinch (champ StuckClosed)
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/**   # ST_WinchFinalInterlockReq cote supervision + ST_SafetyWinch (champ ContactorStuck)
       - CODE/H_TREUILS_BENNE/FB_Winch.st
       - CODE/H_TREUILS_BENNE/FB_SpeedStep.st      # consommation des bornes (08b)
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st       # 2 sites d'appel + retrait Mode
@@ -72,7 +72,7 @@ contract:
     dropped_on_purpose:
       - "L'entrée VAR_INPUT Mode (morte)"
       - "Le calcul de clamp interne de FB_Winch (deplacé dans l'agrégateur PRG_04, 08b)"
-      - "La production interne de StuckClosed par FB_Winch (deplacée dans FB_Safety_Winch)"
+      - "La production interne de ContactorStuck par FB_Winch (deplacée dans FB_Safety_Winch)"
       - "Toute idée de shadow comparison comme oracle (remplacé par table d'attendus écrite à la main)"
 
   evidence_required:
@@ -85,7 +85,7 @@ contract:
     - "omni/cc/claude-sonnet-5"
 
   alert_duty: >
-    Si retirer Mode ou déplacer StuckClosed casse un consommateur non prévu, si l'agrégateur
+    Si retirer Mode ou déplacer ContactorStuck casse un consommateur non prévu, si l'agrégateur
     T181-10 n'est pas prêt au moment de 08b, ou si le comportement 08a n'est PAS bit-identique
     (un écart apparaît sur un vecteur) : REMONTER à l'orchestrateur avant de contourner.
     Ne jamais commiter 08a et 08b ensemble.

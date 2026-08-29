@@ -110,7 +110,7 @@ Lorsque `instBucket.Busy`, `PRG_04 §3` écrit seulement `DriveRequest.StartStop
 |---|---|---|
 | 1 | Deux seuils `FB_WinchRateInterlock` restent des constantes locales indépendantes : safety nu côté final, safety+marge côté `FB_Winch`. **Valeurs numériques non fixées.** | Essai site et analyse sécurité avant valeur |
 | 2 | D13 : supprimer `M2_SpeedStepTableActive` si les TC démontrent `MaxStepDown:=1` équivalent ; sinon conserver avec justification. | TC M2 jog + régression M1 ; visa humain |
-| 3 | Ajouter à `ST_SafetyWinch` un champ public `StuckClosed` produit exclusivement par `FB_Safety_Winch`, puis `PRG_04` réalimente `ContactorsCheck.StuckClosed`. | G200 : un producteur ; IHM/Troubleshooting conservent le champ |
+| 3 | Ajouter à `ST_SafetyWinch` un champ public `ContactorStuck` produit exclusivement par `FB_Safety_Winch`, puis `PRG_04` réalimente `ContactorsCheck.ContactorStuck`. | G200 : un producteur ; IHM/Troubleshooting conservent le champ |
 | 4 | Remplacer toute vitesse `%` de jog par `BucketJogStep : INT`, valeur de calibration humaine. | P1, absence de vitesse continue dans `FB_Winch` |
 | 5 | Table RETAIN : `[axe][sens][charge][palier]` avec `Valid`, vitesse apprise et compteur échantillons ; chaque vitesse doit être finie, positive et dans une enveloppe configurée par palier. Initialisation invalide, collecte passive ; validation complète charge/vide avant armement. | migration RETAIN, test corruption et procédure de première mise en service |
 | 6 | Import : `_TYPES` communs/supervision → DUT treuil → sous-FB → `FB_Winch`/Safety → `PRG_03/04/06` → `PRG_07`, `GVL_Troubleshooting`, IHM → SimBench. | import CODESYS manuel et bundle/G200 |
