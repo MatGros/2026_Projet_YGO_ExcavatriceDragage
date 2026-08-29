@@ -43,7 +43,7 @@
 
 ## 🧪 Tests associés
 
-> **Etat** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
 > non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 | ID | Vérifie | Preuve | Etat |

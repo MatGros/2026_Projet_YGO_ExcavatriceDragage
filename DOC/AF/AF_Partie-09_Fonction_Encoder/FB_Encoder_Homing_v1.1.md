@@ -27,7 +27,7 @@ consomme `HomingRefRaw` produit ici).
 
 Décline `TC-P09-020` (chapô) :
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 | ID | Comportement attendu | Type | Réf | Etat |
 |---|---|---|---|---|

@@ -34,7 +34,7 @@ entrée de configuration (`DefaultValueS`, valeur de secours) et une seule sorti
 > étapes numérotées — **jamais** un nouvel identifiant racine (`CODE_QUALITY_STANDARDS.md §0`).
 > Source des tests : `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_cycletime.st`.
 
-> **Etat** ? `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
 > non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 | ID | Comportement attendu | Type | Réf | Etat |

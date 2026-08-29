@@ -33,7 +33,7 @@ dont elle n'a pas l'usage.
 > Décline `TC-P08-010` (macro chapô, partagé `F08.01`+`F08.02`) en étapes numérotées — pas de
 > nouvel identifiant racine (`GUIDE_EDITION_AF_v1.0.md` §4, `FB_SPEC_TEMPLATE.md` §2).
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 | ID | Comportement attendu | Type | Réf | Etat |
 |---|---|---|---|---|

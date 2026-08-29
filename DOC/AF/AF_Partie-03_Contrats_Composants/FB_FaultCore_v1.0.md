@@ -50,7 +50,7 @@ distincte, remplie par le FB porteur lui-même, **hors périmètre de FB_FaultCo
 > `TC-P03-001` à `007` restent au chapô (règles générales du socle Cause/Ack, §4 AF03, pas
 > spécifiques à `FB_FaultCore`).
 
-> **Etat** ? `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 | ID | Comportement attendu | Type | Réf | Etat |
 |---|---|---|---|---|

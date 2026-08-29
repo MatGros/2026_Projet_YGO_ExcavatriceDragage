@@ -16,7 +16,7 @@ Distingue `READY` (bus réel online) de `SIMULATED` (bypass actif).
 > nibble — spécifique à ce FB) — pas dupliqué au chapô. `TC-P12-010`/`020`/`040` restent au chapô
 > (partagés avec `FB_Diag_CanOpen`, voir `AF_Partie-12_Fonction_Diagnostic_v1.4.md` §2).
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 | ID | Comportement attendu | Type | Etat |
 |---|---|---|---|

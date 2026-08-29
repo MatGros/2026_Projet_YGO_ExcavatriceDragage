@@ -19,7 +19,7 @@
 
 ## 🎯 1 · Table des fonctions
 
-> **Etat** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 | ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
 |---|---|---|---|---|---|---|---|
@@ -27,7 +27,7 @@
 
 ## 🧪 2 · Points de validation
 
-> **Etat** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
 | <nobr>ID Unique</nobr> | Groupe | Comportement attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
 |---|---|---|---|---|---|
