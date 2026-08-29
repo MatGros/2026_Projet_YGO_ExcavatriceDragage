@@ -108,11 +108,116 @@ domains:
         ref: FB_Safety_EmergencyManagement
         etat: NV-I
       TC-P01-010:
-        intention: Coupure IHM maintenue pendant le pulse de réarmement — écart connu,
-          non corrigé (audit 2026-08-22)
+        intention: "⚡ Étape 1 : Impulsion de réarmement en cours (Step 5, ArmPulse_RQ=TRUE)\
+          \ \n        \U0001F6D1 Étape 2 : Appui volontaire opérateur sur BtnEmergencyCutOff\
+          \ pendant le pulse \n        ✅ Étape 3 : Coupure immédiate du pulse et du\
+          \ maintien sans lever d'alarme de collage (avortement propre)"
         type: 💻 AUTO
-        ref: FB_Safety_EmergencyManagement
-        etat: NV-I
+        ref: §4.3
+        etat: V-I
+      TC-P01-SCEN-NOM:
+        intention: "\U0001F4A4 Étape 0 : Repos initial (boucle saine, contacteur au\
+          \ repos, Armable=TRUE) \n        \U0001F680 Étape 1 : Demande réarmement\
+          \ (ArmRequest ➔ lance TestA) \n        \U0001F50D Étape 2 : Réaction boucle\
+          \ à TestA (chute boucle ➔ RestoreA) \n        \U0001F50D Étape 3 : Restauration\
+          \ boucle A (refermeture ➔ lance TestB) \n        \U0001F50D Étape 4 : Réaction\
+          \ boucle à TestB (chute boucle ➔ RestoreB) \n        ⚡ Étape 5 : Impulsion\
+          \ collage contacteur 1s (ArmPulse_RQ=TRUE) \n        ⏱️ Étape 6 : Fin impulsion\
+          \ 1s ➔ Attente confirmation contacteur \n        ✅ Étape 7 : Confirmation\
+          \ collage (PowerContactorEngaged=TRUE ➔ Done=TRUE)"
+        type: ⚡ AUTO
+        ref: §4.3
+        etat: V-I
+      TC-P01-SCEN-DYN:
+        intention: "\U0001F680 Phase 1 : Réarmement nominal réussi et mise en service\
+          \ (Done=TRUE) \n        ⚡ Phase 2 : Coupure métier en marche (PowerCutOffRequest=TRUE\
+          \ ➔ retombée A/B, Armable=FALSE) \n        \U0001F6E1️ Phase 3 : Tentative\
+          \ réarmement bloquée sous défaut (refus net, reste Step 0) \n        \U0001F504\
+          \ Phase 4 : Disparition dérive métier + Reset (retour Armable=TRUE) \n \
+          \       ⚠️ Phase 5 : Nouvel armement avec échec collage contacteur (timeout\
+          \ 2s Step 6 ➔ EmergencyArmingFailed + Lockout 5s) \n        \U0001F513 Phase\
+          \ 6 : Expiration lockout 5s + Reset (prêt pour nouvel essai)"
+        type: 💻 AUTO
+        ref: §4.3
+        etat: V-I
+      TC-P01-001:
+        intention: "⚡ Étape 1 : Enfoncement coup de poing AU physique sur site \n\
+          \        \U0001F512 Étape 2 : Ouverture matérielle immédiate de la boucle\
+          \ 24V de sécurité \n        ⛔ Étape 3 : Retombée instantanée du contacteur\
+          \ de puissance ligne (API reste sous tension)"
+        type: 🟢 SITE
+        ref: §6.1
+        etat: V-I
+      TC-P01-002:
+        intention: "\U0001F50D Étape 1 : Surveillance indépendante des canaux A et\
+          \ B en régime nominal établi \n        ⚡ Étape 2 : Test de coupure unilatérale\
+          \ du canal A (MaintainA_RQ=FALSE, B maintenu) \n        \U0001F50D Étape\
+          \ 3 : Vérification réaction boucle ➔ Restauration immédiate canal A \n \
+          \       ⚡ Étape 4 : Test de coupure unilatérale du canal B (MaintainB_RQ=FALSE,\
+          \ A maintenu) ➔ Restauration canal B"
+        type: ⚡ MIXTE
+        ref: §5
+        etat: V-I
+      TC-P01-003:
+        intention: "\U0001F680 Étape 1 : Front montant ArmRequest sous préconditions\
+          \ saines (boucle OK, pas de défaut) \n        ⚡ Étape 2 : Auto-tests A/B\
+          \ croisés validés ➔ Génération impulsion collage contacteur 1.0s (ArmPulse_RQ=TRUE)\
+          \ \n        ⏱️ Étape 3 : Retombée du pulse à 1.0s (ArmPulse_RQ=FALSE) et\
+          \ passage en attente confirmation (Step 6)"
+        type: ⚡ AUTO
+        ref: §4.3
+        etat: V-I
+      TC-P01-004:
+        intention: "⚠️ Étape 1 : Apparition d'un défaut de sécurité ou d'auto-test\
+          \ (Error=TRUE) \n        \U0001F504 Étape 2 : Front montant sur Reset ➔\
+          \ Effacement de l'affichage du défaut (Error=FALSE) \n        \U0001F6E1\
+          ️ Étape 3 : Verrouillage maintenu (aucun redémarrage automatique, séquence\
+          \ reste à IDLE Step 0)"
+        type: 💻 AUTO
+        ref: §4.4
+        etat: V-I
+      TC-P01-005:
+        intention: "\U0001F504 Temps 1 : Action 1 = Impulsion Reset opérateur pour\
+          \ acquitter et purger l'état de défaut \n        \U0001F680 Temps 2 : Action\
+          \ 2 = Impulsion ArmRequest distincte et consciente pour engager l'armement"
+        type: ⚡ MIXTE
+        ref: §4.4
+        etat: V-I
+      TC-P01-006:
+        intention: "\U0001F680 Étape 1 : Front ArmRequest ➔ Lancement TestA (Step\
+          \ 1, coupure logicielle canal A) \n        ⚠️ Étape 2 : Détection canal\
+          \ collé (boucle reste fermée malgré coupure A) \n        \U0001F6A8 Étape\
+          \ 3 : Avortement immédiat ➔ Alarme RedundancyTestFailed, maintien neutralisé\
+          \ et retour IDLE Step 0"
+        type: ⚡ AUTO
+        ref: §4.3b
+        etat: V-I
+      TC-P01-007:
+        intention: "⚡ Étape 1 : Fin d'impulsion de collage 1s ➔ Entrée en Step 6 Attente\
+          \ confirmation \n        ⏱️ Étape 2 : Écoulement timeout 2.0s sans retour\
+          \ PowerContactorEngaged \n        \U0001F512 Étape 3 : Déclenchement alarme\
+          \ EmergencyArmingFailed + Activation Lockout anti-mitraillage 5.0s"
+        type: 💻 AUTO
+        ref: §4.3
+        etat: V-I
+      TC-P01-008:
+        intention: "⚡ Étape 1 : Détection dérive métier critique (ex. dérive treuil\
+          \ M3 ➔ PowerCutOffRequest=TRUE) \n        ⛔ Étape 2 : Retombée immédiate\
+          \ et inconditionnelle des canaux A et B (MaintainA/B_RQ=FALSE) \n      \
+          \  \U0001F6E1️ Étape 3 : Verrouillage Armable=FALSE interdisant tout maintien\
+          \ de puissance"
+        type: 💻 AUTO
+        ref: §4.1
+        etat: V-I
+      TC-P01-009:
+        intention: "\U0001F6E1️ Étape 1 : Présence active de PowerCutOffRequest=TRUE\
+          \ (ou défaut non résolu) \n        \U0001F6AB Étape 2 : Tentative d'armement\
+          \ ArmRequest ➔ Refus net, interdiction de transition hors Step 0 \n    \
+          \    \U0001F504 Étape 3 : Persistance de l'alarme si Reset sans disparition\
+          \ de la cause brute"
+        type: 💻 AUTO
+        ref: §4.2
+        etat: V-I
   AF-02:
     file: AF_Partie-02_Architecture_Programme_v3.2.md
     functions:
@@ -178,36 +283,31 @@ domains:
         etat: NV-I
     validation_points:
       TC-P02-001:
-        intention: Un seul producteur par donnée
-        preuve: Aucun écouteur/écrivain multiple sur un contrat *(⚠️ G200_check_linkage.py
-          L10 remonte des faux positifs intra-POU — voir TBD §8)*
+        intention: Aucun écouteur/écrivain multiple sur un contrat (⚠️ G200_check_linkage.py
+          L10 remonte des faux positifs intra-POU — voir TBD §8)
         type: 💻 AUTO
         ref: §2
         etat: NV
       TC-P02-002:
-        intention: Programme d'orchestration ST sans logique métier cachée
-        preuve: Les calculs et machines d'état résident dans les FB ; le PRG rend
+        intention: Les calculs et machines d'état résident dans les FB ; le PRG rend
           ses arbitrages et flux explicitement lisibles
         type: 💻 AUTO
         ref: §2
         etat: NV
       TC-P02-003:
-        intention: Sorties physiques via PRG_06_Outputs
-        preuve: Aucun autre POU n'écrit les Q/PDO finaux
+        intention: Aucun autre POU n'écrit les Q/PDO finaux
         type: 💻 AUTO
         ref: §3
         etat: NV
       TC-P02-004:
-        intention: Ordre d'exécution MainTask conforme
-        preuve: Tâche CODESYS + G200_check_linkage.py PASS *(⚠️ ne vérifie pas l'ordre
-          inter-POU — revue manuelle à ce jour, voir TBD §8)*
+        intention: Tâche CODESYS + G200_check_linkage.py PASS (⚠️ ne vérifie pas l'ordre
+          inter-POU — revue manuelle à ce jour, voir TBD §8)
         type: ⚡ SITE+AUTO
         ref: §5
         etat: NV
       TC-P02-005:
-        intention: Vue troubleshooting en lecture seule
-        preuve: FB_TroubleshootingView ne produit aucune commande, configuration ni
-          interlock
+        intention: FB_TroubleshootingView ne produit aucune commande, configuration
+          ni interlock
         type: 💻 AUTO
         ref: §3
         etat: NV
@@ -216,51 +316,43 @@ domains:
     functions: {}
     validation_points:
       TC-P03-001:
-        intention: Cycle de vie et neutralisation Enable
-        preuve: Enable=FALSE neutralise commandes et statut (gate) ; Enable=TRUE autorise
-          l'état Ready
+        intention: Enable=FALSE neutralise commandes et statut (gate) ; Enable=TRUE
+          autorise l'état Ready
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P03-002:
-        intention: Reset inconditionnel (Cause/Ack)
-        preuve: Front Reset efface l'affichage (interlock reste sur Cause)
+        intention: Front Reset efface l'affichage (interlock reste sur Cause)
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P03-003:
-        intention: Pas de redémarrage auto après Ack
-        preuve: Retour READY, nouvel ordre explicite requis
+        intention: Retour READY, nouvel ordre explicite requis
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P03-004:
-        intention: Pas de SafeStop/StartStop hors mouvement
-        preuve: Absents des briques E/S, joystick et diag
+        intention: Absents des briques E/S, joystick et diag
         type: 💻 AUTO
         ref: §3
         etat: NV
       TC-P03-005:
-        intention: Encapsulation stricte
-        preuve: Échanges via interfaces/DUTs publics uniquement
+        intention: Échanges via interfaces/DUTs publics uniquement
         type: 💻 AUTO
         ref: §2
         etat: NV
       TC-P03-006:
-        intention: Re-latch sur ré-apparition Cause
-        preuve: Nouveau front Cause ➔ Ack=FALSE
+        intention: Nouveau front Cause ➔ Ack=FALSE
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P03-007:
-        intention: Warning auto-effaçable vs Fault latché
-        preuve: Warning s'efface sans Reset, Fault exige Ack
+        intention: Warning s'efface sans Reset, Fault exige Ack
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P03-014:
-        intention: Bornage du dt de cycle (FB_CycleTime)
-        preuve: Hors plage nominale (dt = 0 ou dt > CST_MaxCycleDeltaMs) ➔ CycleTimeS
+        intention: Hors plage nominale (dt = 0 ou dt > CST_MaxCycleDeltaMs) ➔ CycleTimeS
           = DefaultValueS ; sinon dt réel ; secours non latché
         type: 💻 AUTO
         ref: §3 → fiche
@@ -333,62 +425,52 @@ domains:
     functions: {}
     validation_points:
       TC-P04-001:
-        intention: Relâchement manche (retour centre) stoppe sans perte d'étape
-        preuve: StartStop=FALSE, étape inchangée
+        intention: StartStop=FALSE, étape inchangée
         type: 💻 AUTO
         ref: §2
         etat: V-I
       TC-P04-002:
-        intention: Cycle produit des demandes, zéro sortie physique
-        preuve: Aucune Q/PDO écrite par FB_Cycle
+        intention: Aucune Q/PDO écrite par FB_Cycle
         type: 💻 AUTO
         ref: §2
         etat: V-I
       TC-P04-003:
-        intention: STABILIZING fige l'étape (hold sûr)
-        preuve: Étape figée, pas de reprise auto
+        intention: Étape figée, pas de reprise auto
         type: 💻 AUTO
         ref: §4
         etat: V-I
       TC-P04-004:
-        intention: 'Reprise après STABILIZING : Cause + Reset + nouvel ordre'
-        preuve: 3 conditions nécessaires
+        intention: 3 conditions nécessaires
         type: 💻 AUTO
         ref: §2
         etat: V-I
       TC-P04-010:
-        intention: 'FB_DiveSearch : mise en service recherche de couche'
-        preuve: Transition READY -> SEARCHING
+        intention: Transition READY -> SEARCHING
         type: 💻 AUTO
         ref: §3
         etat: V-I
       TC-P04-011:
-        intention: Séquence Kobold 4 temps à la volée + coupure contacteur sur fond
-        preuve: Alimentation contacteur + coupure anti-chauffe
+        intention: Alimentation contacteur + coupure anti-chauffe
         type: 💻 AUTO
         ref: §3
         etat: V-I
       TC-P04-012:
-        intention: Interdiction Palier 5 sous Kobold
-        preuve: Vitesse > 4 déclenche défaut bloquant immédiat
+        intention: Vitesse > 4 déclenche défaut bloquant immédiat
         type: 💻 AUTO
         ref: §3
         etat: V-I
       TC-P04-013:
-        intention: Bascule Semi-Auto vers Maintenance
-        preuve: Mémorise étape, bloque commandes, reprise explicite
+        intention: Mémorise étape, bloque commandes, reprise explicite
         type: 💻 AUTO
         ref: §4
         etat: V-I
       TC-P04-020:
-        intention: 'FB_ExtractionSequence : mise en service séquence extraction'
-        preuve: Transition READY -> CLOSING
+        intention: Transition READY -> CLOSING
         type: 💻 AUTO
         ref: §3
         etat: V-I
       TC-P04-021:
-        intention: Enchaînement continu d'extraction sous maintien joystick
-        preuve: Fermeture $\rightarrow$ Décollage $\rightarrow$ Nominal sans à-coup
+        intention: Fermeture $\rightarrow$ Décollage $\rightarrow$ Nominal sans à-coup
         type: 💻 AUTO
         ref: §3
         etat: V-I
@@ -397,38 +479,32 @@ domains:
     functions: {}
     validation_points:
       TC-P05-001:
-        intention: Modes machine restreints (DISABLE, MAINT_N1, MAINT_N2, SEMI_AUTO)
-        preuve: SyncEnable, Diving, Extraction hors E_Mode
+        intention: SyncEnable, Diving, Extraction hors E_Mode
         type: 💻 AUTO
         ref: §2-3
         etat: NV
       TC-P05-002:
-        intention: 'Mode nominal : joystick pilote M1+M2 conjointement'
-        preuve: M1 et M2 reçoivent la même intention
+        intention: M1 et M2 reçoivent la même intention
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P05-003:
-        intention: 'Mode MAINT_N2 M1 seul : M2 bloqué, frein serré'
-        preuve: Safety reste active sur M2
+        intention: Safety reste active sur M2
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P05-004:
-        intention: Refus mode SEMI_AUTO si codeurs invalides
-        preuve: Bascule refusée + message IHM
+        intention: Bascule refusée + message IHM
         type: 💻 AUTO
         ref: §7
         etat: NV
       TC-P05-005:
-        intention: Limite légale = blocage exploitation, pas safety
-        preuve: Pas de PowerCutOff sur simple limite légale
+        intention: Pas de PowerCutOff sur simple limite légale
         type: 💻 AUTO
         ref: §6
         etat: NV
       TC-P05-006:
-        intention: Pas de redémarrage automatique après défaut
-        preuve: Reset + nouvel ordre explicite requis
+        intention: Reset + nouvel ordre explicite requis
         type: 💻 AUTO
         ref: §7
         etat: NV
@@ -449,38 +525,32 @@ domains:
         etat: NV-I
     validation_points:
       TC-P06-001:
-        intention: Aucune lecture d'E/S brute dans les FB métier
-        preuve: Consommateurs lisent des faits qualifiés
+        intention: Consommateurs lisent des faits qualifiés
         type: 💻 AUTO
         ref: §3
         etat: NV
       TC-P06-002:
-        intention: Polarité normalisée une seule fois à l'acquisition
-        preuve: Zéro ré-inversion dans les FB métier
+        intention: Zéro ré-inversion dans les FB métier
         type: 💻 AUTO
         ref: §3
         etat: NV
       TC-P06-003:
-        intention: Bascule réel/simulation centralisée
-        preuve: HwIn source unique par domaine
+        intention: HwIn source unique par domaine
         type: 💻 AUTO
         ref: §3
         etat: NV
       TC-P06-004:
-        intention: Diag CANopen/EtherCAT publié en ligne
-        preuve: Statuts dispos pour Modes/Safety/IHM
+        intention: Statuts dispos pour Modes/Safety/IHM
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P06-005:
-        intention: Noms des signaux de puissance validés
-        preuve: PowerKeepAlive_A/B_RQ, EmergencyChainClosed_DI
+        intention: PowerKeepAlive_A/B_RQ, EmergencyChainClosed_DI
         type: 🟢 SITE
         ref: §5
         etat: NV
       TC-P06-006:
-        intention: Écriture des sorties physiques centralisée
-        preuve: PRG_06_Outputs seul producteur final
+        intention: PRG_06_Outputs seul producteur final
         type: 💻 AUTO
         ref: §6
         etat: NV
@@ -490,63 +560,54 @@ domains:
           PreflightBusy=TRUE et aucun verdict final. Une fois immobile, les 16 bits
           sont agrégés et PreflightOk=(PreflightErrorId=0).'
         type: 💻 AUTO_PLC
-        ref: FB_Acquisition_PreflightPRG_07_Supervision
+        ref: FB_Acquisition_Preflight PRG_07_Supervision
         etat: NV-I
   AF-07:
     file: AF_Partie-07_Interface_IHM_v2.2.md
     functions: {}
     validation_points:
       TC-P07-001:
-        intention: IHM et PLC partagent les mêmes DUTs
-        preuve: Aucun miroir parallèle de variables
+        intention: Aucun miroir parallèle de variables
         type: 💻 AUTO
         ref: §2
         etat: NV-I
       TC-P07-002:
-        intention: Structures Cmd/State/Cfg par domaine
-        preuve: Convention respectée dans GVL_IHM
+        intention: Convention respectée dans GVL_IHM
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P07-003:
-        intention: IHM limitée aux variables de GVL_IHM
-        preuve: Zéro accès direct aux internes des FB
+        intention: Zéro accès direct aux internes des FB
         type: 💻 AUTO
         ref: §2
         etat: NV
       TC-P07-004:
-        intention: Producteur unique par champ State
-        preuve: Un seul écrivain PLC par variable d'état
+        intention: Un seul écrivain PLC par variable d'état
         type: 💻 AUTO
         ref: §2
         etat: NV
       TC-P07-005:
-        intention: Page Troubleshooting en lecture seule
-        preuve: Zéro écriture de commande/config/bypass
+        intention: Zéro écriture de commande/config/bypass
         type: 💻 AUTO
         ref: §7
         etat: NV
       TC-P07-006:
-        intention: Séparation messages action vs état
-        preuve: 2 familles distinctes, alarmes sur ErrorId
+        intention: 2 familles distinctes, alarmes sur ErrorId
         type: ⚡ SITE+AUTO
         ref: §5
         etat: NV
       TC-P07-007:
-        intention: Warning auto-effaçable vs Fault sur Reset
-        preuve: Warning s'efface seul, Fault exige Ack
+        intention: Warning s'efface seul, Fault exige Ack
         type: ⚡ SITE+AUTO
         ref: §5
         etat: NV
       TC-P07-008:
-        intention: Carrousel d'alarmes un message à la fois, index n/N
-        preuve: Banner.AlarmBanner.Index/Count cohérents
+        intention: Banner.AlarmBanner.Index/Count cohérents
         type: 💻 AUTO
         ref: §6
         etat: NV
       TC-P07-009:
-        intention: Aucun défaut actif → bandeau d'alarme vide
-        preuve: HasAlarm=FALSE, Text='', Index=0, Count=0
+        intention: HasAlarm=FALSE, Text='', Index=0, Count=0
         type: 💻 AUTO
         ref: §6
         etat: NV
@@ -673,14 +734,14 @@ domains:
         ref: §4
         etat: NV
       TC-P08-010.2:
-        intention: 'Deadband ADC centrée sur le neutre : \|RawIn-Neutral\| <= DeadbandRaw
+        intention: 'Deadband ADC centrée sur le neutre : |RawIn-Neutral| <= DeadbandRaw
           ⇒ OutPct=0.0'
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P08-010.3:
         intention: 'Saturation stricte : toute sortie de plage RawIn (hors [0;10000])
-          ne produit jamais \|OutPct\| > 100.0'
+          ne produit jamais |OutPct| > 100.0'
         type: 💻 AUTO
         ref: §4
         etat: NV
@@ -772,7 +833,7 @@ domains:
       TC-P09-030:
         intention: Conversion signée exacte ; hors bornes ou suspect → EncoderIncoherent=TRUE
         type: 💻 AUTO
-        ref: FB_Encoder_ScaleFB_Encoder_Safety
+        ref: FB_Encoder_Scale FB_Encoder_Safety
         etat: NV
       TC-P09-040:
         intention: EncoderFault ne dépend pas de Homed (non-référencé ≠ incohérent)
@@ -996,6 +1057,51 @@ domains:
         statut: ✅
         etat: NV-I
     validation_points:
+      TC-P10-011, 017, 018, 019:
+        intention: (non détaillé)
+        type: —
+        ref: FB_Winch_v1.0.md
+        etat: NV-I
+      TC-P10-001 à 010:
+        intention: (non détaillé)
+        type: —
+        ref: FB_Safety_Winch_v1.0.md
+        etat: NV-I
+      TC-P10-014, 015, 016:
+        intention: (non détaillé)
+        type: —
+        ref: FB_WinchSync_v1.1.md
+        etat: NV
+      TC-P10-012, 013, 020, 021, 022:
+        intention: (non détaillé)
+        type: —
+        ref: FB_WinchOutputInterlock_v1.0.md
+        etat: NV
+      TC-P10-023 à 034:
+        intention: (non détaillé)
+        type: —
+        ref: FB_Bucket_v1.0.md
+        etat: NV-I
+      Diagnostic MES-008, symétrie:
+        intention: (non détaillé)
+        type: —
+        ref: FB_Winch_Symmetry_v1.1.md
+        etat: NV
+      Décodage paliers 1..5 & garde-fou:
+        intention: (non détaillé)
+        type: —
+        ref: FB_SpeedStep_v1.0.md
+        etat: NV
+      Diagnostic charge 2D:
+        intention: (non détaillé)
+        type: —
+        ref: FB_WinchLoadEstimator_v1.0.md
+        etat: NV
+      Dérive position sous frein:
+        intention: (non détaillé)
+        type: —
+        ref: FB_DriftGuard_v1.0.md
+        etat: NV
       TC-P10-023:
         intention: Fermeture seulement si MotionDirection=1 ET MotionRequestActive
         type: 💻 AUTO
@@ -1184,7 +1290,7 @@ domains:
         statut: ✅
         etat: NV-I
       F11.05:
-        fonction: Anti-télescopage hauteur M1/M2 (collision benne/translation)
+        fonction: Anti-télescopage hauteur M1/M2
         description: Bloque translation si câbles M1/M2 sous hauteur mini, sauf Bypass.MinHeight
           conscient (jamais via BypassGlobal)
         realisee_par: PRG_05_Translation §0 (câblage direct, hors FB dédié)
@@ -1217,7 +1323,7 @@ domains:
         type: ⚡ AUTO_PLC
         ref: FB_TranslationOutputInterlock
         etat: NV
-      — (aucun TC):
+      —:
         intention: Translation bloquée si CablePosM1 ou CablePosM2 sous _TranslationMinHeightM1M2_M,
           sauf Bypass.MinHeight conscient. ⚠️ Câblé directement dans PRG_05_Translation.st
           §0, hors FB_Safety_Translation — pas de test dédié aujourd'hui
@@ -1319,14 +1425,14 @@ domains:
           M2) : StateRaw≠RUNNING/ACTIVE ➔ Online=FALSE, Operational=FALSE, State=INIT,
           sans effet sur les autres devices'
         type: 💻 AUTO
-        ref: FB_Diag_CanOpenFB_Diag_Ethercat
+        ref: FB_Diag_CanOpen FB_Diag_Ethercat
         etat: NV-I
       TC-P12-020:
         intention: Défaut isolé sur un seul device ➔ ErrorId de ce device porte exactement
           son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices
           (Joystick bit0/1, Variateur bit4, M1 bit5, M2 bit6)
         type: 💻 AUTO
-        ref: FB_Diag_CanOpenFB_Diag_Ethercat
+        ref: FB_Diag_CanOpen FB_Diag_Ethercat
         etat: NV-I
       TC-P12-030:
         intention: Error global et synthèse ErrorId par nibble (0x00F0 variateur /
@@ -1339,7 +1445,7 @@ domains:
           ; réel RUNNING sans bypass ➔ READY ; ni l'un ni l'autre ➔ INIT ; Enable=FALSE
           prioritaire ➔ DISABLED
         type: 💻 AUTO
-        ref: FB_Diag_CanOpenFB_Diag_Ethercat
+        ref: FB_Diag_CanOpen FB_Diag_Ethercat
         etat: NV
       TC-P12-050:
         intention: Absence de front TglHeartbeatIhm pendant IhmTimeout ➔ HeartbeatIhmTimeout=TRUE/HeartbeatIhmOk=FALSE
@@ -1351,6 +1457,33 @@ domains:
     file: AF_Partie-13_Fonction_Simulation_v2.4.md
     functions: {}
     validation_points:
+      TC-P13-010..013:
+        intention: Enveloppe unique, décalage 1 scan, REX StatusWord AC600 corrigé
+        type: 💻 AUTO+👁️ MANUEL
+        ref: FB_SimBench
+        etat: NV
+      TC-P13-020..023:
+        intention: 'Chaîne AU simulée, latch contacteur, 🆕 TC-P13-023 : défaut réel
+          latché survit au cycle Reset du modèle simulé (§4)'
+        type: 💻 AUTO+👁️ MANUEL
+        ref: FB_Sim_Safety
+        etat: NV
+      TC-P13-030..033:
+        intention: Position codeur simulée, persistance reset froid
+        type: 💻 AUTO+👁️ MANUEL
+        ref: FB_Sim_Encoder
+        etat: NV
+      TC-P13-040..043:
+        intention: 6 mots thermomètre valides, bornage position, reset Trémie sur
+          Enable=FALSE
+        type: 💻 AUTO
+        ref: FB_Sim_Translation
+        etat: NV
+      TC-P13-050..052:
+        intention: Entrées brutes joystick, homme-mort jamais contourné
+        type: ⚡ SITE+AUTO+👁️ MANUEL
+        ref: FB_Sim_Joystick
+        etat: NV
       TC-P13-030:
         intention: RelayFwd/RelayRev font compter RawPos de SpeedTgt_Pct * 0.1 * SpeedScaleFactor
           par scan
@@ -1445,4 +1578,11 @@ domains:
   AF-14:
     file: AF_Partie-14_Fonction_Troubleshooting_v1.4.md
     functions: {}
-    validation_points: {}
+    validation_points:
+      TC-P14-TSV-01..05:
+        intention: Zéro VAR_OUTPUT de commande, chaque champ a un producteur réel
+          documenté, aucun TBD affiché comme mesure réelle, instance unique dans PRG_07_Supervision,
+          zéro régression gates
+        type: 👁️ REVUE+🔒 GATE
+        ref: FB_TroubleshootingView
+        etat: NV
