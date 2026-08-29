@@ -69,6 +69,14 @@ FB_CycleTime:
     - CODE/A_COMMUN/FB_CycleTime.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_cycletime.st
 
+FB_FaultCore:
+  domain: A_COMMUN
+  sources:
+    - CODE/A_COMMUN/FB_FaultCore.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_faultcore.st
+
 FB_Ramp:
   domain: A_COMMUN
   sources:
@@ -333,8 +341,8 @@ FB_SimBench:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
-    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
-    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
+    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st
@@ -460,8 +468,8 @@ FB_Hmi_BannerFormatter:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
-    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
-    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
+    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st
@@ -649,8 +657,8 @@ PRG_04_Treuils_Benne:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
-    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
-    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
+    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st
@@ -693,8 +701,8 @@ PRG_05_Translation:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
-    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
-    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
+    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st
@@ -772,8 +780,8 @@ PRG_07_Supervision:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
-    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
-    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
+    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st
@@ -901,8 +909,8 @@ MAIN_GLOBAL:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCycleInterPrg.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
-    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
-    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
+    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st
