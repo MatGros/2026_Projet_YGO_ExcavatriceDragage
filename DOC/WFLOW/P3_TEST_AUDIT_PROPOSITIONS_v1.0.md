@@ -63,7 +63,9 @@ Verdict transversal : 33/33 nominal ✓ ; granulaire quasi absent partout (front
 
 - **C4 homme-mort** `TC-P08-020.1..4` : armement hors neutre / désarmement perte `ArmingPermit` / pas de réarmement auto / bornes 100ms-3s-100ms. ⚠️ **`ArmingPermit` câblé en dur `TRUE`** dans le code (§10 Q1 fiche AF-08) — bug potentiel à ouvrir en TASKS.
 - P09 : `010.3/.4/.5` (acquisition nominale, front `PresetRequest`, gel persistant) ; `020.6/.7/.8/.9` (TopPositionSensor absent, homing sans permit, `HomingSuspect` RETAIN, borne cible) ; `030.8/.9/.10/.11` (garde dépassement DINT, borne RawPos=HomingRefRaw→0, bornage `PositionMaxM`, bascule `BypassGlobal`) ; `050.5/.6` (fenêtre de mesure sans purge, vitesse exacte) ; `040.4/.5` (table 8 combos, incohérence) ; P08 `010.4/.5/.6` (Neutral≠5000, borne deadband, saturation ±100).
-- **Écarts de spec à trancher** (non tranchables par test) : `FB_Encoder_Safety` **monocanal** vs exigence ISO 13849 cat.3 (écart de spec) ; `FB_Encoder_SpeedMonitor` retiré → plus de garde-fou jitter sur la mesure vitesse (impact FB_Safety_Winch).
+- **Écarts de spec à trancher** (non tranchables par test) : `FB_Encoder_Safety` **monocanal** vs exigence ISO 13849 cat.3 (écart de spec) ; `FB_Encoder_SpeedMonitor` retiré → plus de garde-fou jitter sur la mesure vitesse (impact `FB_Safety_Winch`).
+- **Q2 non tranchée** : asymétrie homme-mort treuils/translation (armement/désarmement selon domaine) — décision de design attendue.
+- **`TC-P08-060` = GAP déclaré** (C1, `ArmingPermitDenied`, couverture nulle — le TC dit lui-même « GAP ») : à implémenter (code + test) ou requalifier.
 
 ### P3-1d — Communs/Diag/TSV (12)
 
