@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -35,6 +36,10 @@ except ImportError:  # pragma: no cover
     print("PyYAML requis", file=sys.stderr)
     sys.exit(1)
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Reutilise l'extracteur de TC des titres TEST (meme dossier scripts/).
+from G450_check_af_ci_coverage import ids_from_test_titles, TC_RE  # noqa: E402
+
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
@@ -45,6 +50,166 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 MATRIX_PATH = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "af_traceability_matrix.yaml"
 SYNC_PATH = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "fb_cartouche_sync.json"
 OUT_PATH = REPO_ROOT / "DOC" / "WFLOW" / "AF_VIEWER.html"
+
+FB_TOKEN_RE = re.compile(r"FB_[A-Za-z0-9_]+")
+
+
+def _canonical_tc_ids(text: str) -> list[str]:
+    """Etend 'TC-P01-004/009', 'TC-P10-001-010'... en identifiants canoniques ordonnes."""
+    out: list[str] = []
+    for part, first, second in TC_RE.findall(str(text)):
+        for cid in (f"TC-P{part}-{first}", f"TC-P{part}-{second}" if second else None):
+            if cid and cid not in out:
+                out.append(cid)
+    return out
+
+
+def _vp_lookup(vpoints: dict[str, Any]) -> dict[str, dict[str, str]]:
+    """id canonique -> {intention, type} ; gere les cles composees ('TC-a, TC-b')."""
+    table: dict[str, dict[str, str]] = {}
+    for key, val in (vpoints or {}).items():
+        val = val or {}
+        entry = {"intention": str(val.get("intention", "")), "type": str(val.get("type", ""))}
+        for cid in _canonical_tc_ids(key):
+            table.setdefault(cid, entry)
+    return table
+
+
+def _ci_verdict(root: Path, registry: dict, fb_key: str | None) -> dict[str, Any]:
+    empty = {"domain": "", "total": 0, "passed": 0, "failed": 0, "verdict": "none", "report_rel": ""}
+    if not fb_key:
+        return empty
+    entry = registry.get(fb_key)
+    if not isinstance(entry, dict):
+        return empty
+    domain = str(entry.get("domain", ""))
+    jpath = root / "TOOLS" / "TEST_AUTO_CI" / "RESULTS" / domain / "reports" / f"{fb_key}.json"
+    if not jpath.is_file():
+        return {**empty, "domain": domain}
+    try:
+        data = json.loads(jpath.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {**empty, "domain": domain}
+    summ = data.get("summary") or {}
+    total = int(summ.get("total", 0) or 0)
+    passed = int(summ.get("passed", 0) or 0)
+    failed = int(summ.get("failed", 0) or 0)
+    verdict = "pass" if (total > 0 and failed == 0) else ("fail" if total > 0 else "none")
+    return {
+        "domain": domain,
+        "total": total,
+        "passed": passed,
+        "failed": failed,
+        "verdict": verdict,
+        "report_rel": f"../../TOOLS/TEST_AUTO_CI/RESULTS/{domain}/reports/{fb_key}.html",
+    }
+
+
+def _traceability(matrix: dict[str, Any], root: Path) -> dict[str, Any]:
+    """Chaine Besoin -> Fonction -> TC certifiant -> preuve CI (PASS/FAIL + rapport)."""
+    root = Path(root)
+    reg_path = root / "TOOLS" / "TEST_AUTO_CI" / "registry.yaml"
+    registry: dict[str, Any] = {}
+    if reg_path.is_file():
+        registry = yaml.safe_load(reg_path.read_text(encoding="utf-8")) or {}
+
+    fb_titles: dict[str, set[str]] = {}
+    all_tested: set[str] = set()
+    ignored: set[str] = set()
+    for key, entry in registry.items():
+        if not isinstance(entry, dict):
+            continue
+        ignored.update(entry.get("af_ignore", []) or [])
+        ids: set[str] = set()
+        test = entry.get("test")
+        if test:
+            tpath = root / test
+            if tpath.is_file():
+                ids = ids_from_test_titles(tpath.read_text(encoding="utf-8"))
+        fb_titles[key] = ids
+        all_tested |= ids
+
+    rows: list[dict] = []
+    fn_no_tc: list[dict] = []
+    tc_orphan: list[dict] = []
+    tc_no_ci: list[dict] = []
+    n_func = n_pass = n_gap = 0
+
+    for af in sorted(matrix.get("domains", {})):
+        dom = matrix["domains"][af] or {}
+        functions = dom.get("functions", {}) or {}
+        vpoints = dom.get("validation_points", {}) or {}
+        vp_table = _vp_lookup(vpoints)
+        af_cited: set[str] = set()
+
+        for fid, f in functions.items():
+            f = f or {}
+            n_func += 1
+            tc_ids = _canonical_tc_ids(" ".join(str(t) for t in (f.get("tc_couvrants") or []) if t))
+            af_cited.update(tc_ids)
+            realisee = str(f.get("realisee_par", "") or "")
+            fb_key = next((tok for tok in FB_TOKEN_RE.findall(realisee) if tok in registry), None)
+            titles = fb_titles.get(fb_key, set()) if fb_key else set()
+
+            tcs = [
+                {
+                    "id": cid,
+                    "intention": vp_table.get(cid, {}).get("intention", ""),
+                    "type": vp_table.get(cid, {}).get("type", ""),
+                    "in_ci_title": cid in titles,
+                }
+                for cid in tc_ids
+            ]
+            ci = _ci_verdict(root, registry, fb_key)
+
+            if not tc_ids:
+                fn_no_tc.append({"af": af, "fid": fid, "fonction": f.get("fonction", "")})
+            for t in tcs:
+                typ = t["type"]
+                if t["id"] in all_tested or t["id"] in ignored:
+                    continue
+                if "SITE" in typ and "AUTO" not in typ:
+                    continue
+                if "AUTO" not in typ:
+                    continue
+                tc_no_ci.append({"af": af, "fid": fid, "tc": t["id"]})
+
+            if ci["verdict"] == "pass":
+                n_pass += 1
+            if (not tc_ids) or any(not t["in_ci_title"] for t in tcs):
+                n_gap += 1
+
+            rows.append({
+                "af": af,
+                "fid": fid,
+                "fonction": f.get("fonction", ""),
+                "criticite": f.get("criticite", ""),
+                "realisee_par": realisee,
+                "tcs": tcs,
+                "ci": ci,
+            })
+
+        seen: set[str] = set()
+        for key, val in vpoints.items():
+            val = val or {}
+            for cid in _canonical_tc_ids(key):
+                if cid in seen:
+                    continue
+                seen.add(cid)
+                if cid not in af_cited:
+                    tc_orphan.append({"af": af, "tc": cid, "intention": str(val.get("intention", ""))})
+
+    return {
+        "rows": rows,
+        "fn_no_tc": fn_no_tc,
+        "tc_orphan": tc_orphan,
+        "tc_no_ci": tc_no_ci,
+        "counts": {
+            "functions": n_func,
+            "functions_with_ci_pass": n_pass,
+            "functions_with_gap": n_gap,
+        },
+    }
 
 
 def _git(*args: str) -> str:
@@ -198,6 +363,28 @@ td.mono,span.mono{{font-family:"SF Mono",SFMono-Regular,Consolas,"Liberation Mon
 .p-no_pointer{{background:var(--none-bg);color:var(--none)}}
 .b-yes{{color:var(--ok);font-weight:700}} .b-no{{color:var(--red);font-weight:700}} .b-na{{color:var(--muted)}}
 .small{{color:var(--muted);font-size:11px}}
+.tcbadge{{display:inline-block;margin:1px 3px 1px 0;padding:1px 6px;border-radius:9px;font-size:10px;
+  font-family:"SF Mono",SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;
+  border:1px solid var(--line);background:var(--row-alt);color:var(--muted)}}
+.tcbadge.ok{{color:var(--ok);border-color:var(--ok)}}
+.tcbadge.no{{color:var(--red);border-color:var(--red)}}
+.verdict{{font-weight:700;white-space:nowrap}}
+.verdict.pass{{color:var(--ok)}} .verdict.fail{{color:var(--red)}} .verdict.none{{color:var(--muted)}}
+.gapbox{{margin:10px 0}}
+.gapbox>summary{{cursor:pointer;font-weight:600;padding:4px 0;color:var(--ink);list-style:none}}
+.gapbox>summary::-webkit-details-marker{{display:none}}
+.gapbox>summary::before{{content:"\\25B8";color:var(--accent);font-size:11px;margin-right:6px;display:inline-block}}
+.gapbox[open]>summary::before{{transform:rotate(90deg)}}
+.gapbox ul{{margin:6px 0 8px 20px}}
+.gapbox li{{margin:2px 0;font-size:11px}}
+.okmsg{{color:var(--ok);font-size:11px;margin:4px 0 8px}}
+.refresh code{{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:4px;
+  padding:2px 7px;font-size:11px;
+  font-family:"SF Mono",SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;color:var(--ink)}}
+.refresh .cmdline{{display:flex;gap:8px;align-items:center;margin:4px 0;flex-wrap:wrap}}
+.copybtn{{background:var(--panel);border:1px solid var(--line);color:var(--ink);cursor:pointer;
+  border-radius:4px;padding:2px 8px;font-size:11px}}
+.copybtn:hover{{background:var(--th-hover)}}
 footer{{margin-top:26px;color:var(--muted);font-size:11px;border-top:1px solid var(--line);padding-top:10px}}
 </style>
 </head>
@@ -209,6 +396,15 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 
 <div class="panel" id="stats"></div>
 <div class="panel freshbar" id="fresh"></div>
+
+<div class="panel refresh">
+<strong>\U0001F504 Rafraichir (aucun serveur — colle dans un terminal a la racine du repo)</strong>
+<div class="cmdline"><code data-cmd="1">python TOOLS/AGENT_WORKFLOW/scripts/check_fb_cartouche_sync.py</code><button type="button" class="copybtn" data-copy="1">copier</button></div>
+<div class="cmdline"><code data-cmd="2">python TOOLS/AGENT_WORKFLOW/scripts/extract_functions_matrix.py</code><button type="button" class="copybtn" data-copy="2">copier</button></div>
+<div class="cmdline"><code data-cmd="3">python TOOLS/AGENT_WORKFLOW/scripts/generate_af_viewer.py</code><button type="button" class="copybtn" data-copy="3">copier</button></div>
+<div class="cmdline"><button type="button" class="copybtn" id="copy-all">copier tout</button>
+<span class="small">ou double-clic sur <code>refresh_af_viewer.bat</code> (meme dossier que cette page)</span></div>
+</div>
 
 <details class="sec"><summary>1 &middot; Fonctions par AF <span class="count" id="c-fn"></span></summary>
 <div class="body">
@@ -239,6 +435,19 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 </tr></thead><tbody></tbody></table></div>
 </div></details>
 
+<details class="sec"><summary>4 &middot; Tracabilite Fonction → TC → Test CI <span class="count" id="c-tr"></span></summary>
+<div class="body">
+<div class="sub">Chaine <span class="mono">Besoin → Fonction (F&lt;NN&gt;.&lt;seq&gt;) → TC certifiant → preuve CI</span>.
+Jointure matrice AF &times; registre <span class="mono">TEST_AUTO_CI</span> &times; rapports JSON — met en evidence les trous.</div>
+<div class="controls"><input type="text" id="f-tr" placeholder="filtre texte (AF, fonction, FB, TC, verdict…)" autocomplete="off"></div>
+<div class="tablewrap"><table id="t-tr"><thead><tr>
+<th data-k="af">AF</th><th data-k="fonction">Fonction</th><th data-k="criticite">Crit.</th>
+<th data-k="realisee_par">Realisee par</th><th data-k="tc_str">TC (✅ titre TEST / ❌ absent)</th>
+<th data-k="ci_str">CI</th><th data-k="rpt_str">Rapport</th>
+</tr></thead><tbody></tbody></table></div>
+<div id="tr-gaps"></div>
+</div></details>
+
 <footer id="foot"></footer>
 
 <script type="application/json" id="data-fn">{FN}</script>
@@ -246,10 +455,11 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 <script type="application/json" id="data-sy">{SY}</script>
 <script type="application/json" id="data-dom">{DOM}</script>
 <script type="application/json" id="data-meta">{META}</script>
+<script type="application/json" id="data-tr">{TR}</script>
 <script>
 "use strict";
 function grab(id){{return JSON.parse(document.getElementById(id).textContent);}}
-var FN=grab("data-fn"), TC=grab("data-tc"), SY=grab("data-sy"), DOM=grab("data-dom"), META=grab("data-meta");
+var FN=grab("data-fn"), TC=grab("data-tc"), SY=grab("data-sy"), DOM=grab("data-dom"), META=grab("data-meta"), TR=grab("data-tr");
 function esc(s){{s=(s==null?"":String(s));return s.replace(/[&<>"]/g,function(c){{return {{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}}[c];}});}}
 
 /* ---------- bandeau stats ---------- */
@@ -272,6 +482,8 @@ function esc(s){{s=(s==null?"":String(s));return s.replace(/[&<>"]/g,function(c)
     '<div class="statgrid">'
     + '<div class="stat"><div class="n">'+FN.length+'</div><div class="l">fonctions AF</div></div>'
     + '<div class="stat"><div class="n">'+TC.length+'</div><div class="l">TC AF</div></div>'
+    + '<div class="stat"><div class="n">'+(TR.counts.functions-TR.fn_no_tc.length)+'</div><div class="l">fonctions tracees</div></div>'
+    + '<div class="stat"><div class="n">'+TR.counts.functions_with_gap+'</div><div class="l">fonctions avec trou</div></div>'
     + '<div class="stat"><div class="n">'+(c.synced||0)+'</div><div class="l">&#9989; synced</div></div>'
     + '<div class="stat"><div class="n">'+(c.drift||0)+'</div><div class="l">&#9888; drift</div></div>'
     + '<div class="stat"><div class="n">'+(c.no_fiche||0)+'</div><div class="l">&#128309; no_fiche</div></div>'
@@ -392,6 +604,94 @@ makeTable("t-sy","f-sy","c-sy",SY,[
   {{k:"role_match",fmt:function(r){{return r.role_match==null?'<span class="b-na">n/a</span>':(r.role_match?'<span class="b-yes">oui</span>':'<span class="b-no">non</span>');}}}}
 ],{{key:"_rank",dir:1}});
 
+/* ---------- section 4 : tracabilite Fonction -> TC -> Test CI ---------- */
+(function(){{
+  var rows=TR.rows.map(function(r){{
+    var ci=r.ci||{{}};
+    r.tc_str=(r.tcs||[]).map(function(t){{return t.id+(t.in_ci_title?" ok":" no");}}).join(" ")||"aucun";
+    r.ci_str=(ci.verdict||"none")+" "+(ci.passed||0)+"/"+(ci.total||0);
+    r.rpt_str=ci.report_rel?"rapport":"";
+    return r;
+  }});
+  function tcCell(r){{
+    if(!r.tcs||!r.tcs.length) return '<span class="tcbadge no">aucun TC</span>';
+    return r.tcs.map(function(t){{
+      var cls=t.in_ci_title?"ok":"no", mk=t.in_ci_title?"\\u2705":"\\u274c";
+      return '<span class="tcbadge '+cls+'" title="'+esc((t.type?t.type+" \\u2014 ":"")+t.intention)+'">'
+        + esc(t.id)+' '+mk+'</span>';
+    }}).join("");
+  }}
+  function ciCell(r){{
+    var ci=r.ci||{{}}, v=ci.verdict||"none";
+    var txt = v==="pass" ? ("\\uD83D\\uDFE2 "+(ci.passed||0)+"/"+(ci.total||0))
+            : v==="fail" ? ("\\uD83D\\uDD34 "+(ci.passed||0)+"/"+(ci.total||0))
+            : "\\u26AA none";
+    return '<span class="verdict '+v+'">'+txt+'</span>';
+  }}
+  function rptCell(r){{
+    var ci=r.ci||{{}};
+    return ci.report_rel
+      ? '<a href="'+esc(ci.report_rel)+'" target="_blank" rel="noopener">rapport</a>'
+      : '<span class="small">\\u2014</span>';
+  }}
+  makeTable("t-tr","f-tr","c-tr",rows,[
+    {{k:"af",fmt:function(r){{return esc(r.af);}}}},
+    {{k:"fonction",fmt:function(r){{return '<span class="mono">'+esc(r.fid)+'</span> '+esc(r.fonction);}}}},
+    {{k:"criticite",fmt:function(r){{return esc(r.criticite);}}}},
+    {{k:"realisee_par",fmt:function(r){{return esc(r.realisee_par);}}}},
+    {{k:"tc_str",fmt:tcCell}},
+    {{k:"ci_str",fmt:ciCell}},
+    {{k:"rpt_str",fmt:rptCell}}
+  ],{{key:"af",dir:1}});
+
+  function gapList(title,items,render){{
+    var body=items.length?('<ul>'+items.map(render).join("")+'</ul>'):'<div class="okmsg">aucun</div>';
+    return '<details class="gapbox"'+(items.length?" open":"")+'><summary>'+esc(title)
+      + ' ('+items.length+')</summary>'+body+'</details>';
+  }}
+  var g="";
+  g+=gapList("Fonctions sans TC",TR.fn_no_tc,function(x){{
+    return '<li><span class="mono">'+esc(x.af+" "+x.fid)+'</span> \\u2014 '+esc(x.fonction)+'</li>';
+  }});
+  g+=gapList("TC orphelins \\u2014 aucune fonction ne les revendique",TR.tc_orphan,function(x){{
+    return '<li><span class="mono">'+esc(x.af+" "+x.tc)+'</span>'+(x.intention?' \\u2014 '+esc(x.intention):"")+'</li>';
+  }});
+  g+=gapList("TC AUTO sans titre TEST",TR.tc_no_ci,function(x){{
+    return '<li><span class="mono">'+esc(x.af+" "+x.fid+" \\u2192 "+x.tc)+'</span></li>';
+  }});
+  document.getElementById("tr-gaps").innerHTML=g;
+}})();
+
+/* ---------- boutons COPIER (page file:// = pas de script serveur) ---------- */
+(function(){{
+  var CMDS={{
+    "1":"python TOOLS/AGENT_WORKFLOW/scripts/check_fb_cartouche_sync.py",
+    "2":"python TOOLS/AGENT_WORKFLOW/scripts/extract_functions_matrix.py",
+    "3":"python TOOLS/AGENT_WORKFLOW/scripts/generate_af_viewer.py"
+  }};
+  function copyText(txt){{
+    try{{
+      if(navigator.clipboard&&navigator.clipboard.writeText){{navigator.clipboard.writeText(txt);return;}}
+    }}catch(e){{}}
+    var ta=document.createElement("textarea");
+    ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{{document.execCommand("copy");}}catch(e){{}}
+    document.body.removeChild(ta);
+  }}
+  function flash(btn){{
+    var old=btn.textContent; btn.textContent="copie \\u2713";
+    setTimeout(function(){{btn.textContent=old;}},1200);
+  }}
+  Array.prototype.forEach.call(document.querySelectorAll(".copybtn[data-copy]"),function(btn){{
+    btn.addEventListener("click",function(){{copyText(CMDS[btn.getAttribute("data-copy")]||"");flash(btn);}});
+  }});
+  var all=document.getElementById("copy-all");
+  if(all) all.addEventListener("click",function(){{
+    copyText([CMDS["1"],CMDS["2"],CMDS["3"]].join("\\n"));flash(all);
+  }});
+}})();
+
 document.getElementById("foot").innerHTML=
   "Sources : <span class=mono>af_traceability_matrix.yaml</span> + <span class=mono>fb_cartouche_sync.json</span>. "
   + "Genere par <span class=mono>generate_af_viewer.py</span> le "+esc(META.build_at)+" (HEAD "+esc(META.build_head)+"). "
@@ -414,6 +714,7 @@ def main() -> int:
     sync = json.loads(SYNC_PATH.read_text(encoding="utf-8"))
 
     fn_rows, tc_rows, dom_stats = _rows_from_matrix(matrix)
+    trace = _traceability(matrix, REPO_ROOT)
 
     sync_counts = sync.get("counts") or {}
     for k in ("synced", "drift", "no_fiche", "no_pointer"):
@@ -437,6 +738,7 @@ def main() -> int:
         SY=_json_for_script(sync.get("fb", [])),
         DOM=_json_for_script(dom_stats),
         META=_json_for_script(meta),
+        TR=_json_for_script(trace),
     )
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -447,6 +749,11 @@ def main() -> int:
     hits = [b for b in banned if b in page]
     print(f"AF_VIEWER genere -> {OUT_PATH.relative_to(REPO_ROOT).as_posix()}")
     print(f"  {len(fn_rows)} fonctions, {len(tc_rows)} TC, {len(sync.get('fb', []))} FB")
+    tcn = trace["counts"]
+    print(f"  tracabilite : {tcn['functions']} fonctions, {tcn['functions_with_ci_pass']} CI pass, "
+          f"{tcn['functions_with_gap']} avec trou | "
+          f"{len(trace['fn_no_tc'])} sans TC, {len(trace['tc_orphan'])} TC orphelins, "
+          f"{len(trace['tc_no_ci'])} TC AUTO sans titre TEST")
     print(f"  matrice AF : {meta['matrix_fresh']}  |  sync : {meta['sync_generated_at']}  |  build HEAD {meta['build_head']}")
     if hits:
         print(f"  !! motifs interdits detectes : {hits}", file=sys.stderr)
