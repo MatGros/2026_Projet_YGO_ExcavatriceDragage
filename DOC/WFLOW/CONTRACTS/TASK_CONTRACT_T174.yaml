@@ -1,0 +1,71 @@
+# Contrat T174 — Tests CI du socle FaultCore + Safety EmergencyManagement
+# Source des écarts : DOC/WFLOW/P3_TEST_AUDIT_PROPOSITIONS_v1.0.md (audits P3-1a..d, 2026-08-29)
+
+contract:
+  task_id: T174
+  criticality: C3            # preuve CI manquante sur le socle transverse Fault (18 FB standard) + fiche Safety V-I à prouver
+  strategy: patch
+
+  objective: >
+    Rendre prouvées par CI les fonctions socle FB_FaultCore (TC-P03-008..013, état V-I sans
+    aucun test exécutable : test_fb_fbstatus.st vise un FB supprimé au commit 51fccce6) et
+    FB_Safety_EmergencyManagement (12 TC-P01 : SCEN-NOM, SCEN-DYN, 001..010, tous V-I) —
+    de sorte que chaque TC dispose d'un TEST STruCpp nommé à son ID, enregistré dans
+    registry.yaml, et exécuté avec preuve de résultat.
+
+  acceptance:
+    - id: AC1
+      statement: "Un fichier test_fb_faultcore.st couvre TC-P03-008..013 (latch cause, disparition cause + Reset sur front, priorité causes, masque, indépendance d'instances) et compile contre FB_FaultCore.st actuel."
+      verified_by: "pytest TOOLS/AGENT_WORKFLOW/tests/test_g450_af_ci_coverage.py + run du harnais TEST_AUTO_CI (G460) : 0 échec"
+    - id: AC2
+      statement: "Un fichier test_fb_safety_emergency.st couvre les 12 TC-P01 conformément à la fiche §2 et §4 (Steps 1-6 : 200ms, pulse 1.0s, timeout 2.0s, lockout 5.0s, Avortement IHM BtnEmergencyCutOff) avec assertions sur les sorties State/Diag nommées."
+      verified_by: "run harnais G460 + lecture registry.yaml"
+    - id: AC3
+      statement: "Chaque TEST porte un titre contenant l'identifiant TC couvert et chaque TC est enregistré dans TOOLS/TEST_AUTO_CI/registry.yaml (zéro TC-P03-008..013 / TC-P01-* absent du registry)."
+      verified_by: "G450_check_af_ci_coverage.py --report : disparition des WARN AF-03/AF-01 correspondants"
+    - id: AC4
+      statement: "L'entrée af_ignore: [TC-P01-005] de registry.yaml est soit justifiée par un commentaire factuel (action 2 temps = acquittement IHM puis réarmement pupitre = test site), soit supprimée si un TEST automatisable la couvre."
+      verified_by: "lecture registry.yaml + note de justification datée"
+    - id: AC5
+      statement: "Aucun etat de TC (V, V-I, NV, NV-I, R, NA) n'est modifie dans DOC/AF : le lot ne touche QUE l'outillage CI (les etats evolueront ensuite sur preuves d'execution)."
+      verified_by: "git diff -- DOC/AF vide en fin de lot"
+
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/TESTS/**
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/** (rapports de run)
+    forbidden:
+      - CODE/**                    # aucun changement de comportement machine dans ce lot
+      - DOC/AF/**                  # aucun changement d'état de TC ici
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/TASKS.yaml       # la tâche est écrite une fois ici, pas par le lot
+
+  evidence_required:
+    - run_all_gates          # G420/G460 (pytest + harnais)
+    - G450_report            # couverture AF -> TC -> TEST_AUTO_CI
+    - pytest_gates           # test_extract_functions_matrix / test_generate_af_viewer
+
+  alert_duty: >
+    Si FB_Safety_EmergencyManagementLogic.st ne permet pas de forcer proprement les entrées
+    des TC (pas de points d'injection), lever l'alerte IMMÉDIATEMENT (le lot devient
+    "contrat d'instrumentation" à arbitrer) — jamais approximer un scénario.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir par l'agent exécutant : fichiers de test créés, résultats harnais, registry.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Rappel : pré-condition humaine — arbitrage de l'insertion des 63 TC nouveaux (annexe
+    P3_TEST_AUDIT_PROPOSITIONS_v1.0.md) attendu pour les TC suffixés ; ce lot T174 vise
+    d'abord les TC RACINES existants déjà décrits dans les fiches.
