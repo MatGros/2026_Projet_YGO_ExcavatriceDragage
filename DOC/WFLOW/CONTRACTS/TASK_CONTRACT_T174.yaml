@@ -7,19 +7,22 @@ contract:
   strategy: patch
 
   objective: >
-    Rendre prouvées par CI les fonctions socle FB_FaultCore (TC-P03-008..013, état V-I sans
-    aucun test exécutable : test_fb_fbstatus.st vise un FB supprimé au commit 51fccce6) et
-    FB_Safety_EmergencyManagement (12 TC-P01 : SCEN-NOM, SCEN-DYN, 001..010, tous V-I) —
-    de sorte que chaque TC dispose d'un TEST STruCpp nommé à son ID, enregistré dans
-    registry.yaml, et exécuté avec preuve de résultat.
+    Rendre prouvées par CI les fonctions socle FB_FaultCore (TC-P03-008..013 — SOCLE P0 :
+    test_fb_fbstatus.st vise un FB supprimé au commit 51fccce6, ne compile plus) et
+    compléter la couverture FB_Safety_EmergencyManagement : 10/12 TC déjà prouvés par
+    rapport daté (2026-08-29 12:50:02, 10/10 PASS) — restent TC-P01-001 (essai SITE,
+    non automatisable par nature) et TC-P01-005 (af_ignore).
 
   acceptance:
+    - id: AC0
+      statement: "Preuve existante : test_fb_safety_emergency.st (10/12 TC) et son rapport reports/FB_Safety_EmergencyManagement.json (10/10 PASS, 2026-08-29 12:50) restent verts après le lot (aucune régression du fichier existant)."
+      verified_by: "re-run harnais TEST_AUTO_CI sur la fiche : 10/10 PASS conservés"
     - id: AC1
       statement: "Un fichier test_fb_faultcore.st couvre TC-P03-008..013 (latch cause, disparition cause + Reset sur front, priorité causes, masque, indépendance d'instances) et compile contre FB_FaultCore.st actuel."
       verified_by: "pytest TOOLS/AGENT_WORKFLOW/tests/test_g450_af_ci_coverage.py + run du harnais TEST_AUTO_CI (G460) : 0 échec"
     - id: AC2
-      statement: "Un fichier test_fb_safety_emergency.st couvre les 12 TC-P01 conformément à la fiche §2 et §4 (Steps 1-6 : 200ms, pulse 1.0s, timeout 2.0s, lockout 5.0s, Avortement IHM BtnEmergencyCutOff) avec assertions sur les sorties State/Diag nommées."
-      verified_by: "run harnais G460 + lecture registry.yaml"
+      statement: "TC-P01-005 : soit l'af_ignore est justifié par une note datée (test logique minimal 'ArmRequest sans Reset bloqué, puis Reset+ArmRequest arme' ajouté si retenu), soit un TEST correspondant est ajouté au fichier existant."
+      verified_by: "lecture registry.yaml + run harnais"
     - id: AC3
       statement: "Chaque TEST porte un titre contenant l'identifiant TC couvert et chaque TC est enregistré dans TOOLS/TEST_AUTO_CI/registry.yaml (zéro TC-P03-008..013 / TC-P01-* absent du registry)."
       verified_by: "G450_check_af_ci_coverage.py --report : disparition des WARN AF-03/AF-01 correspondants"

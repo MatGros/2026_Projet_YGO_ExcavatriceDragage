@@ -1,0 +1,64 @@
+# Contrat T175 — Écarts code découverts par l'audit P3-1 (treuils/benne)
+# Source : DOC/WFLOW/P3_TEST_AUDIT_PROPOSITIONS_v1.0.md (vérifiés ligne à ligne par l'orchestrateur)
+
+contract:
+  task_id: T175
+  criticality: C4            # mécanismes de sécurité décrits par les TC mais absents du code
+  strategy: patch
+
+  objective: >
+    Rendre le code conforme aux TC déjà écrits et à la sécurité attendue : 4 mécanismes
+    documentés mais absents/incohérents dans CODE (vérifiés ligne à ligne le 2026-08-29).
+
+  acceptance:
+    - id: AC1
+      statement: "FB_DriftGuard expose une entrée de garde vitesse (ex. CommandedSpeedMps/VelocityMps) et FB_Safety_Winch la câble : TC-P10-001 'dérive >2.0m OU vitesse >0.02m/s' devient exécutable telles qu'écrites."
+      verified_by: "grep des ports + existence du test CI correspondant"
+    - id: AC2
+      statement: "Temps mort directionnel : DeadTimeSameDir/DeadTimeOppositeDir (ou équivalent nommé) distinct de RestartDelay (T#1500ms uniforme) — les TC-P10-021/022 décrivent 1s par direction, la valeur implémentée est tranchée et documentée."
+      verified_by: "lecture code + test TC-P10-021/022 exécutables"
+    - id: AC3
+      statement: "FB_Bucket lit réellement M1_Busy/M2_Busy (L29-30, déclarées jamais lues) pour l'anti-traversée demandée (TC-P10-025) : demande benne refusée si un treuil agit."
+      verified_by: "grep M1_Busy dans le corps FB_Bucket + test TC-P10-025"
+    - id: AC4
+      statement: "FB_Bucket confirme/ouvre sous MAINT_N1 ET N2 comme décrit (TC-P10-030) ou la fiche est corrigée MAINT_N2 seul — décision tracée, plus d'écart silencieux."
+      verified_by: "diff fiche + code alignés (TC-P10-030)"
+    - id: AC5
+      statement: "Suite de validation : tous les gates palier C passent après les 4 patchs (non-régression)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/**
+    forbidden:
+      - DOC/AF/**             # la fiche ne bouge qu'après le code, sur preuve
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/TASKS.yaml
+
+  evidence_required:
+    - check_linkage          # G200 bloquant sur le bundle
+    - run_all_gates          # palier C complet
+    - bundle                 # CODE_Bundle.xml régénéré
+
+  alert_duty: >
+    Toute option de conception nouvelle (ex. source de vitesse à câbler pour DriftGuard :
+    capteur réel vs estimation) est soumise à l'orchestrateur AVANT implémentation — choisir
+    seul une source physique n'est pas dans le scope.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir : 4 patchs, preuves code+tests.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Les TC existants concernés (001/011/021/022/025/030) changent de verdict APRES ce lot :
+    pipeline doc (état, fiche) séparé, sur preuve d'exécution.
