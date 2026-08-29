@@ -14,5 +14,12 @@ STRUCT
                                                     UNIQUEMENT actif si MAINT_N2 (voir FB_Modes.InhibitM1/M2) *)
     BtnHomingAtZero     : BOOL;             (* Force le homing à 0 m (points codeur centre),
                                                     sans devoir modifier CfgTopSensorPos_M *)
+    BtnOverrideTopSoftware : BOOL;          (* Autorisation MAINTENUE de dépasser le FDC
+                                                    haut LOGICIEL (7,5 m) jusqu'au capteur physique
+                                                    (CfgTopSensorPos_M ≈ 8,5 m). Bouton, pas toggle :
+                                                    relâché ➔ retour immédiat à 7,5 m. Sans effet hors
+                                                    MAINT_N1 (N2 utilise le bypass latché
+                                                    Bypass.TopLimitSoftware). N'ouvre JAMAIS le FDC
+                                                    capteur physique. *)
 END_STRUCT
 END_TYPE

@@ -203,6 +203,22 @@ FB_ExtractionSequence:
     - CODE/G_CYCLE/FB_ExtractionSequence.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_extractionsequence.st
 
+FB_SpeedStep:
+  domain: H_TREUILS_BENNE
+  sources:
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st
+    - CODE/H_TREUILS_BENNE/FB_SpeedStep.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_speedstep.st
+
+FB_WinchSpeedLearning:
+  domain: H_TREUILS_BENNE
+  sources:
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchSpeedLearning_Cell.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchSpeedLearning_Table.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchSpeedLearning_Cfg.st
+    - CODE/H_TREUILS_BENNE/FB_WinchSpeedLearning.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch_speed_learning.st
+
 FB_Winch:
   domain: H_TREUILS_BENNE
   sources:

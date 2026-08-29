@@ -15,6 +15,7 @@
 2. [🎚️ Modes machine](#2-modes-machine)
 3. [🧩 Fonctions et petits cycles](#3-fonctions-et-petits-cycles)
 4. [🎮 Sélection de commande](#4-sélection-de-commande)
+4bis. [🛡️ Matrice de bypass maintenance — treuils M1/M2](#4bis-matrice-de-bypass-maintenance--treuils-m1m2)
 5. [📐 Bus d'autorisations](#5-bus-dautorisations)
 6. [📏 Limite légale](#6-limite-légale)
 7. [🛡️ Défauts et reprise](#7-défauts-et-reprise)
@@ -161,11 +162,91 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 - L'inhibition d'un treuil est une action de maintenance distincte.
 - Elle neutralise le mouvement de l'axe concerne et impose les consequences de synchro.
 - Elle est pilotée via `Auth.InhibitM1/2` (bus `Auth : ST_fbModes_Autorisations`).
-- Matrice complete des bypass : **TBD**.
+- Matrice complete des bypass : **§4bis** (treuils M1/M2, T181-11).
 
 > 📌 **Authentification** : gérée côté IHM (visibilité des actions selon niveau utilisateur).
 > L'automate reçoit uniquement le mode arbitré (`MAINT_N1` / `MAINT_N2` / `SEMI_AUTO`).
 > Aucun garde-fou mot de passe côté PLC — `FB_Modes` accepte `SelMode` tel quel.
+
+---
+
+## 🛡️ 4bis · Matrice de bypass maintenance — treuils M1/M2
+
+> **Source** : cadrage T181-11 (`DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T181-11_MATRICE_MAINT.md`), décision Q8 du plan de gel T181. Implémentation : T181-14.
+
+### Principe
+
+Un bypass de sécurité n'est **effectif que si `Mode = MAINT_N2`** (doctrine `ST_BypassWinch` /
+`ST_BypassCommun` / `ST_BypassBucket`). Un bypass IHM activé hors N2 est **ignoré** (affiché
+« inactif — passer en N2 »). Exception unique : l'**override FDC haut logiciel** est possible en
+`MAINT_N1` via un **bouton maintenu** (momentané), borné par le capteur physique haut (≈ 8,5 m),
+jamais franchi.
+
+```
+bypass_effectif := bypass_IHM AND (Mode = MAINT_N2)   (* pour tous les bypass, sauf override FDC N1 *)
+```
+
+### Matrice mode × bypass
+
+| Famille | Bypass | N1 | N2 | Latence |
+|---|---|---|---|---|
+| Communication & aux. | `OperatorComm`, `EncoderFault`, `PhaseRotation`, `BrakeThermal`, `MotorThermal`, `ContactorFeedback` | ❌ | ✅ | latché (RETAIN) |
+| Limites position | `TopLimitSwitch`, `CableLimitSwitch`, `LimitLegal`, `SlackCable` | ❌ | ✅ | latché |
+| Limites position | `TopLimitSoftware` | ⚠️ momentané (bouton tenu) | ✅ | N1 : tant que tenu · N2 : latché |
+| Méca A-E | `MecaA`, `MecaC`, `MecaD`, `MecaE` | ❌ | ✅ | latché |
+| Méca A-E | `MecaB` | ❌ | ✅ | latché + bandeau d'avertissement fort |
+| Groupés | `Safety`, `Process`, `Global` (axe / commun / benne) | ❌ | ✅ | latché (RETAIN) — **conservés** (homogène projet, idem translation M3) |
+
+> **Total : 25 bascules** (18 axe `ST_BypassWinch` + 6 commun `ST_BypassCommun` + 1 benne
+> `ST_BypassBucket`), toutes RETAIN, toutes mode-gated sur `MAINT_N2`. Aucun retrait de DUT
+> (aucun impact IHM/SCADA). `MecaB` et `LimitLegal` restent bypassables en N2 (homogène) ; la
+> traçabilité est assurée par le RETAIN + le journal de bypass existant.
+
+### Override FDC haut logiciel (décision Q8)
+
+| Contexte | `TopLimitM` (calculé `PRG_04`) | Butée physique |
+|---|---|---|
+| Fonctionnement normal (SEMI_AUTO, N1 sans override, N2 sans override) | **7,5 m** (`CfgCableLimitAscent_M`) | capteur `TopPositionSensor` ≈ 8,5 m (jamais atteint en nominal) |
+| **N1 + bouton IHM « autoriser dépassement FDC » MAINTENU** | **8,5 m** (borne physique = capteur homing haut) | capteur `TopPositionSensor` — **jamais dépassé** (`BypassTopLimitSwitch` reste FALSE) |
+| **N2 + bypass `TopLimitSoftware` latché** | 8,5 m | capteur `TopPositionSensor` (sauf si `TopLimitSwitch` aussi bypassé — acte N2 séparé) |
+
+- **N1 momentané** : `OverrideTopSoftwareN1 := (Mode = MAINT_N1) AND GVL_IHM.<axe>.Cmd.BtnOverrideTopSoftware` (bouton, pas toggle). Relâche → `TopLimitM` **repasse à 7,5 m au cycle suivant**, le FDC logiciel redevient actif immédiatement.
+- **La butée physique 8,5 m n'est jamais franchie en N1** : `BypassTopLimitSwitch` n'est **pas** ouvert par cet override. Si le capteur `TopPositionSensor` retombe, `AscentPermit` tombe (`FB_Safety_Winch.st:382-383`) → arrêt matériel.
+- **N2 latché** : `TopLimitSoftware` classique, RETAIN, débit assumé jusqu'à sortie de N2.
+
+### Bascule de mode
+
+**Passage en / hors `MAINT_N1` ou `MAINT_N2` refusé tant que le treuil n'est pas à l'arrêt mécanique confirmé** — même composite que l'armement Méca B (`FB_Safety_Winch.st:247`) :
+
+```
+BasculeModeAutorisee := FwdRevSpeedFeedbackOff AND NOT BrakeFeedback
+                        (* contacteurs retombés ET frein serré *)
+                        AND (ABS(MeasuredSpeedMps) < MovementSpeedThresholdMps)   (* redondance mesure *)
+```
+
+- Tant que faux : `FB_Modes` maintient le mode courant, remonte `ModeChangePendingBlocked` à l'IHM (« arrêter le treuil avant de changer de mode »).
+- S'applique aux **deux sens** (entrer et sortir de N1/N2).
+- Décision et calcul dans **`FB_Modes`** (arbitrage de mode), pas dans `PRG_04`.
+
+### Re-homing obligatoire
+
+Après **toute** sortie d'un mode maintenance qui a **effectivement** utilisé :
+- l'override FDC N1 momentané (`OverrideTopSoftwareN1` a été vrai au moins un cycle), **ou**
+- un bypass de la famille position (`TopLimitSwitch`, `TopLimitSoftware`, `CableLimitSwitch`, `LimitLegal`, `MecaD`) latché en N2,
+
+→ le treuil concerné est marqué `HomingRequired := TRUE` (drapeau persistant par axe).
+- Tant que `HomingRequired` : SEMI_AUTO **interdit** pour cet axe (`FB_Modes` bloque l'arbitrage), N1 autorisé pour manœuvrer, `HomingSuspect` forcé côté diag.
+- `HomingRequired` retombe uniquement sur **cycle de homing complet réussi** (`EncoderMx.HomingLifecycle.Done` + `Homed AND NOT HomingSuspect`).
+- Raison : un dépassement des limites de position invalide la confiance dans `CablePosM` — la re-référence est la seule remise à zéro sûre.
+
+### Confirm / ouvre benne en maintenance (alignement T175 AC4)
+
+T175 AC4 : *« FB_Bucket confirme/ouvre sous MAINT_N1 ET N2 comme décrit (TC-P10-030), ou la fiche est corrigée MAINT_N2 seul — décision tracée »*.
+
+**Décision : MAINT_N1 ET MAINT_N2.**
+- Rationale : ouvrir/fermer la benne est une **manœuvre de service courante** (dégagement, entretien du grappin) qui ne nécessite aucun bypass de sécurité — elle doit rester possible avec toutes sécurités actives (N1).
+- N2 ajoute seulement la possibilité de la faire **avec** des bypass position/méca actifs (ex. benne bloquée en butée).
+- ⇒ `FB_Bucket.ConfirmOpen` / `ConfirmClose` gatés sur `Mode IN {MAINT_N1, MAINT_N2}` (pas N2 seul). À implémenter en **T181-14** ; le TC-P10-030 est réécrit en conséquence.
 
 ---
 
@@ -218,12 +299,13 @@ La chaine AU, `PowerKeepAlive` et le rearmement sont proprietaires de la Partie 
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.2 | 2026-08-29 | T181-11 : ajout §4bis « Matrice de bypass maintenance — treuils M1/M2 » (25 bascules mode-gated N2, override FDC N1 momentané 7,5/8,5 m, règle de bascule contacteurs retombés + frein serré, re-homing obligatoire, alignement T175 AC4 = N1 ET N2). Sommaire et TBD mis à jour. |
 | v2.1 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, section « Bus d'autorisations » intégrée à la numérotation (§5, était orpheline), Suivi historique ajouté, renumérotation complète + réfs `§N` cascadées. Correctif de fond (review sous-agent expert automatisme, vérifié contre `FB_Modes.st`) : §5 citait `TglMaintenanceZoneAccess`, nom inexistant dans le code — corrigé en `SelMaintenanceZoneAccess` (variable réelle, ligne 165). Struct `ST_fbModes_Autorisations`, `E_Mode`, logique booléenne `MaintenanceM3TargetEnable`, absence de garde mot de passe PLC (§4) et propriété `FB_Safety_Winch` de la limite légale (§6) tous vérifiés conformes au code |
 | v2.0 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
 ## ❓ 9 · TBD
 
-- Matrice exhaustive des bypass N1/N2 et tracabilite.
+- Matrice exhaustive des bypass N1/N2 et tracabilite : **résolue en §4bis** (treuils M1/M2, T181-11). Reste à étendre aux autres sous-systèmes (translation M3, commun) si besoin.
 - Detail complet des effets de `SyncEnable` par defaut safety.
 - Eventuel contrat unique d'intention de conduite entre joystick, boutons et cycle.
 

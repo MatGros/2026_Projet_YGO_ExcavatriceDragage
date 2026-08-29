@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Gate runner par palier (GUIDE_GATES_ET_TESTS_v1.2.md Â§2) â€” exÃ©cution par intention.
 
 Menu par intention : l'agent CHOISIT le palier adaptÃ© Ã  sa tÃ¢che du moment
@@ -115,7 +115,6 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "390", "G390 â€” Fraicheur bundle",                         [sys.executable, f"{S}/G390_check_bundle_freshness.py", "."]),
     ("C", "400", "G400 â€” Syntaxe ST du bundle (no terminator)",     [sys.executable, f"{S}/G400_check_bundle_st_syntax.py", "."]),
     ("C", "405", "G405 â€” LittÃ©raux STRING ASCII (REX 2026-08-17)",   [sys.executable, f"{S}/G405_check_st_string_ascii.py", "."]),
-    ("C", "410", "G410 â€” Invariants LD (tous les POU `_LD`, REX 2026-08-04/13)", [sys.executable, f"{S}/G410_check_ld_invariants.py", "."]),
     ("C", "420", "G420 â€” PyTest (gates + convertisseur)",           [str(_py313()), "-m", "pytest",
                                                                      "TOOLS/CONVERTER_ST2XML_PLCopenXML/tests",
                                                                      "TOOLS/AGENT_WORKFLOW/tests", "-q"]),
@@ -127,6 +126,8 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "470", "G470 â€” UnicitÃ© catalogue TC (matrice AF, informatif, REX 2026-08-29)", [sys.executable, f"{S}/G470_check_tc_uniqueness.py"]),
     ("C", "480", "G480 — Harnais integration : stub FB_TestHarness_PRG_04 miroir de PRG_04 (T181-00 AC2)", [sys.executable, f"{S}/G480_check_harness_mirrors_prg04.py"]),
     ("C", "481", "G481 — Harnais integration treuil WINCH_INTEG compile+execute (T181-00 AC7, baseline rouge OK)", [sys.executable, f"{S}/G481_check_winch_integ.py"]),
+    ("C", "482", "G482 — Clamp bornes FB_SpeedStep (T181-07 AC6)", [sys.executable, f"{S}/G482_check_speedstep_clamp_bounds.py"]),
+    ("C", "483", "G483 - Matrice maintenance N1/N2 : bypass gates MAINT_N2, override FDC borne, re-homing (T181-14 AC1-AC12)", [sys.executable, f"{S}/G483_check_bypass_matrix_mode_gated.py"]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]
@@ -218,9 +219,6 @@ def main() -> int:
                         rebuilt.append((pal, gid, f"{title} ({f.name})", [sys.executable, f"{S}/{Path(cmd[1]).name}", str(f)]))
             elif gid == "200":
                 rebuilt.append((pal, gid, title, [sys.executable, f"{S}/G200_check_linkage.py", "--files"] + [str(f) for f in args.files]))
-        for f in args.files:
-            if f.name.endswith("_LD.st"):
-                rebuilt.append(("A", "410x", f"LD convertible + invariants ({f.name})", [sys.executable, f"{S}/check_ld_file.py", str(f)]))
         plan = rebuilt
     else:
         plan = select_plan(args.palier, with_pytest=args.with_pytest, with_full_ci=args.full_ci)

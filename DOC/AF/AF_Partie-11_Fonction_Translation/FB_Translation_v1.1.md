@@ -29,43 +29,75 @@
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 170px);">
-    <col style="width: 90px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-003</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>Enable=FALSE</code> coupe tout indépendamment de <code>SafeStop</code>/<code>StartStop</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Enable</b><br>coupe tout</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>Enable=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Toute commande entrante (<code>SafeStop</code>/<code>StartStop</code> quelconques)<br>
+        ⚡ <b>Étape 2</b> : Neutralisation totale<br>
+        ✅ <b>Étape 3</b> : <code>Enable=FALSE</code> coupe tout, indépendamment de <code>SafeStop</code>/<code>StartStop</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§1</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-004</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Ralentissement PV actif si <code>Direction=1</code> (Trémie) ET <code>SlowdownSensor</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Ralentiss.</b><br>PV</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : M3 en mouvement vers Trémie (<code>Direction=1</code>)<br>
+        🚀 <b>Étape 1</b> : Activation <code>SlowdownSensorTremie</code> (PV) lors de l'approche<br>
+        ⚡ <b>Étape 2</b> : Ralentissement d'approche engagé<br>
+        ✅ <b>Étape 3</b> : Ralentissement PV actif si <code>Direction=1</code> (Trémie) ET <code>SlowdownSensor</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-005</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Interlock sens : bascule directe si vitesse=0, sinon délai 200ms</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Interlock</b><br>sens</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : M3 en mouvement sens A<br>
+        🚀 <b>Étape 1</b> : Demande inversion de sens<br>
+        ⚡ <b>Étape 2</b> : Bascule directe si <code>vitesse=0</code>, sinon délai <code>DirectionInterlockDelay</code>=200ms<br>
+        ✅ <b>Étape 3</b> : Interlock de sens correctement appliqué
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-013</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Boutons IHM en MAINT exigent <code>DeadmanArmed=TRUE</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Boutons</b><br>MAINT</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Mode <code>MAINT</code> actif, boutons IHM disponibles<br>
+        🚀 <b>Étape 1</b> : Appui bouton mouvement sans armement homme-mort<br>
+        ⚡ <b>Étape 2</b> : Vérification <code>DeadmanArmed</code><br>
+        ✅ <b>Étape 3</b> : Mouvement refusé — boutons IHM MAINT exigent <code>DeadmanArmed=TRUE</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>

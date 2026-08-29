@@ -1,21 +1,21 @@
 {
   "version": 1,
-  "file": "test_fb_cycletime.st",
+  "file": "test_fb_diag_ethercat.st",
   "results": [
     {
-      "name": "Premier cycle retourne la valeur de secours (pas de dt mesurable)",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "Cycle suivant calcule le dt reel ecoule (ms->s)",
+      "name": "TC-P12-010 EtherCAT : surveillance maitre et esclaves",
       "passed": true
     },
     {
-      "name": "Delta nul (deux appels sans avance horloge) : borne basse -> valeur de secours",
+      "name": "TC-P12-030 EtherCAT : State != RUNNING par device -> bits ErrorId + Error global",
       "passed": true
     },
     {
-      "name": "Delta aberrant > plafond (5s, simule rebouclage TIME() / reprise) : borne haute -> secours, non latche",
+      "name": "TC-P12-040 EtherCAT : bypass sim/reseau vs etat reel (READY/SIMULATED/DISABLED)",
       "passed": true
     }
   ],

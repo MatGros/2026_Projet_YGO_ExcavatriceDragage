@@ -159,16 +159,16 @@ Modes/Cycle → procédés avec leur safety → PRG_06_Outputs → Supervision
 
 Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte seulement leur acquisition et leur publication.
 
-### Repartition ST / Ladder — cible v2.1
+### Repartition ST — cible v2.1
 
 | Type de signal | Programme propriétaire | Langage | Bloc / DUT |
 |---|---|---|---|
 | E/S TOR, PDO, diagnostics device, simulation et image sélectionnée | `PRG_02_Acquisition` | ST | `ST_HardwareImage`, FB d'acquisition et `GetDeviceState()` |
-| Barrière finale des sorties physiques | `PRG_06_Outputs` | Ladder | Interlocks finaux et coils de sortie |
+| Barrière finale des sorties physiques | `PRG_06_Outputs` | ST | Interlocks finaux et coils de sortie |
 | Ancienne qualification TOR | `PRG_01_Inputs_LD` | Ladder | En retrait ; aucun nouveau câblage |
 
-> 📌 La frontière cible est donc unique dans `PRG_02_Acquisition`. Le Ladder reste justifié pour
-> la barrière finale des sorties ; il n'est pas requis pour afficher ou conditionner les entrées.
+> 📌 La frontière cible est donc unique dans `PRG_02_Acquisition`. La barrière finale des sorties
+> est en ST (`PRG_06_Outputs`) ; le Ladder n'est plus requis pour afficher ou conditionner les entrées.
 > Le retrait de l'ancien POU est un lot de code ultérieur, après remappage et validation.
 
 ---
@@ -497,7 +497,7 @@ confirme la boucle AU (Partie 01).
 
 ## ⚡ 6 · Sorties physiques & Barrières de sécurité
 
-Les sorties finales et barrières de commande matérielle sont gérées dans `PRG_06_Outputs` en Ladder.
+Les sorties finales et barrières de commande matérielle sont gérées dans `PRG_06_Outputs` en ST.
 
 | Regle | Exigence |
 |---|---|
@@ -506,9 +506,9 @@ Les sorties finales et barrières de commande matérielle sont gérées dans `PR
 | 🔴 Coupure finale | `Enable=FALSE` uniquement sur `PowerCutOff` matériel ou défaut d'interlock bloquant. |
 | 🧨 PowerCutOff | Demande safety agregee puis canaux A/B fail-safe. |
 
-### 🔍 Diagnostic graphique Ladder & Publication GVL_IHM
+### 🔍 Diagnostic graphique & Publication GVL_IHM
 
-Pour chaque actionneur (**M1 Treuil Retenue**, **M2 Treuil Benne**, **M3 Translation**), `PRG_06_Outputs` intègre 3 blocs opérateurs `OR` de diagnostic pur (Watch/Ladder) :
+Pour chaque actionneur (**M1 Treuil Retenue**, **M2 Treuil Benne**, **M3 Translation**), `PRG_06_Outputs` intègre 3 blocs opérateurs `OR` de diagnostic pur (ST) :
 
 1. **`*PowerCutOffSafetyInfo`** (Bloc 1) : Regroupe les mécanismes critiques provoquant une coupure de puissance amont (Méca A..E, thermiques, perte de contrôle).
 2. **`*SafeStopSafetyInfo`** (Bloc 2) : Regroupe les défauts entraînant une rampe de décélération rapide contrôlée (perte comm opérateur/joystick, codeur, rotation phase, etc.).

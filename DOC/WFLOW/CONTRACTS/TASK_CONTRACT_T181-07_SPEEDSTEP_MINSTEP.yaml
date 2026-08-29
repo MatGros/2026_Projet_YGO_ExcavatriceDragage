@@ -1,0 +1,83 @@
+# Contrat T181-07 — FB_SpeedStep : ajout MinStepNumber + garde de précédence + recentrage décodeur
+# Source : PLAN §4-B, AF10_INTERFACE §1 (ST_fbWinch_Cfg), §4 ; CADRAGE_T181-06 §3 (amendements B/C).
+
+contract:
+  task_id: T181-07_SPEEDSTEP_MINSTEP
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Ajouter à FB_SpeedStep une entrée MinStepNumber (plancher) et la garde de précédence
+    LIMIT(1, MinStepNumber, MaxStepClamped) appliquée APRÈS le plafond et AVANT le CASE.
+    Recentrer FB_SpeedStep en décodeur palier -> contacteurs pur : retirer SpeedTgt_Pct /
+    HystMargin (le décodage % + hystérésis remonte en amont) et MeasuredSpeedBand /
+    SpeedGuardEnable / SpeedGuardReady (survitesse -> FB_Safety_Winch, T181-16).
+
+  acceptance:
+    - id: AC1
+      statement: "FB_SpeedStep a une entrée MinStepNumber : INT := 1 (défaut rétro-compatible). Aucun appelant existant cassé (l'ancien appel sans MinStepNumber compile et se comporte comme avant)."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_SpeedStep ; G200_check_linkage.py"
+    - id: AC2
+      statement: "Garde de précédence : MinClamped := LIMIT(1, MinStepNumber, MaxStepClamped) est calculé APRÈS l'application du plafond et AVANT le CASE StepNumber. Le résultat StepNumber n'est JAMAIS hors [0..5]."
+      verified_by: "TC : MinStepNumber=3 + plafond source=1 -> StepNumber=1 (plafond gagne) ; TC : aucune combinaison d'entrées -> StepNumber < 0 ou > 5"
+    - id: AC3
+      statement: "MinStepNumber est SANS EFFET si Enable=FALSE (relâche -> palier 0). Le plancher agit sur la cible (RequestedStep), jamais par affectation directe StepNumber := MinStepNumber."
+      verified_by: "TC : Enable passe FALSE -> StepNumber = 0 ; grep 'StepNumber :=' non gardé absent"
+    - id: AC4
+      statement: "FB_SpeedStep ne contient plus SpeedTgt_Pct, HystMargin, MeasuredSpeedBand, SpeedGuardEnable, SpeedGuardReady ni la sortie SpeedGuardLimited. Devient un décodeur palier -> contacteurs pur + clamp."
+      verified_by: "grep de ces identifiants dans FB_SpeedStep.st = 0 ; diff VAR_INPUT/OUTPUT"
+    - id: AC5
+      statement: "L'entrée du FB devient un palier demandé (SpeedStepReq : INT 0..5) au lieu d'un %. Le décodage % -> palier + hystérésis est déplacé dans la chaîne joystick / PRG_04 (hors périmètre de ce ticket : documenter où)."
+      verified_by: "diff FB_SpeedStep.st + note dans execution: sur la destination du décodage %"
+    - id: AC6
+      statement: "Gate G4xx_check_speedstep_clamp_bounds : échoue si un chemin de FB_SpeedStep peut produire StepNumber hors [0..5] ou si LIMIT n'est pas appliqué après le plafond."
+      verified_by: "exécution du gate PASS ; ajout à run_all_gates palier C"
+    - id: AC7
+      statement: "Non-régression : G200 PASS, gates palier C PASS, harnais WINCH_INTEG ne régresse pas (par TC)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_SpeedStep.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st                       # appel de FB_SpeedStep (passage SpeedStepReq/MinStepNumber)
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_speedstep.st
+      - TOOLS/AGENT_WORKFLOW/scripts/
+    forbidden:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                    # agrégateur = T181-10
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st                # survitesse = T181-16
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Le décodage palier -> combinaisons de contacteurs (Contactor1..4) actuel"
+      - "Le plafond MaxStepNumber existant"
+    dropped_on_purpose:
+      - "Le décodage % + hystérésis (remonte en amont)"
+      - "Le garde-fou survitesse §2ter mort (retiré, -> FB_Safety_Winch)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si retirer le décodage % de FB_SpeedStep casse un appelant non identifié, ou si l'hystérésis
+    ne peut pas être portée proprement en amont : REMONTER à l'orchestrateur.
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: "À remplir."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Revue orchestrateur : git diff + TC précédence + non-régression. bloque_par : T181-06."

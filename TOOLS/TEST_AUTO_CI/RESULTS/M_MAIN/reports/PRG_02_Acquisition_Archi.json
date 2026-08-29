@@ -1,31 +1,23 @@
 {
   "version": 1,
-  "file": "test_prg02_acquisition_archi.st",
+  "file": "test_prg_06_outputs.st",
   "results": [
     {
-      "name": "TC-P02-001 Un seul producteur par donnee : bus Data qualifie et complet (essai d architecture - validation partielle boite noire)",
+      "name": "PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale",
       "passed": true
     },
     {
-      "name": "TC-P02-002 Orchestration ST sans logique cachee : qualification joystick et codeurs (essai d architecture - validation partielle boite noire)",
+      "name": "PRG_06_Outputs : Transmission Ordre M2 en Marche Normale",
       "passed": true
     },
     {
-      "name": "TC-P02-003 Sorties physiques via PRG_06 : PRG_02 ne produit aucune commande actionneur (essai d architecture - validation partielle boite noire)",
-      "passed": true
-    },
-    {
-      "name": "TC-P02-004 Ordre MainTask conforme : HwIn image arbitree reel/simule (essai d architecture - validation partielle boite noire)",
-      "passed": true
-    },
-    {
-      "name": "TC-P02-005 Troubleshooting lecture seule : PRG_02 produit les diagnostics observes (essai d architecture - validation partielle boite noire)",
+      "name": "PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1",
       "passed": true
     }
   ],
   "summary": {
-    "total": 5,
-    "passed": 5,
+    "total": 3,
+    "passed": 3,
     "failed": 0
   }
 }

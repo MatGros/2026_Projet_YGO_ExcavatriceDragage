@@ -24,7 +24,7 @@ humain, il ne peut donc pas servir de reference. Debogage ponctuel uniquement.
 Usage :
   python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py            # tout CODE/
   python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report   # + bloc de restitution
-  python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --files CODE/MAIN/PRG_10_Outputs_LD.st
+  python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --files CODE/M_MAIN/PRG_06_Outputs.st
 """
 
 from __future__ import annotations
@@ -541,11 +541,11 @@ class L9Checker:
 
     # `load_io_mapping()` ne construit des clés que pour ces deux POU (seuls
     # points de contact réels entre le code et les canaux physiques bruts du
-    # CSV — cf. son propre code : IEC address %Q → PRG_OUTPUTS_LD, sinon
-    # PRG_01_Inputs_LD). Vérifier un VAR_OUTPUT de n'importe quel autre PROGRAM
+    # CSV — cf. son propre code : IEC address %Q → PRG_06_Outputs, sinon
+    # PRG_02_Acquisition). Vérifier un VAR_OUTPUT de n'importe quel autre PROGRAM
     # contre cette table est un faux positif garanti par construction : la
     # clé ne peut structurellement jamais y figurer (REX 2026-08-01, T100).
-    PHYSICAL_IO_POUS = frozenset({"PRG_OUTPUTS_LD", "PRG_01_Inputs_LD"})
+    PHYSICAL_IO_POUS = frozenset({"PRG_06_Outputs", "PRG_02_Acquisition"})
 
     def __init__(self, pou: Pou, device_io_map: dict):
         self.pou = pou

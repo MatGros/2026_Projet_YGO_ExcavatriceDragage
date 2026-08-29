@@ -41,5 +41,15 @@ STRUCT
 
     // === 🛡️ Permission d'armement homme-mort (Option B — combiné interlock benne) ===
     ArmingPermit                 : BOOL;               // 🛡️ Permission d'armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)
+
+    // === Usage effectif d'un override/bypass de POSITION (consommé PRG_03 → FB_Modes) ===
+    // Producteur unique : PRG_04_Treuils_Benne §5. Lecteur : PRG_03_Modes_Cycle (lag 1 scan assumé,
+    // même doctrine que les autres échanges PRG_03/PRG_04 de ce bus).
+    // TRUE = la limite de position de cet axe est actuellement levée au-delà du nominal :
+    // override FDC logiciel N1 maintenu OU bypass N2 effectif de la famille position
+    // (TopLimitSwitch / TopLimitSoftware / CableLimitSwitch / LimitLegal / MecaD).
+    // Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de mouvement.
+    PositionLimitOverriddenM1    : BOOL;               // 🧭 Treuil M1 — limite de position levée
+    PositionLimitOverriddenM2    : BOOL;               // 🧭 Treuil M2 — limite de position levée
 END_STRUCT
 END_TYPE

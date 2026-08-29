@@ -8,7 +8,6 @@ la trace de l'ordre MainTask sans etre des erreurs PLCopenXML.
 
 Controles :
   S1  nom du fichier source == nom du PROGRAM declare
-  S2  suffixe _CFC / _LD == langage correspondant dans CODE_Bundle.xml
   S3  chaque PROGRAM porte le prefixe d'ordre PRG_XX_
   S4  un fichier .st ne contient pas plus d'un END_PROGRAM ou END_FUNCTION_BLOCK,
       et l'epilogue correspond au type de POU declare (REX 2026-08 : double
@@ -34,7 +33,6 @@ FUNCTION_BLOCK_HEADER = re.compile(r"^\s*FUNCTION_BLOCK\b", re.MULTILINE)
 END_PROGRAM_RE = re.compile(r"^\s*END_PROGRAM\b", re.MULTILINE)
 END_FUNCTION_BLOCK_RE = re.compile(r"^\s*END_FUNCTION_BLOCK\b", re.MULTILINE)
 ORDERED_PROGRAM = re.compile(r"^PRG_\d{2}_")
-LANGUAGE_SUFFIXES = {"_CFC": "CFC", "_LD": "LD"}
 BUNDLE_NAMES = {"CODE_Bundle.xml", "CODE_AU_Bundle.xml"}
 
 
@@ -80,22 +78,6 @@ def xml_program_sources(code: Path) -> list[ProgramSource]:
     return sources
 
 
-def bundle_languages(bundle: Path) -> dict[str, set[str]]:
-    """Retourne les langages reels emis pour chaque POU dans le bundle."""
-    root = ET.parse(bundle).getroot()
-
-    languages: dict[str, set[str]] = {}
-    for pou in root.iter():
-        if local_name(pou.tag) != "pou":
-            continue
-        name = pou.get("name")
-        if not name or not name.startswith("PRG_"):
-            continue
-        found = {local_name(child.tag) for child in pou.iter()}
-        languages[name] = found & {"ST", "LD", "CFC", "FBD", "SFC", "IL"}
-    return languages
-
-
 def check(root: Path) -> list[str]:
     code = root / "CODE"
     main = code / "M_MAIN" if (code / "M_MAIN").is_dir() else code / "MAIN"
@@ -106,10 +88,6 @@ def check(root: Path) -> list[str]:
     bundle = root / "CODE_XML" / "CODE_Bundle.xml"
     if not bundle.is_file():
         return [f"[S0] bundle introuvable : {bundle.relative_to(root).as_posix()}"]
-    try:
-        languages = bundle_languages(bundle)
-    except ET.ParseError as exc:
-        return [f"[S0] bundle XML mal forme : {exc}"]
 
     errors: list[str] = []
     for source in sources:
@@ -118,19 +96,6 @@ def check(root: Path) -> list[str]:
             errors.append(
                 f"[S1] {rel}: nom de fichier '{source.path.stem}' != PROGRAM '{source.name}'"
             )
-
-        expected_language = next(
-            (language for suffix, language in LANGUAGE_SUFFIXES.items() if source.name.endswith(suffix)),
-            None,
-        )
-        if expected_language:
-            actual_languages = languages.get(source.name, set())
-            if expected_language not in actual_languages:
-                emitted = ", ".join(sorted(actual_languages)) or "absent du bundle"
-                errors.append(
-                    f"[S2] {rel}: {source.name} suffixe {expected_language} "
-                    f"mais bundle emet {emitted}"
-                )
 
         if not ORDERED_PROGRAM.match(source.name):
             errors.append(

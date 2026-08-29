@@ -42,3 +42,9 @@ def _run_fb_test(fb_name: str):
 @pytest.mark.unit
 def test_FB_Hmi_BannerFormatter():
     _run_fb_test("FB_Hmi_BannerFormatter")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_TroubleshootingView():
+    _run_fb_test("FB_TroubleshootingView")

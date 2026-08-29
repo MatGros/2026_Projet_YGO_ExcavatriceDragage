@@ -698,88 +698,131 @@ domains:
         etat: NV
     validation_points:
       TC-P08-010:
-        intention: RawX=9000→80%, RawY=300→-94% proportionnel (pas seulement aux bornes)
-          ; deadband ADC centrée neutre
+        intention: "\U0001F4A4 Étape 0 : Joystick au neutre, SpeedTgt=0 \n       \
+          \ \U0001F680 Étape 1 : Injection RawX=9000 → échelle proportionnelle → 80%\
+          \ \n        ⚡ Étape 2 : Injection RawY=300 → échelle asymétrique → -94%\
+          \ (proportionnel, pas seulement aux bornes) \n        ✅ Étape 3 : Deadband\
+          \ ADC centrée neutre vérifiée — |RawIn-Neutral|≤DeadbandRaw → 0"
         type: 💻 AUTO
         ref: FB_AxisScale
         etat: NV
       TC-P08-020:
-        intention: Armement maintien+permission ; relâché avant fin = annulé ; désarmement
-          (décélération normale, pas coupure) sur ArmingPermit=FALSE ou neutre tenu
-          après grâce 3s
+        intention: "\U0001F4A4 Étape 0 : Repos, DeadmanArmed=FALSE, bouton relâché\
+          \ \n        \U0001F680 Étape 1 : Appui bouton + maintien DeadmanArmHoldTime\
+          \ (100ms) + ArmingPermit=TRUE → DeadmanArmed=TRUE \n        ⚡ Étape 2 :\
+          \ Relâchement bouton avant fin 100ms → armement annulé \n        ⚡ Étape\
+          \ 3 : Désarmement sur ArmingPermit=FALSE (immédiat) ou neutre tenu après\
+          \ grâce 3s \n        ✅ Étape 4 : DeadmanArmed=FALSE, SpeedTgt=0 — décélération\
+          \ normale (pas coupure de puissance)"
         type: 💻 AUTO
         ref: FB_Joystick
         etat: NV
       TC-P08-030:
-        intention: Hors plage ±marge ➔ SpeedTgt=0 2 axes, ErrorId bit1 Warning auto-effacé
+        intention: "\U0001F4A4 Étape 0 : Acquisition nominale, RawX/RawY dans [0;10000]\
+          \ \n        \U0001F680 Étape 1 : Injection RawX ou RawY hors [0;10000] ±\
+          \ marge 500 \n        ⚡ Étape 2 : SpeedTgt=0 sur les 2 axes, ErrorId bit1\
+          \ (Warning) levé \n        ✅ Étape 3 : Retour en plage → Warning auto-effacé,\
+          \ SpeedTgt restauré"
         type: 💻 AUTO
         ref: FB_Joystick
         etat: NV
       TC-P08-040:
-        intention: Hors [2000;8000] ➔ Fault bit0 à acquitter ; neutre persiste après
-          redémarrage PLC
+        intention: "\U0001F4A4 Étape 0 : Neutre mémorisé, Calibrate au repos \n  \
+          \      \U0001F680 Étape 1 : Front Calibrate avec axes hors [2000;8000] \n\
+          \        ⚡ Étape 2 : Fault bit0 levé, calibration refusée, à acquitter par\
+          \ Reset + axes en zone \n        ✅ Étape 3 : Neutre persistant survit au\
+          \ redémarrage PLC (RETAIN)"
         type: ⚡ AUTO+SITE
         ref: FB_Joystick
         etat: NV
       TC-P08-050:
-        intention: Translation refuse tout ordre sans DeadmanArmed (tous modes) ;
-          Treuils seulement en mode Joystick Maître (arbitré 2026-08-29, §10 Q2 —
-          interlock directionnel par technologie, voir §7)
+        intention: "\U0001F4A4 Étape 0 : DeadmanArmed=FALSE, machine en mode opératoire\
+          \ \n        \U0001F680 Étape 1 : Demande de mouvement translation sans armement\
+          \ homme-mort \n        ⚡ Étape 2 : Translation refuse tout ordre (tous modes,\
+          \ y compris boutons IHM) \n        ⚡ Étape 3 : Treuils M1/M2 — exigent DeadmanArmed\
+          \ seulement en mode Joystick Maître (TglJoystickMaster=TRUE) \n        ✅\
+          \ Étape 4 : Aucun mouvement sans armement valide (interlock directionnel\
+          \ par technologie, arbitré 2026-08-29 §10 Q2)"
         type: 🔒 GATE
         ref: G375_check_deadman_arming_gate.py
         etat: NV
       TC-P08-060:
-        intention: ArmingPermitDenied=TRUE pendant tout appui bouton si ArmingPermit=FALSE
+        intention: "\U0001F4A4 Étape 0 : ArmingPermit=FALSE, bouton relâché \n   \
+          \     \U0001F680 Étape 1 : Appui bouton (RawButton=TRUE) avec ArmingPermit=FALSE\
+          \ \n        ⚡ Étape 2 : ArmingPermitDenied=TRUE maintenu pendant tout l'appui\
+          \ (Warning IHM) \n        ✅ Étape 3 : Relâchement bouton → ArmingPermitDenied=FALSE,\
+          \ aucun armement"
         type: ⬜ GAP
         ref: FB_Joystick
         etat: NV
       TC-P08-020.1:
-        intention: 'Homme-mort : armement hors neutre — front bouton + maintien 100ms
-          + ArmingPermit → DeadmanArmed=TRUE même axes déviés (FB_Joystick.st:172)'
+        intention: "\U0001F4A4 Étape 0 : Axes déviés (AtNeutral=FALSE), bouton relâché\
+          \ \n        \U0001F680 Étape 1 : Front bouton + maintien 100ms + ArmingPermit=TRUE\
+          \ (axes toujours déviés) \n        ⚡ Étape 2 : DeadmanArmed=TRUE — armement\
+          \ indépendant de la position des axes \n        ✅ Étape 3 : DeadmanArmed=TRUE\
+          \ confirmé même axes déviés (FB_Joystick.st:172)"
         type: 💻 AUTO
         ref: FB_Joystick
         etat: NV-I
       TC-P08-020.2:
-        intention: 'Désarmement perte ArmingPermit : ArmingPermit=FALSE → DeadmanArmed=FALSE
-          immédiat, SpeedTgt=0 (FB_Joystick.st:180-183)'
+        intention: "\U0001F4A4 Étape 0 : Geste armé (DeadmanArmed=TRUE), mouvement\
+          \ en cours \n        \U0001F680 Étape 1 : Perte ArmingPermit (ArmingPermit=FALSE)\
+          \ \n        ⚡ Étape 2 : DeadmanArmed=FALSE immédiat, SpeedTgt=0 \n     \
+          \   ✅ Étape 3 : Décélération normale côté FB mouvement aval (pas coupure\
+          \ brute) — FB_Joystick.st:180-183"
         type: 💻 AUTO
         ref: FB_Joystick
         etat: NV-I
       TC-P08-020.3:
-        intention: 'Pas de réarmement auto : retour ArmingPermit ne réarme pas ; exige
-          nouveau front + maintien 100ms (FB_Joystick.st:167-176)'
+        intention: "\U0001F4A4 Étape 0 : Geste désarmé (DeadmanArmed=FALSE), ArmingPermit=FALSE\
+          \ \n        \U0001F680 Étape 1 : Retour ArmingPermit=TRUE sans nouvel appui\
+          \ bouton \n        ⚡ Étape 2 : DeadmanArmed reste FALSE — aucun réarmement\
+          \ automatique \n        ✅ Étape 3 : Nouveau front bouton + maintien 100ms\
+          \ requis pour réarmer (FB_Joystick.st:167-176)"
         type: 💻 AUTO
         ref: FB_Joystick
         etat: NV-I
       TC-P08-020.4:
-        intention: 'Bornes temporelles : armement 100ms, grâce 3s, neutre 100ms (ST_fbJoystick_Cfg.st:15-17
-          ; FB_Joystick.st:172,189-191)'
+        intention: "\U0001F4A4 Étape 0 : Configuration chargée (ST_fbJoystick_Cfg.st:15-17)\
+          \ \n        \U0001F680 Étape 1 : Appui bouton → comptage DeadmanArmHoldTime\
+          \ = 100ms \n        ⚡ Étape 2 : Grâce DeadmanArmGraceTime = 3s avant désarmement\
+          \ par neutre \n        ⚡ Étape 3 : Neutre tenu NeutralHoldTime = 100ms après\
+          \ grâce → désarmement \n        ✅ Étape 4 : Bornes temporelles vérifiées\
+          \ : 100ms / 3s / 100ms (FB_Joystick.st:172,189-191)"
         type: 💻 AUTO
         ref: FB_Joystick
         etat: NV-I
       TC-P08-010.1:
-        intention: 'Échelle proportionnelle asymétrique : RawX=9000 (neutre 5000)
-          → 80% ; RawY=300 (neutre 5000) → -94% — pas seulement aux bornes'
+        intention: "\U0001F4A4 Étape 0 : Neutre calibré à 5000, RawIn au neutre →\
+          \ OutPct=0 \n        \U0001F680 Étape 1 : Injection RawX=9000 (neutre 5000)\
+          \ → demi-plage haute (10000-5000)=5000 \n        ⚡ Étape 2 : OutPct=(9000-5000)/5000*100=80%\
+          \ ; RawY=300 → -94% \n        ✅ Étape 3 : Échelle proportionnelle asymétrique\
+          \ vérifiée (pas seulement aux bornes)"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P08-010.2:
-        intention: 'Deadband centrée sur le neutre : |RawIn−Neutral| ≤ DeadbandRaw
-          ⇒ OutPct=0.0 ; borne exacte : RawIn=Neutral±DeadbandRaw → 0.0, RawIn=Neutral±(DeadbandRaw+1)
-          → |OutPct|>0'
+        intention: "\U0001F4A4 Étape 0 : RawIn au neutre, OutPct=0.0 \n        \U0001F680\
+          \ Étape 1 : Injection RawIn=Neutral±DeadbandRaw (borne exacte) \n      \
+          \  ⚡ Étape 2 : |RawIn−Neutral| ≤ DeadbandRaw → OutPct=0.0 \n        ✅ Étape\
+          \ 3 : RawIn=Neutral±(DeadbandRaw+1) → |OutPct|>0 — borne validée"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P08-010.3:
-        intention: 'Saturation stricte : RawIn=10000 (neutre 5000) → +100.0 ; RawIn=0
-          → −100.0 ; toute sortie de plage RawIn ne produit jamais |OutPct|>100.0
-          (LIMIT(−100,OutPct,100))'
+        intention: "\U0001F4A4 Étape 0 : RawIn dans plage nominale [0;10000] \n  \
+          \      \U0001F680 Étape 1 : Injection RawIn=10000 (neutre 5000) → +100.0\
+          \ ; RawIn=0 → −100.0 \n        ⚡ Étape 2 : LIMIT(−100, OutPct, 100) appliqué\
+          \ \n        ✅ Étape 3 : Toute sortie de plage ne produit jamais |OutPct|>100.0"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P08-010.4:
-        intention: 'Échelle asymétrique neutre≠5000 : normalisation indépendante de
-          chaque demi-plage'
+        intention: "\U0001F4A4 Étape 0 : Neutre calibré ≠ 5000 (ex. 4800 après calibration)\
+          \ \n        \U0001F680 Étape 1 : Injection RawIn dans demi-plage haute puis\
+          \ basse \n        ⚡ Étape 2 : Normalisation indépendante de chaque demi-plage\
+          \ sur sa propre amplitude \n        ✅ Étape 3 : OutPct correct même si neutre\
+          \ ≠ 5000 — échelle asymétrique validée"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
@@ -857,31 +900,52 @@ domains:
         etat: NV-I
     validation_points:
       TC-P09-010:
-        intention: Bus/esclave KO → EncoderAvailable=FALSE, RawPos gelé ; preset hors
-          tolérance après timeout → PresetNak + Fault
+        intention: "\U0001F4A4 Étape 0 : Bus EtherCAT opérationnel, EncoderAvailable=TRUE\
+          \ \n        \U0001F680 Étape 1 : Perte bus/esclave (AlarmsIn≠0 ou NOT SlaveOperational)\
+          \ \n        ⚡ Étape 2 : EncoderAvailable=FALSE, RawPos gelé (dernière valeur\
+          \ conservée) \n        ⚡ Étape 3 : Front PresetRequest + écart hors tolérance\
+          \ après timeout PresetTimeout \n        ✅ Étape 4 : PresetNak + ErrorId\
+          \ bit1 (Fault) levé"
         type: 💻 AUTO
         ref: FB_Encoder_Abs
         etat: NV-I
       TC-P09-020:
-        intention: 3 modes homing bornent la cible [-99;+99]m avant écriture ; écart
-          au boot > tolérance → HomingSuspect, levé par confirmation explicite
+        intention: "\U0001F4A4 Étape 0 : Codeur disponible, Homed=FALSE \n       \
+          \ \U0001F680 Étape 1 : Front Home (3 modes : nominal/unitaire/dynamique),\
+          \ cible bornée [-99;+99]m avant écriture \n        ⚡ Étape 2 : Écart au\
+          \ boot RawPos vs Calib.LastKnownRawPos > tolérance (1000 pts) \n       \
+          \ ⚡ Étape 3 : HomingSuspect=TRUE, Homed=FALSE (référence non fiable) \n\
+          \        ✅ Étape 4 : Levé uniquement par BtnConfirmCoherence (front explicite,\
+          \ pas d'auto-effacement)"
         type: 💻 AUTO
         ref: FB_Encoder_Homing
         etat: NV
       TC-P09-030:
-        intention: Conversion signée exacte ; hors bornes ou suspect → EncoderIncoherent=TRUE
+        intention: "\U0001F4A4 Étape 0 : HomingRefRaw mémorisé, conversion DINT avant\
+          \ soustraction (évite dépassement) \n        \U0001F680 Étape 1 : Calcul\
+          \ CablePosM := (RawPos - HomingRefRaw) × CableM_PerRev / PointsPerRev —\
+          \ signée exacte \n        ⚡ Étape 2 : CablePosM hors [PositionMinM;PositionMaxM]\
+          \ ou HomingSuspect=TRUE \n        ✅ Étape 3 : EncoderIncoherent=TRUE (auto-effacé\
+          \ au retour en plage)"
         type: 💻 AUTO
         ref: FB_Encoder_Scale FB_Encoder_Safety
         etat: NV
       TC-P09-040:
-        intention: EncoderFault ne dépend pas de Homed (non-référencé ≠ incohérent)
-          ; HomedAndReliable exige les 3 conditions
+        intention: "\U0001F4A4 Étape 0 : Codeur disponible, non référencé (Homed=FALSE)\
+          \ \n        \U0001F680 Étape 1 : Évaluation EncoderFault := NOT Available\
+          \ OR Incoherent (sans Homed) \n        ⚡ Étape 2 : HomedAndReliable := Available\
+          \ AND Homed AND NOT Incoherent — gate stricte M3 \n        ✅ Étape 3 : Non-référencé\
+          \ ≠ incohérent — EncoderFault n'exige pas Homed"
         type: 💻 AUTO
         ref: FB_EncoderReliability
         etat: NV
       TC-P09-050:
-        intention: Valid=TRUE après 6 échantillons (≥50ms) ; absorption des perturbations
-          mécaniques câble & vibrations ; purge sur perte validité amont
+        intention: "\U0001F4A4 Étape 0 : Fenêtre glissante vide, Valid=FALSE \n  \
+          \      \U0001F680 Étape 1 : Accumulation de 6 échantillons espacés ≥10ms\
+          \ \n        ⚡ Étape 2 : Fenêtre couvre ≥50ms → Valid=TRUE, Speed_Mps signée\
+          \ (+ montée) \n        ⚡ Étape 3 : Absorption des perturbations mécaniques\
+          \ câble & vibrations \n        ✅ Étape 4 : Purge complète sur perte validité\
+          \ amont ou rebouclage TIME()"
         type: 💻 AUTO
         ref: FB_Encoder_SpeedMeasure
         etat: V-I
@@ -891,188 +955,271 @@ domains:
         ref: —
         etat: NV
       TC-P09-010.1:
-        intention: AlarmsIn≠0 OU NOT SlaveOperational → EncoderAvailable=FALSE, RawPos/AngleRaw/TurnCount
-          gelés (dernière valeur) ; le gel persiste sur plusieurs scans tant que la
-          cause reste active
+        intention: "\U0001F4A4 Étape 0 : Bus EtherCAT opérationnel, RawPos actif \n\
+          \        \U0001F680 Étape 1 : AlarmsIn≠0 OU NOT SlaveOperational \n    \
+          \    ⚡ Étape 2 : EncoderAvailable=FALSE, RawPos/AngleRaw/TurnCount gelés\
+          \ (dernière valeur) \n        ✅ Étape 3 : Gel persiste sur plusieurs scans\
+          \ tant que la cause reste active"
         type: 💻 AUTO
         ref: §5
         etat: NV-I
       TC-P09-010.3:
-        intention: 'Acquisition nominale : bus OK → RawPos=RawPosIn, AngleRaw=MOD,
-          TurnCount=division (FB_Encoder_Abs.st:116-120)'
+        intention: "\U0001F4A4 Étape 0 : Bus OK, Enable=TRUE \n        \U0001F680\
+          \ Étape 1 : Lecture RawPosIn du PDO EtherCAT \n        ⚡ Étape 2 : RawPos=RawPosIn,\
+          \ AngleRaw=MOD, TurnCount=division \n        ✅ Étape 3 : EncoderAvailable=TRUE\
+          \ confirmé (FB_Encoder_Abs.st:116-120)"
         type: 💻 AUTO
         ref: §3
         etat: NV-I
       TC-P09-010.4:
-        intention: Front PresetRequest + EncoderAvailable → PresetSeqStep=1, PresetTriggerCmd=2
-          (FB_Encoder_Abs.st:128,134)
+        intention: "\U0001F4A4 Étape 0 : PresetSeqStep=0 (IDLE), PresetTriggerCmd=0\
+          \ \n        \U0001F680 Étape 1 : Front PresetRequest + EncoderAvailable=TRUE\
+          \ \n        ⚡ Étape 2 : PresetSeqStep=1, PresetTriggerCmd=2 \n        ✅\
+          \ Étape 3 : Timer PresetTimeout armé (FB_Encoder_Abs.st:128,134)"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-010.2:
-        intention: 'Preset : écart abs(RawPos - PresetValueOut) ≤ PresetTolerancePts
-          → PresetAck après 500ms visuel ; sinon timeout PresetTimeout → PresetNak
-          + ErrorId bit1'
+        intention: "\U0001F4A4 Étape 0 : PresetSeqStep=1, PresetTriggerCmd=2, timer\
+          \ armé \n        \U0001F680 Étape 1 : Écart abs(RawPos-PresetValueOut) ≤\
+          \ PresetTolerancePts \n        ⚡ Étape 2 : Maintien 500ms visuel puis PresetAck\
+          \ (pulse 1 cycle) \n        ✅ Étape 3 : Sinon timeout PresetTimeout → PresetNak\
+          \ + ErrorId bit1"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-020.1:
-        intention: 'Nominal : front Home + front TopPositionSensor (dans les 2 ordres)
-          → HomingRefRaw calculé pour CablePosM = CfgTopSensorPosM'
+        intention: "\U0001F4A4 Étape 0 : Homed=FALSE, HomingPermit=TRUE \n       \
+          \ \U0001F680 Étape 1 : Front Home + front TopPositionSensor (dans les 2\
+          \ ordres) \n        ⚡ Étape 2 : Calcul HomingRefRaw pour CablePosM = CfgTopSensorPosM\
+          \ \n        ✅ Étape 3 : Homed=TRUE, PresetRequest pulsé vers FB_Encoder_Abs"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-020.2:
-        intention: 'Unitaire : front Home seul → cible CfgHomingTargetM'
+        intention: "\U0001F4A4 Étape 0 : Homed=FALSE, HomingPermit=TRUE, UseDynamicTarget=FALSE\
+          \ \n        \U0001F680 Étape 1 : Front Home seul (sans capteur haut) \n\
+          \        ⚡ Étape 2 : Cible = CfgHomingTargetM (libre, MAINT_N2 typiquement)\
+          \ \n        ✅ Étape 3 : Homed=TRUE, HomingRefRaw calculé pour cible unitaire"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-020.3:
-        intention: 'Dynamique : front UseDynamicTarget (ou combiné Home) → cible DynamicHomingTargetM
-          (ex. auto-référencement benne M2)'
+        intention: "\U0001F4A4 Étape 0 : Homed=FALSE, HomingPermit=TRUE \n       \
+          \ \U0001F680 Étape 1 : Front UseDynamicTarget (ou combiné Home) \n     \
+          \   ⚡ Étape 2 : Cible = DynamicHomingTargetM (calculée par l'appelant, ex.\
+          \ auto-référencement benne M2) \n        ✅ Étape 3 : Homed=TRUE, HomingRefRaw\
+          \ calculé pour cible dynamique"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-020.4:
-        intention: 'Toute cible hors [-99;+99]m → homing refusé, ErrorId bit4, pas
-          d''écriture RETAIN ; borne exacte : cible=±99.0m acceptée, ±99.1m refusée'
+        intention: "\U0001F4A4 Étape 0 : Homed=FALSE, HomingPermit=TRUE \n       \
+          \ \U0001F680 Étape 1 : Front Home avec cible hors [-99;+99]m \n        ⚡\
+          \ Étape 2 : Homing refusé, ErrorId bit4 levé \n        ✅ Étape 3 : Pas d'écriture\
+          \ RETAIN ; borne exacte : cible=±99.0m acceptée, ±99.1m refusée"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-020.6:
-        intention: 'TopPositionSensor absent : sans capteur haut, mode nominal ne
-          déclenche pas ; seuls unitaire/dynamique (FB_Encoder_Homing.st:206-207)'
+        intention: "\U0001F4A4 Étape 0 : TopPositionSensor=FALSE (absent), HomingPermit=TRUE\
+          \ \n        \U0001F680 Étape 1 : Front Home en mode nominal \n        ⚡\
+          \ Étape 2 : Mode nominal ne déclenche pas (capteur haut requis) \n     \
+          \   ✅ Étape 3 : Seuls unitaire/dynamique fonctionnent (FB_Encoder_Homing.st:206-207)"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-020.7:
-        intention: 'Homing sans permit : front Home sans HomingPermit → HomingModeError
-          (bit0), pas d''écriture (FB_Encoder_Homing.st:202-204)'
+        intention: "\U0001F4A4 Étape 0 : HomingPermit=FALSE, Homed=FALSE \n      \
+          \  \U0001F680 Étape 1 : Front Home sans HomingPermit \n        ⚡ Étape 2\
+          \ : HomingModeError (bit0) levé \n        ✅ Étape 3 : Pas d'écriture RETAIN\
+          \ (FB_Encoder_Homing.st:202-204)"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-020.8:
-        intention: 'HomingSuspect RETAIN : stocké dans Calib RETAIN → persiste après
-          redémarrage (FB_Encoder_Homing.st:185)'
+        intention: "\U0001F4A4 Étape 0 : HomingSuspect=TRUE stocké dans Calib RETAIN\
+          \ \n        \U0001F680 Étape 1 : Redémarrage PLC (cycle froid) \n      \
+          \  ⚡ Étape 2 : Calib.HomingSuspect restauré depuis RETAIN \n        ✅ Étape\
+          \ 3 : HomingSuspect persiste après redémarrage (FB_Encoder_Homing.st:185)"
         type: 💻 AUTO
         ref: §5
         etat: NV-I
       TC-P09-020.5:
-        intention: Écart RawPos/Calib.LastKnownRawPos au boot > tolérance → HomingSuspect=TRUE,
-          Homed=FALSE ; levé uniquement par front BtnConfirmCoherence ET HomingPermit=TRUE
+        intention: "\U0001F4A4 Étape 0 : Boot PLC, Calib.LastKnownRawPos RETAIN restauré\
+          \ \n        \U0001F680 Étape 1 : Premier scan EncoderAvailable=TRUE, écart\
+          \ RawPos vs Calib.LastKnownRawPos > tolérance (1000 pts) \n        ⚡ Étape\
+          \ 2 : HomingSuspect=TRUE, Homed=FALSE (référence non fiable) \n        ✅\
+          \ Étape 3 : Levé uniquement par front BtnConfirmCoherence ET HomingPermit=TRUE\
+          \ (pas d'auto-effacement)"
         type: 💻 AUTO
         ref: §5
         etat: NV
       TC-P09-030.4:
-        intention: 'CablePosM hors [PositionMinM;PositionMaxM] → EncoderIncoherent=TRUE,
-          bit0, auto-effacé au retour ; borne haute : PositionMaxM accepté, +ε → incohérent'
+        intention: "\U0001F4A4 Étape 0 : CablePosM dans [PositionMinM;PositionMaxM]\
+          \ (déf. ±99m) \n        \U0001F680 Étape 1 : CablePosM sort de la plage\
+          \ (ex. PositionMaxM+ε) \n        ⚡ Étape 2 : EncoderIncoherent=TRUE, bit0\
+          \ levé \n        ✅ Étape 3 : Auto-effacé au retour en plage ; borne haute\
+          \ : PositionMaxM accepté, +ε → incohérent"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-030.5:
-        intention: HomingSuspect=TRUE → EncoderIncoherent=TRUE, bit1, tant que non
-          confirmé
+        intention: "\U0001F4A4 Étape 0 : HomingSuspect=FALSE, EncoderIncoherent=FALSE\
+          \ \n        \U0001F680 Étape 1 : HomingSuspect=TRUE (incohérence boot non\
+          \ confirmée) \n        ⚡ Étape 2 : EncoderIncoherent=TRUE, bit1 levé \n\
+          \        ✅ Étape 3 : Persiste tant que HomingSuspect non confirmé (suit\
+          \ l'état Homing, pas latché ici)"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-030.6:
-        intention: BypassGlobal=TRUE → neutralise bornage + cohérence boot ; retour
-          FALSE → les 2 causes redeviennent actives au scan suivant
+        intention: "\U0001F4A4 Étape 0 : BypassGlobal=FALSE, bornage + cohérence actifs\
+          \ \n        \U0001F680 Étape 1 : BypassGlobal=TRUE (mise en service) \n\
+          \        ⚡ Étape 2 : Bornage + cohérence boot neutralisés → EncoderIncoherent=FALSE\
+          \ \n        ✅ Étape 3 : Retour FALSE → les 2 causes redeviennent actives\
+          \ au scan suivant"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-030.7:
-        intention: CablePosMSafe = CablePosM toujours (jamais gelée — distinct du
-          gel RawPos côté Abs)
+        intention: "\U0001F4A4 Étape 0 : CablePosM active, Enable=TRUE \n        \U0001F680\
+          \ Étape 1 : Lecture continue de CablePosM depuis FB_Encoder_Scale \n   \
+          \     ⚡ Étape 2 : CablePosMSafe = CablePosM (transmission continue) \n \
+          \       ✅ Étape 3 : CablePosMSafe jamais gelée ici (distinct du gel RawPos\
+          \ côté Abs)"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-030.1:
-        intention: RawPos=HomingRefRaw+4096 (soit ½ tour), CableM_PerRev=2.0, PointsPerRev=8192
-          → CablePosM=1.0
+        intention: "\U0001F4A4 Étape 0 : HomingRefRaw mémorisé, PointsPerRev=8192,\
+          \ CableM_PerRev=2.0 \n        \U0001F680 Étape 1 : Injection RawPos=HomingRefRaw+4096\
+          \ (soit ½ tour) \n        ⚡ Étape 2 : Conversion DINT avant soustraction\
+          \ → RawDiff=4096 \n        ✅ Étape 3 : CablePosM = 4096 × (2.0/8192) = 1.0\
+          \ m"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-030.2:
-        intention: RawPos<HomingRefRaw → CablePosM négative (sous l'eau)
+        intention: "\U0001F4A4 Étape 0 : HomingRefRaw mémorisé (position haute) \n\
+          \        \U0001F680 Étape 1 : Injection RawPos < HomingRefRaw (descente\
+          \ sous l'eau) \n        ⚡ Étape 2 : RawDiff négatif → CablePosM signée négative\
+          \ \n        ✅ Étape 3 : CablePosM < 0 (sous l'eau, convention signée +enroulé/−sous)"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-030.3:
-        intention: PointsPerRev=0 → CablePosM=0.0 (garde division par zéro), pas de
-          plantage
+        intention: "\U0001F4A4 Étape 0 : PointsPerRev=8192 (normal) \n        \U0001F680\
+          \ Étape 1 : Injection PointsPerRev=0 (config aberrante) \n        ⚡ Étape\
+          \ 2 : Garde division par zéro → CablePosM=0.0 \n        ✅ Étape 3 : Pas\
+          \ de plantage, sortie sûre (0.0)"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-030.8:
-        intention: 'Garde dépassement DINT : conversion DINT avant soustraction →
-          pas de dépassement (FB_Encoder_Scale.st:34)'
+        intention: "\U0001F4A4 Étape 0 : RawPos et HomingRefRaw proches des bornes\
+          \ UDINT \n        \U0001F680 Étape 1 : Soustraction RawPos - HomingRefRaw\
+          \ sans conversion DINT \n        ⚡ Étape 2 : Risque de dépassement si soustraction\
+          \ directe UDINT \n        ✅ Étape 3 : Conversion DINT AVANT soustraction\
+          \ → pas de dépassement (FB_Encoder_Scale.st:34)"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-030.9:
-        intention: RawPos=HomingRefRaw → CablePosM=0.0 (FB_Encoder_Scale.st:34,38)
+        intention: "\U0001F4A4 Étape 0 : HomingRefRaw mémorisé \n        \U0001F680\
+          \ Étape 1 : Injection RawPos = HomingRefRaw (position de référence exacte)\
+          \ \n        ⚡ Étape 2 : RawDiff = 0 \n        ✅ Étape 3 : CablePosM = 0.0\
+          \ (FB_Encoder_Scale.st:34,38)"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-050.1:
-        intention: Valid=TRUE seulement après 6 échantillons couvrant WindowElapsed
-          ≥ T#50ms
+        intention: "\U0001F4A4 Étape 0 : Buffer vide, Valid=FALSE \n        \U0001F680\
+          \ Étape 1 : Accumulation de 6 échantillons espacés ≥10ms \n        ⚡ Étape\
+          \ 2 : Fenêtre couvre ≥ T#50ms (WindowElapsed ≥ WindowTime) \n        ✅ Étape\
+          \ 3 : Valid=TRUE — vitesse calculée disponible"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-050.2:
-        intention: PositionValid=FALSE (amont) → purge complète immédiate (CollectedSamples:=0,
-          Valid:=FALSE)
+        intention: "\U0001F4A4 Étape 0 : Valid=TRUE, buffer plein (6 échantillons)\
+          \ \n        \U0001F680 Étape 1 : PositionValid=FALSE (amont — perte chaîne\
+          \ codeur) \n        ⚡ Étape 2 : Purge complète immédiate (CollectedSamples:=0)\
+          \ \n        ✅ Étape 3 : Valid:=FALSE — vitesse non disponible"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-050.3:
-        intention: Rebouclage TIME() détecté (CurrentTimestamp < LastTimestamp) →
-          purge sans réutiliser le delta aberrant
+        intention: "\U0001F4A4 Étape 0 : Valid=TRUE, horodatage normal \n        \U0001F680\
+          \ Étape 1 : CurrentTimestamp < LastTimestamp (rebouclage TIME() 49,7j) \n\
+          \        ⚡ Étape 2 : Purge sans réutiliser le delta aberrant \n        ✅\
+          \ Étape 3 : Valid=FALSE, buffer remis à zéro"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-050.4:
-        intention: SignedSpeed_Mps signée (+ montée) ; Speed_Mps = ABS(SignedSpeed_Mps)
+        intention: "\U0001F4A4 Étape 0 : Valid=TRUE, 6 positions collectées \n   \
+          \     \U0001F680 Étape 1 : Mouvement de montée (position croissante) \n\
+          \        ⚡ Étape 2 : SignedSpeed_Mps signée (+ montée) \n        ✅ Étape\
+          \ 3 : Speed_Mps = ABS(SignedSpeed_Mps) — valeur absolue"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-050.5:
-        intention: Fenêtre <50ms → Valid=FALSE sans purge (buffer conservé) (FB_Encoder_SpeedMeasure.st:128-132)
+        intention: "\U0001F4A4 Étape 0 : 6 échantillons collectés, fenêtre < 50ms\
+          \ \n        \U0001F680 Étape 1 : WindowElapsed < WindowTime (T#50ms) \n\
+          \        ⚡ Étape 2 : Valid=FALSE sans purge (buffer conservé) \n       \
+          \ ✅ Étape 3 : Attend le prochain échantillon (FB_Encoder_SpeedMeasure.st:128-132)"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-050.6:
-        intention: 'Vitesse exacte : SignedSpeed_Mps=(P[5]−P[0])/WindowElapsed ; Speed_Mps=ABS
-          (FB_Encoder_SpeedMeasure.st:124-126)'
+        intention: "\U0001F4A4 Étape 0 : 6 positions P[0]..P[5], fenêtre ≥50ms \n\
+          \        \U0001F680 Étape 1 : Calcul SignedSpeed_Mps = (P[5]−P[0]) / WindowElapsed\
+          \ \n        ⚡ Étape 2 : Speed_Mps = ABS(SignedSpeed_Mps) \n        ✅ Étape\
+          \ 3 : Vitesse exacte vérifiée (FB_Encoder_SpeedMeasure.st:124-126)"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-040.1:
-        intention: EncoderAvailable=TRUE, Homed=FALSE, EncoderIncoherent=FALSE → EncoderFault=FALSE
-          (non-référencé ≠ incohérent)
+        intention: "\U0001F4A4 Étape 0 : EncoderAvailable=TRUE, Homed=FALSE, EncoderIncoherent=FALSE\
+          \ \n        \U0001F680 Étape 1 : Évaluation EncoderFault := NOT Available\
+          \ OR Incoherent \n        ⚡ Étape 2 : Available=TRUE et Incoherent=FALSE\
+          \ → EncoderFault=FALSE \n        ✅ Étape 3 : Non-référencé (Homed=FALSE)\
+          \ n'affecte pas EncoderFault"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-040.2:
-        intention: Même cas → HomedAndReliable=FALSE (gate stricte exige Homed)
+        intention: "\U0001F4A4 Étape 0 : Même cas (Available=TRUE, Homed=FALSE, Incoherent=FALSE)\
+          \ \n        \U0001F680 Étape 1 : Évaluation HomedAndReliable := Available\
+          \ AND Homed AND NOT Incoherent \n        ⚡ Étape 2 : Homed=FALSE → gate\
+          \ stricte FALSE \n        ✅ Étape 3 : HomedAndReliable=FALSE (gate stricte\
+          \ exige Homed)"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-040.3:
-        intention: EncoderAvailable=FALSE → EncoderFault=TRUE quel que soit Homed/EncoderIncoherent
+        intention: "\U0001F4A4 Étape 0 : EncoderAvailable=TRUE, état nominal \n  \
+          \      \U0001F680 Étape 1 : EncoderAvailable=FALSE (perte bus/esclave) \n\
+          \        ⚡ Étape 2 : EncoderFault=TRUE quel que soit Homed/EncoderIncoherent\
+          \ \n        ✅ Étape 3 : HomedAndReliable=FALSE (gate stricte exige Available)"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-040.4:
-        intention: Table de vérité exhaustive des 2 gates sur 8 combos (FB_EncoderReliability.st:30,34)
+        intention: "\U0001F4A4 Étape 0 : 8 combinaisons (Available, Homed, Incoherent)\
+          \ à tester \n        \U0001F680 Étape 1 : Évaluation des 2 gates sur chaque\
+          \ combo \n        ⚡ Étape 2 : Vérification exhaustive EncoderFault et HomedAndReliable\
+          \ \n        ✅ Étape 3 : Table de vérité complète validée (FB_EncoderReliability.st:30,34)"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-040.5:
-        intention: EncoderIncoherent → EncoderFault=TRUE et HomedAndReliable=FALSE
-          (FB_EncoderReliability.st:30,34)
+        intention: "\U0001F4A4 Étape 0 : EncoderAvailable=TRUE, Homed=TRUE \n    \
+          \    \U0001F680 Étape 1 : EncoderIncoherent=TRUE (hors bornes ou suspect)\
+          \ \n        ⚡ Étape 2 : EncoderFault=TRUE et HomedAndReliable=FALSE \n \
+          \       ✅ Étape 3 : Incohérence fait tomber les 2 gates (FB_EncoderReliability.st:30,34)"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
@@ -1161,270 +1308,468 @@ domains:
         etat: NV-I
     validation_points:
       TC-P10-011, 017, 018, 019:
-        intention: (non détaillé)
+        intention: "\U0001F4A4 Étape 0 : Treuil au repos, contacteurs coupés, frein\
+          \ serré \n        \U0001F680 Étape 1 : Consigne opérateur (joystick/boutons)\
+          \ → arbitrage palier/sens \n        ⚡ Étape 2 : Activation contacteurs selon\
+          \ palier, décodage FB_SpeedStep \n        ✅ Étape 3 : Mouvement treuil piloté\
+          \ — détail dans FB_Winch_v1.0.md"
         type: —
         ref: FB_Winch_v1.0.md
         etat: NV-I
       TC-P10-001 à 010:
-        intention: (non détaillé)
+        intention: "\U0001F4A4 Étape 0 : Mouvement nominal, aucun défaut actif \n\
+          \        \U0001F680 Étape 1 : Injection défaut (dérite, non-confirmation\
+          \ arrêt, sens opposé, etc.) \n        ⚡ Étape 2 : Détection par mécanisme\
+          \ Méca A-G, ErrorId bit levé \n        ✅ Étape 3 : SafeStop ± PowerCutOff\
+          \ selon masque — détail dans FB_Safety_Winch_v1.0.md"
         type: —
         ref: FB_Safety_Winch_v1.0.md
         etat: NV-I
       TC-P10-014, 015, 016:
-        intention: (non détaillé)
+        intention: "\U0001F4A4 Étape 0 : M1/M2 synchronisés, écart < 0.8m (Zone 1)\
+          \ \n        \U0001F680 Étape 1 : Injection écart entre M1 et M2 \n     \
+          \   ⚡ Étape 2 : Zone 2 (0.8-2.5m) → dégradation palier 1 ; Zone 3 (≥2.5m)\
+          \ → SafeStop \n        ✅ Étape 3 : Comportement 3 zones validé — détail\
+          \ dans FB_WinchSync_v1.1.md"
         type: —
         ref: FB_WinchSync_v1.1.md
         etat: NV
       TC-P10-012, 013, 020, 021, 022:
-        intention: (non détaillé)
+        intention: "\U0001F4A4 Étape 0 : Sorties autorisées, frein couplé direct \n\
+          \        \U0001F680 Étape 1 : Arrêt commandé ou défaut → coupure contacteurs\
+          \ + frein \n        ⚡ Étape 2 : Watchdog frein 500ms, anti-redémarrage,\
+          \ gate mot/fréquence \n        ✅ Étape 3 : Zéro redémarrage auto validé\
+          \ — détail dans FB_WinchOutputInterlock_v1.0.md"
         type: —
         ref: FB_WinchOutputInterlock_v1.0.md
         etat: NV
       TC-P10-023 à 034:
-        intention: (non détaillé)
+        intention: "\U0001F4A4 Étape 0 : Benne au repos, M1/M2 synchronisés \n   \
+          \     \U0001F680 Étape 1 : Demande ouverture/fermeture benne (désynchro\
+          \ M1/M2) \n        ⚡ Étape 2 : Glissement, assistants Dive/Extraction, défense\
+          \ en profondeur \n        ✅ Étape 3 : Manœuvre benne validée — détail dans\
+          \ FB_Bucket_v1.0.md"
         type: —
         ref: FB_Bucket_v1.0.md
         etat: NV-I
       Diagnostic MES-008, symétrie:
-        intention: (non détaillé)
+        intention: "\U0001F4A4 Étape 0 : M1/M2 en mouvement, métriques passives collectées\
+          \ \n        \U0001F680 Étape 1 : Mesure écarts démarrage/frein/arrêt/position\
+          \ \n        ⚡ Étape 2 : Calcul DeltaStartDelay_Ms, MaxSyncDeviation_M, etc.\
+          \ \n        ✅ Étape 3 : Diagnostic passif publié IHM — détail dans FB_Winch_Symmetry_v1.1.md"
         type: —
         ref: FB_Winch_Symmetry_v1.1.md
         etat: NV
       Décodage paliers 1..5 & garde-fou:
-        intention: (non détaillé)
+        intention: "\U0001F4A4 Étape 0 : Consigne SpeedCmd_Pct reçue (0-100%) \n \
+          \       \U0001F680 Étape 1 : Quantification en 5 paliers (PV/GV1/GV2/GV3/GV4)\
+          \ \n        ⚡ Étape 2 : Activation contacteurs selon palier, garde-fou vitesse\
+          \ mesurée \n        ✅ Étape 3 : Décodeur validé — détail dans FB_SpeedStep_v1.0.md"
         type: —
         ref: FB_SpeedStep_v1.0.md
         etat: NV
       Diagnostic charge 2D:
-        intention: (non détaillé)
+        intention: "\U0001F4A4 Étape 0 : Treuil en mouvement, palier et vitesse mesurés\
+          \ \n        \U0001F680 Étape 1 : Estimation charge 2D (palier × vitesse)\
+          \ \n        ⚡ Étape 2 : Calcul diagnostic passif, aucune action sécurité\
+          \ \n        ✅ Étape 3 : Estimation publiée IHM — détail dans FB_WinchLoadEstimator_v1.0.md"
         type: —
         ref: FB_WinchLoadEstimator_v1.0.md
         etat: NV
       Dérive position sous frein:
-        intention: (non détaillé)
+        intention: "\U0001F4A4 Étape 0 : Treuil à l'arrêt, frein serré, position captée\
+          \ \n        \U0001F680 Étape 1 : Surveillance position pendant arrêt (frein\
+          \ maintenu) \n        ⚡ Étape 2 : Détection dérive > seuil → alerte \n \
+          \       ✅ Étape 3 : Capture & surveillance validées — détail dans FB_DriftGuard_v1.0.md"
         type: —
         ref: FB_DriftGuard_v1.0.md
         etat: NV
       TC-P10-023:
-        intention: Fermeture seulement si MotionDirection=1 ET MotionRequestActive
+        intention: "\U0001F4A4 Étape 0 : Benne au repos, State=READY \n        \U0001F680\
+          \ Étape 1 : Demande CmdClose avec MotionDirection=1 ET MotionRequestActive\
+          \ \n        ⚡ Étape 2 : Vérification des 2 conditions obligatoires \n  \
+          \      ✅ Étape 3 : Fermeture engagée seulement si les 2 conditions réunies"
         type: 💻 AUTO
+        ref: §2
         etat: NV-I
       TC-P10-024:
-        intention: Ouverture seulement si MotionDirection=-1 ET MotionRequestActive
+        intention: "\U0001F4A4 Étape 0 : Benne au repos, State=READY \n        \U0001F680\
+          \ Étape 1 : Demande CmdOpen avec MotionDirection=-1 ET MotionRequestActive\
+          \ \n        ⚡ Étape 2 : Vérification des 2 conditions obligatoires \n  \
+          \      ✅ Étape 3 : Ouverture engagée seulement si les 2 conditions réunies"
         type: 💻 AUTO
+        ref: §2
         etat: NV
       TC-P10-025:
-        intention: 'Demande benne (CmdOpen/CmdClose) refusée si M1_Busy OR M2_Busy
-          à l''entrée (READY). ⚠️ État code : M1_Busy/M2_Busy déclarés (FB_Bucket.st:29-30)
-          mais NON utilisés — anti-traversée non câblée (T175).'
+        intention: "\U0001F4A4 Étape 0 : State=READY, entrée manœuvre benne \n   \
+          \     \U0001F680 Étape 1 : Demande CmdOpen/CmdClose avec M1_Busy OR M2_Busy\
+          \ \n        ⚡ Étape 2 : Refus de la demande benne \n        ✅ Étape 3 :\
+          \ ⚠️ État code : M1_Busy/M2_Busy déclarés (FB_Bucket.st:29-30) mais NON\
+          \ utilisés — anti-traversée non câblée (T175)"
         type: 💻 AUTO
+        ref: §2
         etat: NV
       TC-P10-026:
-        intention: Glissement M1>1.0m pendant BUSY ➔ bit4 + M1SlipDetected + coupe
-          M2
+        intention: "\U0001F4A4 Étape 0 : Manœuvre benne (State=BUSY) \n        \U0001F680\
+          \ Étape 1 : Glissement M1 >1.0m pendant BUSY \n        ⚡ Étape 2 : ErrorId\
+          \ bit4 + M1SlipDetected levés, coupe M2 \n        ✅ Étape 3 : Protection\
+          \ couche 1 active (dérive M1)"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-027:
-        intention: M1SlipDetected force SafeStop sur M1 côté Treuils
+        intention: "\U0001F4A4 Étape 0 : M1SlipDetected=FALSE \n        \U0001F680\
+          \ Étape 1 : Glissement M1 détecté → M1SlipDetected=TRUE \n        ⚡ Étape\
+          \ 2 : Propagation du signal vers côté Treuils \n        ✅ Étape 3 : SafeStop\
+          \ forcé sur M1"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-028:
-        intention: 'Couche 2 (Méca C) : dérive M1>2.0m ➔ PowerCutOff'
+        intention: "\U0001F4A4 Étape 0 : Manœuvre benne, couche 1 (SafeStop) active\
+          \ \n        \U0001F680 Étape 1 : Dérive M1 continue >2.0m (Méca C) \n  \
+          \      ⚡ Étape 2 : Escalade couche 2 \n        ✅ Étape 3 : PowerCutOff déclenché\
+          \ (défense en profondeur — 2.0m)"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-029:
-        intention: Recul (sens inverse) borné à la position de départ, jamais au-delà
+        intention: "\U0001F4A4 Étape 0 : Manœuvre benne, position de départ mémorisée\
+          \ \n        \U0001F680 Étape 1 : Recul (sens inverse) \n        ⚡ Étape\
+          \ 2 : Calcul du recul max autorisé \n        ✅ Étape 3 : Recul borné à la\
+          \ position de départ, jamais au-delà"
         type: 💻 AUTO
+        ref: §2
         etat: NV
       TC-P10-030:
-        intention: 'ConfirmOpen/ClosePosition : effet seulement MAINT_N1/N2 arrêtés'
+        intention: "\U0001F4A4 Étape 0 : Machine arrêtée, mode MAINT_N1/N2 \n    \
+          \    \U0001F680 Étape 1 : ConfirmOpen/ClosePosition \n        ⚡ Étape 2\
+          \ : Vérification mode MAINT seule acceptée \n        ✅ Étape 3 : Effet seulement\
+          \ en MAINT_N1/N2 arrêtés"
         type: 💻 AUTO
+        ref: §2
         etat: NV
       TC-P10-031:
-        intention: Codeur(s) non référencé(s) ➔ bit3 permanent, indépendant de Reset
+        intention: "\U0001F4A4 Étape 0 : Codeur (M1 ou M2) non référencé (Homed=FALSE)\
+          \ \n        \U0001F680 Étape 1 : Évaluation des besoins position benne \n\
+          \        ⚡ Étape 2 : ErrorId bit3 levé \n        ✅ Étape 3 : bit3 permanent,\
+          \ indépendant de Reset"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-032:
-        intention: FB_ExtractionSequence.Busy préserve l'armement joystick en fin
-          benne
+        intention: "\U0001F4A4 Étape 0 : Manœuvre benne en cours, fin de fermeture\
+          \ \n        \U0001F680 Étape 1 : Vérification FB_ExtractionSequence.Busy\
+          \ actif \n        ⚡ Étape 2 : Préservation armement joystick \n        ✅\
+          \ Étape 3 : Armement joystick préservé en fin de benne"
         type: 💻 AUTO
+        ref: §5
         etat: NV
       TC-P10-033:
-        intention: Butée haute M2 décalée de OffsetCloseM si fermé/en fermeture
+        intention: "\U0001F4A4 Étape 0 : Benne fermée ou en fermeture \n        \U0001F680\
+          \ Étape 1 : Calcul butée haute M2 \n        ⚡ Étape 2 : Application du décalage\
+          \ OffsetCloseM \n        ✅ Étape 3 : Butée haute M2 décalée de OffsetCloseM\
+          \ si fermé/en fermeture"
         type: 💻 AUTO
+        ref: §2
         etat: NV
       TC-P10-034:
-        intention: 'Terrain : cinématique réelle en charge, amplitude offset validée'
+        intention: "\U0001F4A4 Étape 0 : Essai réel en charge \n        \U0001F680\
+          \ Étape 1 : Manœuvre benne sur le terrain \n        ⚡ Étape 2 : Mesure amplitude\
+          \ offset réelle \n        ✅ Étape 3 : Cinématique en charge validée, amplitude\
+          \ offset validée sur site"
         type: 🟢 SITE
+        ref: §2
         etat: NV
       TC-P10-045.1:
-        intention: 'Benne partiellement fermée → remontée palier 1 seul : NOT IsClosed
-          + demande montée → paliers 2-5 verrouillés.'
+        intention: "\U0001F4A4 Étape 0 : Benne partiellement fermée (NOT IsClosed),\
+          \ demande de montée \n        \U0001F680 Étape 1 : Vérification état benne\
+          \ \n        ⚡ Étape 2 : Verrouillage paliers 2-5 \n        ✅ Étape 3 : Remontée\
+          \ autorisée en palier 1 seul — paliers 2-5 verrouillés"
         type: 💻 AUTO
+        ref: §7.5
         etat: NV-I
       TC-P10-046.1:
-        intention: Timeout mouvement T#60s pendant BUSY → bit timeout + latch (CfgTimeoutDuration=60s,
-          code réel — corrige le 30s documenté).
+        intention: "\U0001F4A4 Étape 0 : Manœuvre benne (State=BUSY) \n        \U0001F680\
+          \ Étape 1 : Maintien sans fin de manœuvre (CfgTimeoutDuration=60s) \n  \
+          \      ⚡ Étape 2 : Timeout mouvement déclenché \n        ✅ Étape 3 : bit\
+          \ timeout + latch (CfgTimeoutDuration=60s, code réel — corrige le 30s documenté)"
         type: 💻 AUTO
+        ref: §2
         etat: NV-I
       TC-P10-047.1:
-        intention: 'Incohérence boot : 1er cycle avec ni IsOpen ni IsClosed → StateIncoherent=TRUE,
-          ActiveOffsetValid=FALSE.'
+        intention: "\U0001F4A4 Étape 0 : 1er cycle, ni IsOpen ni IsClosed \n     \
+          \   \U0001F680 Étape 1 : Évaluation état benne \n        ⚡ Étape 2 : StateIncoherent=TRUE,\
+          \ ActiveOffsetValid=FALSE \n        ✅ Étape 3 : Incohérence boot détectée,\
+          \ offset déclaré invalide"
         type: 💻 AUTO
+        ref: §2
         etat: NV-I
       TC-P10-048.1:
-        intention: 'Offset RETAIN : OffsetCloseM=15.0 persiste après power cycle (_BucketCfgPersist
-          en VAR_GLOBAL PERSISTENT).'
+        intention: "\U0001F4A4 Étape 0 : OffsetCloseM=15.0 configuré, stocké dans\
+          \ _BucketCfgPersist (PERSISTENT) \n        \U0001F680 Étape 1 : Power cycle\
+          \ (redémarrage PLC) \n        ⚡ Étape 2 : Restauration OffsetCloseM depuis\
+          \ _BucketCfgPersist \n        ✅ Étape 3 : OffsetCloseM=15.0 persiste après\
+          \ power cycle"
         type: 💻 AUTO
+        ref: §6
         etat: NV-I
       TC-P10-001:
-        intention: 'Armer Méca A (contacteurs+frein coupés, joystick neutre, hors
-          homing). Injecter dérive position >2.0m (canal position, DriftGuardA) →
-          SafeStop+PowerCutOff. 🆕 Mono-canal assumé (décision 2026-08-29) : la détection
-          s''appuie sur le canal position seul ; le seuil vitesse (UncommandedSpeedThresholdMps)
-          reste déclaré mais non utilisé et n''est plus exigé — pas de croisement
-          Cat.3 logiciel sur ce socle.'
+        intention: "\U0001F4A4 Étape 0 : Contrôleurs+frein coupés, joystick neutre,\
+          \ hors homing \n        \U0001F680 Étape 1 : Injection dérive position >2.0m\
+          \ (canal position, DriftGuardA) \n        ⚡ Étape 2 : Détection Méca A,\
+          \ bit7 levé \n        ✅ Étape 3 : SafeStop+PowerCutOff — \U0001F195 mono-canal\
+          \ assumé (2026-08-29) : seuil vitesse UncommandedSpeedThresholdMps déclaré\
+          \ mais non utilisé, pas de croisement Cat.3 logiciel"
         type: 💻 AUTO
+        ref: §3
         etat: NV-I
       TC-P10-002:
-        intention: 'Méca B (bit8) : non-confirmation arrêt 3s ➔ SafeStop+PowerCutOff'
+        intention: "\U0001F4A4 Étape 0 : Arrêt commandé, FwdRevSpeedFeedbackOff attendu\
+          \ \n        \U0001F680 Étape 1 : Maintien de la non-confirmation 3s (PostRampTimeout)\
+          \ \n        ⚡ Étape 2 : Détection Méca B, bit8 levé \n        ✅ Étape 3\
+          \ : SafeStop+PowerCutOff"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-003:
-        intention: 'Méca C (bit9) : dérive M1>2m en maintien M1 ➔ SafeStop+PowerCutOff'
+        intention: "\U0001F4A4 Étape 0 : BenneHoldStillActive (M1 seul), maintien\
+          \ \n        \U0001F680 Étape 1 : Dérive M1 >2.0m en maintien \n        ⚡\
+          \ Étape 2 : Détection Méca C, bit9 levé \n        ✅ Étape 3 : SafeStop+PowerCutOff"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-004:
-        intention: 'Méca D (bit11) : capteur haut sans arrêt 3s ➔ SafeStop+PowerCutOff'
+        intention: "\U0001F4A4 Étape 0 : Capteur/limite haut atteint, hors homing,\
+          \ montée \n        \U0001F680 Étape 1 : Maintien sans arrêt confirmé 3s\
+          \ \n        ⚡ Étape 2 : Détection Méca D, bit11 levé (marge +0.10m) \n \
+          \       ✅ Étape 3 : SafeStop+PowerCutOff"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-005:
-        intention: 'Méca E bit12 : écart>2m ➔ SafeStop seul (pas PowerCutOff)'
+        intention: "\U0001F4A4 Étape 0 : SyncEnable, hors benne/homing \n        \U0001F680\
+          \ Étape 1 : Écart M1/M2 >2m (CriticalSyncToleranceM=2.5m) \n        ⚡ Étape\
+          \ 2 : Détection Méca E bit12 \n        ✅ Étape 3 : SafeStop seul (pas PowerCutOff)\
+          \ — escalade par bit13"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-006:
-        intention: 'Méca E bit13 : bit12 non confirmé 3s ➔ escalade PowerCutOff'
+        intention: "\U0001F4A4 Étape 0 : Bit12 levé (SafeStop seul), écart persistant\
+          \ \n        \U0001F680 Étape 1 : Non-confirmation 3s après bit12 \n    \
+          \    ⚡ Étape 2 : Détection Méca E bit13 \n        ✅ Étape 3 : Escalade →\
+          \ PowerCutOff ajouté au SafeStop"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-007:
-        intention: 'Méca F (bit14) : sens mesuré opposé au sens commandé 500ms ➔ SafeStop'
+        intention: "\U0001F4A4 Étape 0 : Mouvement commandé, hors homing \n      \
+          \  \U0001F680 Étape 1 : Signe vitesse mesurée opposé à la commande \n  \
+          \      ⚡ Étape 2 : Confirmé 500ms (seuil 0.02 m/s) \n        ✅ Étape 3 :\
+          \ Détection Méca F, bit14 → SafeStop seul"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-008:
-        intention: 'Méca G (bit15) : vitesse nulle malgré commande 3s ➔ SafeStop seul'
+        intention: "\U0001F4A4 Étape 0 : Mouvement commandé, hors homing \n      \
+          \  \U0001F680 Étape 1 : Vitesse mesurée sous seuil malgré commande \n  \
+          \      ⚡ Étape 2 : Maintien 3s \n        ✅ Étape 3 : Détection Méca G, bit15\
+          \ → SafeStop seul"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-009:
-        intention: PowerCutOff = exactement bits 2,7,8,9,10,11,13 (masque 16#2F84)
+        intention: "\U0001F4A4 Étape 0 : Évaluation combinatoire des bits ErrorId\
+          \ \n        \U0001F680 Étape 1 : Vérification du masque 16#2F84 (bits 2,7,8,9,10,11,13)\
+          \ \n        ⚡ Étape 2 : Comparaison PowerCutOff = (ErrorId AND 16#2F84)\
+          \ ≠ 0 \n        ✅ Étape 3 : Masque exact vérifié — aucun bit hors liste\
+          \ ne déclenche PowerCutOff"
         type: 💻 AUTO
+        ref: §4
         etat: NV
       TC-P10-010:
-        intention: SafeStop exclut bit3 (mou câble) si SyncEnable=FALSE
+        intention: "\U0001F4A4 Étape 0 : SyncEnable=FALSE, mou câble (bit3) actif\
+          \ \n        \U0001F680 Étape 1 : Vérification du masque SafeStop = NOT PowerContactorEngaged\
+          \ OR (ErrorId AND 16#FF97) \n        ⚡ Étape 2 : Bit3 exclu du SafeStop\
+          \ (mou câble = DescendPermit:=FALSE seul) \n        ✅ Étape 3 : Masque SafeStop\
+          \ corrigé (bit3 exclu) quand SyncEnable=FALSE"
         type: 💻 AUTO
+        ref: §4
         etat: NV
       TC-P10-036.1:
-        intention: 'Warmup 3s : après Enable, perte com opérateur (cause 0) ne déclenche
-          PAS pendant les 3 premières s (TonStartupWarmup) ; après 3s → SafeStop.'
+        intention: "\U0001F4A4 Étape 0 : Après Enable=TRUE, fenêtre warmup 3s (TonStartupWarmup)\
+          \ \n        \U0001F680 Étape 1 : Perte com opérateur (cause 0) dans les\
+          \ 3 premières s \n        ⚡ Étape 2 : Aucun SafeStop pendant les 3s (anti-faux-défaut\
+          \ au démarrage) \n        ✅ Étape 3 : Après 3s → SafeStop déclenché sur\
+          \ perte com"
         type: 💻 AUTO
+        ref: §3
         etat: NV-I
       TC-P10-037.1:
-        intention: 'Gate Enable=FALSE : SafeStop/Permit/PowerCutOff forcés FALSE,
-          Ready=FALSE, mais latches (MecaAFaultLatched…) préservés ; re-Enable exige
-          Reset front.'
+        intention: "\U0001F4A4 Étape 0 : Enable=FALSE \n        \U0001F680 Étape 1\
+          \ : SafeStop/Permit/PowerCutOff forcés FALSE, Ready=FALSE \n        ⚡ Étape\
+          \ 2 : Latches (MecaAFaultLatched…) préservés \n        ✅ Étape 3 : Re-Enable\
+          \ exige un Reset front"
         type: 💻 AUTO
+        ref: §1
         etat: NV-I
       TC-P10-044.1:
-        intention: 'Mou câble : SyncEnable=FALSE → DescendPermit=FALSE (blocage descente)
-          mais AscentPermit autorisé palier 1 ; dès M2_TensionedCable_DI=TRUE, blocage
-          levé.'
+        intention: "\U0001F4A4 Étape 0 : SyncEnable=FALSE, mou câble détecté \n  \
+          \      \U0001F680 Étape 1 : DescendPermit:=FALSE (blocage descente), AscentPermit\
+          \ autorisé palier 1 \n        ⚡ Étape 2 : Opérateur enroule pour retendre\
+          \ / fermer la benne \n        ✅ Étape 3 : Dès M2_TensionedCable_DI=TRUE,\
+          \ blocage descente levé"
         type: 💻 AUTO
+        ref: §3
         etat: NV-I
       TC-P10-051.1:
-        intention: 'Chaîne PowerCutOff bout-en-bout : demande PRG_04 → agrégation
-          PRG_06 → coupure AU (bout-en-bout, pas seulement le masque 16#2F84).'
+        intention: "\U0001F4A4 Étape 0 : Demande PowerCutOff émise par PRG_04 \n \
+          \       \U0001F680 Étape 1 : Agrégation dans PRG_06 \n        ⚡ Étape 2\
+          \ : Propagation → coupure AU \n        ✅ Étape 3 : Chaîne bout-en-bout validée\
+          \ (pas seulement le masque 16#2F84)"
         type: ⚡ AUTO
+        ref: §6
         etat: NV
       TC-P10-011:
-        intention: 'Inversion Fwd↔Rev en descente exige DirectionInterlockDelayDescent=400ms
-          (+100ms palier=500ms) ; en montée DirectionInterlockDelayAscent=900ms (+100ms=1000ms).
-          Neutre↔sens = immédiat. DirectionChangePending force la rampe à 0.0 pendant
-          l''attente. Redémarrage même sens / inversion : temps mort 1s.'
+        intention: "\U0001F4A4 Étape 0 : Treuil en mouvement, sens commandé établi\
+          \ (RelayFwd ou RelayRev) \n        \U0001F680 Étape 1 : Demande inversion\
+          \ Fwd↔Rev (vitesse < 0.1 requise) \n        ⚡ Étape 2 : DirectionChangePending\
+          \ force la rampe à 0.0 ; délai typé : descente 400ms (+100ms palier=500ms),\
+          \ montée 900ms (+100ms=1000ms) ; redémarrage temps mort 1s (même sens /\
+          \ inversion) \n        ✅ Étape 3 : Neutre↔sens = immédiat ; aucune inversion\
+          \ directe sans délai typé respecté"
         type: 💻 AUTO
+        ref: §3
         etat: NV-I
       TC-P10-017:
-        intention: Config palier invalide (FB_SpeedStep) ➔ palier 0, sorties sûres
+        intention: "\U0001F4A4 Étape 0 : FB_SpeedStep chargé, table ST_SpeedStepTable\
+          \ en validation \n        \U0001F680 Étape 1 : Injection config invalide\
+          \ (seuils non croissants, hystérésis ≤0, ou contacteurs incohérents) \n\
+          \        ⚡ Étape 2 : ConfigError := TRUE, StepNumber forcé à 0 \n      \
+          \  ✅ Étape 3 : Contactor1..4 := FALSE (sorties sûres), palier 0 maintenu"
         type: 💻 AUTO
+        ref: §5
         etat: NV
       TC-P10-018:
-        intention: 'StuckClosed : contacteurs off non confirmés 500ms ➔ bit1'
+        intention: "\U0001F4A4 Étape 0 : Treuil à l'arrêt commandé, contacteurs commandés\
+          \ OFF \n        \U0001F680 Étape 1 : AllContactorsCommandedOff = TRUE mais\
+          \ FwdRevSpeedFeedbackOff = FALSE (contacteur/bobine collé) \n        ⚡ Étape\
+          \ 2 : Attente ContactorFeedbackTimeout = 500ms sans confirmation arrêt \n\
+          \        ✅ Étape 3 : bit1 ErrorId levé (StuckClosed)"
         type: 💻 AUTO
+        ref: §4
         etat: NV
       TC-P10-019:
-        intention: 'Ordre MainTask : Safety ➔ WinchControl ➔ PRG_06_Outputs'
+        intention: "\U0001F4A4 Étape 0 : Programme chargé, MainTask 4ms active \n\
+          \        \U0001F680 Étape 1 : Exécution d'un scan MainTask \n        ⚡ Étape\
+          \ 2 : Ordre d'appel vérifié : Safety ➔ WinchControl ➔ PRG_06_Outputs \n\
+          \        ✅ Étape 3 : Aucune remontée Safety traitée après Outputs sur le\
+          \ même scan"
         type: ⚡ SITE+AUTO
+        ref: —
         etat: NV
       TC-P10-042.1:
-        intention: 'Plafonds dynamiques palier par contexte : descente max 3, montée
-          max 5, approche capteur haut=1, zones ralentissement haut/bas capent le
-          palier.'
+        intention: "\U0001F4A4 Étape 0 : Treuil Enable, SpeedTgt_Pct reçu \n     \
+          \   \U0001F680 Étape 1 : Changement de contexte (descente / montée / approche\
+          \ capteur haut / zone ralentissement) \n        ⚡ Étape 2 : StepNumber plafonné\
+          \ par contexte : descente max 3, montée max 5, approche capteur haut = 1,\
+          \ zones ralentissement haut/bas capent le palier \n        ✅ Étape 3 : Palier\
+          \ effectif ≤ plafond dynamique du contexte, aucun dépassement"
         type: 💻 AUTO
+        ref: §4
         etat: NV-I
       TC-P10-052.1:
-        intention: 'Garde-fou vitesse (SpeedGuardEnable, désactivé par défaut) : vitesse
-          non-stable → palier 1 ; MeasuredSpeedBand < StepNumber → bride. Testable
-          après activation.'
+        intention: "\U0001F4A4 Étape 0 : SpeedGuardEnable activé (désactivé par défaut),\
+          \ treuil en mouvement \n        \U0001F680 Étape 1 : Vitesse mesurée non-stable\
+          \ OU MeasuredSpeedBand < StepNumber \n        ⚡ Étape 2 : SpeedGuardLimited\
+          \ bride le palier à 1 \n        ✅ Étape 3 : StepNumber réduit, pas de passage\
+          \ aux paliers supérieurs sans vitesse confirmée"
         type: 💻 AUTO
+        ref: §5
         etat: NV-I
       TC-P10-012:
-        intention: 'Armer le watchdog sur BrakeCmd (BrakeCmd=TRUE, BrakeFeedback=FALSE,
-          RestartInhibit=FALSE). Maintenir 500ms sans confirmation → bit0 ErrorId,
-          RestartInhibit:=TRUE, Reason:=BRAKE_COMMAND_NOT_CONFIRMED, FAULT. Vérifier
-          l''absence de faux défaut au RestartRequired : BrakeCmd retenu par RestartRequired
-          (jusqu''à 1000ms) ne doit PAS armer le watchdog (armé sur BrakeCmd final,
-          jamais sur RequestedRelayFwd/Rev).'
+        intention: "\U0001F4A4 Étape 0 : BrakeCmd=TRUE, BrakeFeedback=FALSE, RestartInhibit=FALSE\
+          \ — watchdog armé \n        \U0001F680 Étape 1 : Maintien 500ms sans confirmation\
+          \ frein \n        ⚡ Étape 2 : ErrorId bit0, RestartInhibit:=TRUE, Reason:=BRAKE_COMMAND_NOT_CONFIRMED,\
+          \ FAULT \n        ✅ Étape 3 : Pas de faux défaut au RestartRequired — BrakeCmd\
+          \ retenu par RestartRequired (jusqu'à 1000ms) n'arme PAS le watchdog (armé\
+          \ sur BrakeCmd final, jamais sur RequestedRelayFwd/Rev)"
         type: ⚡ AUTO_PLC
+        ref: §3
         etat: NV
       TC-P10-013:
-        intention: 'Provoquer un défaut (timeout frein) → ErrorId/RestartInhibit/ResetRequired
-          latches. Couper Enable (ou AU) → sorties FALSE MAIS ErrorId, RestartInhibit,
-          ResetRequired préservés. Réautorisation : cause disparue + front Reset +
-          demande neutre observée + nouvelle demande distincte → RestartInhibit:=FALSE.'
+        intention: "\U0001F4A4 Étape 0 : État nominal, aucun défaut \n        \U0001F680\
+          \ Étape 1 : Provoquer un défaut (timeout frein) → ErrorId/RestartInhibit/ResetRequired\
+          \ latches \n        ⚡ Étape 2 : Couper Enable (ou AU) → sorties FALSE, MAIS\
+          \ ErrorId/RestartInhibit/ResetRequired préservés \n        ✅ Étape 3 : Réautorisation\
+          \ = cause disparue + front Reset + demande neutre + nouvelle demande distincte\
+          \ → RestartInhibit:=FALSE"
         type: ⚡ AUTO_PLC
+        ref: §5
         etat: NV
       TC-P10-020:
-        intention: Watchdog frein réel terrain (temps, contacteur/bobine)
+        intention: "\U0001F4A4 Étape 0 : Essai réel, frein + contacteur/bobine sur\
+          \ le banc \n        \U0001F680 Étape 1 : Injecter un défaut de confirmation\
+          \ frein \n        ⚡ Étape 2 : Mesurer le comportement watchdog réel (times,\
+          \ contacteur/bobine) \n        ✅ Étape 3 : Watchdog frein validé sur le\
+          \ terrain"
         type: 🟢 SITE
+        ref: §3
         etat: NV
       TC-P10-021:
-        intention: 'Temps mort même sens : 1s après arrêt ➔ nouvelle demande'
+        intention: "\U0001F4A4 Étape 0 : Arrêt commandé, MotorRequest=FALSE \n   \
+          \     \U0001F680 Étape 1 : Nouvelle demande dans le même sens avant expiration\
+          \ \n        ⚡ Étape 2 : Temps mort DeadTimeSameDir (défaut 1s) respecté\
+          \ après arrêt \n        ✅ Étape 3 : Redémarrage même sens bloqué tant que\
+          \ le temps mort n'est pas écoulé"
         type: 💻 AUTO
+        ref: §5
         etat: NV
       TC-P10-022:
-        intention: 'Temps mort inversion : 1s après arrêt + inversion sens'
+        intention: "\U0001F4A4 Étape 0 : Arrêt commandé, MotorRequest=FALSE \n   \
+          \     \U0001F680 Étape 1 : Nouvelle demande en sens inverse avant expiration\
+          \ \n        ⚡ Étape 2 : Temps mort DeadTimeOppositeDir (défaut 1s, > même\
+          \ sens) — en sus du délai d'inversion 200ms FB_Winch \n        ✅ Étape 3\
+          \ : Inversion bloquée tant que le temps mort n'est pas écoulé"
         type: 💻 AUTO
+        ref: §5
         etat: NV
       TC-P10-039.1:
-        intention: 'Frein couplé direct : pour tout état (Error/RestartInhibit/RestartRequired),
-          BrakeCmd := RelayFwd OR RelayRev — jamais de divergence frein/mouvement.'
+        intention: "\U0001F4A4 Étape 0 : Tout état machine (Error/RestartInhibit/RestartRequired)\
+          \ \n        \U0001F680 Étape 1 : Calcul BrakeCmd :=\\: RelayFwd OR RelayRev\
+          \ \n        ⚡ Étape 2 : Vérification sur tous les états \n        ✅ Étape\
+          \ 3 : Jamais de divergence frein/mouvement — frein suit directement la commande\
+          \ de sens"
         type: 💻 AUTO
+        ref: §2bis
         etat: NV-I
       TC-P10-014:
-        intention: 'Écart M1/M2 > seuil Warn (_SyncCfgPersist.CfgSyncTolerance_M=0.8m,
-          GVL_PERSISTENT — corrige le 0.10m documenté) → SyncWarn IHM instantané +
-          latch, sans timer. Zone 2 : SyncDeviationWarn force le palier 1 sur M1/M2
-          SANS coupure (pas de SafeStop sur simple écart).'
+        intention: "\U0001F4A4 Étape 0 : M1/M2 synchronisés, écart < CfgSyncTolerance_M=0.8m\
+          \ (Zone 1) \n        \U0001F680 Étape 1 : Injection écart M1/M2 > 0.8m (_SyncCfgPersist,\
+          \ GVL_PERSISTENT — corrige le 0.10m documenté) \n        ⚡ Étape 2 : SyncWarn\
+          \ IHM instantané + latch (sans timer) ; SyncDeviationWarn force le palier\
+          \ 1 sur M1/M2 \n        ✅ Étape 3 : Pas de SafeStop sur simple écart (Zone\
+          \ 2 = dégradation palier 1 SANS coupure)"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-015:
-        intention: Sync bit1 (incohérence commande, 500 ms) ➔ SafeStop fast
+        intention: "\U0001F4A4 Étape 0 : M1/M2 en marche, cohérence commande nominale\
+          \ \n        \U0001F680 Étape 1 : Injection incohérence commande (ContactorMismatch)\
+          \ \n        ⚡ Étape 2 : Détection bit1 ErrorId, temporisation 500ms \n \
+          \       ✅ Étape 3 : SafeStop fast déclenché côté Treuils"
         type: 💻 AUTO
+        ref: §3
         etat: NV
       TC-P10-016:
-        intention: SyncActive=TRUE, arrêt sur M1 → M2 coupé au MÊME scan (SafeStopM2_Active
-          := SafeStopM2_Raw OR (SyncActive AND SafeStopM1_Raw)), sans attendre le
-          filtre 500/800ms. Symétrique M2→M1. Suspendu pendant BenneBusy et en butée
-          normale.
+        intention: "\U0001F4A4 Étape 0 : SyncActive=TRUE, M1 et M2 en mouvement synchrone\
+          \ (hors BenneBusy, hors butée) \n        \U0001F680 Étape 1 : Arrêt (SafeStop/Permit)\
+          \ sur M1 \n        ⚡ Étape 2 : SafeStopM2_Active := SafeStopM2_Raw OR (SyncActive\
+          \ AND SafeStopM1_Raw) \n        ✅ Étape 3 : M2 coupé au MÊME scan (sans\
+          \ attendre le filtre 500/800ms), symétrique M2→M1"
         type: 💻 AUTO
+        ref: §4
         etat: NV
   AF-11:
     file: AF_Partie-11_Fonction_Translation_v2.3.md
@@ -1486,109 +1831,169 @@ domains:
         etat: NV
     validation_points:
       TC-P11-001/002:
-        intention: 5 capteurs ➔ mot valide ➔ position qualifiée. Mot incohérent ➔
-          Incoherent=TRUE ➔ Safety bit7 ➔ SafeStop+PowerCutOff
+        intention: "\U0001F4A4 Étape 0 : 5 capteurs M3 lus, mot capteurs en formation\
+          \ \n        \U0001F680 Étape 1 : Décodage 5 capteurs → mot valide → position\
+          \ qualifiée (Travail/Trémie/Extrêmes) \n        ⚡ Étape 2 : Mot incohérent\
+          \ injecté → Incoherent=TRUE \n        ✅ Étape 3 : Safety bit7 → SafeStop+PowerCutOff"
         type: 💻 AUTO
         ref: FB_Translation_PositionDecoder
         etat: NV-I
       TC-P11-010/011/014:
-        intention: Arrêt commandé mais mouvement résiduel (Méca A) ou incohérence
-          prolongée (Méca B) ➔ SafeStop+PowerCutOff. BypassGlobal efface ErrorId
+        intention: "\U0001F4A4 Étape 0 : M3 en mouvement nominal, BypassGlobal=FALSE\
+          \ \n        \U0001F680 Étape 1 : Injection défaut (Méca A : mouvement résiduel\
+          \ ; Méca B : incohérence prolongée) \n        ⚡ Étape 2 : SafeStop+PowerCutOff\
+          \ déclenchés \n        ✅ Étape 3 : BypassGlobal efface ErrorId (vérifié\
+          \ séparément)"
         type: ⚡ AUTO_PLC
         ref: FB_Safety_Translation
         etat: NV-I
       TC-P11-003/004/005/013:
-        intention: Joystick/SemiAuto ➔ Rampe ➔ AC600. Ralentissement PV si Direction=1+capteur.
-          Interlock sens 200ms si vitesse≠0. Boutons IHM MAINT exigent homme-mort
+        intention: "\U0001F4A4 Étape 0 : M3 au repos, joystick au neutre \n      \
+          \  \U0001F680 Étape 1 : Consigne joystick/SemiAuto → rampe → AC600 \n  \
+          \      ⚡ Étape 2 : Ralentissement PV si Direction=1+capteur ; interlock\
+          \ sens 200ms si vitesse≠0 \n        ✅ Étape 3 : Boutons IHM MAINT exigent\
+          \ DeadmanArmed — mouvement validé"
         type: ⚡ AUTO_PLC
         ref: FB_Translation
         etat: NV
       TC-P11-006-009:
-        intention: Watchdog frein 500ms sans confirmation ➔ FAULT+Inhibit. Réautorisation
-          = Cause+Reset+Mot 0+nouvelle demande. Zéro redémarrage auto
+        intention: "\U0001F4A4 Étape 0 : Sorties M3 autorisées, frein OK \n      \
+          \  \U0001F680 Étape 1 : Perte BrakeFeedback pendant mouvement \n       \
+          \ ⚡ Étape 2 : Watchdog frein 500ms sans confirmation → FAULT+Inhibit \n\
+          \        ✅ Étape 3 : Réautorisation = Cause+Reset+Mot 0+nouvelle demande\
+          \ — zéro redémarrage auto"
         type: ⚡ AUTO_PLC
         ref: FB_TranslationOutputInterlock
         etat: NV
       TC-P11-015:
-        intention: Translation bloquée si CablePosM1 ou CablePosM2 sous _TranslationMinHeightM1M2_M
-          (6.0m) → M3_HeightInterlockOk=FALSE, translation bloquée (PRG_05:105-110).
-          Bypass.MinHeight (dédié) lève l'anti-collision ; BypassGlobal ne le lève
-          pas (PRG_05:102-105). MinHeight=TRUE → autorisé sous hauteur mini ; BypassGlobal
-          seul → toujours bloqué. ⚠️ Câblé directement dans PRG_05_Translation.st
-          §0, hors FB_Safety_Translation
+        intention: "\U0001F4A4 Étape 0 : CablePosM1/CablePosM2 > _TranslationMinHeightM1M2_M\
+          \ (6.0m) \n        \U0001F680 Étape 1 : Descente treuils sous 6.0m → M3_HeightInterlockOk=FALSE\
+          \ \n        ⚡ Étape 2 : Translation bloquée ; Bypass.MinHeight (dédié) lève\
+          \ l'interlock, BypassGlobal non \n        ✅ Étape 3 : Interlock anti-télescopage\
+          \ actif — câblé PRG_05_Translation.st §0 (hors FB dédié)"
         type: 💻 AUTO
         ref: PRG_05_Translation
         etat: NV-I
       TC-P11-002:
-        intention: Mot incohérent ➔ Incoherent=TRUE ➔ bit7 Safety ➔ SafeStop+PowerCutOff
+        intention: "\U0001F4A4 Étape 0 : Décodage actif, mot capteurs lu \n      \
+          \  \U0001F680 Étape 1 : Injection d'un mot incohérent \n        ⚡ Étape\
+          \ 2 : Incoherent=TRUE → Safety bit7 levé \n        ✅ Étape 3 : SafeStop+PowerCutOff"
         type: ⚡ AUTO_PLC
+        ref: §3
         etat: NV
       TC-P11-010:
-        intention: 'Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff'
+        intention: "\U0001F4A4 Étape 0 : Arrêt commandé, DriveActualFreqHz attendu\
+          \ à 0 \n        \U0001F680 Étape 1 : ABS(DriveActualFreqHz)>0.5Hz maintenu\
+          \ >1s \n        ⚡ Étape 2 : Détection Méca A, bit5 levé \n        ✅ Étape\
+          \ 3 : SafeStop+PowerCutOff"
         type: ⚡ AUTO_PLC
+        ref: §4
         etat: NV-I
       TC-P11-010.1:
-        intention: 'Absence redémarrage auto : Méca A → latch MecaAFault (FB_Safety_Translation.st:81,95-99,175).
-          Après disparition, défaut reste latché, aucun redémarrage auto — Reset front
-          + nouvelle demande requis'
+        intention: "\U0001F4A4 Étape 0 : Méca A déclenché → MecaAFault latché (FB_Safety_Translation.st:81,95-99,175)\
+          \ \n        \U0001F680 Étape 1 : Cause disparaît (freq retombe) \n     \
+          \   ⚡ Étape 2 : Défaut reste latché, aucun redémarrage automatique \n  \
+          \      ✅ Étape 3 : Reset front + nouvelle demande requis pour réarmer"
         type: 💻 AUTO
+        ref: §4
         etat: NV-I
       TC-P11-011:
-        intention: 'Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff'
+        intention: "\U0001F4A4 Étape 0 : Arrêt commandé (Direction=0) \n        \U0001F680\
+          \ Étape 1 : Incohérence arrêt maintenue >3s \n        ⚡ Étape 2 : Détection\
+          \ Méca B, bit4 levé \n        ✅ Étape 3 : SafeStop+PowerCutOff"
         type: ⚡ AUTO_PLC
+        ref: §4
         etat: NV
       TC-P11-011.1:
-        intention: 'Méca B variante perte IHM : HeartbeatIhmOk=FALSE → condition élargie
-          : ABS(freq)>0.5 OR DriveStatusWord.0 OR NOT BrakeFeedback (FB_Safety_Translation.st:151-152)
-          → SafeStop+PowerCutOff'
+        intention: "\U0001F4A4 Étape 0 : HeartbeatIhmOk=FALSE (perte IHM) \n     \
+          \   \U0001F680 Étape 1 : Condition élargie : ABS(freq)>0.5 OR DriveStatusWord.0\
+          \ OR NOT BrakeFeedback (FB_Safety_Translation.st:151-152) \n        ⚡ Étape\
+          \ 2 : Méca B variante déclenchée \n        ✅ Étape 3 : SafeStop+PowerCutOff"
         type: 💻 AUTO
+        ref: §4
         etat: NV-I
       TC-P11-014:
-        intention: BypassGlobal efface ErrorId, coupe TONs, Reset fonctionnel
+        intention: "\U0001F4A4 Étape 0 : BypassGlobal=FALSE, défauts actifs \n   \
+          \     \U0001F680 Étape 1 : BypassGlobal=TRUE (mise en service) \n      \
+          \  ⚡ Étape 2 : ErrorId effacé, TONs coupés, Reset fonctionnel \n       \
+          \ ✅ Étape 3 : Bypass global neutralise la safety M3"
         type: ⚡ AUTO_PLC
+        ref: §6
         etat: NV
       TC-P11-001:
-        intention: 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ Incoherent
+        intention: "\U0001F4A4 Étape 0 : 5 capteurs TOR lus (SensorTremie/PV/P2/P1/Maintenance)\
+          \ \n        \U0001F680 Étape 1 : Codage du mot thermomètre (bit4=Trémie\
+          \ … bit0=Maintenance) \n        ⚡ Étape 2 : 6 mots valides acceptés (11111➔00000)\
+          \ \n        ✅ Étape 3 : Tout autre mot → Incoherent=TRUE"
         type: 💻 AUTO
+        ref: §3
         etat: NV-I
       TC-P11-003:
-        intention: Enable=FALSE coupe tout indépendamment de SafeStop/StartStop
+        intention: "\U0001F4A4 Étape 0 : Enable=FALSE \n        \U0001F680 Étape 1\
+          \ : Toute commande entrante (SafeStop/StartStop quelconques) \n        ⚡\
+          \ Étape 2 : Neutralisation totale \n        ✅ Étape 3 : Enable=FALSE coupe\
+          \ tout, indépendamment de SafeStop/StartStop"
         type: ⚡ AUTO_PLC
+        ref: §1
         etat: NV
       TC-P11-004:
-        intention: Ralentissement PV actif si Direction=1 (Trémie) ET SlowdownSensor
+        intention: "\U0001F4A4 Étape 0 : M3 en mouvement vers Trémie (Direction=1)\
+          \ \n        \U0001F680 Étape 1 : Activation SlowdownSensorTremie (PV) lors\
+          \ de l'approche \n        ⚡ Étape 2 : Ralentissement d'approche engagé \n\
+          \        ✅ Étape 3 : Ralentissement PV actif si Direction=1 (Trémie) ET\
+          \ SlowdownSensor"
         type: ⚡ AUTO_PLC
+        ref: §4
         etat: NV
       TC-P11-005:
-        intention: 'Interlock sens : bascule directe si vitesse=0, sinon délai 200ms'
+        intention: "\U0001F4A4 Étape 0 : M3 en mouvement sens A \n        \U0001F680\
+          \ Étape 1 : Demande inversion de sens \n        ⚡ Étape 2 : Bascule directe\
+          \ si vitesse=0, sinon délai DirectionInterlockDelay=200ms \n        ✅ Étape\
+          \ 3 : Interlock de sens correctement appliqué"
         type: ⚡ AUTO_PLC
+        ref: §6
         etat: NV
       TC-P11-013:
-        intention: Boutons IHM en MAINT exigent DeadmanArmed=TRUE
+        intention: "\U0001F4A4 Étape 0 : Mode MAINT actif, boutons IHM disponibles\
+          \ \n        \U0001F680 Étape 1 : Appui bouton mouvement sans armement homme-mort\
+          \ \n        ⚡ Étape 2 : Vérification DeadmanArmed \n        ✅ Étape 3 :\
+          \ Mouvement refusé — boutons IHM MAINT exigent DeadmanArmed=TRUE"
         type: ⚡ AUTO_PLC
+        ref: §3
         etat: NV
       TC-P11-006:
-        intention: 'Watchdog 500ms armé si BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed
-          AND NOT RestartInhibit (FB_TranslationOutputInterlock.st:85-86). Frontière
-          : confirmation à 499ms → pas de défaut ; à 500ms → bit0, RestartInhibit,
-          FAULT'
+        intention: "\U0001F4A4 Étape 0 : BrakeReleaseRequest, NOT BrakeCommandOpenConfirmed,\
+          \ NOT RestartInhibit — watchdog armé (FB_TranslationOutputInterlock.st:85-86)\
+          \ \n        \U0001F680 Étape 1 : Confirmation à 499ms (avant exp.) \n  \
+          \      ⚡ Étape 2 : Confirmation à 500ms (expiration) \n        ✅ Étape 3\
+          \ : Frontière 499ms → pas de défaut ; 500ms → bit0, RestartInhibit, FAULT"
         type: ⚡ AUTO_PLC
+        ref: §3
         etat: NV
       TC-P11-007:
-        intention: 'Après timeout frein : RestartInhibit:=TRUE. Acquittement : ResetEdge.Q
-          AND BrakeCommandOpenConfirmed → efface bit0. Réautorisation : NOT Error
-          AND NOT ResetRequired + mot 0 vu (NeutralRequestSeen) puis nouvelle demande
-          1/2 (FB_TranslationOutputInterlock.st:99-125)'
+        intention: "\U0001F4A4 Étape 0 : Timeout frein → RestartInhibit:=TRUE \n \
+          \       \U0001F680 Étape 1 : Acquittement : ResetEdge.Q AND BrakeCommandOpenConfirmed\
+          \ → efface bit0 (FB_TranslationOutputInterlock.st:99-125) \n        ⚡ Étape\
+          \ 2 : Réautorisation : NOT Error AND NOT ResetRequired + mot 0 vu (NeutralRequestSeen)\
+          \ \n        ✅ Étape 3 : Nouvelle demande 1/2 → mouvement réautorisé"
         type: ⚡ AUTO_PLC
+        ref: §5
         etat: NV
       TC-P11-008:
-        intention: 'Gate final : Mot/fréquence nuls sans confirmation frein simultanée'
+        intention: "\U0001F4A4 Étape 0 : Demande de mouvement M3 reçue \n        \U0001F680\
+          \ Étape 1 : Vérification confirmation frein simultanée \n        ⚡ Étape\
+          \ 2 : Mot/fréquence nuls sans confirmation \n        ✅ Étape 3 : Mot/fréquence\
+          \ autorisés seulement si confirmation frein simultanée"
         type: ⚡ AUTO_PLC
+        ref: §4
         etat: NV
       TC-P11-009:
-        intention: Mot 7 (reset AC600) autorisé pendant RestartInhibit (sans levée
-          inhibition)
+        intention: "\U0001F4A4 Étape 0 : RestartInhibit=TRUE (défaut frein) \n   \
+          \     \U0001F680 Étape 1 : Envoi du mot 7 (reset AC600) \n        ⚡ Étape\
+          \ 2 : Vérification que l'inhibition n'est pas levée \n        ✅ Étape 3\
+          \ : Mot 7 autorisé pendant RestartInhibit (sans levée d'inhibition)"
         type: ⚡ AUTO_PLC
+        ref: §6
         etat: NV
   AF-12:
     file: AF_Partie-12_Fonction_Diagnostic_v1.4.md
@@ -1627,17 +2032,20 @@ domains:
         etat: NV
     validation_points:
       TC-P12-010:
-        intention: 'Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur
-          M2) : StateRaw≠RUNNING/ACTIVE ➔ Online=FALSE, Operational=FALSE, State=INIT,
-          sans effet sur les autres devices — indépendance inter-devices'
+        intention: "\U0001F4A4 Étape 0 : Tous devices opérationnels (StateRaw=RUNNING)\
+          \ \n        \U0001F680 Étape 1 : Un device perd son état (StateRaw≠RUNNING/ACTIVE)\
+          \ \n        ⚡ Étape 2 : Online=FALSE, Operational=FALSE, State=INIT pour\
+          \ ce device \n        ✅ Étape 3 : Aucun effet sur les autres devices — indépendance\
+          \ inter-devices"
         type: 💻 AUTO
         ref: FB_Diag_CanOpen FB_Diag_Ethercat
         etat: NV-I
       TC-P12-020:
-        intention: Défaut isolé sur un seul device ➔ ErrorId de ce device porte exactement
-          son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices
-          (Joystick bit0/1, Variateur bit4, M1 bit5, M2 bit6). ⚠️ M2 porte 16#0030
-          (bug T159, pas 16#0040)
+        intention: "\U0001F4A4 Étape 0 : Tous devices OK, ErrorId=0 pour chaque device\
+          \ \n        \U0001F680 Étape 1 : Défaut isolé sur un seul device (ex. Joystick,\
+          \ Variateur, M1, M2) \n        ⚡ Étape 2 : ErrorId de ce device porte exactement\
+          \ son bit attendu \n        ✅ Étape 3 : Aucun bit croisé sur un autre device\
+          \ — ⚠️ M2 porte 16#0030 (bug T159, pas 16#0040)"
         type: 💻 AUTO
         ref: FB_Diag_CanOpen FB_Diag_Ethercat
         etat: NV-I
@@ -1648,9 +2056,11 @@ domains:
         type: 💻 AUTO
         etat: NV
       TC-P12-040:
-        intention: SimBypass/NetworkBypassActive sans device réel RUNNING ➔ SIMULATED
-          ; réel RUNNING sans bypass ➔ READY ; ni l'un ni l'autre ➔ INIT ; Enable=FALSE
-          prioritaire ➔ DISABLED
+        intention: "\U0001F4A4 Étape 0 : Enable=TRUE, device réel RUNNING, pas de\
+          \ bypass \n        \U0001F680 Étape 1 : Activation SimBypass/NetworkBypassActive\
+          \ sans device réel RUNNING \n        ⚡ Étape 2 : États SIMULATED (bypass),\
+          \ READY (réel seul), INIT (ni l'un ni l'autre), DISABLED (Enable=FALSE prioritaire)\
+          \ \n        ✅ Étape 3 : Table de vérité bypass vs état réel validée"
         type: 💻 AUTO
         ref: FB_Diag_CanOpen FB_Diag_Ethercat
         etat: NV
@@ -1666,29 +2076,46 @@ domains:
     functions: {}
     validation_points:
       TC-P13-010..013:
-        intention: Enveloppe unique, décalage 1 scan, REX StatusWord AC600 corrigé
+        intention: "\U0001F4A4 Étape 0 : SimulationModeActive=FALSE, banc inactif\
+          \ \n        \U0001F680 Étape 1 : Front montant SimulationModeActive=TRUE\
+          \ → 4 domaines activés \n        ⚡ Étape 2 : Décalage 1 scan entre sortie\
+          \ N-1 et image sim N ; REX StatusWord AC600 corrigé \n        ✅ Étape 3\
+          \ : Enveloppe unique de simulation validée"
         type: 💻 AUTO+👁️ MANUEL
         ref: FB_SimBench
         etat: NV
       TC-P13-020..023:
-        intention: 'Chaîne AU simulée, latch contacteur, 🆕 TC-P13-023 : défaut réel
-          latché survit au cycle Reset du modèle simulé (§4)'
+        intention: "\U0001F4A4 Étape 0 : Chaîne AU simulée au repos (SimChainOk=TRUE)\
+          \ \n        \U0001F680 Étape 1 : Activation SimSafetyActive → simulation\
+          \ chaîne AU/contacteur \n        ⚡ Étape 2 : Latch contacteur sur EmergencyArming\
+          \ ; retombée si chaîne ouverte \n        ✅ Étape 3 : \U0001F195 TC-P13-023\
+          \ : défaut réel latché survit au cycle Reset du modèle simulé (§4)"
         type: 💻 AUTO+👁️ MANUEL
         ref: FB_Sim_Safety
         etat: NV
       TC-P13-030..033:
-        intention: Position codeur simulée, persistance reset froid
+        intention: "\U0001F4A4 Étape 0 : Codeurs simulés au repos, position initiale\
+          \ \n        \U0001F680 Étape 1 : Activation SimWinchActive → génération\
+          \ position codeurs M1/M2 \n        ⚡ Étape 2 : RelayFwd/RelayRev font compter\
+          \ RawPos \n        ✅ Étape 3 : Persistance reset froid validée (RawPos survit\
+          \ au redémarrage)"
         type: 💻 AUTO+👁️ MANUEL
         ref: FB_Sim_Encoder
         etat: NV
       TC-P13-040..043:
-        intention: 6 mots thermomètre valides, bornage position, reset Trémie sur
-          Enable=FALSE
+        intention: "\U0001F4A4 Étape 0 : Capteurs M3 simulés au repos \n        \U0001F680\
+          \ Étape 1 : Activation SimTranslationActive → progression continue M3 \n\
+          \        ⚡ Étape 2 : 6 mots thermomètre valides, bornage position [Trémie,\
+          \ Maintenance] \n        ✅ Étape 3 : Reset Trémie sur Enable=FALSE validé"
         type: 💻 AUTO
         ref: FB_Sim_Translation
         etat: NV
       TC-P13-050..052:
-        intention: Entrées brutes joystick, homme-mort jamais contourné
+        intention: "\U0001F4A4 Étape 0 : Joystick simulé au neutre \n        \U0001F680\
+          \ Étape 1 : Activation SimOperatorActive → entrées brutes joystick \n  \
+          \      ⚡ Étape 2 : RawButton reflète l'appui homme-mort (jamais contourné)\
+          \ \n        ✅ Étape 3 : Homme-mort réel FB_Joystick reste actif — pas de\
+          \ bypass"
         type: ⚡ SITE+AUTO+👁️ MANUEL
         ref: FB_Sim_Joystick
         etat: NV
@@ -1789,11 +2216,12 @@ domains:
     functions: {}
     validation_points:
       TC-P14-TSV-01..05:
-        intention: Zéro VAR_OUTPUT de commande — seule sortie Ready:BOOL (SafeStop,
-          Enable, Cmd, Bypass, Config absents), toute publication passe par GVL_Troubleshooting
-          (lecture seule) ; chaque champ a un producteur réel documenté, aucun TBD
-          affiché comme mesure réelle, instance unique dans PRG_07_Supervision, zéro
-          régression gates
+        intention: "\U0001F4A4 Étape 0 : Instance FB_TroubleshootingView dans PRG_07_Supervision,\
+          \ au repos \n        \U0001F680 Étape 1 : Évolution de la machine (états\
+          \ d'entrée, safety, cycle) \n        ⚡ Étape 2 : Recopie passive vers GVL_Troubleshooting\
+          \ (lecture seule) ; zéro VAR_OUTPUT de commande \n        ✅ Étape 3 : Chaque\
+          \ champ a un producteur réel documenté, aucun TBD affiché comme mesure réelle,\
+          \ zéro régression gates"
         type: 👁️ REVUE+🔒 GATE
         ref: FB_TroubleshootingView
         etat: NV

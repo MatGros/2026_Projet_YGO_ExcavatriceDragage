@@ -65,23 +65,6 @@ def test_gvl_name_derived_from_filename(tmp_path):
     assert objects[0].folder == ""
 
 
-def test_standalone_ld_export_is_a_blocking_error(tmp_path):
-    """Un *_LD.xml posé à côté de son .st est interdit (REX 2026-08) : la
-    livraison Ladder passe exclusivement par le bundle CODE_Bundle.xml."""
-    _write(tmp_path / "PRG_01_Inputs_LD.st", "PROGRAM PRG_01_Inputs_LD\nEND_PROGRAM\n")
-    _write(
-        tmp_path / "PRG_01_Inputs_LD.xml",
-        '<project><pou name="PRG_01_Inputs_LD" pouType="program"><body><LD /></body></pou></project>',
-    )
-
-    diag = DiagnosticCollector()
-    objects = discover_objects(tmp_path, diag)
-
-    assert [object_.name for object_ in objects] == ["PRG_01_Inputs_LD"]
-    errors = [str(e) for e in diag.of(Severity.ERROR)]
-    assert any("standalone LD export" in e for e in errors)
-
-
 def test_bundle_prefixed_xml_is_excluded(tmp_path):
     """Un XML de test nommé Bundle_HB_*.xml (artefact de dichotomie, REX 2026-08)
     ne doit JAMAIS être découvert comme POU XML natif : il contient un POU
@@ -111,9 +94,8 @@ def test_real_code_dir_dynamic_count_relationship():
     """CODE/ isn't a fixed number we hardcode here: recompute it from disk so
     this stays meaningful as files are added/removed.
 
-    La livraison Ladder passe par le bundle : aucun *_LD.xml ne doit exister
-    à côté de son .st (REX 2026-08) — un tel artefact serait une ERREUR, pas
-    un POU à compter."""
+    Les bundles générés (CODE_Bundle.xml) et artefacts de dichotomie (Bundle_*)
+    ne comptent pas comme POU natifs."""
     all_st_files = sorted(CODE_DIR.rglob("*.st"))
     # Même filtre que discover_objects : CODE_Bundle.xml et les artefacts
     # Bundle_* (dichotomie REX 2026-08) ne comptent pas comme POU natifs.

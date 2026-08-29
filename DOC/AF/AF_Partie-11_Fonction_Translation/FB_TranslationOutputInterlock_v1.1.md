@@ -24,43 +24,75 @@
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 170px);">
-    <col style="width: 90px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-006</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Watchdog 500ms armé si <code>BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed AND NOT RestartInhibit</code> (FB_TranslationOutputInterlock.st:85-86). Frontière : confirmation à 499ms → pas de défaut ; à 500ms → bit0, <code>RestartInhibit</code>, FAULT</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Watchdog</b><br>frein</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>BrakeReleaseRequest</code>, <code>NOT BrakeCommandOpenConfirmed</code>, <code>NOT RestartInhibit</code> — watchdog armé (FB_TranslationOutputInterlock.st:85-86)<br>
+        🚀 <b>Étape 1</b> : Confirmation à 499ms (avant exp.)<br>
+        ⚡ <b>Étape 2</b> : Confirmation à 500ms (expiration)<br>
+        ✅ <b>Étape 3</b> : Frontière 499ms → pas de défaut ; 500ms → bit0, <code>RestartInhibit</code>, FAULT
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-007</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Après timeout frein : <code>RestartInhibit:=TRUE</code>. Acquittement : <code>ResetEdge.Q AND BrakeCommandOpenConfirmed</code> → efface bit0. Réautorisation : <code>NOT Error AND NOT ResetRequired</code> + mot 0 vu (<code>NeutralRequestSeen</code>) puis nouvelle demande 1/2 (FB_TranslationOutputInterlock.st:99-125)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Anti-</b><br>redémarrage</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Timeout frein → <code>RestartInhibit:=TRUE</code><br>
+        🚀 <b>Étape 1</b> : Acquittement : <code>ResetEdge.Q AND BrakeCommandOpenConfirmed</code> → efface bit0 (FB_TranslationOutputInterlock.st:99-125)<br>
+        ⚡ <b>Étape 2</b> : Réautorisation : <code>NOT Error AND NOT ResetRequired</code> + mot 0 vu (<code>NeutralRequestSeen</code>)<br>
+        ✅ <b>Étape 3</b> : Nouvelle demande 1/2 → mouvement réautorisé
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-008</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Gate final : Mot/fréquence nuls sans confirmation frein simultanée</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Gate</b><br>final double</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Demande de mouvement M3 reçue<br>
+        🚀 <b>Étape 1</b> : Vérification confirmation frein simultanée<br>
+        ⚡ <b>Étape 2</b> : Mot/fréquence nuls sans confirmation<br>
+        ✅ <b>Étape 3</b> : Mot/fréquence autorisés seulement si confirmation frein simultanée
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-009</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Mot 7 (reset AC600) autorisé pendant <code>RestartInhibit</code> (sans levée inhibition)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Reset</b><br>AC600</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>RestartInhibit=TRUE</code> (défaut frein)<br>
+        🚀 <b>Étape 1</b> : Envoi du mot 7 (reset AC600)<br>
+        ⚡ <b>Étape 2</b> : Vérification que l'inhibition n'est pas levée<br>
+        ✅ <b>Étape 3</b> : Mot 7 autorisé pendant <code>RestartInhibit</code> (sans levée d'inhibition)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>

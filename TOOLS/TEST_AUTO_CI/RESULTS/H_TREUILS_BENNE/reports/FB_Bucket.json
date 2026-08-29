@@ -36,14 +36,7 @@
     },
     {
       "name": "TC-P10-030 ConfirmOpen/ClosePosition : effet seulement MAINT_N1/N2 arretes",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "BUCKETSTATE.ISOPEN expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 277,
-        "message": "MAINT_N1 + ConfirmOpen -> IsOpen=TRUE"
-      }
+      "passed": true
     },
     {
       "name": "TC-P10-031 Codeur(s) non reference(s) -> defaut permanent, independant de Reset",
@@ -67,25 +60,11 @@
     },
     {
       "name": "TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.FAULT.ERROR expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 429,
-        "message": "Timeout mouvement 1s -> Error"
-      }
+      "passed": true
     },
     {
       "name": "TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -> StateIncoherent, ActiveOffsetValid=FALSE",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 446,
-        "message": "Boot incoherent -> StateIncoherent=TRUE"
-      }
+      "passed": true
     },
     {
       "name": "TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle",
@@ -94,7 +73,7 @@
   ],
   "summary": {
     "total": 17,
-    "passed": 14,
-    "failed": 3
+    "passed": 17,
+    "failed": 0
   }
 }

@@ -96,6 +96,8 @@ VAR_INPUT
     BucketCfgTimeoutDuration : TIME := T#60s;
     TglEnableCoupledBucketSequencing : BOOL := FALSE;
     HeartbeatIhmOk          : BOOL := TRUE;
+    CanBusOperational       : BOOL := TRUE;    // Réseau joystick CAN simulé sain par défaut
+    JoyOperational          : BOOL := TRUE;    // Joystick simulé opérationnel par défaut
 
     // === 🧩 Bypass maintenance (miroir GVL_IHM.Bypass) ===
     BypassM1                : ST_BypassWinch;
@@ -238,6 +240,19 @@ END_IF;
 IF SlowdownMaxStep <= 0 THEN
     SlowdownMaxStep := 1;
 END_IF;
+// Le dialecte STruCpp remet les VAR_INPUT omises a zero entre deux appels
+// machine(). La table suivante est un PARAMETRAGE DE MODELE de banc (pas une
+// constante metier PLC) : elle conserve une physique coherente dans les scans
+// de convergence qui ne changent aucune vitesse. Les vecteurs gardent la
+// possibilite de fournir explicitement leur propre table.
+IF ModelStepSpeedMps[1] <= 0.0 THEN
+    ModelStepSpeedMps[0] := 0.0;
+    ModelStepSpeedMps[1] := 0.2;
+    ModelStepSpeedMps[2] := 0.5;
+    ModelStepSpeedMps[3] := 0.9;
+    ModelStepSpeedMps[4] := 1.4;
+    ModelStepSpeedMps[5] := 2.0;
+END_IF;
 IF SyncToleranceM <= 0.0 THEN
     SyncToleranceM := 0.10;
 END_IF;
@@ -292,7 +307,9 @@ prg02(
     M1_BrakeCmd             := m1BrakeFeedbackModel,
     M2_BrakeCmd             := m2BrakeFeedbackModel,
     PowerContactorEngaged   := PowerContactorEngaged,
-    EmergencyChainClosed    := EmergencyChainClosed
+    EmergencyChainClosed    := EmergencyChainClosed,
+    CanBusOperational       := CanBusOperational,
+    JoyOperational          := JoyOperational
 );
 BusAcq := prg02.Data;
 

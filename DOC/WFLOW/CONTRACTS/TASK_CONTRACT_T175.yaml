@@ -28,10 +28,22 @@ contract:
     - id: AC5
       statement: "Suite de validation : tous les gates palier C passent après les 4 patchs (non-régression)."
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+    - id: AC6
+      statement: "Le nom de fichier est egal au nom de POU pour PRG_04_Treuils_Benne.st."
+      verified_by: "bundle frais : PRG_04_Treuils_Benne.st correspond au POU PRG_04_Treuils_Benne."
+    - id: AC7
+      statement: "Le suffixe de langage est egal au langage genere dans le bundle pour PRG_04_Treuils_Benne.st."
+      verified_by: "bundle frais + G200 : PRG_04_Treuils_Benne.st est le seul appelant hors H_TREUILS_BENNE modifié."
 
   scope:
     allowed:
       - CODE/H_TREUILS_BENNE/**
+      # AC3 exige le câblage des Busy produits par les deux instances de treuil.
+      # Exception minimale : seul l'appelant PRG_04 est autorisé hors du sous-système.
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      # Preuve exécutable AC2/AC3/AC4, sans élargir le code de production.
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winchoutputinterlock.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
     forbidden:
       - DOC/AF/**             # la fiche ne bouge qu'après le code, sur preuve
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export

@@ -58,8 +58,8 @@ def test_FB_Acquisition_Preflight():
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
-def test_FB_FbStatus():
-    _run_fb_test("FB_FbStatus")
+def test_FB_FaultCore():
+    _run_fb_test("FB_FaultCore")
 
 
 @pytest.mark.ci_fb

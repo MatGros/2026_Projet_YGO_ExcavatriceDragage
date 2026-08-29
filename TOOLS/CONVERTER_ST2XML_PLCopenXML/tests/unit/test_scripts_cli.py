@@ -1,12 +1,11 @@
 """Tests for the modular CLI scripts in ``scripts/``.
 
 These tests validate the testable contract:
-  1. st_to_ld.py  → valid XML, 1 <pou> with 1 <body><LD>, CallType/ElementType have xmlns=""
-  2. st_to_pou.py → valid XML, 1 <pou> with 1 <body><ST>
-  3. cfc_extract.py → valid XML, 1 <pou> with CFC body, ObjectIds aligned, xmlns=""
-  4. build_bundle.py → valid <project> with <ProjectStructure>, ObjectId alignment, no nested addData
-  5. st_to_dut.py → valid XML, 1 <dataType>
-  6. Error handling: non-LD file rejected, missing file exits 1
+  1. st_to_pou.py → valid XML, 1 <pou> with 1 <body><ST>
+  2. cfc_extract.py → valid XML, 1 <pou> with CFC body, ObjectIds aligned, xmlns=""
+  3. build_bundle.py → valid <project> with <ProjectStructure>, ObjectId alignment, no nested addData
+  4. st_to_dut.py → valid XML, 1 <dataType>
+  5. Error handling: missing file exits 1
 """
 from __future__ import annotations
 
@@ -29,7 +28,6 @@ MAIN_DIR = CODE_DIR / "M_MAIN" if (CODE_DIR / "M_MAIN").is_dir() else CODE_DIR /
 AU_DIR = CODE_DIR / "B_AU_SECURITE" if (CODE_DIR / "B_AU_SECURITE").is_dir() else CODE_DIR / "AU"
 CYCLE_DIR = CODE_DIR / "G_CYCLE" if (CODE_DIR / "G_CYCLE").is_dir() else CODE_DIR / "CYCLE"
 
-from scripts.st_to_ld import build_ld_pou_xml, build_ld_project_xml
 from scripts.st_to_pou import build_st_pou_xml, build_st_project_xml
 from scripts.st_to_dut import build_dut_xml, build_dut_project_xml
 from scripts.cfc_extract import extract_cfc_pou, extract_cfc_project_xml
@@ -60,50 +58,6 @@ def _has_xmlns_empty(element: ET.Element, tag: str) -> bool:
     return f'<{tag} xmlns="">' in raw or f'<{tag} xmlns=""' in raw
 
 
-# ── st_to_ld.py ──────────────────────────────────────────────────────────────
-
-
-def test_st_to_ld_produces_valid_pou_with_ld_body():
-    st_file = MAIN_DIR / "PRG_AU_Outputs_LD.st"
-    if not st_file.exists():
-        pytest.skip("PRG_AU_Outputs_LD.st not available")
-    diag = DiagnosticCollector()
-    data = build_ld_pou_xml(st_file, diag)
-    root = _parse_strip_ns(data)
-
-    assert root.tag == "pou"
-    pous = [root]
-    assert len(pous) == 1
-    pou = pous[0]
-    assert pou.get("name") == "PRG_AU_Outputs_LD"
-
-    bodies = pou.findall("body")
-    assert len(bodies) == 1
-    ld = bodies[0].find("LD")
-    assert ld is not None, "body must contain <LD>"
-
-    # CallType / ElementType must have xmlns="" in the raw output
-    raw_text = data.decode("utf-8-sig")
-    assert 'CallType xmlns=""' in raw_text
-    assert 'ElementType xmlns=""' in raw_text
-
-
-def test_st_to_ld_rejects_non_ld_program():
-    st_file = AU_DIR / "FB_Safety_EmergencyManagement.st"
-    if not st_file.exists():
-        pytest.skip("FB_Safety_EmergencyManagement.st not available")
-    diag = DiagnosticCollector()
-    with pytest.raises(ValueError, match="PRG_\\*_LD"):
-        build_ld_pou_xml(st_file, diag)
-
-
-def test_st_to_ld_missing_file_exits_1(tmp_path):
-    from scripts.st_to_ld import main
-
-    rc = main([str(tmp_path / "nonexistent.st"), "-o", str(tmp_path / "out.xml")])
-    assert rc == 1
-
-
 # ── st_to_pou.py ─────────────────────────────────────────────────────────────
 
 
@@ -124,15 +78,6 @@ def test_st_to_pou_produces_valid_pou_with_st_body():
     assert len(bodies) == 1
     st = bodies[0].find("ST")
     assert st is not None, "body must contain <ST>"
-
-
-def test_st_to_pou_rejects_ld_program():
-    st_file = MAIN_DIR / "PRG_AU_Outputs_LD.st"
-    if not st_file.exists():
-        pytest.skip("PRG_AU_Outputs_LD.st not available")
-    diag = DiagnosticCollector()
-    with pytest.raises(ValueError, match="st_to_ld"):
-        build_st_pou_xml(st_file, diag)
 
 
 def test_st_to_pou_missing_file_exits_1(tmp_path):
@@ -271,13 +216,13 @@ def test_build_bundle_produces_valid_project_with_project_structure():
 
 def test_build_bundle_from_multiple_inputs():
     au_dir = AU_DIR
-    ld_file = MAIN_DIR / "PRG_AU_Outputs_LD.st"
-    if not au_dir.exists() or not ld_file.exists():
+    st_file = MAIN_DIR / "PRG_06_Outputs.st"
+    if not au_dir.exists() or not st_file.exists():
         pytest.skip("required inputs not available")
     diag = DiagnosticCollector()
-    objects_by_name = _collect_objects_from_args([au_dir, ld_file], diag)
-    # PRG_AU_Outputs_LD should be included
-    assert "PRG_AU_Outputs_LD" in objects_by_name
+    objects_by_name = _collect_objects_from_args([au_dir, st_file], diag)
+    # PRG_06_Outputs should be included
+    assert "PRG_06_Outputs" in objects_by_name
 
 
 def test_build_bundle_missing_path_reports_error(tmp_path):
@@ -340,21 +285,6 @@ def _assert_valid_project_bundle(data: bytes, expected_pou_count: int) -> ET.Ele
     return root
 
 
-def test_st_to_ld_multi_file_produces_valid_project():
-    """st_to_ld.py with 2 files → <project> with 2 <pou> in <LD>."""
-    f1 = MAIN_DIR / "PRG_AU_Outputs_LD.st"
-    f2 = MAIN_DIR / "PRG_10_Outputs_LD.st"
-    if not f1.exists() or not f2.exists():
-        pytest.skip("LD test files not available")
-    diag = DiagnosticCollector()
-    data = build_ld_project_xml([f1, f2], diag)
-    root = _assert_valid_project_bundle(data, 2)
-    # Both POUs must have <LD> bodies
-    for pou in root.findall(".//pou"):
-        ld = pou.find(".//LD")
-        assert ld is not None, f"pou {pou.get('name')} must have <LD> body"
-
-
 def test_st_to_pou_multi_file_produces_valid_project():
     """st_to_pou.py with 2 files → <project> with 2 <pou> in <ST>."""
     f1 = AU_DIR / "FB_Safety_EmergencyManagement.st"
@@ -397,20 +327,3 @@ def test_st_to_dut_multi_file_produces_valid_project():
     dt_names = {dt.get("name") for dt in dts}
     assert "ST_Safety_Emergency_State" in dt_names
     assert "ST_Safety_Emergency_Diag" in dt_names
-
-
-def test_st_to_ld_multi_file_main_exits_0(tmp_path):
-    """CLI main() with 2 LD files exits 0 and writes a <project> file."""
-    from scripts.st_to_ld import main
-
-    f1 = MAIN_DIR / "PRG_AU_Outputs_LD.st"
-    f2 = MAIN_DIR / "PRG_10_Outputs_LD.st"
-    if not f1.exists() or not f2.exists():
-        pytest.skip("LD test files not available")
-    out = tmp_path / "bundle.xml"
-    rc = main([str(f1), str(f2), "-o", str(out)])
-    assert rc == 0
-    assert out.is_file()
-    data = out.read_bytes()
-    root = _parse_strip_ns(data)
-    assert root.tag == "project"

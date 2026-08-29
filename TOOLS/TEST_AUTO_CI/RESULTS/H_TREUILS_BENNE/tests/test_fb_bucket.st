@@ -269,23 +269,65 @@ TEST 'TC-P10-030 ConfirmOpen/ClosePosition : effet seulement MAINT_N1/N2 arretes
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := FALSE;
 
-    (* Scan 1 : Mode MAINT_N1, ConfirmOpenPosition -> IsOpen=TRUE *)
+    (* Scan 0 : isole le cas de test des latches/Lifecycle du scénario précédent. *)
+    FB(Enable := FALSE, Reset := FALSE, Mode := E_Mode.MAINT_N1, PowerContactorEngaged := TRUE,
+       ConfirmOpenPosition := FALSE, ConfirmClosePosition := FALSE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    BucketState := FB.BucketState; // STruCpp : émule le copy-out VAR_IN_OUT CODESYS.
+
+    (* Scan 1 : acquittement, puis état bas explicite pour armer le R_TRIG. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N1, PowerContactorEngaged := TRUE,
+       ConfirmOpenPosition := FALSE, ConfirmClosePosition := FALSE, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    BucketState := FB.BucketState;
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, PowerContactorEngaged := TRUE,
+       ConfirmOpenPosition := FALSE, ConfirmClosePosition := FALSE, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    BucketState := FB.BucketState;
+
+    (* Scan 2 : front MAINT_N1, ConfirmOpenPosition -> IsOpen=TRUE. *)
+    ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, PowerContactorEngaged := TRUE,
        ConfirmOpenPosition := TRUE, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
+    BucketState := FB.BucketState;
     ASSERT_TRUE(BucketState.IsOpen, 'MAINT_N1 + ConfirmOpen -> IsOpen=TRUE');
     ASSERT_FALSE(BucketState.IsClosed, 'MAINT_N1 + ConfirmOpen -> IsClosed=FALSE');
     ASSERT_FALSE(BucketState.StateIncoherent, 'Confirmation -> incoherence leve');
 
-    (* Scan 2 : Mode SEMI_AUTO, ConfirmClosePosition -> AUCUN effet *)
+    (* Scan 3 : relâche la confirmation ouverture. *)
     ADVANCE_TIME(10000000);
-    FB(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO, PowerContactorEngaged := TRUE,
+    FB(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, PowerContactorEngaged := TRUE,
+       ConfirmOpenPosition := FALSE, ConfirmClosePosition := FALSE, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    BucketState := FB.BucketState;
+
+    (* Scan 4 : front MAINT_N2, ConfirmClosePosition -> IsClosed=TRUE. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, PowerContactorEngaged := TRUE,
        ConfirmClosePosition := TRUE, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
-    ASSERT_TRUE(BucketState.IsOpen, 'SEMI_AUTO + ConfirmClose -> pas d effet (IsOpen conserve)');
-    ASSERT_FALSE(BucketState.IsClosed, 'SEMI_AUTO + ConfirmClose -> IsClosed reste FALSE');
+    BucketState := FB.BucketState;
+    ASSERT_FALSE(BucketState.IsOpen, 'MAINT_N2 + ConfirmClose -> IsOpen=FALSE');
+    ASSERT_TRUE(BucketState.IsClosed, 'MAINT_N2 + ConfirmClose -> IsClosed=TRUE');
+
+    (* Scan 5 : Mode SEMI_AUTO, ConfirmOpenPosition -> AUCUN effet. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO, PowerContactorEngaged := TRUE,
+       ConfirmOpenPosition := TRUE, ConfirmClosePosition := FALSE, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    BucketState := FB.BucketState;
+    ASSERT_FALSE(BucketState.IsOpen, 'SEMI_AUTO + ConfirmOpen -> IsOpen reste FALSE');
+    ASSERT_TRUE(BucketState.IsClosed, 'SEMI_AUTO + ConfirmOpen -> IsClosed conserve TRUE');
 END_TEST
 
 TEST 'TC-P10-031 Codeur(s) non reference(s) -> defaut permanent, independant de Reset'
@@ -419,7 +461,15 @@ TEST 'TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch'
        Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
     ASSERT_TRUE(FB.Lifecycle.Busy, 'Fermeture en cours');
 
-    (* Scan 3 : apres 1s de BUSY sans atteindre la cible -> timeout *)
+    (* Scan 3 : le TON lit Lifecycle.Busy au scan suivant son armement. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 4 : apres 1s de BUSY sans atteindre la cible -> timeout. *)
     ADVANCE_TIME(1000000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
@@ -443,6 +493,7 @@ TEST 'TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -> StateIn
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
+    BucketState := FB.BucketState; // STruCpp : émule le copy-out VAR_IN_OUT CODESYS.
     ASSERT_TRUE(BucketState.StateIncoherent, 'Boot incoherent -> StateIncoherent=TRUE');
     ASSERT_FALSE(FB.ActiveOffsetValid, 'Boot incoherent -> ActiveOffsetValid=FALSE');
 END_TEST

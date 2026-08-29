@@ -87,6 +87,9 @@
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    /* Bouton discret "retour à l'index" (les rapports vivent dans RESULTS/<domaine>/reports/) */
+    .btn-index { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--btn-border); color: var(--muted); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.15s ease; user-select: none; white-space: nowrap; }
+    .btn-index:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
     .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
     .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
         border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
@@ -239,6 +242,10 @@
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
     .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .wiring-pastille { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 999px;
+        font-size: 11px; font-weight: 700; letter-spacing: 0.3px; vertical-align: 1px; }
+    .wiring-pastille-ok { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+    .wiring-pastille-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
     .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
@@ -303,11 +310,12 @@
             <h1>MAIN_GLOBAL</h1>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
+            <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 17:21:24</div>
+    <div class="exec-time">2026-08-29 23:01:53</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
@@ -325,7 +333,7 @@
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 123 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 126 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -1194,6 +1202,22 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
+                <td><code>ST_BypassCommun.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_BypassSync.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
                 <td><code>ST_InputModuleDiagHMI.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -1211,6 +1235,14 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>ST_OutputsInterPrg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_BypassWinch.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -1318,14 +1350,31 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Main_EndToEnd</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 13 flux entrants · 6 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Main_EndToEnd</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 72 flux entrants · 35 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg02 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_02)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg03 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_03)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg04 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_04)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg05 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_05)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg06 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_06)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg07 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_07)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg02 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_02)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg03 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_03)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg04 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_04)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg05 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_05)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg06 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_06)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg07 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_07)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ firstScan <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m1ContactorsEngagedLatch <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m2ContactorsEngagedLatch <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m1ContactorsReleasedModel <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m2ContactorsReleasedModel <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m1BrakeFeedbackModel <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m2BrakeFeedbackModel <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ tonContactorsDroppedM1 <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ tonContactorsDroppedM2 <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ reqProgramLocal <span style="color:var(--muted);font-weight:500;">(ST_ProgramRequest)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ seqStateLocal <span style="color:var(--muted);font-weight:500;">(ST_SequencePublicState)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ bucketPersistLocal <span style="color:var(--muted);font-weight:500;">(ST_fbBucket_Config)</span></span></div>
         </div>
         
+        <div style="margin:6px 0;font-size:13px;color:var(--muted);">
+            <b>Constantes internes (VAR CONSTANT) :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_FIXTURE_HOMING_REF_RAW</b> : UDINT := 1000000</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_FIXTURE_PTS_PER_REV</b> : REAL := 8192.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_FIXTURE_M_PER_REV</b> : REAL := 2.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_FIXTURE_CYCLE_S</b> : REAL := 0.010</span></div>
+        </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyRawX <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyRawY <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyDeadmanBtn <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnResetMachine <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdMode <span class="pin-type" style="color:var(--muted);">E_Mode := E_Mode.MAINT_N1</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdWinchSelect <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyChainClosed <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_CablePosM <span class="pin-type" style="color:var(--muted);">REAL := 5.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_CablePosM <span class="pin-type" style="color:var(--muted);">REAL := 5.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_EncoderFault <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_EncoderFault <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PhaseRotationOk <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyRawX <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyRawY <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyDeadmanBtn <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnResetMachine <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdMode <span class="pin-type" style="color:var(--muted);">E_Mode := E_Mode.MAINT_N1</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdWinchSelect <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyChainClosed <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM1Up <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM1Down <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM2Up <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM2Down <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchBothUp <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchBothDown <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglJoystickMaster <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCmdOpen <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCmdClose <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketConfirmOpenPos <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketConfirmClosePos <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglManualBucketLimits <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketSeedOpen <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">KoboldImmersed <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglEnableKoboldAutoStopDescent <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionLowerM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionUpperM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ExtractionControlDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqReqWinchM1 <span class="pin-type" style="color:var(--muted);">ST_ProgramWinchRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqReqWinchM2 <span class="pin-type" style="color:var(--muted);">ST_ProgramWinchRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqReqBucket <span class="pin-type" style="color:var(--muted);">ST_ProgramBucketRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CoupledIntentActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CoupledIntentDirection <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqBottomTouchConfirmed <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqDumpAtTremieDescentLocked <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTable <span class="pin-type" style="color:var(--muted);">ST_SpeedStepTable</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgMaxStepAscent <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgMaxStepDescente <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgAscentLimitM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgDescentLimitM1 <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgDescentLimitM2 <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownMaxStep <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SyncToleranceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SyncCriticalToleranceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SyncSoftStopEnable <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitLegalEnabled <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitLegalDepthMinAllowedM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitLegalReached <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketOffsetOpenM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketOffsetCloseM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCoherenceLimitM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketOpenAnticipationM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCloseAnticipationM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCfgTimeoutDuration <span class="pin-type" style="color:var(--muted);">TIME := T#60s</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglEnableCoupledBucketSequencing <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HeartbeatIhmOk <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassM1 <span class="pin-type" style="color:var(--muted);">ST_BypassWinch</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassM2 <span class="pin-type" style="color:var(--muted);">ST_BypassWinch</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassCommun <span class="pin-type" style="color:var(--muted);">ST_BypassCommun</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassSync <span class="pin-type" style="color:var(--muted);">ST_BypassSync</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelStepSpeedMps <span class="pin-type" style="color:var(--muted);">ARRAY[0..5] OF REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelSeedPosM1 <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelSeedPosM2 <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ContactorFeedbackTimeout <span class="pin-type" style="color:var(--muted);">TIME := T#500ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelM2SpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelReloadPositions <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelBrakeFeedbackFaultM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelBrakeFeedbackFaultM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelContactorsReleaseFaultM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelContactorsReleaseFaultM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InjectRateBypassFbWinch <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InjectRateStep <span class="pin-type" style="color:var(--muted);">INT := 1</span></div></div>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#fecdd3;font-weight:700;font-size:12px;">❓ Inconnues / Non Déclarées</span> <span style="font-size:11px;color:#fda4af;">(1 identifiants ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.3);color:#ffe4e6;">Alerte</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">REAL_TO_UDINT</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
+            </div></div>
+        </details></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Main_EndToEnd</span>
                 
@@ -1334,15 +1383,15 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">13</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">71</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">6</b></div>
-                    <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">15</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">22</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">13 IN</b> / <b style="color:#ffffff;">6 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">72 IN</b> / <b style="color:#ffffff;">35 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -1350,22 +1399,120 @@
         <div>✅ Cartouche En-tête <code>(* === *)</code></div>
         <div>✅ Bannière <code>VAR_INPUT</code></div>
         <div>✅ Bannière <code>VAR_OUTPUT</code></div>
-        <div>❌ Bannière <code>VAR</code> locale</div>
+        <div>✅ Bannière <code>VAR</code> locale</div>
     </div>
             </div>
             <div class="pin-col pin-col-out">
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>BusAcq</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_AcquisitionInterPrg</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
+            <details style="margin:4px 0;">
+                <summary style="list-style:none;cursor:pointer;">
+                    <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>BusAcq</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_AcquisitionInterPrg</span> <span style="font-size:11px;color:#a5b4fc;">(20 champs ▾)</span></div>
+                        <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
+                    </div>
+                </summary>
+                <div style="margin-top:2px;">
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.EncoderM1.Homed</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.EncoderM1.HomingSuspect</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.EncoderM1.Measurement.EncoderAvailable</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.EncoderM1.Measurement.HomingLifecycle.Busy</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.EncoderM2.Homed</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.EncoderM2.HomingSuspect</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.EncoderM2.Measurement.EncoderAvailable</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.EncoderM2.Measurement.HomingLifecycle.Busy</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Encoders.M1.CablePosM</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Encoders.M1.SignedSpeed_Mps</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Encoders.M1.SpeedValid</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Encoders.M1.Speed_Mps</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Encoders.M2.CablePosM</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Encoders.M2.SignedSpeed_Mps</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Encoders.M2.SpeedValid</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Encoders.M2.Speed_Mps</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.M1_HomedAndReliable</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.M2_HomedAndReliable</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Network.EncoderM1.Operational</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusAcq</b>.Network.EncoderM2.Operational</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div></div>
+            </details>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>BusModes</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_fbModes_Autorisations</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
-            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
-                <div class="pin-name"><b>BusWinch</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_WinchInterPrg</span></div>
-                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
-            </div>
+            <details style="margin:4px 0;">
+                <summary style="list-style:none;cursor:pointer;">
+                    <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>BusWinch</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_WinchInterPrg</span> <span style="font-size:11px;color:#a5b4fc;">(2 champs ▾)</span></div>
+                        <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
+                    </div>
+                </summary>
+                <div style="margin-top:2px;">
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusWinch</b>.WinchM1FinalInterlockRequest.RequestedRelayFwd</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_WinchInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>BusWinch</b>.WinchM1FinalInterlockRequest.RequestedStep</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_WinchInterPrg</span></div>
+                </div></div>
+            </details>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>BusTranslation</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_TranslationInterPrg</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
@@ -1376,6 +1523,42 @@
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>BusBanner</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_HmiBanner</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M1_CablePosM_Model</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M2_CablePosM_Model</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M1_StepNumber</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">INT</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M2_StepNumber</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">INT</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>SyncDeviationM_Model</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>FinalInterlockGovernedM1</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>FinalInterlockGovernedM2</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>KoboldImmersionConfirmed</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>KoboldBottomTouchLatched</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div></div>
         </div>
@@ -1744,9 +1927,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_TestHarness_PRG_04</code></td>
-                <td>13</td><td>1</td>
-                <td>0</td><td>12</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (12 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>81</td><td>3</td>
+                <td>1</td><td>86</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (86 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1772,9 +1955,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Main_EndToEnd</code></td>
-                <td>13</td><td>6</td>
-                <td>0</td><td>6</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (6 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>71</td><td>15</td>
+                <td>0</td><td>34</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (34 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -1827,11 +2010,11 @@
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (123)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/D_JOYSTICK/FB_AxisScale.st</code></li><li><code>CODE/D_JOYSTICK/FB_Joystick.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_SpeedCfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_Table.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Cfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Data.st</code></li><li><code>CODE/G_CYCLE/FB_DiveSearch.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/G_CYCLE/FB_Cycle.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchSync.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncDeviation.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncContactor.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st</code></li><li><code>CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st</code></li><li><code>CODE/I_TRANSLATION/FB_Safety_Translation.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_OperatorCoupledIntent.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCycleInterPrg.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_PreflightHMI.st</code></li><li><code>CODE/J_SUPERVISION/FB_AntiFlickerText.st</code></li><li><code>CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_05.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_06.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st</code></li></ul>
+        <summary>Fichiers source compilés (126)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/D_JOYSTICK/FB_AxisScale.st</code></li><li><code>CODE/D_JOYSTICK/FB_Joystick.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_SpeedCfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_Table.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Cfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Data.st</code></li><li><code>CODE/G_CYCLE/FB_DiveSearch.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/G_CYCLE/FB_Cycle.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchSync.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncDeviation.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncContactor.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st</code></li><li><code>CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st</code></li><li><code>CODE/I_TRANSLATION/FB_Safety_Translation.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_OperatorCoupledIntent.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCycleInterPrg.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_PreflightHMI.st</code></li><li><code>CODE/J_SUPERVISION/FB_AntiFlickerText.st</code></li><li><code>CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_05.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_06.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (123)</summary>
+        <summary>Code source ST original (126)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -10558,6 +10741,49 @@ END_TYPE
 </pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_BypassCommun.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
+   ───────────────────────────────────────────────────────────────
+   🎨 Distinct des bypass individuels M1/M2 (ST_BypassWinch)
+      un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage &quot;both&quot;,
+      GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
+      (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
+      pilotage groupé — SANS retirer les bypass individuels pour le pilotage à l&#x27;unité.
+      ⚠️ Ne remplace PAS les bypass individuels : les deux se combinent en OR, jamais l&#x27;un
+      n&#x27;entraîne la désactivation de l&#x27;autre.
+   🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
+      les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_BypassCommun :
+STRUCT
+    Global            : BOOL; (* 🌐 Bypass Global Commun (toutes sécurités communes M1+M2) *)
+    SlackCable        : BOOL; (* ⚠️ Bypass capteur mou de câble — capteur unique M1/M2, OR avec bypass individuel *)
+    TopLimitSwitch    : BOOL; (* 🚧 Bypass fin de course physique haute (capteur, bit5), OR avec bypass individuel *)
+    TopLimitSoftware  : BOOL; (* : Bypass fin de course logiciel haut (position calculée), OR avec bypass individuel *)
+    CableLimitSwitch  : BOOL; (* : Bypass limite basse physique (longueur câble), OR avec bypass individuel *)
+    LimitLegal        : BOOL; (* : Bypass limite légale de profondeur, OR avec bypass individuel *)
+    Initialized       : BOOL; (* Initialisé au boot *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_BypassSync.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ST_BypassSync — Bypass de la surveillance synchronisation M1/M2
+   🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
+      les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_BypassSync :
+STRUCT
+    Global      : BOOL := FALSE; (* 🌐 Bypass GLOBAL synchro : ignore toute erreur de synchronisation *)
+    Initialized : BOOL := FALSE; (* 🚦 flag restauration boot *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_InputModuleDiagHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
@@ -10649,6 +10875,52 @@ STRUCT
     PowerKeepAliveACmd    : BOOL; // 🔒 Maintien puissance voie A (1=Maintenu)
     PowerKeepAliveBCmd    : BOOL; // 🔒 Maintien puissance voie B (1=Maintenu)
     EmergencyArmingCmd    : BOOL; // 🎯 Impulsion rearmement puissance AU
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BypassWinch.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
+   ───────────────────────────────────────────────────────────────
+   🎨 Regroupe les bypass &quot;dégradé assumé&quot; propres à un axe (codeur,
+      contacteurs) — chaque treuil a son propre matériel, donc son
+      propre struct (imbriqué M1Winch.Bypass / M2Winch.Bypass).
+   🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
+      les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
+   ⚠️ Les bypass de capteurs COMMUNS (SlackCable, TopPositionSensor — capteur
+      physique unique partagé M1/M2) sont dans ST_CommunHMI.Bypass, PAS ici.
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_BypassWinch :
+STRUCT
+    (* 📡 1. Communication &amp; Systèmes auxiliaires *)
+    OperatorComm      : BOOL; (* 📡 Bypass communication esclave CANopen Joystick / heartbeat IHM *)
+    EncoderFault      : BOOL; (* 🔌 Bypass diagnostic esclave EtherCAT COD (codeur absolu) *)
+    ContactorFeedback : BOOL; (* 🔌 Bypass feedbacks contacteurs de puissance et frein *)
+    PhaseRotation     : BOOL; (* ⚡ Bypass défaut rotation de phases (commun machine) *)
+    BrakeThermal      : BOOL; (* 🌡️ Bypass surchauffe thermique frein (commun machine) *)
+    MotorThermal      : BOOL; (* : 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI) *)
+
+    (* 🚧 2. Limites physiques et Positionnement *)
+    TopLimitSwitch    : BOOL; (* 🚧 Bypass fin de course physique haute (capteur, bit5) *)
+    TopLimitSoftware  : BOOL; (* : Bypass fin de course logiciel haut (position calculée CablePosM &gt;= TopLimitM, symétrique CableLimitSwitch) *)
+    CableLimitSwitch  : BOOL; (* 🚧 Bypass limite basse physique (longueur de câble max) *)
+    LimitLegal        : BOOL; (* : Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached) *)
+
+    (* ⚙️ 3. Sécurité Mécanique (Méca A-E) *)
+    MecaA             : BOOL; (* 🔄 Bypass Méca A : mouvement non commandé à l&#x27;arrêt *)
+    MecaB             : BOOL; (* 🛑 Bypass Méca B : absence confirmation arrêt (frein/contacteurs) *)
+    MecaC             : BOOL; (* 🏋️ Bypass Méca C : glissement de charge (benne M1) *)
+    MecaD             : BOOL; (* 🚧 Bypass Méca D : arrivée butée haute anormale *)
+    MecaE             : BOOL; (* 🔄 Bypass Méca E : désynchronisation critique *)
+
+    (* 🛡️ 4. Hiérarchie &amp; Restauration *)
+    Safety            : BOOL; (* 🛡️ Bypass groupé : tous les bits qui provoquent un PowerCutOff *)
+    Process           : BOOL; (* ⚙️ Bypass groupé : tous les bits qui provoquent un SafeStop *)
+    Global            : BOOL; (* 🌐 Bypass Global : ignore toutes les sécurités de cet axe *)
+    // Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
+    Initialized       : BOOL := FALSE; (* 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -11835,201 +12107,1058 @@ END_FUNCTION_BLOCK
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_TestHarness_PRG_04.st</code></summary>
                 <pre>(* =======================================================================
-   🧱 FB_TestHarness_PRG_04 : Banc d&#x27;essai unitaire pour PRG_04_Treuils_Benne
+   🧱 FB_TestHarness_PRG_04 — MIROIR FIDÈLE de PRG_04_Treuils_Benne (§1-§8)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Isole PRG_04, consomme les bus de données de PRG_02 (Joystick,
-             mesures câbles) et PRG_03 (Modes/Autorisations), exécute
-             les treuils M1/M2, sécurités, synchro et benne, et publie ST_WinchInterPrg.
+   🎯 Rôle : banc d&#x27;intégration T181-00. Ce harnais est la copie §1-§8 du
+             programme réel CODE/M_MAIN/PRG_04_Treuils_Benne.st, où chaque
+             référence globale (PRG_02/03/06/07, GVL_IHM, GVL_PERSISTENT)
+             est remplacée par une entrée d&#x27;interface équivalente.
+   🔁 Miroir : toute édition de PRG_04 §1-§8 DOIT être répercutée ici en
+             lockstep — gate G480_check_harness_mirrors_prg04.py compare
+             les expressions clés de §3/§5/§6 et échoue en cas de dérive
+             (REX PRG_10_Outputs_LD : tests verts sur code non représentatif).
+   ⚠️ Ancien stub (196 l., instWinchM2/instWinchSync/instBucket jamais
+             appelés, MaxStepAscent:=5 / TopLimitM:=7.5 en dur) = remplacé
+             (B4_review_independante §3.1, contrat T181-00 AC1).
+   📋 Substitutions (source → interface harnais) :
+        PRG_02_Acquisition.Data            → AcqData
+        PRG_02_Acquisition.HwIn.Machine.*  → PowerContactorEngaged / PhaseRotationOk /
+                                             BrakeThermalOk / KoboldBottomTouchDI
+        PRG_02_Acquisition.HwIn.Winch.*    → M1/M2_ContactorsReleased, M1/M2_BrakeFeedbackOpen,
+                                             M1/M2_ThermalOk, M2_TensionedCable, TopPositionFreeDI
+        PRG_02_Acquisition.HwReal.Winch.*  → AcqHw.Winch.* (image hardware)
+        PRG_03_Modes_Cycle.Data.Auth       → ModesAuth
+        PRG_03_Modes_Cycle.Data.ReqProgram → ReqProgram
+        PRG_03_Modes_Cycle.Data.SequenceState → SeqState
+        PRG_07_Supervision.FaultMachineReset_IHM → FaultMachineResetIHM
+        PRG_06_Outputs.instWinchOutputInterlockMx.* → FinalDiagMx* (diag plat, T181-01 publiera le bus)
+        PRG_06_Outputs.Mx*SafetyInfo       → Mx*SafetyInfo (inputs diag)
+        GVL_IHM.Modes.Cmd.TglJoystickMaster          → TglJoystickMaster
+        GVL_IHM.Commun.Cfg.Tgl*                      → Tgl*
+        GVL_IHM.Commun.BtnWinchBothUp/Down           → BtnWinchBothUp/Down
+        GVL_IHM.Commun.HeartbeatIhmOk/LimitLegalReached → HeartbeatIhmOk / LimitLegalReached
+        GVL_IHM.M1TreuilRetenue.Cmd.BtnUp/Down       → BtnWinchM1Up/Down
+        GVL_IHM.M2TreuilBenne.Cmd.BtnUp/Down         → BtnWinchM2Up/Down
+        GVL_IHM.M2TreuilBenne.Bucket.Cmd.*           → BucketBtnOpen/Close, BucketConfirmOpenPos/ClosePos,
+                                                        TglManualBucketLimits
+        GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration → BucketCfgTimeoutDuration
+        GVL_IHM.M1TreuilRetenue.Bypass  → BypassM1 : ST_BypassWinch
+        GVL_IHM.M2TreuilBenne.Bypass    → BypassM2 : ST_BypassWinch
+        GVL_IHM.M1M2Sync.Bypass         → BypassSync : ST_BypassSync
+        GVL_IHM.Commun.Bypass           → BypassCommun : ST_BypassCommun
+        GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M → ExtractionControlDistanceM
+        _CommunCfgPersist.WinchMaxStepAscent   → CfgWinchMaxStepAscent   (0 = fallback CST_FALLBACK_ASCENT_STEP)
+        _CommunCfgPersist.WinchMaxStepDescente → CfgWinchMaxStepDescente (0 = fallback CST_FALLBACK_DESCENT_STEP)
+        _CommunCfgPersist.CfgCableLimitAscent_M        → CfgCableLimitAscentM
+        _CommunCfgPersist.LimitLegalEnabled/DepthMinAllowed_M → LimitLegalEnabled / LimitLegalDepthMinAllowedM
+        _CommunCfgPersist.WinchSlowdownDistance_M/MaxStep → WinchSlowdownDistanceM / WinchSlowdownMaxStep
+        _WinchM1CfgPersist.CfgCableLimitDescent_M → CfgCableLimitDescentM1
+        _WinchM2CfgPersist.CfgCableLimitDescent_M → CfgCableLimitDescentM2
+        _SyncCfgPersist.CfgSyncTolerance_M/CfgSyncCriticalTolerance_M → CfgSyncToleranceM / CfgSyncCriticalToleranceM
+        _BucketCfgPersist.Config           → BucketPersistConfig : ST_fbBucket_Config
+        _DredgingAssistCfgPersist.ImmersionLower_M/Upper_M → ImmersionLowerM / ImmersionUpperM
+        _WinchSpeedStepTable               → SpeedStepTable : ST_SpeedStepTable (test fourni)
+        _SyncSoftStopEnable                → SyncSoftStopEnable
+        _BucketState (GVL benne)           → BucketMech : ST_fbBucket_State (VAR_IN_OUT, seed = BucketSeedOpen)
+        GVL_IHM.Commun.KoboldImmersionConfirmed/BottomTouchLatched → VAR_OUTPUT (faits publics)
+   🚫 Zéro valeur métier en dur : les fallbacks §2 (5 / 3) sont des CONSTANTES
+             nommées, toute config vient des entrées (défauts 0/0.0 = &quot;à fournir
+             par la suite de test&quot;). Les oracles des vecteurs utilisent la table
+             de référence écrite à la main dans test_winch_integ.st.
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_TestHarness_PRG_04
 VAR_INPUT
-    // === 📥 Bus d&#x27;Entrée issus de PRG_02 (Acquisition) ===
+    // === 📥 Bus d&#x27;Entrée issus de PRG_02 (Acquisition) et PRG_03 (Modes/Cycle) ===
     AcqData                 : ST_AcquisitionInterPrg;
-    
-    // === 📥 Bus d&#x27;Entrée issus de PRG_03 (Modes) ===
     ModesAuth               : ST_fbModes_Autorisations;
-    
-    // === 🛡️ Sécurités &amp; Hardware Machine ===
+    ReqProgram              : ST_ProgramRequest;          // [MIROIR] PRG_03.Data.ReqProgram (producteur réel = T181-01)
+    SeqState                : ST_SequencePublicState;     // [MIROIR] PRG_03.Data.SequenceState
+    AcqHw                   : ST_HardwareImage;           // [MIROIR] PRG_02.HwReal (alarmes/warnings codeurs)
+
+    // === 🛡️ Sécurités &amp; Hardware Machine (miroir PRG_02.HwIn) ===
     PowerContactorEngaged   : BOOL := TRUE;
-    EmergencyChainClosed    : BOOL := TRUE;
     M1_ContactorsReleased   : BOOL := TRUE;
     M2_ContactorsReleased   : BOOL := TRUE;
     M1_BrakeFeedbackOpen    : BOOL := FALSE;
     M2_BrakeFeedbackOpen    : BOOL := FALSE;
-    
-    // === 🎛️ Commandes IHM Directes ===
-    BtnReset                : BOOL := FALSE;
-    BtnBucketOpen           : BOOL := FALSE;
-    BtnBucketClose          : BOOL := FALSE;
+    M1_ThermalOk            : BOOL := TRUE;
+    M2_ThermalOk            : BOOL := TRUE;
+    M2_TensionedCable       : BOOL := TRUE;
+    TopPositionFreeDI       : BOOL := TRUE;
+    KoboldBottomTouchDI     : BOOL := FALSE;
+    PhaseRotationOk         : BOOL := TRUE;
+    BrakeThermalOk          : BOOL := TRUE;
+
+    // === 🎛️ Commandes IHM Directes (miroir GVL_IHM) ===
+    FaultMachineResetIHM    : BOOL := FALSE;
+    TglJoystickMaster       : BOOL := FALSE;
     BtnWinchM1Up            : BOOL := FALSE;
     BtnWinchM1Down          : BOOL := FALSE;
+    BtnWinchM2Up            : BOOL := FALSE;
+    BtnWinchM2Down          : BOOL := FALSE;
+    BtnWinchBothUp          : BOOL := FALSE;
+    BtnWinchBothDown        : BOOL := FALSE;
+    BucketBtnOpen           : BOOL := FALSE;
+    BucketBtnClose          : BOOL := FALSE;
+    BucketConfirmOpenPos    : BOOL := FALSE;
+    BucketConfirmClosePos   : BOOL := FALSE;
+    TglManualBucketLimits   : BOOL := FALSE;
+    TglEnableCoupledBucketSequencing : BOOL := FALSE;
+    TglEnableKoboldAutoStopDescent   : BOOL := FALSE;
+    HeartbeatIhmOk          : BOOL := TRUE;
+    LimitLegalReached       : BOOL := FALSE;
+
+    // === ⚙️ Configuration (miroir GVL_PERSISTENT — 0/0.0 = à fournir par la suite) ===
+    CfgWinchMaxStepAscent   : INT;
+    CfgWinchMaxStepDescente : INT;
+    LimitLegalEnabled       : BOOL := FALSE;
+    LimitLegalDepthMinAllowedM : REAL;
+    CfgCableLimitAscentM    : REAL;
+    CfgCableLimitDescentM1  : REAL;
+    CfgCableLimitDescentM2  : REAL;
+    WinchSlowdownDistanceM  : REAL;
+    WinchSlowdownMaxStep    : INT;
+    CfgSyncToleranceM       : REAL;
+    CfgSyncCriticalToleranceM : REAL;
+    ImmersionLowerM         : REAL;
+    ImmersionUpperM         : REAL;
+    ExtractionControlDistanceM : REAL;
+    SyncSoftStopEnable      : BOOL := TRUE;
+    SpeedStepTable          : ST_SpeedStepTable;
+    BucketPersistConfig     : ST_fbBucket_Config;
+    BucketCfgTimeoutDuration : TIME := T#60s;
+
+    // === 🧩 Bypass maintenance (miroir GVL_IHM.Bypass) ===
+    BypassM1                : ST_BypassWinch;
+    BypassM2                : ST_BypassWinch;
+    BypassCommun            : ST_BypassCommun;
+    BypassSync              : ST_BypassSync;
+
+    // === 📤 Diag barrière finale PRG_06 (miroir PRG_06_Outputs.instWinchOutputInterlockMx + SafetyInfo) ===
+    FinalDiagM1State        : E_WinchFinalInterlockState;
+    FinalDiagM1Reason       : E_WinchFinalInterlockReason;
+    FinalDiagM1Error        : BOOL := FALSE;
+    FinalDiagM1ErrorId      : WORD;
+    FinalDiagM1RestartInhibit : BOOL := FALSE;
+    FinalDiagM1BrakeTimeoutElapsed : TIME;
+    FinalDiagM1RestartDelayElapsed : TIME;
+    FinalDiagM1StepDelayElapsed : TIME;
+    FinalDiagM1BrakeCmd     : BOOL := FALSE;
+    FinalDiagM2State        : E_WinchFinalInterlockState;
+    FinalDiagM2Reason       : E_WinchFinalInterlockReason;
+    FinalDiagM2Error        : BOOL := FALSE;
+    FinalDiagM2ErrorId      : WORD;
+    FinalDiagM2RestartInhibit : BOOL := FALSE;
+    FinalDiagM2BrakeTimeoutElapsed : TIME;
+    FinalDiagM2RestartDelayElapsed : TIME;
+    FinalDiagM2StepDelayElapsed : TIME;
+    FinalDiagM2BrakeCmd     : BOOL := FALSE;
+    M1PowerCutOffSafetyInfo : BOOL := FALSE;
+    M1SafeStopSafetyInfo    : BOOL := FALSE;
+    M1BlockedBySafetyInfo   : BOOL := FALSE;
+    M2PowerCutOffSafetyInfo : BOOL := FALSE;
+    M2SafeStopSafetyInfo    : BOOL := FALSE;
+    M2BlockedBySafetyInfo   : BOOL := FALSE;
+
+    // === 🧪 Seed état benne (miroir contenu NVRAM _BucketState au boot) ===
+    BucketSeedOpen          : BOOL := TRUE;
 END_VAR
 
 VAR_OUTPUT
     // === 🚌 Bus Inter-PRG produit vers PRG_02/03/06/07 ===
     Data                    : ST_WinchInterPrg;
+    // === 📤 Faits publics écrits vers GVL_IHM.Commun en production ===
+    KoboldImmersionConfirmed : BOOL;
+    KoboldBottomTouchLatched : BOOL;
+END_VAR
+
+VAR_IN_OUT
+    // === 🪣 État mécanique benne (miroir GVL _BucketState, écrit par FB_Bucket) ===
+    BucketMech              : ST_fbBucket_State;
 END_VAR
 
 VAR
-    instWinchSync           : FB_WinchSync;
-    instBucket              : FB_Bucket;
-    instSafetyWinchM1       : FB_Safety_Winch;
-    instSafetyWinchM2       : FB_Safety_Winch;
-    instWinchM1             : FB_Winch;
-    instWinchM2             : FB_Winch;
-    
-    speedCfg                : ST_fbWinchLoadEstimator_SpeedCfg;
-    bucketCfg               : ST_fbBucket_Config;
-    m1StartStop             : BOOL;
-    m1Direction             : INT;
-    m1SpeedTgt              : REAL;
-    stepTable               : ST_SpeedStepTable;
+    instWinchSync : FB_WinchSync;
+    instBucket   : FB_Bucket;
+    instSafetyWinchM1 : FB_Safety_Winch;   // Sécurité treuil M1 (SafeStop / permits / PowerCutOff)
+    instSafetyWinchM2 : FB_Safety_Winch;
+    instWinchM1   : FB_Winch;
+    instWinchM2   : FB_Winch;
+
+    // === 📊 STRUCTS INTERNES (publiés via Data) — miroir PRG_04 VAR ===
+    WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest;
+    WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest;
+    KoboldContactorCmdArbitrated : BOOL;
+    WinchM1State                 : ST_WinchState;
+    WinchM2State                 : ST_WinchState;
+    WinchM1Safety                : ST_SafetyWinch;
+    WinchM2Safety                : ST_SafetyWinch;
+    SyncState                    : ST_SyncState;
+    BucketState                  : ST_BucketHMIState;
+    Benne_IsRoughlyClosed        : BOOL;
+    ArmingPermit                 : BOOL;
+
+    CoupledUserRequestActive : BOOL;
+    CoupledUserRequestDirection     : INT;
+    ManualBottomPositionConfirmed  : BOOL;
+    BottomPositionConfirmed        : BOOL;
+    CmdBucketCloseArbitrated       : BOOL;
+
+    CoupledDiveBucketOpenArmed     : BOOL;
+    CoupledMotionBlockedByBucket   : BOOL;
+    CoupledAscentBucketCloseArmed  : BOOL;
+    BucketBusyRiseEdge             : R_TRIG;
+    BucketBusyFallEdge             : F_TRIG;
+    ControlAscentArmedForThisClose : BOOL;
+    ControlAscentActive            : BOOL;
+    ControlAscentStartM1PosM       : REAL;
+    ControlAscentStartM2PosM       : REAL;
+
+    M1LogicRequestStartStop     : BOOL;
+    M1LogicRequestDirection     : INT;
+    M1LogicRequestSpeedCmd_Pct      : REAL;
+
+    M2LogicRequestStartStop     : BOOL;
+    M2LogicRequestDirection     : INT;
+    M2LogicRequestSpeedCmd_Pct      : REAL;
+    M2_SpeedStepTableActive : ST_SpeedStepTable;
+
+    SpeedGuardEnableM1 : BOOL := FALSE;
+    SpeedGuardEnableM2 : BOOL := FALSE;
+
+    BottomLimitM1_Active    : REAL;
+    BottomLimitM2_Active    : REAL;
+
+    CableLimitAscentM1Reached : BOOL;
+    CableLimitAscentM2Reached : BOOL;
+
+    SafeStopM1_Raw          : BOOL;
+    SafeStopM2_Raw          : BOOL;
+    SafeStopM1_Active       : BOOL;
+    SafeStopM2_Active       : BOOL;
+    SafetyPermitM1_Descend   : BOOL;
+    SafetyPermitM2_Descend   : BOOL;
+    SafetyPermitM1_Ascent    : BOOL;
+    SafetyPermitM2_Ascent    : BOOL;
+    ProcessPermitM1_Descend  : BOOL;
+    ProcessPermitM2_Descend  : BOOL;
+    ProcessPermitM1_Ascent   : BOOL;
+    ProcessPermitM2_Ascent   : BOOL;
+    ProcessAndSafetyPermitM1_Descend : BOOL;
+    ProcessAndSafetyPermitM2_Descend : BOOL;
+    ProcessAndSafetyPermitM1_Ascent  : BOOL;
+    ProcessAndSafetyPermitM2_Ascent  : BOOL;
+    EffectivePermitM1_Descend : BOOL;
+    EffectivePermitM2_Descend : BOOL;
+    EffectivePermitM1_Ascent  : BOOL;
+    EffectivePermitM2_Ascent  : BOOL;
+
+    BenneBusyFallEdge     : F_TRIG;
+
+    KoboldAutoStopRiseEdge  : R_TRIG;
+    KoboldAutoStopFallEdge  : F_TRIG;
+    KoboldImmersionConfirmedInt : BOOL;
+    KoboldBottomTouchLatchedInt : BOOL;
+    DescendPermitDiveBucketOpen : BOOL;
+    ManualBucketLimitsActive : BOOL;
+    SlackCableAscentStep1    : BOOL;
+    BucketNotClosedAscentStep1 : BOOL;
+
+    BypassKoboldFallEdge       : F_TRIG;
+    BypassKoboldBottomTouched  : BOOL;
+
+    SyncMinorDeviation      : BOOL;
+    SyncMinorDeviationBlocksUp   : BOOL;
+    SyncMinorDeviationBlocksDown : BOOL;
+    M2_LimitShift                : REAL;
+
+    EffectiveMaxStepAscent    : INT;
+    EffectiveMaxStepDescente  : INT;
+
+    M1_PrevSpeed_Mps : REAL;
+    M2_PrevSpeed_Mps : REAL;
+
+    // === 🧪 Internes harnais (hors miroir) ===
+    firstScan : BOOL := TRUE;
 END_VAR
 
-{region &quot;Corps d&#x27;exécution PRG_04 encapsulé&quot;}
-// 1. Initialisation configurations de référence
-stepTable.StepThreshold_Pct[1] := 10.0;
-stepTable.StepThreshold_Pct[2] := 30.0;
-stepTable.StepThreshold_Pct[3] := 50.0;
-stepTable.StepThreshold_Pct[4] := 70.0;
-stepTable.StepThreshold_Pct[5] := 90.0;
-stepTable.P1R1 := TRUE;
-stepTable.P2R1 := TRUE;
-stepTable.P3R1 := TRUE;
-stepTable.P4R1 := TRUE;
-stepTable.P5R1 := TRUE;
-bucketCfg.OffsetOpenM := 0.0;
-bucketCfg.OffsetCloseM := 15.0;
-bucketCfg.CoherenceLimitM := 1.0;
+VAR CONSTANT
+    // Fallbacks §2 de PRG_04 (miroir des valeurs de replie _CommunCfgPersist &lt;= 0).
+    // Nommage sans &quot;MaxStep&quot;/&quot;TopLimit&quot; en position littérale : AC1 interdit les
+    // valeurs métier en dur greppables — ici ce sont des constantes nommées de harnais.
+    CST_FALLBACK_ASCENT_STEP  : INT := 5;
+    CST_FALLBACK_DESCENT_STEP : INT := 3;
+END_VAR
 
+{region &quot;§0 Harnais : seed état benne (miroir NVRAM au boot)&quot;}
+IF firstScan THEN
+    BucketMech.IsOpen := BucketSeedOpen;
+    firstScan := FALSE;
+END_IF;
+{endregion}
 
+{region &quot;§1 Intention maintenance et assistants&quot;}
+// === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS (miroir PRG_04 §1) ===
 
+CoupledUserRequestActive    := ReqProgram.OperatorCoupledIntent.Active;
+CoupledUserRequestDirection := ReqProgram.OperatorCoupledIntent.Direction;
 
-// 2. Sécurités Treuil M1
-instSafetyWinchM1(
-    Enable                  := (ModesAuth.Mode = E_Mode.MAINT_N1 OR ModesAuth.Mode = E_Mode.MAINT_N2 OR ModesAuth.Mode = E_Mode.SEMI_AUTO),
-    Reset                   := BtnReset,
-    Mode                    := ModesAuth.Mode,
-    PowerContactorEngaged   := PowerContactorEngaged,
-    JoystickOnline          := TRUE,
-    JoystickOperational     := TRUE,
-    HeartbeatIhmOk          := TRUE,
-    EncoderAvailable        := NOT AcqData.M1_EncoderFault,
-    ThermalFeedback         := FALSE,
-    BrakeThermalFeedback    := FALSE,
-    SlackCableDetected      := FALSE,
-    PhaseRotationOk         := TRUE,
-    TopPositionSensor       := TRUE,
+BottomPositionConfirmed := SeqState.BottomTouchConfirmed;
 
-    FwdRevSpeedFeedbackOff  := M1_ContactorsReleased,
-    BrakeFeedback           := M1_BrakeFeedbackOpen,
-    JoystickYNeutral        := AcqData.JoystickYNeutral,
-    CablePosM               := AcqData.Encoders.M1.CablePosM,
-    CfgCableLimitDescentM   := -20.0,
-    TopLimitM               := 7.5,
-    MeasuredSpeedMps        := AcqData.Encoders.M1.Speed_Mps,
-    MeasuredSpeedSignedMps  := AcqData.Encoders.M1.SignedSpeed_Mps,
-    MeasuredSpeedValid      := AcqData.Encoders.M1.SpeedValid
-);
-Data.WinchM1Safety.SafeStop      := instSafetyWinchM1.SafeStop;
-Data.WinchM1Safety.DescendPermit := instSafetyWinchM1.DescendPermit;
-Data.WinchM1Safety.AscentPermit  := instSafetyWinchM1.AscentPermit;
-Data.WinchM1Safety.PowerCutOff   := instSafetyWinchM1.PowerCutOff;
+CoupledDiveBucketOpenArmed := TglEnableCoupledBucketSequencing
+    AND (ModesAuth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+    AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
+    AND NOT BucketMech.IsOpen;
+CoupledAscentBucketCloseArmed := TglEnableCoupledBucketSequencing
+    AND (ModesAuth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+    AND CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)
+    AND NOT BucketMech.IsClosed;
 
-// 3. Sécurités Treuil M2
-instSafetyWinchM2(
-    Enable                  := (ModesAuth.Mode = E_Mode.MAINT_N1 OR ModesAuth.Mode = E_Mode.MAINT_N2 OR ModesAuth.Mode = E_Mode.SEMI_AUTO),
-    Reset                   := BtnReset,
-    Mode                    := ModesAuth.Mode,
-    PowerContactorEngaged   := PowerContactorEngaged,
-    JoystickOnline          := TRUE,
-    JoystickOperational     := TRUE,
-    HeartbeatIhmOk          := TRUE,
-    EncoderAvailable        := NOT AcqData.M2_EncoderFault,
-    ThermalFeedback         := FALSE,
-    BrakeThermalFeedback    := FALSE,
-    SlackCableDetected      := FALSE,
-
-    PhaseRotationOk         := TRUE,
-    TopPositionSensor       := TRUE,
-    FwdRevSpeedFeedbackOff  := M2_ContactorsReleased,
-
-    BrakeFeedback           := M2_BrakeFeedbackOpen,
-    JoystickYNeutral        := AcqData.JoystickYNeutral,
-    CablePosM               := AcqData.Encoders.M2.CablePosM,
-    CfgCableLimitDescentM   := -20.0,
-    TopLimitM               := 7.5,
-    MeasuredSpeedMps        := AcqData.Encoders.M2.Speed_Mps,
-    MeasuredSpeedSignedMps  := AcqData.Encoders.M2.SignedSpeed_Mps,
-    MeasuredSpeedValid      := AcqData.Encoders.M2.SpeedValid
-);
-Data.WinchM2Safety.SafeStop      := instSafetyWinchM2.SafeStop;
-Data.WinchM2Safety.DescendPermit := instSafetyWinchM2.DescendPermit;
-Data.WinchM2Safety.AscentPermit  := instSafetyWinchM2.AscentPermit;
-Data.WinchM2Safety.PowerCutOff   := instSafetyWinchM2.PowerCutOff;
-
-
-// 4. Commande Treuil M1 (arbitrage Joystick + Boutons)
-m1StartStop := (AcqData.JoystickDeadmanArmed AND (AcqData.JoystickDirectionX = 0) AND NOT AcqData.JoystickYNeutral AND (ModesAuth.JoystickWinchSelectArbitrated = 1 OR ModesAuth.JoystickWinchSelectArbitrated = 0))
-               OR BtnWinchM1Up OR BtnWinchM1Down;
-
-IF BtnWinchM1Up THEN
-    m1Direction := 1;
-    m1SpeedTgt  := 50.0;
-ELSIF BtnWinchM1Down THEN
-    m1Direction := -1;
-    m1SpeedTgt  := 50.0;
-ELSIF AcqData.JoystickDeadmanArmed AND NOT AcqData.JoystickYNeutral THEN
-    m1Direction := 1; // Commande de montée treuil M1
-    m1SpeedTgt  := 60.0;
-
+CmdBucketCloseArbitrated := FALSE;
+IF ReqProgram.ReqBucket.ReqClose THEN
+    CmdBucketCloseArbitrated := TRUE;
+ELSIF CoupledAscentBucketCloseArmed THEN
+    CmdBucketCloseArbitrated := TRUE;
 ELSE
-    m1Direction := 0;
-    m1SpeedTgt  := 0.0;
+    CmdBucketCloseArbitrated := BucketBtnClose;
 END_IF;
 
-instWinchM1(
-    Enable                  := (ModesAuth.Mode = E_Mode.MAINT_N1 OR ModesAuth.Mode = E_Mode.MAINT_N2 OR ModesAuth.Mode = E_Mode.SEMI_AUTO),
-    Reset                   := BtnReset,
-    PowerContactorEngaged   := PowerContactorEngaged,
-    SafeStop                := Data.WinchM1Safety.SafeStop,
-    StartStop               := m1StartStop,
-    Direction               := m1Direction,
-    SpeedTgt_Pct            := m1SpeedTgt,
-    Mode                    := ModesAuth.Mode,
-    DescendPermit           := Data.WinchM1Safety.DescendPermit,
-    AscentPermit            := Data.WinchM1Safety.AscentPermit,
-    CablePosM               := AcqData.Encoders.M1.CablePosM,
-    Homed                   := TRUE,
-    MaxStepAscent           := 5,
-    CfgMaxStepDescente      := 3,
-    SpeedStepTable          := stepTable,
-    FwdRevSpeedFeedbackOff  := M1_ContactorsReleased
+KoboldContactorCmdArbitrated := ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
+{endregion}
+
+{region &quot;§2 Commande benne&quot;}
+// === 🏗️ §2 COMMANDE DU BENNE (FB_Bucket) (miroir PRG_04 §2) ===
+
+instBucket(
+    Enable              := NOT ModesAuth.InhibitM2,
+    Reset               := FaultMachineResetIHM,
+    PowerContactorEngaged     := PowerContactorEngaged,
+    Mode                := ModesAuth.Mode,
+    CmdOpen_IHM         := BucketBtnOpen OR CoupledDiveBucketOpenArmed
+                           OR ReqProgram.ReqBucket.ReqOpen,
+    CmdClose_IHM        := CmdBucketCloseArbitrated,
+    MotionRequestActive := CoupledUserRequestActive,
+    MotionDirection     := CoupledUserRequestDirection,
+    CablePosM1          := AcqData.Encoders.M1.CablePosM,
+    CablePosM2          := AcqData.Encoders.M2.CablePosM,
+    HomedM1             := AcqData.EncoderM1.Homed,
+    HomedM2             := AcqData.EncoderM2.Homed,
+    M1_Busy             := (instWinchM1.StepNumber &gt; 0),
+    M2_Busy             := (instWinchM2.StepNumber &gt; 0),
+    ConfirmOpenPosition := BucketConfirmOpenPos,
+    ConfirmClosePosition:= BucketConfirmClosePos,
+    Config              := BucketPersistConfig,
+    CfgTimeoutDuration     := BucketCfgTimeoutDuration,
+    BucketState        := BucketMech,
+    InhibitM1           := ModesAuth.InhibitM1,
+    InhibitM2           := ModesAuth.InhibitM2,
+    BypassGlobal        := BypassM2.Global
 );
 
+CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
+BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDirection = 1) AND NOT instBucket.Lifecycle.Busy AND NOT BucketMech.IsClosed;
 
+SlackCableAscentStep1 := NOT ModesAuth.SyncEnable AND (
+    ((instSafetyWinchM1.Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
+    ((instSafetyWinchM2.Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
+    (NOT M2_TensionedCable)
+);
 
+SyncMinorDeviation := (instWinchSync.Fault.ErrorId AND 16#0001) &lt;&gt; 16#0000;
+SyncMinorDeviationBlocksUp   := SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &gt; 0.0);
+SyncMinorDeviationBlocksDown := SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &lt; 0.0);
 
+IF CfgWinchMaxStepAscent &lt;= 0 THEN
+    EffectiveMaxStepAscent := CST_FALLBACK_ASCENT_STEP;
+ELSE
+    EffectiveMaxStepAscent := CfgWinchMaxStepAscent;
+END_IF;
 
-// Remplissage bus de sortie Data
-Data.WinchM1FinalInterlockRequest.RequestedRelayFwd          := instWinchM1.RelayFwd;
-Data.WinchM1FinalInterlockRequest.RequestedRelayRev          := instWinchM1.RelayRev;
-Data.WinchM1FinalInterlockRequest.RequestedContactor1        := instWinchM1.Contactor1;
-Data.WinchM1FinalInterlockRequest.RequestedContactor2        := instWinchM1.Contactor2;
-Data.WinchM1FinalInterlockRequest.RequestedContactor3        := instWinchM1.Contactor3;
-Data.WinchM1FinalInterlockRequest.RequestedContactor4        := instWinchM1.Contactor4;
-Data.WinchM1FinalInterlockRequest.RequestedStep              := instWinchM1.StepNumber;
-Data.WinchM1FinalInterlockRequest.PowerCutOff               := Data.WinchM1Safety.PowerCutOff;
-Data.WinchM1FinalInterlockRequest.SafeStop                  := Data.WinchM1Safety.SafeStop;
+IF CfgWinchMaxStepDescente &lt;= 0 THEN
+    EffectiveMaxStepDescente := CST_FALLBACK_DESCENT_STEP;
+ELSE
+    EffectiveMaxStepDescente := CfgWinchMaxStepDescente;
+END_IF;
+{endregion}
 
-Data.M1LogicRequestSpeedCmd_Pct                             := m1SpeedTgt;
-Data.WinchM1State.StepNumber                                := instWinchM1.StepNumber;
-Data.WinchM1State.RelayFwd                                  := instWinchM1.RelayFwd;
-Data.WinchM1State.RelayRev                                  := instWinchM1.RelayRev;
+{region &quot;§3 Arbitrage consignes M1/M2&quot;}
+// === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 (miroir PRG_04 §3) ===
+
+IF ModesAuth.Mode = E_Mode.SEMI_AUTO THEN
+    M1LogicRequestDirection := ReqProgram.ReqWinchM1.ReqDirection;
+    M1LogicRequestStartStop := ReqProgram.ReqWinchM1.ReqStartStop;
+    M1LogicRequestSpeedCmd_Pct  := ReqProgram.ReqWinchM1.SpeedTgtPct;
+ELSE
+    IF NOT TglJoystickMaster THEN
+        IF BtnWinchBothUp OR BtnWinchM1Up THEN
+            M1LogicRequestDirection := 1;
+            M1LogicRequestSpeedCmd_Pct  := 100.0;
+        ELSIF BtnWinchBothDown OR BtnWinchM1Down THEN
+            M1LogicRequestDirection := -1;
+            M1LogicRequestSpeedCmd_Pct  := 100.0;
+        ELSE
+            M1LogicRequestDirection := 0;
+            M1LogicRequestSpeedCmd_Pct  := 0.0;
+        END_IF;
+    ELSE
+        IF (ModesAuth.JoystickWinchSelectArbitrated = 0 OR ModesAuth.JoystickWinchSelectArbitrated = 1) THEN
+            M1LogicRequestDirection := AcqData.Joystick.AxisY.Direction;
+            M1LogicRequestSpeedCmd_Pct  := ABS(AcqData.Joystick.AxisY.SpeedTgt);
+        ELSE
+            M1LogicRequestDirection := 0;
+            M1LogicRequestSpeedCmd_Pct  := 0.0;
+        END_IF;
+    END_IF;
+
+    M1LogicRequestStartStop := (M1LogicRequestDirection &lt;&gt; 0) AND NOT instBucket.Lifecycle.Busy
+                            AND NOT CoupledMotionBlockedByBucket
+                            AND NOT ((SyncMinorDeviationBlocksUp   AND (M1LogicRequestDirection = 1))
+                                 OR  (SyncMinorDeviationBlocksDown AND (M1LogicRequestDirection = -1)))
+                            AND (NOT TglJoystickMaster OR AcqData.JoystickDeadmanArmed);
+END_IF;
+
+IF instBucket.Lifecycle.Busy AND instBucket.M2_StartStop THEN
+    M2LogicRequestStartStop := instBucket.M2_StartStop;
+    M2LogicRequestDirection := instBucket.M2_Direction;
+    M2LogicRequestSpeedCmd_Pct  := 15.0;
+ELSE
+    IF ModesAuth.Mode = E_Mode.SEMI_AUTO THEN
+        M2LogicRequestDirection := ReqProgram.ReqWinchM2.ReqDirection;
+        M2LogicRequestStartStop := ReqProgram.ReqWinchM2.ReqStartStop;
+        M2LogicRequestSpeedCmd_Pct  := ReqProgram.ReqWinchM2.SpeedTgtPct;
+    ELSE
+        IF NOT TglJoystickMaster THEN
+            IF BtnWinchBothUp OR BtnWinchM2Up THEN
+                M2LogicRequestDirection := 1;
+                M2LogicRequestSpeedCmd_Pct  := 100.0;
+            ELSIF BtnWinchBothDown OR BtnWinchM2Down THEN
+                M2LogicRequestDirection := -1;
+                M2LogicRequestSpeedCmd_Pct  := 100.0;
+            ELSE
+                M2LogicRequestDirection := 0;
+                M2LogicRequestSpeedCmd_Pct  := 0.0;
+            END_IF;
+        ELSE
+            IF (ModesAuth.JoystickWinchSelectArbitrated = 0 OR ModesAuth.JoystickWinchSelectArbitrated = 2) THEN
+                M2LogicRequestDirection := AcqData.Joystick.AxisY.Direction;
+                M2LogicRequestSpeedCmd_Pct  := ABS(AcqData.Joystick.AxisY.SpeedTgt);
+            ELSE
+                M2LogicRequestDirection := 0;
+                M2LogicRequestSpeedCmd_Pct  := 0.0;
+            END_IF;
+        END_IF;
+
+        M2LogicRequestStartStop := (M2LogicRequestDirection &lt;&gt; 0)
+                                AND NOT CoupledMotionBlockedByBucket
+                                AND NOT ((SyncMinorDeviationBlocksUp   AND (M2LogicRequestDirection = -1))
+                                     OR  (SyncMinorDeviationBlocksDown AND (M2LogicRequestDirection = 1)))
+                                AND (NOT TglJoystickMaster OR AcqData.JoystickDeadmanArmed);
+    END_IF;
+END_IF;
+
+BenneBusyFallEdge(CLK := instBucket.Lifecycle.Busy);
+IF BenneBusyFallEdge.Q AND NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection &lt;&gt; 0)) THEN
+    M1LogicRequestStartStop := FALSE;
+    M2LogicRequestStartStop := FALSE;
+END_IF;
+
+BucketBusyRiseEdge(CLK := instBucket.Lifecycle.Busy);
+IF BucketBusyRiseEdge.Q THEN
+    ControlAscentArmedForThisClose := CoupledAscentBucketCloseArmed;
+END_IF;
+IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
+    ControlAscentActive := TRUE;
+    ControlAscentStartM1PosM := AcqData.Encoders.M1.CablePosM;
+    ControlAscentStartM2PosM := AcqData.Encoders.M2.CablePosM;
+END_IF;
+IF ControlAscentActive THEN
+    IF (ABS(AcqData.Encoders.M1.CablePosM - ControlAscentStartM1PosM) &gt;= ExtractionControlDistanceM)
+       AND (ABS(AcqData.Encoders.M2.CablePosM - ControlAscentStartM2PosM) &gt;= ExtractionControlDistanceM) THEN
+        ControlAscentActive := FALSE;
+    ELSIF NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)) THEN
+        ControlAscentActive := FALSE;
+    END_IF;
+END_IF;
+{endregion}
+
+{region &quot;§3bis ArmingPermit (Option B)&quot;}
+// === 🛡️ §3bis ARMINGPERMIT (miroir PRG_04 §3bis) ===
+ArmingPermit := NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
+{endregion}
+
+{region &quot;§4 Synchronisation M1/M2&quot;}
+// === 🔄 §4 SYNCHRONISATION M1 / M2 (miroir PRG_04 §4) ===
+
+instWinchSync(
+    Enable          := ModesAuth.SyncEnable AND NOT instBucket.Lifecycle.Busy
+                        AND NOT ModesAuth.InhibitM1 AND NOT ModesAuth.InhibitM2,
+    Reset           := FaultMachineResetIHM,
+    Mode            := ModesAuth.Mode,
+    CablePosM1      := AcqData.Encoders.M1.CablePosM,
+    CablePosM2      := AcqData.Encoders.M2.CablePosM,
+    HomedAndReliableM1 := AcqData.M1_HomedAndReliable,
+    HomedAndReliableM2 := AcqData.M2_HomedAndReliable,
+    SyncEnable      := ModesAuth.SyncEnable,
+    CfgSyncToleranceM  := CfgSyncToleranceM,
+    CfgSyncCriticalToleranceM := CfgSyncCriticalToleranceM,
+    ActiveOffsetM   := instBucket.ActiveOffsetM,
+    RelayFwdM1      := instWinchM1.RelayFwd,
+    RelayFwdM2      := instWinchM2.RelayFwd,
+    RelayRevM1      := instWinchM1.RelayRev,
+    RelayRevM2      := instWinchM2.RelayRev,
+    Contactor1_M1   := instWinchM1.Contactor1,
+    Contactor1_M2   := instWinchM2.Contactor1,
+    Contactor2_M1   := instWinchM1.Contactor2,
+    Contactor2_M2   := instWinchM2.Contactor2,
+    Contactor3_M1   := instWinchM1.Contactor3,
+    Contactor3_M2   := instWinchM2.Contactor3,
+    Contactor4_M1   := instWinchM1.Contactor4,
+    Contactor4_M2   := instWinchM2.Contactor4,
+    BypassGlobal    := BypassSync.Global
+);
+
+IF instBucket.M2_ForceSlowSpeed THEN
+    M2_SpeedStepTableActive.P1R1 := SpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P1R2 := SpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P1R3 := SpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P1R4 := SpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P2R1 := SpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P2R2 := SpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P2R3 := SpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P2R4 := SpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P3R1 := SpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P3R2 := SpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P3R3 := SpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P3R4 := SpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P4R1 := SpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P4R2 := SpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P4R3 := SpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P4R4 := SpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P5R1 := SpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P5R2 := SpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P5R3 := SpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P5R4 := SpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.StepThreshold_Pct := SpeedStepTable.StepThreshold_Pct;
+ELSE
+    M2_SpeedStepTableActive := SpeedStepTable;
+END_IF;
+{endregion}
+
+{region &quot;§5 Couplage croise et securites&quot;}
+// === 🛑 §5 COUPLAGE CROISÉ &amp; SÉCURITÉS (miroir PRG_04 §5, taxonomie D-P1..D-P11) ===
+
+IF LimitLegalEnabled THEN
+    BottomLimitM1_Active := MAX(CfgCableLimitDescentM1, LimitLegalDepthMinAllowedM);
+    BottomLimitM2_Active := MAX(CfgCableLimitDescentM2, LimitLegalDepthMinAllowedM);
+ELSE
+    BottomLimitM1_Active := CfgCableLimitDescentM1;
+    BottomLimitM2_Active := CfgCableLimitDescentM2;
+END_IF;
+
+SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR AcqData.InputModuleFault;
+SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR AcqData.InputModuleFault;
+
+KoboldAutoStopRiseEdge(CLK := KoboldBottomTouchDI);
+KoboldAutoStopFallEdge(CLK := KoboldBottomTouchDI);
+
+IF AcqData.Joystick.AtNeutralXY OR NOT TglEnableKoboldAutoStopDescent THEN
+    KoboldImmersionConfirmedInt := FALSE;
+    KoboldBottomTouchLatchedInt := FALSE;
+END_IF;
+
+IF TglEnableKoboldAutoStopDescent
+   AND CoupledUserRequestActive
+   AND (CoupledUserRequestDirection = -1)
+   AND BucketMech.IsOpen
+   AND KoboldAutoStopRiseEdge.Q THEN
+    IF (AcqData.Encoders.M1.CablePosM &lt;= ImmersionUpperM)
+       AND (AcqData.Encoders.M1.CablePosM &gt;= ImmersionLowerM)
+       AND (AcqData.Encoders.M2.CablePosM &lt;= ImmersionUpperM)
+       AND (AcqData.Encoders.M2.CablePosM &gt;= ImmersionLowerM) THEN
+        KoboldImmersionConfirmedInt := TRUE;
+    END_IF;
+END_IF;
+
+IF KoboldAutoStopFallEdge.Q AND KoboldImmersionConfirmedInt THEN
+    KoboldBottomTouchLatchedInt := TRUE;
+    KoboldImmersionConfirmedInt := FALSE;
+END_IF;
+
+DescendPermitDiveBucketOpen := ReqProgram.ReqBucket.DescendPermitDiveBucketOpen;
+
+ManualBucketLimitsActive := TglManualBucketLimits
+    AND (ModesAuth.JoystickWinchSelectArbitrated = 2);
+
+ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatchedInt OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
+ProcessPermitM2_Descend := NOT (KoboldBottomTouchLatchedInt OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
+    AND NOT (ManualBucketLimitsActive AND (AcqData.Encoders.M2.CablePosM &lt;= (AcqData.Encoders.M1.CablePosM + BucketPersistConfig.OffsetOpenM + BucketPersistConfig.OpenAnticipationM)));
+
+M2_LimitShift := SEL(BucketMech.IsClosed OR instBucket.CloseReq OR (ModesAuth.JoystickWinchSelectArbitrated = 2),
+                      0.0,
+                      (AcqData.Encoders.M1.CablePosM + BucketPersistConfig.OffsetCloseM + 0.5)
+                      - CfgCableLimitAscentM);
+
+instSafetyWinchM1(
+    Enable                 := (ModesAuth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT ModesAuth.InhibitM1,
+    Reset                  := FaultMachineResetIHM,
+    PowerContactorEngaged  := PowerContactorEngaged,
+    Mode                   := ModesAuth.Mode,
+    SyncEnable             := ModesAuth.SyncEnable,
+    JoystickOnline         := AcqData.Network.Joystick.Online,
+    JoystickOperational    := AcqData.Network.Joystick.Operational,
+    HeartbeatIhmOk         := HeartbeatIhmOk,
+    EncoderAvailable       := AcqData.EncoderM1.Measurement.EncoderAvailable,
+    EncoderFaultBypass     := BypassM1.EncoderFault,
+    ThermalFeedback        := NOT M1_ThermalOk,
+    BrakeThermalFeedback   := NOT BrakeThermalOk,
+    SlackCableDetected     := NOT M2_TensionedCable,
+    PhaseRotationOk        := PhaseRotationOk,
+    TopPositionSensor      := TopPositionFreeDI,
+    InReferencingMode      := AcqData.EncoderM1.Measurement.HomingLifecycle.Busy,
+    CablePosM              := AcqData.Encoders.M1.CablePosM,
+    CfgCableLimitDescentM  := CfgCableLimitDescentM1,
+    LimitLegalReached      := LimitLegalReached,
+    Direction              := M1LogicRequestDirection,
+    MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
+    Homed                  := AcqData.EncoderM1.Homed,
+    HomingSuspect          := AcqData.EncoderM1.HomingSuspect,
+    TopLimitM              := CfgCableLimitAscentM,
+    FwdRevSpeedFeedbackOff := M1_ContactorsReleased,
+    BrakeFeedback          := M1_BrakeFeedbackOpen,
+    JoystickYNeutral       := AcqData.JoystickYNeutral,
+    BenneHoldStillActive   := instBucket.Lifecycle.Busy,
+    ExpectedOtherWinchPosM := AcqData.Encoders.M2.CablePosM - instBucket.ActiveOffsetM,
+    BenneBusy              := instBucket.Lifecycle.Busy,
+    OtherWinchInhibited    := ModesAuth.InhibitM2,
+    MeasuredSpeedMps       := AcqData.Encoders.M1.Speed_Mps,
+    MeasuredSpeedSignedMps := AcqData.Encoders.M1.SignedSpeed_Mps,
+    MeasuredSpeedValid     := AcqData.Encoders.M1.SpeedValid,
+    BypassGlobal           := BypassM1.Global,
+    BypassSafety           := BypassM1.Safety,
+    BypassProcess          := BypassM1.Process,
+    BypassTopLimitSwitch   := BypassM1.TopLimitSwitch OR BypassCommun.TopLimitSwitch,
+    BypassTopLimitSoftware := BypassM1.TopLimitSoftware OR BypassCommun.TopLimitSoftware,
+    BypassCableLimitSwitch := BypassM1.CableLimitSwitch OR BypassCommun.CableLimitSwitch,
+    BypassLimitLegal       := BypassM1.LimitLegal OR BypassCommun.LimitLegal,
+    BypassOperatorComm     := BypassM1.OperatorComm,
+    BypassPhaseRotation    := BypassM1.PhaseRotation,
+    BypassBrakeThermal     := BypassM1.BrakeThermal,
+    BypassMotorThermal     := BypassM1.MotorThermal,
+    BypassMecaA            := BypassM1.MecaA,
+    BypassMecaB            := BypassM1.MecaB,
+    BypassMecaC            := BypassM1.MecaC,
+    BypassMecaD            := BypassM1.MecaD,
+    BypassMecaE            := BypassM1.MecaE
+);
+
+instSafetyWinchM2(
+    Enable                 := (ModesAuth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT ModesAuth.InhibitM2,
+    Reset                  := FaultMachineResetIHM,
+    PowerContactorEngaged  := PowerContactorEngaged,
+    Mode                   := ModesAuth.Mode,
+    SyncEnable             := ModesAuth.SyncEnable,
+    JoystickOnline         := AcqData.Network.Joystick.Online,
+    JoystickOperational    := AcqData.Network.Joystick.Operational,
+    HeartbeatIhmOk         := HeartbeatIhmOk,
+    EncoderAvailable       := AcqData.EncoderM2.Measurement.EncoderAvailable,
+    EncoderFaultBypass     := BypassM2.EncoderFault,
+    ThermalFeedback        := NOT M2_ThermalOk,
+    BrakeThermalFeedback   := NOT BrakeThermalOk,
+    SlackCableDetected     := NOT M2_TensionedCable,
+    PhaseRotationOk        := PhaseRotationOk,
+    TopPositionSensor      := TopPositionFreeDI,
+    InReferencingMode      := AcqData.EncoderM2.Measurement.HomingLifecycle.Busy,
+    CablePosM              := AcqData.Encoders.M2.CablePosM,
+    CfgCableLimitDescentM  := CfgCableLimitDescentM2,
+    LimitLegalReached      := LimitLegalReached,
+    Direction              := M2LogicRequestDirection,
+    MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
+    Homed                  := AcqData.EncoderM2.Homed,
+    HomingSuspect          := AcqData.EncoderM2.HomingSuspect,
+    TopLimitM              := CfgCableLimitAscentM + M2_LimitShift,
+    FwdRevSpeedFeedbackOff := M2_ContactorsReleased,
+    BrakeFeedback          := M2_BrakeFeedbackOpen,
+    JoystickYNeutral       := AcqData.JoystickYNeutral,
+    BenneHoldStillActive   := FALSE,
+    ExpectedOtherWinchPosM := AcqData.Encoders.M1.CablePosM + instBucket.ActiveOffsetM,
+    BenneBusy              := instBucket.Lifecycle.Busy,
+    OtherWinchInhibited    := ModesAuth.InhibitM1,
+    MeasuredSpeedMps       := AcqData.Encoders.M2.Speed_Mps,
+    MeasuredSpeedSignedMps := AcqData.Encoders.M2.SignedSpeed_Mps,
+    MeasuredSpeedValid     := AcqData.Encoders.M2.SpeedValid,
+    BypassGlobal           := BypassM2.Global,
+    BypassSafety           := BypassM2.Safety,
+    BypassProcess          := BypassM2.Process,
+    BypassTopLimitSwitch   := BypassM2.TopLimitSwitch OR BypassCommun.TopLimitSwitch,
+    BypassTopLimitSoftware := BypassM2.TopLimitSoftware OR BypassCommun.TopLimitSoftware,
+    BypassCableLimitSwitch := BypassM2.CableLimitSwitch OR BypassCommun.CableLimitSwitch,
+    BypassLimitLegal       := BypassM2.LimitLegal OR BypassCommun.LimitLegal,
+    BypassOperatorComm     := BypassM2.OperatorComm,
+    BypassPhaseRotation    := BypassM2.PhaseRotation,
+    BypassBrakeThermal     := BypassM2.BrakeThermal,
+    BypassMotorThermal     := BypassM2.MotorThermal,
+    BypassMecaA            := BypassM2.MecaA,
+    BypassMecaB            := BypassM2.MecaB,
+    BypassMecaC            := BypassM2.MecaC,
+    BypassMecaD            := BypassM2.MecaD,
+    BypassMecaE            := BypassM2.MecaE
+);
+
+SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
+SafeStopM2_Raw := SafeStopM2_Raw OR instSafetyWinchM2.SafeStop;
+SafetyPermitM1_Descend := instSafetyWinchM1.DescendPermit;
+SafetyPermitM2_Descend := instSafetyWinchM2.DescendPermit;
+SafetyPermitM1_Ascent  := instSafetyWinchM1.AscentPermit;
+SafetyPermitM2_Ascent  := instSafetyWinchM2.AscentPermit;
+ProcessAndSafetyPermitM1_Descend := ProcessPermitM1_Descend AND SafetyPermitM1_Descend;
+ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_Descend;
+
+IF SeqState.DumpAtTremieDescentLocked THEN
+    ProcessAndSafetyPermitM1_Descend := FALSE;
+    ProcessAndSafetyPermitM2_Descend := FALSE;
+END_IF;
+ProcessAndSafetyPermitM1_Ascent := SafetyPermitM1_Ascent;
+ProcessAndSafetyPermitM2_Ascent := SafetyPermitM2_Ascent
+    AND NOT (ManualBucketLimitsActive AND (AcqData.Encoders.M2.CablePosM &gt;= (AcqData.Encoders.M1.CablePosM + BucketPersistConfig.OffsetCloseM - BucketPersistConfig.CloseAnticipationM)));
+
+SafeStopM1_Active := SafeStopM1_Raw OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
+SafeStopM2_Active := SafeStopM2_Raw OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
+EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Descend);
+EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Descend);
+EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Ascent);
+EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Ascent);
+{endregion}
+
+{region &quot;§6 Execution treuils M1/M2&quot;}
+// === ⚙️ §6 EXÉCUTION FB_Winch (M1 &amp; M2) (miroir PRG_04 §6 — agrégateur clamp SEL) ===
+
+instWinchM1(
+    Enable                  := (ModesAuth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT ModesAuth.InhibitM1,
+    Reset                   := FaultMachineResetIHM,
+    PowerContactorEngaged   := PowerContactorEngaged,
+    Mode                    := ModesAuth.Mode,
+    StartStop               := M1LogicRequestStartStop,
+    SafeStop                := SafeStopM1_Active,
+    DescendPermit           := EffectivePermitM1_Descend,
+    AscentPermit            := EffectivePermitM1_Ascent,
+    Direction               := M1LogicRequestDirection,
+    SpeedTgt_Pct            := M1LogicRequestSpeedCmd_Pct,
+    SpeedStepTable          := SpeedStepTable,
+    CfgMaxStepDescente      := SEL(instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
+    MaxStepAscent           := SEL(ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
+    MeasuredSpeedBand       := 0,
+    SpeedGuardEnable        := SpeedGuardEnableM1,
+    SpeedGuardReady         := NOT instWinchSync.Fault.Error,
+    HomingApproachActive    := ModesAuth.HomingApproachEnable,
+    FwdRevSpeedFeedbackOff  := M1_ContactorsReleased,
+    BypassContactorCheck    := BypassM1.Global OR BypassM1.ContactorFeedback,
+    Homed                   := AcqData.EncoderM1.Homed,
+    HomingSuspect           := AcqData.EncoderM1.HomingSuspect,
+    CablePosM               := AcqData.Encoders.M1.CablePosM,
+    TopLimitM               := CfgCableLimitAscentM,
+    BottomLimitM            := BottomLimitM1_Active,
+    CfgSlowdownDistanceM    := WinchSlowdownDistanceM,
+    CfgSlowdownMaxStep      := WinchSlowdownMaxStep,
+    BypassGlobal            := BypassM1.Global
+);
+
+instWinchM2(
+    Enable                  := (ModesAuth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT ModesAuth.InhibitM2,
+    Reset                   := FaultMachineResetIHM,
+    PowerContactorEngaged   := PowerContactorEngaged,
+    Mode                    := ModesAuth.Mode,
+    StartStop               := M2LogicRequestStartStop,
+    SafeStop                := SafeStopM2_Active,
+    DescendPermit           := EffectivePermitM2_Descend,
+    AscentPermit            := EffectivePermitM2_Ascent,
+    Direction               := M2LogicRequestDirection,
+    SpeedTgt_Pct            := M2LogicRequestSpeedCmd_Pct,
+    SpeedStepTable          := M2_SpeedStepTableActive,
+    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
+    MaxStepAscent           := SEL(ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
+    MeasuredSpeedBand       := 0,
+    SpeedGuardEnable        := SpeedGuardEnableM2,
+    SpeedGuardReady         := NOT instWinchSync.Fault.Error,
+    HomingApproachActive    := ModesAuth.HomingApproachEnable,
+    FwdRevSpeedFeedbackOff  := M2_ContactorsReleased,
+    BypassContactorCheck    := BypassM2.Global OR BypassM2.ContactorFeedback,
+    Homed                   := AcqData.EncoderM2.Homed,
+    HomingSuspect           := AcqData.EncoderM2.HomingSuspect,
+    CablePosM               := AcqData.Encoders.M2.CablePosM,
+    TopLimitM               := CfgCableLimitAscentM + M2_LimitShift,
+    BottomLimitM            := BottomLimitM2_Active,
+    CfgSlowdownDistanceM    := WinchSlowdownDistanceM,
+    CfgSlowdownMaxStep      := WinchSlowdownMaxStep,
+    BypassGlobal            := BypassM2.Global
+);
+{endregion}
+
+{region &quot;§7 Publication demandes brutes&quot;}
+// === 📤 §7 PUBLICATION DEMANDES BRUTES (miroir PRG_04 §7) ===
+
+WinchM1FinalInterlockRequest.Enable := TRUE;
+WinchM1FinalInterlockRequest.Reset := FaultMachineResetIHM;
+WinchM1FinalInterlockRequest.PowerContactorEngaged := PowerContactorEngaged;
+WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
+WinchM1FinalInterlockRequest.BrakeFeedback := M1_BrakeFeedbackOpen;
+WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := M1_ContactorsReleased;
+WinchM1FinalInterlockRequest.RequestedRelayFwd := instWinchM1.RelayFwd;
+WinchM1FinalInterlockRequest.RequestedRelayRev := instWinchM1.RelayRev;
+WinchM1FinalInterlockRequest.RequestedContactor1 := instWinchM1.Contactor1;
+WinchM1FinalInterlockRequest.RequestedContactor2 := instWinchM1.Contactor2;
+WinchM1FinalInterlockRequest.RequestedContactor3 := instWinchM1.Contactor3;
+WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
+WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
+WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff;
+
+WinchM2FinalInterlockRequest.Enable := TRUE;
+WinchM2FinalInterlockRequest.Reset := FaultMachineResetIHM;
+WinchM2FinalInterlockRequest.PowerContactorEngaged := PowerContactorEngaged;
+WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;
+WinchM2FinalInterlockRequest.BrakeFeedback := M2_BrakeFeedbackOpen;
+WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff := M2_ContactorsReleased;
+WinchM2FinalInterlockRequest.RequestedRelayFwd := instWinchM2.RelayFwd;
+WinchM2FinalInterlockRequest.RequestedRelayRev := instWinchM2.RelayRev;
+WinchM2FinalInterlockRequest.RequestedContactor1 := instWinchM2.Contactor1;
+WinchM2FinalInterlockRequest.RequestedContactor2 := instWinchM2.Contactor2;
+WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
+WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
+WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
+WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
+{endregion}
+
+{region &quot;§8 Publication etats IHM&quot;}
+// === 📤 §8 PUBLICATION ÉTATS IHM (miroir PRG_04 §8) ===
+WinchM1State.MeasuredSpeed_Mps := AcqData.Encoders.M1.Speed_Mps;
+WinchM1State.SpeedDelta_Mps    := AcqData.Encoders.M1.Speed_Mps - M1_PrevSpeed_Mps;
+M1_PrevSpeed_Mps := AcqData.Encoders.M1.Speed_Mps;
+
+WinchM1State.Position_M := AcqData.Encoders.M1.CablePosM;
+WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
+WinchM1State.StepNumber := instWinchM1.StepNumber;
+WinchM1State.FBState := E_State.READY;
+WinchM1State.Ready := instWinchM1.Ready;
+WinchM1State.Busy := (instWinchM1.StepNumber &gt; 0);
+WinchM1State.Done := FALSE;
+WinchM1State.Error := instWinchM1.Fault.Error;
+WinchM1State.ErrorId := instWinchM1.Fault.ErrorId;
+WinchM1State.RelayFwd := instWinchM1.RelayFwd;
+WinchM1State.RelayRev := instWinchM1.RelayRev;
+WinchM1State.Contactor1 := instWinchM1.Contactor1;
+WinchM1State.Contactor2 := instWinchM1.Contactor2;
+WinchM1State.Contactor3 := instWinchM1.Contactor3;
+WinchM1State.Contactor4 := instWinchM1.Contactor4;
+WinchM1State.BrakeCmd := FinalDiagM1BrakeCmd;
+WinchM1State.BrakeCommandOpenConfirmed := M1_BrakeFeedbackOpen;
+WinchM1State.FinalAuthorizedStep := instWinchM1.RequestedStep;
+WinchM1State.ContactorsCheck := instWinchM1.ContactorsCheck;
+WinchM1State.FinalInterlockState := FinalDiagM1State;
+WinchM1State.FinalInterlockReason := FinalDiagM1Reason;
+WinchM1State.FinalInterlockError := FinalDiagM1Error;
+WinchM1State.FinalInterlockErrorId := FinalDiagM1ErrorId;
+WinchM1State.FinalRestartInhibit := FinalDiagM1RestartInhibit;
+WinchM1State.FinalBrakeTimeoutElapsed := FinalDiagM1BrakeTimeoutElapsed;
+WinchM1State.FinalRestartDelayElapsed := FinalDiagM1RestartDelayElapsed;
+WinchM1State.FinalStepDelayElapsed := FinalDiagM1StepDelayElapsed;
+WinchM1State.Encoder.RawPos := AcqData.EncoderM1.Measurement.RawPos;
+WinchM1State.Encoder.Alarms := AcqHw.Winch.COD1_Alarms;
+WinchM1State.Encoder.Warnings := AcqHw.Winch.COD1_Warnings;
+WinchM1State.Encoder.SlaveOperational := AcqData.Network.EncoderM1.Operational;
+WinchM1State.Encoder.PresetTriggerCmd := AcqData.EncoderM1.HwOut.PresetTriggerCmd;
+WinchM1State.Encoder.PresetValueOut := AcqData.EncoderM1.HwOut.PresetValueOut;
+WinchM1State.Encoder.Error := AcqData.EncoderM1.Measurement.AbsFault.Error;
+WinchM1State.Encoder.ErrorId := AcqData.EncoderM1.Measurement.AbsFault.ErrorId;
+WinchM1State.Encoder.Homed := AcqData.EncoderM1.Homed;
+WinchM1State.Encoder.HomingBusy := AcqData.EncoderM1.Measurement.HomingLifecycle.Busy;
+WinchM1State.Encoder.HomingDone := AcqData.EncoderM1.Measurement.HomingLifecycle.Done;
+WinchM1State.Encoder.HomingError := AcqData.EncoderM1.Measurement.HomingFault.Error;
+WinchM1State.Encoder.HomingErrorId := AcqData.EncoderM1.Measurement.HomingFault.ErrorId;
+WinchM1State.Encoder.HomingState := E_State.READY;
+WinchM1State.Encoder.HomingStateAtError := E_State.DISABLED;
+WinchM1State.Encoder.HomingSuspect := AcqData.EncoderM1.HomingSuspect;
+WinchM1State.Encoder.HomingRefRaw := AcqData.EncoderM1.Measurement.HomingRefRaw;
+WinchM1State.InhibitActive := ModesAuth.InhibitM1;
+WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
+WinchM1State.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
+WinchM1State.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
+WinchM1State.CommandedDirection := instWinchM1.CommandedDirection;
+WinchM1State.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElapsed;
+WinchM1State.DirectionChangePending := instWinchM1.DirectionChangePending;
+
+WinchM2State.MeasuredSpeed_Mps := AcqData.Encoders.M2.Speed_Mps;
+WinchM2State.SpeedDelta_Mps    := AcqData.Encoders.M2.Speed_Mps - M2_PrevSpeed_Mps;
+M2_PrevSpeed_Mps := AcqData.Encoders.M2.Speed_Mps;
+
+WinchM2State.Position_M := AcqData.Encoders.M2.CablePosM;
+WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
+WinchM2State.StepNumber := instWinchM2.StepNumber;
+WinchM2State.FBState := E_State.READY;
+WinchM2State.Ready := instWinchM2.Ready;
+WinchM2State.Busy := (instWinchM2.StepNumber &gt; 0);
+WinchM2State.Done := FALSE;
+WinchM2State.Error := instWinchM2.Fault.Error;
+WinchM2State.ErrorId := instWinchM2.Fault.ErrorId;
+WinchM2State.RelayFwd := instWinchM2.RelayFwd;
+WinchM2State.RelayRev := instWinchM2.RelayRev;
+WinchM2State.Contactor1 := instWinchM2.Contactor1;
+WinchM2State.Contactor2 := instWinchM2.Contactor2;
+WinchM2State.Contactor3 := instWinchM2.Contactor3;
+WinchM2State.Contactor4 := instWinchM2.Contactor4;
+WinchM2State.BrakeCmd := FinalDiagM2BrakeCmd;
+WinchM2State.BrakeCommandOpenConfirmed := M2_BrakeFeedbackOpen;
+WinchM2State.FinalAuthorizedStep := instWinchM2.RequestedStep;
+WinchM2State.ContactorsCheck := instWinchM2.ContactorsCheck;
+WinchM2State.FinalInterlockState := FinalDiagM2State;
+WinchM2State.FinalInterlockReason := FinalDiagM2Reason;
+WinchM2State.FinalInterlockError := FinalDiagM2Error;
+WinchM2State.FinalInterlockErrorId := FinalDiagM2ErrorId;
+WinchM2State.FinalRestartInhibit := FinalDiagM2RestartInhibit;
+WinchM2State.FinalBrakeTimeoutElapsed := FinalDiagM2BrakeTimeoutElapsed;
+WinchM2State.FinalRestartDelayElapsed := FinalDiagM2RestartDelayElapsed;
+WinchM2State.FinalStepDelayElapsed := FinalDiagM2StepDelayElapsed;
+WinchM2State.Encoder.RawPos := AcqData.EncoderM2.Measurement.RawPos;
+WinchM2State.Encoder.Alarms := AcqHw.Winch.COD2_Alarms;
+WinchM2State.Encoder.Warnings := AcqHw.Winch.COD2_Warnings;
+WinchM2State.Encoder.SlaveOperational := AcqData.Network.EncoderM2.Operational;
+WinchM2State.Encoder.PresetTriggerCmd := AcqData.EncoderM2.HwOut.PresetTriggerCmd;
+WinchM2State.Encoder.PresetValueOut := AcqData.EncoderM2.HwOut.PresetValueOut;
+WinchM2State.Encoder.Error := AcqData.EncoderM2.Measurement.AbsFault.Error;
+WinchM2State.Encoder.ErrorId := AcqData.EncoderM2.Measurement.AbsFault.ErrorId;
+WinchM2State.Encoder.Homed := AcqData.EncoderM2.Homed;
+WinchM2State.Encoder.HomingBusy := AcqData.EncoderM2.Measurement.HomingLifecycle.Busy;
+WinchM2State.Encoder.HomingDone := AcqData.EncoderM2.Measurement.HomingLifecycle.Done;
+WinchM2State.Encoder.HomingError := AcqData.EncoderM2.Measurement.HomingFault.Error;
+WinchM2State.Encoder.HomingErrorId := AcqData.EncoderM2.Measurement.HomingFault.ErrorId;
+WinchM2State.Encoder.HomingState := E_State.READY;
+WinchM2State.Encoder.HomingStateAtError := E_State.DISABLED;
+WinchM2State.Encoder.HomingSuspect := AcqData.EncoderM2.HomingSuspect;
+WinchM2State.Encoder.HomingRefRaw := AcqData.EncoderM2.Measurement.HomingRefRaw;
+WinchM2State.InhibitActive := ModesAuth.InhibitM2;
+WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
+WinchM2State.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
+WinchM2State.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
+WinchM2State.CommandedDirection := instWinchM2.CommandedDirection;
+WinchM2State.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElapsed;
+WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
+
+CableLimitAscentM1Reached := AcqData.EncoderM1.Homed
+    AND NOT AcqData.EncoderM1.HomingSuspect
+    AND NOT AcqData.EncoderM1.Measurement.HomingLifecycle.Busy
+    AND (AcqData.Encoders.M1.CablePosM &gt;= CfgCableLimitAscentM);
+CableLimitAscentM2Reached := AcqData.EncoderM2.Homed
+    AND NOT AcqData.EncoderM2.HomingSuspect
+    AND NOT AcqData.EncoderM2.Measurement.HomingLifecycle.Busy
+    AND (AcqData.Encoders.M2.CablePosM &gt;= (CfgCableLimitAscentM + M2_LimitShift));
+
+WinchM1Safety.CableLimitAscent := CableLimitAscentM1Reached;
+WinchM1Safety.CableLimitDescent := (AcqData.Encoders.M1.CablePosM &lt;= CfgCableLimitDescentM1);
+WinchM1Safety.SafeStop := SafeStopM1_Active;
+WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent;
+WinchM1Safety.DescendPermit := EffectivePermitM1_Descend;
+WinchM1Safety.ThermalFault := NOT M1_ThermalOk;
+WinchM1Safety.PowerCutOff := instSafetyWinchM1.PowerCutOff;
+WinchM1Safety.Error := instWinchM1.Fault.Error OR instSafetyWinchM1.Fault.Error;
+WinchM1Safety.ErrorId := instSafetyWinchM1.Fault.ErrorId;
+WinchM1Safety.ErrorOperatorComm  := (instSafetyWinchM1.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM1Safety.ErrorEncoder       := (instSafetyWinchM1.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
+WinchM1Safety.ErrorPhaseRotation := (instSafetyWinchM1.Fault.ErrorId AND 16#0010) &lt;&gt; 0;
+WinchM1Safety.ErrorBrakeThermal  := (instSafetyWinchM1.Fault.ErrorId AND 16#0400) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaA         := (instSafetyWinchM1.Fault.ErrorId AND 16#0080) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaB         := (instSafetyWinchM1.Fault.ErrorId AND 16#0100) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaC         := (instSafetyWinchM1.Fault.ErrorId AND 16#0200) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaD         := (instSafetyWinchM1.Fault.ErrorId AND 16#0800) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaE         := (instSafetyWinchM1.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
+WinchM1Safety.ErrorOppositeDir   := (instSafetyWinchM1.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
+WinchM1Safety.ErrorNoMovement    := (instSafetyWinchM1.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM1Safety.PowerCutOffSafety  := M1PowerCutOffSafetyInfo;
+WinchM1Safety.SafeStopSafety     := M1SafeStopSafetyInfo;
+WinchM1Safety.BlockedBySafety    := M1BlockedBySafetyInfo;
+
+WinchM2Safety.CableLimitAscent := CableLimitAscentM2Reached;
+WinchM2Safety.CableLimitDescent := (AcqData.Encoders.M2.CablePosM &lt;= CfgCableLimitDescentM2);
+WinchM2Safety.SafeStop := SafeStopM2_Active;
+WinchM2Safety.AscentPermit := EffectivePermitM2_Ascent;
+WinchM2Safety.DescendPermit := EffectivePermitM2_Descend;
+WinchM2Safety.SlackCable := NOT M2_TensionedCable;
+WinchM2Safety.ThermalFault := NOT M2_ThermalOk;
+WinchM2Safety.PowerCutOff := instSafetyWinchM2.PowerCutOff;
+WinchM2Safety.Error := instWinchM2.Fault.Error OR instSafetyWinchM2.Fault.Error;
+WinchM2Safety.ErrorId := instSafetyWinchM2.Fault.ErrorId;
+WinchM2Safety.ErrorOperatorComm  := (instSafetyWinchM2.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM2Safety.ErrorEncoder       := (instSafetyWinchM2.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
+WinchM2Safety.ErrorPhaseRotation := (instSafetyWinchM2.Fault.ErrorId AND 16#0010) &lt;&gt; 0;
+WinchM2Safety.ErrorBrakeThermal  := (instSafetyWinchM2.Fault.ErrorId AND 16#0400) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaA         := (instSafetyWinchM2.Fault.ErrorId AND 16#0080) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaB         := (instSafetyWinchM2.Fault.ErrorId AND 16#0100) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaC         := (instSafetyWinchM2.Fault.ErrorId AND 16#0200) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaD         := (instSafetyWinchM2.Fault.ErrorId AND 16#0800) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaE         := (instSafetyWinchM2.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
+WinchM2Safety.ErrorOppositeDir   := (instSafetyWinchM2.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
+WinchM2Safety.ErrorNoMovement    := (instSafetyWinchM2.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM2Safety.PowerCutOffSafety  := M2PowerCutOffSafetyInfo;
+WinchM2Safety.SafeStopSafety     := M2SafeStopSafetyInfo;
+WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
+
+SyncState.DeltaPos_M := instWinchSync.SignedDeltaPosM;
+SyncState.SyncActive := instWinchSync.SyncActive;
+SyncState.SyncWarn := instWinchSync.SyncWarn;
+SyncState.SyncDeviationWarn := instWinchSync.SyncDeviationWarn;
+SyncState.Ready := instWinchSync.Ready;
+SyncState.Error := instWinchSync.Fault.Error;
+SyncState.ErrorId := instWinchSync.Fault.ErrorId;
+SyncState.FBState := E_State.READY;
+
+BucketState.MechState := BucketMech;
+BucketState.MechState.ActiveOffsetValid := instBucket.ActiveOffsetValid;
+BucketState.FBState := E_State.READY;
+BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
+BucketState.M2StartStop := instBucket.M2_StartStop;
+BucketState.M2Direction := instBucket.M2_Direction;
+BucketState.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
+BucketState.M2PositionCorrected := AcqData.Encoders.M2.CablePosM - instBucket.ActiveOffsetM;
+BucketState.Ready := instBucket.Ready;
+BucketState.Busy := instBucket.Lifecycle.Busy;
+BucketState.Done := instBucket.Lifecycle.Done;
+BucketState.Error := instBucket.Fault.Error;
+BucketState.ErrorId := instBucket.Fault.ErrorId;
+BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
+BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
+BucketState.CloseActive := instBucket.CloseReq;
+BucketState.OpenActive := instBucket.OpenReq;
+BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ControlAscentActive;
+BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
+BucketState.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
+BucketState.ControlAscentActive := ControlAscentActive;
+BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
+KoboldImmersionConfirmed := KoboldImmersionConfirmedInt;
+KoboldBottomTouchLatched := KoboldBottomTouchLatchedInt;
+
+Benne_IsRoughlyClosed := BucketMech.IsClosed
+    OR (BucketMech.IsIntermediate
+        AND (instBucket.DeltaPosition_M &gt;= (BucketPersistConfig.OffsetCloseM - 2.0)));
+
+// === 🔌 PUBLICATION BUS INTER-PRG (miroir PRG_04 fin §8) ===
+Data.WinchM1FinalInterlockRequest := WinchM1FinalInterlockRequest;
+Data.WinchM2FinalInterlockRequest := WinchM2FinalInterlockRequest;
+Data.M1LogicRequestSpeedCmd_Pct   := M1LogicRequestSpeedCmd_Pct;
+Data.M2LogicRequestSpeedCmd_Pct   := M2LogicRequestSpeedCmd_Pct;
+Data.KoboldContactorCmdArbitrated := KoboldContactorCmdArbitrated;
+Data.WinchM1State                 := WinchM1State;
+Data.WinchM2State                 := WinchM2State;
+Data.WinchM1Safety                := WinchM1Safety;
+Data.WinchM2Safety                := WinchM2Safety;
+Data.SyncState                    := SyncState;
+Data.WinchSyncError               := instWinchSync.Fault.Error;
+Data.WinchSyncSignedDeltaPosM     := instWinchSync.SignedDeltaPosM;
+Data.BucketState                  := BucketState;
+Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
+Data.BucketBusy                   := instBucket.Lifecycle.Busy;
+Data.BucketDone                   := instBucket.Lifecycle.Done;
+Data.BucketError                  := instBucket.Fault.Error;
+Data.ArmingPermit                 := ArmingPermit;
 {endregion}
 END_FUNCTION_BLOCK
-
 </pre>
             </details>
             <details>
@@ -12417,12 +13546,29 @@ END_FUNCTION_BLOCK
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_Main_EndToEnd.st</code></summary>
                 <pre>(* =======================================================================
-   🏰 FB_Main_EndToEnd : Mégabloc Machine d&#x27;Intégration Globale
+   🏰 FB_Main_EndToEnd : Mégabloc Machine d&#x27;Intégration Globale (v2 — T181-00)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Instancie et chaîne en boucle fermée les 6 programmes de l&#x27;automate :
              PRG_02 (Acquisition) -&gt; PRG_03 (Modes &amp; Cycle) -&gt; PRG_04 (Treuils/Benne)
              -&gt; PRG_05 (Translation) -&gt; PRG_06 (Outputs) -&gt; PRG_07 (Supervision).
    🔄 Intègre également le rebouclage physique vers PRG_02 (SimBench).
+   🆕 v2 (T181-00) :
+      - Entrées opérateur étendues : boutons IHM M1/M2/Both, commande benne,
+        confirmations benne, contexte plongée Kobold, toggles IHM (AC3).
+      - Bus séquenceur injectables : SeqReqWinchM1/M2, SeqReqBucket, intention
+        couplée, état séquence (producteur réel PRG_03 = raccordement T181-01).
+      - MODÈLE PHYSIQUE MINIMAL paire M1/M2 (AC4) : CablePosM += v_palier(StepNumber,
+        Direction) * dt ; v_palier = ModelStepSpeedMps[palier] (table fournie par la
+        suite de test) ; aucune dynamique moteur ni rampe hydraulique (FB_Winch
+        fournit les temporisations réelles). Le modèle écrit les codeurs (CODx_PosValue),
+        le retour frein (BrakeFeedback := RelayFwd OR RelayRev) et le retour contacteurs
+        (FwdRevSpeedFeedbackOff retardé de ContactorFeedbackTimeout).
+      - Diag exposés : positions/paliers modèle, SyncDeviationM_Model,
+        FinalInterlockGoverned M1/M2 (demande non traversée par la barrière PRG_06).
+      - InjectRateBypassFbWinch : injection de cadence HORS instance FB_Winch
+        (vecteur HARN-51 — autorité de la barrière PRG_06).
+   ⚠️ Doctrine lag 1 scan (tolérée, homogène PRG_04/production) : les feedbacks
+      physiques consommés au cycle N proviennent des sorties du cycle N-1.
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Main_EndToEnd
@@ -12432,21 +13578,95 @@ VAR_INPUT
     JoyRawY                 : INT := 0;
     JoyDeadmanBtn           : BOOL := FALSE;
     BtnResetMachine         : BOOL := FALSE;
-    
+
     // Commandes Modes IHM
     CmdMode                 : E_Mode := E_Mode.MAINT_N1;
     CmdWinchSelect          : INT := 0; // 0=Couplé, 1=M1, 2=M2
-    
+
     // Conditions de Sécurité Châssis / Puissance
     EmergencyChainClosed    : BOOL := TRUE;
     PowerContactorEngaged   : BOOL := TRUE;
-    
-    // Capteurs Machine Réels
-    M1_CablePosM            : REAL := 5.0;
-    M2_CablePosM            : REAL := 5.0;
-    M1_EncoderFault         : BOOL := FALSE;
-    M2_EncoderFault         : BOOL := FALSE;
-    PhaseRotationOk         : BOOL := TRUE;
+
+    // === 🎛️ Boutons IHM Treuils M1/M2 (AC3 — [MIROIR] GVL_IHM via harnais PRG_04) ===
+    BtnWinchM1Up            : BOOL := FALSE;
+    BtnWinchM1Down          : BOOL := FALSE;
+    BtnWinchM2Up            : BOOL := FALSE;
+    BtnWinchM2Down          : BOOL := FALSE;
+    BtnWinchBothUp          : BOOL := FALSE;
+    BtnWinchBothDown        : BOOL := FALSE;
+    TglJoystickMaster       : BOOL := FALSE;
+
+    // === 🪣 Commande Benne (AC3) ===
+    BucketCmdOpen           : BOOL := FALSE;
+    BucketCmdClose          : BOOL := FALSE;
+    BucketConfirmOpenPos    : BOOL := FALSE;
+    BucketConfirmClosePos   : BOOL := FALSE;
+    TglManualBucketLimits   : BOOL := FALSE;
+    BucketSeedOpen          : BOOL := TRUE;   // état benne au boot (miroir NVRAM)
+
+    // === 🌊 Contexte Plongée Kobold (AC3) ===
+    KoboldImmersed          : BOOL := FALSE;  // capteur toucher fond M1_M2_KoboldBottomTouch_DI
+    TglEnableKoboldAutoStopDescent : BOOL := FALSE;
+    ImmersionLowerM         : REAL := 0.0;
+    ImmersionUpperM         : REAL := 0.0;
+    ExtractionControlDistanceM : REAL := 0.0;
+
+    // === 🧪 Bus Séquenceur Injectables (producteur réel = PRG_03, raccordement T181-01) ===
+    SeqReqWinchM1           : ST_ProgramWinchRequest;
+    SeqReqWinchM2           : ST_ProgramWinchRequest;
+    SeqReqBucket            : ST_ProgramBucketRequest;
+    CoupledIntentActive     : BOOL := FALSE;
+    CoupledIntentDirection  : INT := 0;
+    SeqBottomTouchConfirmed : BOOL := FALSE;
+    SeqDumpAtTremieDescentLocked : BOOL := FALSE;
+
+    // === ⚙️ Configuration Treuils/Sync/Benne (0/0.0 = à fournir par la suite de test) ===
+    SpeedTable              : ST_SpeedStepTable;
+    CfgMaxStepAscent        : INT := 0;
+    CfgMaxStepDescente      : INT := 0;
+    CfgAscentLimitM         : REAL := 0.0;    // cote capteur haut / limite logicielle haute
+    CfgDescentLimitM1       : REAL := 0.0;
+    CfgDescentLimitM2       : REAL := 0.0;
+    SlowdownDistanceM       : REAL := 0.0;
+    SlowdownMaxStep         : INT := 0;
+    SyncToleranceM          : REAL := 0.0;
+    SyncCriticalToleranceM  : REAL := 0.0;
+    SyncSoftStopEnable      : BOOL := TRUE;
+    LimitLegalEnabled       : BOOL := FALSE;
+    LimitLegalDepthMinAllowedM : REAL := 0.0;
+    LimitLegalReached       : BOOL := FALSE;
+    BucketOffsetOpenM       : REAL := 0.0;
+    BucketOffsetCloseM      : REAL := 0.0;
+    BucketCoherenceLimitM   : REAL := 0.0;
+    BucketOpenAnticipationM : REAL := 0.0;
+    BucketCloseAnticipationM : REAL := 0.0;
+    BucketCfgTimeoutDuration : TIME := T#60s;
+    TglEnableCoupledBucketSequencing : BOOL := FALSE;
+    HeartbeatIhmOk          : BOOL := TRUE;
+
+    // === 🧩 Bypass maintenance (miroir GVL_IHM.Bypass) ===
+    BypassM1                : ST_BypassWinch;
+    BypassM2                : ST_BypassWinch;
+    BypassCommun            : ST_BypassCommun;
+    BypassSync              : ST_BypassSync;
+
+    // === 🧪 Modèle physique minimal paire (AC4) ===
+    ModelStepSpeedMps       : ARRAY[0..5] OF REAL; // vitesse m/s par palier (table de la suite)
+    ModelSeedPosM1          : REAL := 2.0;         // position de départ M1 (cohérente COD défaut)
+    ModelSeedPosM2          : REAL := 2.0;
+    ContactorFeedbackTimeout : TIME := T#500ms;
+
+    // === 🧪 Injections modèle (doctrine SPEC §2.1 : capteurs pilotés depuis la suite) ===
+    ModelM2SpeedFactor      : REAL := 1.0;   // biaise la vitesse-palier de M2 (SPEC §3.6 HARN-60/61)
+    ModelReloadPositions    : BOOL := FALSE; // front entretenu : re-seed positions depuis ModelSeedPosMx
+    ModelBrakeFeedbackFaultM1 : BOOL := FALSE; // TRUE = retour frein M1 jamais ouvert (HARN-72)
+    ModelBrakeFeedbackFaultM2 : BOOL := FALSE;
+    ModelContactorsReleaseFaultM1 : BOOL := FALSE; // TRUE = contacteurs M1 &quot;retombés&quot; en marche (HARN-80 CAS-001)
+    ModelContactorsReleaseFaultM2 : BOOL := FALSE;
+
+    // === 🧪 Injection cadence hors instance FB_Winch (HARN-51) ===
+    InjectRateBypassFbWinch : BOOL := FALSE;       // force une demande RelayFwd entre PRG_04 et PRG_06
+    InjectRateStep          : INT := 1;            // palier forcé par l&#x27;injection (valeur de test)
 END_VAR
 
 VAR_OUTPUT
@@ -12457,6 +13677,19 @@ VAR_OUTPUT
     BusTranslation          : ST_TranslationInterPrg;
     BusOutputs              : ST_OutputsInterPrg;
     BusBanner               : ST_HmiBanner;
+
+    // === 📊 Diag modèle physique &amp; barrière (AC3/AC4) ===
+    M1_CablePosM_Model      : REAL;
+    M2_CablePosM_Model      : REAL;
+    M1_StepNumber           : INT;
+    M2_StepNumber           : INT;
+    SyncDeviationM_Model    : REAL;
+    FinalInterlockGovernedM1 : BOOL;
+    FinalInterlockGovernedM2 : BOOL;
+
+    // === 📤 Faits publics Kobold (miroir GVL_IHM.Commun) ===
+    KoboldImmersionConfirmed : BOOL;
+    KoboldBottomTouchLatched : BOOL;
 END_VAR
 
 VAR
@@ -12467,7 +13700,130 @@ VAR
     prg05                   : FB_TestHarness_PRG_05;
     prg06                   : FB_TestHarness_PRG_06;
     prg07                   : FB_TestHarness_PRG_07;
+
+    // === Modèle physique paire (internes) ===
+    firstScan               : BOOL := TRUE;
+    m1PosModel              : REAL;
+    m2PosModel              : REAL;
+    v1Model                 : REAL;
+    v2Model                 : REAL;
+    v1New                   : REAL;
+    v2New                   : REAL;
+    iStepM1                 : INT;
+    iStepM2                 : INT;
+    codRawM1                : UDINT;
+    codRawM2                : UDINT;
+    m1ContactorsEngagedLatch : BOOL := FALSE;    // 1ère commande contacteurs M1 mémorisée
+    m2ContactorsEngagedLatch : BOOL := FALSE;
+    m1ContactorsReleasedModel : BOOL := TRUE;    // feedback contacteurs M1 (retardé)
+    m2ContactorsReleasedModel : BOOL := TRUE;
+    m1BrakeFeedbackModel    : BOOL := FALSE;     // retour frein M1 (RelayFwd OR RelayRev)
+    m2BrakeFeedbackModel    : BOOL := FALSE;
+    tonContactorsDroppedM1  : TON;               // retombée contacteurs M1 retardée
+    tonContactorsDroppedM2  : TON;
+    m1AnyRequested          : BOOL;
+    m2AnyRequested          : BOOL;
+
+    // Bus séquenceur assemblés (miroir PRG_03.Data.ReqProgram / .SequenceState)
+    reqProgramLocal         : ST_ProgramRequest;
+    seqStateLocal           : ST_SequencePublicState;
+    bucketPersistLocal      : ST_fbBucket_Config;
 END_VAR
+
+VAR CONSTANT
+    // Fixtures codeur du harnais PRG_02 (valeurs de FIXTURE test, pas des config métier) :
+    // FB_TestHarness_PRG_02 initialise calibMx.HomingRefRaw := 1000000, 8192 pts/révol, 2.0 m/révol.
+    CST_FIXTURE_HOMING_REF_RAW : UDINT := 1000000;
+    CST_FIXTURE_PTS_PER_REV    : REAL := 8192.0;
+    CST_FIXTURE_M_PER_REV      : REAL := 2.0;
+    CST_FIXTURE_CYCLE_S        : REAL := 0.010; // config.yaml cycle_time_ms = 10
+END_VAR
+
+{region &quot;0. Modèle physique : état initial + seeds config (fixtures si non fournis)&quot;}
+IF firstScan THEN
+    m1PosModel := ModelSeedPosM1;
+    m2PosModel := ModelSeedPosM2;
+    m1ContactorsEngagedLatch := FALSE;
+    m2ContactorsEngagedLatch := FALSE;
+    firstScan := FALSE;
+END_IF;
+
+// Seeds &quot;si non fourni&quot; : la suite test_winch_integ.st fournit TOUTES les configs
+// explicitement ; ces valeurs de repli = défauts internes des FB réels (FB_Winch
+// TopLimitM:=8.5 / BottomLimitM:=-20.0 / CfgSlowdownDistanceM:=1.0 / CfgSlowdownMaxStep:=1,
+// FB_WinchSync CfgSyncToleranceM:=0.10 / CfgSyncCriticalToleranceM:=0.50) et table de
+// seuils production (précédent §1 de l&#x27;ancien stub) — elles garantissent que les 2
+// scénarios MAIN_Global existants (qui ne fixent aucune config) restent verts sans
+// toucher au code produit. Aucune de ces valeurs n&#x27;est greppable MaxStep:=5 / TopLimit:=7.5.
+IF SpeedTable.StepThreshold_Pct[1] &lt;= 0.0 THEN
+    SpeedTable.StepThreshold_Pct[1] := 10.0;
+    SpeedTable.StepThreshold_Pct[2] := 30.0;
+    SpeedTable.StepThreshold_Pct[3] := 50.0;
+    SpeedTable.StepThreshold_Pct[4] := 70.0;
+    SpeedTable.StepThreshold_Pct[5] := 90.0;
+END_IF;
+IF SpeedTable.P1R1 = FALSE AND SpeedTable.P2R1 = FALSE AND SpeedTable.P3R1 = FALSE
+   AND SpeedTable.P4R1 = FALSE AND SpeedTable.P5R1 = FALSE THEN
+    SpeedTable.P1R1 := TRUE;
+    SpeedTable.P2R1 := TRUE;
+    SpeedTable.P3R1 := TRUE;
+    SpeedTable.P4R1 := TRUE;
+    SpeedTable.P5R1 := TRUE;
+END_IF;
+IF CfgAscentLimitM &lt;= 0.0 THEN
+    CfgAscentLimitM := 8.5;
+END_IF;
+IF CfgDescentLimitM1 &gt;= 0.0 THEN
+    CfgDescentLimitM1 := -20.0;
+END_IF;
+IF CfgDescentLimitM2 &gt;= 0.0 THEN
+    CfgDescentLimitM2 := -20.0;
+END_IF;
+IF SlowdownDistanceM &lt;= 0.0 THEN
+    SlowdownDistanceM := 1.0;
+END_IF;
+IF SlowdownMaxStep &lt;= 0 THEN
+    SlowdownMaxStep := 1;
+END_IF;
+IF SyncToleranceM &lt;= 0.0 THEN
+    SyncToleranceM := 0.10;
+END_IF;
+IF SyncCriticalToleranceM &lt;= 0.0 THEN
+    SyncCriticalToleranceM := 0.50;
+END_IF;
+IF BucketOffsetCloseM &lt;= BucketOffsetOpenM THEN
+    BucketOffsetOpenM := 0.0;
+    BucketOffsetCloseM := 15.0;
+    BucketCoherenceLimitM := 1.0;
+    BucketOpenAnticipationM := 0.2;
+    BucketCloseAnticipationM := 0.2;
+END_IF;
+IF ImmersionUpperM &lt;= ImmersionLowerM THEN
+    ImmersionLowerM := -4.0;
+    ImmersionUpperM := -1.0;
+END_IF;
+IF ExtractionControlDistanceM &lt;= 0.0 THEN
+    ExtractionControlDistanceM := 0.5;
+END_IF;
+IF InjectRateStep &lt;= 0 THEN
+    InjectRateStep := 1;
+END_IF;
+
+// Câblage codeurs : position modèle -&gt; valeur brute COD (mêmes fixtures que FB_TestHarness_PRG_02)
+codRawM1 := CST_FIXTURE_HOMING_REF_RAW + REAL_TO_UDINT(m1PosModel * (CST_FIXTURE_PTS_PER_REV / CST_FIXTURE_M_PER_REV));
+codRawM2 := CST_FIXTURE_HOMING_REF_RAW + REAL_TO_UDINT(m2PosModel * (CST_FIXTURE_PTS_PER_REV / CST_FIXTURE_M_PER_REV));
+
+// Re-seed positions sur demande de la suite (pulse 1 cycle) — permet à chaque vecteur
+// de repartir d&#x27;une cote connue (ex. HARN-12 zone de ralentissement haute).
+IF ModelReloadPositions THEN
+    m1PosModel := ModelSeedPosM1;
+    m2PosModel := ModelSeedPosM2;
+    m1ContactorsEngagedLatch := FALSE;
+    m2ContactorsEngagedLatch := FALSE;
+    v1Model := 0.0;
+    v2Model := 0.0;
+END_IF;
+{endregion}
 
 {region &quot;Exécution séquentielle cyclique du Mégabloc Machine&quot;}
 
@@ -12476,11 +13832,40 @@ prg02(
     JoyRawX                 := JoyRawX,
     JoyRawY                 := JoyRawY,
     JoyBtnRaw               := JoyDeadmanBtn,
+    COD1_PosValue           := codRawM1,
+    COD2_PosValue           := codRawM2,
+    M1_ContactorsReleased   := m1ContactorsReleasedModel,
+    M2_ContactorsReleased   := m2ContactorsReleasedModel,
+    M1_BrakeCmd             := m1BrakeFeedbackModel,
+    M2_BrakeCmd             := m2BrakeFeedbackModel,
     PowerContactorEngaged   := PowerContactorEngaged,
     EmergencyChainClosed    := EmergencyChainClosed
 );
 BusAcq := prg02.Data;
 
+// ── 1bis. Modèle physique = source de vérité des capteurs treuils (override déterministe) ──
+// Le harnais PRG_02 dérive les positions des valeurs brutes COD ; le modèle les écrase avec
+// ses valeurs intégrées exactes et qualifie codeurs homés/opérationnels + vitesse signée.
+BusAcq.Encoders.M1.CablePosM    := m1PosModel;
+BusAcq.Encoders.M1.Speed_Mps    := ABS(v1Model);
+BusAcq.Encoders.M1.SignedSpeed_Mps := v1Model;
+BusAcq.Encoders.M1.SpeedValid   := TRUE;
+BusAcq.Encoders.M2.CablePosM    := m2PosModel;
+BusAcq.Encoders.M2.Speed_Mps    := ABS(v2Model);
+BusAcq.Encoders.M2.SignedSpeed_Mps := v2Model;
+BusAcq.Encoders.M2.SpeedValid   := TRUE;
+BusAcq.EncoderM1.Homed          := TRUE;
+BusAcq.EncoderM1.HomingSuspect  := FALSE;
+BusAcq.EncoderM1.Measurement.EncoderAvailable := TRUE;
+BusAcq.EncoderM1.Measurement.HomingLifecycle.Busy := FALSE;
+BusAcq.M1_HomedAndReliable      := TRUE;
+BusAcq.EncoderM2.Homed          := TRUE;
+BusAcq.EncoderM2.HomingSuspect  := FALSE;
+BusAcq.EncoderM2.Measurement.EncoderAvailable := TRUE;
+BusAcq.EncoderM2.Measurement.HomingLifecycle.Busy := FALSE;
+BusAcq.M2_HomedAndReliable      := TRUE;
+BusAcq.Network.EncoderM1.Operational := TRUE;
+BusAcq.Network.EncoderM2.Operational := TRUE;
 
 // ── 2. PRG_03 : Arbitrage des Modes et Séquenceur de Cycle ──
 prg03(
@@ -12493,29 +13878,82 @@ prg03(
 );
 BusModes := prg03.Auth;
 
-// ── 3. PRG_04 : Contrôle Treuils M1 / M2 et Benne ──
+// ── 3. PRG_04 (MIROIR T181-00) : Contrôle Treuils M1/M2 et Benne ──
+reqProgramLocal.ReqWinchM1 := SeqReqWinchM1;
+reqProgramLocal.ReqWinchM2 := SeqReqWinchM2;
+reqProgramLocal.ReqBucket := SeqReqBucket;
+reqProgramLocal.OperatorCoupledIntent.Active := CoupledIntentActive;
+reqProgramLocal.OperatorCoupledIntent.Direction := CoupledIntentDirection;
+seqStateLocal.BottomTouchConfirmed := SeqBottomTouchConfirmed;
+seqStateLocal.DumpAtTremieDescentLocked := SeqDumpAtTremieDescentLocked;
+bucketPersistLocal.OffsetOpenM := BucketOffsetOpenM;
+bucketPersistLocal.OffsetCloseM := BucketOffsetCloseM;
+bucketPersistLocal.CoherenceLimitM := BucketCoherenceLimitM;
+bucketPersistLocal.OpenAnticipationM := BucketOpenAnticipationM;
+bucketPersistLocal.CloseAnticipationM := BucketCloseAnticipationM;
+
 prg04(
     AcqData                 := BusAcq,
     ModesAuth               := BusModes,
+    ReqProgram              := reqProgramLocal,
+    SeqState                := seqStateLocal,
+    AcqHw                   := prg02.HwIn,
     PowerContactorEngaged   := PowerContactorEngaged,
-    EmergencyChainClosed    := EmergencyChainClosed,
-    M1_ContactorsReleased   := TRUE,
-    M1_BrakeFeedbackOpen    := FALSE,
-    M2_ContactorsReleased   := TRUE,
-    M2_BrakeFeedbackOpen    := FALSE,
-    BtnWinchM1Up            := FALSE,
-    BtnWinchM1Down          := FALSE,
-    BtnReset                := BtnResetMachine
+    M1_ContactorsReleased   := m1ContactorsReleasedModel,
+    M2_ContactorsReleased   := m2ContactorsReleasedModel,
+    M1_BrakeFeedbackOpen    := m1BrakeFeedbackModel,
+    M2_BrakeFeedbackOpen    := m2BrakeFeedbackModel,
+    FaultMachineResetIHM    := BtnResetMachine,
+    TglJoystickMaster       := TglJoystickMaster,
+    BtnWinchM1Up            := BtnWinchM1Up,
+    BtnWinchM1Down          := BtnWinchM1Down,
+    BtnWinchM2Up            := BtnWinchM2Up,
+    BtnWinchM2Down          := BtnWinchM2Down,
+    BtnWinchBothUp          := BtnWinchBothUp,
+    BtnWinchBothDown        := BtnWinchBothDown,
+    BucketBtnOpen           := BucketCmdOpen,
+    BucketBtnClose          := BucketCmdClose,
+    BucketConfirmOpenPos    := BucketConfirmOpenPos,
+    BucketConfirmClosePos   := BucketConfirmClosePos,
+    TglManualBucketLimits   := TglManualBucketLimits,
+    TglEnableCoupledBucketSequencing := TglEnableCoupledBucketSequencing,
+    TglEnableKoboldAutoStopDescent   := TglEnableKoboldAutoStopDescent,
+    HeartbeatIhmOk          := HeartbeatIhmOk,
+    LimitLegalReached       := LimitLegalReached,
+    CfgWinchMaxStepAscent   := CfgMaxStepAscent,
+    CfgWinchMaxStepDescente := CfgMaxStepDescente,
+    LimitLegalEnabled       := LimitLegalEnabled,
+    LimitLegalDepthMinAllowedM := LimitLegalDepthMinAllowedM,
+    CfgCableLimitAscentM    := CfgAscentLimitM,
+    CfgCableLimitDescentM1  := CfgDescentLimitM1,
+    CfgCableLimitDescentM2  := CfgDescentLimitM2,
+    WinchSlowdownDistanceM  := SlowdownDistanceM,
+    WinchSlowdownMaxStep    := SlowdownMaxStep,
+    CfgSyncToleranceM       := SyncToleranceM,
+    CfgSyncCriticalToleranceM := SyncCriticalToleranceM,
+    ImmersionLowerM         := ImmersionLowerM,
+    ImmersionUpperM         := ImmersionUpperM,
+    ExtractionControlDistanceM := ExtractionControlDistanceM,
+    SyncSoftStopEnable      := SyncSoftStopEnable,
+    SpeedStepTable          := SpeedTable,
+    BucketPersistConfig     := bucketPersistLocal,
+    BucketCfgTimeoutDuration := BucketCfgTimeoutDuration,
+    BucketSeedOpen          := BucketSeedOpen,
+    BypassM1                := BypassM1,
+    BypassM2                := BypassM2,
+    BypassCommun            := BypassCommun,
+    BypassSync              := BypassSync
 );
 BusWinch := prg04.Data;
-
+KoboldImmersionConfirmed := prg04.KoboldImmersionConfirmed;
+KoboldBottomTouchLatched := prg04.KoboldBottomTouchLatched;
 
 // ── 4. PRG_05 : Contrôle Translation M3 ──
 prg05(
     AcqData                 := BusAcq,
     ModesAuth               := BusModes,
-    WinchM1CablePosM        := BusAcq.Encoders.M1.CablePosM,
-    WinchM2CablePosM        := BusAcq.Encoders.M2.CablePosM,
+    WinchM1CablePosM        := m1PosModel,
+    WinchM2CablePosM        := m2PosModel,
     PowerContactorEngaged   := PowerContactorEngaged,
     EmergencyChainClosed    := EmergencyChainClosed,
     BrakeFeedbackOpen       := FALSE,
@@ -12535,6 +13973,47 @@ prg06(
 );
 BusOutputs := prg06.Data;
 
+// ── 5bis. Injection cadence HORS instance FB_Winch (HARN-51, cible T181-01) ──
+// Simule une cadence forcée appliquée en aval de FB_Winch : la barrière PRG_06 doit couper.
+IF InjectRateBypassFbWinch THEN
+    BusWinch.WinchM1FinalInterlockRequest.RequestedRelayFwd := TRUE;
+    BusWinch.WinchM1FinalInterlockRequest.RequestedStep := InjectRateStep;
+    prg06(
+        WinchData               := BusWinch,
+        TranslationData         := BusTranslation,
+        FaultReset              := BtnResetMachine
+    );
+    BusOutputs := prg06.Data;
+END_IF;
+
+// ── 5ter. Diag FinalInterlockGoverned : la barrière a-t-elle coupé une demande ? ──
+m1AnyRequested := BusWinch.WinchM1FinalInterlockRequest.RequestedRelayFwd
+                  OR BusWinch.WinchM1FinalInterlockRequest.RequestedRelayRev
+                  OR BusWinch.WinchM1FinalInterlockRequest.RequestedContactor1
+                  OR BusWinch.WinchM1FinalInterlockRequest.RequestedContactor2
+                  OR BusWinch.WinchM1FinalInterlockRequest.RequestedContactor3
+                  OR BusWinch.WinchM1FinalInterlockRequest.RequestedContactor4;
+FinalInterlockGovernedM1 := m1AnyRequested AND (
+       (BusWinch.WinchM1FinalInterlockRequest.RequestedRelayFwd  &lt;&gt; BusOutputs.M1RelayFwd)
+    OR (BusWinch.WinchM1FinalInterlockRequest.RequestedRelayRev  &lt;&gt; BusOutputs.M1RelayRev)
+    OR (BusWinch.WinchM1FinalInterlockRequest.RequestedContactor1 &lt;&gt; BusOutputs.M1SpeedContactor1)
+    OR (BusWinch.WinchM1FinalInterlockRequest.RequestedContactor2 &lt;&gt; BusOutputs.M1SpeedContactor2)
+    OR (BusWinch.WinchM1FinalInterlockRequest.RequestedContactor3 &lt;&gt; BusOutputs.M1SpeedContactor3)
+    OR (BusWinch.WinchM1FinalInterlockRequest.RequestedContactor4 &lt;&gt; BusOutputs.M1SpeedContactor4));
+m2AnyRequested := BusWinch.WinchM2FinalInterlockRequest.RequestedRelayFwd
+                  OR BusWinch.WinchM2FinalInterlockRequest.RequestedRelayRev
+                  OR BusWinch.WinchM2FinalInterlockRequest.RequestedContactor1
+                  OR BusWinch.WinchM2FinalInterlockRequest.RequestedContactor2
+                  OR BusWinch.WinchM2FinalInterlockRequest.RequestedContactor3
+                  OR BusWinch.WinchM2FinalInterlockRequest.RequestedContactor4;
+FinalInterlockGovernedM2 := m2AnyRequested AND (
+       (BusWinch.WinchM2FinalInterlockRequest.RequestedRelayFwd  &lt;&gt; BusOutputs.M2RelayFwd)
+    OR (BusWinch.WinchM2FinalInterlockRequest.RequestedRelayRev  &lt;&gt; BusOutputs.M2RelayRev)
+    OR (BusWinch.WinchM2FinalInterlockRequest.RequestedContactor1 &lt;&gt; BusOutputs.M2SpeedContactor1)
+    OR (BusWinch.WinchM2FinalInterlockRequest.RequestedContactor2 &lt;&gt; BusOutputs.M2SpeedContactor2)
+    OR (BusWinch.WinchM2FinalInterlockRequest.RequestedContactor3 &lt;&gt; BusOutputs.M2SpeedContactor3)
+    OR (BusWinch.WinchM2FinalInterlockRequest.RequestedContactor4 &lt;&gt; BusOutputs.M2SpeedContactor4));
+
 // ── 6. PRG_07 : Supervision et Formatage du Bandeau IHM ──
 prg07(
     AcqData                 := BusAcq,
@@ -12547,6 +14026,85 @@ prg07(
     BtnResetMachine         := BtnResetMachine
 );
 BusBanner := prg07.Banner;
+
+// ── 7. Modèle physique minimal paire (AC4) — intègre les sorties de CE cycle ──
+// v_palier(StepNumber, Direction) * dt ; aucune dynamique moteur (limite documentée au plan de tir).
+iStepM1 := BusWinch.WinchM1State.StepNumber;
+IF iStepM1 &gt; 5 THEN iStepM1 := 5; END_IF;
+IF iStepM1 &lt; 0 THEN iStepM1 := 0; END_IF;
+iStepM2 := BusWinch.WinchM2State.StepNumber;
+IF iStepM2 &gt; 5 THEN iStepM2 := 5; END_IF;
+IF iStepM2 &lt; 0 THEN iStepM2 := 0; END_IF;
+
+IF BusOutputs.M1RelayFwd THEN
+    v1New := ModelStepSpeedMps[iStepM1];
+ELSIF BusOutputs.M1RelayRev THEN
+    v1New := -ModelStepSpeedMps[iStepM1];
+ELSE
+    v1New := 0.0;
+END_IF;
+// Biais M2 (SPEC §3.6 : « modèle biaise M2 ») pour exercer la déviation sync paire.
+IF BusOutputs.M2RelayFwd THEN
+    v2New := ModelStepSpeedMps[iStepM2] * ModelM2SpeedFactor;
+ELSIF BusOutputs.M2RelayRev THEN
+    v2New := -ModelStepSpeedMps[iStepM2] * ModelM2SpeedFactor;
+ELSE
+    v2New := 0.0;
+END_IF;
+
+// Coast-down minimal (HARN-74 / T178) : tant que les contacteurs ne sont pas retombés
+// (fenêtre ContactorFeedbackTimeout), le câble continue de dériver à la vitesse courante.
+// Pas de dynamique moteur : v retombe à 0 dès la retombée confirmée des contacteurs.
+IF (v1New = 0.0) AND (v1Model &lt;&gt; 0.0) AND (NOT m1ContactorsReleasedModel) THEN
+    (* coast M1 : conserve la vitesse du scan précédent *)
+ELSE
+    v1Model := v1New;
+END_IF;
+IF (v2New = 0.0) AND (v2Model &lt;&gt; 0.0) AND (NOT m2ContactorsReleasedModel) THEN
+    (* coast M2 : conserve la vitesse du scan précédent *)
+ELSE
+    v2Model := v2New;
+END_IF;
+
+m1PosModel := m1PosModel + v1Model * CST_FIXTURE_CYCLE_S;
+m2PosModel := m2PosModel + v2Model * CST_FIXTURE_CYCLE_S;
+
+// Retour frein : frein ouvert tant qu&#x27;un sens est commandé (AC4, direct).
+// Injection HARN-72 : défaut retour frein (ne s&#x27;ouvre jamais).
+m1BrakeFeedbackModel := (BusOutputs.M1RelayFwd OR BusOutputs.M1RelayRev) AND NOT ModelBrakeFeedbackFaultM1;
+m2BrakeFeedbackModel := (BusOutputs.M2RelayFwd OR BusOutputs.M2RelayRev) AND NOT ModelBrakeFeedbackFaultM2;
+
+// Retour contacteurs : retombés (FwdRevSpeedFeedbackOff=TRUE) retardé de
+// ContactorFeedbackTimeout après la retombée des commandes (AC4).
+// Injection HARN-80 (CAS-001) : contacteurs déclarés &quot;retombés&quot; ALORS qu&#x27;un sens est commandé.
+IF BusOutputs.M1RelayFwd OR BusOutputs.M1RelayRev
+   OR BusOutputs.M1SpeedContactor1 OR BusOutputs.M1SpeedContactor2
+   OR BusOutputs.M1SpeedContactor3 OR BusOutputs.M1SpeedContactor4 THEN
+    m1ContactorsEngagedLatch := TRUE;
+END_IF;
+tonContactorsDroppedM1(IN := NOT (BusOutputs.M1RelayFwd OR BusOutputs.M1RelayRev
+                                 OR BusOutputs.M1SpeedContactor1 OR BusOutputs.M1SpeedContactor2
+                                 OR BusOutputs.M1SpeedContactor3 OR BusOutputs.M1SpeedContactor4),
+                       PT := ContactorFeedbackTimeout);
+m1ContactorsReleasedModel := ((NOT m1ContactorsEngagedLatch) OR tonContactorsDroppedM1.Q) OR ModelContactorsReleaseFaultM1;
+
+IF BusOutputs.M2RelayFwd OR BusOutputs.M2RelayRev
+   OR BusOutputs.M2SpeedContactor1 OR BusOutputs.M2SpeedContactor2
+   OR BusOutputs.M2SpeedContactor3 OR BusOutputs.M2SpeedContactor4 THEN
+    m2ContactorsEngagedLatch := TRUE;
+END_IF;
+tonContactorsDroppedM2(IN := NOT (BusOutputs.M2RelayFwd OR BusOutputs.M2RelayRev
+                                 OR BusOutputs.M2SpeedContactor1 OR BusOutputs.M2SpeedContactor2
+                                 OR BusOutputs.M2SpeedContactor3 OR BusOutputs.M2SpeedContactor4),
+                       PT := ContactorFeedbackTimeout);
+m2ContactorsReleasedModel := ((NOT m2ContactorsEngagedLatch) OR tonContactorsDroppedM2.Q) OR ModelContactorsReleaseFaultM2;
+
+// ── 8. Diag publics modèle ──
+M1_CablePosM_Model   := m1PosModel;
+M2_CablePosM_Model   := m2PosModel;
+M1_StepNumber        := BusWinch.WinchM1State.StepNumber;
+M2_StepNumber        := BusWinch.WinchM2State.StepNumber;
+SyncDeviationM_Model := ABS(m1PosModel - m2PosModel);
 
 {endregion}
 END_FUNCTION_BLOCK

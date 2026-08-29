@@ -2,8 +2,8 @@
 
 > **Statut : proposé — ARRÊT VALIDATION HUMAINE.** Aucune écriture `CODE/`.
 > Contrat : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-11_MATRICE_MAINT_N1_N2.yaml` (AC1-AC8).
-> Alimente une section de `DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md` (§8 ci-dessous) + l'implémentation T181-14.
-> Date : 2026-08-29.
+> Alimente une section de `DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md` (§4bis ci-dessous) + l'implémentation T181-14.
+> Date : 2026-08-29. **Vérifié contre le code** (`FB_Safety_Winch.st`, `PRG_04_Treuils_Benne.st`, `FB_Modes.st`, DUT `ST_Bypass*`) le 2026-08-29.
 
 ---
 
@@ -78,11 +78,11 @@ Un bypass IHM activé alors que `Mode ≠ MAINT_N2` est **ignoré** (pas d'erreu
 |---|---|---|---|---|---|
 | `OperatorComm`, `EncoderFault`, `ContactorFeedback`, `PhaseRotation`, `BrakeThermal`, `MotorThermal` | ❌ | ✅ latché | ❌ | N2 latché (RETAIN) | doctrine standard |
 | `MecaA`, `MecaC`, `MecaD`, `MecaE` | ❌ | ✅ latché | ❌ | N2 latché | doctrine standard |
-| `MecaB` | ❌ | ⚠️ **latché, avec avertissement fort** | ❌ | N2 latché | Méca B = confirmation d'arrêt + coast-down + ContactorStuck. Bypass = plus aucune détection qu'un treuil ne s'arrête pas. **À valider : autoriser en N2 ou interdire totalement ?** |
+| `MecaB` | ❌ | ✅ **latché, avec avertissement fort** | ❌ | N2 latché | Méca B = confirmation d'arrêt + coast-down + ContactorStuck. Bypass = plus aucune détection qu'un treuil ne s'arrête pas. **Décision : autorisé en N2** (homogène, traçabilité RETAIN + journal) — bandeau d'avertissement fort. |
 | `TopLimitSwitch` (capteur physique 8,5 m) | ❌ | ✅ latché | ❌ | N2 latché | dépasser le capteur physique = uniquement N2, acte assumé |
 | **`TopLimitSoftware`** (logiciel 7,5 m) | ⚠️ **momentané** (bouton maintenu) | ✅ latché | ❌ | **N1 = tant que bouton tenu** ; N2 = latché | **décision Q8** — voir §3 |
 | `CableLimitSwitch` (limite câble physique) | ❌ | ✅ latché | ❌ | N2 latché | limite basse = intégrité câble |
-| `LimitLegal` (limite légale) | ❌ | ✅ latché | ❌ | N2 latché | ⚠️ **à valider** : bypasser une limite **légale** — sous quelle responsabilité ? |
+| `LimitLegal` (limite légale) | ❌ | ✅ latché | ❌ | N2 latché | **Décision : bypassable en N2** (homogène) — la traçabilité de l'action reste assurée par le RETAIN + le journal de bypass. |
 | `SlackCable` (commun) | ❌ | ✅ latché | ❌ | N2 latché | doctrine standard |
 | `Safety` (groupé) | ❌ | ✅ latché | ❌ | N2 latché | **conservé** — homogénéité projet (idem translation M3) |
 | `Process` (groupé) | ❌ | ✅ latché | ❌ | N2 latché | **conservé** — homogénéité projet |
@@ -160,15 +160,15 @@ T175 AC4 : *« FB_Bucket confirme/ouvre sous MAINT_N1 ET N2 comme décrit (TC-P1
 
 ## 7 · Gaps de câblage relevés en passant (devoir d'alerte)
 
-- **7-a** — `ST_BypassWinch.ContactorFeedback` est **déclaré** (DUT) mais **jamais câblé** dans `PRG_04` vers `FB_Safety_Winch`. Soit le bypass est mort (à retirer du DUT), soit il manque le fil. À trancher avec la matrice.
-- **7-b** — `GVL_IHM.Commun.Bypass.SlackCable` (n° 20) : je n'ai pas retrouvé son câblage explicite dans l'extrait `PRG_04:601-627` (les autres `Commun.Bypass.*` y sont, pas `SlackCable`). À vérifier lors de l'implémentation.
-- **7-c** — Le mou de câble (`SlackCableDetected`, `FB_Safety_Winch.st:199`) n'a **que** `BypassProcess` comme échappatoire (pas de bypass dédié individuel). Si `Process` groupé est retiré (§2), il n'y a plus **aucun** moyen de bypasser le mou de câble en maintenance → prévoir un `BypassSlackCable` individuel dans `ST_BypassWinch`, ou confirmer que c'est voulu (jamais bypassable).
+- **7-a** — `ST_BypassWinch.ContactorFeedback` est **câblé**, mais vers `FB_Winch` (via `BypassContactorCheck`, `PRG_04:687,723`), **pas** vers `FB_Safety_Winch`. Il lève le timeout de retombée des contacteurs (`ContactorFeedbackTimeout`, `FB_Winch.st:293`). Ce n'est **pas** un bypass mort : il est **vivant** sur `FB_Winch` et doit figurer dans la matrice (N2 latché). Le `ContactorStuck` (propriétaire `FB_Safety_Winch`, D07) n'a, lui, **pas** de bypass dédié — couvert par `BypassSafety`/`BypassGlobal`.
+- **7-b** — `GVL_IHM.Commun.Bypass.SlackCable` (n° 20) : **confirmé non consommé** comme bypass de sécurité. Il est **miré** vers le RETAIN `BypassSlackCable` (`PRG_07:241-242,259`) mais **aucun** `Bypass*` de `FB_Safety_Winch` ne le lit : le mou de câble (`SlackCableDetected`, cause 3) n'a que `BypassProcess` comme échappatoire. Le bypass commun `SlackCable` est donc **effectivement mort** (déclaré + miré, jamais appliqué).
+- **7-c** — Le mou de câble (`SlackCableDetected`, `FB_Safety_Winch.st:199`) n'a **que** `BypassProcess` comme échappatoire (pas de bypass dédié individuel). `Process` groupé étant **conservé** (§2), le mou de câble reste bypassable en N2 via `Process` — mais le bypass commun `SlackCable` (7-b) étant mort, il n'y a **pas** de bypass granulaire dédié. À trancher en T181-14 : ajouter un `BypassSlackCable` individuel dans `ST_BypassWinch`, ou confirmer que le bypass granulaire n'est pas requis (le groupé `Process` suffit).
 
 ---
 
-## 8 · Section pour `AF_Partie-05_Modes_Maintenance` (à insérer par le doc-agent / T181-14)
+## 8 · Section pour `AF_Partie-05_Modes_Maintenance` (insérée en §4bis par T181-11)
 
-### X · Matrice de bypass maintenance — treuils M1/M2
+### 4bis · Matrice de bypass maintenance — treuils M1/M2
 
 **Principe** — Un bypass de sécurité n'est **effectif que si `Mode = MAINT_N2`** (doctrine `ST_BypassWinch` / `ST_BypassCommun` / `ST_BypassBucket`). Un bypass IHM activé hors N2 est ignoré (affiché « inactif »). Exception unique : l'**override FDC haut logiciel** est possible en `MAINT_N1` via un **bouton maintenu** (momentané), borné par le capteur physique haut (≈ 8,5 m), jamais franchi.
 
@@ -178,8 +178,8 @@ T175 AC4 : *« FB_Bucket confirme/ouvre sous MAINT_N1 ET N2 comme décrit (TC-P1
 | Limites position | `TopLimitSwitch`, `CableLimitSwitch`, `LimitLegal`, `SlackCable` | ❌ | ✅ | latché |
 | Limites position | `TopLimitSoftware` | ⚠️ momentané (bouton tenu) | ✅ | N1 : tant que tenu · N2 : latché |
 | Méca A-E | `MecaA`, `MecaC`, `MecaD`, `MecaE` | ❌ | ✅ | latché |
-| Méca A-E | `MecaB` | ❌ | ⚠️ (à valider) | latché + bandeau |
-| Groupés | `Safety`, `Process`, `Global` (axe / commun / benne) | ❌ | ❌ retirés | — |
+| Méca A-E | `MecaB` | ❌ | ✅ | latché + bandeau d'avertissement fort |
+| Groupés | `Safety`, `Process`, `Global` (axe / commun / benne) | ❌ | ✅ | latché (RETAIN) — **conservés** (homogène projet, idem translation M3) |
 
 **Bascule de mode** — entrer/sortir de N1/N2 refusé tant que : `contacteurs retombés ET frein serré ET |vitesse| < seuil`. Sinon `FB_Modes` maintient le mode courant + remonte « arrêter le treuil avant changement de mode ».
 
@@ -192,8 +192,8 @@ T175 AC4 : *« FB_Bucket confirme/ouvre sous MAINT_N1 ET N2 comme décrit (TC-P1
 ## 9 · Livrables aval (T181-14, sur validation de ce cadrage)
 
 - `FB_Modes` : calcul `BasculeModeAutorisee`, drapeau `HomingRequired` par axe, gate SEMI_AUTO.
-- `PRG_04` : `bypass_effectif := bypass_IHM AND (Mode = MAINT_N2)` pour les 25 bascules ; `TopLimitM` (7,5 / 8,5) ; retrait de la propagation `Safety`/`Process`/`Global`.
-- DUT : retrait `Safety`/`Process`/`Global` de `ST_BypassWinch`/`ST_BypassCommun`/`ST_BypassBucket` (sur décision §2-3) ; ajout `BtnOverrideTopSoftware` dans `ST_WinchHMI.Cmd` ; éventuel `BypassSlackCable` (§7-c).
+- `PRG_04` : `bypass_effectif := bypass_IHM AND (Mode = MAINT_N2)` pour les 25 bascules ; `TopLimitM` (7,5 / 8,5) ; **aucun retrait** des groupés `Safety`/`Process`/`Global` (conservés, homogène projet — décision §2-3).
+- DUT : **aucun retrait** de `ST_BypassWinch`/`ST_BypassCommun`/`ST_BypassBucket` (les 25 bascules restent, mode-gated) ; ajout `BtnOverrideTopSoftware` dans `ST_WinchHMI.Cmd` ; éventuel `BypassSlackCable` (§7-c).
 - `FB_Bucket` : gate confirm/ouvre sur `Mode IN {MAINT_N1, MAINT_N2}`.
 - Gate : `G4xx_check_bypass_matrix_mode_gated.py` — aucun `Bypass*` propagé sans `AND (Mode = MAINT_N2)` (sauf l'override FDC N1 explicitement listé).
 - Migration variables IHM : `IHM_VARIABLES_MIGRATION.md` mis à jour pour les champs retirés/ajoutés.

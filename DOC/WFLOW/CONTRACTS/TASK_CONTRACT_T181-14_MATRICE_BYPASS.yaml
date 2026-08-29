@@ -1,0 +1,210 @@
+# Contrat T181-14 — Implémentation de la matrice de maintenance N1/N2 (mode-gating des bypass,
+# override FDC haut logiciel, règle de bascule de mode, re-homing obligatoire)
+#
+# Source : DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T181-11_MATRICE_MAINT.md (validé humain 2026-08-29)
+#          DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md §4bis
+# Porte : D15 (faire respecter par le code la doctrine déjà spécifiée) + Q8 (override FDC N1).
+#
+# ⚠️ Ce contrat est la SEULE référence de succès. Toute restitution se juge contre ses AC.
+
+contract:
+  task_id: T181-14_MATRICE_BYPASS
+  criticality: C3            # touche 25 bascules de sécurité treuil + arbitrage de mode
+  strategy: patch            # aucun FB créé, aucun DUT retiré ; gating ajouté sur le câblage existant
+
+  objective: >
+    Rendre effectif par le code ce que la doctrine spécifie déjà : aucun bypass de sécurité treuil
+    n'agit hors MAINT_N2 ; l'override du fin de course haut logiciel est possible en MAINT_N1 par
+    bouton maintenu, borné à la position du capteur physique haut (8,5 m) et jamais au-delà ; toute
+    bascule vers/ hors MAINT_N1/N2 exige les deux treuils à l'arrêt mécanique confirmé ; et tout
+    usage effectif d'un override/bypass de la famille position impose un re-homing avant retour en
+    SEMI_AUTO.
+
+  # ── Décisions d'implémentation tracées (non négociées dans le cadrage) ──────────────
+  decisions:
+    - id: D1
+      statement: >
+        Mode-gating réalisé en ligne dans PRG_04_Treuils_Benne (programme de câblage, AF03 §3
+        « Programme d'orchestration ») via un booléen local unique `MaintN2`. Aucun FB nouveau :
+        le gating est du câblage, pas une responsabilité métier — créer un FB ajouterait un POU à
+        recréer à la main dans CODESYS sans gain de testabilité.
+    - id: D2
+      statement: >
+        Exception de sécurité à la règle de bascule : une transition vers ou depuis DISABLE n'est
+        JAMAIS bloquée par `BasculeModeAutorisee` (une sortie de maintenance ne doit jamais être
+        retenue par un treuil en mouvement).
+    - id: D3
+      statement: >
+        `HomingRequired` est un drapeau PERSISTANT par axe, porté par `GVL_PERSISTENT`
+        (`_MaintHomingRequiredM1/M2`), restauré au boot via les entrées
+        `HomingRequiredM1/M2Persist` de `FB_Modes` et réécrit chaque scan par PRG_03 (pattern
+        `FB_MirrorBypassRetain`, aucun `VAR RETAIN` dans un FB — forme sans précédent dans ce dépôt).
+    - id: D4
+      statement: >
+        L'usage effectif est mémorisé PENDANT le mode maintenance (`MaintOverrideUsedMx`) et
+        transféré dans `HomingRequired` à la SORTIE du mode (cadrage §5 : « après toute sortie »).
+    - id: D5
+      statement: >
+        `Auth.Mode` étant un mode machine unique (pas un mode par axe), « SEMI_AUTO interdit pour
+        cet axe » s'implémente par : SEMI_AUTO refusé (bascule en MAINT_N1) si M1 OU M2 est sous
+        `HomingRequired`, avec cause nommée remontée dans `FB_Modes.Fault`.
+    - id: D6
+      statement: >
+        Le câblage `SlackCableAscentStep1` (PRG_04:217) lit `GVL_IHM.Commun.Bypass.SlackCable` en
+        clair : ce n'est pas une propagation de bypass de sécurité mais un sélecteur de mode de
+        récupération. Il est PRÉSERVÉ tel quel.
+    - id: D7
+      statement: >
+        Périmètre treuils M1/M2 + benne uniquement. `ST_BypassTranslation` (M3) et
+        `GVL_IHM.M1M2Sync.Bypass.Global` restent hors scope (AF-05 §9 l'explicite comme extension
+        à part). Alerte levée, pas d'élargissement de scope.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Aucun `Bypass*` transmis à `instSafetyWinchM1/M2`, `instWinchM1/M2` et `instBucket` depuis
+        PRG_04 n'est propagé sans être combiné à `(Mode = MAINT_N2)`.
+      verified_by: "TOOLS/AGENT_WORKFLOW/scripts/G483_check_bypass_matrix_mode_gated.py (ajouté par cette tâche)"
+    - id: AC2
+      statement: >
+        `TopLimitM` vaut 7,5 m (`_CommunCfgPersist.CfgCableLimitAscent_M`) en nominal, et 8,5 m
+        (`_WinchMxCfgPersist.CfgTopSensorPos_M`) uniquement si l'override N1 momentané est maintenu
+        ou si le bypass N2 du FDC logiciel est effectif. Le relâchement du bouton ramène 7,5 m au
+        cycle suivant.
+      verified_by: "G483 (présence du SEL et de ses deux bornes) + relecture du diff PRG_04 §5"
+    - id: AC3
+      statement: >
+        L'override N1 n'ouvre JAMAIS `BypassTopLimitSwitch` : la butée physique (capteur
+        `TopPositionSensor`) reste active en MAINT_N1.
+      verified_by: "G483 (BypassTopLimitSwitch reste un bypass N2 latché, jamais l'override)"
+    - id: AC4
+      statement: >
+        `FB_Modes` calcule `BasculeModeAutorisee := contacteurs retombés ET frein serré ET
+        |vitesse| < seuil` sur M1 ET M2, et maintient le mode courant tant que la condition est
+        fausse.
+      verified_by: "G483 (expression booléenne présente) + relecture FB_Modes §3bis"
+    - id: AC5
+      statement: >
+        Toute transition vers ou depuis DISABLE reste libre, même treuils en mouvement (D2).
+      verified_by: "G483 (test d'exemption DISABLE dans l'expression de blocage)"
+    - id: AC6
+      statement: >
+        `HomingRequired` est armé pour l'axe concerné à la sortie d'un mode maintenance ayant
+        effectivement utilisé l'override FDC N1 ou un bypass position latché N2
+        (`TopLimitSwitch`, `TopLimitSoftware`, `CableLimitSwitch`, `LimitLegal`, `MecaD`).
+      verified_by: "G483 (présence du transfert MaintOverrideUsedMx -> HomingRequiredMx hors N1/N2)"
+    - id: AC7
+      statement: >
+        `HomingRequired` retombe uniquement sur cycle de homing complet réussi
+        (`HomingLifecycle.Done` ET `Homed` ET NON `HomingSuspect`).
+      verified_by: "G483 (expression de levée) + relecture FB_Modes §3ter"
+    - id: AC8
+      statement: >
+        Tant que `HomingRequired` est vrai sur M1 ou M2, `FB_Modes` refuse SEMI_AUTO (bascule
+        MAINT_N1) et remonte une cause nommée dans `Fault`.
+      verified_by: "G483 (refus SEMI_AUTO conditionné à HomingRequired + cause instCauses[1])"
+    - id: AC9
+      statement: >
+        `G200_check_linkage.py` passe : aucune instance orpheline, les nouveaux champs de DUT sont
+        déclarés et câblés.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report"
+    - id: AC10
+      statement: >
+        Aucun champ n'est RETIRÉ de `ST_BypassWinch` / `ST_BypassCommun` / `ST_BypassBucket` :
+        les 25 bascules restent déclarées (aucun impact IHM/SCADA), seul leur effet est gaté.
+      verified_by: "git diff --stat CODE/J_SUPERVISION/_TYPES (aucune ligne supprimée)"
+    - id: AC11
+      statement: >
+        Les modifications non committées préexistantes (T181-02/03/05/07, câblage `SlackCable`,
+        FB_Winch/FB_SpeedStep, contrats T181-07/09/12/13) sont intégralement préservées.
+      verified_by: "git status + git diff --stat comparés avant/après ; aucun reset, aucun commit"
+    - id: AC12
+      statement: >
+        `BtnOverrideTopSoftware` est déclaré dans `ST_WinchCmd` (préfixe `Btn`, NC-060) et n'entre
+        PAS dans `ST_BypassWinch` (ce n'est pas un bypass latché).
+      verified_by: "git diff CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st"
+    - id: AC13
+      statement: >
+        Structure : le nom de fichier est identique au nom de POU — `FB_Modes.st` déclare
+        `FUNCTION_BLOCK FB_Modes`, `PRG_03_Modes_Cycle.st` déclare `PROGRAM PRG_03_Modes_Cycle`,
+        `PRG_04_Treuils_Benne.st` déclare `PROGRAM PRG_04_Treuils_Benne`, `PRG_07_Supervision.st`
+        déclare `PROGRAM PRG_07_Supervision` ; aucun POU n'est créé, renommé ni supprimé.
+      verified_by: "git diff --stat CODE/ (aucun nouveau POU) + G120_check_fb_dut_naming.py"
+    - id: AC14
+      statement: >
+        Structure : le suffixe de langage est identique au langage généré dans le bundle —
+        aucun suffixe `_CFC` / `_LD` n'est ajouté (les POU modifiés restent du ST pur, générés
+        en `<ST>` dans CODE_XML), donc aucun suffixe mensonger dans le PLCopenXML.
+      verified_by: "G300_check_structure.py + generate_codesys_bundle.py (section <ST> attendue)"
+
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-14_MATRICE_BYPASS.yaml   # ce fichier
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st                                # miroir IHM uniquement
+      - CODE/GVL_PERSISTENT.st                                           # drapeaux re-homing RETAIN
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st         # BtnOverrideTopSoftware
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st    # PositionLimitOverriddenM1/M2
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st      # miroir IHM
+      - TOOLS/AGENT_WORKFLOW/scripts/G483_check_bypass_matrix_mode_gated.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py                    # enregistrement G483
+      - CODE_XML/**                                                      # régénéré par le bundle
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/TASKS.yaml
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st    # contrat d'entrée inchangé : le gating est en amont
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st    # T175 AC4 déjà conforme (voir alertes)
+      - CODE/J_SUPERVISION/_TYPES/**/ST_BypassWinch.st     # aucun retrait (D10/AC10)
+      - CODE/J_SUPERVISION/_TYPES/**/ST_BypassCommun.st
+      - CODE/J_SUPERVISION/_TYPES/**/ST_BypassBucket.st
+      - CODE/**/PRG_02_Acquisition.st
+      - CODE/**/PRG_05_Translation.st
+      - CODE/**/PRG_06_Outputs.st
+
+  conservation:
+    must_survive:
+      - "Les 25 bascules déclarées dans ST_BypassWinch / ST_BypassCommun / ST_BypassBucket (aucun retrait)"
+      - "Le câblage SlackCable existant : Commun.Bypass.SlackCable -> BypassProcess (PRG_04:558/615) ET SlackCableAscentStep1 (PRG_04:217)"
+      - "Le FDC logiciel 7,5 m en nominal (l'override est l'exception)"
+      - "La butée physique 8,5 m (capteur TopPositionSensor) jamais franchie en MAINT_N1"
+      - "Le comportement de FB_Safety_Winch / FB_Winch / FB_Bucket (contrats d'entrée inchangés)"
+      - "Toutes les modifications non committées présentes au démarrage de la tâche"
+    dropped_on_purpose:
+      - "Rien n'est retiré. Aucun bypass n'est supprimé ; seul son effet devient conditionnel au mode."
+
+  evidence_required:
+    - check_linkage          # bloc "Auto-vérification liaison" (G200)
+    - run_all_gates          # résultat des gates (palier C au minimum)
+    - bundle                 # CODE_XML/CODE_Bundle.xml régénéré
+    - git_diff               # diff complet des fichiers modifiés
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout écart entre le cadrage T181-11 et le code réel est remonté IMMÉDIATEMENT à
+    l'orchestrateur, pas à la fin et jamais silencieusement. Signaler n'est pas élargir le
+    périmètre : aucun correctif hors `scope.allowed` n'est entrepris sans accord.
+
+status: IN_PROGRESS
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir en fin d'exécution : fichiers modifiés, résultat G200/G483/run_all_gates,
+    alertes levées, critères non vérifiables mécaniquement.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Validation humaine requise avant application manuelle dans CODESYS 3.5.

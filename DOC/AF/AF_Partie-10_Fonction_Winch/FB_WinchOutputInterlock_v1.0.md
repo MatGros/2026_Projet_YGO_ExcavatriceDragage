@@ -23,55 +23,101 @@
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 170px);">
-    <col style="width: 90px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-012</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Armer le watchdog sur <code>BrakeCmd</code> (<code>BrakeCmd</code>=TRUE, <code>BrakeFeedback</code>=FALSE, <code>RestartInhibit</code>=FALSE). Maintenir 500ms sans confirmation → bit0 <code>ErrorId</code>, <code>RestartInhibit</code>:=TRUE, <code>Reason</code>:=<code>BRAKE_COMMAND_NOT_CONFIRMED</code>, FAULT. Vérifier l'absence de faux défaut au <code>RestartRequired</code> : <code>BrakeCmd</code> retenu par <code>RestartRequired</code> (jusqu'à 1000ms) ne doit PAS armer le watchdog (armé sur <code>BrakeCmd</code> final, jamais sur <code>RequestedRelayFwd/Rev</code>).</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Watchdog</b><br>frein</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>BrakeCmd=TRUE</code>, <code>BrakeFeedback=FALSE</code>, <code>RestartInhibit=FALSE</code> — watchdog armé<br>
+        🚀 <b>Étape 1</b> : Maintien 500ms sans confirmation frein<br>
+        ⚡ <b>Étape 2</b> : <code>ErrorId</code> bit0, <code>RestartInhibit:=TRUE</code>, <code>Reason:=BRAKE_COMMAND_NOT_CONFIRMED</code>, FAULT<br>
+        ✅ <b>Étape 3</b> : Pas de faux défaut au <code>RestartRequired</code> — <code>BrakeCmd</code> retenu par <code>RestartRequired</code> (jusqu'à 1000ms) n'arme PAS le watchdog (armé sur <code>BrakeCmd</code> final, jamais sur <code>RequestedRelayFwd/Rev</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-013</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Provoquer un défaut (timeout frein) → <code>ErrorId</code>/<code>RestartInhibit</code>/<code>ResetRequired</code> latches. Couper <code>Enable</code> (ou AU) → sorties FALSE MAIS <code>ErrorId</code>, <code>RestartInhibit</code>, <code>ResetRequired</code> préservés. Réautorisation : cause disparue + front Reset + demande neutre observée + nouvelle demande distincte → <code>RestartInhibit</code>:=FALSE.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Latch</b><br>défaut</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : État nominal, aucun défaut<br>
+        🚀 <b>Étape 1</b> : Provoquer un défaut (timeout frein) → <code>ErrorId</code>/<code>RestartInhibit</code>/<code>ResetRequired</code> latches<br>
+        ⚡ <b>Étape 2</b> : Couper <code>Enable</code> (ou AU) → sorties FALSE, MAIS <code>ErrorId</code>/<code>RestartInhibit</code>/<code>ResetRequired</code> préservés<br>
+        ✅ <b>Étape 3</b> : Réautorisation = cause disparue + front Reset + demande neutre + nouvelle demande distincte → <code>RestartInhibit:=FALSE</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-020</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Watchdog frein réel terrain (temps, contacteur/bobine)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>🟢 SITE</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Watchdog</b><br>terrain</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Essai réel, frein + contacteur/bobine sur le banc<br>
+        🚀 <b>Étape 1</b> : Injecter un défaut de confirmation frein<br>
+        ⚡ <b>Étape 2</b> : Mesurer le comportement watchdog réel (times, contacteur/bobine)<br>
+        ✅ <b>Étape 3</b> : Watchdog frein validé sur le terrain
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>🟢 SITE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-021</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Temps mort même sens : 1s après arrêt ➔ nouvelle demande</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Temps mort</b><br>même sens</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Arrêt commandé, <code>MotorRequest=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Nouvelle demande dans le même sens avant expiration<br>
+        ⚡ <b>Étape 2</b> : Temps mort <code>DeadTimeSameDir</code> (défaut 1s) respecté après arrêt<br>
+        ✅ <b>Étape 3</b> : Redémarrage même sens bloqué tant que le temps mort n'est pas écoulé
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-022</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Temps mort inversion : 1s après arrêt + inversion sens</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Temps mort</b><br>inversion</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Arrêt commandé, <code>MotorRequest=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Nouvelle demande en sens inverse avant expiration<br>
+        ⚡ <b>Étape 2</b> : Temps mort <code>DeadTimeOppositeDir</code> (défaut 1s, &gt; même sens) — en sus du délai d'inversion 200ms FB_Winch<br>
+        ✅ <b>Étape 3</b> : Inversion bloquée tant que le temps mort n'est pas écoulé
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-039.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Frein couplé direct : pour tout état (Error/RestartInhibit/RestartRequired), <code>BrakeCmd</code> := <code>RelayFwd</code> OR <code>RelayRev</code> — jamais de divergence frein/mouvement.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Frein</b><br>couplé direct</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Tout état machine (Error/RestartInhibit/RestartRequired)<br>
+        🚀 <b>Étape 1</b> : Calcul <code>BrakeCmd</code> :=\: <code>RelayFwd</code> OR <code>RelayRev</code><br>
+        ⚡ <b>Étape 2</b> : Vérification sur tous les états<br>
+        ✅ <b>Étape 3</b> : Jamais de divergence frein/mouvement — frein suit directement la commande de sens
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2bis</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

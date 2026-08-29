@@ -406,7 +406,7 @@ def load_io_mapping(root: Path) -> Dict[str, Dict]:
             
             if var_name and iec_address and iec_address.startswith('%'):
                 # Détecter INPUT vs OUTPUT via le prefixe %I vs %Q
-                pou_name = "PRG_OUTPUTS_LD" if iec_address.startswith('%Q') else "PRG_01_Inputs_LD"
+                pou_name = "PRG_06_Outputs" if iec_address.startswith('%Q') else "PRG_02_Acquisition"
                 full_name = f"{pou_name}.{var_name}"
                 
                 mapping[full_name] = {

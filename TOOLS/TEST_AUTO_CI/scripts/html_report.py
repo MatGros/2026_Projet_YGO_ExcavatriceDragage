@@ -472,7 +472,10 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
     return f"""
     <div class="chronogram-group">
         {fail_note}
-        <details {"open" if not test_passed else ""}>
+        <!-- Décision (2026-08-29) : les 2 chronogrammes (graphique + tableau) sont OUVERTS par
+             défaut quand la carte du test est dépliée, quel que soit le PASS/FAIL. Avant, ils
+             ne s'ouvraient qu'en cas d'échec. L'échec reste signalé par `fail_note` ci-dessus. -->
+        <details open>
             <summary class="chrono-table-summary">
                 <div class="chrono-summary-inner">
                     <span>📊 Chronogramme graphique ({len(scans)} scans, {len(changed_fields)} variables actives)</span>
@@ -483,7 +486,7 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
             </summary>
             <div class="wf-scroll">{_render_waveform(scans, changed_fields, field_types, fail_scan_num, scan_notes=scan_notes)}</div>
         </details>
-        <details {"open" if not test_passed else ""}>
+        <details open>
             <summary class="chrono-table-summary">
                 <div class="chrono-summary-inner">
                     <span>📋 Chronogramme tableau ({len(scans)} scans)</span>
@@ -988,6 +991,9 @@ _CSS = """
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    /* Bouton discret "retour à l'index" (les rapports vivent dans RESULTS/<domaine>/reports/) */
+    .btn-index { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--btn-border); color: var(--muted); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.15s ease; user-select: none; white-space: nowrap; }
+    .btn-index:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
     .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
     .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
         border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
@@ -1140,6 +1146,10 @@ _CSS = """
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
     .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .wiring-pastille { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 999px;
+        font-size: 11px; font-weight: 700; letter-spacing: 0.3px; vertical-align: 1px; }
+    .wiring-pastille-ok { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+    .wiring-pastille-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
     .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
@@ -2003,7 +2013,12 @@ def _render_pin_diagram(fb_name: str, wiring: dict | None, label: str | None = N
             <ul>{items}</ul>
         </div>"""
 
-    summary_txt = f"🔌 Interface & câblage production — {_html.escape(label)}" if label else "🔌 Interface & câblage production"
+    pastille = (f'<span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage '
+                f'production — informatif, n\'impacte pas le résultat du rapport">⚠️ {n_warn} écart{"s" if n_warn > 1 else ""}</span>'
+                if n_warn else
+                '<span class="wiring-pastille wiring-pastille-ok" title="Interface entièrement câblée en production">✓ 0 écart</span>')
+    summary_txt = (f"🔌 Interface & câblage production — {_html.escape(label)} {pastille}" if label
+                   else f"🔌 Interface & câblage production {pastille}")
     block_label = f"{_html.escape(fb_name)} ({_html.escape(label)})" if label else _html.escape(fb_name)
     return f"""
     <details class="pin-diagram-details">
@@ -2059,6 +2074,7 @@ def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
             <h1>{_html.escape(fb_name)}</h1>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
+            <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
             {_badge(section['all_pass'])}
         </div>
@@ -2100,6 +2116,7 @@ def render_group_report(group_name: str, fb_sections: list) -> str:
             <h1>{_html.escape(group_name)}</h1>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
+            <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
             {_badge(all_pass)}
         </div>

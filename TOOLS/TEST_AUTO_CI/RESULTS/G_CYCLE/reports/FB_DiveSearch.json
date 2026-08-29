@@ -1,43 +1,67 @@
 {
   "version": 1,
-  "file": "test_fb_divesearch.st",
+  "file": "test_fb_safety_winch.st",
   "results": [
     {
-      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "name": "TC-P10-001 Meca A : derive >2.0m a l arret (joystick neutre) -> SafeStop + PowerCutOff",
       "passed": true
     },
     {
-      "name": "TC-P04-010 DiveSearch : mise en service recherche de couche",
+      "name": "TC-P10-002 Meca B : non confirmation arret 3s -> SafeStop + PowerCutOff",
       "passed": true
     },
     {
-      "name": "TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond",
+      "name": "TC-P10-003 Meca C : glissement M1 >2.0m pendant maintien benne -> SafeStop + PowerCutOff",
       "passed": true
     },
     {
-      "name": "TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant",
+      "name": "TC-P10-004 Meca D : capteur haut sans arret 3s -> SafeStop (immediat) puis PowerCutOff (3s)",
       "passed": true
     },
     {
-      "name": "TC-P04-013 : Depassement tempo recherche immersion Kobold -> ERROR_HOLD et capture StepAtFault",
+      "name": "TC-P10-005 Meca E bit12 : ecart >2.5m -> SafeStop SEUL (pas PowerCutOff)",
       "passed": true
     },
     {
-      "name": "TC-P04-014 : Depassement tempo recherche fond Kobold -> ERROR_HOLD et capture StepAtFault",
+      "name": "TC-P10-006 Meca E bit13 : bit12 non confirme 3s -> escalade PowerCutOff",
       "passed": true
     },
     {
-      "name": "TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seulement sur front Reset",
+      "name": "TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -> SafeStop SEUL",
       "passed": true
     },
     {
-      "name": "TC-P04-016 : Contacteur Kobold coupe des le relachement de la descente (anti-chauffe, H1)",
+      "name": "TC-P10-008 Meca G : vitesse nulle malgre commande 3s -> SafeStop SEUL",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-009 Masque PowerCutOff : bit2 (surchauffe moteur) coupe, bit14 (sens oppose) ne coupe pas",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-010 SafeStop exclut bit3 (mou cable) si SyncEnable=FALSE",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-036.1 Warmup 3s : perte com operateur ignoree pendant 3s puis SafeStop",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves, re-Enable exige Reset",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-044.1 Mou cable : SyncEnable=FALSE -> DescendPermit=FALSE, AscentPermit autorise, blocage leve au retension",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04->PRG_06->AU = essai site",
       "passed": true
     }
   ],
   "summary": {
-    "total": 8,
-    "passed": 8,
+    "total": 14,
+    "passed": 14,
     "failed": 0
   }
 }

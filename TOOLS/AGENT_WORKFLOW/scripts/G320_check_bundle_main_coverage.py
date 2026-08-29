@@ -54,21 +54,6 @@ def local_name(tag: str) -> str:
     return tag.rsplit("}", maxsplit=1)[-1]
 
 
-def is_standalone_ld_export(path: Path, programs: list[str]) -> bool:
-    """Return whether ``path`` is the delivery export of its sibling LD ST source.
-
-    A ``PRG_*_LD.xml`` next to its identically named ``.st`` is import material,
-    not a native XML source. The ST source remains the sole bundle input.
-    """
-    if not (path.stem.endswith("_LD") and programs == [path.stem]):
-        return False
-    st_source = path.with_suffix(".st")
-    if not st_source.is_file():
-        return False
-    match = PROGRAM_HEADER.search(st_source.read_text(encoding="utf-8", errors="replace"))
-    return match is not None and match.group("name") == path.stem
-
-
 def discover_main_program_sources(main: Path) -> tuple[list[MainProgramSource], list[str], list[str]]:
     """Discover PROGRAM sources and validate their source-level identity."""
     sources: list[MainProgramSource] = []
@@ -84,7 +69,7 @@ def discover_main_program_sources(main: Path) -> tuple[list[MainProgramSource], 
             continue
 
         name = match.group("name")
-        expected_language = "LD" if path.stem.endswith("_LD") else "ST"
+        expected_language = "ST"
         sources.append(MainProgramSource(name, path, expected_language))
         if name != path.stem:
             identity_errors.append(
@@ -112,14 +97,6 @@ def discover_main_program_sources(main: Path) -> tuple[list[MainProgramSource], 
         if not programs:
             if path.stem.startswith("PRG_"):
                 coverage_errors.append(f"[BMC0] {path}: source PRG XML sans pou/@name")
-            continue
-        if is_standalone_ld_export(path, programs):
-            # Un *_LD.xml à côté de son .st est un artefact de livraison interdit :
-            # le Ladder n'est livré QUE par le bundle (REX 2026-08, import CODESYS).
-            coverage_errors.append(
-                f"[BMC0] {path}: standalone LD export interdit — la livraison "
-                f"Ladder est CODE_Bundle.xml uniquement (REX 2026-08)"
-            )
             continue
         if not path.stem.endswith("_CFC"):
             coverage_errors.append(f"[BMC0] {path}: source PROGRAM XML doit etre nomme *_CFC.xml")

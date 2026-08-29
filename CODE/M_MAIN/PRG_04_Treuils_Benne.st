@@ -134,6 +134,34 @@ VAR
     // Mémoire scan précédent pour SpeedDelta_Mps (IHM)
     M1_PrevSpeed_Mps : REAL;
     M2_PrevSpeed_Mps : REAL;
+
+    // === MATRICE DE MAINTENANCE N1/N2 (AF-05 §4bis) ===
+    // PRG_04 est le producteur unique du bypass EFFECTIF de son axe : FB_Safety_Winch / FB_Winch /
+    // FB_Bucket ne connaissent que des booléens déjà gatés, jamais le mode (encapsulation AF03 §2).
+    MaintN1 : BOOL;   // . [LOC] Mode MAINT_N1 arbitré (override FDC logiciel momentané)
+    MaintN2 : BOOL;   // . [LOC] Mode MAINT_N2 arbitré (seul mode où un bypass est effectif)
+
+    // Override du FDC haut LOGICIEL — MAINT_N1, bouton IHM MAINTENU (jamais latché).
+    // Le FDC haut CAPTEUR (TopPositionSensor ≈ 8,5 m) n'est JAMAIS ouvert par cet override.
+    OverrideTopSoftwareN1M1 : BOOL;
+    OverrideTopSoftwareN1M2 : BOOL;
+
+    // Limite haute logicielle active (m) : 7,5 m nominal ➔ 8,5 m (capteur homing haut) sous override.
+    TopLimitM1_M : REAL;
+    TopLimitM2_M : REAL;
+
+    // Bypass EFFECTIFS de la famille position (= IHM ET MAINT_N2). Servent au câblage ET à
+    // l'armement du re-homing obligatoire publié vers PRG_03 (PositionLimitOverriddenM1/M2).
+    BypassM1TopLimitSwitchEff   : BOOL;
+    BypassM1TopLimitSoftwareEff : BOOL;
+    BypassM1CableLimitSwitchEff : BOOL;
+    BypassM1LimitLegalEff       : BOOL;
+    BypassM1MecaDEff            : BOOL;
+    BypassM2TopLimitSwitchEff   : BOOL;
+    BypassM2TopLimitSoftwareEff : BOOL;
+    BypassM2CableLimitSwitchEff : BOOL;
+    BypassM2LimitLegalEff       : BOOL;
+    BypassM2MecaDEff            : BOOL;
 END_VAR
 
 {region "§1 Intention maintenance et assistants"}
@@ -145,6 +173,12 @@ CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCouple
 
 // Récupération de l'état fond synthétisé par PRG_03
 BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
+
+// MODES DE MAINTENANCE (calculés en tête de scan : consommés dès §2 par instBucket)
+// Doctrine AF-05 §4bis : un bypass n'est effectif qu'en MAINT_N2 ; MAINT_N1 n'ouvre que l'override
+// momentané du FDC haut logiciel (§5).
+MaintN1 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1);
+MaintN2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 
 // Règle absolue en pilotage couplé (both) normal --
 // descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
@@ -197,7 +231,8 @@ instBucket(
     BucketState        := _BucketState,
     InhibitM1           := PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     InhibitM2           := PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
-    BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
+    // Bypass benne (n°25 de la matrice) effectif UNIQUEMENT en MAINT_N2
+    BypassGlobal        := MaintN2 AND GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
 
 // Auto-séquencement benne & Dégradation Palier 1
@@ -214,7 +249,8 @@ BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDire
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
 // au §5bis (lag d'un cycle automate nominal, sécurisé en amont par la lecture directe de M2_TensionedCable_DI).
-SlackCableAscentStep1 := NOT PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND (
+SlackCableAscentStep1 := NOT GVL_IHM.Commun.Bypass.SlackCable
+    AND NOT PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND (
     ((instSafetyWinchM1.Fault.ErrorId AND 16#0008) <> 16#0000) OR
     ((instSafetyWinchM2.Fault.ErrorId AND 16#0008) <> 16#0000) OR
     (NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI)
@@ -513,6 +549,59 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
                       (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _CommunCfgPersist.CfgCableLimitAscent_M);
 
+{endregion}
+
+{region "§5-0 Matrice maintenance N1/N2 — bypass effectifs & override FDC"}
+// === 🛡️ §5-0 MATRICE DE MAINTENANCE N1/N2 (AF-05 §4bis) ===
+// Règle : bypass_effectif := bypass_IHM AND (Mode = MAINT_N2), pour TOUTES les bascules treuil.
+// Un bypass IHM activé hors MAINT_N2 est IGNORÉ (l'IHM l'affiche « inactif — passer en N2 »).
+// Exception unique : l'override du FDC haut logiciel, momentané en MAINT_N1 (§ ci-dessous).
+
+// --- Override FDC haut LOGICIEL (décision Q8) ---------------------------------------------
+// MAINT_N1 + bouton IHM MAINTENU ➔ la limite logicielle passe de 7,5 m à la position du capteur
+// de homing haut (8,5 m). Relâché ➔ retour à 7,5 m au cycle suivant (aucune mémorisation).
+// ⛔ Cet override n'ouvre PAS BypassTopLimitSwitch : le capteur physique haut reste la butée
+// dure — si TopPositionSensor retombe, AscentPermit tombe (FB_Safety_Winch §3) ➔ arrêt matériel.
+OverrideTopSoftwareN1M1 := MaintN1 AND GVL_IHM.M1TreuilRetenue.Cmd.BtnOverrideTopSoftware;
+OverrideTopSoftwareN1M2 := MaintN1 AND GVL_IHM.M2TreuilBenne.Cmd.BtnOverrideTopSoftware;
+
+// --- Bypass EFFECTIFS de la famille position (individuel OR commun, puis gate MAINT_N2) ---
+BypassM1TopLimitSwitchEff   := MaintN2 AND (GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch   OR GVL_IHM.Commun.Bypass.TopLimitSwitch);
+BypassM1TopLimitSoftwareEff := MaintN2 AND (GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware);
+BypassM1CableLimitSwitchEff := MaintN2 AND (GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch);
+BypassM1LimitLegalEff       := MaintN2 AND (GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal       OR GVL_IHM.Commun.Bypass.LimitLegal);
+BypassM1MecaDEff            := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.MecaD;
+BypassM2TopLimitSwitchEff   := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch      OR GVL_IHM.Commun.Bypass.TopLimitSwitch);
+BypassM2TopLimitSoftwareEff := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware    OR GVL_IHM.Commun.Bypass.TopLimitSoftware);
+BypassM2CableLimitSwitchEff := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch    OR GVL_IHM.Commun.Bypass.CableLimitSwitch);
+BypassM2LimitLegalEff       := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.LimitLegal          OR GVL_IHM.Commun.Bypass.LimitLegal);
+BypassM2MecaDEff            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.MecaD;
+
+// --- Limite haute logicielle active -------------------------------------------------------
+// Nominal 7,5 m (CfgCableLimitAscent_M) ; 8,5 m (CfgTopSensorPos_M) sous override N1 momentané
+// ou bypass N2 latché du FDC logiciel. M2 conserve son décalage benne (M2_LimitShift) dans les
+// deux cas : l'override ne modifie que l'assiette de référence, pas la géométrie M1/M2.
+TopLimitM1_M := SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
+                    _CommunCfgPersist.CfgCableLimitAscent_M,
+                    _WinchM1CfgPersist.CfgTopSensorPos_M);
+TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
+                    _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+                    _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift);
+
+// --- Usage effectif d'un override/bypass de position → re-homing obligatoire ---------------
+// Publié vers PRG_03 (rang 03) ➔ FB_Modes arme HomingRequiredMx à la sortie du mode maintenance.
+// Famille position : TopLimitSwitch, TopLimitSoftware, CableLimitSwitch, LimitLegal, MecaD
+// (+ l'override N1 momentané).
+PositionLimitOverriddenM1 := OverrideTopSoftwareN1M1 OR BypassM1TopLimitSwitchEff
+                             OR BypassM1TopLimitSoftwareEff OR BypassM1CableLimitSwitchEff
+                             OR BypassM1LimitLegalEff OR BypassM1MecaDEff;
+PositionLimitOverriddenM2 := OverrideTopSoftwareN1M2 OR BypassM2TopLimitSwitchEff
+                             OR BypassM2TopLimitSoftwareEff OR BypassM2CableLimitSwitchEff
+                             OR BypassM2LimitLegalEff OR BypassM2MecaDEff;
+{endregion}
+
+{region "§5bis Sécurité treuils M1/M2"}
+
 // FB_Safety_Winch M1/M2.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
 // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
@@ -526,7 +615,7 @@ instSafetyWinchM1(
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
     EncoderAvailable       := PRG_02_Acquisition.Data.EncoderM1.Measurement.EncoderAvailable,
-    EncoderFaultBypass     := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
+    EncoderFaultBypass     := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
@@ -540,7 +629,7 @@ instSafetyWinchM1(
     MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
     Homed                  := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomingSuspect          := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
-    TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M,
+    TopLimitM              := TopLimitM1_M,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
@@ -551,25 +640,29 @@ instSafetyWinchM1(
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.Encoders.M1.SignedSpeed_Mps,
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M1.SpeedValid,
-    BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
-    BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
-    BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
+    // Matrice AF-05 §4bis : TOUT bypass transmis est gaté par (Mode = MAINT_N2).
+    // Le bypass commun reste en OR avec l'individuel (pilotage "both"), le gate s'applique
+    // ensuite à l'ensemble — la philosophie du câblage d'origine est inchangée.
+    BypassGlobal           := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.Global,
+    BypassSafety           := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.Safety,
+    BypassProcess          := MaintN2 AND (GVL_IHM.M1TreuilRetenue.Bypass.Process
+                              OR GVL_IHM.Commun.Bypass.SlackCable),
     // OR avec le bypass commun (Commun.Bypass) -- leve la
     // protection sur les 2 treuils simultanement pour le pilotage "both", sans retirer le
     // bypass individuel pour le pilotage a l'unite.
-    BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch,
-    BypassTopLimitSoftware := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware,
-    BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
-    BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal,
-    BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
-    BypassPhaseRotation    := GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
-    BypassBrakeThermal     := GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
-    BypassMotorThermal     := GVL_IHM.M1TreuilRetenue.Bypass.MotorThermal,
-    BypassMecaA            := GVL_IHM.M1TreuilRetenue.Bypass.MecaA,
-    BypassMecaB            := GVL_IHM.M1TreuilRetenue.Bypass.MecaB,
-    BypassMecaC            := GVL_IHM.M1TreuilRetenue.Bypass.MecaC,
-    BypassMecaD            := GVL_IHM.M1TreuilRetenue.Bypass.MecaD,
-    BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE
+    BypassTopLimitSwitch   := BypassM1TopLimitSwitchEff,
+    BypassTopLimitSoftware := BypassM1TopLimitSoftwareEff,
+    BypassCableLimitSwitch := BypassM1CableLimitSwitchEff,
+    BypassLimitLegal       := BypassM1LimitLegalEff,
+    BypassOperatorComm     := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
+    BypassPhaseRotation    := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
+    BypassBrakeThermal     := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
+    BypassMotorThermal     := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.MotorThermal,
+    BypassMecaA            := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.MecaA,
+    BypassMecaB            := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.MecaB,
+    BypassMecaC            := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.MecaC,
+    BypassMecaD            := BypassM1MecaDEff,
+    BypassMecaE            := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.MecaE
 );
 
 instSafetyWinchM2(
@@ -582,7 +675,7 @@ instSafetyWinchM2(
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
     EncoderAvailable       := PRG_02_Acquisition.Data.EncoderM2.Measurement.EncoderAvailable,
-    EncoderFaultBypass     := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
+    EncoderFaultBypass     := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
@@ -596,7 +689,7 @@ instSafetyWinchM2(
     MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
     Homed                  := PRG_02_Acquisition.Data.EncoderM2.Homed,
     HomingSuspect          := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
-    TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+    TopLimitM              := TopLimitM2_M,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
@@ -607,23 +700,25 @@ instSafetyWinchM2(
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.Encoders.M2.SignedSpeed_Mps,
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M2.SpeedValid,
-    BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
-    BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
-    BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
+    // Matrice AF-05 §4bis (identique à M1 ci-dessus)
+    BypassGlobal           := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Global,
+    BypassSafety           := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Safety,
+    BypassProcess          := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.Process
+                              OR GVL_IHM.Commun.Bypass.SlackCable),
     // OR avec le bypass commun (Commun.Bypass) -- voir M1 ci-dessus
-    BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch,
-    BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware,
-    BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
-    BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal,
-    BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
-    BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
-    BypassBrakeThermal     := GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
-    BypassMotorThermal     := GVL_IHM.M2TreuilBenne.Bypass.MotorThermal,
-    BypassMecaA            := GVL_IHM.M2TreuilBenne.Bypass.MecaA,
-    BypassMecaB            := GVL_IHM.M2TreuilBenne.Bypass.MecaB,
-    BypassMecaC            := GVL_IHM.M2TreuilBenne.Bypass.MecaC,
-    BypassMecaD            := GVL_IHM.M2TreuilBenne.Bypass.MecaD,
-    BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE
+    BypassTopLimitSwitch   := BypassM2TopLimitSwitchEff,
+    BypassTopLimitSoftware := BypassM2TopLimitSoftwareEff,
+    BypassCableLimitSwitch := BypassM2CableLimitSwitchEff,
+    BypassLimitLegal       := BypassM2LimitLegalEff,
+    BypassOperatorComm     := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
+    BypassPhaseRotation    := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
+    BypassBrakeThermal     := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
+    BypassMotorThermal     := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.MotorThermal,
+    BypassMecaA            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.MecaA,
+    BypassMecaB            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.MecaB,
+    BypassMecaC            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.MecaC,
+    BypassMecaD            := BypassM2MecaDEff,
+    BypassMecaE            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.MecaE
 );
 
 SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
@@ -668,7 +763,6 @@ instWinchM1(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := EffectivePermitM1_Descend,
@@ -684,22 +778,23 @@ instWinchM1(
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
     HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
-    BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback,
+    // ContactorFeedback (n°3 de la matrice) et Global, gatés MAINT_N2.
+    BypassContactorCheck    := MaintN2 AND (GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback),
     Homed                   := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomingSuspect           := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
-    TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M,
+    // Même limite haute active que FB_Safety_Winch (7,5 m / 8,5 m sous override).
+    TopLimitM               := TopLimitM1_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
     CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
-    BypassGlobal            := GVL_IHM.M1TreuilRetenue.Bypass.Global
+    BypassGlobal            := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
 instWinchM2(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := EffectivePermitM2_Descend,
@@ -720,15 +815,17 @@ instWinchM2(
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
     HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
-    BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback,
+    // Idem M1 ci-dessus
+    BypassContactorCheck    := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback),
     Homed                   := PRG_02_Acquisition.Data.EncoderM2.Homed,
     HomingSuspect           := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
-    TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+    // Même limite haute active que FB_Safety_Winch (M2_LimitShift conservé).
+    TopLimitM               := TopLimitM2_M,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
     CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
-    BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
+    BypassGlobal            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
 
@@ -1014,6 +1111,9 @@ Data.BucketBusy                   := instBucket.Lifecycle.Busy;
 Data.BucketDone                   := instBucket.Lifecycle.Done;
 Data.BucketError                  := instBucket.Fault.Error;
 Data.ArmingPermit                 := ArmingPermit;
+// Usage effectif d'un override/bypass de position (consommé PRG_03 → FB_Modes)
+Data.PositionLimitOverriddenM1    := PositionLimitOverriddenM1;
+Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
 
 {endregion}
 END_PROGRAM

@@ -367,6 +367,10 @@ GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs.EmergencyDiag.Redunda
 GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs.EmergencyDiag.ArmFailed;
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error OR PRG_02_Acquisition.Data.InputModuleFault;
 GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs.PowerCutOffActive;
+// Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
+GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
+GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
+GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
 
 // ---------- §3f. État joystick & réseau (diagnostic bus) ----------
 GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;

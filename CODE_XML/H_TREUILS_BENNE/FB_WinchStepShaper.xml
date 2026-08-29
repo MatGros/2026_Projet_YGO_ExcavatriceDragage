@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T22:08:32.151772" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T22:08:32.151772">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_WinchStepShaper" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation FB (TRUE = actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier cible demande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepRampDelay">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai de cadence montee de palier</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="ShapedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Palier metier temporise actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepDelayElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule tempo metier palier</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="StepDelay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation hausse de palier</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_WinchStepShaper — Cadencement de palier (montee cadencee)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Cadence la montee de palier (+1 cran / StepRampDelay),
+             descente immediate a 0 (aucune rampe descendante)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Interface : Brique technique (contrat light, pas de defaut)
+   🔒 Sécurité : D10 — StepRampDelay dedie, decouple des delais direction
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+IF NOT Enable THEN
+    ShapedStep := 0;
+    StepDelay(IN := FALSE);
+    StepDelayElapsed := T#0s;
+    RETURN;
+END_IF;
+
+// Temporisation : compte quand la cible est au-dessus du palier courant
+StepDelay(
+    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0),
+    PT := StepRampDelay
+);
+StepDelayElapsed := StepDelay.ET;
+
+// Cadencement asymetrique : montee +1 cran / StepRampDelay, descente immediate
+IF TargetStep = 0 THEN
+    ShapedStep := 0;
+ELSIF TargetStep &lt; ShapedStep THEN
+    ShapedStep := TargetStep;
+ELSIF TargetStep &gt; ShapedStep THEN
+    IF ShapedStep = 0 THEN
+        ShapedStep := 1;
+    ELSIF StepDelay.Q THEN
+        ShapedStep := ShapedStep + 1;
+    END_IF;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9ff21482-5982-5964-8b75-503c2d5a480e</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="H_TREUILS_BENNE">
+          <Object Name="FB_WinchStepShaper" ObjectId="9ff21482-5982-5964-8b75-503c2d5a480e" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

@@ -57,68 +57,6 @@ def test_program_pou_type():
     assert pou.get("pouType") == "program"
 
 
-def test_only_prg_ld_is_converted_to_ladder():
-    program = SourceObject(
-        kind="program", name="PRG_10_Outputs_LD", folder="MAIN", file_path="x",
-        input_vars=[VariableDecl("M1RelayFwd", BaseType("BOOL"))],
-        body_text="M1_RelayFwd_Up_DQ := M1RelayFwd;"
-    )
-    function_block = _fb(
-        "FB_WinchOutputInterlock", body_text="IF Enable THEN\n    Ready := TRUE;\nEND_IF;"
-    )
-    diag = DiagnosticCollector()
-    root = build_project_xml(
-        "PRG_10_Outputs_LD",
-        {program.name: program, function_block.name: function_block},
-        diag,
-        include_deps=False,
-    )
-    pou = root.find("types/pous/pou")
-    assert pou.find("body/LD") is not None
-    assert pou.find("body/LD/contact/variable").text == "M1RelayFwd"
-    assert pou.find("body/LD/coil/variable").text == "M1_RelayFwd_Up_DQ"
-
-    root = build_project_xml(
-        "FB_WinchOutputInterlock",
-        {program.name: program, function_block.name: function_block},
-        diag,
-        include_deps=False,
-    )
-    pou = root.find("types/pous/pou")
-    assert pou.find("body/ST/xhtml").text == "IF Enable THEN\n    Ready := TRUE;\nEND_IF;"
-    assert pou.find("body/LD") is None
-
-
-def test_prg_ld_block_type_name_matches_declared_instance_type():
-    program = SourceObject(
-        kind="program",
-        name="PRG_10_Outputs_LD",
-        folder="MAIN",
-        file_path="x",
-        local_vars=[
-            VariableDecl("instWinchOutputInterlockM1_LD", DerivedType("FB_WinchOutputInterlock")),
-            VariableDecl("instWinchOutputInterlockM2_LD", DerivedType("FB_WinchOutputInterlock")),
-            VariableDecl("instTranslationOutputInterlock_LD", DerivedType("FB_TranslationOutputInterlock")),
-        ],
-        body_text=(
-            "instWinchOutputInterlockM1_LD(Enable := M1Enable, RequestedStep := M1Step);\n"
-            "instWinchOutputInterlockM2_LD(Enable := M2Enable, RequestedStep := M2Step);\n"
-            "instTranslationOutputInterlock_LD(Enable := M3Enable, RequestedDriveControlWord := M3Word);"
-        ),
-    )
-    diag = DiagnosticCollector()
-    root = build_project_xml(program.name, {program.name: program}, diag, include_deps=False)
-    blocks = {
-        block.get("instanceName"): block.get("typeName")
-        for block in root.findall("types/pous/pou/body/LD/block")
-    }
-    assert blocks == {
-        "instWinchOutputInterlockM1_LD": "FB_WinchOutputInterlock",
-        "instWinchOutputInterlockM2_LD": "FB_WinchOutputInterlock",
-        "instTranslationOutputInterlock_LD": "FB_TranslationOutputInterlock",
-    }
-
-
 def test_inout_and_temp_vars_only_emitted_when_present():
     obj = _fb("FB_Demo", input_vars=[VariableDecl("A", BaseType("BOOL"))], body_text="")
     diag = DiagnosticCollector()

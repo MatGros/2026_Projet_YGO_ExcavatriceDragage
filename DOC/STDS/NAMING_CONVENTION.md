@@ -218,15 +218,12 @@ décidé — `NC-110` s'applique à **tout nouveau** DUT et à tout DUT touché 
 | Suffixe | Langage bundle | Source versionnee | Rôle | Exemple |
 |---------|----------------|-------------------|------|---------|
 | (sans suffixe) | Structured Text (`<ST>`) | `.st` | Orchestration ST par procédé, câblage d'instances FB par bus DUT | `PRG_02_Acquisition.st`, `PRG_04_Treuils_Benne.st` |
-| `_LD` | Ladder Diagram (`<LD>`) | `.st`, converti automatiquement en Ladder dans le bundle | Barrière finale des sorties physiques TOR | `PRG_06_Outputs.st` |
 
 **Règles :**
 - Tout programme est préfixé `PRG_XX_` : la numérotation fixe l'ordre exact d'exécution dans la `MainTask` (décidé dans `AF_Partie-02`).
 - Les programmes d'orchestration procédés sont rédigés en **Texte Structuré ST (`.st`)** pour maximiser la vitesse d'implémentation et la lisibilité textuelle.
 - **Organisation en sections commentées avec emojis dans le ST** : Chaque programme ST d'orchestration doit structurer son flux de manière limpide de haut en bas (ex: `// === 📥 §1 ACQUISITION ===`, `// === 🛡️ §2 SÉCURITÉ ===`, `// === 🔀 §3 ARBITRAGE ===`). Les sections de responsabilité distinctes d'un POU ST sont repliables avec `{region "§N Rôle fonctionnel"}` / `{endregion}` ; le commentaire reste visible dans le source et la recherche texte.
 - **Aucune logique métier inline** dans les POU `PRG_` ST : l'orchestration ne contient ni `IF` complexe ni calcul métier — uniquement des instanciations de FB et des câblages par bus DUT (`ST_*`).
-- Les programmes `_LD.st` restent convertis automatiquement en `<LD>` pour la barrière finale des sorties
-  (`PRG_06_Outputs.st`). `PRG_01_Inputs_LD.st` est une couche historique en retrait.
 
 ### Noms cibles des programmes — aucun renommage sans lot dedie
 
@@ -243,7 +240,7 @@ décidé — `NC-110` s'applique à **tout nouveau** DUT et à tout DUT touché 
 | 03 | `PRG_03_Modes_Cycle` | `.st` ST pur (Orchestration Modes & Cycle) |
 | 04 | `PRG_04_Treuils_Benne` | `.st` ST pur (Orchestration Levage/Treuils) |
 | 05 | `PRG_05_Translation` | `.st` ST pur (Orchestration Translation) |
-| 06 | `PRG_06_Outputs` | `.st` converti en `<LD>` (Ladder Sorties) |
+| 06 | `PRG_06_Outputs` | `.st` ST pur (Barrière finale sorties) |
 | 07 | `PRG_07_Supervision` | `.st` ST pur (Supervision / Lecture seule) |
 
 🚫 **Noms abandonnes comme cibles** — ne pas les reintroduire dans une table de nommage :
@@ -784,16 +781,6 @@ STRUCT
 END_STRUCT
 END_TYPE
 ```
-
----
-
-## En Ladder : lisibilité flux
-```
-[FB_Joystick]     →  (.Done)  →  [FB_Treuil.Enable]
-     ↓ SpeedTgt        + StartStop ↓ SpeedTgt
-[FB_Encodeur]     ←  (.CablePosAct)
-```
-→ Chaînes d'instance, flux d'info immédiatement visible pour maintenance. ✅
 
 ---
 
