@@ -125,7 +125,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
-      <th style="padding: 4px 1px; text-align: center;"><small style="writing-mode: vertical-rl; transform: rotate(180deg);">ID</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
       <th style="padding: 4px 2px;"><small>Intention</small></th>
       <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Preuve</small></th>
