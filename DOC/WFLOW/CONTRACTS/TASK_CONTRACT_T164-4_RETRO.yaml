@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T164-4
+# Chapo de famille : mise en conformite interface FB_Encoder (4A -> 4D)
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). T164-4 est un chapo scinde en T164-4A
+# (cadrage architecture), T164-4B (persistance), T164-4C (split HW + transaction
+# preset) et T164-4D (migration facade Fault:ST_Fault). Chaque sous-tache porte
+# son contrat propre ; ce document acte l'orchestration et le critere d'arrivee.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T164-4_RETRO
+  parent_id: T164
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Orchestrer les sous-taches T164-4A a T164-4D pour amener l'interface publique
+    de FB_Encoder au profil standard AF-03 (proprietaires de configuration figes,
+    constantes mecaniques figees, persistance, transaction preset/HW, facade de
+    defaut Fault de type ST_Fault) sans fusionner les reglages M1 et M2.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Les quatre sous-taches enfants T164-4A, T164-4B, T164-4C et T164-4D sont
+        marquees terminees (statut cocher vert) dans DOC/WFLOW/TASKS.yaml, dans
+        l'ordre 4A vers 4D, chacune avec revue orchestrateur.
+      verified_by: >
+        grep -n "parent_id: T164-4$" DOC/WFLOW/TASKS.yaml puis controle du champ
+        statut de chaque bloc enfant (tous en cocher vert) ; presence des quatre
+        contrats T164-4A..T164-4D references en champ contrat.
+    - id: AC2
+      statement: >
+        FB_Encoder.st expose une facade de defaut Fault de type ST_Fault alimentee
+        par le socle FB_FaultCore a partir de sorties publiques uniquement, sans
+        lecture de VAR privees des sous-FB.
+      verified_by: >
+        grep -n "Fault +: ST_Fault|FB_FaultCore|sorties publiques" dans
+        CODE/E_CODEURS/FB_Encoder.st (declaration ligne ~54, instFault ligne ~77,
+        commentaire ligne ~218-219).
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/
+      - CODE/E_CODEURS/FB_Encoder.st
+    forbidden:
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - tasks_yaml_children_status
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Toute sous-tache T164-4* dont l'etat reel differe de l'etat consigne, ou toute
+    fusion des reglages M1/M2 constatee, est remontee immediatement a
+    l'orchestrateur. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-27T21:20:00"
+  status: COMPLETED
+  summary: >
+    Famille T164-4 livree via les lots T164-4A (cadrage architecture, contrat
+    archive), T164-4B (persistance), T164-4C (split HW + transaction preset) et
+    T164-4D (facade Fault:ST_Fault). FB_Encoder.st porte desormais Fault:ST_Fault
+    rempli par FB_FaultCore depuis des faits publics.
+  evidence_submitted:
+    - "T164-4A..T164-4D : statut cocher vert dans TASKS.yaml, chacune sous contrat propre"
+    - "CODE/E_CODEURS/FB_Encoder.st : Fault:ST_Fault + instFault:FB_FaultCore, causes issues de sorties publiques"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés. AC1 est un critère de
+    traçabilité (chaînage des quatre sous-contrats et de leur statut), le seul
+    critère d'intégration global formulable pour un chapô de cadrage.

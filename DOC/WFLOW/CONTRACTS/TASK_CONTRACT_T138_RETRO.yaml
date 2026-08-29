@@ -1,0 +1,72 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T138
+# Deduplication documentaire AF_Partie-03 <-> CODE_QUALITY_STANDARDS
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Tache documentaire absorbee par T136 :
+# critere de tracabilite vers la tache absorbante.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T138_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Supprimer la redondance entre AF_Partie-03 et CODE_QUALITY_STANDARDS sur le
+    Ladder (AF-03 paragraphe 6 devient un pointeur vers CQS paragraphe 11) et
+    corriger la double numerotation 2bis de CQS.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Le traitement de cette deduplication est realise et integre dans le cadre
+        de la tache T136 (criteres AC4 et AC5 de son contrat), et non par un
+        livrable propre a T138.
+      verified_by: >
+        entree DOC/WFLOW/TASKS.yaml T138 (description : "Traite et integre dans le
+        cadre de T136 (AC4 & AC5)") ; contrat de T136.
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Si AF-03 paragraphe 6 et CQS paragraphe 11 se re-dupliquent, ou si le double
+    2bis de CQS subsiste, le SIGNALER a l'orchestrateur. Signaler n'est pas
+    elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-19T14:30:00"
+  status: COMPLETED
+  summary: >
+    Deduplication AF-03 <-> CQS traitee et integree via T136 (AC4 et AC5). Pas de
+    livrable propre a T138.
+  evidence_submitted:
+    - "TASKS.yaml T138 : traite dans le cadre de T136 (AC4 & AC5)"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés. AC1 est un critère de
+    traçabilité (renvoi vers le contrat de T136, tâche absorbante) : T138 n'a pas
+    de livrable documentaire distinct.

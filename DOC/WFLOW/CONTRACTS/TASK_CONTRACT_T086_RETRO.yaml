@@ -1,0 +1,81 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T086
+# Recette : validation du blocage deterministe si Enable=FALSE (FB_Safety_Winch)
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Tache de recette securite : la preuve est
+# la relecture du gate de neutralisation et le test associe.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T086_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Certifier que FB_Safety_Winch neutralise le treuil de maniere deterministe
+    des que Enable vaut FALSE : aucune sortie de mouvement autorisee, Ready force
+    a FALSE, sans redemarrage automatique au retour de Enable.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Dans FB_Safety_Winch.st, la branche IF NOT Enable THEN met le FB en etat
+        sur : Ready := Enable AND NOT Fault.Latched impose Ready = FALSE tant que
+        Enable = FALSE, et le retour de Enable ne relance aucun mouvement sans
+        front Reset.
+      verified_by: >
+        Relecture de CODE/H_TREUILS_BENNE/FB_Safety_Winch.st (gate NOT Enable
+        ligne ~344, calcul Ready ligne ~360, socle instFault ligne ~338).
+    - id: AC2
+      statement: >
+        Le comportement Enable=FALSE de FB_Safety_Winch est couvert par le test
+        unitaire du FB dans TEST_AUTO_CI et le verdict est PASS.
+      verified_by: >
+        python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Safety_Winch ; entree
+        DOC/WFLOW/TASKS.yaml T086.
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - run_all_gates
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Tout chemin ou une sortie de mouvement resterait active avec Enable=FALSE, ou
+    tout redemarrage automatique au retour de Enable, est remonte immediatement a
+    l'orchestrateur. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-12T09:00:00"
+  status: COMPLETED
+  summary: >
+    Recette certifiee par relecture securite de CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+    (gate IF NOT Enable, Ready conditionne a Enable, socle de defaut latche) et par
+    le test unitaire associe. Aucun code touche.
+  evidence_submitted:
+    - "FB_Safety_Winch.st : IF NOT Enable THEN (ligne ~344), Ready := Enable AND NOT Fault.Latched (ligne ~360)"
+    - "TEST_AUTO_CI FB_Safety_Winch : PASS"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés.

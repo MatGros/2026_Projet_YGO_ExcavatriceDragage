@@ -1,0 +1,98 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T168
+# Chapo de famille : harmonisation DumpAtTremie et diagnostic Troubleshooting
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Sous-taches deja contractualisees :
+# T168-A (centralisation decision DumpAtTremie dans PRG_03), T168-B (diagnostic
+# unifie dans PRG_07 + StepAtFault assistants), T168-C (reset assistants
+# semi-auto), T168-D (OperatorActionId type WORD).
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T168_RETRO
+  parent_id: ''
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Orchestrer les sous-taches T168-A a T168-D pour porter le vidage tremie sur
+    le modele Decision PRG_03 / Muscle PRG_04-05 (PRG_03 decide et publie via
+    ReqBucket.ReqOpen, PRG_04 consomme et applique) et raccorder le diagnostic
+    unifie a la supervision PRG_07.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Les quatre sous-taches enfants T168-A, T168-B, T168-C et T168-D sont
+        marquees terminees (statut cocher vert) dans DOC/WFLOW/TASKS.yaml.
+      verified_by: >
+        grep -n "parent_id: T168$" DOC/WFLOW/TASKS.yaml puis controle du champ
+        statut de chaque bloc enfant (tous en cocher vert).
+    - id: AC2
+      statement: >
+        PRG_03_Modes_Cycle.st decide le vidage tremie et le publie via
+        Data.ReqProgram.ReqBucket.ReqOpen (arme depuis DumpAtTremieBucketOpenArmed),
+        sans logique DumpAtTremie inline dans PRG_04.
+      verified_by: >
+        grep -n "ReqBucket\.ReqOpen|DumpAtTremieBucketOpenArmed"
+        CODE/M_MAIN/PRG_03_Modes_Cycle.st (lignes ~238 et ~311) ; contrat T168-A.
+    - id: AC3
+      statement: >
+        La chaine de diagnostic va de PRG_03.Data.SequenceState jusqu'a
+        FB_TroubleshootingView (via PRG_07 et GVL_IHM.DredgingAssist.State puis
+        GVL_Troubleshooting.AssistanceDragage), avec G200 en PASS et gates palier C
+        a 16 sur 16.
+      verified_by: >
+        Contrat T168-B (description TASKS.yaml : "G200 PASS, gates C 16/16,
+        PRG_07 3/3") ; grep -n "DredgingAssist\.State|AssistanceDragage"
+        CODE/M_MAIN/PRG_07_Supervision.st et CODE/J_SUPERVISION/.
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - tasks_yaml_children_status
+    - traceability_grep
+    - check_linkage
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Toute logique DumpAtTremie residuelle inline dans PRG_04, ou tout ecart d'etat
+    des sous-taches T168-*, est remonte immediatement a l'orchestrateur. Signaler
+    n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-28T16:38:00+02:00"
+  status: COMPLETED
+  summary: >
+    Famille T168 livree via T168-A (decision DumpAtTremie dans PRG_03, publication
+    ReqBucket.ReqOpen), T168-B (diagnostic unifie PRG_07 + StepAtFault assistants,
+    projection GVL_IHM.DredgingAssist.State), T168-C (reset assistants semi-auto)
+    et T168-D (OperatorActionId type WORD sur toute la chaine).
+  evidence_submitted:
+    - "T168-A..T168-D : statut cocher vert dans TASKS.yaml, sous-contrats propres"
+    - "PRG_03_Modes_Cycle.st : ReqBucket.ReqOpen arme depuis DumpAtTremieBucketOpenArmed"
+    - "T168-B : G200 PASS, gates C 16/16, PRG_07 3/3 (consigne TASKS.yaml)"
+    - "Chaine PRG_03.Data.SequenceState -> PRG_07 -> GVL_IHM.DredgingAssist.State -> GVL_Troubleshooting.AssistanceDragage"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés.

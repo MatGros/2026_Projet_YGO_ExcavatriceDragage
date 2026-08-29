@@ -1,0 +1,87 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T147
+# FB_FbStatus : fault latche perdu sur un cycle Enable=FALSE->TRUE sans Reset
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Constat d'audit devenu sans objet : le FB
+# concerne a ete supprime au profit du socle ST_Fault / FB_FaultCore (T164-3).
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T147_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Garantir qu'un defaut latche ne peut pas disparaitre silencieusement d'un FB
+    de statut lors d'un cycle Enable=FALSE puis TRUE sans front Reset explicite,
+    conformement au principe Reset = front conscient.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Il n'existe plus de definition ni d'instanciation de FB_FbStatus dans
+        CODE/ : la brique de statut a defaut latche est remplacee par le socle
+        ST_Fault alimente par FB_FaultCore (issu de T164-3), et le constat
+        d'origine n'a donc plus d'objet executable.
+      verified_by: >
+        grep -rn "FB_FbStatus" CODE/ : aucun POU de ce nom, seule subsiste une
+        mention en commentaire dans CODE/A_COMMUN/_TYPES/ST_Status.st (ligne ~8),
+        sans code executable associe.
+    - id: AC2
+      statement: >
+        Le socle de remplacement FB_FaultCore conserve la memoire de defaut latche
+        entre scans et n'acquitte que sur front Reset, jamais sur Enable=FALSE.
+      verified_by: >
+        Relecture de CODE/A_COMMUN/FB_FaultCore.st (memoire latchee retenue, gate
+        Reset sur front) ; contrats de la famille T164-3 / T164-4 dans
+        DOC/WFLOW/TASKS.yaml.
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - CODE/A_COMMUN/FB_FaultCore.st
+      - CODE/A_COMMUN/_TYPES/ST_Status.st
+    forbidden:
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Si une mention residuelle de FB_FbStatus redevenait executable, ou si
+    FB_FaultCore acquittait un defaut latche sur Enable=FALSE, le SIGNALER
+    immediatement a l'orchestrateur. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-24T05:15:00"
+  status: COMPLETED
+  summary: >
+    Le constat d'audit (fault latche remis a zero par Enable=FALSE dans
+    FB_FbStatus) est devenu sans objet : FB_FbStatus a ete supprime du code au
+    profit du socle ST_Fault / FB_FaultCore (T164-3), qui retient la memoire
+    latchee entre scans et n'acquitte que sur front Reset. Seule subsiste une
+    mention en commentaire dans ST_Status.st.
+  evidence_submitted:
+    - "grep -rn FB_FbStatus CODE/ : 0 POU, 1 mention en commentaire (ST_Status.st ligne ~8)"
+    - "FB_FaultCore : memoire latchee retenue, acquittement sur front Reset uniquement"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés. La formule initiale
+    "grep FB_FbStatus = 0" est corrigée : il subsiste une occurrence en
+    commentaire dans ST_Status.st (ligne ~8), sans objet exécutable.

@@ -1,0 +1,86 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T090
+# Recette : cote capteur haut et limite logicielle de montee figees, ajustables
+# sur site au premier homing
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Tache de recette : la preuve est la valeur
+# figee dans GVL_PERSISTENT et le visa utilisateur, pas une ecriture de code.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T090_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Figer une valeur de reference exploitable pour la cote du capteur physique
+    haut et pour la limite logicielle de montee du cable, ajustable sur place au
+    premier homing sans modification de code.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Dans GVL_PERSISTENT, CfgTopSensorPos_M vaut 8.5 (capteur physique reel) et
+        CfgCableLimitAscent_M vaut 7.5 (limite logicielle de montee, maintenue sous
+        le capteur physique) ; les deux sont des variables persistantes ajustables
+        depuis l'IHM.
+      verified_by: >
+        grep -n "CfgTopSensorPos_M|CfgCableLimitAscent_M" CODE/GVL_PERSISTENT.st
+        (CfgTopSensorPos_M := 8.5 lignes ~41/49, CfgCableLimitAscent_M := 7.5
+        ligne ~137).
+    - id: AC2
+      statement: >
+        Le figeage de ces deux valeurs est vise par l'utilisateur le 2026-08-28,
+        la validation terrain definitive au premier homing restant ouverte.
+      verified_by: >
+        entree DOC/WFLOW/TASKS.yaml T090 (description : "valide utilisateur
+        2026-08-28, ajustable sur place").
+
+  scope:
+    allowed:
+      - CODE/GVL_PERSISTENT.st
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Si un essai terrain au premier homing impose une cote capteur ou une limite de
+    montee differente, le SIGNALER immediatement : la valeur figee est une
+    reference de mise en service, pas une donnee definitive. Signaler n'est pas
+    elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-28T09:47:00"
+  status: COMPLETED
+  summary: >
+    Recette certifiee : CfgTopSensorPos_M = 8.5 m et CfgCableLimitAscent_M = 7.5 m
+    figes dans CODE/GVL_PERSISTENT.st, vise utilisateur le 2026-08-28, ajustables
+    sur place via l'IHM. Validation terrain au premier homing tracee separement
+    (T092, en attente). Aucun code metier touche.
+  evidence_submitted:
+    - "CODE/GVL_PERSISTENT.st : CfgTopSensorPos_M := 8.5 (lignes ~41/49), CfgCableLimitAscent_M := 7.5 (ligne ~137)"
+    - "Visa utilisateur 2026-08-28 (TASKS.yaml T090)"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés. La cote capteur retenue est
+    8.5 m (et non 8.0 m comme dans l'intitulé initial) : valeur figée confirmée
+    dans GVL_PERSISTENT et par le visa du 2026-08-28.

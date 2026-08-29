@@ -1,0 +1,97 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T171
+# Chapo de famille : animation visuelle pilotee par le code compile FB_Cycle
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Sous-taches deja contractualisees :
+# T171-A (harnais ST de simulation dynamique + trace scan-par-scan), T171-B
+# (raccordement animation Canvas sur la trace compilee), T171-CR (revue
+# independante par sous-agent Ollama). Travail mene en worktree isole.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T171_RETRO
+  parent_id: ''
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Orchestrer les sous-taches T171-A, T171-B et T171-CR pour supprimer la
+    simulation JavaScript fictive de l'animation Canvas et piloter la cinematique
+    machine a partir de la trace d'execution scan-par-scan du binaire STruCpp
+    compile de FB_Cycle.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Les trois sous-taches enfants T171-A, T171-B et T171-CR sont marquees
+        terminees (statut cocher vert) dans DOC/WFLOW/TASKS.yaml, chacune avec son
+        contrat propre.
+      verified_by: >
+        grep -n "parent_id: T171$" DOC/WFLOW/TASKS.yaml puis controle du champ
+        statut de chaque bloc enfant (tous en cocher vert).
+    - id: AC2
+      statement: >
+        Le harnais ST dynamique produit le fichier de trace
+        trace_semi_auto_cycle.json couvrant une traversee X0 a X13 de FB_Cycle
+        compile sous stimuli realistes.
+      verified_by: >
+        Presence de TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/trace_semi_auto_cycle.json ;
+        contrat T171-A (TASK_CONTRACT_T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE.yaml).
+    - id: AC3
+      statement: >
+        Le visualiseur Canvas de FICHE_SEMI_AUTO_ANIMATION.html consomme la trace
+        JSON compilee (scrub par scan, window.__traceScan) et n'embarque plus de
+        moteur de simulation JavaScript fictif.
+      verified_by: >
+        Contrat T171-B (TASK_CONTRACT_T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE.yaml)
+        et revue T171-CR (TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml),
+        tous deux en statut valide dans DOC/WFLOW/TASKS.yaml.
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - tasks_yaml_children_status
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Toute reintroduction d'un moteur de simulation JavaScript fictif dans
+    l'animation, ou tout ecart d'etat des sous-taches T171-*, est remonte
+    immediatement a l'orchestrateur. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-28T23:36:41"
+  status: COMPLETED
+  summary: >
+    Famille T171 livree via T171-A (harnais ST dynamique etendant test_fb_cycle.st,
+    generation de trace_semi_auto_cycle.json selon le Grafcet AF-04), T171-B
+    (adaptation du visualiseur Canvas : scrub par scan, window.__traceScan, lecture
+    temps-reel) et T171-CR (audit independant sous-agent Ollama). Travail en
+    worktree isole.
+  evidence_submitted:
+    - "T171-A / T171-B / T171-CR : statut cocher vert dans TASKS.yaml, sous-contrats propres"
+    - "trace_semi_auto_cycle.json present sous TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/"
+    - "FICHE_SEMI_AUTO_ANIMATION.html : moteur JS fictif eradique, consommation de la trace compilee"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés.

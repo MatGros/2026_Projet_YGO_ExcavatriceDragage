@@ -1,0 +1,99 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T167
+# Chapo de famille : refonte et unification du Grafcet Plongee / Recherche Fond
+# / Extraction
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29). Sous-taches deja contractualisees :
+# T167-A (spec Grafcet cible), T167-B (refonte FB_DiveSearch), T167-C (refonte
+# FB_ExtractionSequence), T167-CR (revue independante). B+C VALIDATED (visa
+# humain 2026-08-28, CODESYS OK). Items D1/D2 explicitement hors scope.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T167_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Orchestrer les sous-taches T167-A a T167-CR pour unifier les sequences de
+    plongee, recherche de fond et extraction sous un Grafcet cible unique, avec
+    traitement guard sur le bypass Kobold, gestion des time-outs et capture de
+    l'etape au moment du defaut (StepAtFault).
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Les quatre sous-taches enfants T167-A, T167-B, T167-C et T167-CR sont
+        marquees terminees (statut cocher vert) dans DOC/WFLOW/TASKS.yaml ;
+        T167-B et T167-C sont en etat valide (visa humain 2026-08-28, CODESYS OK).
+      verified_by: >
+        grep -n "parent_id: T167$" DOC/WFLOW/TASKS.yaml puis controle du champ
+        statut de chaque bloc enfant (tous en cocher vert).
+    - id: AC2
+      statement: >
+        PRG_03_Modes_Cycle.st capture et publie l'etape figee au defaut pour les
+        deux assistants : Data.SequenceState.DiveStepAtFault reprend
+        instDiveSearch.StepAtFault et Data.SequenceState.ExtractionStepAtFault
+        reprend instExtractionSequence.StepAtFault.
+      verified_by: >
+        grep -n "DiveStepAtFault|ExtractionStepAtFault|instDiveSearch\.StepAtFault|instExtractionSequence\.StepAtFault"
+        CODE/M_MAIN/PRG_03_Modes_Cycle.st (lignes ~367 et ~375).
+    - id: AC3
+      statement: >
+        Les items D1 (recovery reset FB_ExtractionSequence) et D2 (garde position
+        basse FB_DiveSearch) sont explicitement portes hors du perimetre de la
+        famille et renvoyes en suivi.
+      verified_by: >
+        DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md paragraphe 4 ; champ
+        contexte de T167 dans DOC/WFLOW/TASKS.yaml ("Items D1/D2 = hors scope").
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - tasks_yaml_children_status
+    - traceability_grep
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Toute reintroduction des items D1/D2 dans le perimetre de la famille sans
+    decision d'orchestrateur, ou tout ecart d'etat des sous-taches T167-*, est
+    remonte immediatement. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-28T16:38:00+02:00"
+  status: COMPLETED
+  summary: >
+    Famille T167 livree via T167-A (spec Grafcet cible unifie), T167-B (refonte
+    FB_DiveSearch, fix+guard bypass Kobold), T167-C (refonte FB_ExtractionSequence,
+    coordination de vitesse controlee) et T167-CR (revue independante). 3 revues
+    independantes + 2 passes de durcissement (H1-H5 puis F1-F3). Capture StepAtFault
+    projetee jusqu'a PRG_07. Items D1/D2 hors scope, renvoyes en suivi.
+  evidence_submitted:
+    - "T167-A..T167-CR : statut cocher vert dans TASKS.yaml, sous-contrats propres"
+    - "T167-B / T167-C : VALIDATED, visa humain 2026-08-28, CODESYS OK"
+    - "PRG_03_Modes_Cycle.st : DiveStepAtFault / ExtractionStepAtFault alimentes depuis les assistants"
+    - "T167-CR_REVUE_INDEPENDANTE_CYCLES.md paragraphe 4 : D1/D2 traces hors scope"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés.

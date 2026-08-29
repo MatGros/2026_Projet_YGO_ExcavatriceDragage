@@ -1,0 +1,98 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE RETROACTIF — T127
+# Chapo de famille : cycle semi-auto (sequenceur Grafcet X0..X13)
+# ═══════════════════════════════════════════════════════════════════════════
+# Contrat retroactif (REX 2026-08-29) : T127 a ete cloturee avant la discipline
+# "contrat obligatoire des C2". Ses 6 sous-taches T127-A..T127-F portent chacune
+# leur propre contrat ; ce document ne fait qu'acter le role d'orchestration du
+# chapo et ses criteres d'integration globale, tels qu'ecrits dans TASKS.yaml.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T127_RETRO
+  parent_id: ''
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Orchestrer et integrer les sous-taches T127-A a T127-F pour livrer un cycle
+    de dragage semi-automatique complet (sequenceur Grafcet X0..X13 + STABILIZING,
+    sous-cycles Dive/Extraction) dont la bascule Semi-Auto vers Maintenance se fait
+    sans a-coup et sans redemarrage intempestif.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Les six sous-taches enfants T127-A, T127-B, T127-C, T127-D, T127-E et
+        T127-F sont marquees terminees (statut cocher vert) dans DOC/WFLOW/TASKS.yaml.
+      verified_by: >
+        grep -n "parent_id: T127$" DOC/WFLOW/TASKS.yaml puis controle du champ
+        statut de chaque bloc enfant (tous en cocher vert).
+    - id: AC2
+      statement: >
+        La suite mecanique de fin de lot est verte pour la famille : 22 gates sur
+        22 en PASS, G200 liaison en PASS, tests CI G_CYCLE et M_MAIN a 100 pourcent
+        PASS, compilation CODESYS a zero erreur.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py ; python
+        TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report ; entree
+        TASKS.yaml T127 (description : "22/22 Gates PASS, G200 PASS, compilation
+        CODESYS 0 erreur").
+    - id: AC3
+      statement: >
+        Aucune bascule Semi-Auto vers Maintenance ni retour ne provoque de
+        redemarrage intempestif d'un mouvement ; l'interface FB_Cycle suit le
+        profil standard AF-03 paragraphe 3 (socle FB_FaultCore, ST_Lifecycle).
+      verified_by: >
+        Contrats T127-A (interface AF-03) et T127-D/E (12 cas TC-P04-001..012
+        STruCpp), tous en statut valide dans DOC/WFLOW/TASKS.yaml.
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - tasks_yaml_children_status
+    - run_all_gates
+    - check_linkage
+
+  models_allowed:
+    - "auto/best-reasoning"
+
+  alert_duty: >
+    Tout ecart entre l'etat reel des sous-taches T127-* et l'etat consigne dans
+    TASKS.yaml est remonte immediatement a l'orchestrateur, sans correction
+    spontanee. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "Claude Code (Orchestrateur) — contrat retroactif"
+  completed_at: "2026-08-28T16:01:00"
+  status: COMPLETED
+  summary: >
+    Famille T127 livree via les lots T127-A a T127-F (sequenceur Grafcet X0..X13,
+    types G_CYCLE, sous-cycles Dive/Extraction, raccordement PRG_03). Integration
+    globale validee : 22/22 gates PASS, G200 PASS, CI G_CYCLE et M_MAIN 100 PASS,
+    compilation CODESYS 0 erreur (cf. TASKS.yaml T127).
+  evidence_submitted:
+    - "T127-A..T127-F : statut cocher vert dans TASKS.yaml, chacune sous contrat propre"
+    - "run_all_gates : 22/22 PASS (consigne TASKS.yaml T127)"
+    - "G200 linkage : PASS"
+    - "compilation CODESYS : 0 erreur (visa historique)"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur) — contrat rétroactif"
+  validated_at: "2026-08-29T12:00:00+02:00"
+  notes: >
+    Contrat rétroactif : tâche clôturée avant la discipline C2 (REX 2026-08-29).
+    AC dérivés de la description réelle, non inventés.
