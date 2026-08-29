@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T15:42:21.778606" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T15:42:21.778606">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T14:14:17.914535" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T14:14:17.914535">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -981,6 +981,15 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur sous-systeme benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Permission d'armement homme-mort (Option B — combiné interlock benne) ===
+🛡️ Permission d'armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2263,6 +2272,14 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Benne consideree fermee</xhtml>
               </documentation>
             </variable>
+            <variable name="ArmingPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permission d'armement homme-mort (combiné interlock benne, Option B)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CoupledUserRequestActive">
               <type>
                 <BOOL />
@@ -2893,6 +2910,18 @@ IF ControlAscentActive THEN
 END_IF;
 
 
+{endregion}
+
+{region "§3bis ArmingPermit (Option B)"}
+// === 🛡️ §3bis ARMINGPERMIT (Option B — combiné interlock benne) ===
+// ArmingPermit = permission d'armement homme-mort (entrée FB_Joystick, consommée PRG_02).
+// Combiné interlock benne : interdit l'armement pendant une action benne
+// (ouverture/fermeture, instBucket.Lifecycle.Busy) et pendant 1 scan après la fin
+// de l'action (BenneBusyFallEdge.Q, déjà câblé §3) — l'opérateur doit re-presser
+// consciemment le bouton homme-mort (pas de ré-armement "surprise" à la ré-acquisition).
+// Délai fin de cycle benne → ré-armement autorisé : 1 scan MainTask = 10 ms
+// (dans la fenêtre 10-20 ms exigée). Polarité positive (NC-100) : TRUE = armement autorisé.
+ArmingPermit := NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
 {endregion}
 
 {region "§4 Synchronisation M1/M2"}
@@ -3537,6 +3566,7 @@ Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
 Data.BucketBusy                   := instBucket.Lifecycle.Busy;
 Data.BucketDone                   := instBucket.Lifecycle.Done;
 Data.BucketError                  := instBucket.Fault.Error;
+Data.ArmingPermit                 := ArmingPermit;
 
 {endregion}
 </xhtml>

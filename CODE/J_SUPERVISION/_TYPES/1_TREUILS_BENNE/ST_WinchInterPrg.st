@@ -38,5 +38,8 @@ STRUCT
     BucketBusy                   : BOOL;               // ⚙️ Mouvement d'ouverture/fermeture benne en cours
     BucketDone                   : BOOL;               // ✅ Mouvement benne termine avec succes
     BucketError                  : BOOL;               // ❌ Defaut sur sous-systeme benne
+
+    // === 🛡️ Permission d'armement homme-mort (Option B — combiné interlock benne) ===
+    ArmingPermit                 : BOOL;               // 🛡️ Permission d'armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)
 END_STRUCT
 END_TYPE
