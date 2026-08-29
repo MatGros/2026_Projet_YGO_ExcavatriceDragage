@@ -3009,7 +3009,7 @@ tasks:
   bloque_par: []
 - id: T181-00
   parent_id: T181
-  statut: ⬜
+  statut: ⏳
   criticite: C4
   domaine: TEST_AUTO_CI
   agent: ''
@@ -3029,7 +3029,7 @@ tasks:
     T169-A (AGY-01) modifie le même FB_Main_EndToEnd — bloque_par: [T169-A].
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-00_HARNESS_INTEG.yaml
   objectifs:
   - FB_Main_EndToEnd étendu accepte boutons IHM M1/M2, commande benne, contexte plongée Kobold
   - Modèle physique minimal paire: position M1/M2 intègre la vitesse-cran, écart = déviation sync
@@ -3179,7 +3179,7 @@ tasks:
   - T181-03
 - id: T181-06
   parent_id: T181
-  statut: ⬜
+  statut: ⏳
   criticite: C4
   domaine: TREUILS
   agent: ''
@@ -3255,7 +3255,7 @@ tasks:
     dans le test (ancien == nouveau sur toute la matrice de vecteurs).
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-08_INTERFACE_FB_WINCH.yaml
   objectifs:
   - FB_Winch compile avec la nouvelle interface ; bundle PLCopenXML régénéré sans erreur
   - Les 2 sites PRG_04 + FB_SimBench + test_fb_winch migrés (aucun appelant orphelin, G200 PASS)
@@ -3312,7 +3312,7 @@ tasks:
     guard: TC régression M1 (benne en M2_BucketJogLimit + M1 demande palier 4 → M1 reste à 4).
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-10_AGREGATEUR_CLAMP.yaml
   objectifs:
   - Une seule fonction calcule les bornes de clamp ; plus aucun SEL() de clamp inline dans PRG_04
   - Bornes communes bit-à-bit identiques sur instWinchM1 et instWinchM2 (assert harnais)
@@ -3323,7 +3323,7 @@ tasks:
   - T181-09
 - id: T181-11
   parent_id: T181
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: MODES
   agent: ''
@@ -3477,7 +3477,7 @@ tasks:
     (coast-down ≠ dérive), TC-P10-060 (apprentissage), G4xx_check_measuredspeedband_wired.
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-16_SURVITESSE.yaml
   objectifs:
   - MeasuredSpeedBand n'est plus forcé à 0 en dur (grep PRG_04 = 0 occurrence) ; câblé via Sensors
   - Survitesse soft à appris+0,5 m/s → défaut diag sans arrêt (TC)
