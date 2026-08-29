@@ -26,37 +26,62 @@
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 170px);">
-    <col style="width: 90px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-014</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Écart M1/M2 &gt; seuil Warn (<code>_SyncCfgPersist.CfgSyncTolerance_M</code>=0.8m, <code>GVL_PERSISTENT</code> — corrige le 0.10m documenté) → <code>SyncWarn</code> IHM instantané + latch, sans timer. Zone 2 : <code>SyncDeviationWarn</code> force le palier 1 sur M1/M2 SANS coupure (pas de <code>SafeStop</code> sur simple écart).</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Écart</b><br>Warn</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : M1/M2 synchronisés, écart &lt; <code>CfgSyncTolerance_M</code>=0.8m (Zone 1)<br>
+        🚀 <b>Étape 1</b> : Injection écart M1/M2 &gt; 0.8m (<code>_SyncCfgPersist</code>, <code>GVL_PERSISTENT</code> — corrige le 0.10m documenté)<br>
+        ⚡ <b>Étape 2</b> : <code>SyncWarn</code> IHM instantané + latch (sans timer) ; <code>SyncDeviationWarn</code> force le palier 1 sur M1/M2<br>
+        ✅ <b>Étape 3</b> : Pas de <code>SafeStop</code> sur simple écart (Zone 2 = dégradation palier 1 SANS coupure)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-015</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Sync bit1 (incohérence commande, 500 ms) ➔ SafeStop fast</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Incohérence</b><br>commande</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : M1/M2 en marche, cohérence commande nominale<br>
+        🚀 <b>Étape 1</b> : Injection incohérence commande (<code>ContactorMismatch</code>)<br>
+        ⚡ <b>Étape 2</b> : Détection bit1 <code>ErrorId</code>, temporisation 500ms<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code> fast déclenché côté Treuils
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-016</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>SyncActive</code>=TRUE, arrêt sur M1 → M2 coupé au MÊME scan (<code>SafeStopM2_Active</code> := <code>SafeStopM2_Raw</code> OR (<code>SyncActive</code> AND <code>SafeStopM1_Raw</code>)), sans attendre le filtre 500/800ms. Symétrique M2→M1. Suspendu pendant <code>BenneBusy</code> et en butée normale.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Couplage</b><br>croisé</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>SyncActive</code>=TRUE, M1 et M2 en mouvement synchrone (hors <code>BenneBusy</code>, hors butée)<br>
+        🚀 <b>Étape 1</b> : Arrêt (SafeStop/Permit) sur M1<br>
+        ⚡ <b>Étape 2</b> : <code>SafeStopM2_Active</code> := <code>SafeStopM2_Raw</code> OR (<code>SyncActive</code> AND <code>SafeStopM1_Raw</code>)<br>
+        ✅ <b>Étape 3</b> : M2 coupé au MÊME scan (sans attendre le filtre 500/800ms), symétrique M2→M1
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>

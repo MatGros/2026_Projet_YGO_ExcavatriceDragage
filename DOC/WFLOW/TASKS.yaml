@@ -428,23 +428,6 @@ tasks:
   contrat: ''
   objectifs: []
   bloque_par: []
-- id: T108
-  parent_id: ''
-  statut: ⏸️
-  criticite: C2
-  domaine: TRANSLATION
-  agent: —
-  titre: Interlock Translation M3 si Trémie pleine (TremieFull_OR_GateR...
-  contexte: 'Intitulé complet : Interlock Translation M3 si Trémie pleine (TremieFull_OR_GateRaised_DI)'
-  description: '✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T108_INTERLOCK_TREMIE_v0.1.md`) : constat vérifié — TremieFull_OR_GateRaised_DI
-    déclaré+qualifié (PRG_02:160) mais NON consommé. Interlock proposé : blocage directionnel M3 vers Trémie (Direction=+1)
-    si trémie pleine/grille levée, sortie libre (Direction=-1). ⏳ **Implémentation en attente** : choix injection A/B, impact
-    cycle semi-auto (SelTarget=1), câblage électrique réel, validation humaine. (Signal renommé HopperFull→TremieFull_OR_GateRaised
-    par T162, 2026-08-26.)'
-  objectifs: []
-  contrat: ''
-  date: '2026-08-28T21:04:16'
-  bloque_par: []
 - id: T109
   parent_id: ''
   statut: ✅
@@ -2880,26 +2863,28 @@ tasks:
   domaine: TREUILS
   agent: ''
   date: '2026-08-29T16:30:00'
-  titre: Seuil coast-down treuil après retombée contacteurs + note AF (choix délibéré)
-  contexte: 'Décision 2026-08-29 (utilisateur). (1) T054 « latence boucle 10 ms au calcul temps
-    d''arrêt » CLÔTURÉE / ABSORBÉE : à vitesse max (~2-3 m/s) la latence scan 10 ms = 2-3 cm,
-    négligeable devant le coast-down freinage réel (1-2 m au relâcher joystick, collage frein +
-    inertie charge/tambour). Aucune implémentation CST_ScanLatencyMs ; rentre dans la marge fixe.
-    (2) Le vrai paramètre à sécuriser = le déplacement toléré APRÈS retombée des contacteurs avant
-    de déclarer un défaut (frein qui lâche / glissement câble → AU).'
-  description: 'À faire : quand la surveillance « déplacement après contacteur-off » sera implémentée
-    (périmètre FB_Safety_EmergencyManagement / surveillance treuil), exposer un paramètre config
-    CfgWinchCoastMax_M ajustable IHM, DÉFAUT SOUPLE = 3.0 m (zéro faux déclenchement au relâcher
-    joystick en mise en service). Défaut si descente > CfgWinchCoastMax_M OU encore en mouvement
-    ~3 s après contacteur-off. + Mettre un MOT dans l''AF (AF_Partie-10 Winch ou AF_Partie-01
-    Safety) indiquant que ce seuil large est un CHOIX DÉLIBÉRÉ de mise en service, à affiner vers
-    le bas sur mesures site (chargé/à vide), sans jamais passer sous le coast max mesuré + marge.
-    Ne pas ajouter la latence aux timeouts de coupure réels.'
-  contrat: ''
+  titre: Mise en conformité AF DriftGuard (Méca A) — armement sur contacteurs-off + frein serré
+  contexte: 'Revue AF indépendante (2026-08-29) : FB_DriftGuard / Méca A est armé sur JoystickYNeutral
+    (FB_Safety_Winch.st:235) au lieu de « contacteurs au repos + frein serré » (FB_DriftGuard_v1.0.md:13,25
+    ; AF_Partie-10 F10.09 TC l.293 « Treuil à l''arrêt, frein serré, position captée »). Conséquence
+    : le coast-down normal (inertie + jeu frein après retombée contacteurs) est mesuré comme une
+    dérive -> faux PowerCutOff à chaque arrêt lourd. T178 initial (seuil coast-down CfgWinchCoastMax_M
+    + note AF) jugé REDONDANT : le volet temps 3 s est déjà couvert par Méca B (PostRampTimeout:=T#3s,
+    FB_Safety_Winch.st:246-249) ; la dérive statique relève de Méca A. Aucun nouveau paramètre ni
+    aucune 2e fonction à créer. T054 hors ressort (utilisateur : « T054 pas mon problème »).'
+  description: 'Corriger DriftGuardA.Arm pour être conforme AF : DriftGuardA.Arm := NOT(BypassSafety
+    OR BypassMecaA) AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback [AND NOT BenneHoldStillActive].
+    Même composite que « arrêt confirmé » Méca B (FB_Safety_Winch.st:247). Aucun nouveau paramètre
+    CfgWinchCoastMax_M, aucune nouvelle fonction RunOn. Mettre à jour FB_DriftGuard_v1.0.md + TC-P10-001
+    si le calage d''armement change. Le coast-down normal n''est plus mesuré (fenêtre = arrêt mécanique
+    confirmé) ; un frein qui lâche APRES arrêt reste détecté.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T178.yaml
   objectifs:
-  - Paramètre CfgWinchCoastMax_M (config, IHM), défaut 3.0 m, borne haute + timeout mouvement
-  - Note explicite dans l''AF : seuil large = choix délibéré mise en service, à affiner site
-  - T054 tracée comme absorbée (pas d''implémentation latence 10 ms)
+  - DriftGuardA.Arm conforme AF = FwdRevSpeedFeedbackOff AND NOT BrakeFeedback (hors bypass/holdstill)
+  - Zéro faux PowerCutOff au relâcher joystick (coast normal non mesuré comme dérive)
+  - Méca A détecte encore un frein qui lâche après arrêt confirmé
+  - Aucun nouveau paramètre / aucune 2e fonction (redondance Méca B évitée)
+  - Gates palier C PASS + G200 liaison PASS après implémentation
   bloque_par: []
 - id: T179
   parent_id: ''
