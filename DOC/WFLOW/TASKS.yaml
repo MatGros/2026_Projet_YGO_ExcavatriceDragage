@@ -2888,11 +2888,11 @@ tasks:
   bloque_par: []
 - id: T179
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C1
   domaine: OUTILLAGE
   agent: ''
-  date: '2026-08-29T17:30:00+02:00'
+  date: '2026-08-29T18:45:00+02:00'
   titre: Resynchro wrappers pytest TEST_AUTO_CI_UNITARY ↔ tests ST (secondaire)
   contexte: 'Clarification structure tests CI (session migration §2 AF, 2026-08-29) : les tests
     ST réels vivent dans TOOLS/TEST_AUTO_CI/RESULTS/<DOMAINE>/tests/test_fb_*.st (38 fichiers,
@@ -2900,9 +2900,18 @@ tasks:
     (13 fichiers) sont SECONDAIRES — ils appellent run_tests.py via subprocess. Tâche de suivi pour
     plus tard : vérifier la cohérence wrappers ↔ ST, supprimer les wrappers morts si redondants,
     ou à l''inverse consolider si les wrappers apportent une valeur (filtrage domaine, pytest fixtures).'
-  description: '⬜ Non commencée. Priorité BASSE — les tests ST (RESULTS/.../tests/) sont la référence
-    urgente qui tourne dans run_tests.py. Cette tâche traite la couche pytest secondaire uniquement.
-    Décision utilisateur 2026-08-29 : ST prioritaire, pytest secondaire → tâche pour plus tard.'
+  description: '✅ **Clôturé + validé par revue indépendante 2026-08-29** — audit fait, 4 écarts corrigés, wrappers alignés sur registry
+    (32 tests collectés, 32 entrées registry). Décision : **conserver** les wrappers pytest — ils apportent le filtrage
+    par marqueur (ci_fb/unit) et le dispatch par domaine, valeur ajoutée réelle par-dessus run_tests.py. Corrections
+    appliquées dans TOOLS/TEST_AUTO_CI/TEST_AUTO_CI_UNITARY/ : (1) A_COMMUN : FB_FbStatus (FB supprimé par T164-3,
+    remplacé par FB_FaultCore) → test_FB_FaultCore ; (2) J_SUPERVISION : + test_FB_TroubleshootingView ; (3) M_MAIN :
+    + test_PRG_02_Acquisition_Archi. Aucun wrapper mort/redondant à supprimer après correction (le seul "mort" était
+    FB_FbStatus, FB inexistant). Aucune suppression de fichier, __pycache__ conservé. Gates palier C PASS, run_tests.py
+    inchangé. NB : exécution complète via run_tests.py limitée par le sandbox Windows multiprocessing ; collecte pytest
+    32/32 OK. 🔍 **Revue indépendante READ-ONLY (VERDICT PASS)** : alignement wrappers/registry OK 0 écart (12 domaines),
+    FB_FbStatus bien supprimé/absent, 3 entrées cibles présentes registry + test ST sur disque, collecte pytest 32/32,
+    0 effet de bord. 1 obs mineure non bloquante : html_report.py:539 garde `is_p03_fb = (fb_name=="FB_FbStatus")` (dead-ref
+    à nettoyer dans une tâche ultérieure).'
   contrat: ''
   objectifs:
   - Auditer la cohérence wrappers pytest ↔ tests ST (1 wrapper par domaine, couvre-t-il les mêmes FB ?)
@@ -2913,23 +2922,25 @@ tasks:
   bloque_par: []
 - id: T180
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
   agent: ''
-  date: '2026-08-29T17:30:00+02:00'
+  date: '2026-08-29T18:45:00+02:00'
   titre: Audit 29 cas limites sécurité oubliés (AF 08-14) — challenge migration §2
   contexte: 'Livré par subagent DSH (b9e938aa) le 2026-08-29 dans le cadre de l''OM « Reprise &
     Migration TC/AF §2 » Étape 1 (challenge préalable sécurité). Audit READ-ONLY strict de 7 chapôs
     AF08→14 + 13 fiches FB filles + spec étalon AF01. 29 cas limites identifiés après dédoublonnage :
     2 C4 (chute de charge possible), 16 C3, 11 C2. Tous read-only — recommandations limitées à l''ajout
     de couverture TC, aucune proposition de modif code.'
-  description: '⬜ Non commencée. Rapport complet dans le transcript session (message subagent b9e938aa).
-    Priorité d''action suggérée : 🔴 C4 immédiat (CAS-001 retombée contacteur en marche, CAS-002 AU
-    pendant transition) ; 🟠 C3 priorité 1 (CAS-008 T147 FB_Bucket, CAS-012 T175 interlock non câblé,
-    CAS-005/006 homing perdu en marche) ; 🟠 C3 priorité 2 (CAS-003/004/009/010/011/013/014/016/017) ;
-    🔵 C2 (CAS-019 à CAS-029). 2 écarts code avérés signalés (T147 FB_Bucket CAS-008, T175 CAS-012)
-    — à traiter côté code par l''orchestrateur. 10 incertitudes à qualifier par lecture code.'
+  description: '✅ **Livré + validé par revue indépendante 2026-08-29** — audit 29 cas consolidé et matérialisé dans
+    `DOC/WFLOW/AUDITS/AUDIT_29_CAS_LIMITES_SECURITE_AF_20260829.md` (criticités, tableaux détaillés, cas non
+    oubliés, 10 incertitudes, priorités d''action). READ-ONLY strict — aucun CODE/ ni AF touché. Recommandations
+    limitées à la couverture TC. 🔍 **Revue indépendante READ-ONLY (VERDICT PASS)** : structure 29 cas (2C4/16C3/11C2) OK,
+    références fiches/TC vérifiées par grep, conformité read-only OK, 7 affirmations de fond vérifiées mot pour mot,
+    aucune contradiction principes sécurité. 2 corrections mineures appliquées post-revue : CAS-008 (citation L158 au lieu
+    de L170 + vrai enjeu `M1SlipFaultLatched` L143) et §1 (comptage des catégories non disjoint clarifié, renvoi §4 pour les
+    10 incertitudes). Prochaine étape : trier en tâches correctives distinctes (priorités §5 du rapport).'
   contrat: ''
   objectifs:
   - 'Trier les 29 cas par criticité et créer des tâches correctives distinctes (1 par cas ou par famille)'
@@ -2939,3 +2950,616 @@ tasks:
   - 'CAS-005/006 (homing perdu en marche) : étude défense en profondeur — re-contrôle cohérence sur retour bus transitoire'
   - 'Les 10 incertitudes : qualifier par lecture code (R_TRIG Reset, cumul défauts, Méca E mono-codeur, PRG_05 §0bis, etc.)'
   bloque_par: []
+- id: T182
+  parent_id: ''
+  statut: ✅
+  criticite: C2
+  domaine: DOCUMENTATION
+  agent: DSH
+  date: '2026-08-29T18:50:00+02:00'
+  titre: Migration §2 TC/AF 08-14 vers format HTML rigide à séquences typées
+  contexte: 'OM « Reprise & Migration TC/AF §2 » (2026-08-29) : convertir chaque tableau §2 « Points de
+    validation » des fiches AF métiers (08-14 + fiches filles) vers le gabarit étalon
+    FB_Safety_EmergencyManagement_v1.2.md §2 : colgroup 6-col (28/50/calc-165/45/26/36), Intention 2 lignes,
+    ID verticalisé, séquences typées 💤/🚀/⚡/✅, colonne Preuve supprimée (assertion dans ✅ Étape N).'
+  description: '✅ **Done 2026-08-29 + validé par revue indépendante (VERDICT PASS)**. 23 fichiers migrés :
+    7 chapôs (AF-Partie-08→14) + 16 fiches filles (FB_AxisScale, 6 FB_Encoder, 5 FB_Winch, 4 FB_Translation).
+    Vérification : G450 PASS (47 fct, 186 TC, 0 absent) · Gates palier C 21/21 PASS · G340 PASS. Lot 1 commité
+    (98a907c0), lots 3-4 en working tree non commité. 🔍 Revue indépendante read-only : zéro perte d''info,
+    colonne Preuve supprimée OK, TC/Type/Réf/État préservés, 22/23 conformes au 1er passage — 2 écarts MAJOR
+    corrigés et re-validés (P13 colgroup → gabarit étalon ; FB_Bucket `</table>` orphelin supprimé). NB : les
+    fiches sans §2 tableau (FB_Winch_Symmetry, FB_SpeedStep, FB_WinchLoadEstimator, FB_DriftGuard) sont hors
+    périmètre. Avertissement G340 FB_Winch v1/v2 (double version) = préexistant, hors périmètre.'
+  contrat: ''
+  objectifs:
+  - '23 fichiers §2 AF migrés au gabarit étalon 6-col (parents 08-14 + fiches filles)'
+  - 'Colonne Preuve supprimée, assertion réintégrée dans ✅ Étape N'
+  - 'G450 PASS + gates palier C 21/21 PASS après chaque lot'
+  - 'Revue indépendante read-only : PASS sur le périmètre (2 écarts corrigés, zéro perte d''info)'
+  bloque_par: []
+- id: T181
+  parent_id: ''
+  statut: ⬜
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Gel du sous-système treuil — chapô (assainir, clamp unifié, apprentissage, maintenance)
+  contexte: 'Consolidation de 6 sources (2 revues expertes archi+fonctionnel, 2 challenges indépendants,
+    rapports CI, décisions Q1–Q8). Plan maître : DOC/WFLOW/AUDITS/DESIGN/PLAN_GEL_TREUIL_T181_v0.1.md.
+    Objectif : « un winch qui fonctionne du premier coup », zéro régression, pas de big-bang. 17 défauts
+    D01–D17 avec critère de sortie mesurable. Phasage -1 harness / 0 corrections C4 à interface stable
+    / 0b extraction sous-FB / A clamp en shadow-comparison / C matrice maint N1-N2 / B apprentissage+survitesse
+    / D rétro-TC. Se coordonne avec T175/T176/T177/T178/T169/T180.
+
+    '
+  description: 'Chapô de coordination — le travail réel est dans les sous-tâches T181-00 à T181-17. Supersède
+    T130/T131/T135 (refactor intention palier, ⏸️). Absorbe T096 (apprentissage vitesse). 3 arrêts de
+    validation humaine : T181-01 (autorité 2 interlocks), T181-06 (interface DriveRequest), T181-11 (matrice
+    maintenance).
+
+    '
+  contrat: ''
+  objectifs:
+  - Les 17 défauts D01–D17 ont chacun un critère de sortie vérifié (TC CI, gate, grep, invariant)
+  - Aucune régression hors treuil (run_all_gates complet + PRG_02/PRG_07/Troubleshooting)
+  - Barrière finale FB_WinchOutputInterlock 7/7 TC PASS avant tout refactor d'API
+  - FinalInterlockGoverned reste FALSE sur 100 % des vecteurs nominaux du harnais T181-00
+  - Clamp de palier calculé une seule fois, appliqué M1 et M2 (bornes communes + plafond M2 propre)
+  bloque_par: []
+- id: T181-00
+  parent_id: T181
+  statut: ⬜
+  criticite: C4
+  domaine: TEST_AUTO_CI
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Harnais d'intégration ST paire M1+M2+PRG_04+PRG_06 + plan FAT/rollback/import
+  contexte: 'Le CI unitaire STruCpp teste chaque FB isolé — aucun test ne fait tourner PRG_03→PRG_04→
+    FB_Winch×2→PRG_06 ensemble. FB_Main_EndToEnd (RESULTS/M_MAIN/) chaîne déjà PRG_02→07 en boucle fermée
+    mais est mince (2 tests, joystick raw, zéro assert clamp/palier/interlock). Se greffer sur T169-A
+    (harnais scénarios dragage). Phase -1, bloque toutes les autres sous-tâches T181.
+
+    '
+  description: 'fix: étendre FB_Main_EndToEnd + nouvelle suite test_winch_integ.st (registre MAIN_EndToEnd
+    ou entrée dédiée) — passer les boutons IHM/M2/benne/plongée, modèle position câble intégrant la vitesse-cran,
+    injection MeasuredSpeedBand, modèle retour frein + contacteurs retombés, surfacer FinalInterlockGoverned
+    sur un bus. guard: gate « harnais intégration vert » ajouté à run_all_gates (palier C ou D). + plan
+    FAT / essais site / rollback Git par phase / ordre d''application manuelle CODESYS. COORDINATION :
+    T169-A (AGY-01) modifie le même FB_Main_EndToEnd — bloque_par: [T169-A].
+
+    '
+  contrat: null
+  objectifs:
+  - FB_Main_EndToEnd étendu accepte boutons IHM M1/M2, commande benne, contexte plongée Kobold
+  - Modèle physique minimal paire: position M1/M2 intègre la vitesse-cran, écart = déviation sync
+  - Modèle E/S retour frein (BrakeFeedback) + FwdRevSpeedFeedbackOff (contacteurs retombés) pilotable
+    — requis pour croisements T178 / T180 CAS-001
+  - Fidélité du modèle chiffrée dans le doc: intégration pos = v_palier x 10 ms ; pas de dynamique moteur
+      ; limite explicitée
+  - 6 familles de vecteurs exécutables (Grafcet↔Winch, Joystick↔Winch, plongée, régression M1, autorité
+    interlock, sync paire)
+  - Gate harnais intégré à run_all_gates, rouge tant que la suite n'est pas verte
+  - Document plan de tir livré (FAT, ordre import CODESYS, points de rollback par phase)
+  - Liste des vecteurs croisée avec les CAS-xxx de T180 (au moins CAS-001, CAS-012)
+  bloque_par:
+  - T169-A
+- id: T181-01
+  parent_id: T181
+  statut: ⬜
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: FB_WinchOutputInterlock 7/7 + contrat d'autorité des 2 interlocks + FB_WinchRateInterlock
+  contexte: 'Barrière finale C4 : 2/7 TC PASS (FAIL TC-P10-012 watchdog frein, 013 latches hors Enable,
+    021/022 temps morts directionnels, 020 SITE). Décision Q6 : interlock de cadence unifié 2 niveaux
+    (1 FB FB_WinchRateInterlock instancié dans FB_Winch avec seuils safety+marge ET dans PRG_06 avec seuils
+    safety nus), diag FinalInterlockGoverned DOIT rester FALSE en nominal. Phase 0, interface FB_WinchOutputInterlock
+    INCHANGÉE. TC-021/022 : se coordonner avec T175 AC2 (une seule implémentation du temps mort directionnel,
+    pas deux).
+
+    '
+  description: 'fix: TC-P10-012/013/021/022 verts + FB_WinchRateInterlock (2 jeux de seuils). guard: G4xx_check_final_interlock_governed_false
+    (échoue si un vecteur nominal du harnais T181-00 met FinalInterlockGoverned à TRUE). ARRÊT VALIDATION
+    HUMAINE sur le contrat d''autorité.
+
+    '
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-01_AUTORITE_2_INTERLOCKS.yaml
+  objectifs:
+  - CI FB_WinchOutputInterlock 7/7 PASS sur interface inchangée (TC-P10-012/013/021/022)
+  - FB_WinchRateInterlock existe, instancié dans FB_Winch (seuils +marge) ET PRG_06 (seuils nus)
+  - Vecteur harnais « nominal » → FinalInterlockGoverned = FALSE (100 % des cas)
+  - Vecteur d'injection « cadence > safety en contournant l'instance FB_Winch » → l'instance PRG_06 coupe
+  - Pas de double-freinage: quand l'instance FB_Winch gouverne (marge), l'instance PRG_06 reste passive
+  - Temps mort directionnel: une seule implémentation, cohérente avec T175 AC2 ; TC-021/022 exécutables
+  - G200 PASS + gates palier C PASS
+  bloque_par:
+  - T181-00
+- id: T181-02
+  parent_id: T181
+  statut: ⬜
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: FB_Winch — corriger inversion Fwd/Rev (TC-P10-011), interface INCHANGÉE
+  contexte: 'FB_Winch 5/7 TC PASS (FAIL TC-P10-011 inversion Fwd/Rev, 018 StuckClosed → traité T181-03).
+    Challenge #1 impose : corriger les rouges C4 AVANT tout refactor d''interface (sinon on ne sait plus
+    si un écart vient du bug d''origine ou de la refonte). Phase 0.
+
+    '
+  description: 'fix: TC-P10-011 vert (sens de rotation correct). guard: TC direction intégré au harnais
+    T181-00 (Grafcet↔Winch : chaque étape X exige le bon sens).
+
+    '
+  contrat: null
+  objectifs:
+  - CI FB_Winch: TC-P10-011 PASS, aucune régression sur les 5 déjà verts
+  - Interface FB_Winch (VAR_INPUT/OUTPUT) strictement inchangée (diff signature = vide)
+  - Harnais T181-00: sens Fwd/Rev correct pour toutes les étapes de cycle testées
+  - G200 PASS + gates palier C PASS
+  bloque_par:
+  - T181-00
+- id: T181-03
+  parent_id: T181
+  statut: ⬜
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: StuckClosed — propriétaire unique FB_Safety_Winch (retrait de FB_Winch)
+  contexte: 'Détection StuckClosed dupliquée : FB_Winch (~500 ms) ET FB_Safety_Winch Méca B (~3 s). Décision
+    Q7 : centraliser. Le propriétaire unique est FB_Safety_Winch. Phase 0.
+
+    '
+  description: 'fix: retrait de la détection StuckClosed du corps de FB_Winch ; TC-P10-018 déplacé/réécrit
+    côté FB_Safety_Winch. guard: G4xx_check_stuckclosed_single_owner (grep : « StuckClosed » assigné dans
+    un seul FB).
+
+    '
+  contrat: null
+  objectifs:
+  - FB_Winch ne contient plus aucune logique de détection StuckClosed (grep corps = 0 assignation)
+  - FB_Safety_Winch reste seul producteur ; TC-P10-018 exécutable et PASS côté Safety
+  - Gate G4xx_check_stuckclosed_single_owner présent et vert
+  - Aucune régression CI FB_Winch / FB_Safety_Winch ; G200 PASS + gates palier C PASS
+  bloque_par:
+  - T181-00
+- id: T181-04
+  parent_id: T181
+  statut: ❌
+  criticite: C3
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: RETIRÉE — anti-traversée benne (M1_Busy/M2_Busy) est couverte par T175 (AC3)
+  contexte: 'Le défaut D04 (M1_Busy/M2_Busy déclarés jamais lus → TC-P10-025 teste un chemin mort) est
+    déjà porté par T175 AC3 (⏳, contrat DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T175.yaml). Créer une tâche
+    T181 parallèle = collision. T181 s''appuie sur le résultat de T175.
+
+    '
+  description: 'Aucune action propre. Prérequis : T175 AC3 livrée et validée. Le harnais T181-00 vérifie
+    le chemin réel (croisement M1/M2 refusé) une fois T175 AC3 en place.
+
+    '
+  contrat: null
+  objectifs:
+  - Sans objet (tâche retirée) — voir T175 AC3
+  bloque_par: []
+- id: T181-05
+  parent_id: T181
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Extraction sous-FB (DirectionInterlock, StepShaper) + retrait entrées mortes FB_Winch
+  contexte: 'Revue archi : blocs sains à isoler — interlock de changement de direction et minuteur de
+    rampe palier (BusinessStepDelay). Aujourd''hui le minuteur de rampe réutilise les délais d''interlock
+    direction (couplage caché, D10). Entrées mortes FB_Winch : Mode (E_Mode jamais lu), CycleTimeCalc
+    (FB_CycleTime instancié jamais consommé) — D09. Phase 0b, interface FB_Winch INCHANGÉE (extraction
+    interne uniquement).
+
+    '
+  description: 'fix: FB_WinchDirectionInterlock + FB_WinchStepShaper extraits ; minuteur de rampe = paramètre
+    dédié (plus de réemploi des délais d''interlock) ; retrait Mode + CycleTimeCalc. guard: TC isolés
+    pour chaque sous-FB extrait ; G200 (les sous-FB apparaissent câblés).
+
+    '
+  contrat: null
+  objectifs:
+  - FB_WinchDirectionInterlock et FB_WinchStepShaper existent, testés isolément (≥ 1 TC chacun)
+  - Le minuteur de rampe palier n'utilise plus les délais d'interlock direction (grep + diff)
+  - FB_Winch ne déclare plus Mode ni CycleTimeCalc (diff VAR = suppression nette)
+  - CI FB_Winch iso-résultat vs avant extraction (0 régression) ; G200 PASS ; gates palier C PASS
+  bloque_par:
+  - T181-01
+  - T181-02
+  - T181-03
+- id: T181-06
+  parent_id: T181
+  statut: ⬜
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Cadrage ST_fbWinch_DriveRequest + mapping sources de clamp commun / M2-propre + AF-10
+  contexte: 'Interface cible : DriveRequest {StartStop, Direction, SpeedTgt_Pct, Min/MaxStep{Ascent,Descent},
+    SyncCoupled diag}. Challenge #2 : 4 amendements bloquants — (A) clamp calculé par instance ou scindé
+    commun + plafond M2 propre (les bridages benne sont M2-only, sinon régression M1) ; (B) précédence
+    « plafond safety gagne » + garde LIMIT dans FB_SpeedStep ; (C) aucun producteur de MinStepDescent
+    n''existe → à créer (T181-12) ; (D) MinStepNumber agit sur la cible, lissé. Phase A. ARRÊT VALIDATION
+    HUMAINE.
+
+    '
+  description: 'Contrat de cadrage : DUT ST_fbWinch_DriveRequest / _Sensors / _Cfg, tableau des sources
+    de borne (commun M1=M2 vs M2-propre), matrice d''interconnexion 8 producteurs, mise à jour AF-10.
+    Aucune écriture CODE/ avant validation humaine de la note.
+
+    '
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-06_DRIVEREQUEST_CADRAGE.yaml
+  objectifs:
+  - DUT ST_fbWinch_DriveRequest / _Sensors / _Cfg spécifiés champ par champ (type, unité, polarité)
+  - Tableau « source de borne → sens → portée commun/M2 → lieu de calcul » complet (≥ 8 sources)
+  - Matrice d'interconnexion producteur→DriveRequest (Cycle, Dive, Extraction, Joystick, Modes, IHM, Bucket): OK
+      / gap / impossible
+  - Les 4 amendements A/B/C/D transcrits en critères testables pour les tâches aval
+  - Section AF-10 rédigée (interface + rôle), revue humaine tracée
+  bloque_par:
+  - T181-05
+- id: T181-07
+  parent_id: T181
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: FB_SpeedStep — ajout MinStepNumber + garde LIMIT de précédence
+  contexte: 'FB_SpeedStep n''a que MaxStepNumber (plafond), pas de plancher. Décision Q5 : Min < Max toujours,
+    plafond gagne. Le plancher plongée Kobold (T181-12) et le geste joystick (T181-13) injectent MinStepNumber.
+    Garde obligatoire (amendement B) : LIMIT(1, MinStepNumber, MaxStepClamped) APRÈS le plafond, AVANT
+    le CASE (sinon sortie hors [0..5]). Phase A.
+
+    '
+  description: 'fix: FB_SpeedStep — entrée MinStepNumber (défaut 1, rétro-compatible), RequestedStep :=
+    MAX(sel_hyst, MinClamped), garde LIMIT. guard: G4xx_check_speedstep_clamp_bounds (TC : Min=3 + plafond=1
+    → résultat 1 ; jamais de StepNumber hors [0..5]).
+
+    '
+  contrat: null
+  objectifs:
+  - FB_SpeedStep accepte MinStepNumber (défaut 1) sans casser les appelants existants (CI iso)
+  - TC: MinStepNumber=3 et plafond source=1 → StepNumber résultant = 1 (plafond gagne)
+  - TC: aucune combinaison d'entrées ne produit StepNumber < 0 ou > 5
+  - MinStepNumber sans effet si Enable/StartStop FALSE (TC: relâche → palier 0)
+  - Gate G4xx_check_speedstep_clamp_bounds vert ; G200 PASS ; gates palier C PASS
+  bloque_par:
+  - T181-06
+- id: T181-08
+  parent_id: T181
+  statut: ⬜
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Refonte interface FB_Winch (struct DriveRequest) + 2 sites PRG_04 + SimBench — shadow comparison
+  contexte: 'L''interface FB_Winch passe de plate (≈15 scalaires) à struct DriveRequest/Sensors/Cfg. 2
+    seuls sites d''appel (instWinchM1/M2 dans PRG_04) + FB_SimBench + tests test_fb_winch. Migration atteinte
+    au même commit. SHADOW COMPARISON : l''ancien calcul de clamp ET le nouveau tournent en parallèle,
+    comparés N cycles, bascule quand identiques. Phase A.
+
+    '
+  description: 'fix: DUT créés, FB_Winch réinterfacé, 2 sites PRG_04 + FB_SimBench + test_fb_winch migrés
+    au même commit ; ancien chemin conservé en shadow jusqu''à bascule validée. guard: assertion shadow-diff
+    dans le test (ancien == nouveau sur toute la matrice de vecteurs).
+
+    '
+  contrat: null
+  objectifs:
+  - FB_Winch compile avec la nouvelle interface ; bundle PLCopenXML régénéré sans erreur
+  - Les 2 sites PRG_04 + FB_SimBench + test_fb_winch migrés (aucun appelant orphelin, G200 PASS)
+  - Shadow: ancien clamp == nouveau clamp sur 100 % des vecteurs du harnais T181-00 pendant ≥ N cycles
+  - CI FB_Winch: résultat identique à l'état pré-migration (0 régression fonctionnelle)
+  - Point de rollback Git taggé avant bascule ; procédure de retour documentée
+  bloque_par:
+  - T181-07
+- id: T181-09
+  parent_id: T181
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Renommage vocabulaire clamp + fusion ExtractionControlActive / ControlAscentActive
+  contexte: 'Décision utilisateur : pas de « Force » dans le vocabulaire du clamp — Min/Max seulement.
+    ForceMinSpeedStep (sémantiquement un plafond MaxStepAscent:=1) → ExtractionControlActive. CfgMaxStepDescente
+    → MaxStepDescent. M2_ForceSlowSpeed → M2_BucketJogLimit. ControlAscentActive (local PRG_04) fusionné
+    dans ExtractionControlActive (2 flags, même effet, D14). Renommage transverse ~7 fichiers — 1 oubli
+    = liaison G200 rouge. Phase A.
+
+    '
+  description: 'fix: renommage propagé (FB_ExtractionSequence, ST_ProgramBucketRequest, PRG_03, PRG_04,
+    fiches AF concernées) ; un seul flag « montée contrôlée → MaxStepAscent:=1 ». guard: G4xx_check_no_force_in_clamp_vocab
+    (grep : aucun identifiant « Force*Step » / « Force*Speed » dans la chaîne de clamp).
+
+    '
+  contrat: null
+  objectifs:
+  - grep « ForceMinSpeedStep » / « Force*SlowSpeed » / « CfgMaxStepDescente » dans CODE/ = 0
+  - Un seul flag de montée contrôlée (ExtractionControlActive) ; ControlAscentActive supprimé
+  - G200 PASS immédiatement après le renommage (aucune liaison cassée)
+  - Gate G4xx_check_no_force_in_clamp_vocab vert ; gates palier C PASS
+  - Fiches AF touchées mises à jour sur preuve (diff aligné au code)
+  bloque_par:
+  - T181-08
+- id: T181-10
+  parent_id: T181
+  statut: ⬜
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Agrégateur de clamp PRG_04 (bornes communes + plafond M2 propre) + décision D13
+  contexte: 'Aujourd''hui : 2 expressions SEL() dupliquées inline (M1 = 2 termes, M2 = 4 termes) + une
+    reconstruction de table à ~24 affectations pour M2 (2ᵉ mécanisme au même effet, D13). Cible (amendement
+    A) : 1 agrégateur — MaxStep := MIN(sources plafond), MinStep := MAX(sources plancher), bornes communes
+    identiques M1=M2, puis M2 applique en plus MIN(., plafond benne). Phase A.
+
+    '
+  description: 'fix: PRG_04 — fonction d''agrégation unique, SEL() inline supprimés ; décision actée sur
+    la reconstruction de table M2 (supprimée si MaxStepDescent:=1 suffit, sinon conservation motivée).
+    guard: TC régression M1 (benne en M2_BucketJogLimit + M1 demande palier 4 → M1 reste à 4).
+
+    '
+  contrat: null
+  objectifs:
+  - Une seule fonction calcule les bornes de clamp ; plus aucun SEL() de clamp inline dans PRG_04
+  - Bornes communes bit-à-bit identiques sur instWinchM1 et instWinchM2 (assert harnais)
+  - TC régression M1: benne jog lent + M1 palier 4 demandé → StepNumber M1 = 4 (PASS)
+  - D13 tranchée: table M2 (~24 affectations) supprimée OU conservation justifiée en clair
+  - G200 PASS ; gates palier C PASS ; shadow-diff toujours vert
+  bloque_par:
+  - T181-09
+- id: T181-11
+  parent_id: T181
+  statut: ⬜
+  criticite: C3
+  domaine: MODES
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Cadrage matrice maintenance N1/N2 (bypass, override FDC, re-homing) + AF-05
+  contexte: 'Décision Q8 : N1 = bouton IHM maintenu momentané, borné par capteur homing haut ; N2 = latché.
+    Capteur homing top toujours > FDC logiciel (8,5 m / 7,5 m ; arrêt normal 7,5 m ; override ≤ 8,5 m).
+    ~20 Bypass* OR-és sans matrice de mode (D15). Se coordonne avec T175 AC4 (MAINT_N1/N2 confirm benne).
+    Phase C. ARRÊT VALIDATION HUMAINE.
+
+    '
+  description: 'Contrat de cadrage : matrice bypass par mode (N1/N2/DISABLE), règle « tout à l''arrêt
+    » pour basculer, re-homing obligatoire, borne 8,5 m de l''override. Section AF-05.
+
+    '
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-11_MATRICE_MAINT_N1_N2.yaml
+  objectifs:
+  - Matrice « mode × bypass » explicite (chaque Bypass* rattaché à N1, N2, ou retiré)
+  - Règle de bascule de mode = « contacteurs retombés + frein serré » formalisée
+  - Override FDC: N1 momentané, N2 latché, plafond physique = capteur homing 8,5 m
+  - Cohérence avec T175 AC4 (MAINT_N1/N2 confirm benne) tracée
+  - Section AF-05 rédigée, revue humaine tracée
+  bloque_par:
+  - T181-01
+- id: T181-12
+  parent_id: T181
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Producteur MinStepDescent (FB_DiveSearch) + flux PRG_03/04 + câblage CurrentSpeedStep
+  contexte: 'Amendement C : aucun producteur de MinStepDescent n''existe. FB_DiveSearch ne sort que des
+    permis (DescendPermit, KoboldMeasureEnable) — il doit exposer MinStepDescent (ou DiveFloorActive→3).
+    Bug latent D12 : FB_DiveSearch.CurrentSpeedStep n''est jamais passé en argument → interdiction palier
+    5 en plongée MORTE. Phase A.
+
+    '
+  description: 'fix: FB_DiveSearch expose MinStepDescent ; flux FB_DiveSearch → PRG_03.ReqProgram → PRG_04
+    → DriveRequest ; CurrentSpeedStep câblé (palier arbitré). guard: TC interdiction palier 5 en Kobold
+    (effective) ; TC latence flux ≤ N cycles.
+
+    '
+  contrat: null
+  objectifs:
+  - FB_DiveSearch produit MinStepDescent (INT) ou DiveFloorActive (BOOL) ; consommé par PRG_04 (G200)
+  - CurrentSpeedStep de FB_DiveSearch est câblé (grep argument non nul) ; interdiction palier 5 effective
+  - TC: en plongée Kobold, demande palier 5 → StepNumber plafonné à 4
+  - TC: front de sortie de plongée → MinStepDescent retombe proprement (pas de plancher résiduel)
+  - G200 PASS ; gates palier C PASS
+  bloque_par:
+  - T181-10
+- id: T181-13
+  parent_id: T181
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Palier plancher plongée Kobold (3-4 constant) + geste joystick lissé + AF-04
+  contexte: 'Décision : en plongée, joystick hors neutre à tout % → StepNumber ≥ plancher (3-4), montée
+    lissée par FB_WinchStepShaper (pas de saut direct = à-coup contacteur), relâche → 0 immédiat. Absorbe
+    la partie « apprentissage de la vitesse plongée » de T096 (partiel). Phase A.
+
+    '
+  description: 'fix: injection du plancher via MinStepNumber (sur la cible RequestedStep, jamais sur StepNumber
+    direct) ; spec AF-04. guard: TC anti-à-coup (StepNumber varie de ≤ +1 par cycle en entrée de plongée).
+
+    '
+  contrat: null
+  objectifs:
+  - Joystick effleuré (~5 %) en plongée → transitions StepNumber 0→1→2→3 temporisées
+  - Aucune transition StepNumber > +1 par cycle (TC anti-à-coup)
+  - Relâche joystick → StepNumber 0 au cycle suivant (arrêt franc préservé)
+  - Le plancher agit sur RequestedStep (grep: pas d'affectation directe StepNumber := plancher)
+  - Section AF-04 rédigée ; G200 PASS ; gates palier C PASS
+  bloque_par:
+  - T181-12
+- id: T181-14
+  parent_id: T181
+  statut: ⬜
+  criticite: C3
+  domaine: MODES
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Code matrice bypass FB_Modes + PRG_04 + override FDC N1 borné 8,5 m (inclut T175 AC4)
+  contexte: 'Implémente le cadrage T181-11. Rationalise les ~20 Bypass* en arbitrage par mode. Intègre
+    T175 AC4 (MAINT_N1/N2 confirm benne — une seule implémentation). Phase C.
+
+    '
+  description: 'fix: FB_Modes + PRG_04 — arbitrage bypass par mode, override FDC N1 momentané ≤ 8,5 m,
+    N2 latché, re-homing forcé au retour. guard: G4xx_check_bypass_matrix_mode_gated (aucun Bypass* actif
+    hors de son mode autorisé).
+
+    '
+  contrat: null
+  objectifs:
+  - Chaque Bypass* n'est actif que dans le(s) mode(s) de la matrice T181-11 (gate vert)
+  - Override FDC N1: relâche bouton IHM → FDC logiciel 7,5 m re-actif immédiatement
+  - Override N1 ne dépasse jamais 8,5 m (TC: consigne au-delà → clamp à 8,5 m)
+  - Bascule de mode refusée si contacteurs non retombés / frein non serré (TC)
+  - T175 AC4 (MAINT_N1/N2 confirm benne) satisfait ici ; TC-P10-030 exécutable
+  - G200 PASS ; gates palier C PASS
+  bloque_par:
+  - T181-11
+  - T181-10
+- id: T181-15
+  parent_id: T181
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: FB_WinchSpeedLearning — collecteur passif (1 bit IHM, RETAIN, charge + vide)
+  contexte: 'Décisions Q1–Q3 : 1 bit IHM « lancer apprentissage », table {M1/M2 × sens × charge/vide ×
+    palier 1-5} en RETAIN, mesure en charge ET à vide, calibration rare, non bloquant, voyant IHM. Tant
+    que l''apprentissage complet n''est pas fait → table vide = non applicable, bypass facile. Absorbe
+    T096. Phase B.
+
+    '
+  description: 'fix: nouvelle FB FB_WinchSpeedLearning (collecteur passif, stabilisation avant enregistrement),
+    table RETAIN, voyant IHM, flag « table complète ». Spec AF-10 §7.x, nouvelle fiche, crée F10.10. guard:
+    TC « table vide → survitesse non armée » ; TC « bit IHM OFF → aucune écriture table ».
+
+    '
+  contrat: null
+  objectifs:
+  - FB_WinchSpeedLearning n'écrit jamais de commande moteur (collecteur strictement passif — grep)
+  - Table RETAIN {M1/M2 × sens × charge/vide × palier 1-5} ; flag TableComplete calculé
+  - bit IHM OFF → zéro écriture dans la table (TC)
+  - Table incomplète → TableComplete = FALSE → survitesse T181-16 non armée (TC de bout en bout)
+  - Fiche F10.10 créée ; section AF-10 rédigée ; G200 PASS ; gates palier C PASS
+  bloque_par:
+  - T181-05
+- id: T181-16
+  parent_id: T181
+  statut: ⬜
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Surveillance survitesse FB_Safety_Winch (2 seuils fixes) + réactivation SpeedGuard
+  contexte: 'D06 : garde-fou survitesse mort (MeasuredSpeedBand:=0 en dur, SpeedGuardEnable=FALSE). Décision
+    Q4 : marge fixe appris+0,5 m/s (soft→diag) / appris+1,5 m/s (hard→SafeStop), active SSI table {sens,charge}
+    complète + flag débrayable. PRÉREQUIS T177 (SpeedGuardEnable:=TRUE par défaut) — T181-16 ne double
+    PAS T177, il consomme son résultat. Anti-calage passage palier via MeasuredSpeedBand. Phase B.
+
+    '
+  description: 'fix: FB_Safety_Winch — 2 seuils survitesse (marge fixe sur vitesse apprise), armé si TableComplete
+    AND NOT bypass ; câblage MeasuredSpeedBand/MeasuredSpeedValid via Sensors (D06). guard: TC-P10-055
+    (coast-down ≠ dérive), TC-P10-060 (apprentissage), G4xx_check_measuredspeedband_wired.
+
+    '
+  contrat: null
+  objectifs:
+  - MeasuredSpeedBand n'est plus forcé à 0 en dur (grep PRG_04 = 0 occurrence) ; câblé via Sensors
+  - Survitesse soft à appris+0,5 m/s → défaut diag sans arrêt (TC)
+  - Survitesse hard à appris+1,5 m/s → SafeStop (TC)
+  - Table incomplète OU flag débrayé → survitesse inactive (TC) ; s'appuie sur T177 livrée
+  - Anti-calage: passage de palier ne déclenche pas la survitesse (TC MeasuredSpeedBand)
+  - TC-P10-055/060 PASS ; G200 PASS ; gates palier C PASS
+  bloque_par:
+  - T181-10
+  - T181-14
+  - T181-15
+  - T177
+- id: T181-17
+  parent_id: T181
+  statut: ❌
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: RETIRÉE — coast-down borné est couvert par T178 (Méca A) + Méca B, sans CfgWinchCoastMax_M
+  contexte: 'Le plan consolidé prévoyait CfgWinchCoastMax_M (~3 m) + timeout + note AF. La T178 vivante
+    (contrat DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T178.yaml, AC4) a EXPLICITEMENT rejeté ce paramètre et
+    toute 2ᵉ fonction RunOn comme redondants : le volet temps est couvert par Méca B (PostRampTimeout
+    T#3s), la dérive statique par Méca A (armement contacteurs-off + frein serré). T054 « hors ressort
+    » (décision utilisateur). Aucune tâche T181 propre.
+
+    '
+  description: 'Aucune action propre. Prérequis : T178 livrée et validée. Le harnais T181-00 vérifie «
+    coast-down normal → pas de faux PowerCutOff » via le scénario TC-P10-001 une fois T178 en place.
+
+    '
+  contrat: null
+  objectifs:
+  - Sans objet (tâche retirée) — voir T178 (AC2/AC3/AC4)
+  bloque_par: []
+- id: T181-18
+  parent_id: T181
+  statut: ⬜
+  criticite: C1
+  domaine: TEST_AUTO_CI
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Rétro-TC F10.06..09 + fiche FB_Winch_v1.0.md réécrite + fix sérialisation traçabilité
+  contexte: 'D11 : F10.06..09 (Symmetry, SpeedStep, LoadEstimator, DriftGuard) sans aucun TC. D17 : fiche
+    FB_Winch périmée (piège). Regrouper les TC (1 macro justifiée par fonction, pas 50). Phase D.
+
+    '
+  description: 'fix: ≥ 1 TC macro par fonction F10.06..09 ; fiche FB_Winch_v1.0.md alignée sur l''interface
+    finale ; correction du bug de sérialisation de la matrice de traçabilité. guard: G450 (couverture
+    AF↔TC).
+
+    '
+  contrat: null
+  objectifs:
+  - F10.06, F10.07, F10.08, F10.09 ont chacune ≥ 1 TC exécutable et vert
+  - Nombre total de nouveaux TC ≤ 8 (regroupement effectif, chaque TC justifié)
+  - Fiche FB_Winch_v1.0.md: interface documentée == interface réelle (diff = 0)
+  - G450 couverture AF↔TC↔CI vert pour F10.06..09 ; gates palier C PASS
+  bloque_par:
+  - T181-10
+- id: T181-19
+  parent_id: T181
+  statut: ⬜
+  criticite: C2
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T20:30:00+02:00'
+  titre: Câbler SyncCoupled (diag) + garde de revue « FB_Winch ne lit jamais SyncCoupled en logique »
+  contexte: 'SyncCoupled dans DriveRequest est DIAG STRICT : information de couplage synchro pour le diagnostic/IHM,
+    jamais un intrant de décision dans FB_Winch. Câblé depuis instWinchSync.SyncActive. Phase A.
+
+    '
+  description: 'fix: DriveRequest.SyncCoupled := instWinchSync.SyncActive (renseigné pour le diag/IHM).
+    guard: G4xx_check_synccoupled_diag_only (grep : SyncCoupled n''apparaît jamais dans une condition
+    exécutable du corps de FB_Winch).
+
+    '
+  contrat: null
+  objectifs:
+  - DriveRequest.SyncCoupled est renseigné à chaque cycle depuis SyncActive (G200)
+  - grep: SyncCoupled absent de toute condition IF/CASE/expression logique du corps FB_Winch
+  - Gate G4xx_check_synccoupled_diag_only présent et vert
+  - Aucune régression CI FB_Winch ; gates palier C PASS
+  bloque_par:
+  - T181-08
