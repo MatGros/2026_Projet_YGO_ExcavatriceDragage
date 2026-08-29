@@ -545,14 +545,17 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
 
         rendered_card = f"""
         <article id="{anchor}" class="{card_classes}">
-            <header>
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 {_badge(passed_r)}
-                <h3>{_html.escape(name)} {contract_tag}</h3>
+                <h3 style="flex: 1;">{_html.escape(name)} {contract_tag}</h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            {scenario_drawer_html}
-            {checks_drawer_html}
-            {_failure_block(r.get('failure'))}
-            {chrono_html}
+            <div class="test-card-body">
+                {scenario_drawer_html}
+                {checks_drawer_html}
+                {_failure_block(r.get('failure'))}
+                {chrono_html}
+            </div>
         </article>"""
 
         if is_contract_test:
@@ -937,9 +940,14 @@ _CSS = """
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease, padding 0.2s ease; }
     .test-card:hover { transform: translateY(-1px); }
     .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    .test-card-collapsed { padding: 10px 18px !important; }
+    .test-card-collapsed .test-card-body { display: none !important; }
+    .test-card-collapsed .test-card-header { margin-bottom: 0 !important; }
+    .test-card-collapsed .test-card-toggle { transform: rotate(-90deg); }
+    .test-card-toggle { transition: transform 0.2s ease; display: inline-block; }
     /* Style distinct pour les tests de contrat et d'interface socle */
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
@@ -1425,15 +1433,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clic simple sur colonne repliee pour la reouvrir
     document.addEventListener('click', function(e) {
         var th = e.target.closest('.chrono-table th.col-collapsed');
-        if (!th) return;
-        var table = th.closest('.chrono-table');
-        if (!table) return;
-        var colIdx = Array.from(th.parentNode.children).indexOf(th);
-        th.classList.remove('col-collapsed');
-        table.querySelectorAll('tbody tr').forEach(function(row) {
-            var cell = row.children[colIdx];
-            if (cell) cell.classList.remove('col-collapsed');
-        });
+        if (th) {
+            var table = th.closest('.chrono-table');
+            if (table) {
+                var colIdx = Array.from(th.parentNode.children).indexOf(th);
+                th.classList.remove('col-collapsed');
+                table.querySelectorAll('tbody tr').forEach(function(row) {
+                    var cell = row.children[colIdx];
+                    if (cell) cell.classList.remove('col-collapsed');
+                });
+            }
+            return;
+        }
+
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        var testHeader = e.target.closest('.test-card-header');
+        if (testHeader) {
+            var card = testHeader.closest('.test-card');
+            if (card) {
+                card.classList.toggle('test-card-collapsed');
+            }
+        }
     });
 
     // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique

@@ -60,9 +60,14 @@
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease, padding 0.2s ease; }
     .test-card:hover { transform: translateY(-1px); }
     .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    .test-card-collapsed { padding: 10px 18px !important; }
+    .test-card-collapsed .test-card-body { display: none !important; }
+    .test-card-collapsed .test-card-header { margin-bottom: 0 !important; }
+    .test-card-collapsed .test-card-toggle { transform: rotate(-90deg); }
+    .test-card-toggle { transition: transform 0.2s ease; display: inline-block; }
     /* Style distinct pour les tests de contrat et d'interface socle */
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
@@ -301,7 +306,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 12:23:48</div>
+    <div class="exec-time">2026-08-29 12:27:05</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (8 tests)</summary>
@@ -641,22 +646,24 @@
         <div style="margin-top: 12px;">
             
         <article id="test-fb-safety-emergencymanagement-0" class="test-card test-card-pass test-card-contract">
-            <header>
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3 style="flex: 1;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
                 <ul class="scenario-list"><li>Scan 0 : Enable=FALSE -&gt; Neutralisation standard</li><li>Scan 1 : Enable=TRUE -&gt; Prete en service</li><li>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
                 <ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=FALSE -&gt; Pas d erreur</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Au repos -&gt; Pas d erreur</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul>
             </details>
-            
-            
+                
+                
     <div class="chronogram-group">
         
         <details >
@@ -692,6 +699,7 @@
         <table class="static-table"><tbody><tr><td><code>BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGSEQSTEP</code></td><td>0</td></tr><tr><td><code>ARMPULSE_RQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNEMERGENCYCUTOFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGLOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>MAINTAINA_RQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MAINTAINB_RQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCUTOFFREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.ARMABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.ARMINGBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.CONTACTOROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.STEP</code></td><td>0</td></tr><tr><td><code>DIAG.ARMFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAG.LASTABORTCAUSE</code></td><td>0</td></tr><tr><td><code>DIAG.LASTABORTSTEP</code></td><td>0</td></tr><tr><td><code>DIAG.LOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
+            </div>
         </article>
         </div>
     </details>
@@ -701,22 +709,24 @@
         <div style="margin-top: 12px;">
             
         <article id="test-fb-safety-emergencymanagement-1" class="test-card test-card-pass">
-            <header>
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu </h3>
+                <h3 style="flex: 1;">TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
                 <ul class="scenario-list"><li>demarrage + regime etabli, sain</li><li>front ArmRequest -&gt; TestA (step 1) : SEUL le canal A doit se couper</li><li>200ms plus tard : la boucle reagit reellement a la coupure de A (preuve physique reelle)</li><li>200ms plus tard : boucle refermee (A restaure) -&gt; passage a TestB (step 3)</li><li>200ms plus tard : boucle reagit a la coupure de B</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (14)</span></summary>
                 <ul class="checks-list"><li>hors defaut, canal A maintenu</li><li>hors defaut, canal B maintenu</li><li>front doit lancer TestA</li><li>TestA : canal A seul doit se couper</li><li>TestA : canal B ne doit PAS etre affecte</li><li>TestA reussi (boucle a reagi) -&gt; RestoreA</li><li>pas de defaut si le canal reagit correctement au test</li><li>canal A restaure immediatement apres son test</li><li>RestoreA reussi -&gt; TestB</li><li>TestB : canal B seul doit se couper</li><li>TestB : canal A ne doit PAS etre affecte</li><li>TestB reussi -&gt; RestoreB</li><li>pas de defaut si le canal B reagit correctement au test</li><li>canal B restaure immediatement apres son test</li></ul>
             </details>
-            
-            
+                
+                
     <div class="chronogram-group">
         
         <details >
@@ -752,24 +762,27 @@
         <table class="static-table"><tbody><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMPULSE_RQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNEMERGENCYCUTOFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGLOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCUTOFFREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.CONTACTOROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ARMFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAG.LASTABORTCAUSE</code></td><td>0</td></tr><tr><td><code>DIAG.LASTABORTSTEP</code></td><td>0</td></tr><tr><td><code>DIAG.LOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
+            </div>
         </article>
         <article id="test-fb-safety-emergencymanagement-2" class="test-card test-card-pass">
-            <header>
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -&gt; pulse 1s puis confirmation </h3>
+                <h3 style="flex: 1;">TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -&gt; pulse 1s puis confirmation </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (8)</span></summary>
                 <ul class="scenario-list"><li>demarrage + regime etabli, sain</li><li>front ArmRequest -&gt; TestA</li><li>TestA reussi (boucle reagit) -&gt; RestoreA</li><li>RestoreA reussi -&gt; TestB</li><li>TestB reussi (boucle reagit) -&gt; RestoreB</li><li>RestoreB reussi -&gt; Pulse (step 5), impulsion 1s</li><li>1s plus tard : pulse termine -&gt; Confirm (step 6)</li><li>contacteur confirme engage -&gt; succes, retour IDLE</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (10)</span></summary>
                 <ul class="checks-list"><li>les 2 canaux valides -&gt; impulsion de reamement</li><li>pulse de reamement doit etre actif (TC-P01-003)</li><li>pulse de 1s termine -&gt; attente confirmation contacteur</li><li>pulse retombe apres 1s</li><li>sequence toujours en cours (attente confirmation)</li><li>confirmation contacteur -&gt; retour IDLE</li><li>contacteur engage confirme -&gt; Done</li><li>sequence terminee</li><li>succes -&gt; pas de lockout</li><li>reamement reussi -&gt; pas de defaut</li></ul>
             </details>
-            
-            
+                
+                
     <div class="chronogram-group">
         
         <details >
@@ -805,13 +818,16 @@
         <table class="static-table"><tbody><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNEMERGENCYCUTOFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGLOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>POWERCUTOFFREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ARMFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAG.LASTABORTCAUSE</code></td><td>0</td></tr><tr><td><code>DIAG.LASTABORTSTEP</code></td><td>0</td></tr><tr><td><code>DIAG.LOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
+            </div>
         </article>
         <article id="test-fb-safety-emergencymanagement-3" class="test-card test-card-pass">
-            <header>
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste </h3>
+                <h3 style="flex: 1;">TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
                 <ul class="scenario-list"><li>reproduit l etat &quot;canal colle&quot; de TC-P01-006 -- setup independant, propre a ce test</li><li>Reset : doit acquitter l affichage sans redemarrage auto (TC-P01-004) -- +1 cycle</li><li>Complete TC-P01-004 : sa colonne &quot;Comportement attendu&quot; precise &quot;Reset efface l affichage
@@ -820,13 +836,13 @@
        ne doit PAS etre restaure par le seul Reset (AF 3.4bis : interlock sur Cause brute,
        jamais sur l Ack).</li><li>nouvel essai : cause toujours presente (canal toujours colle) -&gt; doit re-alarmer (TC-P01-009) -- +1 cycle</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
                 <ul class="checks-list"><li>precondition : canal colle doit avoir leve une erreur</li><li>Reset doit effacer l affichage du defaut</li><li>Reset seul ne relance jamais de sequence (pas de redemarrage auto)</li><li>TC-P01-004 : Reset seul ne doit PAS restaurer le maintien (interlock reste sur Cause, AF 3.4bis)</li><li>un nouveau front ArmRequest doit relancer TestA</li><li>cause persistante doit re-alarmer au nouvel essai, meme apres Reset</li></ul>
             </details>
-            
-            
+                
+                
     <div class="chronogram-group">
         
         <details >
@@ -862,24 +878,27 @@
         <table class="static-table"><tbody><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ARMPULSE_RQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNEMERGENCYCUTOFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGLOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCUTOFFREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.CHAINOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATE.CONTACTOROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ARMFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.LOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
+            </div>
         </article>
         <article id="test-fb-safety-emergencymanagement-4" class="test-card test-card-pass">
-            <header>
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-006 canal colle bloque le reamement (echec auto-test) </h3>
+                <h3 style="flex: 1;">TC-P01-006 canal colle bloque le reamement (echec auto-test) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
                 <ul class="scenario-list"><li>scans 1-2 : demarrage + regime etabli, sain</li><li>front ArmRequest -&gt; ArmingSeqStep passe a 1 (TestA), boucle encore saine ce scan -- +1 cycle</li><li>200ms plus tard : le canal A est cense etre coupe, mais la boucle reste fermee -&gt; collage</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
                 <ul class="checks-list"><li>front ArmRequest doit lancer TestA (step 1)</li><li>canal colle doit lever une erreur (RedundancyTestFailed)</li><li>echec auto-test doit ramener la sequence a IDLE</li><li>un canal colle bloque aussi le maintien normal (interlock sur Cause brute)</li></ul>
             </details>
-            
-            
+                
+                
     <div class="chronogram-group">
         
         <details >
@@ -915,13 +934,16 @@
         <table class="static-table"><tbody><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMPULSE_RQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNEMERGENCYCUTOFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGLOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCUTOFFREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.CHAINOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATE.CONTACTOROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ARMFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.LOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
+            </div>
         </article>
         <article id="test-fb-safety-emergencymanagement-5" class="test-card test-card-pass">
-            <header>
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-007 timeout confirmation contacteur -&gt; lockout 5s </h3>
+                <h3 style="flex: 1;">TC-P01-007 timeout confirmation contacteur -&gt; lockout 5s </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (6)</span></summary>
                 <ul class="scenario-list"><li>meme montee en sequence que TC-P01-003 : les 2 canaux valides, jusqu au pulse</li><li>1s plus tard : pulse termine -&gt; Confirm (step 6), contacteur PAS engage</li><li>2s plus tard (timeout confirmation) : contacteur toujours pas confirme -&gt; echec + lockout</li><li>pendant le lockout : un nouveau front ArmRequest doit etre bloque</li><li>5s apres le debut du lockout : le verrouillage doit se lever automatiquement</li><li>preuve OPERATIONNELLE (pas juste le drapeau) : un nouveau front doit maintenant relancer
@@ -929,13 +951,13 @@
        suivant avant de tenter le nouveau front (ordre de calcul : trigger avant re-evaluation
        du lockout dans le meme scan, cf. Logic.st)</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (9)</span></summary>
                 <ul class="checks-list"><li>les 2 canaux valides -&gt; pulse</li><li>attente confirmation contacteur</li><li>timeout confirmation doit ramener la sequence a IDLE</li><li>timeout doit declencher le lockout (TC-P01-007)</li><li>timeout doit lever le defaut EmergencyArmingFailed</li><li>defaut doit etre visible sur Error</li><li>lockout actif doit bloquer toute nouvelle tentative de reamement</li><li>lockout 5s ecoule -&gt; leve automatiquement</li><li>apres le lockout, un nouveau front doit reellement relancer TestA (pas juste le drapeau qui retombe)</li></ul>
             </details>
-            
-            
+                
+                
     <div class="chronogram-group">
         
         <details >
@@ -971,13 +993,16 @@
         <table class="static-table"><tbody><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNEMERGENCYCUTOFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCUTOFFREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.CONTACTOROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
+            </div>
         </article>
         <article id="test-fb-safety-emergencymanagement-6" class="test-card test-card-pass">
-            <header>
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien </h3>
+                <h3 style="flex: 1;">TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
                 <ul class="scenario-list"><li>Meme montee en sequence que TC-P01-003 jusqu au pulse (step 5)</li><li>Operateur appuie sur la coupure d urgence IHM PENDANT l impulsion mecanique de reamement</li><li>Coherence attendue : si la coupure d urgence IHM coupe le maintien de puissance, elle doit
@@ -986,13 +1011,13 @@
        conditionne par aucune des memes gardes que Cmd.MaintainA/B_Cmd dans
        FB_Safety_EmergencyManagementLogic.st §7 -- ecart releve par l audit du 2026-08-22).</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
                 <ul class="checks-list"><li>les 2 canaux valides -&gt; pulse (step 5)</li><li>precondition : pulse actif</li><li>BtnEmergencyCutOff coupe bien le maintien canal A (comportement attendu, deja correct)</li><li>BtnEmergencyCutOff coupe bien le maintien canal B (comportement attendu, deja correct)</li><li>BtnEmergencyCutOff doit aussi couper le pulse de reamement en cours (coherence avec la coupure du maintien)</li></ul>
             </details>
-            
-            
+                
+                
     <div class="chronogram-group">
         
         <details >
@@ -1028,24 +1053,27 @@
         <table class="static-table"><tbody><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGLOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCUTOFFREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.CONTACTOROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ARMFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAG.LOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
+            </div>
         </article>
         <article id="test-fb-safety-emergencymanagement-7" class="test-card test-card-pass">
-            <header>
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P01-008 PowerCutOffRequest coupe A et B sans armer </h3>
+                <h3 style="flex: 1;">TC-P01-008 PowerCutOffRequest coupe A et B sans armer </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
                 <ul class="scenario-list"><li>scan 1 : autotest demarrage (1 cycle, boucle saine, contacteur repos)</li><li>scan 2 : regime etabli, maintien sain attendu -- +1 cycle automate (10ms)</li><li>scan 3 : coupure demandee par un metier (Winch/Translation) -- +1 cycle automate</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
                 <ul class="checks-list"><li>hors defaut, canal A doit etre maintenu</li><li>hors defaut, canal B doit etre maintenu</li><li>pas de sequence en cours</li><li>PowerCutOffRequest doit couper le canal A</li><li>PowerCutOffRequest doit couper le canal B</li><li>PowerCutOffRequest ne doit jamais declencher une sequence armement</li></ul>
             </details>
-            
-            
+                
+                
     <div class="chronogram-group">
         
         <details >
@@ -1081,6 +1109,7 @@
         <table class="static-table"><tbody><tr><td><code>BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMINGSEQSTEP</code></td><td>0</td></tr><tr><td><code>ARMPULSE_RQ</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ARMREQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNEMERGENCYCUTOFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYARMINGLOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ERRORID</code></td><td>0</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.ARMINGBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.CHAINOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATE.CONTACTOROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATE.STEP</code></td><td>0</td></tr><tr><td><code>DIAG.ARMFAILED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAG.LASTABORTCAUSE</code></td><td>0</td></tr><tr><td><code>DIAG.LASTABORTSTEP</code></td><td>0</td></tr><tr><td><code>DIAG.LOCKOUTACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAG.REDUNDANCYTESTFAILED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
     </details>
     </div>
+            </div>
         </article>
         </div>
     </details>
@@ -2013,15 +2042,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clic simple sur colonne repliee pour la reouvrir
     document.addEventListener('click', function(e) {
         var th = e.target.closest('.chrono-table th.col-collapsed');
-        if (!th) return;
-        var table = th.closest('.chrono-table');
-        if (!table) return;
-        var colIdx = Array.from(th.parentNode.children).indexOf(th);
-        th.classList.remove('col-collapsed');
-        table.querySelectorAll('tbody tr').forEach(function(row) {
-            var cell = row.children[colIdx];
-            if (cell) cell.classList.remove('col-collapsed');
-        });
+        if (th) {
+            var table = th.closest('.chrono-table');
+            if (table) {
+                var colIdx = Array.from(th.parentNode.children).indexOf(th);
+                th.classList.remove('col-collapsed');
+                table.querySelectorAll('tbody tr').forEach(function(row) {
+                    var cell = row.children[colIdx];
+                    if (cell) cell.classList.remove('col-collapsed');
+                });
+            }
+            return;
+        }
+
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        var testHeader = e.target.closest('.test-card-header');
+        if (testHeader) {
+            var card = testHeader.closest('.test-card');
+            if (card) {
+                card.classList.toggle('test-card-collapsed');
+            }
+        }
     });
 
     // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique
