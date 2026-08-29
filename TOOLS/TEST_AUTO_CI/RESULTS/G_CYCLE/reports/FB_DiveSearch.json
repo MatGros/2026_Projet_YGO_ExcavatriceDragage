@@ -1,23 +1,43 @@
 {
   "version": 1,
-  "file": "test_fb_winch.st",
+  "file": "test_fb_divesearch.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations",
+      "name": "TC-P04-010 DiveSearch : mise en service recherche de couche",
       "passed": true
     },
     {
-      "name": "TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse",
+      "name": "TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-013 : Depassement tempo recherche immersion Kobold -> ERROR_HOLD et capture StepAtFault",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-014 : Depassement tempo recherche fond Kobold -> ERROR_HOLD et capture StepAtFault",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seulement sur front Reset",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-016 : Contacteur Kobold coupe des le relachement de la descente (anti-chauffe, H1)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 8,
+    "passed": 8,
     "failed": 0
   }
 }

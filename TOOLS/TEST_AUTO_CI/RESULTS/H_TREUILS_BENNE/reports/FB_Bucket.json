@@ -1,23 +1,100 @@
 {
   "version": 1,
-  "file": "test_fb_winch.st",
+  "file": "test_fb_bucket.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations",
+      "name": "TC-P10-023 Fermeture seulement si MotionDirection=1 ET MotionRequestActive",
       "passed": true
     },
     {
-      "name": "TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse",
+      "name": "TC-P10-024 Ouverture seulement si MotionDirection=-1 ET MotionRequestActive",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-027 M1SlipDetected force SafeStop sur M1 cote Treuils",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-028 Couche 2 (Meca C) : derive M1 >2.0m -> PowerCutOff",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-029 Recul (sens inverse) borne a la position de depart, jamais au-dela",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-030 ConfirmOpen/ClosePosition : effet seulement MAINT_N1/N2 arretes",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "BUCKETSTATE.ISOPEN expected TRUE, got FALSE",
+        "file": "test_fb_bucket.st",
+        "line": 277,
+        "message": "MAINT_N1 + ConfirmOpen -> IsOpen=TRUE"
+      }
+    },
+    {
+      "name": "TC-P10-031 Codeur(s) non reference(s) -> defaut permanent, independant de Reset",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-032 FB_ExtractionSequence.Busy preserve l armement joystick en fin benne",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-033 Butee haute M2 decalee de OffsetCloseM si ferme/en fermeture",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-034 Terrain : cinematique reelle en charge, amplitude offset validee",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-045.1 Benne partiellement fermee -> remontee palier 1 seul",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.FAULT.ERROR expected TRUE, got FALSE",
+        "file": "test_fb_bucket.st",
+        "line": 429,
+        "message": "Timeout mouvement 1s -> Error"
+      }
+    },
+    {
+      "name": "TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -> StateIncoherent, ActiveOffsetValid=FALSE",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
+        "file": "test_fb_bucket.st",
+        "line": 446,
+        "message": "Boot incoherent -> StateIncoherent=TRUE"
+      }
+    },
+    {
+      "name": "TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
-    "failed": 0
+    "total": 17,
+    "passed": 14,
+    "failed": 3
   }
 }

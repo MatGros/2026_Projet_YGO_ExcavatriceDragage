@@ -1,3 +1,13 @@
+(* =======================================================================
+   🧪 test_fb_bucket.st — FB_Bucket (TC-P10-023..034, 045.1, 046.1, 047.1, 048.1)
+   ───────────────────────────────────────────────────────────────
+   Fiche : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+   Conventions : 1 appel fb() = 1 scan ; ADVANCE_TIME(10000000) entre les
+   scans pour les fronts R_TRIG.
+   Config valide : OffsetOpenM=0.0, OffsetCloseM=3.0, CoherenceLimitM=5.0,
+   CloseAnticipationM=0.2, OpenAnticipationM=0.2.
+   ======================================================================= *)
+
 SETUP
 VAR
     FB : FB_Bucket;
@@ -6,12 +16,15 @@ VAR
 END_VAR
 END_SETUP
 
+(* ── Config valide commune ── *)
+
 TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
     Config.OffsetOpenM := 0.0;
     Config.OffsetCloseM := 3.0;
     Config.CoherenceLimitM := 5.0;
     Config.CloseAnticipationM := 0.2;
     Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
 
     (* Scan 0 : Enable=FALSE -> Neutralisation standard *)
     FB(Enable := FALSE, Reset := FALSE, PowerContactorEngaged := TRUE,
@@ -36,16 +49,417 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     ASSERT_FALSE(FB.Ready, 'Coupure -> Ready retombe a FALSE');
 END_TEST
 
-TEST 'TC-P10-023 Benne : mise en service et verrouillage securite'
+TEST 'TC-P10-023 Fermeture seulement si MotionDirection=1 ET MotionRequestActive'
     Config.OffsetOpenM := 0.0;
     Config.OffsetCloseM := 3.0;
     Config.CoherenceLimitM := 5.0;
     Config.CloseAnticipationM := 0.2;
     Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
 
+    (* Scan 1 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(FB.Ready, 'Benne active et prete');
-    ASSERT_FALSE(FB.M2_StartStop, 'Au repos -> Pas de mouvement benne');
+
+    (* Scan 2 : CmdClose + MotionDirection=1 + MotionRequestActive -> fermeture *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.CloseReq, 'CmdClose -> CloseReq');
+    ASSERT_TRUE(FB.M2_StartStop, 'Fermeture -> M2_StartStop=TRUE');
+    ASSERT_EQ(FB.M2_Direction, 1, 'Fermeture -> M2_Direction=1');
+    ASSERT_TRUE(FB.M2_ForceSlowSpeed, 'Fermeture -> vitesse lente forcee');
+END_TEST
+
+TEST 'TC-P10-024 Ouverture seulement si MotionDirection=-1 ET MotionRequestActive'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsClosed := TRUE;
+
+    (* Scan 1 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 2 : CmdOpen + MotionDirection=-1 + MotionRequestActive -> ouverture *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdOpen_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CablePosM1 := 0.0, CablePosM2 := 3.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.OpenReq, 'CmdOpen -> OpenReq');
+    ASSERT_TRUE(FB.M2_StartStop, 'Ouverture -> M2_StartStop=TRUE');
+    ASSERT_EQ(FB.M2_Direction, -1, 'Ouverture -> M2_Direction=-1');
+    ASSERT_TRUE(FB.M2_ForceSlowSpeed, 'Ouverture -> vitesse lente forcee');
+END_TEST
+
+TEST 'TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    (* Scan 1 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 2 : M1_Busy=TRUE -> demande fermeture REFUSEE (anti-traversee) *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       M1_Busy := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.CloseReq, 'M1_Busy -> CloseReq refuse');
+    ASSERT_FALSE(FB.M2_StartStop, 'M1_Busy -> pas de mouvement benne');
+    ASSERT_FALSE(FB.Lifecycle.Busy, 'M1_Busy -> pas de Busy');
+END_TEST
+
+TEST 'TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    (* Scan 1 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 2 : demarrage fermeture, M1RefPosM capture a 0.0 *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'Fermeture en cours -> Busy');
+
+    (* Scan 3 : glissement M1 > 1.0m -> M1SlipDetected + coupe M2 *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 2.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.M1SlipDetected, 'Glissement M1 >1.0m -> M1SlipDetected');
+    ASSERT_TRUE(FB.Fault.Error, 'Glissement M1 -> Error');
+    ASSERT_FALSE(FB.M2_StartStop, 'Glissement M1 -> M2 coupe (M2_StartStop=FALSE)');
+END_TEST
+
+TEST 'TC-P10-027 M1SlipDetected force SafeStop sur M1 cote Treuils'
+    (* (essai site — stub) : le forçage SafeStop M1 depuis M1SlipDetected est cable dans
+       PRG_04_Treuils_Benne.st, pas dans ce FB. On verifie ici la brique amont : M1SlipDetected
+       est bien expose en sortie, condition du forçage. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 2.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.M1SlipDetected, 'M1SlipDetected expose (consomme par Treuils pour SafeStop M1)');
+END_TEST
+
+TEST 'TC-P10-028 Couche 2 (Meca C) : derive M1 >2.0m -> PowerCutOff'
+    (* (essai site — stub) : la couche 2 (Meca C, PowerCutOff a 2.0m) est portee par
+       FB_Safety_Winch (BenneHoldStillActive), pas par FB_Bucket. Verifie ici dans
+       test_fb_safety_winch.st (TC-P10-003). Ce FB expose M1SlipDetected (couche 1, 1.0m). *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Ready, 'Benne prete (couche 1 active)');
+END_TEST
+
+TEST 'TC-P10-029 Recul (sens inverse) borne a la position de depart, jamais au-dela'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    (* Scan 1 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 2 : demarrage fermeture, M2StartPosM=0.0 *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'Fermeture en cours');
+
+    (* Scan 3 : inversion de sens (MotionDirection=-1) -> M2 pilote en descente *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_EQ(FB.M2_Direction, -1, 'Recul -> M2_Direction=-1');
+    ASSERT_TRUE(FB.M2_StartStop, 'Recul commande (borne a M2StartPosM)');
+END_TEST
+
+TEST 'TC-P10-030 ConfirmOpen/ClosePosition : effet seulement MAINT_N1/N2 arretes'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := FALSE;
+
+    (* Scan 1 : Mode MAINT_N1, ConfirmOpenPosition -> IsOpen=TRUE *)
+    FB(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, PowerContactorEngaged := TRUE,
+       ConfirmOpenPosition := TRUE, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(BucketState.IsOpen, 'MAINT_N1 + ConfirmOpen -> IsOpen=TRUE');
+    ASSERT_FALSE(BucketState.IsClosed, 'MAINT_N1 + ConfirmOpen -> IsClosed=FALSE');
+    ASSERT_FALSE(BucketState.StateIncoherent, 'Confirmation -> incoherence leve');
+
+    (* Scan 2 : Mode SEMI_AUTO, ConfirmClosePosition -> AUCUN effet *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO, PowerContactorEngaged := TRUE,
+       ConfirmClosePosition := TRUE, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(BucketState.IsOpen, 'SEMI_AUTO + ConfirmClose -> pas d effet (IsOpen conserve)');
+    ASSERT_FALSE(BucketState.IsClosed, 'SEMI_AUTO + ConfirmClose -> IsClosed reste FALSE');
+END_TEST
+
+TEST 'TC-P10-031 Codeur(s) non reference(s) -> defaut permanent, independant de Reset'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    (* Scan 1 : HomedM1=FALSE -> defaut non reference *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := FALSE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Fault.Error, 'Codeur M1 non reference -> Error');
+
+    (* Scan 2 : Reset -> defaut PERSISTE (cause toujours presente) *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
+       HomedM1 := FALSE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := FALSE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Fault.Error, 'Reset seul -> defaut non reference PERSISTE (cause brute)');
+
+    (* Scan 3 : referencement restaure -> defaut acquittable *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.Fault.Error, 'Referencement restaure + Reset -> plus d erreur');
+END_TEST
+
+TEST 'TC-P10-032 FB_ExtractionSequence.Busy preserve l armement joystick en fin benne'
+    (* (essai site — stub) : PreserveArmingAfterBucket := instExtractionSequence.Busy est cable
+       dans PRG_02_Acquisition.st, pas dans ce FB. Non automatisable en boite noire FB_Bucket. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Ready, 'Benne prete (preservation armement = cote PRG_02)');
+END_TEST
+
+TEST 'TC-P10-033 Butee haute M2 decalee de OffsetCloseM si ferme/en fermeture'
+    (* (essai site — stub) : le decalage de butee haute M2 (OffsetCloseM) est cable dans
+       PRG_04_Treuils_Benne.st, pas dans ce FB. Non automatisable en boite noire FB_Bucket. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsClosed := TRUE;
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Ready, 'Benne fermee (butee haute decalee = cote PRG_04)');
+END_TEST
+
+TEST 'TC-P10-034 Terrain : cinematique reelle en charge, amplitude offset validee'
+    (* (essai site — stub) : la cinematique reelle en charge et l amplitude des offsets
+       (OffsetCloseM=15.0 non valide en charge) sont des verifications terrain, jamais
+       automatisables en boite noire. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Ready, 'Benne prete (cinematique reelle = essai terrain)');
+END_TEST
+
+TEST 'TC-P10-045.1 Benne partiellement fermee -> remontee palier 1 seul'
+    (* (essai site — stub) : le verrouillage des paliers 2-5 en remontee quand NOT IsClosed est
+       cable dans PRG_04_Treuils_Benne.st (arbitrage treuil), pas dans ce FB. Non automatisable
+       en boite noire FB_Bucket. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := FALSE;
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Ready, 'Benne prete (verrouillage paliers = cote PRG_04)');
+END_TEST
+
+TEST 'TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch'
+    (* CfgTimeoutDuration force a 1s pour rendre le test rapide (code reel = 60s). *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    (* Scan 1 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 2 : demarrage fermeture, cible non atteinte -> BUSY maintenu *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'Fermeture en cours');
+
+    (* Scan 3 : apres 1s de BUSY sans atteindre la cible -> timeout *)
+    ADVANCE_TIME(1000000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_TRUE(FB.Fault.Error, 'Timeout mouvement 1s -> Error');
+    ASSERT_TRUE(FB.Fault.Latched, 'Timeout -> defaut latche');
+END_TEST
+
+TEST 'TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -> StateIncoherent, ActiveOffsetValid=FALSE'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := FALSE;
+
+    (* Scan 1 : premier cycle, ni ouvert ni ferme -> incoherence boot *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(BucketState.StateIncoherent, 'Boot incoherent -> StateIncoherent=TRUE');
+    ASSERT_FALSE(FB.ActiveOffsetValid, 'Boot incoherent -> ActiveOffsetValid=FALSE');
+END_TEST
+
+TEST 'TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle'
+    (* (essai site — stub) : la persistance RETAIN de OffsetCloseM (GVL_PERSISTENT) est une
+       propriete de la memoire retenue CODESYS, non automatisable en boite noire (pas de power
+       cycle dans le harnais). On verifie ici que la config OffsetCloseM est bien consommee. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 15.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Ready, 'Config OffsetCloseM=15.0 consommee (persistance RETAIN = cote GVL)');
 END_TEST

@@ -1,23 +1,43 @@
 {
   "version": 1,
-  "file": "test_fb_winch.st",
+  "file": "test_fb_modes.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations",
+      "name": "TC-P05-010 Modes : selection et autorisation mode Maintenance N1",
       "passed": true
     },
     {
-      "name": "TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse",
+      "name": "TC-P05-001 Modes machine restreints : DISABLE, MAINT_N1, MAINT_N2, SEMI_AUTO",
+      "passed": true
+    },
+    {
+      "name": "TC-P05-002 Mode nominal : joystick pilote M1+M2 conjointement (select force 0 hors MAINT_N2)",
+      "passed": true
+    },
+    {
+      "name": "TC-P05-003 Mode MAINT_N2 M1 seul : M2 bloque, frein serre",
+      "passed": true
+    },
+    {
+      "name": "TC-P05-004 Refus mode SEMI_AUTO si codeurs invalides",
+      "passed": true
+    },
+    {
+      "name": "TC-P05-005 Limite legale = blocage exploitation, pas safety (aucune sortie PowerCutOff)",
+      "passed": true
+    },
+    {
+      "name": "TC-P05-006 Pas de redemarrage automatique apres defaut : Reset + nouvel ordre requis",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 8,
+    "passed": 8,
     "failed": 0
   }
 }

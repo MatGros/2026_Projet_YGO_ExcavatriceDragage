@@ -1,15 +1,75 @@
 {
   "version": 1,
-  "file": "test_prg_02_acquisition.st",
+  "file": "test_fb_hmi_bannerformatter.st",
   "results": [
     {
-      "name": "PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-010 AntiFlickerText : affichage instantane force",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-020 RootCause : alarme fille visible quand materiel sain",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-024 Priorite absolue AU sur defaut module E/S",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-009 Aucun defaut actif -> bandeau d alarme vide",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-008 Carrousel d alarmes : un message a la fois, index n/N coherent",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-006 Separation messages action/etat vs alarmes : alarme dans le carrousel, contexte dans le bandeau info",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-002 Structures Cmd/State/Cfg par domaine (invariant structurel)",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-003 IHM limitee aux variables de GVL_IHM (invariant structurel)",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-004 Producteur unique par champ State (invariant structurel)",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-005 Page Troubleshooting en lecture seule (invariant structurel)",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-007 Warning auto-effacable vs Fault sur Reset (invariant structurel)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 1,
-    "passed": 1,
+    "total": 16,
+    "passed": 16,
     "failed": 0
   }
 }

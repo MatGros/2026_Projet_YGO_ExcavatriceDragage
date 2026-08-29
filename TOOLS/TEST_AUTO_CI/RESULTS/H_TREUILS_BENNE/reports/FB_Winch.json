@@ -1,19 +1,53 @@
 {
   "version": 1,
-  "file": "test_fb_simbench.st",
+  "file": "test_fb_winch.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P13-001 Sim_Safety : neutralisation sans Enable",
+      "name": "TC-P10-011 Inversion Fwd<->Rev : neutre->sens immediat, inversion exige delai + rampe a 0",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB_W.DIRECTIONCHANGEPENDING expected TRUE, got FALSE",
+        "file": "test_fb_winch.st",
+        "line": 102,
+        "message": "Inversion -> DirectionChangePending=TRUE"
+      }
+    },
+    {
+      "name": "TC-P10-017 Config palier invalide : palier 0, sorties sures",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-018 StuckClosed : contacteurs off non confirmes 500ms -> bit1 ErrorId",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB_W.FAULT.ERROR expected TRUE, got FALSE",
+        "file": "test_fb_winch.st",
+        "line": 170,
+        "message": "Contacteurs colles 500ms -> Error"
+      }
+    },
+    {
+      "name": "TC-P10-019 Ordre MainTask : Safety -> WinchControl -> PRG_06_Outputs",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, approche capteur haut=1",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-052.1 Garde-fou vitesse : vitesse non-stable -> palier 1 (activation par defaut : T177 en attente)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
-    "failed": 0
+    "total": 7,
+    "passed": 5,
+    "failed": 2
   }
 }

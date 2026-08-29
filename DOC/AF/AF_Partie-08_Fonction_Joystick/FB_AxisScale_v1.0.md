@@ -37,16 +37,18 @@ dont elle n'a pas l'usage.
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 310px);">
-    <col style="width: 90px;">
-    <col style="width: 140px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
@@ -55,31 +57,55 @@ dont elle n'a pas l'usage.
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Échelle proportionnelle asymétrique : <code>RawX=9000</code> (neutre 5000) → <code>80%</code> ; <code>RawY=300</code> (neutre 5000) → <code>-94%</code> — pas seulement aux bornes</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Échelle</b><br>asymétrique</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Neutre calibré à 5000, <code>RawIn</code> au neutre → <code>OutPct=0</code><br>
+        🚀 <b>Étape 1</b> : Injection <code>RawX=9000</code> (neutre 5000) → demi-plage haute <code>(10000-5000)=5000</code><br>
+        ⚡ <b>Étape 2</b> : <code>OutPct=(9000-5000)/5000*100=80%</code> ; <code>RawY=300</code> → <code>-94%</code><br>
+        ✅ <b>Étape 3</b> : Échelle proportionnelle asymétrique vérifiée (pas seulement aux bornes)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010.2</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Deadband centrée sur le neutre : <code>|RawIn−Neutral| ≤ DeadbandRaw</code> ⇒ <code>OutPct=0.0</code> ; borne exacte : <code>RawIn=Neutral±DeadbandRaw</code> → 0.0, <code>RawIn=Neutral±(DeadbandRaw+1)</code> → <code>|OutPct|&gt;0</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Deadband</b><br>neutre</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>RawIn</code> au neutre, <code>OutPct=0.0</code><br>
+        🚀 <b>Étape 1</b> : Injection <code>RawIn=Neutral±DeadbandRaw</code> (borne exacte)<br>
+        ⚡ <b>Étape 2</b> : <code>|RawIn−Neutral| ≤ DeadbandRaw</code> → <code>OutPct=0.0</code><br>
+        ✅ <b>Étape 3</b> : <code>RawIn=Neutral±(DeadbandRaw+1)</code> → <code>|OutPct|&gt;0</code> — borne validée
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010.3</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Saturation stricte : <code>RawIn=10000</code> (neutre 5000) → +100.0 ; <code>RawIn=0</code> → −100.0 ; toute sortie de plage <code>RawIn</code> ne produit jamais <code>|OutPct|&gt;100.0</code> (<code>LIMIT(−100,OutPct,100)</code>)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Saturation</b><br>stricte</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>RawIn</code> dans plage nominale <code>[0;10000]</code><br>
+        🚀 <b>Étape 1</b> : Injection <code>RawIn=10000</code> (neutre 5000) → <code>+100.0</code> ; <code>RawIn=0</code> → <code>−100.0</code><br>
+        ⚡ <b>Étape 2</b> : <code>LIMIT(−100, OutPct, 100)</code> appliqué<br>
+        ✅ <b>Étape 3</b> : Toute sortie de plage ne produit jamais <code>|OutPct|&gt;100.0</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010.4</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Échelle asymétrique neutre≠5000 : normalisation indépendante de chaque demi-plage</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Neutre</b><br>≠5000</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Neutre calibré ≠ 5000 (ex. 4800 après calibration)<br>
+        🚀 <b>Étape 1</b> : Injection <code>RawIn</code> dans demi-plage haute puis basse<br>
+        ⚡ <b>Étape 2</b> : Normalisation indépendante de chaque demi-plage sur sa propre amplitude<br>
+        ✅ <b>Étape 3</b> : <code>OutPct</code> correct même si neutre ≠ 5000 — échelle asymétrique validée
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

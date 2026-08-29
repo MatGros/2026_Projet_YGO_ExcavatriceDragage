@@ -2897,3 +2897,56 @@ tasks:
   - Note explicite dans l''AF : seuil large = choix délibéré mise en service, à affiner site
   - T054 tracée comme absorbée (pas d''implémentation latence 10 ms)
   bloque_par: []
+- id: T179
+  parent_id: ''
+  statut: ⬜
+  criticite: C1
+  domaine: OUTILLAGE
+  agent: ''
+  date: '2026-08-29T17:30:00+02:00'
+  titre: Resynchro wrappers pytest TEST_AUTO_CI_UNITARY ↔ tests ST (secondaire)
+  contexte: 'Clarification structure tests CI (session migration §2 AF, 2026-08-29) : les tests
+    ST réels vivent dans TOOLS/TEST_AUTO_CI/RESULTS/<DOMAINE>/tests/test_fb_*.st (38 fichiers,
+    référence PRIORITAIRE/urgente). Les wrappers Python TOOLS/TEST_AUTO_CI/TEST_AUTO_CI_UNITARY/<DOMAINE>/test_unitaires.py
+    (13 fichiers) sont SECONDAIRES — ils appellent run_tests.py via subprocess. Tâche de suivi pour
+    plus tard : vérifier la cohérence wrappers ↔ ST, supprimer les wrappers morts si redondants,
+    ou à l''inverse consolider si les wrappers apportent une valeur (filtrage domaine, pytest fixtures).'
+  description: '⬜ Non commencée. Priorité BASSE — les tests ST (RESULTS/.../tests/) sont la référence
+    urgente qui tourne dans run_tests.py. Cette tâche traite la couche pytest secondaire uniquement.
+    Décision utilisateur 2026-08-29 : ST prioritaire, pytest secondaire → tâche pour plus tard.'
+  contrat: ''
+  objectifs:
+  - Auditer la cohérence wrappers pytest ↔ tests ST (1 wrapper par domaine, couvre-t-il les mêmes FB ?)
+  - Identifier les wrappers morts ou redondants (subprocess.run qui ne fait que redispatcher)
+  - Décider : conserver les wrappers (valeur ajoutée pytest fixtures/filtrage) ou supprimer (doublon inutile)
+  - Si suppression : retirer TEST_AUTO_CI_UNITARY/ + __pycache__, mettre à jour .bat pytest
+  - Gates palier C PASS + run_tests.py inchangé
+  bloque_par: []
+- id: T180
+  parent_id: ''
+  statut: ⬜
+  criticite: C4
+  domaine: SÉCURITÉ
+  agent: ''
+  date: '2026-08-29T17:30:00+02:00'
+  titre: Audit 29 cas limites sécurité oubliés (AF 08-14) — challenge migration §2
+  contexte: 'Livré par subagent DSH (b9e938aa) le 2026-08-29 dans le cadre de l''OM « Reprise &
+    Migration TC/AF §2 » Étape 1 (challenge préalable sécurité). Audit READ-ONLY strict de 7 chapôs
+    AF08→14 + 13 fiches FB filles + spec étalon AF01. 29 cas limites identifiés après dédoublonnage :
+    2 C4 (chute de charge possible), 16 C3, 11 C2. Tous read-only — recommandations limitées à l''ajout
+    de couverture TC, aucune proposition de modif code.'
+  description: '⬜ Non commencée. Rapport complet dans le transcript session (message subagent b9e938aa).
+    Priorité d''action suggérée : 🔴 C4 immédiat (CAS-001 retombée contacteur en marche, CAS-002 AU
+    pendant transition) ; 🟠 C3 priorité 1 (CAS-008 T147 FB_Bucket, CAS-012 T175 interlock non câblé,
+    CAS-005/006 homing perdu en marche) ; 🟠 C3 priorité 2 (CAS-003/004/009/010/011/013/014/016/017) ;
+    🔵 C2 (CAS-019 à CAS-029). 2 écarts code avérés signalés (T147 FB_Bucket CAS-008, T175 CAS-012)
+    — à traiter côté code par l''orchestrateur. 10 incertitudes à qualifier par lecture code.'
+  contrat: ''
+  objectifs:
+  - 'Trier les 29 cas par criticité et créer des tâches correctives distinctes (1 par cas ou par famille)'
+  - 'CAS-001/002 (C4) : tâches correctives immédiates — retombée contacteur en marche, AU pendant transition'
+  - 'CAS-008 (T147 FB_Bucket) : confirmer par lecture code FB_Bucket.st si M1SlipDetected est reset en DISABLED'
+  - 'CAS-012 (T175) : déjà tracé — interlock anti-traversée M1_Busy/M2_Busy non câblé'
+  - 'CAS-005/006 (homing perdu en marche) : étude défense en profondeur — re-contrôle cohérence sur retour bus transitoire'
+  - 'Les 10 incertitudes : qualifier par lecture code (R_TRIG Reset, cumul défauts, Méca E mono-codeur, PRG_05 §0bis, etc.)'
+  bloque_par: []

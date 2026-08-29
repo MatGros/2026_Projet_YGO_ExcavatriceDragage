@@ -144,40 +144,65 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-010..013</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Enveloppe unique de simulation</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Enveloppe unique, décalage 1 scan, REX StatusWord AC600 corrigé</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Enveloppe</b><br>simulation</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>SimulationModeActive=FALSE</code>, banc inactif<br>
+        🚀 <b>Étape 1</b> : Front montant <code>SimulationModeActive=TRUE</code> → 4 domaines activés<br>
+        ⚡ <b>Étape 2</b> : Décalage 1 scan entre sortie N-1 et image sim N ; REX StatusWord AC600 corrigé<br>
+        ✅ <b>Étape 3</b> : Enveloppe unique de simulation validée
+      </td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO+👁️ MANUEL</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_SimBench</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-020..023</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Chaîne AU/contacteur simulée</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Chaîne AU simulée, latch contacteur, 🆕 <code>TC-P13-023</code> : défaut réel latché <b>survit</b> au cycle Reset du modèle simulé (§4)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Chaîne</b><br>AU simulée</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Chaîne AU simulée au repos (<code>SimChainOk=TRUE</code>)<br>
+        🚀 <b>Étape 1</b> : Activation <code>SimSafetyActive</code> → simulation chaîne AU/contacteur<br>
+        ⚡ <b>Étape 2</b> : Latch contacteur sur <code>EmergencyArming</code> ; retombée si chaîne ouverte<br>
+        ✅ <b>Étape 3</b> : 🆕 <code>TC-P13-023</code> : défaut réel latché <b>survit</b> au cycle Reset du modèle simulé (§4)
+      </td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO+👁️ MANUEL</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Safety</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-030..033</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Position codeurs M1/M2 simulée</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Position codeur simulée, persistance reset froid</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Codeurs</b><br>M1/M2 sim.</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Codeurs simulés au repos, position initiale<br>
+        🚀 <b>Étape 1</b> : Activation <code>SimWinchActive</code> → génération position codeurs M1/M2<br>
+        ⚡ <b>Étape 2</b> : <code>RelayFwd</code>/<code>RelayRev</code> font compter <code>RawPos</code><br>
+        ✅ <b>Étape 3</b> : Persistance reset froid validée (<code>RawPos</code> survit au redémarrage)
+      </td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO+👁️ MANUEL</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Encoder</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-040..043</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>5 capteurs M3 simulés</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">6 mots thermomètre valides, bornage position, reset Trémie sur <code>Enable=FALSE</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Capteurs</b><br>M3 sim.</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Capteurs M3 simulés au repos<br>
+        🚀 <b>Étape 1</b> : Activation <code>SimTranslationActive</code> → progression continue M3<br>
+        ⚡ <b>Étape 2</b> : 6 mots thermomètre valides, bornage position <code>[Trémie, Maintenance]</code><br>
+        ✅ <b>Étape 3</b> : Reset Trémie sur <code>Enable=FALSE</code> validé
+      </td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Translation</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-050..052</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Entrées joystick brutes</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Entrées brutes joystick, homme-mort jamais contourné</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Joystick</b><br>sim. brut</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Joystick simulé au neutre<br>
+        🚀 <b>Étape 1</b> : Activation <code>SimOperatorActive</code> → entrées brutes joystick<br>
+        ⚡ <b>Étape 2</b> : <code>RawButton</code> reflète l'appui homme-mort (jamais contourné)<br>
+        ✅ <b>Étape 3</b> : Homme-mort réel <code>FB_Joystick</code> reste actif — pas de bypass
+      </td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ SITE+AUTO+👁️ MANUEL</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>

@@ -175,80 +175,133 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquisition &amp; échelle</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>RawX=9000→80%</code>, <code>RawY=300→-94%</code> proportionnel (pas seulement aux bornes) ; deadband ADC centrée neutre</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquisition</b><br>&amp; échelle</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Joystick au neutre, <code>SpeedTgt=0</code><br>
+        🚀 <b>Étape 1</b> : Injection <code>RawX=9000</code> → échelle proportionnelle → <code>80%</code><br>
+        ⚡ <b>Étape 2</b> : Injection <code>RawY=300</code> → échelle asymétrique → <code>-94%</code> (proportionnel, pas seulement aux bornes)<br>
+        ✅ <b>Étape 3</b> : Deadband ADC centrée neutre vérifiée — <code>|RawIn-Neutral|≤DeadbandRaw</code> → <code>0</code>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_AxisScale</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homme-mort</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Armement maintien+permission ; relâché avant fin = annulé ; désarmement (décélération normale, pas coupure) sur <code>ArmingPermit=FALSE</code> ou neutre tenu après grâce 3s</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homme-</b><br>mort</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Repos, <code>DeadmanArmed=FALSE</code>, bouton relâché<br>
+        🚀 <b>Étape 1</b> : Appui bouton + maintien <code>DeadmanArmHoldTime</code> (100ms) + <code>ArmingPermit=TRUE</code> → <code>DeadmanArmed=TRUE</code><br>
+        ⚡ <b>Étape 2</b> : Relâchement bouton avant fin 100ms → armement annulé<br>
+        ⚡ <b>Étape 3</b> : Désarmement sur <code>ArmingPermit=FALSE</code> (immédiat) ou neutre tenu après grâce 3s<br>
+        ✅ <b>Étape 4</b> : <code>DeadmanArmed=FALSE</code>, <code>SpeedTgt=0</code> — décélération normale (pas coupure de puissance)
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-030</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Défaut capteur</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Hors plage ±marge ➔ <code>SpeedTgt=0</code> 2 axes, <code>ErrorId</code> bit1 Warning auto-effacé</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Défaut</b><br>capteur</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Acquisition nominale, <code>RawX/RawY</code> dans <code>[0;10000]</code><br>
+        🚀 <b>Étape 1</b> : Injection <code>RawX</code> ou <code>RawY</code> hors <code>[0;10000]</code> ± marge 500<br>
+        ⚡ <b>Étape 2</b> : <code>SpeedTgt=0</code> sur les 2 axes, <code>ErrorId</code> bit1 (Warning) levé<br>
+        ✅ <b>Étape 3</b> : Retour en plage → Warning auto-effacé, <code>SpeedTgt</code> restauré
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-040</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Calibration</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Hors <code>[2000;8000]</code> ➔ Fault bit0 à acquitter ; neutre persiste après redémarrage PLC</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Calibration</b><br>neutre</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Neutre mémorisé, <code>Calibrate</code> au repos<br>
+        🚀 <b>Étape 1</b> : Front <code>Calibrate</code> avec axes hors <code>[2000;8000]</code><br>
+        ⚡ <b>Étape 2</b> : <code>Fault</code> bit0 levé, calibration refusée, à acquitter par <code>Reset</code> + axes en zone<br>
+        ✅ <b>Étape 3</b> : Neutre persistant survit au redémarrage PLC (RETAIN)
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO+SITE</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-050</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Gate consommateurs</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Translation refuse tout ordre sans <code>DeadmanArmed</code> (tous modes) ; Treuils <b>seulement</b> en mode Joystick Maître (arbitré 2026-08-29, §10 Q2 — interlock directionnel par technologie, voir §7)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Gate</b><br>consommateurs</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>DeadmanArmed=FALSE</code>, machine en mode opératoire<br>
+        🚀 <b>Étape 1</b> : Demande de mouvement translation sans armement homme-mort<br>
+        ⚡ <b>Étape 2</b> : Translation refuse tout ordre (tous modes, y compris boutons IHM)<br>
+        ⚡ <b>Étape 3</b> : Treuils M1/M2 — exigent <code>DeadmanArmed</code> seulement en mode Joystick Maître (<code>TglJoystickMaster=TRUE</code>)<br>
+        ✅ <b>Étape 4</b> : Aucun mouvement sans armement valide (interlock directionnel par technologie, arbitré 2026-08-29 §10 Q2)
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>🔒 GATE</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>G375_check_deadman_arming_gate.py</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-060</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Armement refusé</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>ArmingPermitDenied=TRUE</code> pendant tout appui bouton si <code>ArmingPermit=FALSE</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Armement</b><br>refusé</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>ArmingPermit=FALSE</code>, bouton relâché<br>
+        🚀 <b>Étape 1</b> : Appui bouton (<code>RawButton=TRUE</code>) avec <code>ArmingPermit=FALSE</code><br>
+        ⚡ <b>Étape 2</b> : <code>ArmingPermitDenied=TRUE</code> maintenu pendant tout l'appui (Warning IHM)<br>
+        ✅ <b>Étape 3</b> : Relâchement bouton → <code>ArmingPermitDenied=FALSE</code>, aucun armement
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>⬜ GAP</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020.1</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Armement hors neutre</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Homme-mort : armement hors neutre — front bouton + maintien 100ms + <code>ArmingPermit</code> → <code>DeadmanArmed=TRUE</code> même axes déviés (FB_Joystick.st:172)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Armement</b><br>hors neutre</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Axes déviés (<code>AtNeutral=FALSE</code>), bouton relâché<br>
+        🚀 <b>Étape 1</b> : Front bouton + maintien 100ms + <code>ArmingPermit=TRUE</code> (axes toujours déviés)<br>
+        ⚡ <b>Étape 2</b> : <code>DeadmanArmed=TRUE</code> — armement indépendant de la position des axes<br>
+        ✅ <b>Étape 3</b> : <code>DeadmanArmed=TRUE</code> confirmé même axes déviés (<code>FB_Joystick.st:172</code>)
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020.2</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Désarmement perte permission</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Désarmement perte <code>ArmingPermit</code> : <code>ArmingPermit=FALSE</code> → <code>DeadmanArmed=FALSE</code> immédiat, <code>SpeedTgt=0</code> (FB_Joystick.st:180-183)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Désarmement</b><br>perte permit</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Geste armé (<code>DeadmanArmed=TRUE</code>), mouvement en cours<br>
+        🚀 <b>Étape 1</b> : Perte <code>ArmingPermit</code> (<code>ArmingPermit=FALSE</code>)<br>
+        ⚡ <b>Étape 2</b> : <code>DeadmanArmed=FALSE</code> immédiat, <code>SpeedTgt=0</code><br>
+        ✅ <b>Étape 3</b> : Décélération normale côté FB mouvement aval (pas coupure brute) — <code>FB_Joystick.st:180-183</code>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020.3</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Pas de réarmement auto</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Pas de réarmement auto : retour <code>ArmingPermit</code> ne réarme pas ; exige nouveau front + maintien 100ms (FB_Joystick.st:167-176)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Pas de réarm.</b><br>auto</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Geste désarmé (<code>DeadmanArmed=FALSE</code>), <code>ArmingPermit=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Retour <code>ArmingPermit=TRUE</code> sans nouvel appui bouton<br>
+        ⚡ <b>Étape 2</b> : <code>DeadmanArmed</code> reste <code>FALSE</code> — aucun réarmement automatique<br>
+        ✅ <b>Étape 3</b> : Nouveau front bouton + maintien 100ms requis pour réarmer (<code>FB_Joystick.st:167-176</code>)
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020.4</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bornes temporelles</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Bornes temporelles : armement 100ms, grâce 3s, neutre 100ms (ST_fbJoystick_Cfg.st:15-17 ; FB_Joystick.st:172,189-191)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bornes</b><br>temporelles</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Configuration chargée (<code>ST_fbJoystick_Cfg.st:15-17</code>)<br>
+        🚀 <b>Étape 1</b> : Appui bouton → comptage <code>DeadmanArmHoldTime</code> = 100ms<br>
+        ⚡ <b>Étape 2</b> : Grâce <code>DeadmanArmGraceTime</code> = 3s avant désarmement par neutre<br>
+        ⚡ <b>Étape 3</b> : Neutre tenu <code>NeutralHoldTime</code> = 100ms après grâce → désarmement<br>
+        ✅ <b>Étape 4</b> : Bornes temporelles vérifiées : 100ms / 3s / 100ms (<code>FB_Joystick.st:172,189-191</code>)
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>

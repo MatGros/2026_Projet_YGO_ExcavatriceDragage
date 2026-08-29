@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_Winch [PASS]</title>
+<title>Rapport de test — FB_Winch [FAIL]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -304,14 +304,14 @@
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-pass">PASS</span>
+            <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 15:41:30</div>
+    <div class="exec-time">2026-08-29 17:21:05</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-winch-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-1">TC-P13-001 Sim_Safety : neutralisation sans Enable</a></li></ul>
+        <summary>📋 Sommaire (7 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-winch-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-fail"><a href="#test-fb-winch-1">TC-P10-011 Inversion Fwd&lt;-&gt;Rev : neutre-&gt;sens immediat, inversion exige delai + rampe a 0</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-2">TC-P10-017 Config palier invalide : palier 0, sorties sures</a></li><li class="toc-item toc-fail"><a href="#test-fb-winch-3">TC-P10-018 StuckClosed : contacteurs off non confirmes 500ms -&gt; bit1 ErrorId</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-4">TC-P10-019 Ordre MainTask : Safety -&gt; WinchControl -&gt; PRG_06_Outputs</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-5">TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, approche capteur haut=1</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-6">TC-P10-052.1 Garde-fou vitesse : vitesse non-stable -&gt; palier 1 (activation par defaut : T177 en attente)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,7 +320,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            5/7 vérifications validées
         </div>
     </div>
     
@@ -615,6 +615,165 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 49 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BOTTOMLIMITM</code> jamais câblé en production</li><li>Pin <code>BUSINESSSTEPDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BYPASSGLOBAL</code> jamais câblé en production</li><li>Pin <code>CABLEPOSM</code> jamais câblé en production</li><li>Pin <code>CFGMAXSTEPDESCENTE</code> jamais câblé en production</li><li>Pin <code>CFGSLOWDOWNDISTANCEM</code> jamais câblé en production</li><li>Pin <code>CFGSLOWDOWNMAXSTEP</code> jamais câblé en production</li><li>Pin <code>COMMANDEDDIRECTION</code> jamais câblé en production</li><li>Pin <code>CONTACTOR1</code> jamais câblé en production</li><li>Pin <code>CONTACTOR2</code> jamais câblé en production</li><li>Pin <code>CONTACTOR3</code> jamais câblé en production</li><li>Pin <code>CONTACTOR4</code> jamais câblé en production</li><li>Pin <code>CONTACTORFEEDBACKTIMEOUT</code> jamais câblé en production</li><li>Pin <code>CONTACTORSCHECK</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIRECTION</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEPENDING</code> jamais câblé en production</li><li>Pin <code>DIRECTIONINTERLOCKDELAYASCENT</code> jamais câblé en production</li><li>Pin <code>DIRECTIONINTERLOCKDELAYDESCENT</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>FWDREVSPEEDFEEDBACKOFF</code> jamais câblé en production</li><li>Pin <code>HOMED</code> jamais câblé en production</li><li>Pin <code>HOMINGAPPROACHACTIVE</code> jamais câblé en production</li><li>Pin <code>HOMINGSUSPECT</code> jamais câblé en production</li><li>Pin <code>INBOTTOMSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>INTOPSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>MAXSTEPASCENT</code> jamais câblé en production</li><li>Pin <code>MEASUREDSPEEDBAND</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RELAYFWD</code> jamais câblé en production</li><li>Pin <code>RELAYREV</code> jamais câblé en production</li><li>Pin <code>REQUESTEDSTEP</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SAFESTOP</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDENABLE</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDLIMITED</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDREADY</code> jamais câblé en production</li><li>Pin <code>SPEEDSTEPHYSTMARGIN</code> jamais câblé en production</li><li>Pin <code>SPEEDSTEPTABLE</code> jamais câblé en production</li><li>Pin <code>SPEEDTGT_PCT</code> jamais câblé en production</li><li>Pin <code>STARTSTOP</code> jamais câblé en production</li><li>Pin <code>STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>TOPLIMITM</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">STARTSTOP <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DIRECTION <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDTGT_PCT <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MODE <span class="pin-type">IEC_E_MODE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SAFESTOP <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DESCENDPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ASCENTPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDSTEPTABLE <span class="pin-type">ST_SPEEDSTEPTABLE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CFGMAXSTEPDESCENTE <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MAXSTEPASCENT <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMINGAPPROACHACTIVE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDSTEPHYSTMARGIN <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DIRECTIONINTERLOCKDELAYDESCENT <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">DIRECTIONINTERLOCKDELAYASCENT <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CONTACTORFEEDBACKTIMEOUT <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TOPLIMITM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BOTTOMLIMITM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CFGSLOWDOWNDISTANCEM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CFGSLOWDOWNMAXSTEP <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">FWDREVSPEEDFEEDBACKOFF <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMED <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">HOMINGSUSPECT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CABLEPOSM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">MEASUREDSPEEDBAND <span class="pin-type">IEC_INT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDGUARDENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SPEEDGUARDREADY <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSCONTACTORCHECK <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">BYPASSGLOBAL <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Winch</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">RELAYFWD <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">RELAYREV <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTOR1 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTOR2 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTOR3 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTOR4 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">REQUESTEDSTEP <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">STEPNUMBER <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">BUSINESSSTEPDELAYELAPSED <span class="pin-type">IEC_TIME</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">SPEEDGUARDLIMITED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">CONTACTORSCHECK <span class="pin-type">ST_CONTACTORCHECK</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">INTOPSLOWDOWNZONE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">INBOTTOMSLOWDOWNZONE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">COMMANDEDDIRECTION <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DIRECTIONCHANGEDELAYELAPSED <span class="pin-type">IEC_TIME</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">DIRECTIONCHANGEPENDING <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 9 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -726,9 +885,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_WinchOutputInterlock</code></td>
-                <td>13</td><td>20</td>
-                <td>0</td><td>14</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (14 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>15</td><td>21</td>
+                <td>0</td><td>19</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -776,18 +935,135 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 6 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-winch-1" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-winch-1" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P13-001 Sim_Safety : neutralisation sans Enable </h3>
+                <span class="badge badge-fail">FAIL</span>
+                <h3 style="flex: 1;">TC-P10-011 Inversion Fwd&lt;-&gt;Rev : neutre-&gt;sens immediat, inversion exige delai + rampe a 0 </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
+                <ul class="scenario-list"><li>Scan 1 : regime nominal</li><li>Scan 2 : neutre -&gt; montee = IMMEDIAT (pas de DirectionChangePending)</li><li>Scan 3 : arret -&gt; StepNumber=0, CommandedDirection=0</li><li>Scan 4 : inversion directe montee-&gt;descente (StepNumber=0) -&gt; pending + rampe a 0</li><li>Scan 5 : apres DirectionInterlockDelayDescent=400ms -&gt; CommandedDirection=-1</li></ul>
+            </details>
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (9)</span></summary>
+                <ul class="checks-list"><li>Treuil pret</li><li>Neutre-&gt;montee : CommandedDirection=1 immediat</li><li>Neutre-&gt;montee : pas de pending</li><li>Montee -&gt; RelayFwd</li><li>Arret -&gt; StepNumber=0</li><li>Inversion -&gt; DirectionChangePending=TRUE</li><li>Inversion : rampe forcee a 0 pendant attente</li><li>Apres 400ms -&gt; CommandedDirection=-1</li><li>Apres delai -&gt; pending leve</li></ul>
+            </details>
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB_W.DIRECTIONCHANGEPENDING expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_winch.st:102</div><div class='failure-msg'>Inversion -&gt; DirectionChangePending=TRUE</div></div>
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-2" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-017 Config palier invalide : palier 0, sorties sures </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Table invalide : seuils non croissants (tous a 0)</li><li>Scan 1 : Enable=TRUE, config invalide -&gt; ConfigError latche</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>Config invalide -&gt; Error</li><li>Config invalide -&gt; palier 0</li><li>Config invalide -&gt; RelayFwd=FALSE (sortie sure)</li><li>Config invalide -&gt; RelayRev=FALSE</li><li>Config invalide -&gt; Contactor1=FALSE</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-3" class="test-card test-card-fail">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-fail">FAIL</span>
+                <h3 style="flex: 1;">TC-P10-018 StuckClosed : contacteurs off non confirmes 500ms -&gt; bit1 ErrorId </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Scan 1 : regime nominal</li><li>Scan 2 : arret commande mais contacteurs NON retombes (FwdRevSpeedFeedbackOff=FALSE)</li><li>Scan 3 : apres ContactorFeedbackTimeout=500ms -&gt; StuckClosed -&gt; bit1</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>Nominal : pas d erreur</li><li>Avant 500ms : pas encore de defaut</li><li>Contacteurs colles 500ms -&gt; Error</li><li>StuckClosed -&gt; bit1 (2)</li></ul>
+            </details>
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB_W.FAULT.ERROR expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_winch.st:170</div><div class='failure-msg'>Contacteurs colles 500ms -&gt; Error</div></div>
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-4" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-019 Ordre MainTask : Safety -&gt; WinchControl -&gt; PRG_06_Outputs </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>(essai site — stub) : l ordre d execution MainTask (Safety -&gt; WinchControl -&gt; PRG_06)
+       est une propriete de la tache CODESYS, non automatisable en boite noire FB. On verifie
+       ici la brique amont : FB_Winch produit bien sa demande sortie (RelayFwd) qui sera
+       consommee par la barriere finale PRG_06.</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>Demande montee produite (consommee par PRG_06)</li><li>Palier 1 demande</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-5" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, approche capteur haut=1 </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
+                <ul class="scenario-list"><li>Scan 1 : regime nominal</li><li>Descente : SpeedTgt_Pct=90 -&gt; RequestedStep cape a CfgMaxStepDescente=3</li><li>Reset + montee : SpeedTgt_Pct=90 -&gt; RequestedStep=5 (MaxStepAscent)</li><li>Approche capteur haut : HomingApproachActive=TRUE -&gt; palier 1</li><li>Zone ralentissement haut : CablePosM &gt;= TopLimitM - CfgSlowdownDistanceM -&gt; palier 1</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>Descente : palier cape a 3 (CfgMaxStepDescente)</li><li>Montee : palier 5 (MaxStepAscent)</li><li>Approche capteur haut : palier 1</li><li>Zone ralentissement haut active</li><li>Zone ralentissement haut : palier 1</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-6" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-052.1 Garde-fou vitesse : vitesse non-stable -&gt; palier 1 (activation par defaut : T177 en attente) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>(activation par defaut : T177 en attente) — SpeedGuardEnable est FALSE par defaut dans le
+       code (T177 non execute). On force le parametre TRUE dans le setup pour tester le garde-fou.</li><li>Scan 1 : regime nominal</li><li>Scan 2 : SpeedGuardEnable=TRUE, SpeedGuardReady=FALSE (vitesse non stable) -&gt; palier 1</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>Vitesse non stable -&gt; palier 1 (garde-fou)</li><li>Vitesse non stable -&gt; StepNumber=1</li></ul>
+            </details>
                 
                 
             </div>
@@ -1687,6 +1963,10 @@ VAR_INPUT
     RequestedContactor3             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 3
     RequestedContactor4             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 4
     RequestedStep                   : INT;                            // --&gt; [CMD] Palier de vitesse demande
+
+    // === TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
+    DeadTimeSameDir                 : TIME := T#1s;                  // --&gt; [CFG] Temps mort redemarrage meme sens apres arret
+    DeadTimeOppositeDir             : TIME := T#1s;                  // --&gt; [CFG] Temps mort redemarrage inversion sens apres arret
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
@@ -1713,6 +1993,7 @@ VAR_OUTPUT
     BrakeTimeoutElapsed             : TIME;                           // &lt;-- [DIAG] Ecoule temporisation watchdog frein
     RestartInhibit                  : BOOL;                           // &lt;-- [DIAG] Inhibition redemarrage actif
     RestartDelayElapsed             : TIME;                           // &lt;-- [DIAG] Ecoule temporisation anti-court-cycle
+    DeadTimeElapsed                 : TIME;                           // &lt;-- [DIAG] Ecoule temps mort directionnel
     StepDelayElapsed                : TIME;                           // &lt;-- [DIAG] Ecoule temporisation palier
 END_VAR
 VAR
@@ -1723,6 +2004,7 @@ VAR
     BrakeTimeout                    : TON;                            // . [LOC] Temporisation watchdog frein
     StepDelay                       : TON;                            // . [LOC] Temporisation changement de palier
     RestartDelay                    : TON;                            // . [LOC] Temporisation anti-court-cycle redemarrage
+    DeadTime                        : TON;                            // . [LOC] Temporisation temps mort directionnel
 
     // === VARIABLES LOCALES CALCULÉES ===
     RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
@@ -1733,6 +2015,10 @@ VAR
     MotorRequest                    : BOOL;                           // . [LOC] Demande mouvement moteur active
     BrakeTimeoutCause               : BOOL;                           // . [LOC] Cause timeout frein presente
     BrakeTimeoutAck                 : BOOL := TRUE;                  // . [LOC] Acquittement cause timeout frein
+    LastDirection                   : INT;                            // . [LOC] Dernier sens commande (1 montee / -1 descente)
+    DeadTimePending                 : BOOL;                           // . [LOC] Temps mort directionnel en attente
+    NewDirection                    : INT;                            // . [LOC] Sens de la nouvelle demande
+    RequiredDeadTime                : TIME;                           // . [LOC] Temps mort requis selon sens de la demande
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
@@ -1748,6 +2034,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     StepDelay(IN := FALSE, PT := T#1s250ms);
     RestartDelay(IN := FALSE, PT := T#1000ms);
+    DeadTime(IN := FALSE);
+    DeadTimePending := FALSE;
+    DeadTimeElapsed := T#0ms;
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     BrakeCmd := FALSE; AuthorizedStep := 0;
@@ -1809,6 +2098,48 @@ IF RestartDelay.Q THEN
     RestartRequired := FALSE;
 END_IF;
 
+// ── 4bis. Temps mort directionnel (TC-P10-021/022) ─────────────────────────────
+// Distinct du RestartDelay (anti-court-cycle uniforme) : temps mort de redémarrage
+// après arrêt, dépendant du sens de la nouvelle demande. Même sens → DeadTimeSameDir ;
+// inversion → DeadTimeOppositeDir. Neutre↔sens = immédiat (pas de temps mort à l&#x27;armement).
+// Le décompte se fait pendant la pause ET pendant l&#x27;attente après nouvelle demande
+// (purge pendant la pause, comme RestartDelay). PT = DeadTimeOppositeDir (le plus long) ;
+// à la nouvelle demande, on vérifie si le temps mort requis pour le sens réel est déjà
+// écoulé (cas même sens, plus court).
+IF MotorRequest THEN
+    IF RequestedRelayFwd THEN
+        LastDirection := 1;
+    ELSE
+        LastDirection := -1;
+    END_IF;
+END_IF;
+
+IF NOT MotorRequest THEN
+    DeadTimePending := TRUE;
+END_IF;
+
+DeadTime(IN := DeadTimePending AND NOT BrakeFeedback AND NOT RestartInhibit, PT := DeadTimeOppositeDir);
+DeadTimeElapsed := DeadTime.ET;
+IF DeadTime.Q THEN
+    DeadTimePending := FALSE;
+END_IF;
+
+IF MotorRequest AND DeadTimePending THEN
+    IF RequestedRelayFwd THEN
+        NewDirection := 1;
+    ELSE
+        NewDirection := -1;
+    END_IF;
+    IF NewDirection = LastDirection THEN
+        RequiredDeadTime := DeadTimeSameDir;
+    ELSE
+        RequiredDeadTime := DeadTimeOppositeDir;
+    END_IF;
+    IF DeadTime.ET &gt;= RequiredDeadTime THEN
+        DeadTimePending := FALSE;
+    END_IF;
+END_IF;
+
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -1834,7 +2165,7 @@ ELSIF NOT MotorRequest THEN
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.READY;
-ELSIF RestartRequired THEN
+ELSIF RestartRequired OR DeadTimePending THEN
     StepDelay(IN := FALSE, PT := T#1s250ms);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
@@ -2623,11 +2954,21 @@ END_FUNCTION_BLOCK
 
 test_fb_winch.st
   [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
-  [PASS] TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations
-  [PASS] TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse
+         ASSERT_TRUE failed: FB_W.DIRECTIONCHANGEPENDING expected TRUE, got FALSE
+         at test_fb_winch.st:102
+         Message: Inversion -&gt; DirectionChangePending=TRUE
+  [FAIL] TC-P10-011 Inversion Fwd&lt;-&gt;Rev : neutre-&gt;sens immediat, inversion exige delai + rampe a 0
+  [PASS] TC-P10-017 Config palier invalide : palier 0, sorties sures
+         ASSERT_TRUE failed: FB_W.FAULT.ERROR expected TRUE, got FALSE
+         at test_fb_winch.st:170
+         Message: Contacteurs colles 500ms -&gt; Error
+  [FAIL] TC-P10-018 StuckClosed : contacteurs off non confirmes 500ms -&gt; bit1 ErrorId
+  [PASS] TC-P10-019 Ordre MainTask : Safety -&gt; WinchControl -&gt; PRG_06_Outputs
+  [PASS] TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, approche capteur haut=1
+  [PASS] TC-P10-052.1 Garde-fou vitesse : vitesse non-stable -&gt; palier 1 (activation par defaut : T177 en attente)
 
 -----------------------------------------
-3 tests, 3 passed, 0 failed
+7 tests, 5 passed, 2 failed
 </pre>
     </details>
 </div>

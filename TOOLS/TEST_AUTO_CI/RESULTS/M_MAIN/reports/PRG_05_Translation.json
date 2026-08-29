@@ -1,19 +1,23 @@
 {
   "version": 1,
-  "file": "test_prg_04_treuils_benne.st",
+  "file": "test_prg_05_translation.st",
   "results": [
     {
-      "name": "PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth",
+      "name": "PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuils OK)",
       "passed": true
     },
     {
-      "name": "PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)",
+      "name": "PRG_05_Translation : Commande Translation Rev (Joystick X negatif)",
+      "passed": true
+    },
+    {
+      "name": "PRG_05_Translation : Interdiction Mouvement Translation si Treuils en Bas",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 3,
+    "passed": 3,
     "failed": 0
   }
 }
