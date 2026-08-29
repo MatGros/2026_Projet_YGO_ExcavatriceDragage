@@ -68,7 +68,7 @@ machine, organisées dans `GVL_Troubleshooting` :
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_TroubleshootingView</code></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md"><code>FB_TroubleshootingView_v1.2.md</code></a></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P14-TSV-01..05</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>
@@ -110,7 +110,7 @@ machine, organisées dans `GVL_Troubleshooting` :
       <td style="padding: 6px 8px; line-height: 1.55;">Zéro <code>VAR_OUTPUT</code> de commande, chaque champ a un producteur réel documenté, aucun TBD affiché comme mesure réelle, instance unique dans <code>PRG_07_Supervision</code>, zéro régression gates</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>👁️ REVUE+🔒 GATE</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_TroubleshootingView</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>
