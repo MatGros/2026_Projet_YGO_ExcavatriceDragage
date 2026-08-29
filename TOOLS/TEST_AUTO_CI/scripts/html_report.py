@@ -231,26 +231,45 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
     def is_bool(f):
         return field_types.get(f, all(scans[i]["fields"].get(f) in ("0", "1") for i in range(n)))
 
-    OTHER_PALETTE = ["#2563eb", "#059669", "#0891b2", "#65a30d", "#0d9488", "#1d4ed8"]
-    RED_PALETTE = ["#dc2626", "#b91c1c", "#f43f5e", "#e11d48"]
-    _other_colors: dict = {}
-    _red_colors: dict = {}
+    # Palette haute visibilité & contraste élevé (16 teintes distinctes saturées pour les thèmes sombre & clair)
+    DISTINCT_PALETTE = [
+        "#0284c7",  # 0: Bleu Cyan
+        "#16a34a",  # 1: Vert Émeraude
+        "#9333ea",  # 2: Violet Intense
+        "#ea580c",  # 3: Orange Vif
+        "#0d9488",  # 4: Sarcelle / Teal
+        "#d97706",  # 5: Ambre / Doré
+        "#4f46e5",  # 6: Indigo
+        "#059669",  # 7: Vert Menthe
+        "#c026d3",  # 8: Magenta / Fuchsia
+        "#0891b2",  # 9: Bleu Lagon
+        "#65a30d",  # 10: Lime / Vert Pomme
+        "#db2777",  # 11: Rose Bonbon
+        "#2563eb",  # 12: Bleu Royal
+        "#ca8a04",  # 13: Jaune Moutarde
+        "#7c3aed",  # 14: Violet Pourpre
+        "#0284c7"   # 15: Cyan Vif
+    ]
+    RED_PALETTE = ["#ef4444", "#dc2626", "#f43f5e", "#e11d48", "#b91c1c"]
+    _assigned_colors: dict = {}
 
-    def wf_color(f: str) -> str:
+    def wf_color(f: str, lane_idx: int = 0) -> str:
         upper = f.upper()
         if "RESET" in upper:
-            return "#111827"
-        if "LOCKOUT" in upper:
-            return "#ea580c"
+            return "#64748b"  # Gris ardoise neutre pour Reset
         if "ERROR" in upper or "FAILED" in upper or upper.endswith("FAIL"):
-            if f not in _red_colors:
-                _red_colors[f] = RED_PALETTE[len(_red_colors) % len(RED_PALETTE)]
-            return _red_colors[f]
-        if f not in _other_colors:
-            _other_colors[f] = OTHER_PALETTE[len(_other_colors) % len(OTHER_PALETTE)]
-        return _other_colors[f]
+            if f not in _assigned_colors:
+                _assigned_colors[f] = RED_PALETTE[len(_assigned_colors) % len(RED_PALETTE)]
+            return _assigned_colors[f]
+        if "LOCKOUT" in upper:
+            return "#f97316"  # Orange vif alerte
+        
+        # Attribution d'une couleur distincte par ligne / variable
+        if f not in _assigned_colors:
+            _assigned_colors[f] = DISTINCT_PALETTE[lane_idx % len(DISTINCT_PALETTE)]
+        return _assigned_colors[f]
 
-    legend = [("#111827", "Reset"), ("#dc2626", "Erreur / défaut"), ("#ea580c", "Lockout"), ("#2563eb", "Autres (palette)")]
+    legend = [("#64748b", "Reset"), ("#ef4444", "Erreur / défaut"), ("#f97316", "Lockout"), ("#0284c7", "Voies actives")]
     
     notes_dict = scan_notes or {}
     scans_data = []
@@ -293,7 +312,7 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
     for row, f in enumerate(field_names):
         y_lane = top_margin + row * lane_h
         y_mid = y_lane + lane_h / 2
-        color = wf_color(f)
+        color = wf_color(f, row)
         svg_parts.append(f'<circle cx="{left_margin - 8}" cy="{y_mid}" r="4" fill="{color}"/>')
 
         if is_bool(f):
