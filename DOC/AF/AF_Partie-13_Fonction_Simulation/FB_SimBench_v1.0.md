@@ -18,12 +18,48 @@
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Intention / Comportement attendu | Type | Etat |
-|---|---|---|---|
-| <nobr><code>TC-P13-010</code></nobr> | `Enable=FALSE` neutralise tout le banc en un seul `RETURN` (aucun sous-modèle actif) | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P13-011</code></nobr> | 0 lecture de `GVL_*` en interne — toutes les entrées passées en paramètres par l'appelant (`PRG_02_Acquisition`) | `👁️ MANUEL` | `NV` |
-| <nobr><code>TC-P13-012</code></nobr> | `M1_BrakeIsOpen_DI := M1_BrakeCmd` (jamais de `NOT`) — polarité maintien (`P1 Lot L6`) | `💻 AUTO` | `NV` |
-| <nobr><code>TC-P13-013</code></nobr> | 🆕 `M3_StatusWordSim` bit0 retombe à l'arrêt (`Direction=0`) — ne déclenche plus `FB_Safety_Translation` Méca B en continu | `💻 AUTO` | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: calc(100% - 170px);">
+    <col style="width: 90px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-010</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Enable=FALSE</code> neutralise tout le banc en un seul <code>RETURN</code> (aucun sous-modèle actif)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-011</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">0 lecture de <code>GVL_*</code> en interne — toutes les entrées passées en paramètres par l'appelant (<code>PRG_02_Acquisition</code>)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>👁️ MANUEL</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-012</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>M1_BrakeIsOpen_DI := M1_BrakeCmd</code> (jamais de <code>NOT</code>) — polarité maintien (<code>P1 Lot L6</code>)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-013</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">🆕 <code>M3_StatusWordSim</code> bit0 retombe à l'arrêt (<code>Direction=0</code>) — ne déclenche plus <code>FB_Safety_Translation</code> Méca B en continu</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
