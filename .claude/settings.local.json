@@ -127,7 +127,8 @@
       "Bash(awk 'NR==25918,NR==26200' CODE/CODE_Bundle.xml)",
       "Bash(awk *)",
       "Bash(python3 *)",
-      "Bash(cd *)"
+      "Bash(cd *)",
+      "Bash(git --no-pager diff --cached --stat)"
     ],
     "ask": [
       "Bash(git reset *)",

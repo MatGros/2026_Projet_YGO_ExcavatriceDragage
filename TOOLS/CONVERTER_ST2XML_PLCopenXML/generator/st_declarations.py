@@ -193,11 +193,11 @@ def parse_var_block(body_text: str, diagnostics: DiagnosticCollector, source_lab
 
         assign_pos = _find_toplevel_str(tail_masked, ":=")
         if assign_pos == -1:
-            type_text = tail_raw.strip()
+            type_text, _ = _trim_to_masked_content(tail_raw, tail_masked)
             init_raw = None
             init_masked = None
         else:
-            type_text = tail_raw[:assign_pos].strip()
+            type_text, _ = _trim_to_masked_content(tail_raw[:assign_pos], tail_masked[:assign_pos])
             init_raw = tail_raw[assign_pos + 2 :]
             init_masked = tail_masked[assign_pos + 2 :]
 

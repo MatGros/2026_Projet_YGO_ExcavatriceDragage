@@ -2763,10 +2763,10 @@ tasks:
   bloque_par: []
 - id: T173-A
   parent_id: T173
-  statut: ⬜
+  statut: ⏳
   criticite: C2
   domaine: SÉCURITÉ
-  agent: ORCHESTRATEUR
+  agent: AGY
   date: '2026-08-28T23:30:00+02:00'
   titre: Patch de traçage — capturer la provenance de l'échec du 1er réarmement
   contexte: 'La preuve manquante est : QUEL signal coupe la séquence AU au 1er boot (chute chaîne step 2/4/5/6, front ArmRequest

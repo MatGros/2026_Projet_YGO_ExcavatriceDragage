@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T23:35:34.115063" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T23:35:34.115063">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T07:58:35.862620" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T07:58:35.862620">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -694,6 +694,22 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre tentatives de rearmement echouees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape de la sequence AU lors du dernier abandon (0 a 6)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield cause abandon : 16#0001=Cut IHM, 16#0002=Chute chaine pulse/confirm, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=PowerCutOff metier</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -6858,6 +6874,8 @@ GVL_Troubleshooting.Safety.SafetyError          := EmergencyDiag.Error;
 GVL_Troubleshooting.Safety.ArmingErrorId       := EmergencyDiag.ErrorId;
 GVL_Troubleshooting.Safety.RedundancyTestFailed := EmergencyDiag.RedundancyTestFailed;
 GVL_Troubleshooting.Safety.ArmingFailed         := EmergencyDiag.ArmFailed;
+GVL_Troubleshooting.Safety.LastAbortStep        := EmergencyDiag.LastAbortStep;
+GVL_Troubleshooting.Safety.LastAbortCause       := EmergencyDiag.LastAbortCause;
 
 {endregion}
 

@@ -15,12 +15,12 @@ VAR_GLOBAL
     TranslationPontM3     : ST_ChainTranslation;   // ↔️ 5. Translation Pont M3 (Variateur AC600)
     AssistanceDragage     : ST_ChainDredgingAssist; // 🌊 5bis. Assistance Plongée/Extraction/Vidage Trémie
     CycleSemiAuto         : ST_ChainCycleSemiAuto;  // 🔄 6. Séquenceur de Cycle Semi-Automatique (X0 à X13)
-    HomingM1              : ST_HomingChecklist;   (* 🎯 Diagnostic chronologique Homing M1 (Treuil Retenue) *)
-    HomingM2              : ST_HomingChecklist;   (* 🎯 Diagnostic chronologique Homing M2 (Treuil Benne) *)
-    Safety                : ST_SafetyChecklist;   (* 🛡️ Diagnostic chronologique Chaîne de Sécurité & Réarmement AU *)
-    Joystick              : ST_JoystickChecklist; (* 🕹️ Diagnostic chronologique Bus CANopen & Homme-Mort Joystick *)
-    MotionM1              : ST_MotionChecklist;   (* ⚙️ Diagnostic chronologique Mouvement M1 (Treuil Retenue) *)
-    MotionM2              : ST_MotionChecklist;   (* ⚙️ Diagnostic chronologique Mouvement M2 (Treuil Benne) *)
-    MotionM3              : ST_MotionChecklist;   (* ⚙️ Diagnostic chronologique Mouvement M3 (Translation) *)
-    Inputs                : ST_HardwareImage;     (* 📥 Image complète des entrées réelles / qualifiées / simulées *)
+    HomingM1              : ST_HomingChecklist;   // 🎯 Diagnostic chronologique Homing M1 (Treuil Retenue)
+    HomingM2              : ST_HomingChecklist;   // 🎯 Diagnostic chronologique Homing M2 (Treuil Benne)
+    Safety                : ST_SafetyChecklist;   // 🛡️ Diagnostic chronologique Chaîne de Sécurité & Réarmement AU
+    Joystick              : ST_JoystickChecklist; // 🕹️ Diagnostic chronologique Bus CANopen & Homme-Mort Joystick
+    MotionM1              : ST_MotionChecklist;   // ⚙️ Diagnostic chronologique Mouvement M1 (Treuil Retenue)
+    MotionM2              : ST_MotionChecklist;   // ⚙️ Diagnostic chronologique Mouvement M2 (Treuil Benne)
+    MotionM3              : ST_MotionChecklist;   // ⚙️ Diagnostic chronologique Mouvement M3 (Translation)
+    Inputs                : ST_HardwareImage;     // 📥 Image complète des entrées réelles / qualifiées / simulées
 END_VAR

@@ -77,7 +77,9 @@ Output(
     ErrorId := Logic.ErrorId,
     RedundancyTestFailed := Logic.RedundancyTestFailed,
     ArmFailed := Logic.EmergencyArmingFailed,
-    LockoutActive := Logic.EmergencyArmingLockoutActive
+    LockoutActive := Logic.EmergencyArmingLockoutActive,
+    LastAbortStep := Logic.LastAbortStep,
+    LastAbortCause := Logic.LastAbortCause
 );
 {endregion}
 

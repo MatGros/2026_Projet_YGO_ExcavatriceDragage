@@ -42,5 +42,7 @@ STRUCT
     ArmingErrorId               : WORD; (* bit0 redondance ; bit1 échec confirmation contacteur *)
     RedundancyTestFailed         : BOOL; (* TRUE = Défaut test de redondance contacteurs *)
     ArmingFailed                 : BOOL; (* TRUE = Échec de la séquence d'armement *)
+    LastAbortStep                : INT;  (* Étape atteinte lors du dernier abandon de séquence (0..6) *)
+    LastAbortCause               : WORD; (* Cause du dernier abandon (masque bitfield) *)
 END_STRUCT
 END_TYPE

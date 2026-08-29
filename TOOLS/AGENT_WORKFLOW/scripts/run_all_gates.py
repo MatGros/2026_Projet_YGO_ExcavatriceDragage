@@ -37,8 +37,8 @@ if sys.platform == "win32":
         pass
 
 
-def run_stream(cmd: list[str], cwd: Path | None = None) -> tuple[int, str, str]:
-    """Exécute une commande en streamant stdout/stderr en temps réel dans la console."""
+def run_stream(cmd: list[str], cwd: Path | None = None, stream: bool = True) -> tuple[int, str, str]:
+    """Exécute une commande, avec flux détaillé ou capture compacte."""
     env = dict(os.environ)
     env["PYTHONUNBUFFERED"] = "1"
     p = subprocess.Popen(
@@ -55,13 +55,27 @@ def run_stream(cmd: list[str], cwd: Path | None = None) -> tuple[int, str, str]:
     lines: list[str] = []
     if p.stdout:
         for line in iter(p.stdout.readline, ""):
-            # Nettoyage d'affichage pour les terminaux Windows
-            sys.stdout.write(line)
-            sys.stdout.flush()
+            if stream:
+                sys.stdout.write(line)
+                sys.stdout.flush()
             lines.append(line)
         p.stdout.close()
     code = p.wait()
     return code, "".join(lines), ""
+
+
+def color_status(text: str, passed: bool) -> str:
+    """Colore PASS/FAIL sur terminal interactif sans polluer les logs capturés."""
+    if not sys.stdout.isatty():
+        return text
+    color = "\033[32m" if passed else "\033[31m"
+    return f"{color}{text}\033[0m"
+
+
+def failure_tail(output: str, limit: int = 30) -> str:
+    """Dernières lignes utiles d'un gate rouge en mode compact."""
+    lines = output.rstrip().splitlines()
+    return "\n".join(lines[-limit:])
 
 
 # ── Paliers (GUIDE_GATES_ET_TESTS_v1.2.md §2) — tranche d'ID par palier ──────────
@@ -117,6 +131,32 @@ PALIERS = {"A", "B", "C", "D"}
 FILE_SCOPED_GATES = {"100", "110", "200"}
 
 
+def gate_family(gate_id: str) -> str:
+    """Famille quotidienne par centaine, lisible sans connaître les IDs unitaires."""
+    families = {
+        "1": "G100 — Qualité du bloc",
+        "2": "G200 — Liaison & câblage",
+        "3": "G300 — Structure, documentation & sécurité",
+        "4": "G400 — Bundle, qualité source & CI",
+        "5": "G500 — Compilation CODESYS",
+    }
+    if gate_id and gate_id[0] in families:
+        return families[gate_id[0]]
+    return "Contrôles complémentaires"
+
+
+def grouped_plan(plan: list[tuple[str, str, str, list[str]]]) -> list[tuple[str, list[tuple[str, str, str, list[str]]]]]:
+    """Regroupe les gates contiguës d'une même famille en préservant leur ordre d'exécution."""
+    groups: list[tuple[str, list[tuple[str, str, str, list[str]]]]] = []
+    for item in plan:
+        family = gate_family(item[1])
+        if groups and groups[-1][0] == family:
+            groups[-1][1].append(item)
+        else:
+            groups.append((family, [item]))
+    return groups
+
+
 def select_plan(palier: str | None, with_pytest: bool = False) -> list[tuple[str, str, str, list[str]]]:
     if palier is None:
         plan = [g for g in PLANS if g[0] != "D"]
@@ -142,6 +182,11 @@ def main() -> int:
     parser.add_argument("--skip-codesys", action="store_true", help="Ne pas lancer G500 même si --codesys-log fourni")
     parser.add_argument("--strict", action="store_true", help="Fail on any warning")
     parser.add_argument("--fail-fast", action="store_true", help="S'arrêter au premier gate rouge")
+    display_mode = parser.add_mutually_exclusive_group()
+    display_mode.add_argument("--compact", dest="compact", action="store_true", default=True,
+                              help="Résumé quotidien (défaut) : lancement + résultat/durée ; détail seulement sur FAIL")
+    display_mode.add_argument("--verbose", dest="compact", action="store_false",
+                              help="Diagnostic : restitue toute la sortie interne de chaque gate")
     args = parser.parse_args()
 
     project_root = Path(__file__).resolve().parents[3]
@@ -173,18 +218,36 @@ def main() -> int:
     else:
         plan = select_plan(args.palier, with_pytest=args.with_pytest)
 
+    mode_label = "COMPACT" if args.compact else "DIAGNOSTIC VERBEUX"
+    if file_mode:
+        target_label = "FICHIER(S) " + " ".join(str(f) for f in args.files)
+    else:
+        target_label = f"PALIER {args.palier.upper()}" if args.palier else "TOUS LES PALIERS"
+    print("\n" + "=" * 60, flush=True)
+    print(f"🧪 GATES PROJET / MODE {mode_label} ACTIF", flush=True)
+    print("=" * 60, flush=True)
+    print(f"Cible : {target_label} · {len(plan)} gate(s) prévues", flush=True)
+    print("Légende : ✅ PASS · ❌ FAIL · durée cumulée par famille", flush=True)
+
     results: list[tuple[str, bool, float]] = []
+    failure_outputs: dict[str, str] = {}
+    compact_results: list[tuple[str, bool, int, int, float]] = []
 
     def gate(idx: int, total: int, title: str, cmd: list[str]) -> bool:
         clean_title = title.encode("ascii", "replace").decode("ascii")
-        print("\n" + "=" * 60, flush=True)
-        print(f"⏳ [{idx}/{total}] {clean_title} ...", flush=True)
-        print("=" * 60, flush=True)
+        if not args.compact:
+            print("\n" + "=" * 60, flush=True)
+            print(f"⏳ [{idx}/{total}] {clean_title} ...", flush=True)
+            print("=" * 60, flush=True)
         t0 = time.perf_counter()
-        code, _out, _err = run_stream(cmd, project_root)
+        code, out, _err = run_stream(cmd, project_root, stream=not args.compact)
         duration = time.perf_counter() - t0
         status_icon = "✅ PASS" if code == 0 else "❌ FAIL"
-        print(f"\n[{status_icon}] Durée gate : {duration:.2f}s", flush=True)
+        if args.compact:
+            if code != 0:
+                failure_outputs[title] = out
+        else:
+            print(f"\n[{status_icon}] Durée gate : {duration:.2f}s", flush=True)
         results.append((title, code == 0, duration))
         return code == 0
 
@@ -205,10 +268,37 @@ def main() -> int:
         plan = [g for g in plan if g[1] != "500"]
 
     total_gates = len(plan)
-    for idx, (_, _id, title, cmd) in enumerate(plan, 1):
-        ok = gate(idx, total_gates, title, cmd)
-        if not ok and args.fail_fast:
-            break
+    if args.compact:
+        stopped = False
+        for group_index, (family, group) in enumerate(grouped_plan(plan), 1):
+            ids = ", ".join(f"G{item[1]}" for item in group)
+            print(f"▶ [{group_index:02d}] {family} — {ids}", flush=True)
+            group_start = time.perf_counter()
+            before = len(results)
+            for idx, (_, _id, title, cmd) in enumerate(group, before + 1):
+                ok = gate(idx, total_gates, title, cmd)
+                if not ok and args.fail_fast:
+                    stopped = True
+                    break
+            group_results = results[before:]
+            group_ok = all(ok for _title, ok, _duration in group_results)
+            group_duration = time.perf_counter() - group_start
+            compact_results.append((family, group_ok, sum(ok for _title, ok, _duration in group_results), len(group_results), group_duration))
+            print(f"  {color_status('✅ PASS' if group_ok else '❌ FAIL', group_ok)}  "
+                  f"{sum(ok for _title, ok, _duration in group_results)}/{len(group_results)} gates · {group_duration:.2f}s", flush=True)
+            if not group_ok:
+                for title, ok, _duration in group_results:
+                    if not ok:
+                        print(f"  └─ {title}", flush=True)
+                        for line in failure_tail(failure_outputs.get(title, "")).splitlines():
+                            print(f"     {line}", flush=True)
+            if stopped:
+                break
+    else:
+        for idx, (_, _id, title, cmd) in enumerate(plan, 1):
+            ok = gate(idx, total_gates, title, cmd)
+            if not ok and args.fail_fast:
+                break
 
     if not args.skip_codesys and args.codesys_log and not d_plan:
         gate(total_gates + 1, total_gates + 1, "G500 — GATE 6: Compilation CODESYS", [
@@ -227,9 +317,14 @@ def main() -> int:
     print(f"RESUME — {label} (Temps total : {total_duration:.2f}s)")
     print("=" * 60)
     failed = [title for title, ok, _dur in results if not ok]
-    for title, ok, dur in results:
-        status_str = "PASS" if ok else "FAIL"
-        print(f"  {status_str:4s}  [{dur:6.2f}s]  {title}")
+    if args.compact:
+        for family, ok, passed, count, duration in compact_results:
+            status_str = color_status("PASS" if ok else "FAIL", ok)
+            print(f"  {status_str:4s}  [{duration:6.2f}s]  {family} ({passed}/{count})")
+    else:
+        for title, ok, dur in results:
+            status_str = "PASS" if ok else "FAIL"
+            print(f"  {color_status(status_str, ok):4s}  [{dur:6.2f}s]  {title}")
     
     print("-" * 60)
     print(f"TEMPS TOTAL DE L'EXECUTION : {total_duration:.2f} secondes")
