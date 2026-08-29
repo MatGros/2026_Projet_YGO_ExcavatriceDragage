@@ -591,3 +591,525 @@ TEST 'TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs interme
     ASSERT_EQ(fb.AXISCMDY.DIRECTION, -1, 'sens arriere coherent');
     ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX revenu au neutre : axe X inchange');
 END_TEST
+
+(* =========================================================================
+   Lot CI AF-08 : TC-P08-010.x (echelle), TC-P08-020.x (homme-mort),
+   TC-P08-030/040/050/060 (defaut capteur / calibration / gate / armement refuse)
+   Definitions : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md §2
+   + fiche FB_AxisScale_v1.0.md §2 (TC-P08-010.1..4).
+   ========================================================================= *)
+
+TEST 'TC-P08-010 Acquisition & echelle : pipeline arme, proportionnel, deadband centree'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* RawX=9000 -> 80% ; RawY=300 -> -94% (proportionnel, pas seulement aux bornes) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 9000, RAWY := 300, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 80.0, 0.01, 'RawX=9000 : 80%');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'sens avant coherent');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 94.0, 0.01, 'RawY=300 : 94%');
+    ASSERT_EQ(fb.AXISCMDY.DIRECTION, -1, 'sens arriere coherent');
+
+    (* deadband centree : RawX=5150 (neutre+150<300) -> 0, AtNeutralXY *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5150, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX=5150 dans deadband : 0');
+    ASSERT_TRUE(fb.ATNEUTRALXY, '2 axes en zone morte -> AtNeutralXY');
+END_TEST
+
+TEST 'TC-P08-010.1 Echelle proportionnelle asymetrique : RawX=9000->80%, RawY=300->-94%'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* demi-plage haute : (9000-5000)/(10000-5000)*100 = 80% *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 9000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 80.0, 0.01, 'RawX=9000 : 80% (demi-plage haute)');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'sens avant');
+
+    (* demi-plage basse : (300-5000)/5000*100 = -94% *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 300, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 94.0, 0.01, 'RawY=300 : 94% (demi-plage basse)');
+    ASSERT_EQ(fb.AXISCMDY.DIRECTION, -1, 'sens arriere');
+END_TEST
+
+TEST 'TC-P08-010.2 Deadband bornes exactes : |RawIn-Neutral|<=DeadbandRaw -> 0, borne+1 -> >0'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* borne exacte haute : RawX=5300 = 5000+300 -> 0.0 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5300, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX=5300 (borne exacte +300) : 0.0');
+
+    (* borne exacte basse : RawX=4700 = 5000-300 -> 0.0 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 4700, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX=4700 (borne exacte -300) : 0.0');
+
+    (* borne+1 haute : RawX=5301 -> >0 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5301, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.AXISCMDX.SPEEDTGT > 0.0, 'RawX=5301 (borne+1) : sortie de deadband, |OutPct|>0');
+
+    (* borne+1 basse : RawX=4699 -> <0 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 4699, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.AXISCMDX.SPEEDTGT > 0.0, 'RawX=4699 (borne-1) : sortie de deadband, |OutPct|>0');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, -1, 'sens arriere coherent');
+END_TEST
+
+TEST 'TC-P08-010.3 Saturation stricte : RawIn=10000->+100, RawIn=0->-100, jamais >100'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* RawX=10000 -> +100 (saturation haute) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 10000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 100.0, 0.01, 'RawX=10000 : saturation +100');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'sens avant');
+
+    (* RawX=0 -> -100 (saturation basse) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 0, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 100.0, 0.01, 'RawX=0 : saturation -100 (SpeedTgt non signee)');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, -1, 'sens arriere');
+END_TEST
+
+TEST 'TC-P08-010.4 Echelle asymetrique neutre!=5000 : normalisation independante de chaque demi-plage'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 6000; ny := 6000;
+
+    (* arme le geste au neutre calibre 6000 *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 6000, RAWY := 6000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 6000, RAWY := 6000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* demi-plage haute (6000->10000) : (8000-6000)/(10000-6000)*100 = 50% *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 6000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 50.0, 0.01, 'RawX=8000, neutre 6000 : 50% (demi-plage haute 4000 pts)');
+
+    (* demi-plage basse (0->6000) : (3000-6000)/6000*100 = -50% *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 6000, RAWY := 3000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 50.0, 0.01, 'RawY=3000, neutre 6000 : 50% (demi-plage basse 6000 pts)');
+    ASSERT_EQ(fb.AXISCMDY.DIRECTION, -1, 'sens arriere coherent');
+END_TEST
+
+TEST 'TC-P08-020 Homme-mort : armement maintien+permission, relache avant fin annule, desarmement'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* baseline : neutre, bouton relache, pas arme *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'baseline : pas arme');
+
+    (* front bouton + maintien 100ms + permit -> arme *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'maintien 100ms + permit -> arme');
+
+    (* relache bouton : reste arme (pas de resurveillance) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'relache bouton : reste arme (pas de resurveillance)');
+
+    (* perte permission -> desarme immediat *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'ArmingPermit=FALSE -> desarme immediat');
+END_TEST
+
+TEST 'TC-P08-020.1 Armement hors neutre : front bouton + 100ms + permit -> arme meme axes devies'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* axes deja devies (RawX=8000) + front bouton + maintien 100ms + permit -> arme *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'front bouton seul : pas encore arme');
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'armement hors neutre : axes devies n empechent pas l armement (FB_Joystick.st:172)');
+END_TEST
+
+TEST 'TC-P08-020.2 Desarmement perte permission : ArmingPermit=FALSE -> DeadmanArmed=FALSE immediat, SpeedTgt=0'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* perte permission en plein geste -> desarme immediat + SpeedTgt=0 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'ArmingPermit=FALSE -> DeadmanArmed=FALSE immediat (FB_Joystick.st:180-183)');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'SpeedTgt=0 des la perte de permission');
+    ASSERT_FALSE(fb.AXISCMDX.ENABLE, 'Enable axe X retombe (ArmingPermit=FALSE)');
+END_TEST
+
+TEST 'TC-P08-020.3 Pas de rearmement auto : retour ArmingPermit ne rearme pas, exige nouveau front+100ms'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* perte permission -> desarme *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'perte permission -> desarme');
+
+    (* retour permission, bouton toujours relache : PAS de rearmement auto *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'retour ArmingPermit seul ne rearme pas (FB_Joystick.st:167-176)');
+
+    (* nouveau front bouton + maintien 100ms -> rearme *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'nouveau front + 100ms -> rearme');
+END_TEST
+
+TEST 'TC-P08-020.4 Bornes temporelles : armement 100ms, grace 3s, neutre 100ms'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* front bouton, maintien 99ms (< 100ms) : pas encore arme *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(99000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, '99ms < DeadmanArmHoldTime (100ms) : pas arme');
+
+    (* +1ms (total 100ms) : arme *)
+    ADVANCE_TIME(1000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, '100ms >= DeadmanArmHoldTime : arme');
+
+    (* relache bouton, reste au neutre : grace 3s protege, puis neutre 100ms desarme *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'grace 3s : neutre tenu ne desarme pas encore');
+
+    (* grace ecoulee (3s) + neutre 100ms -> desarme *)
+    ADVANCE_TIME(3000000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(100000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'grace 3s + neutre 100ms -> desarme (ST_fbJoystick_Cfg.st:15-17)');
+END_TEST
+
+TEST 'TC-P08-030 Defaut capteur : hors plage +/-marge -> SpeedTgt=0 2 axes, ErrorId bit1 auto-efface'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* RawX hors plage (20000 > 10000+500) -> SpeedTgt=0 2 axes, Warning bit1 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 20000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'RawX hors plage : SpeedTgt X = 0');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'RawX hors plage : SpeedTgt Y aussi = 0 (2 axes)');
+    ASSERT_TRUE(fb.FAULT.ERROR, 'defaut capteur : Error leve (Warning visible)');
+    ASSERT_EQ(fb.FAULT.ERRORID, 16#0002, 'bit1 : capteur hors plage');
+    ASSERT_FALSE(fb.FAULT.LATCHED, 'defaut capteur = Warning auto-efface, PAS un latch');
+
+    (* retour en plage -> auto-efface *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.FAULT.ERROR, 'retour en plage : Warning auto-efface');
+    ASSERT_EQ(fb.FAULT.ERRORID, 0, 'bit1 efface automatiquement');
+END_TEST
+
+TEST 'TC-P08-040 Calibration : hors [2000;8000] -> Fault bit0 a acquitter, Reset en zone acquitte'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* front Calibrate avec axes hors zone valide (9500 > 8000) -> CalibFail latche *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 9500, RAWY := 9500, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 9500, RAWY := 9500, RAWBUTTON := FALSE, CALIBRATE := TRUE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.FAULT.ERROR, 'calibration hors zone : Error leve');
+    ASSERT_TRUE(fb.FAULT.LATCHED, 'calibration = defaut a acquitter (latch)');
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 16#0001, 'bit0 : echec calibration');
+
+    (* Reset alors que la cause persiste (axes toujours hors zone) : ne doit PAS acquitter *)
+    fb(ENABLE := TRUE, RESET := TRUE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 9500, RAWY := 9500, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.FAULT.LATCHED, 'Reset ne doit PAS acquitter tant que les axes restent hors zone');
+
+    (* Reset retombe, axes en zone, nouveau front Reset -> acquitte *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    fb(ENABLE := TRUE, RESET := TRUE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.FAULT.LATCHED, 'front Reset avec axes en zone : acquitte');
+    (* (essai SITE -- stub logique) : la persistance du neutre apres redemarrage PLC
+       (NeutralXMem/NeutralYMem RETAIN) n est pas testable en boite noire. *)
+END_TEST
+
+TEST 'TC-P08-050 Gate consommateurs : DeadmanArmed expose pour le gate G375 (essai SITE - stub logique)'
+    (* Le gate F08.07 vit dans PRG_04_Treuils_Benne / PRG_05_Translation (cablage de collage),
+       pas dans FB_Joystick (qui ignore Winch/Translation). Ce test verifie l invariant logique
+       que le gate consomme : FB_Joystick expose bien DeadmanArmed (et le fait retomber). *)
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* arme le geste -> DeadmanArmed=TRUE (signal que le gate consomme) *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'invariant : DeadmanArmed=TRUE expose pour le gate G375');
+
+    (* desarme -> DeadmanArmed=FALSE (le gate doit alors refuser tout ordre) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'invariant : DeadmanArmed=FALSE apres desarmement (gate bloque)');
+END_TEST
+
+TEST 'TC-P08-060 Armement refuse : ArmingPermitDenied=TRUE pendant appui bouton si ArmingPermit=FALSE'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* appui bouton pendant ArmingPermit=FALSE -> ArmingPermitDenied=TRUE *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.ARMINGPERMITDENIED, 'appui bouton + ArmingPermit=FALSE -> ArmingPermitDenied=TRUE (F08.08)');
+    ASSERT_FALSE(fb.DEADMANARMED, 'armement refuse : pas arme');
+
+    (* appui bouton pendant ArmingPermit=TRUE -> pas de refus *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.ARMINGPERMITDENIED, 'appui bouton + ArmingPermit=TRUE -> pas de refus');
+
+    (* bouton relache + ArmingPermit=FALSE -> pas de refus (niveau, pas front) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.ARMINGPERMITDENIED, 'bouton relache : pas de refus (niveau, pas front)');
+END_TEST

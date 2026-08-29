@@ -386,3 +386,505 @@ TEST 'TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustes
     ASSERT_EQ(fb.Measurement.SignedSpeed_Mps, 0.0, 'Purge vitesse signee -> SignedSpeed_Mps=0.0');
 END_TEST
 
+(* =========================================================================
+   Lot CI AF-09 : TC-P09-010.x (Abs), TC-P09-020.x (Homing), TC-P09-030.x
+   (Scale/Safety), TC-P09-040.x (Reliability), TC-P09-050.x (Speed).
+   Definitions : fiches DOC/AF/AF_Partie-09_Fonction_Encoder/*.md §2.
+   ========================================================================= *)
+
+TEST 'TC-P09-010.1 Abs gel sur doute : perte bus -> EncoderAvailable=FALSE, RawPos gele'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    (* acquisition nominale *)
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.EncoderAvailable, 'bus OK -> EncoderAvailable=TRUE');
+    ASSERT_EQ(fb.Measurement.RawPos, 100000, 'RawPos=RawPosIn');
+
+    (* perte bus -> EncoderAvailable=FALSE, RawPos gele (derniere valeur) *)
+    hwIn.SlaveOperational := FALSE;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.Measurement.EncoderAvailable, 'perte bus -> EncoderAvailable=FALSE');
+    ASSERT_EQ(fb.Measurement.RawPos, 100000, 'RawPos gele (derniere valeur, pas de retour a 0)');
+
+    (* retour bus -> EncoderAvailable=TRUE, RawPos relu *)
+    hwIn.SlaveOperational := TRUE;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.EncoderAvailable, 'retour bus -> EncoderAvailable=TRUE');
+END_TEST
+
+TEST 'TC-P09-010.3 Abs acquisition nominale : bus OK -> RawPos=RawPosIn, EncoderAvailable'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, PointsPerRev := 8192, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.EncoderAvailable, 'bus OK -> EncoderAvailable=TRUE');
+    ASSERT_EQ(fb.Measurement.RawPos, 100000, 'RawPos=RawPosIn (FB_Encoder_Abs.st:116-120)');
+END_TEST
+
+TEST 'TC-P09-010.4 Abs preset : front PresetRequest -> PresetTriggerCmd=2'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* front Home + permit -> homing declenche, PresetRequest pulse vers Abs *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    (* scan 2 : Abs voit le front PresetRequest -> PresetSeqStep=1 (PresetTriggerCmd encore 0) *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    (* scan 3 : Abs en etape 1 -> PresetTriggerCmd=2 *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_EQ(fb.HwOut.PresetTriggerCmd, 2, 'front PresetRequest + EncoderAvailable -> PresetTriggerCmd=2 (FB_Encoder_Abs.st:128,134)');
+END_TEST
+
+TEST 'TC-P09-020 Homing : sequence nominale complete (front Home + capteur haut) -> Homed'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* front Home + front TopPositionSensor (nominal) -> homing declenche *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       TopPositionSensor := TRUE, CfgTopSensorPosM := 8.5, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_FALSE(fb.Homed, 'homing en cours : pas encore Homed');
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       TopPositionSensor := TRUE, CfgTopSensorPosM := 8.5, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Homed, 'homing nominal reussi -> Homed=TRUE');
+    ASSERT_FALSE(fb.HomingSuspect, 'homing nominal : pas de suspicion');
+END_TEST
+
+TEST 'TC-P09-020.1 Homing nominal : front Home + capteur haut -> cible CfgTopSensorPosM'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* front Home pendant que le capteur haut est deja actif -> homing nominal *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       TopPositionSensor := TRUE, CfgTopSensorPosM := 8.5, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       TopPositionSensor := TRUE, CfgTopSensorPosM := 8.5, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Homed, 'homing nominal (capteur haut) -> Homed=TRUE');
+    ASSERT_NEAR(fb.Measurement.CablePosM, 8.5, 0.01, 'position cable = CfgTopSensorPosM (8.5m)');
+END_TEST
+
+TEST 'TC-P09-020.2 Homing unitaire : front Home seul -> cible CfgHomingTargetM'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* front Home seul (pas de capteur) -> homing unitaire vers CfgHomingTargetM *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Homed, 'homing unitaire reussi -> Homed=TRUE');
+    ASSERT_NEAR(fb.Measurement.CablePosM, 1.0, 0.01, 'position cable = CfgHomingTargetM (1.0m)');
+END_TEST
+
+TEST 'TC-P09-020.3 Homing dynamique : front UseDynamicTarget -> cible DynamicHomingTargetM'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* front UseDynamicTarget -> homing dynamique vers DynamicHomingTargetM *)
+    fb(Enable := TRUE, HomingPermit := TRUE, UseDynamicTarget := TRUE,
+       DynamicHomingTargetM := 2.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, UseDynamicTarget := TRUE,
+       DynamicHomingTargetM := 2.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Homed, 'homing dynamique reussi -> Homed=TRUE');
+    ASSERT_NEAR(fb.Measurement.CablePosM, 2.0, 0.01, 'position cable = DynamicHomingTargetM (2.0m)');
+END_TEST
+
+TEST 'TC-P09-020.4 Homing cible hors plage : cible > 99m -> refuse, pas d ecriture'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* front Home avec cible 150m (> 99) -> TargetOutOfRangeError (latch pose en §4) *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 150.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    (* scan suivant : le socle instFault (§1) voit le latch -> Error leve *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 150.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.HomingFault.Error, 'cible hors plage -> Error leve');
+    (* NB : la fiche dit bit4, le code FB_Encoder_Homing.st:140-142 utilise instCauses[1] -> bit1 *)
+    ASSERT_TRUE((fb.Measurement.HomingFault.ErrorId AND 16#0002) <> 0, 'bit1 : cible hors plage (code)');
+    ASSERT_FALSE(fb.Homed, 'pas de referencement (cible hors plage)');
+END_TEST
+
+TEST 'TC-P09-020.5 Coherence boot : ecart RawPos/LastKnown > tolerance -> HomingSuspect, leve par ConfirmCoherence+Permit'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 50000;  (* ecart 50000 > tolerance 1000 *)
+
+    (* premier scan Enable : coherence boot detecte l ecart -> HomingSuspect=TRUE, Homed=FALSE *)
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.HomingSuspect, 'ecart boot > tolerance -> HomingSuspect=TRUE');
+    ASSERT_FALSE(fb.Homed, 'Homed=FALSE tant que suspect');
+
+    (* re-injecte l etat suspect (IN_OUT non round-trip) puis front ConfirmCoherence + permit -> leve *)
+    calib.HomingSuspect := TRUE;
+    fb(Enable := TRUE, ConfirmCoherence := TRUE, HomingPermit := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.HomingSuspect, 'front ConfirmCoherence + permit -> HomingSuspect=FALSE');
+    ASSERT_TRUE(fb.Homed, 'Homed=TRUE apres confirmation');
+END_TEST
+
+TEST 'TC-P09-020.6 Capteur haut absent : mode nominal ne declenche pas, seul unitaire/dynamique'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* front Home SANS capteur haut -> homing unitaire declenche (nominal exige le capteur) *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       TopPositionSensor := FALSE, CfgTopSensorPosM := 8.5, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       TopPositionSensor := FALSE, CfgTopSensorPosM := 8.5, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Homed, 'sans capteur haut : homing unitaire declenche (nominal exige le capteur, FB_Encoder_Homing.st:206-207)');
+END_TEST
+
+TEST 'TC-P09-020.7 Homing sans permit : front Home sans HomingPermit -> HomingModeError, pas d ecriture'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* front Home SANS HomingPermit -> HomingModeError (latch pose en §4) *)
+    fb(Enable := TRUE, HomingPermit := FALSE, HomingAtTargetM := TRUE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    (* scan suivant : le socle instFault (§1) voit le latch -> Error leve *)
+    fb(Enable := TRUE, HomingPermit := FALSE, HomingAtTargetM := FALSE,
+       CfgHomingTargetM := 1.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.HomingFault.Error, 'homing sans permit -> Error leve');
+    ASSERT_TRUE((fb.Measurement.HomingFault.ErrorId AND 16#0001) <> 0, 'bit0 : HomingModeError');
+    ASSERT_FALSE(fb.Homed, 'pas de referencement sans permit');
+END_TEST
+
+TEST 'TC-P09-020.8 HomingSuspect RETAIN : stocke dans Calib -> persiste (FB_Encoder_Homing.st:185)'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := TRUE;  (* etat RETAIN suspect *)
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    (* FB active : HomingSuspect RETAIN est expose tel quel *)
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.HomingSuspect, 'HomingSuspect RETAIN expose');
+    ASSERT_FALSE(fb.Homed, 'Homed=FALSE tant que suspect RETAIN');
+END_TEST
+
+TEST 'TC-P09-030.1 Scale : RawPos=HomingRefRaw+4096 (1/2 tour) -> CablePosM=1.0'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 95904;  (* RawPos - 4096 *)
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, PointsPerRev := 8192, CableM_PerRev := 2.0, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.CablePosM, 1.0, 0.001, 'RawPos=HomingRefRaw+4096, 2.0m/tour, 8192pts -> CablePosM=1.0');
+END_TEST
+
+TEST 'TC-P09-030.2 Scale : RawPos < HomingRefRaw -> CablePosM negative (sous l eau)'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 110000;  (* RawPos < HomingRefRaw *)
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, PointsPerRev := 8192, CableM_PerRev := 2.0, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.CablePosM < 0.0, 'RawPos < HomingRefRaw -> CablePosM negative');
+END_TEST
+
+(* TC-P09-030.3 (PointsPerRev=0 -> CablePosM=0.0) NON TESTABLE via la facade FB_Encoder :
+   PointsPerRev=0 declenche RawPos MOD 0 / RawPos / 0 dans FB_Encoder_Abs (instAbs) ->
+   division par zero, crash du binaire (STATUS_INTEGER_DIVIDE_BY_ZERO). La garde de
+   FB_Encoder_Scale (IF PointsPerRev > 0) n est pas atteignable sans faire planter Abs.
+   A tester en boite blanche sur FB_Encoder_Scale seul (hors harnais facade). *)
+
+TEST 'TC-P09-030.4 Safety bornage : CablePosM hors [Min;Max] -> EncoderIncoherent, auto-efface'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;  (* CablePosM = 100000*2/8192 = 24.4m, dans plage *)
+    calib.LastKnownRawPos := 100000;
+
+    (* position dans plage -> pas incoherent *)
+    fb(Enable := TRUE, PositionMinM := -99.0, PositionMaxM := 99.0, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.Measurement.EncoderIncoherent, 'CablePosM dans plage -> pas incoherent');
+
+    (* position hors plage haute -> incoherent *)
+    hwIn.RawPosIn := 500000;  (* CablePosM = 500000*2/8192 = 122m > 99 *)
+    fb(Enable := TRUE, PositionMinM := -99.0, PositionMaxM := 99.0, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.EncoderIncoherent, 'CablePosM > Max -> EncoderIncoherent=TRUE');
+    ASSERT_TRUE(fb.Fault.Error, 'hors bornage -> Error leve');
+    ASSERT_TRUE((fb.Fault.ErrorId AND 16#0002) <> 0, 'bit1 : incoherence (facade)');
+
+    (* retour en plage -> auto-efface *)
+    hwIn.RawPosIn := 100000;
+    fb(Enable := TRUE, PositionMinM := -99.0, PositionMaxM := 99.0, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.Measurement.EncoderIncoherent, 'retour en plage -> auto-efface');
+END_TEST
+
+TEST 'TC-P09-030.5 Safety HomingSuspect : HomingSuspect=TRUE -> EncoderIncoherent, tant que non confirme'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := TRUE;  (* suspect -> Safety bit1 *)
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.EncoderIncoherent, 'HomingSuspect=TRUE -> EncoderIncoherent=TRUE');
+    ASSERT_TRUE((fb.Fault.ErrorId AND 16#0002) <> 0, 'bit1 : incoherence (facade)');
+END_TEST
+
+TEST 'TC-P09-030.6 Safety BypassGlobal : TRUE neutralise bornage+coherence, retour FALSE -> causes reactives'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 500000;  (* CablePosM = 122m > 99 -> hors bornage *)
+    calib.Homed := TRUE;
+    calib.HomingSuspect := TRUE;  (* suspect -> coherence *)
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 100000;
+
+    (* BypassGlobal=TRUE -> neutralise les 2 causes *)
+    fb(Enable := TRUE, BypassGlobal := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.Measurement.EncoderIncoherent, 'BypassGlobal=TRUE -> pas incoherent');
+
+    (* retour BypassGlobal=FALSE -> causes reactives au scan suivant *)
+    fb(Enable := TRUE, BypassGlobal := FALSE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.EncoderIncoherent, 'BypassGlobal=FALSE -> incoherent reactif');
+END_TEST
+
+TEST 'TC-P09-030.7 Safety CablePosMSafe : = CablePosM toujours (jamais gelee)'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 95904;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.CablePosMSafe, 1.0, 0.001, 'CablePosMSafe = CablePosM (1.0)');
+    ASSERT_NEAR(fb.Measurement.CablePosM, fb.Measurement.CablePosMSafe, 0.001, 'CablePosMSafe = CablePosM toujours');
+END_TEST
+
+TEST 'TC-P09-030.8 Scale garde DINT : conversion DINT avant soustraction -> pas de depassement'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 0;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 0;
+
+    fb(Enable := TRUE, PointsPerRev := 8192, CableM_PerRev := 2.0, HwIn := hwIn, Calib := calib);
+    (* RawDiff = DINT(0) - DINT(100000) = -100000 (signe, pas de sous-debordement UDINT) *)
+    ASSERT_TRUE(fb.Measurement.CablePosM < 0.0, 'soustraction DINT signee : CablePosM negative, pas de depassement');
+END_TEST
+
+TEST 'TC-P09-030.9 Scale : RawPos=HomingRefRaw -> CablePosM=0.0'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, PointsPerRev := 8192, CableM_PerRev := 2.0, HwIn := hwIn, Calib := calib);
+    ASSERT_EQ(fb.Measurement.CablePosM, 0.0, 'RawPos=HomingRefRaw -> CablePosM=0.0');
+END_TEST
+
+TEST 'TC-P09-040.1 Reliability : EncoderAvailable=TRUE, Homed=FALSE, Incoherent=FALSE -> EncoderFault=FALSE'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.EncoderFault, 'non-reference != incoherent : EncoderFault=FALSE');
+END_TEST
+
+TEST 'TC-P09-040.2 Reliability : meme cas -> HomedAndReliable=FALSE (gate stricte exige Homed)'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.HomedAndReliable, 'gate stricte exige Homed : HomedAndReliable=FALSE');
+END_TEST
+
+TEST 'TC-P09-040.3 Reliability : EncoderAvailable=FALSE -> EncoderFault=TRUE quel que soit Homed'
+    hwIn.SlaveOperational := FALSE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.EncoderFault, 'EncoderAvailable=FALSE -> EncoderFault=TRUE');
+    ASSERT_FALSE(fb.HomedAndReliable, 'HomedAndReliable=FALSE');
+END_TEST
+
+TEST 'TC-P09-040.4 Reliability : table de verite des 2 gates sur 8 combos'
+    (* Combo 1 : A=T, H=T, I=F -> EF=F, HAR=T *)
+    hwIn.SlaveOperational := TRUE; hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE; calib.HomingSuspect := FALSE; calib.HomingRefRaw := 100000; calib.LastKnownRawPos := 100000;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.EncoderFault, 'A=T,H=T,I=F : EncoderFault=FALSE');
+    ASSERT_TRUE(fb.HomedAndReliable, 'A=T,H=T,I=F : HomedAndReliable=TRUE');
+
+    (* Combo 2 : A=T, H=F, I=F -> EF=F, HAR=F *)
+    calib.Homed := FALSE;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_FALSE(fb.EncoderFault, 'A=T,H=F,I=F : EncoderFault=FALSE');
+    ASSERT_FALSE(fb.HomedAndReliable, 'A=T,H=F,I=F : HomedAndReliable=FALSE');
+
+    (* Combo 3 : A=T, H=T, I=T (bornage) -> EF=T, HAR=F *)
+    calib.Homed := TRUE; calib.HomingRefRaw := 0; hwIn.RawPosIn := 500000;  (* CablePosM=122m > 99 -> incoherent *)
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.EncoderFault, 'A=T,H=T,I=T : EncoderFault=TRUE');
+    ASSERT_FALSE(fb.HomedAndReliable, 'A=T,H=T,I=T : HomedAndReliable=FALSE');
+
+    (* Combo 4 : A=T, H=F, I=T -> EF=T, HAR=F *)
+    calib.Homed := FALSE; calib.HomingRefRaw := 0;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.EncoderFault, 'A=T,H=F,I=T : EncoderFault=TRUE');
+    ASSERT_FALSE(fb.HomedAndReliable, 'A=T,H=F,I=T : HomedAndReliable=FALSE');
+
+    (* Combo 5 : A=F, H=T, I=F -> EF=T, HAR=F *)
+    hwIn.SlaveOperational := FALSE; hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE; calib.HomingSuspect := FALSE; calib.HomingRefRaw := 100000; calib.LastKnownRawPos := 100000;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.EncoderFault, 'A=F,H=T,I=F : EncoderFault=TRUE');
+    ASSERT_FALSE(fb.HomedAndReliable, 'A=F,H=T,I=F : HomedAndReliable=FALSE');
+
+    (* Combo 6 : A=F, H=F, I=F -> EF=T, HAR=F *)
+    calib.Homed := FALSE;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.EncoderFault, 'A=F,H=F,I=F : EncoderFault=TRUE');
+    ASSERT_FALSE(fb.HomedAndReliable, 'A=F,H=F,I=F : HomedAndReliable=FALSE');
+
+    (* Combo 7 : A=F, H=T, I=T -> EF=T, HAR=F *)
+    hwIn.RawPosIn := 500000; calib.Homed := TRUE; calib.HomingSuspect := FALSE; calib.HomingRefRaw := 0;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.EncoderFault, 'A=F,H=T,I=T : EncoderFault=TRUE');
+    ASSERT_FALSE(fb.HomedAndReliable, 'A=F,H=T,I=T : HomedAndReliable=FALSE');
+
+    (* Combo 8 : A=F, H=F, I=T -> EF=T, HAR=F *)
+    calib.Homed := FALSE; calib.HomingRefRaw := 0;
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.EncoderFault, 'A=F,H=F,I=T : EncoderFault=TRUE');
+    ASSERT_FALSE(fb.HomedAndReliable, 'A=F,H=F,I=T : HomedAndReliable=FALSE');
+END_TEST
+
+TEST 'TC-P09-040.5 Reliability : EncoderIncoherent -> EncoderFault=TRUE et HomedAndReliable=FALSE'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 500000;  (* CablePosM=122m > 99 -> incoherent *)
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.EncoderFault, 'EncoderIncoherent -> EncoderFault=TRUE');
+    ASSERT_FALSE(fb.HomedAndReliable, 'EncoderIncoherent -> HomedAndReliable=FALSE');
+END_TEST
+
+TEST 'TC-P09-050.5 Speed : fenetre <50ms -> Valid=FALSE sans purge (essai SITE - stub logique)'
+    (* La fenetre glissante exige 6 echantillons espaces de SamplePeriod (10ms) -> la fenetre
+       minimale pour 6 echantillons est exactement 50ms. Le cas "fenetre <50ms" (Valid=FALSE sans
+       purge, FB_Encoder_SpeedMeasure.st:128-132) n est pas atteignable avec la config par defaut
+       (SamplePeriod=10ms) : la branche ne se prend jamais. Invariant minimal : a 50ms exactement,
+       Valid=TRUE (borne). *)
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    fb(Enable := TRUE, PointsPerRev := 4096, CableM_PerRev := 0.5, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100123; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100246; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100369; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100492; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100614; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_TRUE(fb.Measurement.SpeedValid, 'borne : 6 ech. sur 50ms -> Valid=TRUE');
+END_TEST
+
+TEST 'TC-P09-050.6 Speed : SignedSpeed=(P[5]-P[0])/WindowElapsed, Speed=ABS'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := TRUE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 100000;
+    calib.LastKnownRawPos := 100000;
+
+    (* montee +15mm/10ms -> 1.50 m/s *)
+    fb(Enable := TRUE, PointsPerRev := 4096, CableM_PerRev := 0.5, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100123; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100246; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100369; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100492; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ADVANCE_TIME(10000000); hwIn.RawPosIn := 100614; fb(Enable := TRUE, HwIn := hwIn, Calib := calib);
+    ASSERT_NEAR(fb.Measurement.Speed_Mps, 1.50, 0.05, 'SignedSpeed=(P[5]-P[0])/0.05 = 1.50 m/s');
+    ASSERT_NEAR(fb.Measurement.SignedSpeed_Mps, 1.50, 0.05, 'SignedSpeed positive (montee)');
+    ASSERT_EQ(fb.Measurement.Speed_Mps, fb.Measurement.SignedSpeed_Mps, 'Speed=ABS(SignedSpeed)');
+END_TEST
+

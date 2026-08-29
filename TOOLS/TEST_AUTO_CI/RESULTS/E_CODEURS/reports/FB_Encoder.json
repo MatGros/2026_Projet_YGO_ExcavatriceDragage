@@ -45,11 +45,119 @@
     {
       "name": "TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)",
       "passed": true
+    },
+    {
+      "name": "TC-P09-010.1 Abs gel sur doute : perte bus -> EncoderAvailable=FALSE, RawPos gele",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-010.3 Abs acquisition nominale : bus OK -> RawPos=RawPosIn, EncoderAvailable",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-010.4 Abs preset : front PresetRequest -> PresetTriggerCmd=2",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-020 Homing : sequence nominale complete (front Home + capteur haut) -> Homed",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-020.1 Homing nominal : front Home + capteur haut -> cible CfgTopSensorPosM",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-020.2 Homing unitaire : front Home seul -> cible CfgHomingTargetM",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-020.3 Homing dynamique : front UseDynamicTarget -> cible DynamicHomingTargetM",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-020.4 Homing cible hors plage : cible > 99m -> refuse, pas d ecriture",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-020.5 Coherence boot : ecart RawPos/LastKnown > tolerance -> HomingSuspect, leve par ConfirmCoherence+Permit",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-020.6 Capteur haut absent : mode nominal ne declenche pas, seul unitaire/dynamique",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-020.7 Homing sans permit : front Home sans HomingPermit -> HomingModeError, pas d ecriture",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-020.8 HomingSuspect RETAIN : stocke dans Calib -> persiste (FB_Encoder_Homing.st:185)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-030.1 Scale : RawPos=HomingRefRaw+4096 (1/2 tour) -> CablePosM=1.0",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-030.2 Scale : RawPos < HomingRefRaw -> CablePosM negative (sous l eau)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-030.4 Safety bornage : CablePosM hors [Min;Max] -> EncoderIncoherent, auto-efface",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-030.5 Safety HomingSuspect : HomingSuspect=TRUE -> EncoderIncoherent, tant que non confirme",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-030.6 Safety BypassGlobal : TRUE neutralise bornage+coherence, retour FALSE -> causes reactives",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-030.7 Safety CablePosMSafe : = CablePosM toujours (jamais gelee)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-030.8 Scale garde DINT : conversion DINT avant soustraction -> pas de depassement",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-030.9 Scale : RawPos=HomingRefRaw -> CablePosM=0.0",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-040.1 Reliability : EncoderAvailable=TRUE, Homed=FALSE, Incoherent=FALSE -> EncoderFault=FALSE",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-040.2 Reliability : meme cas -> HomedAndReliable=FALSE (gate stricte exige Homed)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-040.3 Reliability : EncoderAvailable=FALSE -> EncoderFault=TRUE quel que soit Homed",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-040.4 Reliability : table de verite des 2 gates sur 8 combos",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-040.5 Reliability : EncoderIncoherent -> EncoderFault=TRUE et HomedAndReliable=FALSE",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-050.5 Speed : fenetre <50ms -> Valid=FALSE sans purge (essai SITE - stub logique)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-050.6 Speed : SignedSpeed=(P[5]-P[0])/WindowElapsed, Speed=ABS",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 11,
-    "passed": 11,
+    "total": 38,
+    "passed": 38,
     "failed": 0
   }
 }
