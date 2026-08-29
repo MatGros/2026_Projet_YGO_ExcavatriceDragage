@@ -128,12 +128,14 @@ Verdict transversal : 33/33 nominal ✓ ; granulaire quasi absent partout (front
 | FB_Bucket TC-030 | MAINT_N1/N2 | code : MAINT_N2 seul (L204/L212) | corriger |
 | FB_Bucket TC-025 | interlock `M1_Busy/M2_Busy` | déclarés (L29-30) **jamais lus** | TC marqué « non implémenté » + TBD / choix code |
 
-## 🧭 Décisions à trancher (validation humaine)
+## 🧭 Décisions à trancher (validation humaine) — RÉSOLUES 2026-08-29 (réponses utilisateur)
 
-1. **Insertion des 51 TC proposés** : tous (édit par lots pipeline) / seulement les ~14 prioritaires C4-C3 (035.1, 051.1, 038.1, 039.1, 049.1, 044.1, 045.1, TC-P11-015, 020.1..4, …) / aucun.
-2. **Écarts doc↔code** (table ci-dessus) : corriger la doc sur la vérité code (recommandé), et ouvrir des tâches CODE pour les 4 trous réels (DriftGuard vitesse,DeadTime directionnels,M1_Busy, MAINT_N1).
-3. **Questions de spec** (non tranchables par test) : cat.3 2-canaux exigée ou mono-canal documenté ? `ArmingPermit=TRUE` en dur (code) — bug à ouvrir en `TASKS.yaml` ? `FB_Encoder_Safety` monocanal vs exigence ISO 13849 = écart de spec à arbitrer.
-4. Ancres GitHub sommaire (incohérence AF-08 préexistante) : clic-test humain ou passe mécanique.
+1. **Insertion des TC** : « je veux bien les ajouter mais challenger d'abord (remplacer les similaires, zéro doublon) » → challenger exécuté (verdict : 30 KEEP · 28 REPLACE · 6 REJECT) ; insertion par lots pipeline en cours.
+2. **Écarts doc↔code** : corriger doc + ouvrir tâches CODE (fait : T176 ArmingPermit ; T175 les autres).
+3. **Questions de spec** : `FB_Encoder_Safety` = **mono-canal assumé** (requalification fiche à faire) ; `ArmingPermit` = tâche CODE ouverte (T176) ; cat.3 avec canal vitesse = **tâche code (T175 AC1)**.
+4. Ancres GitHub : en attente du clic-test humain.
+
+**Verdict final du challenger (2026-08-29, listes explicites conservées dans son rapport)** : a=11 KEEP/7 REPLACE/1 REJECT · b=3/5/3 · c=16/6/0 · d=0/10/2. FUSIONS inter-lots=0 (les thèmes Reset/latch/redémarrage auto sont des chemins de code **distincts par FB**, pas des doublons). 6 écarts doc↔code supplémentaires détectés pendant l'audit : **seuil synchro 0.10m (doc) vs 0.8m câblé** (`GVL_PERSISTENT.st:58`) ; référence ArmingPermit ligne 322 (pas 303) ; `StepDelay` code mort (WinchOutputInterlock) ; SpeedGuardEnable désactivé par défaut ; timeout benne 30s vs 60s (déjà listé) ; `test_fb_faultcore.st` manquant (traité T174).
 
 ## ⛔ Pipeline obligatoire à toute insertion
 
