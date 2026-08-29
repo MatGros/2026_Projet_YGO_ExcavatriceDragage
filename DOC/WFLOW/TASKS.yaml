@@ -3042,8 +3042,7 @@ tasks:
   - Gate harnais intégré à run_all_gates, rouge tant que la suite n'est pas verte
   - Document plan de tir livré (FAT, ordre import CODESYS, points de rollback par phase)
   - Liste des vecteurs croisée avec les CAS-xxx de T180 (au moins CAS-001, CAS-012)
-  bloque_par:
-  - T169-A
+  bloque_par: [T169-A]
 - id: T181-01
   parent_id: T181
   statut: ⬜
@@ -3074,8 +3073,7 @@ tasks:
   - Pas de double-freinage: quand l'instance FB_Winch gouverne (marge), l'instance PRG_06 reste passive
   - Temps mort directionnel: une seule implémentation, cohérente avec T175 AC2 ; TC-021/022 exécutables
   - G200 PASS + gates palier C PASS
-  bloque_par:
-  - T181-00
+  bloque_par: [T181-00, T175, T181-05]
 - id: T181-02
   parent_id: T181
   statut: ⬜
@@ -3099,8 +3097,7 @@ tasks:
   - Interface FB_Winch (VAR_INPUT/OUTPUT) strictement inchangée (diff signature = vide)
   - Harnais T181-00: sens Fwd/Rev correct pour toutes les étapes de cycle testées
   - G200 PASS + gates palier C PASS
-  bloque_par:
-  - T181-00
+  bloque_par: [T181-00]
 - id: T181-03
   parent_id: T181
   statut: ⬜
@@ -3124,8 +3121,7 @@ tasks:
   - FB_Safety_Winch reste seul producteur ; TC-P10-018 exécutable et PASS côté Safety
   - Gate G4xx_check_stuckclosed_single_owner présent et vert
   - Aucune régression CI FB_Winch / FB_Safety_Winch ; G200 PASS + gates palier C PASS
-  bloque_par:
-  - T181-00
+  bloque_par: [T181-02]
 - id: T181-04
   parent_id: T181
   statut: ❌
@@ -3150,7 +3146,7 @@ tasks:
 - id: T181-05
   parent_id: T181
   statut: ⬜
-  criticite: C3
+  criticite: C4
   domaine: TREUILS
   agent: ''
   date: '2026-08-29T20:30:00+02:00'
@@ -3173,10 +3169,7 @@ tasks:
   - Le minuteur de rampe palier n'utilise plus les délais d'interlock direction (grep + diff)
   - FB_Winch ne déclare plus Mode ni CycleTimeCalc (diff VAR = suppression nette)
   - CI FB_Winch iso-résultat vs avant extraction (0 régression) ; G200 PASS ; gates palier C PASS
-  bloque_par:
-  - T181-01
-  - T181-02
-  - T181-03
+  bloque_par: [T181-02, T181-03]
 - id: T181-06
   parent_id: T181
   statut: ⏳

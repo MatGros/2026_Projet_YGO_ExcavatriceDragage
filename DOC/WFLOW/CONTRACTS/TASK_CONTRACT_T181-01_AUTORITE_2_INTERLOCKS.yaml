@@ -1,69 +1,96 @@
-# Contrat T181-01 — Barrière finale verte + autorité formelle des 2 interlocks de cadence
-# Source : DOC/WFLOW/AUDITS/DESIGN/PLAN_GEL_TREUIL_T181_v0.1.md §1 (D01), §4 ; décision Q6.
+# Contrat T181-01 — Barrière finale : autorité des 2 interlocks + interlock cadence + règle §3bis
+# Source : PLAN_GEL_TREUIL_T181_v0.1.md §1 (D01), §4, §13#4 ; décision Q6 ; AF10_INTERFACE §3bis/§3ter ;
+#          B4 S1 (StepDelay TON mort) ; B5 (§1.2 conflit barrière §5, §1.1 bornage, §M2 consolidation,
+#          §5 corrections a/b/c/e).
+# CE TICKET CONSOLIDE toutes les modifications de FB_WinchOutputInterlock (B5-§M2).
 
 contract:
-  task_id: T181-01_AUTORITE_2_INTERLOCKS
-  criticality: C4            # barrière de sécurité finale du sous-système treuil
+  task_id: T181-01_BARRIERE_INTERLOCK_CADENCE
+  criticality: C4
   strategy: patch
 
   objective: >
-    Rendre FB_WinchOutputInterlock vert en CI (7/7) SANS toucher son interface, et formaliser
-    l'autorité des deux instances de FB_WinchRateInterlock (une dans FB_Winch avec seuils
-    safety+marge, une dans PRG_06 avec seuils safety nus) de sorte que la barrière finale
-    PRG_06 ne gouverne JAMAIS le mouvement en fonctionnement nominal (FinalInterlockGoverned=FALSE).
+    Rendre FB_WinchOutputInterlock vert en CI (7/7), CRÉER l'interlock de cadence 2 niveaux
+    (FB_WinchRateInterlock : une instance dans FB_Winch seuils safety+marge, une dans PRG_06 seuils
+    nus), et RESTRUCTURER §5 de la barrière pour qu'elle applique la règle §3bis (contacteur de sens
+    jamais relâché avant les contacteurs de vitesse, fenêtre bornée). L'autorité : la logique
+    programme n'est jamais limitée par l'interlock de sécurité en fonctionnement nominal
+    (FinalInterlockGoverned reste FALSE).
 
   acceptance:
     - id: AC1
-      statement: "CI FB_WinchOutputInterlock : TC-P10-012 (watchdog frein), TC-P10-013 (latches hors Enable), TC-P10-021 et TC-P10-022 (temps morts directionnels) PASS ; les TC déjà verts le restent."
-      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_WinchOutputInterlock"
+      statement: "CI FB_WinchOutputInterlock : TC-P10-012 (watchdog frein), TC-P10-013 (latches hors Enable), TC-P10-021 et TC-P10-022 (temps morts directionnels) PASS ; les TC déjà verts le restent (vecteur pass/fail par TC figé par T181-00, aucun TC vert ne repasse rouge)."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_WinchOutputInterlock ; comparaison TC-par-TC a la baseline T181-00"
     - id: AC2
-      statement: "L'interface (VAR_INPUT/VAR_OUTPUT/VAR_IN_OUT) de FB_WinchOutputInterlock est strictement inchangée."
-      verified_by: "git diff sur la zone de déclaration = vide (hors commentaires)"
+      statement: "L'interface (VAR_INPUT/VAR_OUTPUT/VAR_IN_OUT) de FB_WinchOutputInterlock est modifiée uniquement en ADDITIF contrôlé (nouvelles entrées de seuils de cadence et de fenetre T_max / DropConfirmDelay) ; aucune entrée retirée ; les 2 sites PRG_06 mis à jour au même commit."
+      verified_by: "git diff bloc de declaration + G200_check_linkage.py --report (0 orphelin)"
     - id: AC3
-      statement: "FB_WinchRateInterlock existe comme FB unique, instancié dans FB_Winch (jeu de seuils = safety + marge) ET dans PRG_06 (jeu de seuils = safety nus). Les deux jeux de seuils sont des paramètres nommés distincts."
-      verified_by: "grep 'FB_WinchRateInterlock' dans FB_Winch.st et PRG_06_Outputs.st + lecture des seuils"
+      statement: "FB_WinchRateInterlock existe comme FB unique, instancié dans FB_Winch ET dans PRG_06. Les 2 jeux de seuils sont des CONSTANTES en dur distinctes (rien à corrompre) provenant de sources de config disjointes. Les valeurs de cadence de montée sont marquées PROVISOIRES / TODO essai site (base physique = thermique résistances rotoriques + choc de couple, valeur empirique)."
+      verified_by: "grep 'FB_WinchRateInterlock' dans FB_Winch.st et PRG_06_Outputs.st + commentaire 'PROVISOIRE essai site' sur les constantes + gate G4xx_check_rateinterlock_independence (sources de seuils disjointes, zéro GVL/variable partagée)"
     - id: AC4
-      statement: "Diag FinalInterlockGoverned (ou équivalent nommé sur le bus PRG_06) reste FALSE sur 100 % des vecteurs nominaux du harnais T181-00 (Grafcet X0-X13, rampes joystick 0-100 %, plongée, extraction, benne couplée)."
-      verified_by: "harnais intégration T181-00 : assertion FinalInterlockGoverned = FALSE sur toute la matrice nominale"
+      statement: "Diag FinalInterlockGoverned (bus PRG_06) reste FALSE sur 100 % des vecteurs nominaux du harnais T181-00 (Grafcet, rampes joystick, plongée, extraction, benne). CLAUSE COMPAGNON : un DirectionDropBlocked TRANSITOIRE (<= quelques cycles, fenetre §3bis normale) N'EST PAS une gouvernance et ne met pas FinalInterlockGoverned a TRUE."
+      verified_by: "harnais T181-00 : assertion FinalInterlockGoverned = FALSE + assertion DirectionDropBlocked transitoire sur relache joystick nominale"
     - id: AC5
-      statement: "Test d'injection : en forçant une cadence > seuil safety qui contourne l'instance FB_Winch (stub), l'instance PRG_06 coupe la commande (RelayFwd/Rev = FALSE)."
-      verified_by: "harnais T181-00 : vecteur 'injection cadence' → BusOutputs.M1RelayFwd = FALSE"
+      statement: "Injection : cadence > seuil safety en contournant l'instance FB_Winch (stub) -> l'instance PRG_06 coupe (RelayFwd/Rev = FALSE). Pas de double-freinage : quand l'instance FB_Winch gouverne (marge), l'instance PRG_06 reste passive (Busy interne PRG_06 = FALSE)."
+      verified_by: "harnais T181-00 : vecteurs 'injection cadence' et 'marge FB_Winch active'"
     - id: AC6
-      statement: "Pas de double-freinage : quand l'instance FB_Winch gouverne déjà la cadence (marge active), l'instance PRG_06 reste passive (Busy interne PRG_06 = FALSE)."
-      verified_by: "harnais T181-00 : vecteur 'marge FB_Winch active' → interlock PRG_06 non Busy"
+      statement: "REGLE §3bis restructurée dans §5 de la barrière : quand RequestedStep tombe à 0 mais RequestedRelayFwd/Rev reste TRUE, la barrière NE force PLUS RelayFwd/Rev à FALSE immédiatement — elle les TIENT jusqu'à FwdRevSpeedFeedbackOff (feedback) OU T_max (timeout porté par le filet). Le chemin 'ELSIF NOT MotorRequest' de FB_WinchOutputInterlock.st:225-231 est retravaillé en conséquence."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_WinchOutputInterlock : nouveau TC 'sens maintenu apres chute vitesse jusqu a ContactorsAllOff' ; nouveau TC 'T_max atteint sans confirmation -> chute sens forcee + latch'"
     - id: AC7
-      statement: "Temps mort directionnel : une SEULE implémentation dans le code (pas de duplication avec T175 AC2). TC-P10-021/022 décrivent 1 s par direction ; la valeur retenue est tranchée et documentée."
-      verified_by: "lecture code (un seul minuteur temps mort) + cohérence avec l'état de T175 AC2"
+      statement: "Bornage §3ter : à T_max sans confirmation ContactorsAllOff -> chute du sens FORCÉE + latch StuckClosed (via FB_Safety_Winch) + escalade SafeStop. Le maintien indéfini du stator sous tension est INTERDIT. Feedback ContactorsAllOff collé 'released' -> la tempo DropConfirmDelay prévaut (pas d'ouverture du sens sur feedback simple voie seul)."
+      verified_by: "TC : ContactorsAllOff force 'not released' + T_max -> RelayFwd = FALSE + StuckClosed latché + SafeStop ; TC : ContactorsAllOff 'released' premature -> sens tenu jusqu'à DropConfirmDelay"
     - id: AC8
-      statement: "Non-régression : G200 liaison PASS et gates palier C PASS après le patch."
-      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report ; python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+      statement: "DropConfirmDelay et T_max sont des paramètres DÉDIÉS, distincts de DeadTimeSameDir/OppositeDir et DirectionInterlockDelay* (ne pas répéter D10). Ordre garanti : DropConfirmDelay < T_max."
+      verified_by: "lecture des declarations + grep : aucune reutilisation croisee"
     - id: AC9
-      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (PRG_06_Outputs.st -> PRG_06_Outputs ; FB_WinchRateInterlock.st -> FB_WinchRateInterlock)."
-      verified_by: "comparaison basename(fichier) sans extension vs identifiant apres PROGRAM/FUNCTION_BLOCK dans chaque fichier du scope"
+      statement: "Coupures dures exemptées (§3bis §M6) : les chemins NOT Enable, PowerCutOff, et la sous-liste 'dure' de Fault.Error coupent RelayFwd/Rev IMMÉDIATEMENT (pas d'ordonnancement). La garde G4xx_check_direction_after_speed exempte explicitement ces chemins."
+      verified_by: "TC : Enable=FALSE en marche -> RelayFwd = FALSE au cycle suivant ; gate G4xx_check_direction_after_speed PASS (exemptions codées)"
     - id: AC10
-      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage (_CFC/_LD) n'est apposé aux POU touchés ; le suffixe reste identique au langage genere dans le bundle, c'est-a-dire du ST pur (le generateur PLCopenXML n'emet pas de CFC/LD pour ces POU)."
-      verified_by: "grep basename *_CFC/_LD absent ; inspection du bundle CODE_Bundle.xml : POU concernes en ST"
+      statement: "Temps mort directionnel : UNE seule implémentation dans le code, cohérente avec T175 AC2 (pas de duplication). TC-P10-021/022 exécutables."
+      verified_by: "lecture code (un seul minuteur temps mort) + coherence avec l'etat livré de T175"
+    - id: AC11
+      statement: "Argument PLr documenté dans ce contrat (fonction de sécurité concernée, PLr visé, catégorie d'architecture). Non-bypassabilité : l'instance interne FB_Winch de FB_WinchRateInterlock n'est PAS neutralisée par GVL_IHM.MxTreuil*.Bypass.Global."
+      verified_by: "section PLr dans execution: du contrat + TC non-bypass"
+    - id: AC12
+      statement: "Signature sécurité finale = essai site (la CI ne la délivre pas) : critère site chiffré au plan de tir — cadence paliers 1->5 chronométrée, la barrière ne mord pas ; fenêtre §3bis mesurée sous charge (dérive <= X cm)."
+      verified_by: "PLAN_DE_TIR_T181 §4.1 complété"
+    - id: AC13
+      statement: "Non-régression : G200 liaison PASS, gates palier C PASS, harnais WINCH_INTEG ne régresse pas (aucun TC vert ne repasse rouge), MAIN_EndToEnd reste vert."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report ; python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C ; run_tests.py --fb MAIN_EndToEnd"
+    - id: AC14
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (source PRG_06_Outputs -> POU PRG_06_Outputs)."
+      verified_by: "comparaison basename sans extension vs identifiant apres PROGRAM/FUNCTION_BLOCK"
+    - id: AC15
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage (_CFC/_LD) apposé ; le suffixe reste identique au langage genere dans le bundle (ST pur)."
+      verified_by: "grep basename *_CFC/_LD absent + inspection CODE_Bundle.xml"
 
   scope:
     allowed:
-      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st        # 7/7 + §5 restructuré + §3bis + instance filet
       - CODE/H_TREUILS_BENNE/FB_WinchRateInterlock.st          # nouveau FB
-      - CODE/H_TREUILS_BENNE/FB_Winch.st                        # instanciation FB_WinchRateInterlock (interne, pas d'interface)
-      - CODE/M_MAIN/PRG_06_Outputs.st                           # instanciation FB_WinchRateInterlock côté barrière
-      - CODE/H_TREUILS_BENNE/_TYPES/**                          # DUT/enum si un diag FinalInterlockGoverned est ajouté
+      - CODE/H_TREUILS_BENNE/FB_Winch.st                       # instanciation interne + tenue du relais de sens côté programme
+      - CODE/M_MAIN/PRG_06_Outputs.st                          # instance filet + 2 sites
+      - CODE/H_TREUILS_BENNE/_TYPES/**                         # enum/diag DirectionDropBlocked, FinalInterlockGoverned si absents
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st                # latch StuckClosed sur T_max (interface : entrée déclenchement)
       - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winchoutputinterlock.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st
+      - TOOLS/AGENT_WORKFLOW/scripts/                          # G4xx_check_direction_after_speed, G4xx_check_rateinterlock_independence, G4xx_check_final_interlock_governed_false
+      - DOC/WFLOW/AUDITS/DESIGN/PLAN_DE_TIR_T181_v0.1.md       # §4.1 critère site
     forbidden:
-      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                     # pas de refactor du clamp ici (Phase A)
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                    # pas de refactor du clamp ici (Phase A) ; retrait Mode = T181-05
+      - CODE/H_TREUILS_BENNE/FB_SpeedStep.st                   # T181-07/16
       - DOC/WFLOW/TASKS.yaml
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - DOC/NAMING_CONVENTION.md
 
   conservation:
     must_survive:
-      - "Toutes les protections déjà vertes de FB_WinchOutputInterlock (temps morts, anti-court-cycle, watchdog frein déjà couverts)"
-      - "Le comportement Enable=FALSE → sorties sûres + latches"
+      - "Toutes les protections déjà vertes de FB_WinchOutputInterlock (temps morts, anti-court-cycle, watchdog frein)"
+      - "Le comportement Enable=FALSE -> sorties sûres + latches ; pas de redémarrage auto"
+      - "La coupure immédiate sur AU / PowerCutOff / Enable=FALSE (jamais ordonnée)"
     dropped_on_purpose:
-      - "Aucun — cette tâche n'abandonne rien, elle rend vert et formalise"
+      - "Le forçage inconditionnel RelayFwd:=FALSE dès NOT MotorRequest (remplacé par la tenue §3bis bornée)"
+      - "Le StepDelay TON mort (remplacé par FB_WinchRateInterlock réel)"
 
   evidence_required:
     - check_linkage
@@ -71,14 +98,15 @@ contract:
     - bundle
 
   models_allowed:
-    - "omni/cc/claude-sonnet-5"
     - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
 
   alert_duty: >
-    Si rendre TC-012/013/021/022 verts exige de modifier l'interface de FB_WinchOutputInterlock,
-    ou si les feedbacks BrakeFeedback / FwdRevSpeedFeedbackOff se révèlent non fiables, ou si le
-    temps mort directionnel ne peut pas être unifié avec T175 sans conflit : lever l'alerte
-    IMMÉDIATEMENT vers l'orchestrateur, ne pas contourner.
+    Si restructurer §5 de la barrière casse un TC C4 vert (012/013/021/022), si la tenue du relais
+    de sens entre en conflit avec le temps mort directionnel §4bis, si FB_Safety_Winch ne peut pas
+    recevoir le déclenchement StuckClosed sans nouvelle entrée non prévue, ou si le feedback
+    ContactorsAllOff (DI simple voie) se révèle inexploitable pour cette décision C4 :
+    REMONTER à l'orchestrateur AVANT de contourner.
 
 status: PENDING
 
@@ -87,8 +115,8 @@ execution:
   completed_at: ""
   status: PENDING
   summary: >
-    À remplir par l'agent : patchs FB_WinchOutputInterlock, création FB_WinchRateInterlock,
-    instanciation double, preuves CI + harnais + gates.
+    À remplir : barrière 7/7, FB_WinchRateInterlock 2 niveaux, §5 restructuré pour §3bis borné,
+    coupures dures exemptées, gates. Section PLr à compléter.
   evidence_submitted: []
 
 validation:
@@ -96,5 +124,6 @@ validation:
   validated_by: ""
   validated_at: ""
   notes: >
-    ARRÊT VALIDATION HUMAINE : le contrat d'autorité (quel interlock gouverne quoi, jeux de
-    seuils, sémantique FinalInterlockGoverned) est relu et validé par l'humain avant écriture code.
+    ARRÊT VALIDATION HUMAINE : contrat d'autorité + valeurs T_max/DropConfirmDelay + classification
+    des Fault.Error (dure vs ordonnée) + argument PLr — relus et signés avant écriture code.
+    Séquencement : APRÈS T181-05 (sous-FB extraits) et T181-02_03 (TC-011). bloque_par : T181-00, T175, T181-05.

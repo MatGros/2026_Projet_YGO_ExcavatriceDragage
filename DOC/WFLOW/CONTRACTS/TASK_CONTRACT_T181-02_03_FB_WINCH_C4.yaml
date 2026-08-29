@@ -28,8 +28,8 @@ contract:
       statement: "Le champ ContactorsCheck.StuckClosed (VAR_OUTPUT, consommé PRG_04:803/860 -> IHM/Troubleshooting) reste DÉCLARÉ et, pendant la Phase 0, forcé à FALSE (valeur sûre) en attendant la ré-alimentation depuis FB_Safety_Winch (T181-08)."
       verified_by: "lecture FB_Winch.st : StuckClosed := FALSE explicite + commentaire renvoyant à T181-08"
     - id: AC5
-      statement: "FB_Safety_Winch : la détection StuckClosed (Méca B, ~3 s) devient le SEUL producteur ; un TC côté FB_Safety_Winch couvre le scénario (déplacer/adapter TC-P10-018)."
-      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Safety_Winch : scenario StuckClosed PASS"
+      statement: "FB_Safety_Winch : la détection StuckClosed (Méca B, ~3 s) devient le SEUL producteur ET déclenche une ACTION PROTECTRICE définie (au minimum SafeStop ; PowerCutOff si le TC/l'AF l'exige). Documenter noir sur blanc : StuckClosed -> quelle action ? (aujourd'hui le seul consommateur actif de la cause interne FB_Winch etait FB_Winch.Fault ; ne pas perdre la reaction de defaut pendant Phases 0->A). Un TC côté FB_Safety_Winch asserte l'ACTION, pas seulement l'etat (déplacer/adapter TC-P10-018)."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Safety_Winch : scenario 'contacteur collé -> StuckClosed -> SafeStop (et/ou PowerCutOff)' PASS ; section 'action StuckClosed' dans execution: du contrat"
     - id: AC6
       statement: "L'interface (VAR_INPUT/VAR_OUTPUT/VAR_IN_OUT) de FB_Winch est INCHANGÉE (aucune entrée retirée/ajoutée — le retrait de Mode est T181-08, pas ici)."
       verified_by: "git diff sur les blocs de déclaration de FB_Winch = vide (hors commentaires)"
