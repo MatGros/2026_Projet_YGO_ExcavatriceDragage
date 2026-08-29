@@ -29,16 +29,18 @@ Décline `TC-P09-030` (chapô) :
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 310px);">
-    <col style="width: 90px;">
-    <col style="width: 140px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
@@ -47,31 +49,55 @@ Décline `TC-P09-030` (chapô) :
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.4</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>CablePosM</code> hors <code>[PositionMinM;PositionMaxM]</code> → <code>EncoderIncoherent=TRUE</code>, bit0, auto-effacé au retour ; borne haute : <code>PositionMaxM</code> accepté, +ε → incohérent</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bornage</b><br>hors plage</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>CablePosM</code> dans <code>[PositionMinM;PositionMaxM]</code> (déf. ±99m)<br>
+        🚀 <b>Étape 1</b> : <code>CablePosM</code> sort de la plage (ex. <code>PositionMaxM+ε</code>)<br>
+        ⚡ <b>Étape 2</b> : <code>EncoderIncoherent=TRUE</code>, bit0 levé<br>
+        ✅ <b>Étape 3</b> : Auto-effacé au retour en plage ; borne haute : <code>PositionMaxM</code> accepté, +ε → incohérent
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.5</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>HomingSuspect=TRUE</code> → <code>EncoderIncoherent=TRUE</code>, bit1, tant que non confirmé</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Relais</b><br>suspect</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>HomingSuspect=FALSE</code>, <code>EncoderIncoherent=FALSE</code><br>
+        🚀 <b>Étape 1</b> : <code>HomingSuspect=TRUE</code> (incohérence boot non confirmée)<br>
+        ⚡ <b>Étape 2</b> : <code>EncoderIncoherent=TRUE</code>, bit1 levé<br>
+        ✅ <b>Étape 3</b> : Persiste tant que <code>HomingSuspect</code> non confirmé (suit l'état Homing, pas latché ici)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.6</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>BypassGlobal=TRUE</code> → neutralise bornage + cohérence boot ; retour FALSE → les 2 causes redeviennent actives au scan suivant</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bypass</b><br>global</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>BypassGlobal=FALSE</code>, bornage + cohérence actifs<br>
+        🚀 <b>Étape 1</b> : <code>BypassGlobal=TRUE</code> (mise en service)<br>
+        ⚡ <b>Étape 2</b> : Bornage + cohérence boot neutralisés → <code>EncoderIncoherent=FALSE</code><br>
+        ✅ <b>Étape 3</b> : Retour <code>FALSE</code> → les 2 causes redeviennent actives au scan suivant
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.7</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>CablePosMSafe</code> = <code>CablePosM</code> toujours (jamais gelée — distinct du gel <code>RawPos</code> côté Abs)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Position</b><br>safe</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>CablePosM</code> active, <code>Enable=TRUE</code><br>
+        🚀 <b>Étape 1</b> : Lecture continue de <code>CablePosM</code> depuis <code>FB_Encoder_Scale</code><br>
+        ⚡ <b>Étape 2</b> : <code>CablePosMSafe = CablePosM</code> (transmission continue)<br>
+        ✅ <b>Étape 3</b> : <code>CablePosMSafe</code> jamais gelée ici (distinct du gel <code>RawPos</code> côté Abs)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>

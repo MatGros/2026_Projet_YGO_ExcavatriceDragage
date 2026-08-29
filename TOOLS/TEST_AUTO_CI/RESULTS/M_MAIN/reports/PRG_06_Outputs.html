@@ -307,11 +307,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 15:41:39</div>
+    <div class="exec-time">2026-08-29 17:21:23</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,7 +320,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -1205,9 +1205,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_WinchOutputInterlock</code></td>
-                <td>13</td><td>20</td>
-                <td>0</td><td>14</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (14 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>15</td><td>21</td>
+                <td>0</td><td>19</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1234,33 +1234,82 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-06-outputs-0" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+                <h3 style="flex: 1;">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>Contacteur montee M1 active</li><li>Palier 1 M1 active</li><li>Commande desserrage frein M1 active</li><li>Commande desserrage frein M3 active</li></ul>
+            </details>
                 
                 
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (51)</summary>
+            <table class="static-table"><tbody><tr><td><code>WINCHDATA.M1LOGICREQUESTSPEEDCMD_PCT</code></td><td>0</td></tr><tr><td><code>WINCHDATA.M2LOGICREQUESTSPEEDCMD_PCT</code></td><td>0</td></tr><tr><td><code>WINCHDATA.KOBOLDCONTACTORCMDARBITRATED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.WINCHSYNCSIGNEDDELTAPOSM</code></td><td>0</td></tr><tr><td><code>WINCHDATA.BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.BUCKETBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.BUCKETDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.BUCKETERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.ARMINGPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_LIMITSWITCHFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_LIMITSWITCHREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_SENSORSWORD</code></td><td> </td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_ATTREMIESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_ATP1STABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_ATMAINTENANCESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULTRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYFWD</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DATA.M1RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1BRAKECMD</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DATA.M2RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONBRAKECMD</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DATA.POWERKEEPALIVEACMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.POWERKEEPALIVEBCMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.EMERGENCYARMINGCMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1INTERLOCKENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3INTERLOCKENABLE</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+        </details>
+    </div>
             </div>
         </article>
         <article id="test-prg-06-outputs-1" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+                <h3 style="flex: 1;">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Contacteur montee M2 active</li><li>Palier 1 M2 active</li><li>Commande desserrage frein M2 active</li></ul>
+            </details>
                 
                 
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (51)</summary>
+            <table class="static-table"><tbody><tr><td><code>WINCHDATA.M1LOGICREQUESTSPEEDCMD_PCT</code></td><td>0</td></tr><tr><td><code>WINCHDATA.M2LOGICREQUESTSPEEDCMD_PCT</code></td><td>0</td></tr><tr><td><code>WINCHDATA.KOBOLDCONTACTORCMDARBITRATED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.WINCHSYNCSIGNEDDELTAPOSM</code></td><td>0</td></tr><tr><td><code>WINCHDATA.BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.BUCKETBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.BUCKETDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.BUCKETERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.ARMINGPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_LIMITSWITCHFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_LIMITSWITCHREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_SENSORSWORD</code></td><td> </td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_ATTREMIESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_ATP1STABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_ATMAINTENANCESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULTRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2RELAYFWD</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DATA.M2RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2BRAKECMD</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DATA.TRANSLATIONBRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.POWERKEEPALIVEACMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.POWERKEEPALIVEBCMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.EMERGENCYARMINGCMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2INTERLOCKENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
+            </div>
+        </article>
+        <article id="test-prg-06-outputs-2" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Relais montee M1 coupe</li><li>Contacteurs vitesse M1 coupes</li><li>Frein M1 retombe</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (51)</summary>
+            <table class="static-table"><tbody><tr><td><code>WINCHDATA.M1LOGICREQUESTSPEEDCMD_PCT</code></td><td>0</td></tr><tr><td><code>WINCHDATA.M2LOGICREQUESTSPEEDCMD_PCT</code></td><td>0</td></tr><tr><td><code>WINCHDATA.KOBOLDCONTACTORCMDARBITRATED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.WINCHSYNCERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.WINCHSYNCSIGNEDDELTAPOSM</code></td><td>0</td></tr><tr><td><code>WINCHDATA.BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.BUCKETBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.BUCKETDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.BUCKETERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHDATA.ARMINGPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONPOSMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONATMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_LIMITSWITCHFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_LIMITSWITCHREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_SENSORSWORD</code></td><td> </td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.TRANSLATIONDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_ATTREMIESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_ATP1STABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TRANSLATIONDATA.M3_ATMAINTENANCESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULTRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1SPEEDCONTACTOR4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M1BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR3</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2SPEEDCONTACTOR4</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M2BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONBRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.POWERKEEPALIVEACMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.POWERKEEPALIVEBCMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.EMERGENCYARMINGCMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3INTERLOCKENABLE</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
             </div>
         </article>
         </div>
@@ -1566,6 +1615,10 @@ VAR_INPUT
     RequestedContactor3             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 3
     RequestedContactor4             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 4
     RequestedStep                   : INT;                            // --&gt; [CMD] Palier de vitesse demande
+
+    // === TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
+    DeadTimeSameDir                 : TIME := T#1s;                  // --&gt; [CFG] Temps mort redemarrage meme sens apres arret
+    DeadTimeOppositeDir             : TIME := T#1s;                  // --&gt; [CFG] Temps mort redemarrage inversion sens apres arret
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
@@ -1592,6 +1645,7 @@ VAR_OUTPUT
     BrakeTimeoutElapsed             : TIME;                           // &lt;-- [DIAG] Ecoule temporisation watchdog frein
     RestartInhibit                  : BOOL;                           // &lt;-- [DIAG] Inhibition redemarrage actif
     RestartDelayElapsed             : TIME;                           // &lt;-- [DIAG] Ecoule temporisation anti-court-cycle
+    DeadTimeElapsed                 : TIME;                           // &lt;-- [DIAG] Ecoule temps mort directionnel
     StepDelayElapsed                : TIME;                           // &lt;-- [DIAG] Ecoule temporisation palier
 END_VAR
 VAR
@@ -1602,6 +1656,7 @@ VAR
     BrakeTimeout                    : TON;                            // . [LOC] Temporisation watchdog frein
     StepDelay                       : TON;                            // . [LOC] Temporisation changement de palier
     RestartDelay                    : TON;                            // . [LOC] Temporisation anti-court-cycle redemarrage
+    DeadTime                        : TON;                            // . [LOC] Temporisation temps mort directionnel
 
     // === VARIABLES LOCALES CALCULÉES ===
     RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
@@ -1612,6 +1667,10 @@ VAR
     MotorRequest                    : BOOL;                           // . [LOC] Demande mouvement moteur active
     BrakeTimeoutCause               : BOOL;                           // . [LOC] Cause timeout frein presente
     BrakeTimeoutAck                 : BOOL := TRUE;                  // . [LOC] Acquittement cause timeout frein
+    LastDirection                   : INT;                            // . [LOC] Dernier sens commande (1 montee / -1 descente)
+    DeadTimePending                 : BOOL;                           // . [LOC] Temps mort directionnel en attente
+    NewDirection                    : INT;                            // . [LOC] Sens de la nouvelle demande
+    RequiredDeadTime                : TIME;                           // . [LOC] Temps mort requis selon sens de la demande
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
@@ -1627,6 +1686,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     StepDelay(IN := FALSE, PT := T#1s250ms);
     RestartDelay(IN := FALSE, PT := T#1000ms);
+    DeadTime(IN := FALSE);
+    DeadTimePending := FALSE;
+    DeadTimeElapsed := T#0ms;
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     BrakeCmd := FALSE; AuthorizedStep := 0;
@@ -1688,6 +1750,48 @@ IF RestartDelay.Q THEN
     RestartRequired := FALSE;
 END_IF;
 
+// ── 4bis. Temps mort directionnel (TC-P10-021/022) ─────────────────────────────
+// Distinct du RestartDelay (anti-court-cycle uniforme) : temps mort de redémarrage
+// après arrêt, dépendant du sens de la nouvelle demande. Même sens → DeadTimeSameDir ;
+// inversion → DeadTimeOppositeDir. Neutre↔sens = immédiat (pas de temps mort à l&#x27;armement).
+// Le décompte se fait pendant la pause ET pendant l&#x27;attente après nouvelle demande
+// (purge pendant la pause, comme RestartDelay). PT = DeadTimeOppositeDir (le plus long) ;
+// à la nouvelle demande, on vérifie si le temps mort requis pour le sens réel est déjà
+// écoulé (cas même sens, plus court).
+IF MotorRequest THEN
+    IF RequestedRelayFwd THEN
+        LastDirection := 1;
+    ELSE
+        LastDirection := -1;
+    END_IF;
+END_IF;
+
+IF NOT MotorRequest THEN
+    DeadTimePending := TRUE;
+END_IF;
+
+DeadTime(IN := DeadTimePending AND NOT BrakeFeedback AND NOT RestartInhibit, PT := DeadTimeOppositeDir);
+DeadTimeElapsed := DeadTime.ET;
+IF DeadTime.Q THEN
+    DeadTimePending := FALSE;
+END_IF;
+
+IF MotorRequest AND DeadTimePending THEN
+    IF RequestedRelayFwd THEN
+        NewDirection := 1;
+    ELSE
+        NewDirection := -1;
+    END_IF;
+    IF NewDirection = LastDirection THEN
+        RequiredDeadTime := DeadTimeSameDir;
+    ELSE
+        RequiredDeadTime := DeadTimeOppositeDir;
+    END_IF;
+    IF DeadTime.ET &gt;= RequiredDeadTime THEN
+        DeadTimePending := FALSE;
+    END_IF;
+END_IF;
+
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -1713,7 +1817,7 @@ ELSIF NOT MotorRequest THEN
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.READY;
-ELSIF RestartRequired THEN
+ELSIF RestartRequired OR DeadTimePending THEN
     StepDelay(IN := FALSE, PT := T#1s250ms);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
@@ -2258,6 +2362,9 @@ STRUCT
     BucketBusy                   : BOOL;               // ⚙️ Mouvement d&#x27;ouverture/fermeture benne en cours
     BucketDone                   : BOOL;               // ✅ Mouvement benne termine avec succes
     BucketError                  : BOOL;               // ❌ Defaut sur sous-systeme benne
+
+    // === 🛡️ Permission d&#x27;armement homme-mort (Option B — combiné interlock benne) ===
+    ArmingPermit                 : BOOL;               // 🛡️ Permission d&#x27;armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)
 END_STRUCT
 END_TYPE
 </pre>

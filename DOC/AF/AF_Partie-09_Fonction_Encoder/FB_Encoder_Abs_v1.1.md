@@ -30,16 +30,18 @@ Décline `TC-P09-010` (chapô) :
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 310px);">
-    <col style="width: 90px;">
-    <col style="width: 140px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
@@ -48,31 +50,55 @@ Décline `TC-P09-010` (chapô) :
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>AlarmsIn≠0</code> OU <code>NOT SlaveOperational</code> → <code>EncoderAvailable=FALSE</code>, <code>RawPos</code>/<code>AngleRaw</code>/<code>TurnCount</code> gelés (dernière valeur) ; le gel persiste sur plusieurs scans tant que la cause reste active</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§5</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bus KO</b><br>→ gel pos.</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Bus EtherCAT opérationnel, <code>RawPos</code> actif<br>
+        🚀 <b>Étape 1</b> : <code>AlarmsIn≠0</code> OU <code>NOT SlaveOperational</code><br>
+        ⚡ <b>Étape 2</b> : <code>EncoderAvailable=FALSE</code>, <code>RawPos</code>/<code>AngleRaw</code>/<code>TurnCount</code> gelés (dernière valeur)<br>
+        ✅ <b>Étape 3</b> : Gel persiste sur plusieurs scans tant que la cause reste active
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010.3</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Acquisition nominale : bus OK → <code>RawPos=RawPosIn</code>, <code>AngleRaw=MOD</code>, <code>TurnCount=division</code> (FB_Encoder_Abs.st:116-120)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§3</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquisition</b><br>nominale</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Bus OK, <code>Enable=TRUE</code><br>
+        🚀 <b>Étape 1</b> : Lecture <code>RawPosIn</code> du PDO EtherCAT<br>
+        ⚡ <b>Étape 2</b> : <code>RawPos=RawPosIn</code>, <code>AngleRaw=MOD</code>, <code>TurnCount=division</code><br>
+        ✅ <b>Étape 3</b> : <code>EncoderAvailable=TRUE</code> confirmé (<code>FB_Encoder_Abs.st:116-120</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010.4</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Front <code>PresetRequest</code> + <code>EncoderAvailable</code> → <code>PresetSeqStep=1</code>, <code>PresetTriggerCmd=2</code> (FB_Encoder_Abs.st:128,134)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Preset</b><br>déclench.</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>PresetSeqStep=0</code> (IDLE), <code>PresetTriggerCmd=0</code><br>
+        🚀 <b>Étape 1</b> : Front <code>PresetRequest</code> + <code>EncoderAvailable=TRUE</code><br>
+        ⚡ <b>Étape 2</b> : <code>PresetSeqStep=1</code>, <code>PresetTriggerCmd=2</code><br>
+        ✅ <b>Étape 3</b> : Timer <code>PresetTimeout</code> armé (<code>FB_Encoder_Abs.st:128,134</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010.2</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Preset : écart <code>abs(RawPos - PresetValueOut) ≤ PresetTolerancePts</code> → <code>PresetAck</code> après 500ms visuel ; sinon timeout <code>PresetTimeout</code> → <code>PresetNak</code> + <code>ErrorId</code> bit1</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Preset</b><br>succès/échec</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>PresetSeqStep=1</code>, <code>PresetTriggerCmd=2</code>, timer armé<br>
+        🚀 <b>Étape 1</b> : Écart <code>abs(RawPos-PresetValueOut) ≤ PresetTolerancePts</code><br>
+        ⚡ <b>Étape 2</b> : Maintien 500ms visuel puis <code>PresetAck</code> (pulse 1 cycle)<br>
+        ✅ <b>Étape 3</b> : Sinon timeout <code>PresetTimeout</code> → <code>PresetNak</code> + <code>ErrorId</code> bit1
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

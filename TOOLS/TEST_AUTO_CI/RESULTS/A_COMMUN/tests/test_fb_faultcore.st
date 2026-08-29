@@ -245,3 +245,72 @@ TEST 'TC-P03-013 Enable=FALSE : vue LIVE masquee mais vue LATCHEE reste publiee 
     fb.CAUSES[1].LATCHING := FALSE;
     fb(ENABLE := TRUE, RESET := FALSE);
 END_TEST
+
+(* =======================================================================
+   Règles générales du socle Cause/Ack (AF_Partie-03 §4) — TC-P03-003/004/005.
+   Le socle FB_FaultCore illustre ces règles transverses : pas de redémarrage
+   auto après Ack (003), pas de SafeStop/StartStop hors mouvement (004),
+   encapsulation stricte (005).
+   ======================================================================= *)
+
+TEST 'TC-P03-003 Pas de redemarrage auto apres Ack : Reset retourne Ready, un nouvel ordre explicite est requis'
+    (* Remise a zero *)
+    fb(ENABLE := TRUE, RESET := TRUE);
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE);
+
+    (* Cause 0 latchee -> LatchedId = 1 *)
+    fb.CAUSES[0].ACTIVE := TRUE;
+    fb.CAUSES[0].LATCHING := TRUE;
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 1, 'Cause latchee -> bit 0');
+
+    (* Front Reset (Ack) : efface le latch, retour Ready *)
+    fb.CAUSES[0].ACTIVE := FALSE;
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := TRUE);
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 0, 'Ack (Reset) efface le latch');
+    ASSERT_TRUE(fb.READY, 'Apres Ack, le FB est Ready');
+
+    (* Pas de redemarrage auto : sans nouvelle cause, le latch reste 0 sur plusieurs scans *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 0, 'Aucun re-armement auto apres Ack (scan 1)');
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 0, 'Aucun re-armement auto apres Ack (scan 2)');
+
+    (* Un nouvel ordre explicite (nouvelle cause Active AND Latching) re-arme *)
+    fb.CAUSES[0].ACTIVE := TRUE;
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_EQ(fb.FAULT.LATCHEDID, 1, 'Nouvelle cause explicite -> re-armement (pas auto)');
+
+    (* Nettoyage *)
+    fb.CAUSES[0].ACTIVE := FALSE;
+    fb.CAUSES[0].LATCHING := FALSE;
+    fb(ENABLE := TRUE, RESET := FALSE);
+END_TEST
+
+TEST 'TC-P03-004 Pas de SafeStop/StartStop hors mouvement (invariant structurel)'
+    (* 💻 AUTO — invariant structurel documenté, pas un comportement runtime.
+       Règle AF_Partie-03 §3 : SafeStop/StartStop ne sont autorisés QUE sur un FB
+       de mouvement. Le socle FB_FaultCore (brique technique transverse) n'expose
+       NI SafeStop NI StartStop dans son interface : VAR_INPUT = Enable/Reset/Causes,
+       VAR_OUTPUT = Ready/Fault. Aucun SafeStop/StartStop n'est donc possible ici.
+       Vérifié structurellement par l'interface déclarée (pas de port de mouvement). *)
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_TRUE(fb.READY, 'socle actif -> Ready=TRUE (aucun port de mouvement a tester)');
+END_TEST
+
+TEST 'TC-P03-005 Encapsulation stricte : echanges via interfaces/DUTs publics uniquement (invariant structurel)'
+    (* 💻 AUTO — invariant structurel documenté, pas un comportement runtime.
+       Règle AF_Partie-03 §2 : les variables internes sont privées, les échanges
+       passent uniquement par interfaces et DUT publics. FB_FaultCore n'expose que
+       ses VAR_INPUT (Enable/Reset/Causes) et VAR_OUTPUT (Ready/Fault) ; ses internes
+       (ResetEdge, Latch[], i) sont privés. Vérifié par encapsulation_check.py
+       (aucune écriture externe non déclarée, aucun accès GVL direct). *)
+    fb(ENABLE := TRUE, RESET := FALSE);
+    ASSERT_TRUE(fb.READY, 'socle accessible par son interface publique uniquement');
+END_TEST

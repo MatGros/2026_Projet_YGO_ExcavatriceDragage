@@ -31,16 +31,18 @@ Décline `TC-P09-020` (chapô) :
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 310px);">
-    <col style="width: 90px;">
-    <col style="width: 140px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
@@ -49,59 +51,107 @@ Décline `TC-P09-020` (chapô) :
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Nominal : front <code>Home</code> + front <code>TopPositionSensor</code> (dans les 2 ordres) → <code>HomingRefRaw</code> calculé pour <code>CablePosM = CfgTopSensorPosM</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homing</b><br>nominal</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>Homed=FALSE</code>, <code>HomingPermit=TRUE</code><br>
+        🚀 <b>Étape 1</b> : Front <code>Home</code> + front <code>TopPositionSensor</code> (dans les 2 ordres)<br>
+        ⚡ <b>Étape 2</b> : Calcul <code>HomingRefRaw</code> pour <code>CablePosM = CfgTopSensorPosM</code><br>
+        ✅ <b>Étape 3</b> : <code>Homed=TRUE</code>, <code>PresetRequest</code> pulsé vers <code>FB_Encoder_Abs</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020.2</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Unitaire : front <code>Home</code> seul → cible <code>CfgHomingTargetM</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homing</b><br>unitaire</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>Homed=FALSE</code>, <code>HomingPermit=TRUE</code>, <code>UseDynamicTarget=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Front <code>Home</code> seul (sans capteur haut)<br>
+        ⚡ <b>Étape 2</b> : Cible = <code>CfgHomingTargetM</code> (libre, MAINT_N2 typiquement)<br>
+        ✅ <b>Étape 3</b> : <code>Homed=TRUE</code>, <code>HomingRefRaw</code> calculé pour cible unitaire
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020.3</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Dynamique : front <code>UseDynamicTarget</code> (ou combiné <code>Home</code>) → cible <code>DynamicHomingTargetM</code> (ex. auto-référencement benne M2)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homing</b><br>dynamique</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>Homed=FALSE</code>, <code>HomingPermit=TRUE</code><br>
+        🚀 <b>Étape 1</b> : Front <code>UseDynamicTarget</code> (ou combiné <code>Home</code>)<br>
+        ⚡ <b>Étape 2</b> : Cible = <code>DynamicHomingTargetM</code> (calculée par l'appelant, ex. auto-référencement benne M2)<br>
+        ✅ <b>Étape 3</b> : <code>Homed=TRUE</code>, <code>HomingRefRaw</code> calculé pour cible dynamique
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020.4</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Toute cible hors <code>[-99;+99]m</code> → homing refusé, <code>ErrorId</code> bit4, pas d'écriture RETAIN ; borne exacte : cible=<code>±99.0m</code> acceptée, <code>±99.1m</code> refusée</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Cible hors</b><br>bornes</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>Homed=FALSE</code>, <code>HomingPermit=TRUE</code><br>
+        🚀 <b>Étape 1</b> : Front <code>Home</code> avec cible hors <code>[-99;+99]m</code><br>
+        ⚡ <b>Étape 2</b> : Homing refusé, <code>ErrorId</code> bit4 levé<br>
+        ✅ <b>Étape 3</b> : Pas d'écriture RETAIN ; borne exacte : cible=<code>±99.0m</code> acceptée, <code>±99.1m</code> refusée
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020.6</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>TopPositionSensor</code> absent : sans capteur haut, mode nominal ne déclenche pas ; seuls unitaire/dynamique (FB_Encoder_Homing.st:206-207)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Capteur haut</b><br>absent</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>TopPositionSensor=FALSE</code> (absent), <code>HomingPermit=TRUE</code><br>
+        🚀 <b>Étape 1</b> : Front <code>Home</code> en mode nominal<br>
+        ⚡ <b>Étape 2</b> : Mode nominal ne déclenche pas (capteur haut requis)<br>
+        ✅ <b>Étape 3</b> : Seuls unitaire/dynamique fonctionnent (<code>FB_Encoder_Homing.st:206-207</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020.7</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Homing sans permit : front <code>Home</code> sans <code>HomingPermit</code> → <code>HomingModeError</code> (bit0), pas d'écriture (FB_Encoder_Homing.st:202-204)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homing</b><br>sans permit</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>HomingPermit=FALSE</code>, <code>Homed=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Front <code>Home</code> sans <code>HomingPermit</code><br>
+        ⚡ <b>Étape 2</b> : <code>HomingModeError</code> (bit0) levé<br>
+        ✅ <b>Étape 3</b> : Pas d'écriture RETAIN (<code>FB_Encoder_Homing.st:202-204</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020.8</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>HomingSuspect</code> RETAIN : stocké dans <code>Calib</code> RETAIN → persiste après redémarrage (FB_Encoder_Homing.st:185)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§5</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Suspect</b><br>RETAIN</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>HomingSuspect=TRUE</code> stocké dans <code>Calib</code> RETAIN<br>
+        🚀 <b>Étape 1</b> : Redémarrage PLC (cycle froid)<br>
+        ⚡ <b>Étape 2</b> : <code>Calib.HomingSuspect</code> restauré depuis RETAIN<br>
+        ✅ <b>Étape 3</b> : <code>HomingSuspect</code> persiste après redémarrage (<code>FB_Encoder_Homing.st:185</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020.5</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Écart <code>RawPos</code>/<code>Calib.LastKnownRawPos</code> au boot &gt; tolérance → <code>HomingSuspect=TRUE</code>, <code>Homed=FALSE</code> ; levé uniquement par front <code>BtnConfirmCoherence</code> <b>ET</b> <code>HomingPermit=TRUE</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§5</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Cohérence</b><br>boot</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Boot PLC, <code>Calib.LastKnownRawPos</code> RETAIN restauré<br>
+        🚀 <b>Étape 1</b> : Premier scan <code>EncoderAvailable=TRUE</code>, écart <code>RawPos</code> vs <code>Calib.LastKnownRawPos</code> &gt; tolérance (1000 pts)<br>
+        ⚡ <b>Étape 2</b> : <code>HomingSuspect=TRUE</code>, <code>Homed=FALSE</code> (référence non fiable)<br>
+        ✅ <b>Étape 3</b> : Levé uniquement par front <code>BtnConfirmCoherence</code> <b>ET</b> <code>HomingPermit=TRUE</code> (pas d'auto-effacement)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>

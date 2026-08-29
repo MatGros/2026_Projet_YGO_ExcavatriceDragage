@@ -174,40 +174,68 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquisition &amp; preset</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Bus/esclave KO → <code>EncoderAvailable=FALSE</code>, <code>RawPos</code> gelé ; preset hors tolérance après timeout → <code>PresetNak</code> + Fault</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquisition</b><br>&amp; preset</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Bus EtherCAT opérationnel, <code>EncoderAvailable=TRUE</code><br>
+        🚀 <b>Étape 1</b> : Perte bus/esclave (<code>AlarmsIn≠0</code> ou <code>NOT SlaveOperational</code>)<br>
+        ⚡ <b>Étape 2</b> : <code>EncoderAvailable=FALSE</code>, <code>RawPos</code> gelé (dernière valeur conservée)<br>
+        ⚡ <b>Étape 3</b> : Front <code>PresetRequest</code> + écart hors tolérance après timeout <code>PresetTimeout</code><br>
+        ✅ <b>Étape 4</b> : <code>PresetNak</code> + <code>ErrorId</code> bit1 (Fault) levé
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>FB_Encoder_Abs</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-020</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homing &amp; cohérence</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">3 modes homing bornent la cible <code>[-99;+99]m</code> avant écriture ; écart au boot &gt; tolérance → <code>HomingSuspect</code>, levé par confirmation explicite</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homing</b><br>&amp; cohérence</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Codeur disponible, <code>Homed=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Front <code>Home</code> (3 modes : nominal/unitaire/dynamique), cible bornée <code>[-99;+99]m</code> avant écriture<br>
+        ⚡ <b>Étape 2</b> : Écart au boot <code>RawPos</code> vs <code>Calib.LastKnownRawPos</code> &gt; tolérance (1000 pts)<br>
+        ⚡ <b>Étape 3</b> : <code>HomingSuspect=TRUE</code>, <code>Homed=FALSE</code> (référence non fiable)<br>
+        ✅ <b>Étape 4</b> : Levé uniquement par <code>BtnConfirmCoherence</code> (front explicite, pas d'auto-effacement)
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>FB_Encoder_Homing</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Échelle &amp; bornage</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Conversion signée exacte ; hors bornes ou suspect → <code>EncoderIncoherent=TRUE</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Échelle</b><br>&amp; bornage</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>HomingRefRaw</code> mémorisé, conversion <code>DINT</code> avant soustraction (évite dépassement)<br>
+        🚀 <b>Étape 1</b> : Calcul <code>CablePosM := (RawPos - HomingRefRaw) × CableM_PerRev / PointsPerRev</code> — signée exacte<br>
+        ⚡ <b>Étape 2</b> : <code>CablePosM</code> hors <code>[PositionMinM;PositionMaxM]</code> ou <code>HomingSuspect=TRUE</code><br>
+        ✅ <b>Étape 3</b> : <code>EncoderIncoherent=TRUE</code> (auto-effacé au retour en plage)
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>FB_Encoder_Scale<br>FB_Encoder_Safety</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-040</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Fiabilité</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>EncoderFault</code> ne dépend pas de <code>Homed</code> (non-référencé ≠ incohérent) ; <code>HomedAndReliable</code> exige les 3 conditions</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Fiabilité</b><br>gates</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Codeur disponible, non référencé (<code>Homed=FALSE</code>)<br>
+        🚀 <b>Étape 1</b> : Évaluation <code>EncoderFault := NOT Available OR Incoherent</code> (sans <code>Homed</code>)<br>
+        ⚡ <b>Étape 2</b> : <code>HomedAndReliable := Available AND Homed AND NOT Incoherent</code> — gate stricte M3<br>
+        ✅ <b>Étape 3</b> : Non-référencé ≠ incohérent — <code>EncoderFault</code> n'exige pas <code>Homed</code>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>FB_EncoderReliability</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-050</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Vitesse &amp; dynamique</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>Valid=TRUE</code> après 6 échantillons (≥50ms) ; absorption des perturbations mécaniques câble &amp; vibrations ; purge sur perte validité amont</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Vitesse</b><br>&amp; dynamique</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Fenêtre glissante vide, <code>Valid=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Accumulation de 6 échantillons espacés ≥10ms<br>
+        ⚡ <b>Étape 2</b> : Fenêtre couvre ≥50ms → <code>Valid=TRUE</code>, <code>Speed_Mps</code> signée (+ montée)<br>
+        ⚡ <b>Étape 3</b> : Absorption des perturbations mécaniques câble &amp; vibrations<br>
+        ✅ <b>Étape 4</b> : Purge complète sur perte validité amont ou rebouclage <code>TIME()</code>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>FB_Encoder_SpeedMeasure</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>

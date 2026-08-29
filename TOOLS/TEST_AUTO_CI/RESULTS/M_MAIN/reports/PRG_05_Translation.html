@@ -307,11 +307,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 15:41:38</div>
+    <div class="exec-time">2026-08-29 17:21:23</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-05-translation-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-05-translation-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-05-translation-0">PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuils OK)</a></li><li class="toc-item toc-pass"><a href="#test-prg-05-translation-1">PRG_05_Translation : Commande Translation Rev (Joystick X negatif)</a></li><li class="toc-item toc-pass"><a href="#test-prg-05-translation-2">PRG_05_Translation : Interdiction Mouvement Translation si Treuils en Bas</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,7 +320,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -1191,33 +1191,136 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-05-translation-0" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+                <h3 style="flex: 1;">PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuils OK) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>Demande desserrage frein M3 generee</li><li>Aucun SafeStop actif sur translation</li><li>Sens translation avant arbitre</li><li>Consigne vitesse M3 arbitree non nulle</li><li>ControlWord variateur active pendant la commande</li></ul>
+            </details>
                 
                 
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (3 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (3 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuils OK)')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (64)</summary>
+        <table class="static-table"><tbody><tr><td><code>WINCHM1CABLEPOSM</code></td><td>5</td></tr><tr><td><code>WINCHM2CABLEPOSM</code></td><td>5</td></tr><tr><td><code>ACQDATA.M1_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M2_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.INPUTMODULEFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDIRECTIONX</code></td><td>1</td></tr><tr><td><code>ACQDATA.JOYSTICKSPEEDPCTX</code></td><td>75</td></tr><tr><td><code>ACQDATA.JOYSTICKXNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKYNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.LOCALDIGITALIOOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M1_ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M2_ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M3_ACTUALFREQUENCYHZ_FILTERED</code></td><td>0</td></tr><tr><td><code>ACQDATA.M3_STATUSWORD_FILTERED</code></td><td>0</td></tr><tr><td><code>ACQDATA.VH0008ER1OK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0008EROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0800ENDOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0808ETPOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.WINCHINPUTSOURCECHANGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_ATMAINTENANCESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_ATP1STABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_ATTREMIESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_LIMITSWITCHFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_LIMITSWITCHREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_SENSORSWORD</code></td><td> </td></tr><tr><td><code>DATA.M3_SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DRIVEONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DRIVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3DIRECTION</code></td><td>1</td></tr><tr><td><code>M3HEIGHTOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3SPEEDTGT</code></td><td>75</td></tr><tr><td><code>M3STARTSTOP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>0</td></tr><tr><td><code>MODESAUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>1</td></tr><tr><td><code>MODESAUTH.SYNCENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
             </div>
         </article>
         <article id="test-prg-05-translation-1" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+                <h3 style="flex: 1;">PRG_05_Translation : Commande Translation Rev (Joystick X negatif) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Sens translation arriere arbitre</li><li>Frein M3 desserre en arriere</li><li>Aucun SafeStop en commande arriere nominale</li></ul>
+            </details>
                 
                 
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (3 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (3 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'PRG_05_Translation : Commande Translation Rev (Joystick X negatif)')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>1000 ms</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>1010 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (64)</summary>
+        <table class="static-table"><tbody><tr><td><code>WINCHM1CABLEPOSM</code></td><td>5</td></tr><tr><td><code>WINCHM2CABLEPOSM</code></td><td>5</td></tr><tr><td><code>ACQDATA.M1_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M2_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.INPUTMODULEFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDIRECTIONX</code></td><td>-1</td></tr><tr><td><code>ACQDATA.JOYSTICKSPEEDPCTX</code></td><td>60</td></tr><tr><td><code>ACQDATA.JOYSTICKXNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKYNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.LOCALDIGITALIOOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M1_ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M2_ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M3_ACTUALFREQUENCYHZ_FILTERED</code></td><td>0</td></tr><tr><td><code>ACQDATA.M3_STATUSWORD_FILTERED</code></td><td>0</td></tr><tr><td><code>ACQDATA.VH0008ER1OK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0008EROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0800ENDOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0808ETPOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.WINCHINPUTSOURCECHANGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_ATMAINTENANCESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_ATP1STABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_ATTREMIESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_LIMITSWITCHFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_LIMITSWITCHREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_SENSORSWORD</code></td><td> </td></tr><tr><td><code>DATA.M3_SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DRIVEONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DRIVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3DIRECTION</code></td><td>-1</td></tr><tr><td><code>M3HEIGHTOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3SPEEDTGT</code></td><td>60</td></tr><tr><td><code>M3STARTSTOP</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>0</td></tr><tr><td><code>MODESAUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>1</td></tr><tr><td><code>MODESAUTH.SYNCENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr></tbody></table>
+    </details>
+    </div>
+            </div>
+        </article>
+        <article id="test-prg-05-translation-2" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">PRG_05_Translation : Interdiction Mouvement Translation si Treuils en Bas </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>Frein reste serre</li><li>Mouvement interdit</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (64)</summary>
+            <table class="static-table"><tbody><tr><td><code>ACQDATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M1_ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M2_ENCODERFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M1_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M2_HOMEDANDRELIABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDEADMANARMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKYNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.JOYSTICKDIRECTIONX</code></td><td>0</td></tr><tr><td><code>ACQDATA.JOYSTICKSPEEDPCTX</code></td><td>0</td></tr><tr><td><code>ACQDATA.JOYSTICKXNEUTRAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.LOCALDIGITALIOOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0800ENDOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0808ETPOK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0008EROK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.VH0008ER1OK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.INPUTMODULEFAULT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.WINCHINPUTSOURCECHANGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ACQDATA.M3_STATUSWORD_FILTERED</code></td><td>0</td></tr><tr><td><code>ACQDATA.M3_ACTUALFREQUENCYHZ_FILTERED</code></td><td>0</td></tr><tr><td><code>MODESAUTH.MODE</code></td><td>0</td></tr><tr><td><code>MODESAUTH.SYNCENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>0</td></tr><tr><td><code>MODESAUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODESAUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>WINCHM1CABLEPOSM</code></td><td>0.500</td></tr><tr><td><code>WINCHM2CABLEPOSM</code></td><td>5</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BRAKEFEEDBACKOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DRIVEONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DRIVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNTRANSLATIONREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONPOSMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATTREMIE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATPV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATP2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATP1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONATMAINTENANCE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_LIMITSWITCHFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_LIMITSWITCHREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_SENSORWORDINCOHERENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_SENSORSWORD</code></td><td> </td></tr><tr><td><code>DATA.TRANSLATIONBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.TRANSLATIONDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_ATTREMIESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_ATP1STABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DATA.M3_ATMAINTENANCESTABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3STARTSTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3DIRECTION</code></td><td>0</td></tr><tr><td><code>M3SPEEDTGT</code></td><td>0</td></tr><tr><td><code>M3HEIGHTOK</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+        </details>
+    </div>
             </div>
         </article>
         </div>

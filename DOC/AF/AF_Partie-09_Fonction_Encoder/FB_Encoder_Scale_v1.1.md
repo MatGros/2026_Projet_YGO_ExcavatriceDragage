@@ -26,16 +26,18 @@ Décline `TC-P09-030` (chapô) :
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 310px);">
-    <col style="width: 90px;">
-    <col style="width: 140px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
@@ -44,38 +46,68 @@ Décline `TC-P09-030` (chapô) :
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>RawPos=HomingRefRaw+4096</code> (soit ½ tour), <code>CableM_PerRev=2.0</code>, <code>PointsPerRev=8192</code> → <code>CablePosM=1.0</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Échelle</b><br>½ tour</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>HomingRefRaw</code> mémorisé, <code>PointsPerRev=8192</code>, <code>CableM_PerRev=2.0</code><br>
+        🚀 <b>Étape 1</b> : Injection <code>RawPos=HomingRefRaw+4096</code> (soit ½ tour)<br>
+        ⚡ <b>Étape 2</b> : Conversion <code>DINT</code> avant soustraction → <code>RawDiff=4096</code><br>
+        ✅ <b>Étape 3</b> : <code>CablePosM = 4096 × (2.0/8192) = 1.0</code> m
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.2</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>RawPos&lt;HomingRefRaw</code> → <code>CablePosM</code> négative (sous l'eau)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Échelle</b><br>négative</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>HomingRefRaw</code> mémorisé (position haute)<br>
+        🚀 <b>Étape 1</b> : Injection <code>RawPos &lt; HomingRefRaw</code> (descente sous l'eau)<br>
+        ⚡ <b>Étape 2</b> : <code>RawDiff</code> négatif → <code>CablePosM</code> signée négative<br>
+        ✅ <b>Étape 3</b> : <code>CablePosM &lt; 0</code> (sous l'eau, convention signée +enroulé/−sous)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.3</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>PointsPerRev=0</code> → <code>CablePosM=0.0</code> (garde division par zéro), pas de plantage</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Division</b><br>par zéro</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>PointsPerRev=8192</code> (normal)<br>
+        🚀 <b>Étape 1</b> : Injection <code>PointsPerRev=0</code> (config aberrante)<br>
+        ⚡ <b>Étape 2</b> : Garde division par zéro → <code>CablePosM=0.0</code><br>
+        ✅ <b>Étape 3</b> : Pas de plantage, sortie sûre (0.0)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.8</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Garde dépassement DINT : conversion DINT avant soustraction → pas de dépassement (FB_Encoder_Scale.st:34)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Garde</b><br>DINT</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>RawPos</code> et <code>HomingRefRaw</code> proches des bornes <code>UDINT</code><br>
+        🚀 <b>Étape 1</b> : Soustraction <code>RawPos - HomingRefRaw</code> sans conversion <code>DINT</code><br>
+        ⚡ <b>Étape 2</b> : Risque de dépassement si soustraction directe <code>UDINT</code><br>
+        ✅ <b>Étape 3</b> : Conversion <code>DINT</code> AVANT soustraction → pas de dépassement (<code>FB_Encoder_Scale.st:34</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.9</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>RawPos=HomingRefRaw</code> → <code>CablePosM=0.0</code> (FB_Encoder_Scale.st:34,38)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Position</b><br>zéro</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>HomingRefRaw</code> mémorisé<br>
+        🚀 <b>Étape 1</b> : Injection <code>RawPos = HomingRefRaw</code> (position de référence exacte)<br>
+        ⚡ <b>Étape 2</b> : <code>RawDiff = 0</code><br>
+        ✅ <b>Étape 3</b> : <code>CablePosM = 0.0</code> (<code>FB_Encoder_Scale.st:34,38</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

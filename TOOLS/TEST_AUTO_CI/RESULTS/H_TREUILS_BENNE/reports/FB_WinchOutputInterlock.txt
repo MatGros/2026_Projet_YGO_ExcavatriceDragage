@@ -1,0 +1,30 @@
+Error parsing test_fb_winchoutputinterlock.st:
+
+test_fb_winchoutputinterlock.st:45:51: error: unexpected character: ->#<- at offset: 2608, skipped 1 characters.
+  45 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_BRAKE_COMMAND_CONFIRMATION, 'Etat WAIT_BRAKE_COMMAND_CONFIRMATION (2)');
+     |                                                   ^
+
+test_fb_winchoutputinterlock.st:58:53: error: unexpected character: ->#<- at offset: 3416, skipped 1 characters.
+  58 |     ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason#BRAKE_COMMAND_NOT_CONFIRMED, 'Reason=BRAKE_COMMAND_NOT_CONFIRMED (1)');
+     |                                                     ^
+
+test_fb_winchoutputinterlock.st:59:51: error: unexpected character: ->#<- at offset: 3540, skipped 1 characters.
+  59 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#FAULT, 'Etat FAULT (5)');
+     |                                                   ^
+
+test_fb_winchoutputinterlock.st:107:51: error: unexpected character: ->#<- at offset: 6294, skipped 1 characters.
+ 107 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
+     |                                                   ^
+
+test_fb_winchoutputinterlock.st:232:53: error: unexpected character: ->#<- at offset: 13692, skipped 1 characters.
+ 232 |     ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason#BRAKE_COMMAND_NOT_CONFIRMED, 'Reason=BRAKE_COMMAND_NOT_CONFIRMED');
+     |                                                     ^
+
+test_fb_winchoutputinterlock.st:281:51: error: unexpected character: ->#<- at offset: 16813, skipped 1 characters.
+ 281 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
+     |                                                   ^
+
+test_fb_winchoutputinterlock.st:339:51: error: unexpected character: ->#<- at offset: 20503, skipped 1 characters.
+ 339 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
+     |                                                   ^
+

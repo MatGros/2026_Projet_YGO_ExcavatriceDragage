@@ -48,3 +48,21 @@ def test_FB_Bucket():
 @pytest.mark.unit
 def test_FB_Winch():
     _run_fb_test("FB_Winch")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_Safety_Winch():
+    _run_fb_test("FB_Safety_Winch")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_WinchOutputInterlock():
+    _run_fb_test("FB_WinchOutputInterlock")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
+def test_FB_WinchSync():
+    _run_fb_test("FB_WinchSync")

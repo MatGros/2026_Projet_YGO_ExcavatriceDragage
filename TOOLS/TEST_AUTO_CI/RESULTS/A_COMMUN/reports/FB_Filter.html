@@ -307,11 +307,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 15:41:17</div>
+    <div class="exec-time">2026-08-29 17:20:42</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (11 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-filter-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-1">TC-P09-010 Acquisition codeur : mise en service nominale</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-2">TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-3">TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-4">TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-5">TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-6">TC-P09-015 Reset conscient : acquitte le latch sans valider le preset</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-7">TC-P09-016 Fault live : perte materiel codeur (Cause 0)</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-8">TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2)</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-9">TC-P09-018 Fault live : incoherence mesure (Cause 1)</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-10">TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-filter-0">Pass-through si TimeConst=0 (pas de lissage)</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-1">Pass-through si CycleTimeS=0 (temps de cycle invalide)</a></li><li class="toc-item toc-pass"><a href="#test-fb-filter-2">Reponse PT1 : convergence progressive vers un echelon, pas instantanee</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,7 +320,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            11/11 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -398,6 +398,30 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 4 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>CYCLETIMES</code> jamais câblé en production</li><li>Pin <code>TIMECONST</code> jamais câblé en production</li><li>Pin <code>VALUEIN</code> jamais câblé en production</li><li>Pin <code>VALUEOUT</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">VALUEIN <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TIMECONST <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CYCLETIMES <span class="pin-type">IEC_REAL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Filter</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">VALUEOUT <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -474,158 +498,121 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-filter-0" class="test-card test-card-pass test-card-collapsed test-card-contract">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 10 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-filter-1" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-filter-0" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-010 Acquisition codeur : mise en service nominale </h3>
+                <h3 style="flex: 1;">Pass-through si TimeConst=0 (pas de lissage) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>TimeConst=0 -&gt; recopie directe de ValueIn</li></ul>
+            </details>
                 
                 
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (6)</summary>
+            <table class="static-table"><tbody><tr><td><code>VALUEIN</code></td><td>10</td></tr><tr><td><code>TIMECONST</code></td><td>0</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.100</td></tr><tr><td><code>VALUEOUT</code></td><td>10</td></tr><tr><td><code>T</code></td><td>0</td></tr><tr><td><code>ALPHA</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
+            </div>
+        </article>
+        <article id="test-fb-filter-1" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">Pass-through si CycleTimeS=0 (temps de cycle invalide) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>CycleTimeS=0 -&gt; recopie directe de ValueIn (garde-fou division par zero)</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (6)</summary>
+            <table class="static-table"><tbody><tr><td><code>VALUEIN</code></td><td>10</td></tr><tr><td><code>TIMECONST</code></td><td>200000000</td></tr><tr><td><code>CYCLETIMES</code></td><td>0</td></tr><tr><td><code>VALUEOUT</code></td><td>10</td></tr><tr><td><code>T</code></td><td>0.200</td></tr><tr><td><code>ALPHA</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
             </div>
         </article>
         <article id="test-fb-filter-2" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms </h3>
+                <h3 style="flex: 1;">Reponse PT1 : convergence progressive vers un echelon, pas instantanee </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>scan 1 : ValueOut = 0.5*10 + 0.5*0 = 5.0 (pas de saut brutal a 10)</li><li>scan 2 : ValueOut = 0.5*10 + 0.5*5 = 7.5 (memoire du scan precedent)</li><li>scan 3 : ValueOut = 0.5*10 + 0.5*7.5 = 8.75 (convergence exponentielle vers 10)</li></ul>
+            </details>
                 
                 
-                
-            </div>
-        </article>
-        <article id="test-fb-filter-3" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-filter-4" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-filter-5" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-filter-6" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-015 Reset conscient : acquitte le latch sans valider le preset </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-filter-7" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-016 Fault live : perte materiel codeur (Cause 0) </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-filter-8" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2) </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-filter-9" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-018 Fault live : incoherence mesure (Cause 1) </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-filter-10" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations) </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (3 scans, 1 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="388" height="132" viewBox="0 0 388 132" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;VALUEIN&quot;: &quot;10&quot;, &quot;TIMECONST&quot;: &quot;100000000&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;VALUEOUT&quot;: &quot;5&quot;, &quot;T&quot;: &quot;0.1&quot;, &quot;ALPHA&quot;: &quot;0.5&quot;}, &quot;note&quot;: &quot;TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;VALUEIN&quot;: &quot;10&quot;, &quot;TIMECONST&quot;: &quot;100000000&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;VALUEOUT&quot;: &quot;7.5&quot;, &quot;T&quot;: &quot;0.1&quot;, &quot;ALPHA&quot;: &quot;0.5&quot;}, &quot;note&quot;: &quot;TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;VALUEIN&quot;: &quot;10&quot;, &quot;TIMECONST&quot;: &quot;100000000&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;VALUEOUT&quot;: &quot;8.75&quot;, &quot;T&quot;: &quot;0.1&quot;, &quot;ALPHA&quot;: &quot;0.5&quot;}, &quot;note&quot;: &quot;TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5&quot;}]" data-fields="[&quot;VALUEOUT&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="114" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#64748b"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#ef4444"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#f97316"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#0284c7"/><text x="418" y="17" class="wf-legend">Voies actives</text><line x1="200" y1="56" x2="200" y2="114" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="126" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="114" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="126" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="114" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="126" class="wf-scan">#2</text><circle cx="192" cy="82.0" r="4" fill="#0284c7"/><text x="182" y="86.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 0)" title="Cliquer pour basculer Courbe / Chiffres">VALUEOUT</text><g class="wf-numeric-group" data-row="0"><g class="wf-analog-view"><text x="194" y="72" class="wf-scale">8.75</text><text x="194" y="98" class="wf-scale">5.00</text><path d="M200,96.0L256,96.0L256,77.3L312,77.3L312,68.0L368,68.0" class="wf-line" stroke="#0284c7" stroke-width="2.2"/><circle cx="256" cy="77.3" r="2.5" fill="#0284c7"/><circle cx="312" cy="68.0" r="2.5" fill="#0284c7"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="219.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><rect x="273.5" y="68.0" width="21" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="284.0" y="77.0" class="wf-num-changed">7.5</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="326.0" y="68.0" width="28" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">8.75</text></g></g></svg></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (3 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'Reponse PT1 : convergence progressive vers un echelon, pas instantanee')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>VALUEOUT</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell' title='TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5'><span class='chrono-note-chip'>TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5</span></td><td>5</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell' title='TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5'><span class='chrono-note-chip'>TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5</span></td><td class='changed'>7.500</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='chrono-note-cell' title='TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5'><span class='chrono-note-chip'>TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5</span></td><td class='changed'>8.750</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (5)</summary>
+        <table class="static-table"><tbody><tr><td><code>ALPHA</code></td><td>0.500</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.100</td></tr><tr><td><code>T</code></td><td>0.100</td></tr><tr><td><code>TIMECONST</code></td><td>100000000</td></tr><tr><td><code>VALUEIN</code></td><td>10</td></tr></tbody></table>
+    </details>
+    </div>
             </div>
         </article>
         </div>

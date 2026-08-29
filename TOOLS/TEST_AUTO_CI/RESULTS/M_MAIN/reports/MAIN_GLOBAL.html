@@ -307,7 +307,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 15:41:46</div>
+    <div class="exec-time">2026-08-29 17:21:24</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
@@ -1625,9 +1625,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_WinchOutputInterlock</code></td>
-                <td>13</td><td>20</td>
-                <td>0</td><td>14</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (14 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>15</td><td>21</td>
+                <td>0</td><td>19</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -6302,7 +6302,7 @@ IF FirstCycle THEN
 END_IF;
 
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
-IF ConfirmOpenEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
+IF ConfirmOpenEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
@@ -6310,7 +6310,7 @@ IF ConfirmOpenEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
 END_IF;
 
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
-IF ConfirmCloseEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
+IF ConfirmCloseEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
@@ -6330,11 +6330,12 @@ IF SevereError THEN
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
 ELSE
-    // Prise en compte des demandes IHM
-    IF CmdOpen_IHM AND NOT Lifecycle.Busy THEN
+    // Prise en compte des demandes IHM — anti-traversée (TC-P10-025) :
+    // demande benne refusée si un treuil agit (M1_Busy OR M2_Busy) à l&#x27;entrée READY.
+    IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         OpenReq := TRUE;
         CloseReq := FALSE;
-    ELSIF CmdClose_IHM AND NOT Lifecycle.Busy THEN
+    ELSIF CmdClose_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         CloseReq := TRUE;
         OpenReq := FALSE;
     END_IF;
@@ -6927,6 +6928,10 @@ VAR_INPUT
     RequestedContactor3             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 3
     RequestedContactor4             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 4
     RequestedStep                   : INT;                            // --&gt; [CMD] Palier de vitesse demande
+
+    // === TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
+    DeadTimeSameDir                 : TIME := T#1s;                  // --&gt; [CFG] Temps mort redemarrage meme sens apres arret
+    DeadTimeOppositeDir             : TIME := T#1s;                  // --&gt; [CFG] Temps mort redemarrage inversion sens apres arret
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
@@ -6953,6 +6958,7 @@ VAR_OUTPUT
     BrakeTimeoutElapsed             : TIME;                           // &lt;-- [DIAG] Ecoule temporisation watchdog frein
     RestartInhibit                  : BOOL;                           // &lt;-- [DIAG] Inhibition redemarrage actif
     RestartDelayElapsed             : TIME;                           // &lt;-- [DIAG] Ecoule temporisation anti-court-cycle
+    DeadTimeElapsed                 : TIME;                           // &lt;-- [DIAG] Ecoule temps mort directionnel
     StepDelayElapsed                : TIME;                           // &lt;-- [DIAG] Ecoule temporisation palier
 END_VAR
 VAR
@@ -6963,6 +6969,7 @@ VAR
     BrakeTimeout                    : TON;                            // . [LOC] Temporisation watchdog frein
     StepDelay                       : TON;                            // . [LOC] Temporisation changement de palier
     RestartDelay                    : TON;                            // . [LOC] Temporisation anti-court-cycle redemarrage
+    DeadTime                        : TON;                            // . [LOC] Temporisation temps mort directionnel
 
     // === VARIABLES LOCALES CALCULÉES ===
     RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
@@ -6973,6 +6980,10 @@ VAR
     MotorRequest                    : BOOL;                           // . [LOC] Demande mouvement moteur active
     BrakeTimeoutCause               : BOOL;                           // . [LOC] Cause timeout frein presente
     BrakeTimeoutAck                 : BOOL := TRUE;                  // . [LOC] Acquittement cause timeout frein
+    LastDirection                   : INT;                            // . [LOC] Dernier sens commande (1 montee / -1 descente)
+    DeadTimePending                 : BOOL;                           // . [LOC] Temps mort directionnel en attente
+    NewDirection                    : INT;                            // . [LOC] Sens de la nouvelle demande
+    RequiredDeadTime                : TIME;                           // . [LOC] Temps mort requis selon sens de la demande
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
@@ -6988,6 +6999,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     StepDelay(IN := FALSE, PT := T#1s250ms);
     RestartDelay(IN := FALSE, PT := T#1000ms);
+    DeadTime(IN := FALSE);
+    DeadTimePending := FALSE;
+    DeadTimeElapsed := T#0ms;
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     BrakeCmd := FALSE; AuthorizedStep := 0;
@@ -7049,6 +7063,48 @@ IF RestartDelay.Q THEN
     RestartRequired := FALSE;
 END_IF;
 
+// ── 4bis. Temps mort directionnel (TC-P10-021/022) ─────────────────────────────
+// Distinct du RestartDelay (anti-court-cycle uniforme) : temps mort de redémarrage
+// après arrêt, dépendant du sens de la nouvelle demande. Même sens → DeadTimeSameDir ;
+// inversion → DeadTimeOppositeDir. Neutre↔sens = immédiat (pas de temps mort à l&#x27;armement).
+// Le décompte se fait pendant la pause ET pendant l&#x27;attente après nouvelle demande
+// (purge pendant la pause, comme RestartDelay). PT = DeadTimeOppositeDir (le plus long) ;
+// à la nouvelle demande, on vérifie si le temps mort requis pour le sens réel est déjà
+// écoulé (cas même sens, plus court).
+IF MotorRequest THEN
+    IF RequestedRelayFwd THEN
+        LastDirection := 1;
+    ELSE
+        LastDirection := -1;
+    END_IF;
+END_IF;
+
+IF NOT MotorRequest THEN
+    DeadTimePending := TRUE;
+END_IF;
+
+DeadTime(IN := DeadTimePending AND NOT BrakeFeedback AND NOT RestartInhibit, PT := DeadTimeOppositeDir);
+DeadTimeElapsed := DeadTime.ET;
+IF DeadTime.Q THEN
+    DeadTimePending := FALSE;
+END_IF;
+
+IF MotorRequest AND DeadTimePending THEN
+    IF RequestedRelayFwd THEN
+        NewDirection := 1;
+    ELSE
+        NewDirection := -1;
+    END_IF;
+    IF NewDirection = LastDirection THEN
+        RequiredDeadTime := DeadTimeSameDir;
+    ELSE
+        RequiredDeadTime := DeadTimeOppositeDir;
+    END_IF;
+    IF DeadTime.ET &gt;= RequiredDeadTime THEN
+        DeadTimePending := FALSE;
+    END_IF;
+END_IF;
+
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -7074,7 +7130,7 @@ ELSIF NOT MotorRequest THEN
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.READY;
-ELSIF RestartRequired THEN
+ELSIF RestartRequired OR DeadTimePending THEN
     StepDelay(IN := FALSE, PT := T#1s250ms);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
@@ -9872,6 +9928,9 @@ STRUCT
     BucketBusy                   : BOOL;               // ⚙️ Mouvement d&#x27;ouverture/fermeture benne en cours
     BucketDone                   : BOOL;               // ✅ Mouvement benne termine avec succes
     BucketError                  : BOOL;               // ❌ Defaut sur sous-systeme benne
+
+    // === 🛡️ Permission d&#x27;armement homme-mort (Option B — combiné interlock benne) ===
+    ArmingPermit                 : BOOL;               // 🛡️ Permission d&#x27;armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)
 END_STRUCT
 END_TYPE
 </pre>

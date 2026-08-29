@@ -307,11 +307,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 16:08:16</div>
+    <div class="exec-time">2026-08-29 17:20:42</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (6 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-faultcore-0">TC-P03-011 Reset sans historique de defaut : aucun effet parasite</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-1">TC-P03-008 Cumul de 2 causes latchees apparues a des instants differents, un seul Reset les acquitte ensemble</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-2">TC-P03-009 Cause live + cause latchee simultanees : live retombe seule, latchee reste jusqu au Reset</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-3">TC-P03-010 Bornes de la liste Causes : bit 0 et bit 15 correctement mappes (pas d off-by-one)</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-4">TC-P03-012 Reset maintenu niveau haut : pas d acquittement silencieux, cause reaparue re-arme (faille T148 non applicable)</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-5">TC-P03-013 Enable=FALSE : vue LIVE masquee mais vue LATCHEE reste publiee (pas d effacement silencieux OFF-&gt;ON)</a></li></ul>
+        <summary>📋 Sommaire (9 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-faultcore-0">TC-P03-011 Reset sans historique de defaut : aucun effet parasite</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-1">TC-P03-008 Cumul de 2 causes latchees apparues a des instants differents, un seul Reset les acquitte ensemble</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-2">TC-P03-009 Cause live + cause latchee simultanees : live retombe seule, latchee reste jusqu au Reset</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-3">TC-P03-010 Bornes de la liste Causes : bit 0 et bit 15 correctement mappes (pas d off-by-one)</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-4">TC-P03-012 Reset maintenu niveau haut : pas d acquittement silencieux, cause reaparue re-arme (faille T148 non applicable)</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-5">TC-P03-013 Enable=FALSE : vue LIVE masquee mais vue LATCHEE reste publiee (pas d effacement silencieux OFF-&gt;ON)</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-6">TC-P03-003 Pas de redemarrage auto apres Ack : Reset retourne Ready, un nouvel ordre explicite est requis</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-7">TC-P03-004 Pas de SafeStop/StartStop hors mouvement (invariant structurel)</a></li><li class="toc-item toc-pass"><a href="#test-fb-faultcore-8">TC-P03-005 Encapsulation stricte : echanges via interfaces/DUTs publics uniquement (invariant structurel)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,7 +320,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            6/6 vérifications validées
+            9/9 vérifications validées
         </div>
     </div>
     
@@ -552,7 +552,7 @@
     </details>
     
     <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 6 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 9 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-faultcore-0" class="test-card test-card-pass test-card-collapsed test-card-contract">
@@ -893,6 +893,130 @@
     </div>
             </div>
         </article>
+        <article id="test-fb-faultcore-6" class="test-card test-card-pass test-card-collapsed test-card-contract">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P03-003 Pas de redemarrage auto apres Ack : Reset retourne Ready, un nouvel ordre explicite est requis <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (6)</span></summary>
+                <ul class="scenario-list"><li>Remise a zero</li><li>Cause 0 latchee -&gt; LatchedId = 1</li><li>Front Reset (Ack) : efface le latch, retour Ready</li><li>Pas de redemarrage auto : sans nouvelle cause, le latch reste 0 sur plusieurs scans</li><li>Un nouvel ordre explicite (nouvelle cause Active AND Latching) re-arme</li><li>Nettoyage</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>Cause latchee -&gt; bit 0</li><li>Ack (Reset) efface le latch</li><li>Apres Ack, le FB est Ready</li><li>Aucun re-armement auto apres Ack (scan 1)</li><li>Aucun re-armement auto apres Ack (scan 2)</li><li>Nouvelle cause explicite -&gt; re-armement (pas auto)</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (9 scans, 5 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="724" height="292" viewBox="0 0 724 292" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;1&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;I&quot;: &quot;16&quot;}, &quot;note&quot;: &quot;Remise a zero&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;I&quot;: &quot;16&quot;}, &quot;note&quot;: &quot;Remise a zero&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;1&quot;, &quot;FAULT.ERRORID&quot;: &quot;1&quot;, &quot;FAULT.LATCHED&quot;: &quot;1&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;1&quot;, &quot;I&quot;: &quot;16&quot;}, &quot;note&quot;: &quot;Cause 0 latchee -&gt; LatchedId = 1&quot;}, {&quot;scan&quot;: 3, &quot;t_ms&quot;: 30.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;1&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;I&quot;: &quot;16&quot;}, &quot;note&quot;: &quot;Front Reset (Ack) : efface le latch, retour Ready&quot;}, {&quot;scan&quot;: 4, &quot;t_ms&quot;: 40.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;I&quot;: &quot;16&quot;}, &quot;note&quot;: &quot;Front Reset (Ack) : efface le latch, retour Ready&quot;}, {&quot;scan&quot;: 5, &quot;t_ms&quot;: 50.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;I&quot;: &quot;16&quot;}, &quot;note&quot;: &quot;Pas de redemarrage auto : sans nouvelle cause, le latch reste 0 sur plusieurs scans&quot;}, {&quot;scan&quot;: 6, &quot;t_ms&quot;: 60.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;0&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;0&quot;, &quot;I&quot;: &quot;16&quot;}, &quot;note&quot;: &quot;Pas de redemarrage auto : sans nouvelle cause, le latch reste 0 sur plusieurs scans&quot;}, {&quot;scan&quot;: 7, &quot;t_ms&quot;: 70.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;1&quot;, &quot;FAULT.ERRORID&quot;: &quot;1&quot;, &quot;FAULT.LATCHED&quot;: &quot;1&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;1&quot;, &quot;I&quot;: &quot;16&quot;}, &quot;note&quot;: &quot;Un nouvel ordre explicite (nouvelle cause Active AND Latching) re-arme&quot;}, {&quot;scan&quot;: 8, &quot;t_ms&quot;: 80.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;RESET&quot;: &quot;0&quot;, &quot;READY&quot;: &quot;1&quot;, &quot;FAULT.ERROR&quot;: &quot;0&quot;, &quot;FAULT.ERRORID&quot;: &quot;0&quot;, &quot;FAULT.LATCHED&quot;: &quot;1&quot;, &quot;FAULT.LATCHEDID&quot;: &quot;1&quot;, &quot;I&quot;: &quot;16&quot;}, &quot;note&quot;: &quot;Nettoyage&quot;}]" data-fields="[&quot;FAULT.ERROR&quot;, &quot;FAULT.ERRORID&quot;, &quot;FAULT.LATCHED&quot;, &quot;FAULT.LATCHEDID&quot;, &quot;RESET&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="274" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#64748b"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#ef4444"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#f97316"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#0284c7"/><text x="418" y="17" class="wf-legend">Voies actives</text><line x1="200" y1="56" x2="200" y2="274" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="286" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="274" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="286" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="274" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="286" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="274" class="wf-grid"/><text x="396.0" y="52" class="wf-time">30ms</text><text x="396.0" y="286" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="274" class="wf-grid"/><text x="452.0" y="52" class="wf-time">40ms</text><text x="452.0" y="286" class="wf-scan">#4</text><line x1="480" y1="56" x2="480" y2="274" class="wf-grid"/><text x="508.0" y="52" class="wf-time">50ms</text><text x="508.0" y="286" class="wf-scan">#5</text><line x1="536" y1="56" x2="536" y2="274" class="wf-grid"/><text x="564.0" y="52" class="wf-time">60ms</text><text x="564.0" y="286" class="wf-scan">#6</text><line x1="592" y1="56" x2="592" y2="274" class="wf-grid"/><text x="620.0" y="52" class="wf-time">70ms</text><text x="620.0" y="286" class="wf-scan">#7</text><line x1="648" y1="56" x2="648" y2="274" class="wf-grid"/><text x="676.0" y="52" class="wf-time">80ms</text><text x="676.0" y="286" class="wf-scan">#8</text><circle cx="192" cy="82.0" r="4" fill="#ef4444"/><text x="182" y="86.0" class="wf-label">FAULT.ERROR</text><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L312,94L312,68L368,68L368,68L368,94L424,94L480,94L536,94L592,94L592,94L592,68L648,68L648,68L648,94L704,94" class="wf-line" stroke="#ef4444"/><circle cx="192" cy="122.0" r="4" fill="#dc2626"/><text x="182" y="126.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 1)" title="Cliquer pour basculer Courbe / Chiffres">FAULT.ERRORID</text><g class="wf-numeric-group" data-row="1"><g class="wf-analog-view"><text x="194" y="112" class="wf-scale">1.00</text><text x="194" y="138" class="wf-scale">0</text><path d="M200,136.0L256,136.0L312,136.0L312,108.0L368,108.0L368,136.0L424,136.0L480,136.0L536,136.0L592,136.0L592,108.0L648,108.0L648,136.0L704,136.0" class="wf-line" stroke="#dc2626" stroke-width="2.2"/><circle cx="312" cy="108.0" r="2.5" fill="#dc2626"/><circle cx="368" cy="136.0" r="2.5" fill="#dc2626"/><circle cx="592" cy="108.0" r="2.5" fill="#dc2626"/><circle cx="648" cy="136.0" r="2.5" fill="#dc2626"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="219.0" y="108.0" width="18" height="13" rx="3" fill="#dc2626" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">0</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">0</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><rect x="331.0" y="108.0" width="18" height="13" rx="3" fill="#dc2626" class="wf-chip"/><text x="340.0" y="117.0" class="wf-num-changed">1</text><line x1="368" y1="122.0" x2="424" y2="122.0" class="wf-num-line"/><rect x="387.0" y="108.0" width="18" height="13" rx="3" fill="#dc2626" class="wf-chip"/><text x="396.0" y="117.0" class="wf-num-changed">0</text><line x1="424" y1="122.0" x2="480" y2="122.0" class="wf-num-line"/><text x="452.0" y="116.0" class="wf-num">0</text><line x1="480" y1="122.0" x2="536" y2="122.0" class="wf-num-line"/><text x="508.0" y="116.0" class="wf-num">0</text><line x1="536" y1="122.0" x2="592" y2="122.0" class="wf-num-line"/><text x="564.0" y="116.0" class="wf-num">0</text><line x1="592" y1="122.0" x2="648" y2="122.0" class="wf-num-line"/><rect x="611.0" y="108.0" width="18" height="13" rx="3" fill="#dc2626" class="wf-chip"/><text x="620.0" y="117.0" class="wf-num-changed">1</text><line x1="648" y1="122.0" x2="704" y2="122.0" class="wf-num-line"/><rect x="667.0" y="108.0" width="18" height="13" rx="3" fill="#dc2626" class="wf-chip"/><text x="676.0" y="117.0" class="wf-num-changed">0</text></g></g><circle cx="192" cy="162.0" r="4" fill="#9333ea"/><text x="182" y="166.0" class="wf-label">FAULT.LATCHED</text><path d="M200,174L256,174L312,174L312,174L312,148L368,148L368,148L368,174L424,174L480,174L536,174L592,174L592,174L592,148L648,148L704,148" class="wf-line" stroke="#9333ea"/><circle cx="192" cy="202.0" r="4" fill="#ea580c"/><text x="182" y="206.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 3)" title="Cliquer pour basculer Courbe / Chiffres">FAULT.LATCHEDID</text><g class="wf-numeric-group" data-row="3"><g class="wf-analog-view"><text x="194" y="192" class="wf-scale">1.00</text><text x="194" y="218" class="wf-scale">0</text><path d="M200,216.0L256,216.0L312,216.0L312,188.0L368,188.0L368,216.0L424,216.0L480,216.0L536,216.0L592,216.0L592,188.0L648,188.0L704,188.0" class="wf-line" stroke="#ea580c" stroke-width="2.2"/><circle cx="312" cy="188.0" r="2.5" fill="#ea580c"/><circle cx="368" cy="216.0" r="2.5" fill="#ea580c"/><circle cx="592" cy="188.0" r="2.5" fill="#ea580c"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="219.0" y="188.0" width="18" height="13" rx="3" fill="#ea580c" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">0</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><text x="284.0" y="196.0" class="wf-num">0</text><line x1="312" y1="202.0" x2="368" y2="202.0" class="wf-num-line"/><rect x="331.0" y="188.0" width="18" height="13" rx="3" fill="#ea580c" class="wf-chip"/><text x="340.0" y="197.0" class="wf-num-changed">1</text><line x1="368" y1="202.0" x2="424" y2="202.0" class="wf-num-line"/><rect x="387.0" y="188.0" width="18" height="13" rx="3" fill="#ea580c" class="wf-chip"/><text x="396.0" y="197.0" class="wf-num-changed">0</text><line x1="424" y1="202.0" x2="480" y2="202.0" class="wf-num-line"/><text x="452.0" y="196.0" class="wf-num">0</text><line x1="480" y1="202.0" x2="536" y2="202.0" class="wf-num-line"/><text x="508.0" y="196.0" class="wf-num">0</text><line x1="536" y1="202.0" x2="592" y2="202.0" class="wf-num-line"/><text x="564.0" y="196.0" class="wf-num">0</text><line x1="592" y1="202.0" x2="648" y2="202.0" class="wf-num-line"/><rect x="611.0" y="188.0" width="18" height="13" rx="3" fill="#ea580c" class="wf-chip"/><text x="620.0" y="197.0" class="wf-num-changed">1</text><line x1="648" y1="202.0" x2="704" y2="202.0" class="wf-num-line"/><text x="676.0" y="196.0" class="wf-num">1</text></g></g><circle cx="192" cy="242.0" r="4" fill="#64748b"/><text x="182" y="246.0" class="wf-label">RESET</text><path d="M200,228L256,228L256,228L256,254L312,254L368,254L368,254L368,228L424,228L424,228L424,254L480,254L536,254L592,254L648,254L704,254" class="wf-line" stroke="#64748b"/></svg></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (9 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P03-003 Pas de redemarrage auto apres Ack : Reset retourne Ready, un nouvel ordre explicite est requis')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>FAULT.ERROR</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>FAULT.ERRORID</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>FAULT.LATCHED</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>FAULT.LATCHEDID</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>RESET</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell' title='Remise a zero'><span class='chrono-note-chip'>Remise a zero</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell' title='Remise a zero'><span class='chrono-note-chip'>Remise a zero</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='chrono-note-cell' title='Cause 0 latchee -&gt; LatchedId = 1'><span class='chrono-note-chip'>Cause 0 latchee -&gt; LatchedId = 1</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>1</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>1</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>30 ms</td><td class='chrono-note-cell' title='Front Reset (Ack) : efface le latch, retour Ready'><span class='chrono-note-chip'>Front Reset (Ack) : efface le latch, retour Ready</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>40 ms</td><td class='chrono-note-cell' title='Front Reset (Ack) : efface le latch, retour Ready'><span class='chrono-note-chip'>Front Reset (Ack) : efface le latch, retour Ready</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#5</td><td class='scan-t'>50 ms</td><td class='chrono-note-cell' title='Pas de redemarrage auto : sans nouvelle cause, le latch reste 0 sur plusieurs scans'><span class='chrono-note-chip'>Pas de redemarrage auto : sans nouvelle cause, le latch reste 0 sur plusieurs scans</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#6</td><td class='scan-t'>60 ms</td><td class='chrono-note-cell' title='Pas de redemarrage auto : sans nouvelle cause, le latch reste 0 sur plusieurs scans'><span class='chrono-note-chip'>Pas de redemarrage auto : sans nouvelle cause, le latch reste 0 sur plusieurs scans</span></td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td><td>0</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#7</td><td class='scan-t'>70 ms</td><td class='chrono-note-cell' title='Un nouvel ordre explicite (nouvelle cause Active AND Latching) re-arme'><span class='chrono-note-chip'>Un nouvel ordre explicite (nouvelle cause Active AND Latching) re-arme</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>1</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>1</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#8</td><td class='scan-t'>80 ms</td><td class='chrono-note-cell' title='Nettoyage'><span class='chrono-note-chip'>Nettoyage</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'>0</td><td><span class="v-true">TRUE</span></td><td>1</td><td><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (3)</summary>
+        <table class="static-table"><tbody><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+    </details>
+    </div>
+            </div>
+        </article>
+        <article id="test-fb-faultcore-7" class="test-card test-card-pass test-card-collapsed test-card-contract">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P03-004 Pas de SafeStop/StartStop hors mouvement (invariant structurel) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>💻 AUTO — invariant structurel documenté, pas un comportement runtime.
+       Règle AF_Partie-03 §3 : SafeStop/StartStop ne sont autorisés QUE sur un FB
+       de mouvement. Le socle FB_FaultCore (brique technique transverse) n&#x27;expose
+       NI SafeStop NI StartStop dans son interface : VAR_INPUT = Enable/Reset/Causes,
+       VAR_OUTPUT = Ready/Fault. Aucun SafeStop/StartStop n&#x27;est donc possible ici.
+       Vérifié structurellement par l&#x27;interface déclarée (pas de port de mouvement).</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>socle actif -&gt; Ready=TRUE (aucun port de mouvement a tester)</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (8)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERRORID</code></td><td>0</td></tr><tr><td><code>FAULT.LATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.LATCHEDID</code></td><td>0</td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+        </details>
+    </div>
+            </div>
+        </article>
+        <article id="test-fb-faultcore-8" class="test-card test-card-pass test-card-collapsed test-card-contract">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P03-005 Encapsulation stricte : echanges via interfaces/DUTs publics uniquement (invariant structurel) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>💻 AUTO — invariant structurel documenté, pas un comportement runtime.
+       Règle AF_Partie-03 §2 : les variables internes sont privées, les échanges
+       passent uniquement par interfaces et DUT publics. FB_FaultCore n&#x27;expose que
+       ses VAR_INPUT (Enable/Reset/Causes) et VAR_OUTPUT (Ready/Fault) ; ses internes
+       (ResetEdge, Latch[], i) sont privés. Vérifié par encapsulation_check.py
+       (aucune écriture externe non déclarée, aucun accès GVL direct).</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>socle accessible par son interface publique uniquement</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (8)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERRORID</code></td><td>0</td></tr><tr><td><code>FAULT.LATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.LATCHEDID</code></td><td>0</td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+        </details>
+    </div>
+            </div>
+        </article>
         </div>
     </details>
     
@@ -1061,9 +1185,12 @@ test_fb_faultcore.st
   [PASS] TC-P03-010 Bornes de la liste Causes : bit 0 et bit 15 correctement mappes (pas d off-by-one)
   [PASS] TC-P03-012 Reset maintenu niveau haut : pas d acquittement silencieux, cause reaparue re-arme (faille T148 non applicable)
   [PASS] TC-P03-013 Enable=FALSE : vue LIVE masquee mais vue LATCHEE reste publiee (pas d effacement silencieux OFF-&gt;ON)
+  [PASS] TC-P03-003 Pas de redemarrage auto apres Ack : Reset retourne Ready, un nouvel ordre explicite est requis
+  [PASS] TC-P03-004 Pas de SafeStop/StartStop hors mouvement (invariant structurel)
+  [PASS] TC-P03-005 Encapsulation stricte : echanges via interfaces/DUTs publics uniquement (invariant structurel)
 
 -----------------------------------------
-6 tests, 6 passed, 0 failed
+9 tests, 9 passed, 0 failed
 </pre>
     </details>
 </div>

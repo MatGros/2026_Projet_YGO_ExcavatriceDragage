@@ -307,11 +307,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 15:41:18</div>
+    <div class="exec-time">2026-08-29 17:20:42</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (11 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-1">TC-P09-010 Acquisition codeur : mise en service nominale</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-2">TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-3">TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-4">TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-5">TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-6">TC-P09-015 Reset conscient : acquitte le latch sans valider le preset</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-7">TC-P09-016 Fault live : perte materiel codeur (Cause 0)</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-8">TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2)</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-9">TC-P09-018 Fault live : incoherence mesure (Cause 1)</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-10">TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition HeartbeatIhmOk, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-1">TC-P12-020 IHM Heartbeat : surveillance timeout apres 2s sans front</a></li><li class="toc-item toc-pass"><a href="#test-fb-diag-ihmheartbeat-2">TC-P12-050 IHM Heartbeat : timeout -&gt; HeartbeatIhmTimeout + TimeSinceIhmEdge, reprise sur front</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,7 +320,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            11/11 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -397,6 +397,42 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 8 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>HEARTBEATIHMOK</code> jamais câblé en production</li><li>Pin <code>HEARTBEATIHMTIMEOUT</code> jamais câblé en production</li><li>Pin <code>IHMTIMEOUT</code> jamais câblé en production</li><li>Pin <code>PLCTOGGLEPERIOD</code> jamais câblé en production</li><li>Pin <code>TGLHEARTBEATIHM</code> jamais câblé en production</li><li>Pin <code>TGLHEARTBEATPLC</code> jamais câblé en production</li><li>Pin <code>TIMESINCEIHMEDGE</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">TGLHEARTBEATIHM <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">IHMTIMEOUT <span class="pin-type">IEC_TIME</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">PLCTOGGLEPERIOD <span class="pin-type">IEC_TIME</span></div>
+        </div></div>
+            <div class="pin-block">FB_Diag_IhmHeartbeat</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">HEARTBEATIHMOK <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">HEARTBEATIHMTIMEOUT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">TGLHEARTBEATPLC <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">TIMESINCEIHMEDGE <span class="pin-type">IEC_TIME</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -480,151 +516,176 @@
         <article id="test-fb-diag-ihmheartbeat-0" class="test-card test-card-pass test-card-collapsed test-card-contract">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3 style="flex: 1;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition HeartbeatIhmOk, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Scan 0 : Enable=FALSE -&gt; Diagnostic desactive</li><li>Scan 1 : Enable=TRUE, premier front toggle IHM -&gt; Diagnostic OK</li><li>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>Enable=FALSE -&gt; HeartbeatIhmOk=FALSE</li><li>Enable=FALSE -&gt; HeartbeatIhmTimeout=TRUE</li><li>Enable=TRUE + edge -&gt; HeartbeatIhmOk=TRUE</li><li>HeartbeatIhmTimeout=FALSE</li><li>Coupure -&gt; HeartbeatIhmOk retombe a FALSE</li><li>Coupure -&gt; Timeout=TRUE</li></ul>
+            </details>
                 
                 
-                
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (3 scans, 7 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="388" height="372" viewBox="0 0 388 372" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;0&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;0&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;0&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;1&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;0&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;0&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;0&quot;, &quot;IHMEDGESEEN&quot;: &quot;0&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;Scan 0 : Enable=FALSE -&gt; Diagnostic desactive&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;1&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;1&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;0&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;0&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;0&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;1&quot;, &quot;IHMEDGESEEN&quot;: &quot;1&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;Scan 1 : Enable=TRUE, premier front toggle IHM -&gt; Diagnostic OK&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;0&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;1&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;0&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;1&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;0&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;0&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;1&quot;, &quot;IHMEDGESEEN&quot;: &quot;0&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;Scan 2 : Enable=FALSE -&gt; Re-neutralisation&quot;}]" data-fields="[&quot;ENABLE&quot;, &quot;HEARTBEATIHMOK&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;, &quot;IHMEDGEDETECTED&quot;, &quot;IHMEDGESEEN&quot;, &quot;LASTIHMTOGGLE&quot;, &quot;TGLHEARTBEATIHM&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="354" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#64748b"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#ef4444"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#f97316"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#0284c7"/><text x="418" y="17" class="wf-legend">Voies actives</text><line x1="200" y1="56" x2="200" y2="354" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="366" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="354" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="366" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="354" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="366" class="wf-scan">#2</text><circle cx="192" cy="82.0" r="4" fill="#0284c7"/><text x="182" y="86.0" class="wf-label">ENABLE</text><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#0284c7"/><circle cx="192" cy="122.0" r="4" fill="#16a34a"/><text x="182" y="126.0" class="wf-label">HEARTBEATIHMOK</text><path d="M200,134L256,134L256,134L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#16a34a"/><circle cx="192" cy="162.0" r="4" fill="#9333ea"/><text x="182" y="166.0" class="wf-label">HEARTBEATIHMTIMEOUT</text><path d="M200,148L256,148L256,148L256,174L312,174L312,174L312,148L368,148" class="wf-line" stroke="#9333ea"/><circle cx="192" cy="202.0" r="4" fill="#ea580c"/><text x="182" y="206.0" class="wf-label">IHMEDGEDETECTED</text><path d="M200,214L256,214L256,214L256,188L312,188L368,188" class="wf-line" stroke="#ea580c"/><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><text x="182" y="246.0" class="wf-label">IHMEDGESEEN</text><path d="M200,254L256,254L256,254L256,228L312,228L312,228L312,254L368,254" class="wf-line" stroke="#0d9488"/><circle cx="192" cy="282.0" r="4" fill="#d97706"/><text x="182" y="286.0" class="wf-label">LASTIHMTOGGLE</text><path d="M200,294L256,294L256,294L256,268L312,268L368,268" class="wf-line" stroke="#d97706"/><circle cx="192" cy="322.0" r="4" fill="#4f46e5"/><text x="182" y="326.0" class="wf-label">TGLHEARTBEATIHM</text><path d="M200,334L256,334L256,334L256,308L312,308L368,308" class="wf-line" stroke="#4f46e5"/></svg></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (3 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition HeartbeatIhmOk, puis coupure')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>ENABLE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>HEARTBEATIHMOK</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>HEARTBEATIHMTIMEOUT</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>IHMEDGEDETECTED</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>IHMEDGESEEN</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>LASTIHMTOGGLE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>TGLHEARTBEATIHM</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell' title='Scan 0 : Enable=FALSE -&gt; Diagnostic desactive'><span class='chrono-note-chip'>Scan 0 : Enable=FALSE -&gt; Diagnostic desactive</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell' title='Scan 1 : Enable=TRUE, premier front toggle IHM -&gt; Diagnostic OK'><span class='chrono-note-chip'>Scan 1 : Enable=TRUE, premier front toggle IHM -&gt; Diagnostic OK</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='chrono-note-cell' title='Scan 2 : Enable=FALSE -&gt; Re-neutralisation'><span class='chrono-note-chip'>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (4)</summary>
+        <table class="static-table"><tbody><tr><td><code>IHMTIMEOUT</code></td><td>2000000000</td></tr><tr><td><code>PLCTOGGLEPERIOD</code></td><td>500000000</td></tr><tr><td><code>TGLHEARTBEATPLC</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TIMESINCEIHMEDGE</code></td><td>0</td></tr></tbody></table>
+    </details>
+    </div>
             </div>
         </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 10 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-diag-ihmheartbeat-1" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-010 Acquisition codeur : mise en service nominale </h3>
+                <h3 style="flex: 1;">TC-P12-020 IHM Heartbeat : surveillance timeout apres 2s sans front </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>1. Initialisation avec front IHM</li><li>2. Scan suivant : pas de front, le timer de surveillance démarre</li><li>3. Avance dans le temps de 2.5s sans nouveau front</li><li>4. Reprise du toggle IHM -&gt; Retabli</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>Heartbeat IHM valide initialement</li><li>Pas de timeout</li><li>Heartbeat IHM tombe en echec apres timeout</li><li>HeartbeatIhmTimeout leve</li><li>Heartbeat IHM retabli apres nouveau front</li><li>HeartbeatIhmTimeout retombe a FALSE</li></ul>
+            </details>
                 
                 
-                
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (4 scans, 7 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="444" height="372" viewBox="0 0 444 372" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;1&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;1&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;0&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;0&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;0&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;1&quot;, &quot;IHMEDGESEEN&quot;: &quot;1&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;1&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;1&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;0&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;0&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;0&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;1&quot;, &quot;IHMEDGESEEN&quot;: &quot;1&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 2500.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;1&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;0&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;1&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;1&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;2000000000&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;1&quot;, &quot;IHMEDGESEEN&quot;: &quot;1&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;3. Avance dans le temps de 2.5s sans nouveau front&quot;}, {&quot;scan&quot;: 3, &quot;t_ms&quot;: 2510.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;0&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;1&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;0&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;1&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;0&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;0&quot;, &quot;IHMEDGESEEN&quot;: &quot;1&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;4. Reprise du toggle IHM -&gt; Retabli&quot;}]" data-fields="[&quot;HEARTBEATIHMOK&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;, &quot;IHMEDGEDETECTED&quot;, &quot;LASTIHMTOGGLE&quot;, &quot;TGLHEARTBEATIHM&quot;, &quot;TGLHEARTBEATPLC&quot;, &quot;TIMESINCEIHMEDGE&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="354" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#64748b"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#ef4444"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#f97316"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#0284c7"/><text x="418" y="17" class="wf-legend">Voies actives</text><line x1="200" y1="56" x2="200" y2="354" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="366" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="354" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="366" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="354" class="wf-grid"/><text x="340.0" y="52" class="wf-time">2500ms</text><text x="340.0" y="366" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="354" class="wf-grid"/><text x="396.0" y="52" class="wf-time">2510ms</text><text x="396.0" y="366" class="wf-scan">#3</text><circle cx="192" cy="82.0" r="4" fill="#0284c7"/><text x="182" y="86.0" class="wf-label">HEARTBEATIHMOK</text><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L312,68L312,68L312,94L368,94L368,94L368,68L424,68" class="wf-line" stroke="#0284c7"/><circle cx="192" cy="122.0" r="4" fill="#16a34a"/><text x="182" y="126.0" class="wf-label">HEARTBEATIHMTIMEOUT</text><path d="M200,134L256,134L312,134L312,134L312,108L368,108L368,108L368,134L424,134" class="wf-line" stroke="#16a34a"/><circle cx="192" cy="162.0" r="4" fill="#9333ea"/><text x="182" y="166.0" class="wf-label">IHMEDGEDETECTED</text><path d="M200,148L256,148L256,148L256,174L312,174L368,174L368,174L368,148L424,148" class="wf-line" stroke="#9333ea"/><circle cx="192" cy="202.0" r="4" fill="#ea580c"/><text x="182" y="206.0" class="wf-label">LASTIHMTOGGLE</text><path d="M200,188L256,188L312,188L368,188L368,188L368,214L424,214" class="wf-line" stroke="#ea580c"/><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><text x="182" y="246.0" class="wf-label">TGLHEARTBEATIHM</text><path d="M200,228L256,228L312,228L368,228L368,228L368,254L424,254" class="wf-line" stroke="#0d9488"/><circle cx="192" cy="282.0" r="4" fill="#d97706"/><text x="182" y="286.0" class="wf-label">TGLHEARTBEATPLC</text><path d="M200,294L256,294L312,294L312,294L312,268L368,268L424,268" class="wf-line" stroke="#d97706"/><circle cx="192" cy="322.0" r="4" fill="#4f46e5"/><text x="182" y="326.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 6)" title="Cliquer pour basculer Courbe / Chiffres">TIMESINCEIHMEDGE</text><g class="wf-numeric-group" data-row="6"><g class="wf-analog-view"><text x="194" y="312" class="wf-scale">2000000000</text><text x="194" y="338" class="wf-scale">0</text><path d="M200,336.0L256,336.0L312,336.0L312,308.0L368,308.0L368,336.0L424,336.0" class="wf-line" stroke="#4f46e5" stroke-width="2.2"/><circle cx="312" cy="308.0" r="2.5" fill="#4f46e5"/><circle cx="368" cy="336.0" r="2.5" fill="#4f46e5"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="219.0" y="308.0" width="18" height="13" rx="3" fill="#4f46e5" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">0</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><text x="284.0" y="316.0" class="wf-num">0</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><rect x="305.0" y="308.0" width="70" height="13" rx="3" fill="#4f46e5" class="wf-chip"/><text x="340.0" y="317.0" class="wf-num-changed">2000000000</text><line x1="368" y1="322.0" x2="424" y2="322.0" class="wf-num-line"/><rect x="387.0" y="308.0" width="18" height="13" rx="3" fill="#4f46e5" class="wf-chip"/><text x="396.0" y="317.0" class="wf-num-changed">0</text></g></g></svg></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (4 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P12-020 IHM Heartbeat : surveillance timeout apres 2s sans front')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>HEARTBEATIHMOK</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>HEARTBEATIHMTIMEOUT</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>IHMEDGEDETECTED</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>LASTIHMTOGGLE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>TGLHEARTBEATIHM</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>TGLHEARTBEATPLC</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>TIMESINCEIHMEDGE</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell' style='color:var(--muted);'>—</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell' style='color:var(--muted);'>—</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>2500 ms</td><td class='chrono-note-cell' title='3. Avance dans le temps de 2.5s sans nouveau front'><span class='chrono-note-chip'>3. Avance dans le temps de 2.5s sans nouveau front</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>2000000000</td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>2510 ms</td><td class='chrono-note-cell' title='4. Reprise du toggle IHM -&gt; Retabli'><span class='chrono-note-chip'>4. Reprise du toggle IHM -&gt; Retabli</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'>0</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (4)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>IHMEDGESEEN</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>IHMTIMEOUT</code></td><td>2000000000</td></tr><tr><td><code>PLCTOGGLEPERIOD</code></td><td>500000000</td></tr></tbody></table>
+    </details>
+    </div>
             </div>
         </article>
         <article id="test-fb-diag-ihmheartbeat-2" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms </h3>
+                <h3 style="flex: 1;">TC-P12-050 IHM Heartbeat : timeout -&gt; HeartbeatIhmTimeout + TimeSinceIhmEdge, reprise sur front </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>1. Front IHM initial -&gt; OK</li><li>2. Scan suivant sans front -&gt; timer de surveillance demarre</li><li>3. Avance 2.5s sans front -&gt; timeout, TimeSinceIhmEdge = IhmTimeout</li><li>4. Nouveau front -&gt; restaure immediatement, TimeSinceIhmEdge repart de 0</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (8)</span></summary>
+                <ul class="checks-list"><li>Front initial -&gt; HeartbeatIhmOk=TRUE</li><li>Pas de timeout</li><li>Timeout apres 2s sans front</li><li>HeartbeatIhmOk=FALSE sous timeout</li><li>TimeSinceIhmEdge = IhmTimeout (2s)</li><li>Nouveau front -&gt; HeartbeatIhmOk restaure</li><li>Timeout retombe</li><li>TimeSinceIhmEdge repart de 0</li></ul>
+            </details>
                 
                 
-                
-            </div>
-        </article>
-        <article id="test-fb-diag-ihmheartbeat-3" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-diag-ihmheartbeat-4" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-diag-ihmheartbeat-5" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-diag-ihmheartbeat-6" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-015 Reset conscient : acquitte le latch sans valider le preset </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-diag-ihmheartbeat-7" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-016 Fault live : perte materiel codeur (Cause 0) </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-diag-ihmheartbeat-8" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2) </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-diag-ihmheartbeat-9" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-018 Fault live : incoherence mesure (Cause 1) </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
-            </div>
-        </article>
-        <article id="test-fb-diag-ihmheartbeat-10" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations) </h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-                
-                
-                
+    <div class="chronogram-group">
+        
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (4 scans, 7 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="444" height="372" viewBox="0 0 444 372" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;1&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;1&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;0&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;0&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;0&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;1&quot;, &quot;IHMEDGESEEN&quot;: &quot;1&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;1&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;1&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;0&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;0&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;0&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;1&quot;, &quot;IHMEDGESEEN&quot;: &quot;1&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 2500.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;1&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;0&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;1&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;1&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;2000000000&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;1&quot;, &quot;IHMEDGESEEN&quot;: &quot;1&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;3. Avance 2.5s sans front -&gt; timeout, TimeSinceIhmEdge = IhmTimeout&quot;}, {&quot;scan&quot;: 3, &quot;t_ms&quot;: 2510.0, &quot;fields&quot;: {&quot;ENABLE&quot;: &quot;1&quot;, &quot;TGLHEARTBEATIHM&quot;: &quot;0&quot;, &quot;IHMTIMEOUT&quot;: &quot;2000000000&quot;, &quot;PLCTOGGLEPERIOD&quot;: &quot;500000000&quot;, &quot;HEARTBEATIHMOK&quot;: &quot;1&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;: &quot;0&quot;, &quot;TGLHEARTBEATPLC&quot;: &quot;1&quot;, &quot;TIMESINCEIHMEDGE&quot;: &quot;0&quot;, &quot;LASTIHMTOGGLE&quot;: &quot;0&quot;, &quot;IHMEDGESEEN&quot;: &quot;1&quot;, &quot;IHMEDGEDETECTED&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;4. Nouveau front -&gt; restaure immediatement, TimeSinceIhmEdge repart de 0&quot;}]" data-fields="[&quot;HEARTBEATIHMOK&quot;, &quot;HEARTBEATIHMTIMEOUT&quot;, &quot;IHMEDGEDETECTED&quot;, &quot;LASTIHMTOGGLE&quot;, &quot;TGLHEARTBEATIHM&quot;, &quot;TGLHEARTBEATPLC&quot;, &quot;TIMESINCEIHMEDGE&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="354" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#64748b"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#ef4444"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#f97316"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#0284c7"/><text x="418" y="17" class="wf-legend">Voies actives</text><line x1="200" y1="56" x2="200" y2="354" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="366" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="354" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="366" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="354" class="wf-grid"/><text x="340.0" y="52" class="wf-time">2500ms</text><text x="340.0" y="366" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="354" class="wf-grid"/><text x="396.0" y="52" class="wf-time">2510ms</text><text x="396.0" y="366" class="wf-scan">#3</text><circle cx="192" cy="82.0" r="4" fill="#0284c7"/><text x="182" y="86.0" class="wf-label">HEARTBEATIHMOK</text><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L312,68L312,68L312,94L368,94L368,94L368,68L424,68" class="wf-line" stroke="#0284c7"/><circle cx="192" cy="122.0" r="4" fill="#16a34a"/><text x="182" y="126.0" class="wf-label">HEARTBEATIHMTIMEOUT</text><path d="M200,134L256,134L312,134L312,134L312,108L368,108L368,108L368,134L424,134" class="wf-line" stroke="#16a34a"/><circle cx="192" cy="162.0" r="4" fill="#9333ea"/><text x="182" y="166.0" class="wf-label">IHMEDGEDETECTED</text><path d="M200,148L256,148L256,148L256,174L312,174L368,174L368,174L368,148L424,148" class="wf-line" stroke="#9333ea"/><circle cx="192" cy="202.0" r="4" fill="#ea580c"/><text x="182" y="206.0" class="wf-label">LASTIHMTOGGLE</text><path d="M200,188L256,188L312,188L368,188L368,188L368,214L424,214" class="wf-line" stroke="#ea580c"/><circle cx="192" cy="242.0" r="4" fill="#0d9488"/><text x="182" y="246.0" class="wf-label">TGLHEARTBEATIHM</text><path d="M200,228L256,228L312,228L368,228L368,228L368,254L424,254" class="wf-line" stroke="#0d9488"/><circle cx="192" cy="282.0" r="4" fill="#d97706"/><text x="182" y="286.0" class="wf-label">TGLHEARTBEATPLC</text><path d="M200,294L256,294L312,294L312,294L312,268L368,268L424,268" class="wf-line" stroke="#d97706"/><circle cx="192" cy="322.0" r="4" fill="#4f46e5"/><text x="182" y="326.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 6)" title="Cliquer pour basculer Courbe / Chiffres">TIMESINCEIHMEDGE</text><g class="wf-numeric-group" data-row="6"><g class="wf-analog-view"><text x="194" y="312" class="wf-scale">2000000000</text><text x="194" y="338" class="wf-scale">0</text><path d="M200,336.0L256,336.0L312,336.0L312,308.0L368,308.0L368,336.0L424,336.0" class="wf-line" stroke="#4f46e5" stroke-width="2.2"/><circle cx="312" cy="308.0" r="2.5" fill="#4f46e5"/><circle cx="368" cy="336.0" r="2.5" fill="#4f46e5"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="322.0" x2="256" y2="322.0" class="wf-num-line"/><rect x="219.0" y="308.0" width="18" height="13" rx="3" fill="#4f46e5" class="wf-chip"/><text x="228.0" y="317.0" class="wf-num-changed">0</text><line x1="256" y1="322.0" x2="312" y2="322.0" class="wf-num-line"/><text x="284.0" y="316.0" class="wf-num">0</text><line x1="312" y1="322.0" x2="368" y2="322.0" class="wf-num-line"/><rect x="305.0" y="308.0" width="70" height="13" rx="3" fill="#4f46e5" class="wf-chip"/><text x="340.0" y="317.0" class="wf-num-changed">2000000000</text><line x1="368" y1="322.0" x2="424" y2="322.0" class="wf-num-line"/><rect x="387.0" y="308.0" width="18" height="13" rx="3" fill="#4f46e5" class="wf-chip"/><text x="396.0" y="317.0" class="wf-num-changed">0</text></g></g></svg></div>
+        </details>
+        <details >
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (4 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P12-050 IHM Heartbeat : timeout -&gt; HeartbeatIhmTimeout + TimeSinceIhmEdge, reprise sur front')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>HEARTBEATIHMOK</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>HEARTBEATIHMTIMEOUT</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>IHMEDGEDETECTED</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>LASTIHMTOGGLE</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>TGLHEARTBEATIHM</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>TGLHEARTBEATPLC</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>TIMESINCEIHMEDGE</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell' style='color:var(--muted);'>—</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell' style='color:var(--muted);'>—</td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td>0</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>2500 ms</td><td class='chrono-note-cell' title='3. Avance 2.5s sans front -&gt; timeout, TimeSinceIhmEdge = IhmTimeout'><span class='chrono-note-chip'>3. Avance 2.5s sans front -&gt; timeout, TimeSinceIhmEdge = IhmTimeout</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'>2000000000</td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>2510 ms</td><td class='chrono-note-cell' title='4. Nouveau front -&gt; restaure immediatement, TimeSinceIhmEdge repart de 0'><span class='chrono-note-chip'>4. Nouveau front -&gt; restaure immediatement, TimeSinceIhmEdge repart de 0</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td><td class='changed'>0</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (4)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>IHMEDGESEEN</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>IHMTIMEOUT</code></td><td>2000000000</td></tr><tr><td><code>PLCTOGGLEPERIOD</code></td><td>500000000</td></tr></tbody></table>
+    </details>
+    </div>
             </div>
         </article>
         </div>
@@ -723,9 +784,10 @@ END_IF;
 test_fb_diag_ihmheartbeat.st
   [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition HeartbeatIhmOk, puis coupure
   [PASS] TC-P12-020 IHM Heartbeat : surveillance timeout apres 2s sans front
+  [PASS] TC-P12-050 IHM Heartbeat : timeout -&gt; HeartbeatIhmTimeout + TimeSinceIhmEdge, reprise sur front
 
 -----------------------------------------
-2 tests, 2 passed, 0 failed
+3 tests, 3 passed, 0 failed
 </pre>
     </details>
 </div>

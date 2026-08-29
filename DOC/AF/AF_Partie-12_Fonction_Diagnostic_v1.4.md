@@ -145,40 +145,65 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-010</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Perte liaison<br>par device</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur M2) : <code>StateRaw≠RUNNING/ACTIVE</code> ➔ <code>Online=FALSE</code>, <code>Operational=FALSE</code>, <code>State=INIT</code>, sans effet sur les autres devices — indépendance inter-devices</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Perte liaison</b><br>par device</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Tous devices opérationnels (<code>StateRaw=RUNNING</code>)<br>
+        🚀 <b>Étape 1</b> : Un device perd son état (<code>StateRaw≠RUNNING/ACTIVE</code>)<br>
+        ⚡ <b>Étape 2</b> : <code>Online=FALSE</code>, <code>Operational=FALSE</code>, <code>State=INIT</code> pour ce device<br>
+        ✅ <b>Étape 3</b> : Aucun effet sur les autres devices — indépendance inter-devices
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-020</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>ErrorId bit-level par device</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Défaut isolé sur un seul device ➔ <code>ErrorId</code> de ce device porte <b>exactement</b> son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices (Joystick bit0/1, Variateur bit4, M1 bit5, <b>M2 bit6</b>). ⚠️ M2 porte <code>16#0030</code> (bug T159, pas <code>16#0040</code>)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>ErrorId</b><br>bit-level</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Tous devices OK, <code>ErrorId=0</code> pour chaque device<br>
+        🚀 <b>Étape 1</b> : Défaut isolé sur un seul device (ex. Joystick, Variateur, M1, M2)<br>
+        ⚡ <b>Étape 2</b> : <code>ErrorId</code> de ce device porte exactement son bit attendu<br>
+        ✅ <b>Étape 3</b> : Aucun bit croisé sur un autre device — ⚠️ M2 porte <code>16#0030</code> (bug T159, pas <code>16#0040</code>)
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-030</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Synthèse ErrorId globale</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Détail complet dans la fiche dédiée : <a href="AF_Partie-12_Fonction_Diagnostic/FB_Diag_Ethercat_v1.1.md"><code>FB_Diag_Ethercat_v1.1.md</code> §Points de validation</a></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Synthèse</b><br>ErrorId globale</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : État diag nominal<br>
+        🚀 <b>Étape 1</b> : Consultation du catalogue détaillé dans la fiche dédiée<br>
+        ⚡ <b>Étape 2</b> : Vérification de la synthèse globale ErrorId<br>
+        ✅ <b>Étape 3</b> : Détail dans <a href="AF_Partie-12_Fonction_Diagnostic/FB_Diag_Ethercat_v1.1.md"><code>FB_Diag_Ethercat_v1.1.md</code> §Points de validation</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_Ethercat</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-040</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bypass sim/réseau vs état réel</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>SimBypass</code>/<code>NetworkBypassActive</code> sans device réel <code>RUNNING</code> ➔ <code>SIMULATED</code> ; réel <code>RUNNING</code> sans bypass ➔ <code>READY</code> ; ni l'un ni l'autre ➔ <code>INIT</code> ; <code>Enable=FALSE</code> prioritaire ➔ <code>DISABLED</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bypass</b><br>sim/réseau</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>Enable=TRUE</code>, device réel <code>RUNNING</code>, pas de bypass<br>
+        🚀 <b>Étape 1</b> : Activation <code>SimBypass</code>/<code>NetworkBypassActive</code> sans device réel <code>RUNNING</code><br>
+        ⚡ <b>Étape 2</b> : États <code>SIMULATED</code> (bypass), <code>READY</code> (réel seul), <code>INIT</code> (ni l'un ni l'autre), <code>DISABLED</code> (<code>Enable=FALSE</code> prioritaire)<br>
+        ✅ <b>Étape 3</b> : Table de vérité bypass vs état réel validée
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-050</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Heartbeat<br>IHM</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Détail complet dans la fiche dédiée : <a href="AF_Partie-12_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.1.md"><code>FB_Diag_IhmHeartbeat_v1.1.md</code> §Points de validation</a></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Heartbeat</b><br>IHM</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Communication IHM↔PLC active, toggle bidirectionnel<br>
+        🚀 <b>Étape 1</b> : Timeout communication (pas de front IHM dans le délai)<br>
+        ⚡ <b>Étape 2</b> : Détection timeout par surveillance toggle<br>
+        ✅ <b>Étape 3</b> : Détail dans <a href="AF_Partie-12_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.1.md"><code>FB_Diag_IhmHeartbeat_v1.1.md</code> §Points de validation</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_IhmHeartbeat</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>

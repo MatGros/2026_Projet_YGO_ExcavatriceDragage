@@ -25,55 +25,101 @@
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 170px);">
-    <col style="width: 90px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-011</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Inversion Fwd↔Rev en descente exige <code>DirectionInterlockDelayDescent</code>=400ms (+100ms palier=500ms) ; en montée <code>DirectionInterlockDelayAscent</code>=900ms (+100ms=1000ms). Neutre↔sens = immédiat. <code>DirectionChangePending</code> force la rampe à 0.0 pendant l'attente. Redémarrage même sens / inversion : temps mort 1s.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Inversion</b><br>Fwd↔Rev</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Treuil en mouvement, sens commandé établi (<code>RelayFwd</code> ou <code>RelayRev</code>)<br>
+        🚀 <b>Étape 1</b> : Demande inversion Fwd↔Rev (vitesse &lt; 0.1 requise)<br>
+        ⚡ <b>Étape 2</b> : <code>DirectionChangePending</code> force la rampe à 0.0 ; délai typé : descente 400ms (+100ms palier=500ms), montée 900ms (+100ms=1000ms) ; redémarrage temps mort 1s (même sens / inversion)<br>
+        ✅ <b>Étape 3</b> : Neutre↔sens = immédiat ; aucune inversion directe sans délai typé respecté
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-017</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Config palier invalide (<code>FB_SpeedStep</code>) ➔ palier 0, sorties sûres</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Config</b><br>invalide</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>FB_SpeedStep</code> chargé, table <code>ST_SpeedStepTable</code> en validation<br>
+        🚀 <b>Étape 1</b> : Injection config invalide (seuils non croissants, hystérésis ≤0, ou contacteurs incohérents)<br>
+        ⚡ <b>Étape 2</b> : <code>ConfigError</code> := TRUE, <code>StepNumber</code> forcé à 0<br>
+        ✅ <b>Étape 3</b> : <code>Contactor1..4</code> := FALSE (sorties sûres), palier 0 maintenu
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-018</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>StuckClosed</code> : contacteurs off non confirmés 500ms ➔ bit1</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Contacteur</b><br>collé</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Treuil à l'arrêt commandé, contacteurs commandés OFF<br>
+        🚀 <b>Étape 1</b> : <code>AllContactorsCommandedOff</code> = TRUE mais <code>FwdRevSpeedFeedbackOff</code> = FALSE (contacteur/bobine collé)<br>
+        ⚡ <b>Étape 2</b> : Attente <code>ContactorFeedbackTimeout</code> = 500ms sans confirmation arrêt<br>
+        ✅ <b>Étape 3</b> : bit1 <code>ErrorId</code> levé (<code>StuckClosed</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-019</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Ordre MainTask : Safety ➔ WinchControl ➔ PRG_06_Outputs</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ SITE+AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Ordre</b><br>MainTask</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Programme chargé, MainTask 4ms active<br>
+        🚀 <b>Étape 1</b> : Exécution d'un scan MainTask<br>
+        ⚡ <b>Étape 2</b> : Ordre d'appel vérifié : Safety ➔ WinchControl ➔ PRG_06_Outputs<br>
+        ✅ <b>Étape 3</b> : Aucune remontée Safety traitée après Outputs sur le même scan
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ SITE+AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>—</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-042.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Plafonds dynamiques palier par contexte : descente max 3, montée max 5, approche capteur haut=1, zones ralentissement haut/bas capent le palier.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Plafonds</b><br>dynamiques</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Treuil <code>Enable</code>, <code>SpeedTgt_Pct</code> reçu<br>
+        🚀 <b>Étape 1</b> : Changement de contexte (descente / montée / approche capteur haut / zone ralentissement)<br>
+        ⚡ <b>Étape 2</b> : <code>StepNumber</code> plafonné par contexte : descente max 3, montée max 5, approche capteur haut = 1, zones ralentissement haut/bas capent le palier<br>
+        ✅ <b>Étape 3</b> : Palier effectif ≤ plafond dynamique du contexte, aucun dépassement
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-052.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Garde-fou vitesse (<code>SpeedGuardEnable</code>, désactivé par défaut) : vitesse non-stable → palier 1 ; <code>MeasuredSpeedBand</code> &lt; <code>StepNumber</code> → bride. Testable après activation.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Garde-fou</b><br>vitesse</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>SpeedGuardEnable</code> activé (désactivé par défaut), treuil en mouvement<br>
+        🚀 <b>Étape 1</b> : Vitesse mesurée non-stable OU <code>MeasuredSpeedBand</code> &lt; <code>StepNumber</code><br>
+        ⚡ <b>Étape 2</b> : <code>SpeedGuardLimited</code> bride le palier à 1<br>
+        ✅ <b>Étape 3</b> : <code>StepNumber</code> réduit, pas de passage aux paliers supérieurs sans vitesse confirmée
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

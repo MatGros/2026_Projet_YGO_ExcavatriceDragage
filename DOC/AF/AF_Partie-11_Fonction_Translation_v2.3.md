@@ -118,18 +118,18 @@
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 140px;">
-    <col style="width: 150px;">
-    <col style="width: calc(100% - 590px);">
-    <col style="width: 110px;">
-    <col style="width: 140px;">
+    <col style="width: 28px;">
     <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
-      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
@@ -138,43 +138,68 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-001/002</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Position & cohérence</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">5 capteurs ➔ mot valide ➔ position qualifiée. Mot incohérent ➔ <code>Incoherent=TRUE</code> ➔ Safety bit7 ➔ SafeStop+PowerCutOff</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Translation_PositionDecoder</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Position</b><br>&amp; cohérence</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : 5 capteurs M3 lus, mot capteurs en formation<br>
+        🚀 <b>Étape 1</b> : Décodage 5 capteurs → mot valide → position qualifiée (Travail/Trémie/Extrêmes)<br>
+        ⚡ <b>Étape 2</b> : Mot incohérent injecté → <code>Incoherent=TRUE</code><br>
+        ✅ <b>Étape 3</b> : Safety bit7 → <code>SafeStop</code>+<code>PowerCutOff</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Translation_PositionDecoder</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-010/011/014</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Sécurité M3 (Méca A/B, bypass)</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Arrêt commandé mais mouvement résiduel (Méca A) ou incohérence prolongée (Méca B) ➔ SafeStop+PowerCutOff. <code>BypassGlobal</code> efface <code>ErrorId</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_Translation</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Sécurité</b><br>M3</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : M3 en mouvement nominal, <code>BypassGlobal=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Injection défaut (Méca A : mouvement résiduel ; Méca B : incohérence prolongée)<br>
+        ⚡ <b>Étape 2</b> : <code>SafeStop</code>+<code>PowerCutOff</code> déclenchés<br>
+        ✅ <b>Étape 3</b> : <code>BypassGlobal</code> efface <code>ErrorId</code> (vérifié séparément)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Safety_Translation</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-003/004/005/013</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Vitesse, rampes & interlock sens</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Joystick/SemiAuto ➔ Rampe ➔ AC600. Ralentissement PV si <code>Direction=1</code>+capteur. Interlock sens 200ms si vitesse≠0. Boutons IHM MAINT exigent homme-mort</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Translation</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Vitesse</b><br>&amp; interlock</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : M3 au repos, joystick au neutre<br>
+        🚀 <b>Étape 1</b> : Consigne joystick/SemiAuto → rampe → AC600<br>
+        ⚡ <b>Étape 2</b> : Ralentissement PV si <code>Direction=1</code>+capteur ; interlock sens 200ms si vitesse≠0<br>
+        ✅ <b>Étape 3</b> : Boutons IHM MAINT exigent <code>DeadmanArmed</code> — mouvement validé
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Translation</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-006-009</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Barrière sorties & watchdog frein</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Watchdog frein 500ms sans confirmation ➔ FAULT+Inhibit. Réautorisation = Cause+Reset+Mot 0+nouvelle demande. Zéro redémarrage auto</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_TranslationOutputInterlock</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Barrière</b><br>sorties</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Sorties M3 autorisées, frein OK<br>
+        🚀 <b>Étape 1</b> : Perte <code>BrakeFeedback</code> pendant mouvement<br>
+        ⚡ <b>Étape 2</b> : Watchdog frein 500ms sans confirmation → FAULT+Inhibit<br>
+        ✅ <b>Étape 3</b> : Réautorisation = Cause+Reset+Mot 0+nouvelle demande — zéro redémarrage auto
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_TranslationOutputInterlock</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-015</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Anti-télescopage hauteur M1/M2</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Translation bloquée si <code>CablePosM1</code> ou <code>CablePosM2</code> sous <code>_TranslationMinHeightM1M2_M</code> (6.0m) → <code>M3_HeightInterlockOk=FALSE</code>, translation bloquée (PRG_05:105-110). <code>Bypass.MinHeight</code> (dédié) lève l'anti-collision ; <code>BypassGlobal</code> ne le lève pas (PRG_05:102-105). <code>MinHeight=TRUE</code> → autorisé sous hauteur mini ; <code>BypassGlobal</code> seul → toujours bloqué. ⚠️ Câblé directement dans <code>PRG_05_Translation.st</code> §0, hors <code>FB_Safety_Translation</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>PRG_05_Translation</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Anti-</b><br>télescop.</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>CablePosM1</code>/<code>CablePosM2</code> &gt; <code>_TranslationMinHeightM1M2_M</code> (6.0m)<br>
+        🚀 <b>Étape 1</b> : Descente treuils sous 6.0m → <code>M3_HeightInterlockOk=FALSE</code><br>
+        ⚡ <b>Étape 2</b> : Translation bloquée ; <code>Bypass.MinHeight</code> (dédié) lève l'interlock, <code>BypassGlobal</code> non<br>
+        ✅ <b>Étape 3</b> : Interlock anti-télescopage actif — câblé <code>PRG_05_Translation.st</code> §0 (hors FB dédié)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>PRG_05_Translation</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

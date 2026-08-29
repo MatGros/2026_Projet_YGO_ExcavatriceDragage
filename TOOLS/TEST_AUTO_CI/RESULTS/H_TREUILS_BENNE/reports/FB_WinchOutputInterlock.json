@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "file": "test_fb_winchoutputinterlock.st",
+  "results": [
+    {
+      "name": "TC-P10-012 Watchdog frein : BrakeCmd sans confirmation 500ms -> bit0, RestartInhibit, FAULT ; pas de faux defaut au RestartRequired",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.ERROR expected TRUE, got FALSE",
+        "file": "test_fb_winchoutputinterlock.st",
+        "line": 55,
+        "message": "Timeout frein 500ms -> Error"
+      }
+    },
+    {
+      "name": "TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne doit pas armer le watchdog",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-013 Defaut frein : latches preserves hors Enable, reautorisation complete",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.ERROR expected TRUE, got FALSE",
+        "file": "test_fb_winchoutputinterlock.st",
+        "line": 152,
+        "message": "Precondition : defaut frein"
+      }
+    },
+    {
+      "name": "TC-P10-020 Watchdog frein reel terrain : temps/contacteur/bobine",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.ERROR expected TRUE, got FALSE",
+        "file": "test_fb_winchoutputinterlock.st",
+        "line": 231,
+        "message": "Watchdog frein logiciel 500ms -> Error (brique du diagnostic terrain)"
+      }
+    },
+    {
+      "name": "TC-P10-021 Temps mort meme sens : 1s apres arret -> nouvelle demande (DeadTimeSameDir)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.RELAYFWD expected TRUE, got FALSE",
+        "file": "test_fb_winchoutputinterlock.st",
+        "line": 261,
+        "message": "Mouvement autorise -> RelayFwd"
+      }
+    },
+    {
+      "name": "TC-P10-022 Temps mort inversion : 1s apres arret + inversion sens (DeadTimeOppositeDir)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.RELAYFWD expected TRUE, got FALSE",
+        "file": "test_fb_winchoutputinterlock.st",
+        "line": 319,
+        "message": "Mouvement montee -> RelayFwd"
+      }
+    },
+    {
+      "name": "TC-P10-039.1 Frein couple direct : BrakeCmd = RelayFwd OR RelayRev dans tous les etats",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "passed": 2,
+    "failed": 5
+  }
+}

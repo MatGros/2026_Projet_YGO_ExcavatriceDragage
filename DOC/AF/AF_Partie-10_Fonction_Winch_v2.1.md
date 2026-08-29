@@ -184,72 +184,117 @@ dupliqué ici) :
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-011, 017, 018, 019</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_Winch</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Pilotage</b><br>treuil</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Treuil au repos, contacteurs coupés, frein serré<br>
+        🚀 <b>Étape 1</b> : Consigne opérateur (joystick/boutons) → arbitrage palier/sens<br>
+        ⚡ <b>Étape 2</b> : Activation contacteurs selon palier, décodage <code>FB_SpeedStep</code><br>
+        ✅ <b>Étape 3</b> : Mouvement treuil piloté — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md">FB_Winch_v1.0.md</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md">FB_Winch_v1.0.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-001 à 010</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_Safety_Winch</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Sécurité</b><br>treuil</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Mouvement nominal, aucun défaut actif<br>
+        🚀 <b>Étape 1</b> : Injection défaut (dérite, non-confirmation arrêt, sens opposé, etc.)<br>
+        ⚡ <b>Étape 2</b> : Détection par mécanisme Méca A-G, <code>ErrorId</code> bit levé<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code> ± <code>PowerCutOff</code> selon masque — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md">FB_Safety_Winch_v1.0.md</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md">FB_Safety_Winch_v1.0.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-014, 015, 016</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_WinchSync</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Synchro</b><br>M1/M2</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : M1/M2 synchronisés, écart &lt; 0.8m (Zone 1)<br>
+        🚀 <b>Étape 1</b> : Injection écart entre M1 et M2<br>
+        ⚡ <b>Étape 2</b> : Zone 2 (0.8-2.5m) → dégradation palier 1 ; Zone 3 (≥2.5m) → SafeStop<br>
+        ✅ <b>Étape 3</b> : Comportement 3 zones validé — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md">FB_WinchSync_v1.1.md</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md">FB_WinchSync_v1.1.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-012, 013, 020, 021, 022</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_WinchOutputInterlock</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Barrière</b><br>sorties</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Sorties autorisées, frein couplé direct<br>
+        🚀 <b>Étape 1</b> : Arrêt commandé ou défaut → coupure contacteurs + frein<br>
+        ⚡ <b>Étape 2</b> : Watchdog frein 500ms, anti-redémarrage, gate mot/fréquence<br>
+        ✅ <b>Étape 3</b> : Zéro redémarrage auto validé — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md">FB_WinchOutputInterlock_v1.0.md</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md">FB_WinchOutputInterlock_v1.0.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-023 à 034</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_Bucket</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Benne</b><br>ouv./ferm.</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Benne au repos, M1/M2 synchronisés<br>
+        🚀 <b>Étape 1</b> : Demande ouverture/fermeture benne (désynchro M1/M2)<br>
+        ⚡ <b>Étape 2</b> : Glissement, assistants Dive/Extraction, défense en profondeur<br>
+        ✅ <b>Étape 3</b> : Manœuvre benne validée — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md">FB_Bucket_v1.0.md</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md">FB_Bucket_v1.0.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">Diagnostic MES-008, symétrie</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_Winch_Symmetry</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Symétrie</b><br>M1/M2</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : M1/M2 en mouvement, métriques passives collectées<br>
+        🚀 <b>Étape 1</b> : Mesure écarts démarrage/frein/arrêt/position<br>
+        ⚡ <b>Étape 2</b> : Calcul <code>DeltaStartDelay_Ms</code>, <code>MaxSyncDeviation_M</code>, etc.<br>
+        ✅ <b>Étape 3</b> : Diagnostic passif publié IHM — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.1.md">FB_Winch_Symmetry_v1.1.md</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.1.md">FB_Winch_Symmetry_v1.1.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">Décodage paliers 1..5 &amp; garde-fou</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_SpeedStep</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Décodage</b><br>paliers</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Consigne <code>SpeedCmd_Pct</code> reçue (0-100%)<br>
+        🚀 <b>Étape 1</b> : Quantification en 5 paliers (PV/GV1/GV2/GV3/GV4)<br>
+        ⚡ <b>Étape 2</b> : Activation contacteurs selon palier, garde-fou vitesse mesurée<br>
+        ✅ <b>Étape 3</b> : Décodeur validé — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md">FB_SpeedStep_v1.0.md</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md">FB_SpeedStep_v1.0.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">Diagnostic charge 2D</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_WinchLoadEstimator</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Charge</b><br>2D</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Treuil en mouvement, palier et vitesse mesurés<br>
+        🚀 <b>Étape 1</b> : Estimation charge 2D (palier × vitesse)<br>
+        ⚡ <b>Étape 2</b> : Calcul diagnostic passif, aucune action sécurité<br>
+        ✅ <b>Étape 3</b> : Estimation publiée IHM — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md">FB_WinchLoadEstimator_v1.0.md</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md">FB_WinchLoadEstimator_v1.0.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">Dérive position sous frein</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>FB_DriftGuard</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">(non détaillé)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Dérive</b><br>frein serré</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Treuil à l'arrêt, frein serré, position captée<br>
+        🚀 <b>Étape 1</b> : Surveillance position pendant arrêt (frein maintenu)<br>
+        ⚡ <b>Étape 2</b> : Détection dérive &gt; seuil → alerte<br>
+        ✅ <b>Étape 3</b> : Capture &amp; surveillance validées — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md">FB_DriftGuard_v1.0.md</a>
+      </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md">FB_DriftGuard_v1.0.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>

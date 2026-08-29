@@ -25,11 +25,23 @@
     {
       "name": "TC-P03-013 Enable=FALSE : vue LIVE masquee mais vue LATCHEE reste publiee (pas d effacement silencieux OFF->ON)",
       "passed": true
+    },
+    {
+      "name": "TC-P03-003 Pas de redemarrage auto apres Ack : Reset retourne Ready, un nouvel ordre explicite est requis",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-004 Pas de SafeStop/StartStop hors mouvement (invariant structurel)",
+      "passed": true
+    },
+    {
+      "name": "TC-P03-005 Encapsulation stricte : echanges via interfaces/DUTs publics uniquement (invariant structurel)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 6,
-    "passed": 6,
+    "total": 9,
+    "passed": 9,
     "failed": 0
   }
 }

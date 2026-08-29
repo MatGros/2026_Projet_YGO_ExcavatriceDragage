@@ -34,16 +34,18 @@ Décline `TC-P09-040` (chapô) :
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 310px);">
-    <col style="width: 90px;">
-    <col style="width: 140px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
@@ -52,38 +54,68 @@ Décline `TC-P09-040` (chapô) :
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-040.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>EncoderAvailable=TRUE</code>, <code>Homed=FALSE</code>, <code>EncoderIncoherent=FALSE</code> → <code>EncoderFault=FALSE</code> (non-référencé ≠ incohérent)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Non-référencé</b><br>≠ incohérent</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>EncoderAvailable=TRUE</code>, <code>Homed=FALSE</code>, <code>EncoderIncoherent=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Évaluation <code>EncoderFault := NOT Available OR Incoherent</code><br>
+        ⚡ <b>Étape 2</b> : <code>Available=TRUE</code> et <code>Incoherent=FALSE</code> → <code>EncoderFault=FALSE</code><br>
+        ✅ <b>Étape 3</b> : Non-référencé (<code>Homed=FALSE</code>) n'affecte pas <code>EncoderFault</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-040.2</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Même cas → <code>HomedAndReliable=FALSE</code> (gate stricte exige <code>Homed</code>)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Gate stricte</b><br>exige Homed</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Même cas (<code>Available=TRUE</code>, <code>Homed=FALSE</code>, <code>Incoherent=FALSE</code>)<br>
+        🚀 <b>Étape 1</b> : Évaluation <code>HomedAndReliable := Available AND Homed AND NOT Incoherent</code><br>
+        ⚡ <b>Étape 2</b> : <code>Homed=FALSE</code> → gate stricte FALSE<br>
+        ✅ <b>Étape 3</b> : <code>HomedAndReliable=FALSE</code> (gate stricte exige <code>Homed</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-040.3</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>EncoderAvailable=FALSE</code> → <code>EncoderFault=TRUE</code> quel que soit <code>Homed</code>/<code>EncoderIncoherent</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bus KO</b><br>→ Fault</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>EncoderAvailable=TRUE</code>, état nominal<br>
+        🚀 <b>Étape 1</b> : <code>EncoderAvailable=FALSE</code> (perte bus/esclave)<br>
+        ⚡ <b>Étape 2</b> : <code>EncoderFault=TRUE</code> quel que soit <code>Homed</code>/<code>EncoderIncoherent</code><br>
+        ✅ <b>Étape 3</b> : <code>HomedAndReliable=FALSE</code> (gate stricte exige <code>Available</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-040.4</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Table de vérité exhaustive des 2 gates sur 8 combos (FB_EncoderReliability.st:30,34)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Table</b><br>vérité 8</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : 8 combinaisons <code>(Available, Homed, Incoherent)</code> à tester<br>
+        🚀 <b>Étape 1</b> : Évaluation des 2 gates sur chaque combo<br>
+        ⚡ <b>Étape 2</b> : Vérification exhaustive <code>EncoderFault</code> et <code>HomedAndReliable</code><br>
+        ✅ <b>Étape 3</b> : Table de vérité complète validée (<code>FB_EncoderReliability.st:30,34</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-040.5</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>EncoderIncoherent</code> → <code>EncoderFault=TRUE</code> et <code>HomedAndReliable=FALSE</code> (FB_EncoderReliability.st:30,34)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Incohérent</b><br>→ Fault</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>EncoderAvailable=TRUE</code>, <code>Homed=TRUE</code><br>
+        🚀 <b>Étape 1</b> : <code>EncoderIncoherent=TRUE</code> (hors bornes ou suspect)<br>
+        ⚡ <b>Étape 2</b> : <code>EncoderFault=TRUE</code> et <code>HomedAndReliable=FALSE</code><br>
+        ✅ <b>Étape 3</b> : Incohérence fait tomber les 2 gates (<code>FB_EncoderReliability.st:30,34</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>
