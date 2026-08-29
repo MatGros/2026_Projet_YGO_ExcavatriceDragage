@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:56:10.041377" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:56:10.041377">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T14:08:23.755942" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T14:08:23.755942">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -244,6 +244,29 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier de vitesse demande</xhtml>
               </documentation>
             </variable>
+            <variable name="DeadTimeSameDir">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
+--&gt; [CFG] Temps mort redemarrage meme sens apres arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadTimeOppositeDir">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps mort redemarrage inversion sens apres arret</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -401,6 +424,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule temporisation anti-court-cycle</xhtml>
               </documentation>
             </variable>
+            <variable name="DeadTimeElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule temps mort directionnel</xhtml>
+              </documentation>
+            </variable>
             <variable name="StepDelayElapsed">
               <type>
                 <TIME />
@@ -458,6 +489,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation anti-court-cycle redemarrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadTime">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation temps mort directionnel</xhtml>
               </documentation>
             </variable>
             <variable name="RestartRequired">
@@ -528,6 +567,38 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Acquittement cause timeout frein</xhtml>
               </documentation>
             </variable>
+            <variable name="LastDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens commande (1 montee / -1 descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadTimePending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps mort directionnel en attente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NewDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens de la nouvelle demande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequiredDeadTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps mort requis selon sens de la demande</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -557,6 +628,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     StepDelay(IN := FALSE, PT := T#1s250ms);
     RestartDelay(IN := FALSE, PT := T#1000ms);
+    DeadTime(IN := FALSE);
+    DeadTimePending := FALSE;
+    DeadTimeElapsed := T#0ms;
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     BrakeCmd := FALSE; AuthorizedStep := 0;
@@ -618,6 +692,48 @@ IF RestartDelay.Q THEN
     RestartRequired := FALSE;
 END_IF;
 
+// ── 4bis. Temps mort directionnel (TC-P10-021/022) ─────────────────────────────
+// Distinct du RestartDelay (anti-court-cycle uniforme) : temps mort de redémarrage
+// après arrêt, dépendant du sens de la nouvelle demande. Même sens → DeadTimeSameDir ;
+// inversion → DeadTimeOppositeDir. Neutre↔sens = immédiat (pas de temps mort à l'armement).
+// Le décompte se fait pendant la pause ET pendant l'attente après nouvelle demande
+// (purge pendant la pause, comme RestartDelay). PT = DeadTimeOppositeDir (le plus long) ;
+// à la nouvelle demande, on vérifie si le temps mort requis pour le sens réel est déjà
+// écoulé (cas même sens, plus court).
+IF MotorRequest THEN
+    IF RequestedRelayFwd THEN
+        LastDirection := 1;
+    ELSE
+        LastDirection := -1;
+    END_IF;
+END_IF;
+
+IF NOT MotorRequest THEN
+    DeadTimePending := TRUE;
+END_IF;
+
+DeadTime(IN := DeadTimePending AND NOT BrakeFeedback AND NOT RestartInhibit, PT := DeadTimeOppositeDir);
+DeadTimeElapsed := DeadTime.ET;
+IF DeadTime.Q THEN
+    DeadTimePending := FALSE;
+END_IF;
+
+IF MotorRequest AND DeadTimePending THEN
+    IF RequestedRelayFwd THEN
+        NewDirection := 1;
+    ELSE
+        NewDirection := -1;
+    END_IF;
+    IF NewDirection = LastDirection THEN
+        RequiredDeadTime := DeadTimeSameDir;
+    ELSE
+        RequiredDeadTime := DeadTimeOppositeDir;
+    END_IF;
+    IF DeadTime.ET &gt;= RequiredDeadTime THEN
+        DeadTimePending := FALSE;
+    END_IF;
+END_IF;
+
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -643,7 +759,7 @@ ELSIF NOT MotorRequest THEN
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.READY;
-ELSIF RestartRequired THEN
+ELSIF RestartRequired OR DeadTimePending THEN
     StepDelay(IN := FALSE, PT := T#1s250ms);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
