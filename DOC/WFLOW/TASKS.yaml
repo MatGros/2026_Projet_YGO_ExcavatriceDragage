@@ -2870,3 +2870,30 @@ tasks:
   - Zéro régression TC treuils existants + gates palier C
   - Fiche FB_Winch alignée au code (note 🆕 activation par défaut)
   bloque_par: []
+- id: T178
+  statut: ⬜
+  criticite: C4
+  domaine: TREUILS
+  agent: ''
+  date: '2026-08-29T16:30:00'
+  titre: Seuil coast-down treuil après retombée contacteurs + note AF (choix délibéré)
+  contexte: 'Décision 2026-08-29 (utilisateur). (1) T054 « latence boucle 10 ms au calcul temps
+    d''arrêt » CLÔTURÉE / ABSORBÉE : à vitesse max (~2-3 m/s) la latence scan 10 ms = 2-3 cm,
+    négligeable devant le coast-down freinage réel (1-2 m au relâcher joystick, collage frein +
+    inertie charge/tambour). Aucune implémentation CST_ScanLatencyMs ; rentre dans la marge fixe.
+    (2) Le vrai paramètre à sécuriser = le déplacement toléré APRÈS retombée des contacteurs avant
+    de déclarer un défaut (frein qui lâche / glissement câble → AU).'
+  description: 'À faire : quand la surveillance « déplacement après contacteur-off » sera implémentée
+    (périmètre FB_Safety_EmergencyManagement / surveillance treuil), exposer un paramètre config
+    CfgWinchCoastMax_M ajustable IHM, DÉFAUT SOUPLE = 3.0 m (zéro faux déclenchement au relâcher
+    joystick en mise en service). Défaut si descente > CfgWinchCoastMax_M OU encore en mouvement
+    ~3 s après contacteur-off. + Mettre un MOT dans l''AF (AF_Partie-10 Winch ou AF_Partie-01
+    Safety) indiquant que ce seuil large est un CHOIX DÉLIBÉRÉ de mise en service, à affiner vers
+    le bas sur mesures site (chargé/à vide), sans jamais passer sous le coast max mesuré + marge.
+    Ne pas ajouter la latence aux timeouts de coupure réels.'
+  contrat: ''
+  objectifs:
+  - Paramètre CfgWinchCoastMax_M (config, IHM), défaut 3.0 m, borne haute + timeout mouvement
+  - Note explicite dans l''AF : seuil large = choix délibéré mise en service, à affiner site
+  - T054 tracée comme absorbée (pas d''implémentation latence 10 ms)
+  bloque_par: []
