@@ -26,7 +26,7 @@
 | 3 | `DOC/WFLOW/AUDITS/DESIGN/BRIEFS_T181/RESULTS/B2_challenge3_resultat.md` §4.3 | override benne (tranche proposée) |
 | 4 | `DOC/WFLOW/AUDITS/DESIGN/BRIEFS_T181/RESULTS/B4_review_independante.md` §3.2 | `FB_WinchSync`/`Symmetry` hors périmètre — à cadrer |
 | 5 | `DOC/STDS/NAMING_CONVENTION.md` (NC-050, NC-090, NC-110, chaîne `Req/Tgt/Cmd/Act`) | validation des noms |
-| 6 | `DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md` + `DOC/AF/AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md` | format AF (tables HTML), fiche actuelle |
+| 6 | `DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md` + les fiches du dossier `DOC/AF/AF_Partie-10_Fonction_Winch/` | format AF (tables HTML), fiches sœurs |
 | 7 | `CODE/H_TREUILS_BENNE/FB_Winch.st`, `FB_SpeedStep.st`, `CODE/M_MAIN/PRG_04_Treuils_Benne.st` §3 et §6 | l'existant à faire évoluer |
 | 8 | `CODE/H_TREUILS_BENNE/FB_WinchSync.st`, `FB_Winch_Symmetry.st` | dépendances non cadrées |
 
