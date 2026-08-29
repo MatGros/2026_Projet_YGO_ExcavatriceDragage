@@ -117,11 +117,11 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
   <colgroup>
     <col style="width: 28px;">
     <col style="width: 50px;">
-    <col style="width: calc(100% - 215px);">
+    <col style="width: calc(100% - 233px);">
     <col style="width: 48px;">
     <col style="width: 45px;">
     <col style="width: 26px;">
-    <col style="width: 18px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
