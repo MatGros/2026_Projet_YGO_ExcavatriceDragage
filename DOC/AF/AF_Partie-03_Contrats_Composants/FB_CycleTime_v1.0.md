@@ -37,11 +37,47 @@ entrée de configuration (`DefaultValueS`, valeur de secours) et une seule sorti
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
 > non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Comportement attendu | Type | Réf | Etat |
-|---|---|---|---|---|
-| <nobr><code>TC-P03-014.1</code></nobr> | Plage nominale : au 1ᵉʳ appel `CycleTimeS = DefaultValueS` (aucun `dt` disponible) ; aux appels suivants, `0 < dt ≤ CST_MaxCycleDeltaMs` ⟹ `CycleTimeS = dt` réel (ms→s), quelle que soit la valeur du `dt` d'un cycle à l'autre, **borne `dt = CST_MaxCycleDeltaMs` incluse** (⟹ `1.0 s`) | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
-| <nobr><code>TC-P03-014.2</code></nobr> | Borne basse : `dt = 0` (deux appels dans le même instant horloge) ⟹ `CycleTimeS = DefaultValueS` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
-| <nobr><code>TC-P03-014.3</code></nobr> | Borne haute, non latchée : `dt > CST_MaxCycleDeltaMs` (**borne exclue** : `dt = 1001 ms` ⟹ secours ; rebouclage `TIME()` / reprise) ⟹ `CycleTimeS = DefaultValueS` ; dès le scan suivant à `dt` nominal, le `dt` réel est de nouveau publié | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: calc(100% - 310px);">
+    <col style="width: 90px;">
+    <col style="width: 140px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-014.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Plage nominale : au 1ᵉʳ appel <code>CycleTimeS = DefaultValueS</code> (aucun <code>dt</code> disponible) ; aux appels suivants, <code>0 &lt; dt ≤ CST_MaxCycleDeltaMs</code> ⟹ <code>CycleTimeS = dt</code> réel (ms→s), quelle que soit la valeur du <code>dt</code> d'un cycle à l'autre, <b>borne <code>dt = CST_MaxCycleDeltaMs</code> incluse</b> (⟹ <code>1.0 s</code>)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-014.2</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Borne basse : <code>dt = 0</code> (deux appels dans le même instant horloge) ⟹ <code>CycleTimeS = DefaultValueS</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-014.3</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Borne haute, non latchée : <code>dt &gt; CST_MaxCycleDeltaMs</code> (<b>borne exclue</b> : <code>dt = 1001 ms</code> ⟹ secours ; rebouclage <code>TIME()</code> / reprise) ⟹ <code>CycleTimeS = DefaultValueS</code> ; dès le scan suivant à <code>dt</code> nominal, le <code>dt</code> réel est de nouveau publié</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 3 · 🔌 Interface
 
