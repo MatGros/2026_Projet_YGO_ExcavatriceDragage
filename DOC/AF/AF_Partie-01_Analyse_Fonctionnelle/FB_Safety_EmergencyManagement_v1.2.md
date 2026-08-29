@@ -113,32 +113,32 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 > 1. **Scénario 1 (Nominal)** : Cycle complet d'utilisation sans perturbation (Initialisation -> Auto-test A/B -> Pulse 1s -> Confirmation contacteur -> Maintien puissance sain).
 > 2. **Scénarios 2 à 6 (Perturbations & Injections)** : Injection d'événements et de pannes venant perturber ou tester les barrières de sécurité.
 
-<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13.5px;">
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px;">
   <colgroup>
-    <col style="width: 32px;">
-    <col style="width: 80px;">
-    <col style="width: calc(100% - 292px);">
-    <col style="width: 55px;">
-    <col style="width: 55px;">
-    <col style="width: 40px;">
-    <col style="width: 30px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 215px);">
+    <col style="width: 48px;">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 18px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
-      <th style="padding: 6px 2px; text-align: center;"><small style="writing-mode: vertical-rl; transform: rotate(180deg);">ID</small></th>
-      <th style="padding: 6px 6px;"><small>Intention</small></th>
-      <th style="padding: 6px 14px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
-      <th style="padding: 6px 4px; text-align: center;"><small>Preuve</small></th>
-      <th style="padding: 6px 4px; text-align: center;"><small>Type</small></th>
-      <th style="padding: 6px 4px; text-align: center;"><small>Réf</small></th>
-      <th style="padding: 6px 4px; text-align: center;"><small>État</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small style="writing-mode: vertical-rl; transform: rotate(180deg);">ID</small></th>
+      <th style="padding: 4px 2px;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Preuve</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-NOM</span></td>
-      <td style="padding: 6px;"><small><b>Nominal</b><br>Réarm.</small></td>
-      <td style="padding: 8px 14px; line-height: 1.6;">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-NOM</span></td>
+      <td style="padding: 4px 2px;"><small><b>Nominal</b><br>Réarm.</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Repos initial (boucle saine, contacteur au repos, <code>Armable=TRUE</code>)<br>
         🚀 <b>Étape 1</b> : Demande réarmement (<code>ArmRequest</code> ➔ lance TestA)<br>
         🔍 <b>Étape 2</b> : Réaction boucle à TestA (chute boucle ➔ RestoreA)<br>
@@ -148,15 +148,15 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         ⏱️ <b>Étape 6</b> : Fin impulsion 1s ➔ Attente confirmation contacteur<br>
         ✅ <b>Étape 7</b> : Confirmation collage (<code>PowerContactorEngaged=TRUE</code> ➔ <code>Done=TRUE</code>)
       </td>
-      <td style="padding: 6px 4px; text-align: center;"><small>Chrono</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.3</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>Chrono</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-DYN</span></td>
-      <td style="padding: 6px;"><small><b>Dynamique</b><br>Perturb.</small></td>
-      <td style="padding: 8px 14px; line-height: 1.6;">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-DYN</span></td>
+      <td style="padding: 4px 2px;"><small><b>Dynamique</b><br>Perturb.</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
         🚀 <b>Phase 1</b> : Réarmement nominal réussi et mise en service (<code>Done=TRUE</code>)<br>
         ⚡ <b>Phase 2</b> : Coupure métier en marche (<code>PowerCutOffRequest=TRUE</code> ➔ retombée A/B, <code>Armable=FALSE</code>)<br>
         🛡️ <b>Phase 3</b> : Tentative réarmement bloquée sous défaut (refus net, reste Step 0)<br>
@@ -164,100 +164,100 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
         ⚠️ <b>Phase 5</b> : Nouvel armement avec échec collage contacteur (timeout 2s Step 6 ➔ <code>EmergencyArmingFailed</code> + Lockout 5s)<br>
         🔓 <b>Phase 6</b> : Expiration lockout 5s + <code>Reset</code> (prêt pour nouvel essai)
       </td>
-      <td style="padding: 6px 4px; text-align: center;"><small>Chrono</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.3</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>Chrono</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-001</span></td>
-      <td style="padding: 6px;"><small>Coupure AU<br>physique</small></td>
-      <td style="padding: 8px 14px;">Coupe la boucle matérielle, contacteur retombe, API vivant</td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>Contactor=0</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>🟢 SITE</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§6.1</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-001</span></td>
+      <td style="padding: 4px 2px;"><small>Coupure AU<br>physique</small></td>
+      <td style="padding: 6px 8px;">Coupe la boucle matérielle, contacteur retombe, API vivant</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>Contactor=0</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>🟢 SITE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6.1</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-002</span></td>
-      <td style="padding: 6px;"><small>Perte maintien<br>A/B</small></td>
-      <td style="padding: 8px 14px;">Perte canal A ou B ouvre la boucle AU</td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>Maintain=0</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>⚡ MIXTE</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§5</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-002</span></td>
+      <td style="padding: 4px 2px;"><small>Perte maintien<br>A/B</small></td>
+      <td style="padding: 6px 8px;">Perte canal A ou B ouvre la boucle AU</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>Maintain=0</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ MIXTE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-003</span></td>
-      <td style="padding: 6px;"><small>Impulsion<br>réarmement</small></td>
-      <td style="padding: 8px 14px;">Front <code>ArmRequest</code> + préconditions OK ➔ pulse 1s (Step 5)</td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>ArmPulse=1</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.3</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-003</span></td>
+      <td style="padding: 4px 2px;"><small>Impulsion<br>réarm.</small></td>
+      <td style="padding: 6px 8px;">Front <code>ArmRequest</code> + préconditions OK ➔ pulse 1s (Step 5)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>ArmPulse=1</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-004</span></td>
-      <td style="padding: 6px;"><small>Acquittement<br>Reset</small></td>
-      <td style="padding: 8px 14px;"><code>Reset</code> efface l'affichage et purge les verrous d'échec</td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>Reset=OK</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.4</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-004</span></td>
+      <td style="padding: 4px 2px;"><small>Acquittement<br>Reset</small></td>
+      <td style="padding: 6px 8px;"><code>Reset</code> efface l'affichage et purge les verrous d'échec</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>Reset=OK</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-005</span></td>
-      <td style="padding: 6px;"><small>Séquence<br>2 temps</small></td>
-      <td style="padding: 8px 14px;">Acquittement défaut métier et réarmement = 2 actions distinctes</td>
-      <td style="padding: 6px 4px; text-align: center;"><small>2 actions</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>⚡ MIXTE</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.4</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-005</span></td>
+      <td style="padding: 4px 2px;"><small>Séquence<br>2 temps</small></td>
+      <td style="padding: 6px 8px;">Acquittement défaut métier et réarmement = 2 actions distinctes</td>
+      <td style="padding: 4px 1px; text-align: center;"><small>2 actions</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ MIXTE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-006</span></td>
-      <td style="padding: 6px;"><small>Auto-test<br>A/B croisé</small></td>
-      <td style="padding: 8px 14px;">Test dynamique A/B au réarmement (échec ➔ <code>RedundancyFail</code>)</td>
-      <td style="padding: 6px 4px; text-align: center;"><small>Steps 1–4</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.3b</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-006</span></td>
+      <td style="padding: 4px 2px;"><small>Auto-test<br>A/B croisé</small></td>
+      <td style="padding: 6px 8px;">Test dynamique A/B au réarmement (échec ➔ <code>RedundancyFail</code>)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small>Steps 1–4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.3b</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-007</span></td>
-      <td style="padding: 6px;"><small>Échec contacteur<br>+ Lockout</small></td>
-      <td style="padding: 8px 14px;">Contacteur non confirmé sous 2s ➔ Alarme <code>EmergencyArmingFailed</code> + Lockout 5s</td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>Lockout=1</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.3</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-007</span></td>
+      <td style="padding: 4px 2px;"><small>Échec contact.<br>+ Lockout</small></td>
+      <td style="padding: 6px 8px;">Contacteur non confirmé sous 2s ➔ Alarme <code>EmergencyArmingFailed</code> + Lockout 5s</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>Lockout=1</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-008</span></td>
-      <td style="padding: 6px;"><small>Coupure métier<br>active</small></td>
-      <td style="padding: 8px 14px;"><code>PowerCutOffRequest=TRUE</code> (dérive treuil/M3) ➔ <code>Armable=FALSE</code>, retombée immédiate</td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>Maintain=0</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.1</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-008</span></td>
+      <td style="padding: 4px 2px;"><small>Coupure métier<br>active</small></td>
+      <td style="padding: 6px 8px;"><code>PowerCutOffRequest=TRUE</code> (dérive treuil/M3) ➔ <code>Armable=FALSE</code>, retombée immédiate</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>Maintain=0</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.1</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-009</span></td>
-      <td style="padding: 6px;"><small>Interlock<br>PowerCutOff</small></td>
-      <td style="padding: 8px 14px;">Réarmement interdit tant que la coupure métier n'est pas acquittée</td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>Armable=0</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.2</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-009</span></td>
+      <td style="padding: 4px 2px;"><small>Interlock<br>PowerCutOff</small></td>
+      <td style="padding: 6px 8px;">Réarmement interdit tant que la coupure métier n'est pas acquittée</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>Armable=0</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 6px 2px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold;">TC-P01-010</span></td>
-      <td style="padding: 6px;"><small>Avortement<br>volontaire IHM</small></td>
-      <td style="padding: 8px 14px;"><code>BtnEmergencyCutOff</code> pendant le pulse ➔ avortement immédiat propre sans alarme</td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>Pulse=0</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small>§4.3</small></td>
-      <td style="padding: 6px 4px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-010</span></td>
+      <td style="padding: 4px 2px;"><small>Avortement<br>IHM</small></td>
+      <td style="padding: 6px 8px;"><code>BtnEmergencyCutOff</code> pendant le pulse ➔ avortement immédiat propre sans alarme</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>Pulse=0</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
   </tbody>
 </table>
