@@ -90,3 +90,19 @@ Avec des agents experts en **automatisme industriel / sécurité machine (ISO 13
 3. **Pipeline obligatoire après chaque lot** : `extract_functions_matrix.py` + tests consommateurs 7/7 + regen matrice + sweep d'orchestrateur + `G340_check_doc_links.py` + commit restreint. Le reformatage fond passe TOUJOURS par des agents experts avec lecture du diff par l'orchestrateur.
 4. **Grille de tests par TC** : nominal (cycle complet) → défaut classique (panne réaliste) → granulaires (fronts, timeouts, cas limites, bascules de mode) ; lecteur ISO 13849/DSEAR-style sur les TC safety ; aucune validation de complaisance.
 5. **Jamais de push** sans relecture du diff par l'humain et accord explicite.
+
+## ✂️ P3-1 — découpage des lots experts (fiches FB d'abord)
+
+| Lot | Fiches | Lecture experte focus |
+|---|---|---|
+| P3-1a | P10 Winch (5 fiches TC : Bucket, Safety_Winch, Winch, WinchOutputInterlock, WinchSync) | safety treuils : isolement AU, double canal, watchdog frein, sync M1/M2 |
+| P3-1b | P11 Translation (4) + P13 Simulation (5) | interlocks M3, frontière réel/simulé, homme-mort jamais contourné |
+| P3-1c | P09 Encoder (6) + P08 Joystick (1) | homing/preset, échelles axes, homme-mort, deadband |
+| P3-1d | P03 (CycleTime, FaultCore) + P06 Preflight + P12 Diagnostic (2) + P14 TroubleshootingView | contrats communs, prévol flight, diag bus, observation passive |
+
+Grille par TC (verdicts écrits par les experts, dans la fiche FB propriétaire) :
+- `[NOMINAL]` cycle complet sans perturbation — existe-t-il ?
+- `[DEFAUT]` panne classique réaliste (perte PDO, capteur collé, watchdog frein, AU) — couvert ?
+- `[GRANULAIRE]` fronts, timeouts, bornes, bascules de mode, Reset sur front, persistance.
+- Sortie expert : liste (TC → verdict OK / écart → proposition TC suffisé `.N+1` **nouvel ID suffixé**, jamais déplacer un ID existant).
+- Aucune édition directe du tableau par l'expert : propositions revues, puis édition par lot sous contrôle orchestrateur + pipeline obligatoire (§règles verrouillées).
