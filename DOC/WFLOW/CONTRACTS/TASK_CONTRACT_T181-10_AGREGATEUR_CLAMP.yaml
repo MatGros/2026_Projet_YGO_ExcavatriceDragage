@@ -1,0 +1,96 @@
+# Contrat T181-10 — Agrégateur de clamp de palier dans PRG_04 (commun + M2-propre)
+# Source : PLAN_GEL_TREUIL_T181_v0.1.md §4-A ; CADRAGE_T181-06_DRIVEREQUEST.md §3 ;
+#          constats D05 / D13 ; challenge #2-A ; B4 §1 (comptes reels), §3.2 (sync hors interface).
+
+contract:
+  task_id: T181-10_AGREGATEUR_CLAMP
+  criticality: C4            # anti-télescopage benne ; touche PRG_04
+  strategy: patch
+
+  objective: >
+    Remplacer les 2 expressions SEL() de clamp dupliquées inline de PRG_04 (M1 : ~5 conditions,
+    M2 : ~7) par UNE fonction d'agrégation unique : bornes communes identiques M1=M2, puis la
+    branche M2 applique en plus le plafond propre benne. Supprimer la reconstruction de table
+    M2 (~24 affectations) si elle devient redondante (décision D13). Zéro régression M1.
+
+  acceptance:
+    - id: AC1
+      statement: "Une seule fonction (ou bloc nommé) de PRG_04 calcule commonMin/Max{Up,Down} identiques pour instWinchM1 et instWinchM2 ; plus AUCUN SEL() de clamp de palier inline dans les blocs d'appel instWinchM1/M2."
+      verified_by: "grep 'SEL(' autour des appels instWinchM1/M2 dans PRG_04 = 0 pour le clamp ; lecture de la fonction d'agrégation"
+    - id: AC2
+      statement: "Bornes communes bit-à-bit identiques sur les 2 instances : le harnais T181-00 asserte commonMaxUp/commonMaxDown/commonMinUp/commonMinDown egaux entre M1 et M2 sur toute la matrice."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb WINCH_INTEG (vecteur d'egalite des bornes communes)"
+    - id: AC3
+      statement: "La branche M2 applique en plus MIN(., plafond benne) : M2_BucketJogLimit, ManualBucketLimitsActive, BucketNotClosedAscentStep1, SlackCableAscentStep1 restent M2-only et n'affectent JAMAIS M1."
+      verified_by: "TC régression M1 : M2 en jog benne (M2_BucketJogLimit actif) + M1 demande palier 4 -> StepNumber M1 = 4 (PASS)"
+    - id: AC4
+      statement: "Précédence : MaxStep := MIN(sources plafond), MinStep := MAX(sources plancher) ; la garde LIMIT(1, MinStepNumber, MaxStepClamped) de FB_SpeedStep (T181-07) reçoit des bornes cohérentes (Min <= Max toujours possible ; si conflit, le plafond gagne)."
+      verified_by: "TC : MinStepDown=3 (plongée) + source bordure basse voulant MaxStepDown=1 -> resultat 1"
+    - id: AC5
+      statement: "Décision D13 tranchée PAR LES TC : si les TC démontrent que MaxStepDown:=1 de l'agrégateur produit le même effet que la reconstruction de table M2 (PRG_04 ~l.405-429), cette reconstruction est SUPPRIMEE ; sinon elle est conservée avec une justification écrite en clair dans le code."
+      verified_by: "TC comparatif table-swap vs MaxStepDown:=1 + git diff (suppression OU commentaire de justification)"
+    - id: AC6
+      statement: "L'arbitrage synchro reste en amont de l'agrégateur : SafeStopMx_Active, EffectivePermit et SyncDeviationWarn sont calculés dans PRG_04 avant l'appel de la fonction d'agrégation ; SyncDeviationWarn plafonne les DEUX demandes (commun). FB_Winch_Symmetry reste mesure passive, hors interface FB_Winch."
+      verified_by: "lecture PRG_04 (ordre de calcul) + TC harnais : deviation injectee -> plafond 1 sur M1 ET M2"
+    - id: AC7
+      statement: "Renommage vocabulaire propagé (cohérent avec T181-09) : plus de M2_ForceSlowSpeed / CfgMaxStepDescente / MaxStepAscent dans le périmètre touché."
+      verified_by: "grep 'M2_ForceSlowSpeed|CfgMaxStepDescente|MaxStepAscent' dans PRG_04 = 0"
+    - id: AC8
+      statement: "Non-régression : G200 PASS, gates palier C PASS ; TC treuils existants verts."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+    - id: AC9
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (source PRG_04_Treuils_Benne -> POU PRG_04_Treuils_Benne)."
+      verified_by: "comparaison basename sans extension vs identifiant apres PROGRAM"
+    - id: AC10
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage n'est apposé ; le suffixe reste identique au langage genere dans le bundle (ST pur)."
+      verified_by: "grep basename *_CFC/_LD absent + inspection CODE_Bundle.xml"
+
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/H_TREUILS_BENNE/FB_SpeedStep.st       # si l'ordre garde/plafond doit s'ajuster
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st   # vecteurs de clamp
+    forbidden:
+      - CODE/H_TREUILS_BENNE/FB_Winch.st           # l'interface est traitee en T181-08
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Tous les bridages actuellement effectifs (sync deviation -> 1, ralentissement bordure, homing approach, extraction -> 1) : mêmes effets, juste calculés une fois"
+      - "Le fait que le pilotage unitaire M1 n'est PAS bridé par l'état benne (aujourd'hui vrai par la structure inline M2-only ; doit le rester)"
+    dropped_on_purpose:
+      - "Les 2 expressions SEL() de clamp dupliquées inline"
+      - "La reconstruction de table M2 (~24 affectations) SI les TC prouvent l'équivalence (D13)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si l'unification « bornes communes M1=M2 » bride M1 dans un cas non prévu, si D13 ne peut
+    pas être tranché par TC (comportements non équivalents), ou si l'ordre sync/agrégateur crée
+    un lag 1 scan nouveau : REMONTER à l'orchestrateur.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir : fonction d'agrégation unique, suppression SEL inline, décision D13 sur TC.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Revue orchestrateur : git diff réel + TC régression M1 + décision D13 tracée.

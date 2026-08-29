@@ -1,0 +1,109 @@
+# Contrat T181-08 — Refonte interface FB_Winch (struct DriveRequest) — 08a plomberie / 08b clamp
+# Source : PLAN_GEL_TREUIL_T181_v0.1.md §4, §13 change #1 ; CADRAGE_T181-06_DRIVEREQUEST.md ;
+#          B2 §1.2/§2 (big-bang + oracle shadow) ; B4 §1.1 (interface pas « inchangée »), §6.
+
+contract:
+  task_id: T181-08_INTERFACE_FB_WINCH
+  criticality: C4            # l'interface de l'actionneur treuil ; touche PRG_04
+  strategy: rebuild
+
+  objective: >
+    Faire passer FB_Winch de l'interface plate (~30 scalaires) à l'interface objet
+    ST_fbWinch_DriveRequest / _Sensors / _Cfg (cadrage T181-06), en DEUX étapes commitées
+    séparément : 08a = plomberie struct pure à comportement bit-identique ; 08b = bascule du
+    calcul de clamp vers l'agrégateur PRG_04 (dépend de T181-10). Aucun big-bang, aucune
+    régression comportementale non voulue.
+
+  acceptance:
+    # ---- Étape 08a : plomberie struct, comportement bit-identique ----
+    - id: AC1
+      statement: "Les DUT ST_fbWinch_DriveRequest, ST_fbWinch_Sensors, ST_fbWinch_Cfg, ST_WinchFinalInterlockReq existent conformes au cadrage T181-06 §2 (champs, types, unités _M/_Mps, nommage NC-030/050/110)."
+      verified_by: "diff des .st de DUT vs CADRAGE_T181-06_DRIVEREQUEST.md §2 + G120"
+    - id: AC2
+      statement: "FB_Winch est réinterfacé (structs en entrée), et AU MÊME COMMIT : les 2 sites d'appel de PRG_04 (instWinchM1/M2), FB_SimBench et TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st sont migrés. Aucun appelant orphelin."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report (0 orphelin)"
+    - id: AC3
+      statement: "Étape 08a : MinStepNumber est câblé partout à la valeur 1 (aucun plancher actif). Le comportement de FB_Winch est bit-identique à l'état pré-migration sur toute la matrice de vecteurs du harnais T181-00."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Winch (resultat identique a la baseline pre-migration) + run --fb WINCH_INTEG"
+    - id: AC4
+      statement: "L'interface de FB_Winch est en REDUCTION / additive contrôlée : l'entrée morte Mode (VAR_INPUT, jamais lue) est retirée et les 2 sites PRG_04 qui passaient Mode:= sont édités au même commit. Aucune entrée nouvelle hors les 3 structs et les seuils de cadence (T181-01)."
+      verified_by: "git diff FB_Winch.st (bloc VAR_INPUT) + grep 'Mode ' dans les appels instWinchM1/M2 de PRG_04 = 0"
+    - id: AC5
+      statement: "ContactorsCheck.StuckClosed reste publié en sortie de FB_Winch mais n'est plus produit par lui : il est ré-alimenté depuis FB_Safety_Winch via PRG_04 (décision T181-06 #3). La cause de défaut interne StuckClosed de FB_Winch (instCauses) est retirée."
+      verified_by: "grep 'StuckClosed' dans le corps executable de FB_Winch.st = 0 assignation ; lecture PRG_04 (re-alimentation)"
+    # ---- Étape 08b : bascule du calcul de clamp ----
+    - id: AC6
+      statement: "Étape 08b (après T181-10) : FB_Winch/FB_SpeedStep consomment les bornes Min/MaxStep{Up,Down} de DriveRequest calculées par l'agrégateur PRG_04. Le calcul de clamp interne historique de FB_Winch est supprimé."
+      verified_by: "lecture FB_Winch.st + FB_SpeedStep.st : plus de SEL/MIN de clamp local ; les bornes viennent de DriveRequest"
+    - id: AC7
+      statement: "L'oracle de validation de 08b est une TABLE D'ATTENDUS ECRITE A LA MAIN pour les familles HARN-1x a HARN-6x (pas « nouveau == ancien calcul » : l'ancien est connu buggé D05/D08/D13). Un point de retour Git est taggé avant la bascule."
+      verified_by: "presence de la table d'attendus dans test_winch_integ.st + tag git t181-08b-pre"
+    - id: AC8
+      statement: "Non-régression : G200 PASS, gates palier C PASS, et les TC treuils existants (TC-P10-011/014-016/017/023-034/042.1) restent verts après 08a puis 08b."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+    - id: AC9
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (PRG_04_Treuils_Benne.st -> PRG_04_Treuils_Benne)."
+      verified_by: "comparaison basename sans extension vs identifiant apres PROGRAM/FUNCTION_BLOCK pour chaque fichier du scope"
+    - id: AC10
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage (_CFC/_LD) n'est apposé ; le suffixe reste identique au langage genere dans le bundle, c'est-a-dire du ST pur."
+      verified_by: "grep basename *_CFC/_LD absent + inspection CODE_Bundle.xml : POU concernes en ST"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/_TYPES/**            # 3 DUT ST_fbWinch_* + ST_WinchFinalInterlockReq
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/**   # ST_WinchFinalInterlockReq cote supervision + ST_SafetyWinch (champ StuckClosed)
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_SpeedStep.st      # consommation des bornes (08b)
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st       # 2 sites d'appel + retrait Mode
+      - CODE/M_MAIN/PRG_06_Outputs.st             # ST_WinchFinalInterlockReq consommateur
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st
+    forbidden:
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st         # producteur MinStepDown = T181-12, pas ici
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Toutes les sorties publiques de FB_Winch consommées par PRG_04 / bus WinchMxState (RelayFwd_Up/Rev_Down, Contactor1..4, StepNumber, ContactorsCheck, CommandedDirection, zones de ralentissement)"
+      - "Le comportement Enable=FALSE -> sorties sûres + latches ; pas de redémarrage auto après défaut"
+      - "Précédence Enable > SafeStop > StartStop"
+    dropped_on_purpose:
+      - "L'entrée VAR_INPUT Mode (morte)"
+      - "Le calcul de clamp interne de FB_Winch (deplacé dans l'agrégateur PRG_04, 08b)"
+      - "La production interne de StuckClosed par FB_Winch (deplacée dans FB_Safety_Winch)"
+      - "Toute idée de shadow comparison comme oracle (remplacé par table d'attendus écrite à la main)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si retirer Mode ou déplacer StuckClosed casse un consommateur non prévu, si l'agrégateur
+    T181-10 n'est pas prêt au moment de 08b, ou si le comportement 08a n'est PAS bit-identique
+    (un écart apparaît sur un vecteur) : REMONTER à l'orchestrateur avant de contourner.
+    Ne jamais commiter 08a et 08b ensemble.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir : 08a plomberie struct bit-identique, puis 08b bascule clamp.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Revue orchestrateur : git diff réel de 08a (comportement iso) PUIS de 08b (table d'attendus).
+    Deux commits distincts, deux revues.
