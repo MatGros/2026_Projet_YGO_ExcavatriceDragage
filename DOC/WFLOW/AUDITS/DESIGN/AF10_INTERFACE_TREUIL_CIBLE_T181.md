@@ -117,6 +117,48 @@ Producteur `PRG_04`, consommateur `PRG_06`. **Le nom de la struct porte le rôle
 
 ---
 
+## 3bis · Cadencement des contacteurs — règle absolue (utilisateur, critique matériel)
+
+> Cadencer la **montée** protège le moteur et le matériel. La **retombée** doit être quasi
+> instantanée. **Condition absolue** : ne jamais relâcher le contacteur de **sens**
+> (`RelayFwd_Up` / `RelayRev_Down`) **avant** les contacteurs de **vitesse** (`Contactor1..4`).
+
+### Séquence
+
+| Phase | Contacteurs de vitesse `C1..C4` | Contacteur de sens `RelayFwd_Up` / `RelayRev_Down` |
+|---|---|---|
+| **Montée en palier** | montée **cadencée** : +1 cran par `StepRampDelay` (`FB_WinchStepShaper`) | établi **avant** le 1ᵉʳ cran de vitesse ; maintenu |
+| **Relâche joystick / `StartStop=FALSE`** | **tous à 0 immédiatement** (pas de rampe descendante) | **maintenu** tant que `C1..C4 ≠ 0` |
+| **Confirmation vitesse retombée** | `ContactorsAllOff` (feedback) OU `C1..C4` commandés à 0 depuis ≥ `DropConfirmDelay` | **alors seulement** → 0 |
+| **Défaut / `SafeStop`** | tous à 0 immédiatement | 0 après confirmation vitesse (même règle) — sauf coupure puissance (AU / `PowerCutOff`) qui coupe tout en amont |
+
+### `FB_WinchStepShaper` — comportement asymétrique
+
+```
+ShapedStep :
+  montée   : ShapedStep -> ShapedStep+1 quand StepDelayElapsed >= StepRampDelay   (cadencé)
+  descente : ShapedStep -> 0 au cycle suivant                                     (immédiat, pas de rampe descendante)
+```
+
+### Ordonnancement de retombée — règle dans `FB_Winch` ET `FB_WinchOutputInterlock`
+
+La règle « sens jamais avant vitesse » est vérifiée à **deux niveaux**, avec des seuils
+décalés (même patron que `FB_WinchRateInterlock`) :
+
+| Instance | Seuil de confirmation « vitesse retombée » | Rôle |
+|---|---|---|
+| dans `FB_Winch` (sortie) | `DropConfirmDelay` court (marge) — logique programme | gouverne en nominal |
+| dans `FB_WinchOutputInterlock` (barrière) | `DropConfirmDelay` = safety nu (attente feedback `ContactorsAllOff`) | filet — coupe le sens **seulement** après retombée effective |
+
+> Diag : `DirectionDropBlocked` (sens en attente de retombée vitesse) — DOIT être transitoire
+> (≤ quelques cycles) en nominal ; un latch prolongé = contacteur de vitesse collé (→ `StuckClosed`).
+
+### Garde mécanique
+`G4xx_check_direction_after_speed` : dans `FB_Winch.st` et `FB_WinchOutputInterlock.st`,
+toute mise à `FALSE` de `RelayFwd_Up`/`RelayRev_Down` est gardée par une condition
+« tous `Contactor1..4` à 0 » (ou `ContactorsAllOff`). Aucune affectation directe non gardée.
+
+
 ## 4 · Survitesse — une seule implémentation (SEC-2)
 
 Aujourd'hui **deux** gardes morts : `FB_SpeedStep §2ter` **et** `FB_Winch §6`. → **les deux sont retirés**. La surveillance survitesse vit **exclusivement dans `FB_Safety_Winch`** (T181-16) :
