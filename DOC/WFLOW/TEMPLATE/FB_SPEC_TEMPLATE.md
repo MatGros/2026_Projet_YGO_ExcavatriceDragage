@@ -17,7 +17,7 @@
 ## 🧭 Sommaire
 
 1. [🎯 Rôle et profil](#1--rôle-et-profil)
-2. [🧪 Points de validation (détail)](#2--points-de-validation-détail)
+2. [🧪 Table des points de validation (détail)](#2--table-des-points-de-validation-détail)
 3. [🔌 Interface](#3--interface)
 4. [⚙️ Comportement / logique — un paragraphe par mécanisme notable](#4--comportement--logique)
 5. [💾 Réglages RETAIN / persistants](#5--réglages-retain--persistants)
@@ -29,7 +29,7 @@
 [1-2 phrases — profil AF03 (`standard`/`light`), ce que ce FB fait dans la chaîne, ce qu'il ne
 fait pas. Renvoi aux codes `FNN.0X` du chapô, pas de redite du rôle machine déjà écrit là-bas.]
 
-## 2 · 🧪 Points de validation (détail)
+## 2 · 🧪 Table des points de validation (détail)
 
 > Décline le(s) TC macro du chapô en étapes numérotées `TC-PNN-0X0.1`, `.2`... — **jamais** un
 > nouvel identifiant racine (immutabilité, `CODE_QUALITY_STANDARDS.md §0`). Si le chapô n'a pas
