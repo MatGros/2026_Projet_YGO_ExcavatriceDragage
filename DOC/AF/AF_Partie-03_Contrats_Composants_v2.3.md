@@ -38,6 +38,11 @@
 | <nobr><code>TC-P03-005</code></nobr> | Encapsulation stricte | Échanges via interfaces/DUTs publics uniquement | `💻 AUTO` | <small>§2</small> | `NV` |
 | <nobr><code>TC-P03-006</code></nobr> | Re-latch sur ré-apparition Cause | Nouveau front Cause ➔ `Ack=FALSE` | `💻 AUTO` | <small>§4</small> | `NV-I` |
 | <nobr><code>TC-P03-007</code></nobr> | Warning auto-effaçable vs Fault latché | Warning s'efface sans Reset, Fault exige Ack | `💻 AUTO` | <small>§4</small> | `NV-I` |
+| <nobr><code>TC-P03-014</code></nobr> | Bornage du `dt` de cycle (`FB_CycleTime`) | Hors plage nominale (`dt = 0` **ou** `dt > CST_MaxCycleDeltaMs`) ➔ `CycleTimeS = DefaultValueS` ; sinon `dt` réel ; secours non latché | `💻 AUTO` | <small><nobr>§3 →</nobr> <nobr>fiche</nobr></small> | `NV-I` |
+
+> Catalogue `TC-P03-014.1` à `.3` (détail `FB_CycleTime` — plage nominale, borne basse, borne haute
+> non latchée) **décliné dans la fiche dédiée**, pas dupliqué ici (`GUIDE_EDITION_AF_v1.0.md` §4) :
+> [`FB_CycleTime_v1.0.md` §2](AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md#2--points-de-validation-détail).
 
 > Catalogue `TC-P03-008` à `TC-P03-013` (détail `FB_FaultCore` — cumul de causes latchées, vue
 > live vs vue latchée, bornes de liste, faille T148...) **déplacé dans la fiche dédiée** —
@@ -135,6 +140,25 @@ forme de conformité cible :
 Tout FB **nouveau** porte `Fault : ST_Fault` rempli via `FB_FaultCore` (+ `Lifecycle : ST_Lifecycle`
 si machine d'état). Le guard `G315_check_fb_interface.py` reconnaît la forme cible et les formes
 legacy et publie leur décompte (mesure de l'avancement des migrations).
+
+### Briques techniques COMMUN (`CODE/A_COMMUN/`)
+
+> Petites fonctions maison réutilisées par plusieurs domaines : un défaut dans l'une impacte
+> toute la chaîne (ex. `FB_CycleTime` alimente rampes et intégrateurs). Liste d'inventaire +
+> renvoi ; le détail vit dans la fiche dédiée ou dans la fiche du domaine consommateur.
+
+| Brique | Rôle | Inst. | Comportement fail-safe notable | Détail |
+|---|---|---|---|---|
+| `FB_FaultCore` | Socle défaut → `Fault : ST_Fault` (vue live + latchée) | 18 | Latch / acquittement **par cause** (`ST_FaultCause.Latching`) | fiche [`FB_FaultCore_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md) (§4.1) |
+| `FB_CycleTime` | `dt` réel de la tâche (s) | 5 | `dt` borné `0 < dt ≤ CST_MaxCycleDeltaMs`, sinon valeur de secours ; pas de redémarrage auto | fiche [`FB_CycleTime_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md) (<nobr><code>TC-P03-014</code></nobr>) |
+| `FB_Brake` | Frein à manque de courant, temps physiques | 1 | Sécurité positive (`BrakeCmd = FALSE` = frein collé au repos) ; double vérif retour contacteur | résumé `AF_Partie-10_Fonction_Winch_v2.1.md` §3 |
+| `FB_Ramp` | Rampe accel/décel asymétrique (%/s) | 1 | Distingue éloignement / retour à zéro | résumé `AF_Partie-11_Fonction_Translation_v2.3.md` §1 (<nobr><code>TC-P11-040</code></nobr>) |
+| `FB_Acquisition_Preflight` | Verdict passif de qualification E/S machine arrêtée (16 contrôles) | 1 | Observateur pur (aucun `SafeStop` / `PowerCutOff` / ordre machine) | `AF_Partie-06_Acquisition_Qualification_IO_v2.4.md` §6 |
+| `FB_Filter` | Filtre passe-bas PT1 discret | 0 | Pass-through si `T = 0` ou `CycleTimeS = 0` | *(non instancié — inventaire uniquement)* |
+
+Règle : une brique avec un **comportement fail-safe non trivial** (bornage, latch, séquence
+temporisée) a une fiche ou un paragraphe qui le spécifie et un `TC-Pxx` ; une brique de calcul
+pur sans repli particulier se contente de la ligne d'inventaire ci-dessus.
 
 ## 🛑 4 · Cycle de vie, états et défauts
 
@@ -281,6 +305,7 @@ python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.5 | 2026-08-29 | **T088 — catalogue « Briques techniques COMMUN » en §3.** Table d'inventaire des briques maison `CODE/A_COMMUN/` (`FB_FaultCore`, `FB_CycleTime`, `FB_Brake`, `FB_Ramp`, `FB_Acquisition_Preflight`, `FB_Filter`) avec rôle, nombre d'instances, comportement fail-safe et renvoi (fiche dédiée ou fiche du domaine consommateur). Nouvelle sous-fiche [`FB_CycleTime_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md) (bornage du `dt` : plafond haut `CST_MaxCycleDeltaMs` ajouté par T088). TC racine <nobr><code>TC-P03-014</code></nobr> créé, décliné `.1`/`.2`/`.3` dans la sous-fiche. |
 | v2.4 | 2026-08-27 | **T164-3 — socle défaut unifié.** Forme cible du contrat `standard` : `VAR_OUTPUT` = `Ready : BOOL` + `Fault : ST_Fault` (2 vues : live `Error`/`ErrorId` + latchée `Latched`/`LatchedId`), rempli par une instance `FB_FaultCore` alimentée par `Causes : ARRAY[0..15] OF ST_FaultCause` (`Active`/`Latching`/`Texte`), `+ Lifecycle : ST_Lifecycle` si machine d'état à cycle. Remplace `Status : ST_FbStatus` / socle `FB_FbStatus` / type `ST_FbCause` (supprimés du code au commit `51fccce6`). §2, §3, §4, §4.1 réécrits ; sous-fiche renommée `FB_FaultCore_v1.0.md`. **Changement de convention fail-safe assumé** : cause non classée passait en Fault (`IsWarning` absent) → passe désormais en live seulement (`Latching` absent) — l'interlock reste sur la cause brute, mais l'acquittabilité devient un choix explicite par cause. Forme `Status : ST_Status` (ex-`ST_FbStatus`) tolérée sur 17 FB jusqu'à T164-5. |
 | v2.3 | 2026-08-26 | Décongestion du chapô : détail complet de `FB_FbStatus` (interfaces, type `ST_FbCause`, décisions a/b/c, câblage minimal, <nobr><code>TC-P03-008</code></nobr> à `013`) déplacé vers une fiche dédiée (aujourd'hui `FB_FaultCore_v1.0.md`, voir v2.4), suivant le pattern chapô/sous-fiche déjà appliqué par AF10/`FB_Bucket`. §4.1 et §3 ne gardent qu'un résumé + pointeur. Précision ajoutée en §3 : le contrat `standard` porte `Ready`+`Status` **seuls**, sans mirror `Error`/`ErrorId` à plat en complément (écart constaté sur `FB_Joystick.st`, à corriger séparément). |
 | v2.2 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lie, section `🎯 Rôle et périmètre` explicite, ajout Suivi historique et TBD, renumerotation complete des sections (chapô + réfs internes §N cascadées). Correctifs de fond (review sous-agent expert automatisme) : lien casse `AGENTS.md §1bis` corrige, exemple positif `FB_Winch` ajoute a cote du contre-exemple `FB_Joystick` (règle `PowerContactorEngaged`), limite du test automatique `light`/`standard` documentee (ne derive pas le critere semantique du corps du FB), cablage minimal `FB_FbStatus` ajoute (exemple ST copiable) |
@@ -300,3 +325,6 @@ python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v
 - [`FB_FaultCore_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_FaultCore_v1.0.md) : fiche détaillée
   du socle transverse `FB_FaultCore` (interface `Enable`/`Reset`/`Causes[0..15]` → `Ready`/`Fault`,
   vue live vs latchée, changement de convention fail-safe, câblage, TC-008 à 013).
+- [`FB_CycleTime_v1.0.md`](AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md) : fiche détaillée
+  de la brique `FB_CycleTime` (mesure du `dt` de tâche, double bornage du delta, consommateurs,
+  <nobr><code>TC-P03-014</code></nobr>).
