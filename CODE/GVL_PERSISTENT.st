@@ -144,15 +144,6 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🔄 CYCLE SEMI-AUTO
     _CycleSampleCount : INT := 0;    // Compteur de prélèvements — RETAIN, survit à la coupure ; reset MAINT only
 
-    // 🧭 RE-HOMING OBLIGATOIRE PAR AXE (AF-05 §4bis)
-    // Armé à la sortie d'un mode maintenance ayant EFFECTIVEMENT utilisé l'override FDC logiciel N1
-    // ou un bypass N2 de la famille position (TopLimitSwitch / TopLimitSoftware / CableLimitSwitch /
-    // LimitLegal / MecaD). Tant que vrai : SEMI_AUTO interdit pour l'axe (FB_Modes bascule en MAINT_N1).
-    // Ne retombe QUE sur cycle de homing complet réussi (HomingLifecycle.Done ET Homed ET NON HomingSuspect).
-    // ⚠️ Producteur unique de la décision : FB_Modes (PRG_03) ; cette GVL n'est que le miroir persistant.
-    _MaintHomingRequiredM1 : BOOL := FALSE;  // 🧭 M1 : re-homing requis avant tout SEMI_AUTO
-    _MaintHomingRequiredM2 : BOOL := FALSE;  // 🧭 M2 : re-homing requis avant tout SEMI_AUTO
-
     // 🧪 SIMULATION (Banc de test uniquement)
     _SimEncoderRawPosM1 : UDINT := 1000000; // Simulation : survit au reset froid
     _SimEncoderRawPosM2 : UDINT := 1000000; // Simulation : survit au reset froid
@@ -162,5 +153,15 @@ VAR_GLOBAL PERSISTENT RETAIN
 
     // 💾 APPRENTISSAGE VITESSE PAR PALIER (T181-15) — collecteur passif FB_WinchSpeedLearning
     _WinchSpeedLearnTable : ST_fbWinchSpeedLearning_Table; // Table RETAIN {axe x sens x charge/vide x palier}
+
+    // 🧭 RE-HOMING OBLIGATOIRE PAR AXE (AF-05 §4bis) — AJOUTÉ EN FIN DE LISTE
+    // (mapping RETAIN positionnel : jamais d'insertion au milieu — NAMING_CONVENTION §pont persistant)
+    // Armé dès qu'un override/bypass de position est EFFECTIF, quelle que soit la suite du cycle
+    // (armement immédiat : aucune perte possible sur coupure / download en cours de maintenance).
+    // Tant que vrai : SEMI_AUTO interdit pour l'axe (FB_Modes bascule en MAINT_N1).
+    // Ne retombe QUE sur cycle de homing complet réussi (HomingLifecycle.Done ET Homed ET NON HomingSuspect).
+    // ⚠️ Producteur unique de la décision : FB_Modes (PRG_03) ; cette GVL n'est que le miroir persistant.
+    _MaintM1HomingRequired : BOOL := FALSE;  // 🧭 M1 : re-homing requis avant tout SEMI_AUTO
+    _MaintM2HomingRequired : BOOL := FALSE;  // 🧭 M2 : re-homing requis avant tout SEMI_AUTO
 
 END_VAR

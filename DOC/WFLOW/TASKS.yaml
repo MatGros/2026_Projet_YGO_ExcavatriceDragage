@@ -3332,11 +3332,11 @@ tasks:
   - T181-12
 - id: T181-14
   parent_id: T181
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: MODES
-  agent: ''
-  date: '2026-08-29T20:30:00+02:00'
+  agent: Agent externe D — implémentation livrée ; bundle et arbitrages A1/A7 en attente
+  date: '2026-08-30T01:20:00+02:00'
   titre: Code matrice bypass FB_Modes + PRG_04 + override FDC N1 borné 8,5 m (inclut T175 AC4)
   contexte: 'Implémente le cadrage T181-11. Rationalise les ~20 Bypass* en arbitrage par mode. Intègre T175 AC4 (MAINT_N1/N2
     confirm benne — une seule implémentation). Phase C.
@@ -3346,7 +3346,7 @@ tasks:
     forcé au retour. guard: G4xx_check_bypass_matrix_mode_gated (aucun Bypass* actif hors de son mode autorisé).
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-14_MATRICE_BYPASS.yaml
   objectifs:
   - Chaque Bypass* n'est actif que dans le(s) mode(s) de la matrice T181-11 (gate vert)
   - Override FDC N1: relâche bouton IHM → FDC logiciel 7,5 m re-actif immédiatement

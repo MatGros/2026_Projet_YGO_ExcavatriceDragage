@@ -41,8 +41,13 @@ contract:
         `FB_MirrorBypassRetain`, aucun `VAR RETAIN` dans un FB — forme sans précédent dans ce dépôt).
     - id: D4
       statement: >
-        L'usage effectif est mémorisé PENDANT le mode maintenance (`MaintOverrideUsedMx`) et
-        transféré dans `HomingRequired` à la SORTIE du mode (cadrage §5 : « après toute sortie »).
+        ⚠️ RÉVISÉ EN REVUE (findings M1/M2 — race 1 scan + perte au reset). L'usage effectif
+        n'est PLUS mémorisé pour transfert à la sortie : `HomingRequired` est armé
+        IMMÉDIATEMENT, en §1ter, avant l'arbitrage de mode. Motif : (1) le transfert en sortie
+        laissait une fenêtre d'un scan où SEMI_AUTO était arbitré malgré un re-homing requis ;
+        (2) la mémoire intermédiaire (VAR non RETAIN) était perdue sur coupure/download pendant
+        la maintenance. L'armement immédiat est STRICTEMENT PLUS CONSERVATEUR que le cadrage
+        §5 (« après toute sortie ») et reste conforme à son intention. Écart à valider humain.
     - id: D5
       statement: >
         `Auth.Mode` étant un mode machine unique (pas un mode par axe), « SEMI_AUTO interdit pour
@@ -57,7 +62,20 @@ contract:
       statement: >
         Périmètre treuils M1/M2 + benne uniquement. `ST_BypassTranslation` (M3) et
         `GVL_IHM.M1M2Sync.Bypass.Global` restent hors scope (AF-05 §9 l'explicite comme extension
-        à part). Alerte levée, pas d'élargissement de scope.
+        à part). Alerte levée, pas d'élargissement de scope. Le second est placé sous tolérance
+        EXPLICITE et BORNÉE dans G483 (1 occurrence, message de tolérance affiché même en PASS).
+    - id: D8
+      statement: >
+        ⚠️ AJOUTÉ EN REVUE (finding F2/M3). L'override N1 est conditionné à
+        `Homed AND NOT HomingSuspect` : sans référence de position fiable, la butée logicielle
+        (FB_Safety_Winch §3) ET la zone de ralentissement (FB_Winch §3) sont neutralisées —
+        relever la limite ne laisserait que le capteur physique, approché à pleine vitesse.
+    - id: D9
+      statement: >
+        ⚠️ AJOUTÉ EN REVUE (finding B1). Le relèvement de limite est plafonné à la bande de
+        ralentissement (`MIN(..., CfgCableLimitAscent_M + WinchSlowdownDistance_M)`). Neutre
+        aujourd'hui (8,5 = 7,5 + 1,0) mais rend la protection structurelle ; l'invariant de
+        configuration correspondant est vérifié par G483 (AC2b).
 
   acceptance:
     - id: AC1
@@ -136,6 +154,38 @@ contract:
         aucun suffixe `_CFC` / `_LD` n'est ajouté (les POU modifiés restent du ST pur, générés
         en `<ST>` dans CODE_XML), donc aucun suffixe mensonger dans le PLCopenXML.
       verified_by: "G300_check_structure.py + generate_codesys_bundle.py (section <ST> attendue)"
+    - id: AC15
+      statement: >
+        Le re-homing est armé IMMÉDIATEMENT (§1ter, avant l'arbitrage de mode §3) : aucun scan
+        où SEMI_AUTO serait arbitré malgré un re-homing requis, et aucune perte de l'obligation
+        sur coupure / download pendant la maintenance (drapeau écrit dans le miroir PERSISTENT
+        au scan courant).
+      verified_by: "G483 (armement M1 ET M2 + position avant l'arbitrage + restauration boot)"
+    - id: AC16
+      statement: >
+        L'override N1 est refusé si le treuil n'est pas référencé (`Homed` faux) ou si le
+        référencement est suspect, sur les DEUX axes — sans référence de position, il n'y a pas
+        de « dépassement contrôlé ».
+      verified_by: "G483 AC3b"
+    - id: AC17
+      statement: >
+        Le relèvement de limite haute ne peut jamais excéder la bande de ralentissement :
+        `TopLimitM` est borné par `CfgCableLimitAscent_M + WinchSlowdownDistance_M`, et
+        l'invariant de configuration `CfgTopSensorPos_M - CfgCableLimitAscent_M <=
+        WinchSlowdownDistance_M` est vérifié par le gate.
+      verified_by: "G483 AC2 (MIN borné) + AC2b (invariant de configuration, lu dans GVL_PERSISTENT)"
+    - id: AC18
+      statement: >
+        `FB_Modes.Fault` est publié (`ST_ModesCycleInterPrg.ModesFault` → PRG_03) et agrégé dans
+        `GVL_IHM.Modes.State.AnyFaultActive` (PRG_07) : aucun refus de mode silencieux.
+      verified_by: "G483 AC9 (publication PRG_03 + agrégation PRG_07 + champ DUT)"
+    - id: AC19
+      statement: >
+        Le gate G483 est lui-même vérifié : 9 mutations de régression (bypass dé-gaté, gate sur
+        sélecteur IHM, plafond retiré, override sans Homed, armement déplacé après arbitrage,
+        levée sans HomingSuspect, refus SEMI_AUTO supprimé, défaut non publié, miroir persistant
+        coupé) sont toutes détectées.
+      verified_by: "test de mutation exécuté le 2026-08-30 — 9/9 attrapées"
 
   scope:
     allowed:
@@ -148,6 +198,7 @@ contract:
       - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st         # BtnOverrideTopSoftware
       - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st    # PositionLimitOverriddenM1/M2
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCycleInterPrg.st   # ModesFault (AC18)
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st      # miroir IHM
       - TOOLS/AGENT_WORKFLOW/scripts/G483_check_bypass_matrix_mode_gated.py
       - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py                    # enregistrement G483
@@ -190,6 +241,73 @@ contract:
     Tout écart entre le cadrage T181-11 et le code réel est remonté IMMÉDIATEMENT à
     l'orchestrateur, pas à la fin et jamais silencieusement. Signaler n'est pas élargir le
     périmètre : aucun correctif hors `scope.allowed` n'est entrepris sans accord.
+
+  # ── Alertes levées par l'audit (non corrigées, arbitrage humain requis) ──────────────
+  alerts_raised:
+    - id: A1
+      severity: BLOCK_GEOMETRIE
+      statement: >
+        M2 benne FERMÉE : la limite de M2 est RELATIVE à M1 (`M2_LimitShift` fonction de M1Pos)
+        et non absolue. L'override la relève de 1,0 m alors que la marge native de M2 au-dessus
+        de sa position n'est que de 0,5 m (OffsetCloseM = 15,0) : la zone de ralentissement
+        (1,0 m) démarre alors 0,5 m AU-DESSUS de M2, qui atteint donc le capteur physique sans
+        jamais ralentir. Le plafond D9 ne corrige PAS ce cas (8,5 = 7,5 + 1,0 → MIN neutre).
+        Correction possible : ne pas relever la limite de M2 quand `M2_LimitShift <> 0`.
+        NON APPLIQUÉ : dépend de la géométrie réelle du capteur haut partagé M1/M2 (T1) et de
+        OffsetCloseM à reconfirmer sur site (T2).
+    - id: A2
+      severity: MAJOR
+      statement: >
+        `PRG_04:252` (`SlackCableAscentStep1`) lit `GVL_IHM.Commun.Bypass.SlackCable` en clair,
+        donc effectif hors MAINT_N2 — contredit AC1. La ligne a été écrite par un autre lot en
+        cours ; préservation stricte des modifications non committées ⇒ non modifiée ici.
+        À gater (`MaintN2 AND ...`) ou à renommer (sélecteur de récupération, pas un bypass).
+    - id: A3
+      severity: MAJOR
+      statement: >
+        `FB_Safety_Winch.Mode` est déclaré (ligne 14) et JAMAIS utilisé : la doctrine
+        « bypass = MAINT_N2 » vit 25× dans PRG_04 et nulle part dans le FB propriétaire.
+        Tout nouvel appelant contourne la matrice. Arbitrage requis : déplacer la doctrine dans
+        le FB (recommandé par l'audit) ou retirer l'entrée morte.
+    - id: A4
+      severity: MAJOR
+      statement: >
+        `M1M2Sync.Bypass.Global` force `ErrorId = 0` sur le désynchronisme critique et la
+        discordance contacteurs (FB_WinchSync) — plus dangereux que plusieurs bascules
+        désormais gatées. Hors périmètre treuils (D7) : tâche à ouvrir (AF-05 §9).
+    - id: A5
+      severity: MAJOR
+      statement: >
+        Le re-homing est annulable en 1 clic : `BtnHome` presette la position COURANTE et met
+        `HomingLifecycle.Done`, ce qui lève `HomingRequired` sans déplacement ni repère
+        (FB_Encoder_Homing). Le cadrage §5 exige « la re-référence comme seule remise à zéro
+        sûre ». Contre-mesure proposée : n'accepter qu'un homing nominal capteur haut.
+    - id: A6
+      severity: MAJOR
+      statement: >
+        AF-05 §4bis annonce « HomingSuspect forcé côté diag » : non implémenté et IMPOSSIBLE
+        sans second écrivain sur `HomingSuspect` (produit par FB_Encoder, AF03 §2 producteur
+        unique). La doctrine doit être corrigée (banner IHM depuis `Auth.HomingRequiredMx`,
+        déjà miroité) — décision documentaire, hors scope code.
+    - id: A7
+      severity: MINOR
+      statement: >
+        Cadrage §3.1 / AF-05 annoncent « N2 + TopLimitSoftware = 8,5 m ». Le code relève
+        `TopLimitM` à 8,5 m ET transmet `BypassTopLimitSoftware` : FB_Safety_Winch §3 ignore
+        alors `TopLimitM` ⇒ la butée est SUPPRIMÉE, pas relevée. Choisir : ne pas transmettre
+        le bypass (recommandé) ou corriger le cadrage.
+    - id: A8
+      severity: MINOR
+      statement: >
+        `FB_Modes.Fault` remonté mais `FB_Hmi_BannerFormatter` ne produit aucun texte dédié :
+        l'opérateur voit `AnyFaultActive` sans libellé. Complément IHM à prévoir (F16).
+    - id: A9
+      severity: MINOR
+      statement: >
+        Un autre agent travaille CONCURRENT dans le même arbre de travail (fichiers
+        `FB_WinchSpeedLearning*`, `T181-15`, retrait de `Mode` sur FB_Winch, ajout du terme
+        SlackCable en PRG_04:252). G200 et G430 restent rouges sur LEURS apports
+        (FB orphelin, commentaire `T181-15`) — aucune de ces lignes n'a été touchée.
 
 status: IN_PROGRESS
 

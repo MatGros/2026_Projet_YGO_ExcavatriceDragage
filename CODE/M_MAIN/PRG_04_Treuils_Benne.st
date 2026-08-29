@@ -562,8 +562,19 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
 // de homing haut (8,5 m). Relâché ➔ retour à 7,5 m au cycle suivant (aucune mémorisation).
 // ⛔ Cet override n'ouvre PAS BypassTopLimitSwitch : le capteur physique haut reste la butée
 // dure — si TopPositionSensor retombe, AscentPermit tombe (FB_Safety_Winch §3) ➔ arrêt matériel.
-OverrideTopSoftwareN1M1 := MaintN1 AND GVL_IHM.M1TreuilRetenue.Cmd.BtnOverrideTopSoftware;
-OverrideTopSoftwareN1M2 := MaintN1 AND GVL_IHM.M2TreuilBenne.Cmd.BtnOverrideTopSoftware;
+// ⛔ Conditionné à Homed ET NON HomingSuspect : sans référence de position fiable, la butée
+// logicielle de FB_Safety_Winch (§3) ET la zone de ralentissement de FB_Winch (§3) sont
+// neutralisées — relever la limite dans ce cas ne laisserait QUE le capteur physique comme
+// protection, approché à pleine vitesse. Sans référence, il n'y a pas de « dépassement
+// contrôlé » : l'override est refusé, seul reste le bypass N2 (acte conscient, tracé).
+OverrideTopSoftwareN1M1 := MaintN1
+                           AND PRG_02_Acquisition.Data.EncoderM1.Homed
+                           AND NOT PRG_02_Acquisition.Data.EncoderM1.HomingSuspect
+                           AND GVL_IHM.M1TreuilRetenue.Cmd.BtnOverrideTopSoftware;
+OverrideTopSoftwareN1M2 := MaintN1
+                           AND PRG_02_Acquisition.Data.EncoderM2.Homed
+                           AND NOT PRG_02_Acquisition.Data.EncoderM2.HomingSuspect
+                           AND GVL_IHM.M2TreuilBenne.Cmd.BtnOverrideTopSoftware;
 
 // --- Bypass EFFECTIFS de la famille position (individuel OR commun, puis gate MAINT_N2) ---
 BypassM1TopLimitSwitchEff   := MaintN2 AND (GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch   OR GVL_IHM.Commun.Bypass.TopLimitSwitch);
@@ -581,12 +592,20 @@ BypassM2MecaDEff            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.MecaD;
 // Nominal 7,5 m (CfgCableLimitAscent_M) ; 8,5 m (CfgTopSensorPos_M) sous override N1 momentané
 // ou bypass N2 latché du FDC logiciel. M2 conserve son décalage benne (M2_LimitShift) dans les
 // deux cas : l'override ne modifie que l'assiette de référence, pas la géométrie M1/M2.
-TopLimitM1_M := SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
-                    _CommunCfgPersist.CfgCableLimitAscent_M,
-                    _WinchM1CfgPersist.CfgTopSensorPos_M);
-TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
-                    _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
-                    _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift);
+// ⛔ PLAFOND DE SÉCURITÉ : le relèvement ne peut jamais excéder la bande de ralentissement
+// (WinchSlowdownDistance_M). Au-delà, FB_Winch §3 n'engagerait plus le palier 1 avant le capteur
+// physique : arrivée à pleine vitesse puis arrêt sec en 1 scan. Aujourd'hui 8,5 = 7,5 + 1,0 :
+// le MIN est neutre, mais il rend la protection STRUCTURELLE — tout réglage de
+// CfgTopSensorPos_M au-delà de la bande est désormais borné ici ET refusé par le gate G483.
+TopLimitM1_M := MIN(SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
+                        _CommunCfgPersist.CfgCableLimitAscent_M,
+                        _WinchM1CfgPersist.CfgTopSensorPos_M),
+                    _CommunCfgPersist.CfgCableLimitAscent_M + _CommunCfgPersist.WinchSlowdownDistance_M);
+TopLimitM2_M := MIN(SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
+                        _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+                        _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift),
+                    _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift
+                    + _CommunCfgPersist.WinchSlowdownDistance_M);
 
 // --- Usage effectif d'un override/bypass de position → re-homing obligatoire ---------------
 // Publié vers PRG_03 (rang 03) ➔ FB_Modes arme HomingRequiredMx à la sortie du mode maintenance.

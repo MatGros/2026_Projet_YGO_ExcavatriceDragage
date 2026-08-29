@@ -454,8 +454,7 @@ Une restitution sans ce bloc est incomplète, quel que soit l'agent qui l'écrit
 > signale ce piège** — le contacteur frein M3 ne s'est simplement jamais activé, plusieurs
 > heures de diagnostic terrain avant identification. Le même schéma touchait aussi la
 > **chaîne AU** (`PowerKeepAlive_A_RQ`/`PowerKeepAlive_B_RQ`/`EmergencyArming_RQ`, confirmé
-> câblé réel par l'utilisateur) — corrigé dans le même lot. Détail complet et fix :
-> `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py`.
+> câblé réel par l'utilisateur) — corrigé dans le même lot.
 
 **Règle** : un `PROGRAM` ne déclare **jamais** de variable (`VAR`/`VAR_INPUT`/`VAR_OUTPUT`)
 portant le **nom exact** d'un point matériel du mapping E/S (`TOOLS/AGENT_WORKFLOW/config/
