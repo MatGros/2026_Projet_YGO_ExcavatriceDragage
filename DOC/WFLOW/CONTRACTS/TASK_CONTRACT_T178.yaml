@@ -1,0 +1,66 @@
+# Contrat T178 — Mise en conformité AF DriftGuard (Méca A)
+
+contract:
+  task_id: T178
+  criticality: C4            # faux PowerCutOff possible à chaque arrêt lourd = coupure machine intempestive
+  strategy: patch
+
+  objective: >
+    Rendre FB_DriftGuard / Méca A conforme à l'AF : armer la surveillance de dérive uniquement
+    à l'arrêt mécanique confirmé (contacteurs retombés + frein serré), et non sur joystick neutre,
+    pour ne plus mesurer le coast-down normal comme une dérive (faux PowerCutOff).
+
+  acceptance:
+    - id: AC1
+      statement: "DriftGuardA.Arm := NOT(BypassSafety OR BypassMecaA) AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback [AND NOT BenneHoldStillActive] (calage identique à l'arrêt confirmé Méca B, FB_Safety_Winch.st:247)."
+      verified_by: "lecture FB_Safety_Winch.st:235 (Arm) + diff"
+    - id: AC2
+      statement: "Zéro faux PowerCutOff au relâcher joystick : le coast-down normal (inertie + jeu frein) n'est plus mesuré comme dérive (fenêtre d'armement = arrêt mécanique confirmé)."
+      verified_by: "harnais TEST_AUTO_CI treuils (TC-P10-001) + observation mise en service"
+    - id: AC3
+      statement: "Méca A détecte encore un frein qui lâche APRES arrêt confirmé (dérive > UncommandedDriftToleranceM=2.0 m -> SafeStop+PowerCutOff)."
+      verified_by: "TC-P10-001 (scenario dérive à l'arrêt) exécutable et PASS"
+    - id: AC4
+      statement: "Aucun nouveau paramètre CfgWinchCoastMax_M, aucune nouvelle fonction RunOn : la redondance avec Méca B (PostRampTimeout:=T#3s) est évitée."
+      verified_by: "diff ST_WinchCfg.st (aucun champ ajouté) + grep RunOn/DriftGuard"
+    - id: AC5
+      statement: "Fiche FB_DriftGuard_v1.0.md + TC-P10-001 alignées au code sur preuve (calage d'armement = contacteurs-off + frein serré)."
+      verified_by: "diff fiche / TC aligné au code"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_DriftGuard.st
+    forbidden:
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st   # aucun nouveau champ config
+      - CODE/A_COMMUN/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  evidence_required:
+    - check_linkage          # G200 bloquant sur le bundle
+    - run_all_gates          # palier C
+    - bundle                 # CODE_Bundle.xml régénéré
+
+  alert_duty: >
+    Si la lecture de FB_Safety_Winch.st montre que FwdRevSpeedFeedbackOff ou BrakeFeedback ne sont
+    pas fiables (feedback manquant, logique inversée), ou que Méca B n'utilise pas le même composite
+    d'arrêt confirmé, lever l'alerte IMMÉDIATEMENT — ne pas écrire un armement qui diverge de Méca B.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir après implémentation (code ST différé : utilisateur a demandé STOP sur le code).
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Rescope 2026-08-29 : T178 initial (seuil coast-down) annulé comme redondant ; cible = conformité
+    AF DriftGuard (une seule fonction, pas de 2e). Implémentation code en attente de go de l'utilisateur.
