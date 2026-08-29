@@ -295,19 +295,6 @@ tasks:
   contrat: ''
   date: '2026-08-28T20:59:12'
   bloque_par: []
-- id: T081
-  parent_id: ''
-  statut: ⏸️
-  criticite: C2
-  domaine: CYCLE
-  agent: —
-  titre: Séquence détection fond Kobold à 4 étapes
-  contexte: ''
-  description: AF_Partie-04, FB_DiveSearch (codé, attente essais)
-  objectifs: []
-  contrat: ''
-  date: '2026-08-29T07:11:41'
-  bloque_par: []
 - id: T084
   parent_id: ''
   statut: ✅
@@ -350,18 +337,23 @@ tasks:
   bloque_par: []
 - id: T088
   parent_id: ''
-  statut: ⏸️
+  statut: ✅
   criticite: C2
   domaine: CYCLE
-  agent: —
+  agent: ORCHESTRATEUR
   titre: Bouclage TIME() (49,7j) dans FB_CycleTime
   contexte: 'Intitulé complet : Bouclage TIME() (49,7j) dans FB_CycleTime : garde-fou DeltaTimeMs > 1000'
-  description: '✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_FB_CYCLETIME_GARDE_FOU_WRAP_v0.1.md`) : le code actuel
-    n''accepte que DeltaTimeMs>0 (pas de plafond haut) → au wrap 49,7j un CycleTimeS aberrant peut être publié. Garde-fou
-    proposé : secours si DeltaTimeMs>1000 (constante CST_). ⏳ **Implémentation en attente** (code, validation humaine).'
-  objectifs: []
-  contrat: ''
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T088_CYCLETIME_WRAP_GUARD.yaml. Recherche menée (CmpIecTask /
+    LTIME() / SysTimeGetNs sans équivalent exploitable ; soustraction TIME modulo 2^32 correcte pour un rollover simple).
+    fix : VAR CONSTANT CST_MaxCycleDeltaMs := 1000 + §4 borné IF (DeltaTimeMs > 0) AND (DeltaTimeMs <= CST_MaxCycleDeltaMs)
+    sinon DefaultValueS ; commentaire §4 détaillé ; interface inchangée. +3 TC CI. Livré commit f874b8cb. Preuves : CI
+    FB_CycleTime 4/4, G200 PASS 0 err, palier C ALL PASS, consommateurs (FB_Winch/FB_Translation/FB_Ramp/FB_Filter) inchangés.'
+  objectifs:
+  - Borner le dt de cycle (0 < dt <= plafond) sinon valeur de secours, sans redémarrage auto
+  - Couvrir les artefacts de reprise (online-change, point d'arrêt) et la fenêtre de rebouclage TIME()
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T088_CYCLETIME_WRAP_GUARD.yaml
   date: '2026-08-28T21:01:29'
+  completed_at: '2026-08-29T03:15:00+02:00'
   bloque_par: []
 - id: T090
   parent_id: ''
@@ -2489,6 +2481,28 @@ tasks:
   objectifs:
   - Réinitialiser les 17 feuilles d'état assistant manquantes dans la branche SEMI_AUTO
   - Garde-fou mécanique anti-oubli inter-branches de mode (gate G346)
+  bloque_par:
+  - T168-B
+- id: T168-D
+  parent_id: T168
+  statut: ✅
+  criticite: C2
+  domaine: SUPERVISION
+  agent: ORCHESTRATEUR
+  date: '2026-08-29T02:00:00+02:00'
+  completed_at: '2026-08-29T02:15:00+02:00'
+  titre: OperatorActionId typé WORD sur toute la chaîne de diagnostic
+  contexte: 'Défaut C de l''audit T168-B : OperatorActionId (identifiant bit-codé 16#0100..16#0480) était UINT à 4 endroits
+    et WORD ailleurs → 3 conversions implicites UINT<->WORD (warnings build CODESYS). Aucune comparaison ni CASE sur ce champ
+    dans CODE/ → bascule sans impact logique.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-D_OPERATORACTIONID_WORD.yaml. fix : UINT -> WORD dans FB_Cycle,
+    ST_SequencePublicState, FB_TroubleshootingView (CycleOperatorActionId), ST_ChainCycleSemiAuto (Idx211). PRG_03/04/07 non
+    touchés. guard : gate G347_check_actionid_type.py (câblé palier C). Livré commit 3dad68bb. Preuves : grep UINT 4->0, G347
+    PASS + test négatif, G200 PASS 0 err, palier C ALL PASS, CI cycle inchangée, CODE_XML 100% type-only.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-D_OPERATORACTIONID_WORD.yaml
+  objectifs:
+  - Type WORD homogène sur OperatorActionId de FB_Cycle jusqu'à la vue troubleshooting
+  - Garde-fou mécanique contre la réintroduction d'une conversion implicite (gate G347)
   bloque_par:
   - T168-B
 - id: T169
