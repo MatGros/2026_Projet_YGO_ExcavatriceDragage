@@ -113,20 +113,154 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 > 1. **Scénario 1 (Nominal)** : Cycle complet d'utilisation sans perturbation (Initialisation -> Auto-test A/B -> Pulse 1s -> Confirmation contacteur -> Maintien puissance sain).
 > 2. **Scénarios 2 à 6 (Perturbations & Injections)** : Injection d'événements et de pannes venant perturber ou tester les barrières de sécurité.
 
-| <nobr>ID</nobr> | <small>Intention</small> | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Séquence & Déroulé des étapes (Comportement attendu) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | <small>Preuve</small> | <small>Type</small> | <small>Réf</small> | <small>État</small> |
-|:---|:---|:---|:---:|:---:|:---:|:---:|
-| <nobr><code>TC-P01-SCEN-NOM</code></nobr> | <small>**Nominal**<br>Réarm.</small> | 💤 **Étape 0** : Repos initial (boucle saine, contacteur au repos, `Armable=TRUE`)<br>🚀 **Étape 1** : Demande réarmement (`ArmRequest` ➔ lance TestA)<br>🔍 **Étape 2** : Réaction boucle à TestA (chute boucle ➔ RestoreA)<br>🔍 **Étape 3** : Restauration boucle A (refermeture ➔ lance TestB)<br>🔍 **Étape 4** : Réaction boucle à TestB (chute boucle ➔ RestoreB)<br>⚡ **Étape 5** : Impulsion collage contacteur 1s (`ArmPulse_RQ=TRUE`)<br>⏱️ **Étape 6** : Fin impulsion 1s ➔ Attente confirmation contacteur<br>✅ **Étape 7** : Confirmation collage (`PowerContactorEngaged=TRUE` ➔ `Done=TRUE`) | <small>Chrono</small> | <small><code>⚡ AUTO</code></small> | <small>§4.3</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-SCEN-DYN</code></nobr> | <small>**Dynamique**<br>Perturb.</small> | 🚀 **Phase 1** : Réarmement nominal réussi et mise en service (`Done=TRUE`)<br>⚡ **Phase 2** : Coupure métier en marche (`PowerCutOffRequest=TRUE` ➔ retombée A/B, `Armable=FALSE`)<br>🛡️ **Phase 3** : Tentative réarmement bloquée sous défaut (refus net, reste Step 0)<br>🔄 **Phase 4** : Disparition dérive métier + `Reset` (retour `Armable=TRUE`)<br>⚠️ **Phase 5** : Nouvel armement avec échec collage contacteur (timeout 2s Step 6 ➔ `EmergencyArmingFailed` + Lockout 5s)<br>🔓 **Phase 6** : Expiration lockout 5s + `Reset` (prêt pour nouvel essai) | <small>Chrono</small> | <small><code>💻 AUTO</code></small> | <small>§4.3</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-001</code></nobr> | <small>Coupure AU<br>physique</small> | Coupe la boucle matérielle, contacteur retombe, API vivant | <small>`Contactor=0`</small> | <small><code>🟢 SITE</code></small> | <small>§6.1</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-002</code></nobr> | <small>Perte maintien<br>A/B</small> | Perte canal A ou B ouvre la boucle AU | <small>`Maintain=0`</small> | <small><code>⚡ MIXTE</code></small> | <small>§5</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-003</code></nobr> | <small>Impulsion<br>réarmement</small> | Front `ArmRequest` + préconditions OK ➔ pulse 1s (Step 5) | <small>`ArmPulse=1`</small> | <small><code>⚡ AUTO</code></small> | <small>§4.3</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-004</code></nobr> | <small>Acquittement<br>Reset</small> | `Reset` efface l'affichage et purge les verrous d'échec | <small>`Reset=OK`</small> | <small><code>💻 AUTO</code></small> | <small>§4.4</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-005</code></nobr> | <small>Séquence<br>2 temps</small> | Acquittement défaut métier et réarmement = 2 actions distinctes | <small>2 actions</small> | <small><code>⚡ MIXTE</code></small> | <small>§4.4</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-006</code></nobr> | <small>Auto-test<br>A/B croisé</small> | Test dynamique A/B au réarmement (échec ➔ `RedundancyFail`) | <small>Steps 1–4</small> | <small><code>⚡ AUTO</code></small> | <small>§4.3b</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-007</code></nobr> | <small>Échec contacteur<br>+ Lockout</small> | Contacteur non confirmé sous 2s ➔ Alarme `EmergencyArmingFailed` + Lockout 5s | <small>`Lockout=1`</small> | <small><code>💻 AUTO</code></small> | <small>§4.3</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-008</code></nobr> | <small>Coupure métier<br>active</small> | `PowerCutOffRequest=TRUE` (dérive treuil/M3) ➔ `Armable=FALSE`, retombée immédiate | <small>`Maintain=0`</small> | <small><code>💻 AUTO</code></small> | <small>§4.1</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-009</code></nobr> | <small>Interlock<br>PowerCutOff</small> | Réarmement interdit tant que la coupure métier n'est pas acquittée | <small>`Armable=0`</small> | <small><code>💻 AUTO</code></small> | <small>§4.2</small> | <small>`V-I`</small> |
-| <nobr><code>TC-P01-010</code></nobr> | <small>Avortement<br>volontaire IHM</small> | `BtnEmergencyCutOff` pendant le pulse ➔ avortement immédiat propre sans alarme | <small>`Pulse=0`</small> | <small><code>💻 AUTO</code></small> | <small>§4.3</small> | <small>`V-I`</small> |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13.5px;">
+  <colgroup>
+    <col style="width: 110px;">
+    <col style="width: 85px;">
+    <col style="width: calc(100% - 375px);">
+    <col style="width: 60px;">
+    <col style="width: 60px;">
+    <col style="width: 35px;">
+    <col style="width: 25px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 6px 8px;"><nobr>ID Unique</nobr></th>
+      <th style="padding: 6px 8px;"><small>Intention</small></th>
+      <th style="padding: 6px 14px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 6px 4px; text-align: center;"><small>Preuve</small></th>
+      <th style="padding: 6px 4px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 6px 4px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 6px 4px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-SCEN-NOM</code></nobr></td>
+      <td style="padding: 8px;"><small><b>Nominal</b><br>Réarm.</small></td>
+      <td style="padding: 8px 14px; line-height: 1.6;">
+        💤 <b>Étape 0</b> : Repos initial (boucle saine, contacteur au repos, <code>Armable=TRUE</code>)<br>
+        🚀 <b>Étape 1</b> : Demande réarmement (<code>ArmRequest</code> ➔ lance TestA)<br>
+        🔍 <b>Étape 2</b> : Réaction boucle à TestA (chute boucle ➔ RestoreA)<br>
+        🔍 <b>Étape 3</b> : Restauration boucle A (refermeture ➔ lance TestB)<br>
+        🔍 <b>Étape 4</b> : Réaction boucle à TestB (chute boucle ➔ RestoreB)<br>
+        ⚡ <b>Étape 5</b> : Impulsion collage contacteur 1s (<code>ArmPulse_RQ=TRUE</code>)<br>
+        ⏱️ <b>Étape 6</b> : Fin impulsion 1s ➔ Attente confirmation contacteur<br>
+        ✅ <b>Étape 7</b> : Confirmation collage (<code>PowerContactorEngaged=TRUE</code> ➔ <code>Done=TRUE</code>)
+      </td>
+      <td style="padding: 8px 4px; text-align: center;"><small>Chrono</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-SCEN-DYN</code></nobr></td>
+      <td style="padding: 8px;"><small><b>Dynamique</b><br>Perturb.</small></td>
+      <td style="padding: 8px 14px; line-height: 1.6;">
+        🚀 <b>Phase 1</b> : Réarmement nominal réussi et mise en service (<code>Done=TRUE</code>)<br>
+        ⚡ <b>Phase 2</b> : Coupure métier en marche (<code>PowerCutOffRequest=TRUE</code> ➔ retombée A/B, <code>Armable=FALSE</code>)<br>
+        🛡️ <b>Phase 3</b> : Tentative réarmement bloquée sous défaut (refus net, reste Step 0)<br>
+        🔄 <b>Phase 4</b> : Disparition dérive métier + <code>Reset</code> (retour <code>Armable=TRUE</code>)<br>
+        ⚠️ <b>Phase 5</b> : Nouvel armement avec échec collage contacteur (timeout 2s Step 6 ➔ <code>EmergencyArmingFailed</code> + Lockout 5s)<br>
+        🔓 <b>Phase 6</b> : Expiration lockout 5s + <code>Reset</code> (prêt pour nouvel essai)
+      </td>
+      <td style="padding: 8px 4px; text-align: center;"><small>Chrono</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-001</code></nobr></td>
+      <td style="padding: 8px;"><small>Coupure AU<br>physique</small></td>
+      <td style="padding: 8px 14px;">Coupe la boucle matérielle, contacteur retombe, API vivant</td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>Contactor=0</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>🟢 SITE</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§6.1</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-002</code></nobr></td>
+      <td style="padding: 8px;"><small>Perte maintien<br>A/B</small></td>
+      <td style="padding: 8px 14px;">Perte canal A ou B ouvre la boucle AU</td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>Maintain=0</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>⚡ MIXTE</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-003</code></nobr></td>
+      <td style="padding: 8px;"><small>Impulsion<br>réarmement</small></td>
+      <td style="padding: 8px 14px;">Front <code>ArmRequest</code> + préconditions OK ➔ pulse 1s (Step 5)</td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>ArmPulse=1</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-004</code></nobr></td>
+      <td style="padding: 8px;"><small>Acquittement<br>Reset</small></td>
+      <td style="padding: 8px 14px;"><code>Reset</code> efface l'affichage et purge les verrous d'échec</td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>Reset=OK</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.4</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-005</code></nobr></td>
+      <td style="padding: 8px;"><small>Séquence<br>2 temps</small></td>
+      <td style="padding: 8px 14px;">Acquittement défaut métier et réarmement = 2 actions distinctes</td>
+      <td style="padding: 8px 4px; text-align: center;"><small>2 actions</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>⚡ MIXTE</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.4</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-006</code></nobr></td>
+      <td style="padding: 8px;"><small>Auto-test<br>A/B croisé</small></td>
+      <td style="padding: 8px 14px;">Test dynamique A/B au réarmement (échec ➔ <code>RedundancyFail</code>)</td>
+      <td style="padding: 8px 4px; text-align: center;"><small>Steps 1–4</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.3b</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-007</code></nobr></td>
+      <td style="padding: 8px;"><small>Échec contacteur<br>+ Lockout</small></td>
+      <td style="padding: 8px 14px;">Contacteur non confirmé sous 2s ➔ Alarme <code>EmergencyArmingFailed</code> + Lockout 5s</td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>Lockout=1</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-008</code></nobr></td>
+      <td style="padding: 8px;"><small>Coupure métier<br>active</small></td>
+      <td style="padding: 8px 14px;"><code>PowerCutOffRequest=TRUE</code> (dérive treuil/M3) ➔ <code>Armable=FALSE</code>, retombée immédiate</td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>Maintain=0</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.1</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-009</code></nobr></td>
+      <td style="padding: 8px;"><small>Interlock<br>PowerCutOff</small></td>
+      <td style="padding: 8px 14px;">Réarmement interdit tant que la coupure métier n'est pas acquittée</td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>Armable=0</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.2</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px;"><nobr><code>TC-P01-010</code></nobr></td>
+      <td style="padding: 8px;"><small>Avortement<br>volontaire IHM</small></td>
+      <td style="padding: 8px 14px;"><code>BtnEmergencyCutOff</code> pendant le pulse ➔ avortement immédiat propre sans alarme</td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>Pulse=0</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small>§4.3</small></td>
+      <td style="padding: 8px 4px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
