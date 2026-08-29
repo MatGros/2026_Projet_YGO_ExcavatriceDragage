@@ -119,18 +119,37 @@ Producteur `PRG_04`, consommateur `PRG_06`. **Le nom de la struct porte le rôle
 
 ## 3bis · Cadencement des contacteurs — règle absolue (utilisateur, critique matériel)
 
-> Cadencer la **montée** protège le moteur et le matériel. La **retombée** doit être quasi
-> instantanée. **Condition absolue** : ne jamais relâcher le contacteur de **sens**
-> (`RelayFwd_Up` / `RelayRev_Down`) **avant** les contacteurs de **vitesse** (`Contactor1..4`).
+> Cadencer la **montée** protège le moteur et le matériel. La **retombée** des contacteurs de
+> **vitesse** doit être quasi instantanée. **Condition absolue** : ne jamais relâcher le contacteur
+> de **sens** (`RelayFwd_Up` / `RelayRev_Down`) **avant** que les contacteurs de **vitesse**
+> (`Contactor1..4`) soient tous à 0.
+>
+> Fondement électrotechnique (moteur à bagues) : le contacteur de sens est **statorique** (coupe le
+> courant ligne plein → arc AC-3 pleine charge, soudure, transitoire rotor). Les `Contactor1..4`
+> commutent le **circuit rotorique** (résistances, courant de glissement) — c'est leur régime nominal.
+> Séquence saine = ouvrir le rotor (couple s'effondre, courant chute) **puis** ouvrir le stator à
+> courant quasi nul.
 
-### Séquence
+### Séquence — montée / retombée nominale
 
-| Phase | Contacteurs de vitesse `C1..C4` | Contacteur de sens `RelayFwd_Up` / `RelayRev_Down` |
-|---|---|---|
-| **Montée en palier** | montée **cadencée** : +1 cran par `StepRampDelay` (`FB_WinchStepShaper`) | établi **avant** le 1ᵉʳ cran de vitesse ; maintenu |
-| **Relâche joystick / `StartStop=FALSE`** | **tous à 0 immédiatement** (pas de rampe descendante) | **maintenu** tant que `C1..C4 ≠ 0` |
-| **Confirmation vitesse retombée** | `ContactorsAllOff` (feedback) OU `C1..C4` commandés à 0 depuis ≥ `DropConfirmDelay` | **alors seulement** → 0 |
-| **Défaut / `SafeStop`** | tous à 0 immédiatement | 0 après confirmation vitesse (même règle) — sauf coupure puissance (AU / `PowerCutOff`) qui coupe tout en amont |
+| Phase | `Contactor1..4` (rotor) | `RelayFwd_Up` / `RelayRev_Down` (stator) | Frein |
+|---|---|---|---|
+| **Montée en palier** | montée **cadencée** : +1 cran par `StepRampDelay` (`FB_WinchStepShaper`) | établi **avant** le 1ᵉʳ cran de vitesse ; maintenu | desserré |
+| **Relâche joystick / `StartStop=FALSE`** | **tous à 0 immédiatement** (pas de rampe descendante) | **maintenu** (fenêtre de retombée) | voir §3ter |
+| **Confirmation vitesse retombée** | `ContactorsAllOff` = TRUE (feedback) OU `Contactor1..4` commandés à 0 depuis ≥ `DropConfirmDelay` | → 0 | — |
+
+### §3ter — bornage de la fenêtre de retombée (correction B5-§1.1)
+
+La fenêtre « sens maintenu, vitesse déjà à 0 » est **bornée** :
+
+| Cas | Comportement |
+|---|---|
+| Feedback `ContactorsAllOff` confirmé **ou** tempo `DropConfirmDelay` écoulée | chute du sens → 0 (cas nominal) |
+| **`T_max` atteint** sans confirmation (`ContactorsAllOff` collé « not released ») | chute du sens **forcée** + latch `StuckClosed` (propriétaire `FB_Safety_Winch`) + escalade `SafeStop` ; le maintien indéfini du stator sous tension est **interdit** |
+| Feedback `ContactorsAllOff` collé « released » alors qu'un `Contactor1..4` est encore commandé | la garde `DropConfirmDelay` (tempo) **prévaut** sur le feedback seul (DI simple voie) — on n'ouvre pas le sens sur la seule foi du feedback |
+
+`DropConfirmDelay` et `T_max` sont des **paramètres dédiés** — jamais réutiliser `DeadTimeSameDir/OppositeDir`
+ni `DirectionInterlockDelay*` (répéterait D10). Ordre : `DropConfirmDelay < T_max`.
 
 ### `FB_WinchStepShaper` — comportement asymétrique
 
@@ -140,24 +159,49 @@ ShapedStep :
   descente : ShapedStep -> 0 au cycle suivant                                     (immédiat, pas de rampe descendante)
 ```
 
-### Ordonnancement de retombée — règle dans `FB_Winch` ET `FB_WinchOutputInterlock`
+### Ordonnancement de retombée — vérifié à DEUX niveaux (correction B5-§1.2)
 
-La règle « sens jamais avant vitesse » est vérifiée à **deux niveaux**, avec des seuils
-décalés (même patron que `FB_WinchRateInterlock`) :
+⚠️ **Conflit à résoudre AVANT le code** : `FB_WinchOutputInterlock` §5 force aujourd'hui
+`RelayFwd:=FALSE` dès `MotorRequest=FALSE` (`FB_WinchOutputInterlock.st:122,208,225-231`), lui-même
+faux dès `RequestedStep=0`. La barrière **coupe donc le sens le cycle où la vitesse tombe** → elle
+défait le maintien fait dans `FB_Winch`. La règle « 2 niveaux » **exige de restructurer §5** de la
+barrière pour qu'elle **tienne aussi** le relais de sens jusqu'à `FwdRevSpeedFeedbackOff` (borné `T_max`).
+→ **Cette refonte de la barrière est portée par T181-01** (pas T181-05).
 
 | Instance | Seuil de confirmation « vitesse retombée » | Rôle |
 |---|---|---|
 | dans `FB_Winch` (sortie) | `DropConfirmDelay` court (marge) — logique programme | gouverne en nominal |
-| dans `FB_WinchOutputInterlock` (barrière) | `DropConfirmDelay` = safety nu (attente feedback `ContactorsAllOff`) | filet — coupe le sens **seulement** après retombée effective |
+| dans `FB_WinchOutputInterlock` (barrière) | `ContactorsAllOff` **OU** `T_max` (le filet **porte le timeout**) | filet — coupe le sens seulement après retombée effective, mais **jamais indéfiniment** |
 
-> Diag : `DirectionDropBlocked` (sens en attente de retombée vitesse) — DOIT être transitoire
-> (≤ quelques cycles) en nominal ; un latch prolongé = contacteur de vitesse collé (→ `StuckClosed`).
+> Diag `DirectionDropBlocked` (sens en attente de retombée vitesse) : DOIT être **transitoire**
+> (≤ quelques cycles) en nominal. **Un `DirectionDropBlocked` transitoire ne compte PAS comme une
+> gouvernance de la barrière** (`FinalInterlockGoverned` reste FALSE). Un latch prolongé = contacteur
+> de vitesse collé → `StuckClosed`.
 
-### Garde mécanique
-`G4xx_check_direction_after_speed` : dans `FB_Winch.st` et `FB_WinchOutputInterlock.st`,
-toute mise à `FALSE` de `RelayFwd_Up`/`RelayRev_Down` est gardée par une condition
-« tous `Contactor1..4` à 0 » (ou `ContactorsAllOff`). Aucune affectation directe non gardée.
+### Coupures dures vs ordonnées (correction B5-§M6)
 
+L'ordonnancement « sens après vitesse » s'applique aux arrêts **normaux** et à `SafeStop` métier.
+Il ne s'applique **pas** aux coupures dures :
+
+| Événement | Comportement |
+|---|---|
+| `Enable = FALSE`, `PowerCutOff`, AU physique | **coupe tout en amont / immédiat** — l'ordonnancement est court-circuité (la puissance disparaît de toute façon) |
+| `Fault.Error` interne de `FB_Winch` (`FB_Winch.st:300-304`) | à **classer par type** : défaut « puissance/sécurité » → coupe dur ; défaut « process » → ordonné. Liste à figer en T181-05. |
+
+La garde mécanique `G4xx_check_direction_after_speed` **exempte explicitement** les chemins
+`NOT Enable`, `PowerCutOff` et la sous-liste de `Fault.Error` classée « dure ».
+
+### Frein — séquencement à trancher (arrêt humain T181-06, correction B5-§1.3)
+
+Aujourd'hui `BrakeCmd := RelayFwd_Up OR RelayRev_Down` (`FB_WinchOutputInterlock.st:275` + `PRG_06:141,214`)
+→ le frein **colle après** la coupure du sens, donc après `DropConfirmDelay`. Pendant cette fenêtre :
+frein desserré + rotor résistance max + charge possiblement motrice sur M1 (porteur) = **exposition
+dérive (D16 / T178)**, aggravée par §3bis.
+
+**Question T181-06** : le frein doit-il coller **avant** l'ouverture du sens (charge reprise par le
+frein, sens ouvre à couple nul) ? Si oui, `BrakeCmd` cesse d'être `RelayFwd OR RelayRev` et prend sa
+propre logique de séquence (paliers → frein → `BrakeFeedback` fermé → sens). Vecteur T181-00 associé :
+« relâche joystick sous charge → dérive ≤ X cm pendant la fenêtre sens-hold ».
 
 ## 4 · Survitesse — une seule implémentation (SEC-2)
 
