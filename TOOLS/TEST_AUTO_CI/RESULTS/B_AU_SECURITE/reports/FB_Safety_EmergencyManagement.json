@@ -7,6 +7,14 @@
       "passed": true
     },
     {
+      "name": "TC-P01-SCEN-NOM Scenario Nominal : Sequence complete de rearmement sans blocage",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-SCEN-DYN Scenario Dynamique : Enchainement nominal puis perturbations reelles en service",
+      "passed": true
+    },
+    {
       "name": "TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu",
       "passed": true
     },
@@ -32,14 +40,6 @@
     },
     {
       "name": "TC-P01-008 PowerCutOffRequest coupe A et B sans armer",
-      "passed": true
-    },
-    {
-      "name": "TC-P01-SCEN-NOM Scenario Nominal : Sequence complete de rearmement sans blocage",
-      "passed": true
-    },
-    {
-      "name": "TC-P01-SCEN-DYN Scenario Dynamique : Enchainement nominal puis perturbations reelles en service",
       "passed": true
     }
   ],
