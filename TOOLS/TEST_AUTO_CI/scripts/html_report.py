@@ -975,16 +975,16 @@ _CSS = """
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
     .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; background: rgba(0, 0, 0, 0.02); }
-    .checks-summary { cursor: pointer; font-size: 12.5px; color: var(--text); font-weight: 700; outline: none; user-select: text; }
+    .checks-details { margin-top: 10px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 13.5px; color: var(--text); font-weight: 700; outline: none; user-select: text; }
     .checks-summary:hover { color: var(--accent); }
-    .checks-label { font-size: 12.5px; font-weight: 700; }
-    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 10px 0 6px; }
-    .checks-list li { font-size: 12.5px; color: var(--text); padding: 4px 0 4px 24px; position: relative; line-height: 1.5; }
-    .checks-list li::before { content: "✓"; position: absolute; left: 2px; color: var(--green-text); font-weight: bold; font-size: 13px; }
-    .scenario-list li { font-size: 12.5px; color: var(--text); padding: 5px 0 5px 24px; position: relative; line-height: 1.5; border-bottom: 1px dashed rgba(255, 255, 255, 0.05); }
+    .checks-label { font-size: 13.5px; font-weight: 700; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 12px 0 6px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 5px 0 5px 26px; position: relative; line-height: 1.5; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 2px; color: var(--green-text); font-weight: bold; font-size: 14px; }
+    .scenario-list li { font-size: 14px; color: #f1f5f9; padding: 7px 0 7px 28px; position: relative; line-height: 1.6; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-weight: 500; }
     .scenario-list li:last-child { border-bottom: none; }
-    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 11px; opacity: 0.9; top: 6px; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 12px; opacity: 0.9; top: 8px; }
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
