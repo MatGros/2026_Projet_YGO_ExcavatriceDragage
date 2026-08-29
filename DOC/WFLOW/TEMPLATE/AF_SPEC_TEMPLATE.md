@@ -48,12 +48,57 @@ historique. État actuel uniquement, 3-4 lignes max.
 
 ## 🧪 2. Table des points de validation (Cas de Test — TC)
 
-> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
-> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
+> **Organisation & Standard de Rédaction** :
+> - **Séquence & Déroulé** : Décomposition chronologique complète par étapes numérotées (`💤 Étape 0`, `🚀 Étape 1`, `⚡ Étape 2`, `✅ Étape 3`), avec stimuli, temporisations et résultats attendus.
+> - **État** : `V-I` Validé & Implémenté · `V` Validé (non vérifié) · `NV` Non validé · `NV-I` Implémenté non validé · `R` Refusé · `NA` Non applicable.
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf</nobr> | État |
-|---|---|---|---|---|---|
-| <nobr><code>TC-PNN-001</code></nobr> | **[Nom Groupe]** | [Comportement physique et logique, 1-2 phrases] | <nobr><code>💻 AUTO</code></nobr> | <small>§N</small> | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-PNN-SCEN-NOM</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Nominal</b><br>[Fonction]</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Repos initial (conditions nominales saines)<br>
+        🚀 <b>Étape 1</b> : Demande de commande opérateur ou consigne métier<br>
+        ⚡ <b>Étape 2</b> : Exécution de la commande et surveillance dynamique<br>
+        ✅ <b>Étape 3</b> : Atteinte de l'état final cible et confirmation
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§N</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-PNN-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>[Intention<br>courte]</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        ⚡ <b>Étape 1</b> : Stimulus initial d'entrée<br>
+        🔍 <b>Étape 2</b> : Traitement et évaluation logique<br>
+        🛑 <b>Étape 3</b> : Résultat / Sanction attendue sur les sorties
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§N</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 🔄 3. Pipeline et composition
 
