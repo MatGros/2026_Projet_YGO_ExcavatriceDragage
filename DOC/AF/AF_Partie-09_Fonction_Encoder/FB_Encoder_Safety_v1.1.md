@@ -27,12 +27,54 @@ Décline `TC-P09-030` (chapô) :
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Comportement attendu | Type | Réf | Etat |
-|---|---|---|---|---|
-| <nobr><code>TC-P09-030.4</code></nobr> | `CablePosM` hors `[PositionMinM;PositionMaxM]` (déf. ±99m) → `EncoderIncoherent=TRUE`, bit0, auto-effacé au retour en plage | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
-| <nobr><code>TC-P09-030.5</code></nobr> | `HomingSuspect=TRUE` → `EncoderIncoherent=TRUE`, bit1, tant que non confirmé | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
-| <nobr><code>TC-P09-030.6</code></nobr> | `BypassGlobal=TRUE` → neutralise les 2 causes (mise en service) | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
-| <nobr><code>TC-P09-030.7</code></nobr> | `CablePosMSafe` = `CablePosM` toujours (jamais gelée — distinct du gel `RawPos` côté Abs) | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: calc(100% - 310px);">
+    <col style="width: 90px;">
+    <col style="width: 140px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.4</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>CablePosM</code> hors <code>[PositionMinM;PositionMaxM]</code> (déf. ±99m) → <code>EncoderIncoherent=TRUE</code>, bit0, auto-effacé au retour en plage</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.5</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>HomingSuspect=TRUE</code> → <code>EncoderIncoherent=TRUE</code>, bit1, tant que non confirmé</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.6</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>BypassGlobal=TRUE</code> → neutralise les 2 causes (mise en service)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.7</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>CablePosMSafe</code> = <code>CablePosM</code> toujours (jamais gelée — distinct du gel <code>RawPos</code> côté Abs)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 3 · 🔌 Interface
 

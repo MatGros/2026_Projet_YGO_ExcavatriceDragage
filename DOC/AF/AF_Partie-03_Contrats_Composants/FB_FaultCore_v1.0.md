@@ -52,14 +52,68 @@ distincte, remplie par le FB porteur lui-même, **hors périmètre de FB_FaultCo
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Comportement attendu | Type | Réf | Etat |
-|---|---|---|---|---|
-| <nobr><code>TC-P03-008</code></nobr> | Cumul de plusieurs causes latchées : 2 `Causes[i]` distincts (`Active AND Latching`) apparus à des instants différents s'accumulent dans `LatchedId` ; un seul front `Reset` les acquitte ensemble | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
-| <nobr><code>TC-P03-009</code></nobr> | Cause live (`Latching=FALSE`) + cause latchée (`Latching=TRUE`) simultanées : la live alimente `ErrorId` et retombe seule quand `Active` repasse `FALSE` ; la latchée arme `LatchedId` et reste jusqu'au front `Reset` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
-| <nobr><code>TC-P03-010</code></nobr> | Bornes de la liste `Causes[0..15]` : `Causes[0]` et `Causes[15]` correctement mappés sur le bit 0 et le bit 15 (`SHL(WORD#1, i)`), pas d'off-by-one | <nobr><code>💻 AUTO</code></nobr> | §3 | `NV-I` |
-| <nobr><code>TC-P03-011</code></nobr> | `Reset` sans historique de défaut : aucun effet parasite, `LatchedId` reste `0`, `Latched` reste `FALSE` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
-| <nobr><code>TC-P03-012</code></nobr> | `Reset` maintenu (niveau haut) sans nouveau front pendant qu'une cause latchée disparaît puis réapparaît : pas d'acquittement silencieux (le clear n'agit que sur le front `R_TRIG`) ; la cause réapparue `Active AND Latching` **ré-arme** son bit (ré-alarme) — faille T148 **non applicable** à cette brique | <nobr><code>💻 AUTO</code></nobr> | §6 | `NV-I` |
-| <nobr><code>TC-P03-013</code></nobr> | `Enable=FALSE` : la vue LIVE n'est pas évaluée (`ErrorId=0`, `Error=FALSE`) mais la vue LATCHÉE **reste publiée** — un défaut laté non acquitté ne disparaît pas sur bascule `Enable` OFF→ON sans `Reset` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: calc(100% - 310px);">
+    <col style="width: 90px;">
+    <col style="width: 140px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-008</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Cumul de plusieurs causes latchées : 2 <code>Causes[i]</code> distincts (<code>Active AND Latching</code>) apparus à des instants différents s'accumulent dans <code>LatchedId</code> ; un seul front <code>Reset</code> les acquitte ensemble</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-009</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Cause live (<code>Latching=FALSE</code>) + cause latchée (<code>Latching=TRUE</code>) simultanées : la live alimente <code>ErrorId</code> et retombe seule quand <code>Active</code> repasse <code>FALSE</code> ; la latchée arme <code>LatchedId</code> et reste jusqu'au front <code>Reset</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-010</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Bornes de la liste <code>Causes[0..15]</code> : <code>Causes[0]</code> et <code>Causes[15]</code> correctement mappés sur le bit 0 et le bit 15 (<code>SHL(WORD#1, i)</code>), pas d'off-by-one</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§3</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-011</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Reset</code> sans historique de défaut : aucun effet parasite, <code>LatchedId</code> reste <code>0</code>, <code>Latched</code> reste <code>FALSE</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-012</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Reset</code> maintenu (niveau haut) sans nouveau front pendant qu'une cause latchée disparaît puis réapparaît : pas d'acquittement silencieux (le clear n'agit que sur le front <code>R_TRIG</code>) ; la cause réapparue <code>Active AND Latching</code> <b>ré-arme</b> son bit (ré-alarme) — faille T148 <b>non applicable</b> à cette brique</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§6</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-013</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Enable=FALSE</code> : la vue LIVE n'est pas évaluée (<code>ErrorId=0</code>, <code>Error=FALSE</code>) mais la vue LATCHÉE <b>reste publiée</b> — un défaut laté non acquitté ne disparaît pas sur bascule <code>Enable</code> OFF→ON sans <code>Reset</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 Exécution : `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st` — scénarios
 multi-scans, causes injectées via `Causes[i].Active` / `Causes[i].Latching` (aucune source

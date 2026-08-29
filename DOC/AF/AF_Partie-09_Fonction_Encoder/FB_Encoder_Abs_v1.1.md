@@ -28,10 +28,40 @@ Décline `TC-P09-010` (chapô) :
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Comportement attendu | Type | Réf | Etat |
-|---|---|---|---|---|
-| <nobr><code>TC-P09-010.1</code></nobr> | `AlarmsIn≠0` OU `NOT SlaveOperational` → `EncoderAvailable=FALSE`, `RawPos`/`AngleRaw`/`TurnCount` gelés (dernière valeur) | <nobr><code>💻 AUTO</code></nobr> | §5 | `NV-I` |
-| <nobr><code>TC-P09-010.2</code></nobr> | Preset : écart `abs(RawPos - PresetValueOut) ≤ PresetTolerancePts` → `PresetAck` après 500ms visuel ; sinon timeout `PresetTimeout` → `PresetNak` + `ErrorId` bit1 | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: calc(100% - 310px);">
+    <col style="width: 90px;">
+    <col style="width: 140px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>AlarmsIn≠0</code> OU <code>NOT SlaveOperational</code> → <code>EncoderAvailable=FALSE</code>, <code>RawPos</code>/<code>AngleRaw</code>/<code>TurnCount</code> gelés (dernière valeur)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§5</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010.2</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Preset : écart <code>abs(RawPos - PresetValueOut) ≤ PresetTolerancePts</code> → <code>PresetAck</code> après 500ms visuel ; sinon timeout <code>PresetTimeout</code> → <code>PresetNak</code> + <code>ErrorId</code> bit1</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 3 · 🔌 Interface
 

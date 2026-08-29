@@ -26,12 +26,54 @@ Décline `TC-P09-050` (chapô) :
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Comportement attendu | Type | Réf | Etat |
-|---|---|---|---|---|
-| <nobr><code>TC-P09-050.1</code></nobr> | `Valid=TRUE` seulement après 6 échantillons couvrant `WindowElapsed ≥ T#50ms` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
-| <nobr><code>TC-P09-050.2</code></nobr> | `PositionValid=FALSE` (amont) → purge complète immédiate (`CollectedSamples:=0`, `Valid:=FALSE`) | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
-| <nobr><code>TC-P09-050.3</code></nobr> | Rebouclage `TIME()` détecté (`CurrentTimestamp < LastTimestamp`) → purge sans réutiliser le delta aberrant | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
-| <nobr><code>TC-P09-050.4</code></nobr> | `SignedSpeed_Mps` signée (+ montée) ; `Speed_Mps = ABS(SignedSpeed_Mps)` | <nobr><code>💻 AUTO</code></nobr> | §4 | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: calc(100% - 310px);">
+    <col style="width: 90px;">
+    <col style="width: 140px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-050.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Valid=TRUE</code> seulement après 6 échantillons couvrant <code>WindowElapsed ≥ T#50ms</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-050.2</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>PositionValid=FALSE</code> (amont) → purge complète immédiate (<code>CollectedSamples:=0</code>, <code>Valid:=FALSE</code>)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-050.3</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Rebouclage <code>TIME()</code> détecté (<code>CurrentTimestamp &lt; LastTimestamp</code>) → purge sans réutiliser le delta aberrant</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-050.4</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>SignedSpeed_Mps</code> signée (+ montée) ; <code>Speed_Mps = ABS(SignedSpeed_Mps)</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 3 · 🔌 Interface
 
