@@ -96,6 +96,62 @@ def parse_markdown_tables(lines: list[str]) -> list[list[dict[str, str]]]:
     return tables
 
 
+def clean_html_cell(cell: str) -> str:
+    """Nettoie le texte d'une cellule HTML (balises, entités, espaces)."""
+    text = re.sub(r"<br\s*/?\s*>", " ", cell, flags=re.IGNORECASE)
+    text = re.sub(r"<[^>]+>", "", text)
+    text = (
+        text.replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&amp;", "&")
+        .replace("&nbsp;", " ")
+    )
+    # Uniformise les restes Markdown éventuels (backticks, gras).
+    return clean_markdown_cell(text)
+
+
+def parse_html_tables(lines: list[str]) -> list[list[dict[str, str]]]:
+    """Parse les tableaux HTML (<table>...) d'une section en liste de dictionnaires.
+
+    Format cible : gabarits AF (HTML figé, colgroup, th/td sur <tr> mono-ligne ou multi-ligne).
+    """
+    content = "\n".join(lines)
+    tables: list[list[dict[str, str]]] = []
+    for block_match in re.finditer(r"<table\b.*?</table>", content, flags=re.IGNORECASE | re.DOTALL):
+        block = block_match.group(0)
+        head_match = re.search(r"<thead\b(.*?)</thead>", block, flags=re.IGNORECASE | re.DOTALL)
+        if not head_match:
+            continue
+        headers = [
+            clean_html_cell(h.group(1))
+            for h in re.finditer(r"<th\b[^>]*>(.*?)</th>", head_match.group(1), flags=re.IGNORECASE | re.DOTALL)
+        ]
+        if not headers:
+            continue
+        body = block[head_match.end():]
+        rows: list[dict[str, str]] = []
+        for tr_match in re.finditer(r"<tr\b[^>]*>(.*?)</tr>", body, flags=re.IGNORECASE | re.DOTALL):
+            row_html = tr_match.group(1)
+            cells = [
+                clean_html_cell(td.group(1))
+                for td in re.finditer(r"<td\b[^>]*>(.*?)</td>", row_html, flags=re.IGNORECASE | re.DOTALL)
+            ]
+            if not cells:
+                continue
+            row_dict: dict[str, str] = {}
+            for i, header in enumerate(headers):
+                row_dict[header] = cells[i] if i < len(cells) else ""
+            rows.append(row_dict)
+        if rows:
+            tables.append(rows)
+    return tables
+
+
+def parse_tables(lines: list[str]) -> list[list[dict[str, str]]]:
+    """Tableaux d'une section, HTML (gabarits AF migrés) d'abord, Markdown ensuite."""
+    return parse_html_tables(lines) + parse_markdown_tables(lines)
+
+
 def extract_sections(content: str) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
     """Extrait les tables des sections Fonctions et Points de validation d'un contenu markdown."""
     lines = content.splitlines()
@@ -109,12 +165,12 @@ def extract_sections(content: str) -> tuple[list[dict[str, str]], list[dict[str,
     def flush_section():
         nonlocal current_section, current_section_level, section_lines, functions_rows, validation_rows
         if current_section == "functions":
-            for parsed in parse_markdown_tables(section_lines):
+            for parsed in parse_tables(section_lines):
                 if any("fonction" in header.lower() for header in parsed[0]):
                     functions_rows.extend(parsed)
                     break
         elif current_section == "validation":
-            for parsed in parse_markdown_tables(section_lines):
+            for parsed in parse_tables(section_lines):
                 if any(header.lower().startswith("id") for header in parsed[0]):
                     validation_rows.extend(parsed)
                     break
