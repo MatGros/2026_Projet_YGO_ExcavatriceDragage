@@ -108,65 +108,75 @@ domains:
         ref: FB_Safety_EmergencyManagement
         etat: NV-I
       TC-P01-010:
-        intention: BtnEmergencyCutOff pendant le pulse de réarmement (step 5)
-        preuve: ⚠️ ArmPulse_RQ reste TRUE — écart relevé, non corrigé (audit 2026-08-22)
+        intention: BtnEmergencyCutOff pendant le pulse ➔ avortement immédiat propre
+          sans alarme
+        preuve: ArmPulse=FALSE, Error=FALSE
         type: 💻 AUTO
-        ref: §7
-        etat: NV-I
+        ref: §4.3
+        etat: V-I
+      TC-P01-SCEN-NOM:
+        intention: ArmRequest ➔ Auto-test A/B (800ms) ➔ Pulse (1s) ➔ Contacteur collé
+          ➔ Done=TRUE
+        preuve: Chronogramme nominal complet
+        type: ⚡ AUTO_PLC
+        ref: §4.3
+        etat: V-I
       TC-P01-001:
-        intention: Coupe puissance moteurs, API vivant
-        preuve: Contacteur ouvert
+        intention: Coupe la boucle matérielle, contacteur retombe, API vivant
+        preuve: Contacteur=FALSE
         type: 🟢 SITE
         ref: §6.1
-        etat: NV
+        etat: V-I
       TC-P01-002:
         intention: Perte canal A ou B ouvre la boucle AU
         preuve: MaintainA/B_RQ=FALSE
         type: ⚡ SITE+AUTO
         ref: §5
-        etat: NV-I
+        etat: V-I
       TC-P01-003:
-        intention: Front ArmRequest + boucle OK ➔ pulse 1s
-        preuve: Pulse 1s (step 5)
+        intention: Front ArmRequest + préconditions OK ➔ pulse 1s (Step 5)
+        preuve: Cmd.ArmPulse_Cmd=TRUE
         type: ⚡ AUTO_PLC
         ref: §4.3
-        etat: NV-I
+        etat: V-I
       TC-P01-004:
-        intention: Reset efface l'affichage (interlock reste sur Cause)
-        preuve: Error=FALSE
+        intention: Reset efface l'affichage et purge les verrous d'échec
+        preuve: Error=FALSE, Lockout=FALSE
         type: 💻 AUTO
-        ref: §4.4bis
-        etat: NV-I
+        ref: §4.4
+        etat: V-I
       TC-P01-005:
-        intention: Acquittement et réarmement 2 actions distinctes
+        intention: Acquittement défaut métier et réarmement = 2 actions distinctes
         preuve: 2 actions requises
         type: ⚡ SITE+AUTO
         ref: §4.4
-        etat: NV-I
+        etat: V-I
       TC-P01-006:
-        intention: Test croisé A/B au réarmement (échec ➔ RedundancyFail)
+        intention: Test dynamique A/B au réarmement (échec ➔ RedundancyFail)
         preuve: Steps 1–4 (200ms)
         type: ⚡ AUTO_PLC
         ref: §4.3bis
-        etat: NV-I
+        etat: V-I
       TC-P01-007:
-        intention: Échec confirmation contacteur ➔ verrouillage 5s
+        intention: Contacteur non confirmé sous 2s ➔ Alarme EmergencyArmingFailed
+          + Lockout 5s
         preuve: LockoutActive=TRUE
         type: 💻 AUTO
         ref: §4.3
-        etat: NV-I
+        etat: V-I
       TC-P01-008:
-        intention: PowerCutOffRequest=TRUE coupe A et B sans armer
+        intention: PowerCutOffRequest=TRUE (dérive treuil/M3) ➔ Armable=FALSE, retombée
+          immédiate
         preuve: MaintainA/B_RQ=FALSE
         type: 💻 AUTO
-        ref: §4
-        etat: NV-I
+        ref: §4.1
+        etat: V-I
       TC-P01-009:
-        intention: Cause persistante ➔ ré-alarme au prochain essai
-        preuve: Ack=FALSE
+        intention: Réarmement interdit tant que la coupure métier n'est pas acquittée
+        preuve: Armable=FALSE
         type: 💻 AUTO
-        ref: §4.4bis
-        etat: NV-I
+        ref: §4.2
+        etat: V-I
   AF-02:
     file: AF_Partie-02_Architecture_Programme_v3.2.md
     functions:
