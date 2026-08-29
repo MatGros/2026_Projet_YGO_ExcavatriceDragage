@@ -11,7 +11,7 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Points de validation](#1--points-de-validation)
+1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
 2. [🎚️ Modes machine](#2--modes-machine)
 3. [🧩 Fonctions et petits cycles](#3--fonctions-et-petits-cycles)
 4. [🎮 Sélection de commande](#4--sélection-de-commande)
@@ -22,18 +22,80 @@
 9. [❓ TBD](#9--tbd)
 10. [📚 Documents liés](#10--documents-liés)
 
-## 🧪 1 · Points de validation
+## 🧪 1 · Table des points de validation
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Intention | Preuve | Type | Réf | Etat |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P05-001</code></nobr> | Modes machine restreints (`DISABLE`, `MAINT_N1`, `MAINT_N2`, `SEMI_AUTO`) | `SyncEnable`, Diving, Extraction hors `E_Mode` | `💻 AUTO` | <small>§2-3</small> | `NV` |
-| <nobr><code>TC-P05-002</code></nobr> | Mode nominal : joystick pilote M1+M2 conjointement | M1 et M2 reçoivent la même intention | `💻 AUTO` | <small>§4</small> | `NV` |
-| <nobr><code>TC-P05-003</code></nobr> | Mode MAINT_N2 M1 seul : M2 bloqué, frein serré | Safety reste active sur M2 | `💻 AUTO` | <small>§4</small> | `NV` |
-| <nobr><code>TC-P05-004</code></nobr> | Refus mode SEMI_AUTO si codeurs invalides | Bascule refusée + message IHM | `💻 AUTO` | <small>§7</small> | `NV` |
-| <nobr><code>TC-P05-005</code></nobr> | Limite légale = blocage exploitation, pas safety | Pas de `PowerCutOff` sur simple limite légale | `💻 AUTO` | <small>§6</small> | `NV` |
-| <nobr><code>TC-P05-006</code></nobr> | Pas de redémarrage automatique après défaut | `Reset` + nouvel ordre explicite requis | `💻 AUTO` | <small>§7</small> | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P05-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Modes machine restreints (<code>DISABLE</code>, <code>MAINT_N1</code>, <code>MAINT_N2</code>, <code>SEMI_AUTO</code>)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>SyncEnable</code>, Diving, Extraction hors <code>E_Mode</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2-3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P05-002</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Mode nominal : joystick pilote M1+M2 conjointement</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">M1 et M2 reçoivent la même intention</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P05-003</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Mode MAINT_N2 M1 seul : M2 bloqué, frein serré</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Safety reste active sur M2</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P05-004</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Refus mode SEMI_AUTO si codeurs invalides</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Bascule refusée + message IHM</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§7</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P05-005</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Limite légale = blocage exploitation, pas safety</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Pas de <code>PowerCutOff</code> sur simple limite légale</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P05-006</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Pas de redémarrage automatique après défaut</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Reset</code> + nouvel ordre explicite requis</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§7</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 

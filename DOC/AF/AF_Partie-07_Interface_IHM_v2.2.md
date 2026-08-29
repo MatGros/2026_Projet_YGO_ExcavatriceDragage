@@ -13,7 +13,7 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Points de validation](#1--points-de-validation)
+1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
 2. [🎯 Principe](#2--principe)
 3. [🌐 Frontière `GVL_IHM`](#3--frontière-gvl_ihm)
 4. [🧱 Structures par domaine](#4--structures-par-domaine)
@@ -24,21 +24,104 @@
 9. [❓ TBD](#9--tbd)
 10. [📚 Documents liés](#10--documents-liés)
 
-## 🧪 1 · Points de validation
+## 🧪 1 · Table des points de validation
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Intention | Preuve | Type | Réf | Etat |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P07-001</code></nobr> | IHM et PLC partagent les mêmes DUTs | Aucun miroir parallèle de variables | `💻 AUTO` | <small>§2</small> | `NV-I` |
-| <nobr><code>TC-P07-002</code></nobr> | Structures `Cmd/State/Cfg` par domaine | Convention respectée dans `GVL_IHM` | `💻 AUTO` | <small>§4</small> | `NV` |
-| <nobr><code>TC-P07-003</code></nobr> | IHM limitée aux variables de `GVL_IHM` | Zéro accès direct aux internes des FB | `💻 AUTO` | <small>§2</small> | `NV` |
-| <nobr><code>TC-P07-004</code></nobr> | Producteur unique par champ `State` | Un seul écrivain PLC par variable d'état | `💻 AUTO` | <small>§2</small> | `NV` |
-| <nobr><code>TC-P07-005</code></nobr> | Page Troubleshooting en lecture seule | Zéro écriture de commande/config/bypass | `💻 AUTO` | <small>§7</small> | `NV` |
-| <nobr><code>TC-P07-006</code></nobr> | Séparation messages action vs état | 2 familles distinctes, alarmes sur `ErrorId` | `⚡ SITE+AUTO` | <small>§5</small> | `NV` |
-| <nobr><code>TC-P07-007</code></nobr> | Warning auto-effaçable vs Fault sur Reset | Warning s'efface seul, Fault exige `Ack` | `⚡ SITE+AUTO` | <small>§5</small> | `NV` |
-| <nobr><code>TC-P07-008</code></nobr> | Carrousel d'alarmes un message à la fois, index n/N | `Banner.AlarmBanner.Index/Count` cohérents | `💻 AUTO` | <small>§6</small> | `NV` |
-| <nobr><code>TC-P07-009</code></nobr> | Aucun défaut actif → bandeau d'alarme vide | `HasAlarm=FALSE`, `Text=''`, `Index=0`, `Count=0` | `💻 AUTO` | <small>§6</small> | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>IHM et PLC partagent les mêmes DUTs</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Aucun miroir parallèle de variables</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-002</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Structures <code>Cmd/State/Cfg</code> par domaine</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Convention respectée dans <code>GVL_IHM</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-003</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>IHM limitée aux variables de <code>GVL_IHM</code></b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Zéro accès direct aux internes des FB</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-004</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Producteur unique par champ <code>State</code></b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Un seul écrivain PLC par variable d'état</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-005</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Page Troubleshooting en lecture seule</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Zéro écriture de commande/config/bypass</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§7</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-006</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Séparation messages action vs état</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">2 familles distinctes, alarmes sur <code>ErrorId</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ SITE+AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-007</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Warning auto-effaçable vs Fault sur Reset</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Warning s'efface seul, Fault exige <code>Ack</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ SITE+AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-008</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Carrousel d'alarmes un message à la fois, index n/N</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Banner.AlarmBanner.Index/Count</code> cohérents</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-009</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Aucun défaut actif → bandeau d'alarme vide</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>HasAlarm=FALSE</code>, <code>Text=''</code>, <code>Index=0</code>, <code>Count=0</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 

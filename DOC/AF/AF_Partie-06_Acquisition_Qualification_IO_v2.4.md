@@ -16,7 +16,7 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Points de validation](#1--points-de-validation)
+1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
 2. [🎯 Rôle (détail)](#2--rôle-détail)
 3. [🏗️ Chaîne d'acquisition](#3--chaîne-dacquisition)
    - [3bis. 🧩 Intégration programme — cible `PRG_02_Acquisition`](#3bis--integration-programme--cible-prg_02_acquisition)
@@ -30,19 +30,88 @@
 9. [❓ TBD](#9--tbd)
 10. [📚 Documents liés](#10--documents-liés)
 
-## 🧪 1 · Points de validation
+## 🧪 1 · Table des points de validation
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Intention | Preuve | Type | Réf | Etat |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P06-001</code></nobr> | Aucune lecture d'E/S brute dans les FB métier | Consommateurs lisent des faits qualifiés | `💻 AUTO` | <small>§3</small> | `NV` |
-| <nobr><code>TC-P06-002</code></nobr> | Polarité normalisée une seule fois à l'acquisition | Zéro ré-inversion dans les FB métier | `💻 AUTO` | <small>§3</small> | `NV` |
-| <nobr><code>TC-P06-003</code></nobr> | Bascule réel/simulation centralisée | `HwIn` source unique par domaine | `💻 AUTO` | <small>§3</small> | `NV` |
-| <nobr><code>TC-P06-004</code></nobr> | Diag CANopen/EtherCAT publié en ligne | Statuts dispos pour Modes/Safety/IHM | `💻 AUTO` | <small>§4</small> | `NV` |
-| <nobr><code>TC-P06-005</code></nobr> | Noms des signaux de puissance validés | `PowerKeepAlive_A/B_RQ`, `EmergencyChainClosed_DI` | `🟢 SITE` | <small>§5</small> | `NV` |
-| <nobr><code>TC-P06-006</code></nobr> | Écriture des sorties physiques centralisée | `PRG_06_Outputs` seul producteur final | `💻 AUTO` | <small>§6</small> | `NV` |
-| <nobr><code>TC-P06-007</code></nobr> | Preflight passif machine arrêtée | Sur front `Execute` (demande IHM) uniquement — aucun verdict automatique au démarrage automate — verdict 16 bits après immobilité ; publication IHM sans action machine | `💻 AUTO_PLC` | <small>§7 / FB_Acquisition_Preflight</small> | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P06-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Aucune lecture d'E/S brute dans les FB métier</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Consommateurs lisent des faits qualifiés</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P06-002</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Polarité normalisée une seule fois à l'acquisition</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Zéro ré-inversion dans les FB métier</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P06-003</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bascule réel/simulation centralisée</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>HwIn</code> source unique par domaine</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P06-004</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Diag CANopen/EtherCAT publié en ligne</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Statuts dispos pour Modes/Safety/IHM</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P06-005</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Noms des signaux de puissance validés</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>PowerKeepAlive_A/B_RQ</code>, <code>EmergencyChainClosed_DI</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>🟢 SITE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P06-006</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Écriture des sorties physiques centralisée</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>PRG_06_Outputs</code> seul producteur final</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P06-007</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Preflight passif machine arrêtée</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Sur front <code>Execute</code> (demande IHM) uniquement — aucun verdict automatique au démarrage automate — verdict 16 bits après immobilité ; publication IHM sans action machine</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§7 / FB_Acquisition_Preflight</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 

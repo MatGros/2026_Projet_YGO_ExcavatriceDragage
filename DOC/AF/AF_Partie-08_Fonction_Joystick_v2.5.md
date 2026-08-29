@@ -34,18 +34,114 @@
 
 ### 🎯 Table des fonctions
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
-|---|---|---|---|---|---|---|---|
-| `F08.01` | Acquérir axes + bouton | Lit `RawX`/`RawY`/`RawButton` (bus CANopen ou image simulée) | `FB_Joystick` | 🔵 C2 | <nobr><code>TC-P08-010</code></nobr> | ✅ | `NV-I` |
-| `F08.02` | Mettre à l'échelle | Brut ADC → % signé ±100, deadband ADC sur neutre persistant, saturation stricte | `FB_AxisScale` | 🔵 C2 | <nobr><code>TC-P08-010</code></nobr> | ✅ | `NV-I` |
-| `F08.03` | Armer homme-mort | Maintien bouton `DeadmanArmHoldTime` (100ms) **ET** `ArmingPermit=TRUE` | `FB_Joystick` | 🔴 C4 | <nobr><code>TC-P08-020</code></nobr> | ✅ | `NV-I` |
-| `F08.04` | Désarmer homme-mort | `ArmingPermit=FALSE` (immédiat) **ou** neutre tenu `NeutralHoldTime` après grâce `DeadmanArmGraceTime` (3s) | `FB_Joystick` | 🔴 C4 | <nobr><code>TC-P08-020</code></nobr> | ✅ | `NV-I` |
-| `F08.05` | Détecter défaut capteur | `RawX`/`RawY` hors `[0;10000]` ± marge 500 → `SpeedTgt=0` 2 axes + Warning | `FB_Joystick` | 🟠 C3 | <nobr><code>TC-P08-030</code></nobr> | ✅ | `NV-I` |
-| `F08.06` | Calibrer neutre | Front `Calibrate` en zone `[2000;8000]` → mémorise neutre persistant, sinon Fault | `FB_Joystick` | 🔵 C2 | <nobr><code>TC-P08-040</code></nobr> | ⚠️ SITE non exécuté | `NV` |
-| `F08.07` | Interdire mouvement sans armement | Consommateur combine `AxisCmd*.StartStop AND DeadmanArmed` avant tout ordre translation ; **partiel** sur treuils (voir §Intégration) | `PRG_04`/`PRG_05` (câblage), vérifié par `gate` `G375` | 🔴 C4 | <nobr><code>TC-P08-050</code></nobr> | ⚠️ partiel (treuils) | `NV` |
-| `F08.08` | Signaler armement refusé | `ArmingPermitDenied := RawButton AND NOT ArmingPermit` (warning IHM) | `FB_Joystick` | ⚪ C1 | <nobr><code>TC-P08-060</code></nobr> | ⚠️ non testé | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: calc(100% - 520px);">
+    <col style="width: 110px;">
+    <col style="width: 50px;">
+    <col style="width: 90px;">
+    <col style="width: 50px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Fonction</small></th>
+      <th style="padding: 4px 8px;">Description</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réalisée par</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Criticité</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>TC couvrants</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Statut</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F08.01</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquérir axes + bouton</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Lit <code>RawX</code>/<code>RawY</code>/<code>RawButton</code> (bus CANopen ou image simulée)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔵 C2</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F08.02</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Mettre à l'échelle</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Brut ADC → % signé ±100, deadband ADC sur neutre persistant, saturation stricte</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_AxisScale</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔵 C2</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F08.03</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Armer homme-mort</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Maintien bouton <code>DeadmanArmHoldTime</code> (100ms) <b>ET</b> <code>ArmingPermit=TRUE</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F08.04</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Désarmer homme-mort</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>ArmingPermit=FALSE</code> (immédiat) <b>ou</b> neutre tenu <code>NeutralHoldTime</code> après grâce <code>DeadmanArmGraceTime</code> (3s)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F08.05</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Détecter défaut capteur</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>RawX</code>/<code>RawY</code> hors <code>[0;10000]</code> ± marge 500 → <code>SpeedTgt=0</code> 2 axes + Warning</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-030</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F08.06</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Calibrer neutre</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Front <code>Calibrate</code> en zone <code>[2000;8000]</code> → mémorise neutre persistant, sinon Fault</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔵 C2</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-040</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ SITE non exécuté</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F08.07</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Interdire mouvement sans armement</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Consommateur combine <code>AxisCmd*.StartStop AND DeadmanArmed</code> avant tout ordre translation ; <b>partiel</b> sur treuils (voir §Intégration)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>PRG_04</code>/<code>PRG_05</code> (câblage), vérifié par <code>gate</code> <code>G375</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-050</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ partiel (treuils)</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F08.08</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Signaler armement refusé</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>ArmingPermitDenied := RawButton AND NOT ArmingPermit</code> (warning IHM)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚪ C1</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-060</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ non testé</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 > `TC-P08-010` couvre `F08.01`+`F08.02` (même pipeline acquisition+échelle) ; `TC-P08-020` couvre
 > `F08.03`+`F08.04` (armement+désarmement, même TC macro) — partage volontaire (règle guide 3-6
@@ -55,16 +151,78 @@
 
 ## 2 · 🧪 Table des points de validation
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P08-010</code></nobr> | **Acquisition & échelle** | `RawX=9000→80%`, `RawY=300→-94%` proportionnel (pas seulement aux bornes) ; deadband ADC centrée neutre | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_AxisScale</code></small> | `NV` |
-| <nobr><code>TC-P08-020</code></nobr> | **Homme-mort** | Armement maintien+permission ; relâché avant fin = annulé ; désarmement (décélération normale, pas coupure) sur `ArmingPermit=FALSE` ou neutre tenu après grâce 3s | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Joystick</code></small> | `NV` |
-| <nobr><code>TC-P08-030</code></nobr> | **Défaut capteur** | Hors plage ±marge ➔ `SpeedTgt=0` 2 axes, `ErrorId` bit1 Warning auto-effacé | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Joystick</code></small> | `NV` |
-| <nobr><code>TC-P08-040</code></nobr> | **Calibration** | Hors `[2000;8000]` ➔ Fault bit0 à acquitter ; neutre persiste après redémarrage PLC | <nobr><code>⚡ AUTO+SITE</code></nobr> | <small><code>FB_Joystick</code></small> | `NV` |
-| <nobr><code>TC-P08-050</code></nobr> | **Gate consommateurs** | Translation refuse tout ordre sans `DeadmanArmed` (tous modes) ; Treuils **seulement** en mode Joystick Maître (asymétrie non tranchée, §7/Q2) | <nobr><code>🔒 GATE</code></nobr> | <small><code>G375_check_deadman_arming_gate.py</code></small> | `NV` |
-| <nobr><code>TC-P08-060</code></nobr> | **Armement refusé** | `ArmingPermitDenied=TRUE` pendant tout appui bouton si `ArmingPermit=FALSE` | <nobr><code>⬜ GAP</code></nobr> | <small><code>FB_Joystick</code></small> | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Acquisition &amp; échelle</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>RawX=9000→80%</code>, <code>RawY=300→-94%</code> proportionnel (pas seulement aux bornes) ; deadband ADC centrée neutre</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_AxisScale</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Homme-mort</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Armement maintien+permission ; relâché avant fin = annulé ; désarmement (décélération normale, pas coupure) sur <code>ArmingPermit=FALSE</code> ou neutre tenu après grâce 3s</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-030</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Défaut capteur</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Hors plage ±marge ➔ <code>SpeedTgt=0</code> 2 axes, <code>ErrorId</code> bit1 Warning auto-effacé</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-040</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Calibration</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Hors <code>[2000;8000]</code> ➔ Fault bit0 à acquitter ; neutre persiste après redémarrage PLC</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO+SITE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-050</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Gate consommateurs</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Translation refuse tout ordre sans <code>DeadmanArmed</code> (tous modes) ; Treuils <b>seulement</b> en mode Joystick Maître (asymétrie non tranchée, §7/Q2)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>🔒 GATE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>G375_check_deadman_arming_gate.py</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-060</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Armement refusé</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>ArmingPermitDenied=TRUE</code> pendant tout appui bouton si <code>ArmingPermit=FALSE</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⬜ GAP</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 > ⚠️ **`TC-P08-050` n'est pas un test de FB** : le gate vit dans `PRG_04_Treuils_Benne.st` /
 > `PRG_05_Translation.st` (câblage de collage), pas dans `FB_Joystick` (qui ignore Winch/Translation)

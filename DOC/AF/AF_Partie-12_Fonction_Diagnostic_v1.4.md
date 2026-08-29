@@ -17,18 +17,70 @@
 
 ### 🎯 Table des fonctions
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Fonction | Description | Réalisée par | Criticité | TC couvrants | Statut | Etat |
-|---|---|---|---|---|---|---|---|
-| `F12.01` | Diagnostiquer le bus CANopen (joystick) | Perte liaison / non-opérationnel → `ErrorId` bit0/1 | `FB_Diag_CanOpen` | 🟠 C3 | <nobr><code>TC-P12-010</code></nobr>, 020, 040 | ⚠️ conçu, non implémenté | `NV` |
-| `F12.02` | Diagnostiquer le bus EtherCAT (variateur M3, codeurs M1/M2) | Perte liaison par device → `ErrorId` bit4/5/6 (nibbles) | `FB_Diag_Ethercat` | 🟠 C3 | <nobr><code>TC-P12-010</code></nobr>, 020, 030, 040 | ⚠️ conçu, non implémenté | `NV` |
-| `F12.03` | Surveiller le heartbeat IHM↔PLC | Toggle bidirectionnel, détecte timeout communication | `FB_Diag_IhmHeartbeat` | 🟠 C3 | <nobr><code>TC-P12-050</code></nobr> | ⚠️ conçu, non implémenté | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: calc(100% - 520px);">
+    <col style="width: 110px;">
+    <col style="width: 50px;">
+    <col style="width: 90px;">
+    <col style="width: 50px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Fonction</small></th>
+      <th style="padding: 4px 8px;">Description</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réalisée par</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Criticité</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>TC couvrants</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Statut</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F12.01</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Diagnostiquer le bus CANopen (joystick)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Perte liaison / non-opérationnel → <code>ErrorId</code> bit0/1</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Diag_CanOpen</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-010, 020, 040</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ conçu, non implémenté</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F12.02</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Diagnostiquer le bus EtherCAT (variateur M3, codeurs M1/M2)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Perte liaison par device → <code>ErrorId</code> bit4/5/6 (nibbles)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Diag_Ethercat</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-010, 020, 030, 040</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ conçu, non implémenté</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F12.03</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Surveiller le heartbeat IHM↔PLC</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Toggle bidirectionnel, détecte timeout communication</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Diag_IhmHeartbeat</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-050</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>⚠️ conçu, non implémenté</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 📑 Sommaire
 
 1. [🧱 Composition — fiches FB dédiées](#1--composition--fiches-fb-dédiées)
-2. [🧪 Points de validation](#2--points-de-validation)
+2. [🧪 Table des points de validation](#2--table-des-points-de-validation)
 3. [🎭 Rôles et familles](#3--rôles-et-familles)
 4. [🚌 DUT et bus](#4--dut-et-bus)
 5. [🔄 Flux et consommateurs](#5--flux-et-consommateurs)
@@ -55,7 +107,7 @@
 
 ---
 
-## 🧪 2 · Points de validation
+## 🧪 2 · Table des points de validation
 
 > Catalogue conçu (revue expert automatisme/IHM/sécurité, 2026-08-26) — **pas encore implémenté**
 > (`⬜ GAP`, voir TBD §9). Aucun test épisodique/anti-bug isolé : chaque TC décrit un comportement
@@ -68,15 +120,71 @@
 > (`FB_Diag_IhmHeartbeat` seul) sont détaillés dans leur fiche dédiée (propriétaire unique, pas
 > dupliqué ici — `GUIDE_EDITION_AF_v1.0.md` §4).
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> | Etat |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P12-010</code></nobr> | **Perte liaison par device** | Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur M2) : `StateRaw≠RUNNING/ACTIVE` ➔ `Online=FALSE`, `Operational=FALSE`, `State=INIT`, sans effet sur les autres devices | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small> | `NV-I` |
-| <nobr><code>TC-P12-020</code></nobr> | **ErrorId bit-level par device** | Défaut isolé sur un seul device ➔ `ErrorId` de ce device porte **exactement** son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices (Joystick bit0/1, Variateur bit4, M1 bit5, **M2 bit6**) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small> | `NV-I` |
-| <nobr><code>TC-P12-030</code></nobr> | **Synthèse ErrorId globale** | Détail complet dans la fiche dédiée : [`FB_Diag_Ethercat_v1.1.md` §Points de validation](AF_Partie-12_Fonction_Diagnostic/FB_Diag_Ethercat_v1.1.md) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_Ethercat</code></small> | `NV` |
-| <nobr><code>TC-P12-040</code></nobr> | **Bypass sim/réseau vs état réel** | `SimBypass`/`NetworkBypassActive` sans device réel `RUNNING` ➔ `SIMULATED` ; réel `RUNNING` sans bypass ➔ `READY` ; ni l'un ni l'autre ➔ `INIT` ; `Enable=FALSE` prioritaire ➔ `DISABLED` | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small> | `NV` |
-| <nobr><code>TC-P12-050</code></nobr> | **Heartbeat IHM** | Détail complet dans la fiche dédiée : [`FB_Diag_IhmHeartbeat_v1.1.md` §Points de validation](AF_Partie-12_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.1.md) | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Diag_IhmHeartbeat</code></small> | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Perte liaison<br>par device</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur M2) : <code>StateRaw≠RUNNING/ACTIVE</code> ➔ <code>Online=FALSE</code>, <code>Operational=FALSE</code>, <code>State=INIT</code>, sans effet sur les autres devices</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-020</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>ErrorId<br>bit-level</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Défaut isolé sur un seul device ➔ <code>ErrorId</code> de ce device porte <b>exactement</b> son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices (Joystick bit0/1, Variateur bit4, M1 bit5, <b>M2 bit6</b>)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-030</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Synthèse<br>ErrorId</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Détail complet dans la fiche dédiée : <a href="AF_Partie-12_Fonction_Diagnostic/FB_Diag_Ethercat_v1.1.md"><code>FB_Diag_Ethercat_v1.1.md</code> §Points de validation</a></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_Ethercat</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-040</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bypass sim/<br>réseau</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>SimBypass</code>/<code>NetworkBypassActive</code> sans device réel <code>RUNNING</code> ➔ <code>SIMULATED</code> ; réel <code>RUNNING</code> sans bypass ➔ <code>READY</code> ; ni l'un ni l'autre ➔ <code>INIT</code> ; <code>Enable=FALSE</code> prioritaire ➔ <code>DISABLED</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-050</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Heartbeat<br>IHM</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Détail complet dans la fiche dédiée : <a href="AF_Partie-12_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.1.md"><code>FB_Diag_IhmHeartbeat_v1.1.md</code> §Points de validation</a></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_IhmHeartbeat</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 Couverture CI **existante mais superficielle** (pas un substitut au catalogue ci-dessus) :
 `TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_ethercat.st` — 2 cas seulement

@@ -14,7 +14,7 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Points de validation](#1--points-de-validation)
+1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
 2. [🧱 Principes](#2--principes)
 3. [🪨 Petits cycles réutilisables](#3--petits-cycles-réutilisables)
 4. [🔄 Cycle semi-auto (grafcet)](#4--cycle-semi-auto-grafcet)
@@ -24,22 +24,112 @@
 8. [❓ TBD](#8--tbd)
 9. [📚 Documents liés](#9--documents-liés)
 
-## 🧪 1 · Points de validation
+## 🧪 1 · Table des points de validation
 
 > **État** : `V-I` validé et implémenté (tests automatisés STruCpp verts) · `V` validé doc · `NV` non validé.
 
-| ID | Intention | Preuve | Type | Réf | État |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P04-001</code></nobr> | Relâchement manche (retour centre) stoppe sans perte d'étape | `StartStop=FALSE`, étape inchangée | `💻 AUTO` | <small>§2</small> | `V-I` |
-| <nobr><code>TC-P04-002</code></nobr> | Cycle produit des demandes, zéro sortie physique | Aucune Q/PDO écrite par `FB_Cycle` | `💻 AUTO` | <small>§2</small> | `V-I` |
-| <nobr><code>TC-P04-003</code></nobr> | `STABILIZING` fige l'étape (hold sûr) | Étape figée, pas de reprise auto | `💻 AUTO` | <small>§4</small> | `V-I` |
-| <nobr><code>TC-P04-004</code></nobr> | Reprise après `STABILIZING` : Cause + Reset + nouvel ordre | 3 conditions nécessaires | `💻 AUTO` | <small>§2</small> | `V-I` |
-| <nobr><code>TC-P04-010</code></nobr> | `FB_DiveSearch` : mise en service recherche de couche | Transition READY -> SEARCHING | `💻 AUTO` | <small>§3</small> | `V-I` |
-| <nobr><code>TC-P04-011</code></nobr> | Séquence Kobold 4 temps à la volée + coupure contacteur sur fond | Alimentation contacteur + coupure anti-chauffe | `💻 AUTO` | <small>§3</small> | `V-I` |
-| <nobr><code>TC-P04-012</code></nobr> | Interdiction Palier 5 sous Kobold | Vitesse > 4 déclenche défaut bloquant immédiat | `💻 AUTO` | <small>§3</small> | `V-I` |
-| <nobr><code>TC-P04-013</code></nobr> | Bascule Semi-Auto vers Maintenance | Mémorise étape, bloque commandes, reprise explicite | `💻 AUTO` | <small>§4</small> | `V-I` |
-| <nobr><code>TC-P04-020</code></nobr> | `FB_ExtractionSequence` : mise en service séquence extraction | Transition READY -> CLOSING | `💻 AUTO` | <small>§3</small> | `V-I` |
-| <nobr><code>TC-P04-021</code></nobr> | Enchaînement continu d'extraction sous maintien joystick | Fermeture $\rightarrow$ Décollage $\rightarrow$ Nominal sans à-coup | `💻 AUTO` | <small>§3</small> | `V-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Relâchement manche (retour centre) stoppe sans perte d'étape</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>StartStop=FALSE</code>, étape inchangée</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-002</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Cycle produit des demandes, zéro sortie physique</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Aucune Q/PDO écrite par <code>FB_Cycle</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-003</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b><code>STABILIZING</code> fige l'étape (hold sûr)</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Étape figée, pas de reprise auto</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-004</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Reprise après <code>STABILIZING</code> : Cause + Reset + nouvel ordre</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">3 conditions nécessaires</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b><code>FB_DiveSearch</code> : mise en service recherche de couche</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Transition READY -&gt; SEARCHING</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-011</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Séquence Kobold 4 temps à la volée + coupure contacteur sur fond</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Alimentation contacteur + coupure anti-chauffe</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-012</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Interdiction Palier 5 sous Kobold</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Vitesse &gt; 4 déclenche défaut bloquant immédiat</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-013</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bascule Semi-Auto vers Maintenance</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Mémorise étape, bloque commandes, reprise explicite</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-020</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b><code>FB_ExtractionSequence</code> : mise en service séquence extraction</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Transition READY -&gt; CLOSING</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-021</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Enchaînement continu d'extraction sous maintien joystick</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Fermeture $\rightarrow$ Décollage $\rightarrow$ Nominal sans à-coup</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
