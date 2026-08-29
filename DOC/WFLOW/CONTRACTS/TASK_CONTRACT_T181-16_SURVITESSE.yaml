@@ -1,0 +1,107 @@
+# Contrat T181-16 — Surveillance survitesse unifiée dans FB_Safety_Winch
+# Source : PLAN_GEL_TREUIL_T181_v0.1.md §1 (D06) ; décisions Q1-Q4 ; AF10_INTERFACE_TREUIL_CIBLE_T181.md §4 ;
+#          B4 SEC-1 (garde mort a la MES), SEC-2 (DEUX gardes morts), SEC-3 (SpeedGuardReady cable faux).
+#          PREREQUIS : T177 (SpeedGuardEnable:=TRUE) + T181-15 (table apprentissage) + T181-10.
+
+contract:
+  task_id: T181-16_SURVITESSE
+  criticality: C4            # protection survitesse absente = danger a la mise en service
+  strategy: patch
+
+  objective: >
+    Faire vivre la surveillance de survitesse EXCLUSIVEMENT dans FB_Safety_Winch : comparer
+    la vitesse mesurée (m/s) à la vitesse apprise + marge fixe, deux niveaux (soft -> diag,
+    hard -> SafeStop), active seulement si la table {sens, charge} est complète et non débrayée.
+    Retirer les DEUX implémentations mortes (FB_SpeedStep §2ter et FB_Winch §6) et le câblage
+    faux SpeedGuardReady.
+
+  acceptance:
+    - id: AC1
+      statement: "Les DEUX gardes-fous survitesse morts sont retirés : le bloc §2ter de FB_SpeedStep (entrées MeasuredSpeedBand/SpeedGuardEnable/SpeedGuardReady) ET le bloc §6 de FB_Winch. FB_SpeedStep devient un décodeur palier->contacteurs pur (+ clamp LIMIT)."
+      verified_by: "git diff FB_SpeedStep.st + FB_Winch.st : blocs supprimés ; grep 'SpeedGuard' dans les 2 = 0"
+    - id: AC2
+      statement: "MeasuredSpeedBand n'est plus forcé à 0 en dur dans PRG_04 ; la mesure exploitée est MeasuredSpeedMps (REAL, m/s) via Sensors / l'entrée de FB_Safety_Winch."
+      verified_by: "grep 'MeasuredSpeedBand.*:= 0' dans PRG_04 = 0 ; lecture du câblage MeasuredSpeedMps"
+    - id: AC3
+      statement: "Le câblage SpeedGuardReady := NOT instWinchSync.Fault.Error (PRG_04) est SUPPRIME (sémantiquement faux — SEC-3)."
+      verified_by: "grep 'SpeedGuardReady' dans PRG_04 = 0"
+    - id: AC4
+      statement: "FB_Safety_Winch reçoit OverspeedRefMps (vitesse apprise {sens,charge} courants), OverspeedMarginSoftMps (défaut 0.5), OverspeedMarginHardMps (défaut 1.5), OverspeedTableComplete, BypassOverspeed ; produit OverspeedSoftWarn et OverspeedHardTrip."
+      verified_by: "lecture VAR_INPUT/VAR_OUTPUT de FB_Safety_Winch"
+    - id: AC5
+      statement: "Comportement : |MeasuredSpeedMps| > OverspeedRefMps + 0.5 -> OverspeedSoftWarn (défaut diag, sans arrêt). |MeasuredSpeedMps| > OverspeedRefMps + 1.5 -> OverspeedHardTrip -> SafeStop."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Safety_Winch : TC-P10-055 (soft) + un TC hard"
+    - id: AC6
+      statement: "Armement conditionnel : si OverspeedTableComplete = FALSE OU BypassOverspeed = TRUE, la surveillance est INACTIVE (aucun Warn ni Trip)."
+      verified_by: "TC : table incomplète -> pas de trip même en survitesse ; bout-en-bout avec T181-15"
+    - id: AC7
+      statement: "Anti-calage passage de palier : une transition de palier (accélération transitoire attendue) ne déclenche pas la survitesse — fenêtre/temporisation sur MeasuredSpeedMps."
+      verified_by: "TC : montée de palier 2->3 dans la limite attendue -> pas de Warn"
+    - id: AC8
+      statement: "Non-régression : les TC Winch/Safety existants (TC-P10-011/017/018/019 + les 14 de FB_Safety_Winch) restent verts ; TC-P10-060 (apprentissage) exécutable."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+    - id: AC9
+      statement: "G200 PASS ; fiche FB_Safety_Winch mise à jour sur preuve (une seule surveillance survitesse, dans ce FB) ; SEC-1 (aucune protection survitesse active tant que la table n'est pas apprise) inscrit dans le plan de tir."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report + diff fiche"
+    - id: AC10
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (source PRG_04_Treuils_Benne -> POU PRG_04_Treuils_Benne)."
+      verified_by: "comparaison basename sans extension vs identifiant apres PROGRAM/FUNCTION_BLOCK"
+    - id: AC11
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage (_CFC/_LD) n'est apposé ; le suffixe reste identique au langage genere dans le bundle, c'est-a-dire du ST pur."
+      verified_by: "grep basename *_CFC/_LD absent + inspection CODE_Bundle.xml : POU concernes en ST"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_SpeedStep.st       # retrait du bloc §2ter
+      - CODE/H_TREUILS_BENNE/FB_Winch.st           # retrait du bloc §6
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st        # retrait MeasuredSpeedBand:=0 et SpeedGuardReady, câblage MeasuredSpeedMps + refs apprises
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_safety_winch.st
+    forbidden:
+      - CODE/H_TREUILS_BENNE/FB_WinchSpeedLearning.st   # produit par T181-15, pas modifié ici
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Toutes les autres surveillances de FB_Safety_Winch (Méca A-E, thermiques, limites, sync) inchangées"
+      - "SafeStop de FB_Safety_Winch garde son comportement 2 sens, Enable maintenu"
+    dropped_on_purpose:
+      - "Le garde-fou survitesse §2ter de FB_SpeedStep (mort)"
+      - "Le garde-fou survitesse §6 de FB_Winch (mort)"
+      - "Le câblage SpeedGuardReady := NOT instWinchSync.Fault.Error (faux)"
+      - "L'entrée MeasuredSpeedBand : INT (remplacée par MeasuredSpeedMps : REAL)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si retirer le bloc §2ter de FB_SpeedStep casse un TC qui dependait de SpeedGuardLimited,
+    si la marge fixe 0.5/1.5 m/s se révèle inadaptée à une plage de vitesse réelle, ou si
+    l'anti-calage masque une vraie survitesse : REMONTER à l'orchestrateur. Ne jamais écrire
+    un TC plus sévère que ce que le code fait réellement.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir : retrait des 2 gardes morts + du câblage faux, survitesse dans FB_Safety_Winch.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Revue orchestrateur : git diff réel + TC soft/hard + TC table incomplète + non-régression.
+    Vérifier que SEC-1 est bien porté au plan de tir (garde inactive jusqu'à apprentissage).
