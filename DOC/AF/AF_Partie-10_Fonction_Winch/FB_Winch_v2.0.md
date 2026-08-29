@@ -30,7 +30,7 @@ Il ne choisit jamais le producteur, le mode ou la synchronisation. Ces responsab
 <tr><td>IN</td><td><code>SafeStop, PermitUp, PermitDown</code></td><td>sorties déjà arbitrées de <code>FB_Safety_Winch</code></td></tr>
 <tr><td>OUT</td><td><code>RelayFwd_Up, RelayRev_Down, Contactor1..4</code></td><td>commandes envoyées à la barrière finale</td></tr>
 <tr><td>OUT</td><td><code>SpeedStepReq_Decoded, StepNumber, StepRampElapsed</code></td><td>cible clampée et palier temporisé</td></tr>
-<tr><td>OUT</td><td><code>ContactorsCheck, Fault, Ready</code></td><td>diagnostic ; <code>StuckClosed</code> publié mais produit par Safety</td></tr>
+<tr><td>OUT</td><td><code>ContactorsCheck, Fault, Ready</code></td><td>diagnostic ; <code>ContactorStuck</code> publié mais produit par Safety</td></tr>
 </tbody></table>
 
 Les DUT et chaque champ sont définis dans le cadrage T181-06 §2. `SyncCoupled` est diag-only : une revue/garde interdit sa lecture logique dans ce FB.
@@ -43,7 +43,7 @@ Les DUT et chaque champ sont définis dans le cadrage T181-06 §2. `SyncCoupled`
 | Interlock direction | front montant `Enable` armé avec temps mort ; ne pas capturer une direction au premier scan |
 | Rampe palier | extrait en `FB_WinchStepShaper` (IN TargetStep/StepRampDelay -> OUT ShapedStep), cadence dédiée, découple D10 |
 | `FB_WinchRateInterlock` | gouverne en nominal ; seuils locaux safety+marge |
-| `FB_Safety_Winch` | propriétaire unique de la détection `StuckClosed`, SafeStop et permis |
+| `FB_Safety_Winch` | propriétaire unique de la détection `ContactorStuck`, SafeStop et permis |
 | `PRG_04` | producteur unique de `DriveRequest`, sync, clamp commun et branche M2-only |
 
 `TopLimitM`/`BottomLimitM` sont des données du cycle dans `DriveRequest`, pas de la configuration. La mesure vitesse est `MeasuredSpeedMps`, pas une bande entière.

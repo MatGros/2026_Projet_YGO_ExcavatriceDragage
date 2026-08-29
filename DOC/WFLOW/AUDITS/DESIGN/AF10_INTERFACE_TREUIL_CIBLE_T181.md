@@ -100,9 +100,9 @@ Producteur `PRG_04`, consommateur `PRG_06`. **Le nom de la struct porte le rôle
 |---|---|
 | État | `Ready`, `Fault : ST_Fault` |
 | Actionneurs | `RelayFwd_Up`, `RelayRev_Down`, `Contactor1` .. `Contactor4` |
-| Diag | `SpeedStepReq_Decoded` (palier après clamp), `StepNumber` (palier temporisé actif), `StepRampElapsed`, `ContactorsCheck : ST_ContactorCheck` *(sans `StuckClosed` — propriétaire = `FB_Safety_Winch`, voir note)*, `InTopSlowdownZone`, `InBottomSlowdownZone`, `CommandedDirection`, `DirectionChangePending`, `DirectionChangeElapsed` |
+| Diag | `SpeedStepReq_Decoded` (palier après clamp), `StepNumber` (palier temporisé actif), `StepRampElapsed`, `ContactorsCheck : ST_ContactorCheck` *(sans `ContactorStuck` — propriétaire = `FB_Safety_Winch`, voir note)*, `InTopSlowdownZone`, `InBottomSlowdownZone`, `CommandedDirection`, `DirectionChangePending`, `DirectionChangeElapsed` |
 
-> **D07 / `ContactorsCheck.StuckClosed`** : la *détection* passe dans `FB_Safety_Winch`. Le *champ* `ContactorsCheck.StuckClosed` reste publié (consommé IHM/Troubleshooting) mais **ré-alimenté depuis `FB_Safety_Winch`** via `PRG_04` — pas supprimé. La cause de défaut interne `instCauses[1]` de `FB_Winch` est retirée en parallèle.
+> **D07 / `ContactorsCheck.ContactorStuck`** : la *détection* passe dans `FB_Safety_Winch`. Le *champ* `ContactorsCheck.ContactorStuck` reste publié (consommé IHM/Troubleshooting) mais **ré-alimenté depuis `FB_Safety_Winch`** via `PRG_04` — pas supprimé. La cause de défaut interne `instCauses[1]` de `FB_Winch` est retirée en parallèle.
 
 ---
 
@@ -145,10 +145,10 @@ La fenêtre « sens maintenu, vitesse déjà à 0 » est **bornée** :
 | Cas | Comportement |
 |---|---|
 | Feedback `ContactorsAllOff` confirmé **ou** tempo `DropConfirmDelay` écoulée | chute du sens → 0 (cas nominal) |
-| **`T_max` atteint** sans confirmation (`ContactorsAllOff` collé « not released ») | chute du sens **forcée** + latch `StuckClosed` (propriétaire `FB_Safety_Winch`) + escalade `SafeStop` ; le maintien indéfini du stator sous tension est **interdit** |
+| **`T_max` atteint** sans confirmation (`ContactorsAllOff` collé « not released ») | chute du sens **forcée** + latch `ContactorStuck` (propriétaire `FB_Safety_Winch`) + **escalade** : `SafeStop` immédiat, puis `PowerCutOff` **si le collage persiste** (le contacteur collé empêche l'arrêt = cas grave). Le maintien indéfini du stator sous tension est **interdit**. |
 | Feedback `ContactorsAllOff` collé « released » alors qu'un `Contactor1..4` est encore commandé | la garde `DropConfirmDelay` (tempo) **prévaut** sur le feedback seul (DI simple voie) — on n'ouvre pas le sens sur la seule foi du feedback |
 
-`DropConfirmDelay` et `T_max` sont des **paramètres dédiés** — jamais réutiliser `DeadTimeSameDir/OppositeDir`
+`DropConfirmDelay` (défaut 100 ms) et `T_max` (défaut 1 s) sont des **paramètres dédiés modifiables** — jamais réutiliser `DeadTimeSameDir/OppositeDir`
 ni `DirectionInterlockDelay*` (répéterait D10). Ordre : `DropConfirmDelay < T_max`.
 
 ### `FB_WinchStepShaper` — comportement asymétrique
@@ -176,7 +176,7 @@ barrière pour qu'elle **tienne aussi** le relais de sens jusqu'à `FwdRevSpeedF
 > Diag `DirectionDropBlocked` (sens en attente de retombée vitesse) : DOIT être **transitoire**
 > (≤ quelques cycles) en nominal. **Un `DirectionDropBlocked` transitoire ne compte PAS comme une
 > gouvernance de la barrière** (`FinalInterlockGoverned` reste FALSE). Un latch prolongé = contacteur
-> de vitesse collé → `StuckClosed`.
+> de vitesse collé → `ContactorStuck`.
 
 ### Coupures dures vs ordonnées (correction B5-§M6)
 
@@ -191,17 +191,39 @@ Il ne s'applique **pas** aux coupures dures :
 La garde mécanique `G4xx_check_direction_after_speed` **exempte explicitement** les chemins
 `NOT Enable`, `PowerCutOff` et la sous-liste de `Fault.Error` classée « dure ».
 
-### Frein — séquencement à trancher (arrêt humain T181-06, correction B5-§1.3)
+### Frein — décision (utilisateur, plus une question)
 
-Aujourd'hui `BrakeCmd := RelayFwd_Up OR RelayRev_Down` (`FB_WinchOutputInterlock.st:275` + `PRG_06:141,214`)
-→ le frein **colle après** la coupure du sens, donc après `DropConfirmDelay`. Pendant cette fenêtre :
-frein desserré + rotor résistance max + charge possiblement motrice sur M1 (porteur) = **exposition
-dérive (D16 / T178)**, aggravée par §3bis.
+Sur M1/M2 le dernier essai = frein piloté **en direct** par le contacteur (`BrakeCmd := RelayFwd_Up OR RelayRev_Down`, sans tempo). On **réintègre `FB_Brake`** (comme la translation M3) avec **tempos de config = 0 s par défaut** → pilotage et relâchement **instantanés**, mais **modifiables** si on change d'avis. `BrakeCmd` reste asservi au relais de sens : le frein colle donc au même instant que la chute du sens (fin de la fenêtre §3bis, bornée `T_max`). **Aucune logique de séquence frein dédiée.**
 
-**Question T181-06** : le frein doit-il coller **avant** l'ouverture du sens (charge reprise par le
-frein, sens ouvre à couple nul) ? Si oui, `BrakeCmd` cesse d'être `RelayFwd OR RelayRev` et prend sa
-propre logique de séquence (paliers → frein → `BrakeFeedback` fermé → sens). Vecteur T181-00 associé :
-« relâche joystick sous charge → dérive ≤ X cm pendant la fenêtre sens-hold ».
+> La fenêtre §3bis (sens tenu, vitesse à 0, ≤ `T_max`) est la seule fenêtre « frein desserré + couple faible » — croiser avec D16/T178 au vecteur T181-00 « relâche joystick sous charge → dérive ≤ X cm pendant la fenêtre sens-hold ».
+
+## 3quater · Clamp de palier — jeux de bornes par contexte (décision utilisateur)
+
+Le clamp `Min/MaxStep{Up,Down}` de `DriveRequest` reçoit un **jeu de bornes différent selon le
+contexte de pilotage**, calculé par `PRG_04` :
+
+| Contexte | Bornes envoyées | Portée |
+|---|---|---|
+| **Pilotage couplé** (les 2 treuils ensemble) | `SpeedStepMin/Max` **communs** M1 = M2 | commun |
+| **Pilotage M1 seul** ou **M2 seul** | bornes propres à l'axe | par instance |
+| **Commande benne** — maintenance / jog manuel | `BucketJogStep` (défaut **palier 1**, configurable) | M2 |
+| **Commande benne** — **semi-auto / cycle Grafcet** (ouverture / fermeture) | `BucketCycleMaxStep` (défaut **palier 4 ou 5**, configurable) — **PAS forcé lent** | M2 |
+
+> ⚠️ **À vérifier au code** : aux essais, des vitesses lentes ont été forcées pour la benne. En
+> semi-auto / cycle la benne **doit pouvoir monter jusqu'au palier 4-5** (réglable) — le forçage lent
+> benne ne s'applique qu'au jog manuel / maintenance.
+
+### Ralentissement en approche des limites logicielles — avec exception
+
+Un **ralentissement imposé ~1 m avant** chaque limite logicielle (haute / basse) reste **toujours**
+actif (via `Config.SlowdownDistance_M`).
+
+**Exception (constat essai)** : plafonner au **palier 1** en approche du FDC haut logiciel **fait
+caler le moteur** — le contacteur de vitesse joue aussi sur le **couple**. Donc `Config.SlowdownMaxStep`
+**ne vaut PAS 1 par défaut** : valeur **configurable palier 2 ou 3** (à ajuster à l'essai site),
+potentiellement distincte par sens et par contexte (idem risque pour la benne vers position
+ouverture / fermeture — pour l'instant palier 1, à revoir).
+
 
 ## 4 · Survitesse — une seule implémentation (SEC-2)
 
@@ -255,7 +277,7 @@ Renommage **transverse en une passe** + `G200` + `run_all_gates` immédiat (1 ou
 
 1. **Seuils de cadence de `FB_WinchRateInterlock`** : 2 constantes en dur dans le FB, valeurs ?
 2. **D13** : supprimer `M2_SpeedStepTableActive` (`PRG_04:405-429`) si `MaxStepDown:=1` suffit, ou conservation motivée.
-3. **`ContactorsCheck.StuckClosed`** : forme exacte de la ré-alimentation depuis `FB_Safety_Winch` (nouveau champ bus vs réutilisation `ST_SafetyWinch`).
-4. **Override benne** : `Config.BucketJogSpeedPct` → mais P1 dit « pas de % dans le treuil ». Reformuler en `BucketJogStep : INT` (palier de jog benne, ex. 1).
+3. **`ContactorsCheck.ContactorStuck`** : forme exacte de la ré-alimentation depuis `FB_Safety_Winch` (nouveau champ bus vs réutilisation `ST_SafetyWinch`).
+4. **Bornes benne** : `BucketJogStep : INT` (jog manuel/maint, défaut palier 1) + `BucketCycleMaxStep : INT` (semi-auto/cycle, défaut 4-5, **pas** forcé lent). Vérifier le forçage lent benne des essais. `Config.SlowdownMaxStep` **configurable ≠ 1** (le palier 1 en approche FDC fait caler le moteur).
 5. **RETAIN table apprentissage** : structure exacte + bornes de plausibilité par palier + procédure de 1ʳᵉ mise en service.
 6. **Ordre d'import CODESYS** : inclure `PRG_07` + `_TYPES` supervision (partagent `ST_WinchState` / `ST_SafetyWinch` modifiés).

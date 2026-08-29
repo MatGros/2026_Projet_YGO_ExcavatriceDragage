@@ -38,7 +38,7 @@
 | 9 | `CableLimitSwitch` | `BypassCableLimitSwitch` (OR `Commun`) | Limite basse physique (longueur câble max) | `:225, :374-375` |
 | 10 | `LimitLegal` | `BypassLimitLegal` (OR `Commun`) | Limite légale de profondeur | `:376` |
 | 11 | `MecaA` | `BypassMecaA` | Méca A : mouvement non commandé à l'arrêt (DriftGuard dérive statique) | `:235` |
-| 12 | `MecaB` | `BypassMecaB` | Méca B : absence de confirmation d'arrêt (frein/contacteurs), coast-down 3 s, StuckClosed | `:246` |
+| 12 | `MecaB` | `BypassMecaB` | Méca B : absence de confirmation d'arrêt (frein/contacteurs), coast-down 3 s, ContactorStuck | `:246` |
 | 13 | `MecaC` | `BypassMecaC` | Méca C : glissement de charge pendant maintien benne | `:260` |
 | 14 | `MecaD` | `BypassMecaD` | Méca D : arrivée butée haute anormale | `:279-280` |
 | 15 | `MecaE` | `BypassMecaE` | Méca E : désynchronisation critique des treuils | `:291, :300` |
@@ -78,21 +78,21 @@ Un bypass IHM activé alors que `Mode ≠ MAINT_N2` est **ignoré** (pas d'erreu
 |---|---|---|---|---|---|
 | `OperatorComm`, `EncoderFault`, `ContactorFeedback`, `PhaseRotation`, `BrakeThermal`, `MotorThermal` | ❌ | ✅ latché | ❌ | N2 latché (RETAIN) | doctrine standard |
 | `MecaA`, `MecaC`, `MecaD`, `MecaE` | ❌ | ✅ latché | ❌ | N2 latché | doctrine standard |
-| `MecaB` | ❌ | ⚠️ **latché, avec avertissement fort** | ❌ | N2 latché | Méca B = confirmation d'arrêt + coast-down + StuckClosed. Bypass = plus aucune détection qu'un treuil ne s'arrête pas. **À valider : autoriser en N2 ou interdire totalement ?** |
+| `MecaB` | ❌ | ⚠️ **latché, avec avertissement fort** | ❌ | N2 latché | Méca B = confirmation d'arrêt + coast-down + ContactorStuck. Bypass = plus aucune détection qu'un treuil ne s'arrête pas. **À valider : autoriser en N2 ou interdire totalement ?** |
 | `TopLimitSwitch` (capteur physique 8,5 m) | ❌ | ✅ latché | ❌ | N2 latché | dépasser le capteur physique = uniquement N2, acte assumé |
 | **`TopLimitSoftware`** (logiciel 7,5 m) | ⚠️ **momentané** (bouton maintenu) | ✅ latché | ❌ | **N1 = tant que bouton tenu** ; N2 = latché | **décision Q8** — voir §3 |
 | `CableLimitSwitch` (limite câble physique) | ❌ | ✅ latché | ❌ | N2 latché | limite basse = intégrité câble |
 | `LimitLegal` (limite légale) | ❌ | ✅ latché | ❌ | N2 latché | ⚠️ **à valider** : bypasser une limite **légale** — sous quelle responsabilité ? |
 | `SlackCable` (commun) | ❌ | ✅ latché | ❌ | N2 latché | doctrine standard |
-| `Safety` (groupé) | ❌ | ❌ **RETIRÉ** | ❌ | — | viole « jamais ne masque les autres défauts » — remplacer par la sélection granulaire |
-| `Process` (groupé) | ❌ | ❌ **RETIRÉ** | ❌ | — | idem |
-| `Global` axe (18) + `Global` commun (19) + `Global` benne (25) | ❌ | ❌ **RETIRÉ** (ou strictement DISABLE + diagnostic hors puissance) | ❌ | — | « ignore toutes les sécurités » = incompatible avec toute doctrine de traçabilité. **À valider : suppression pure, ou conservation en outil de diagnostic hors-puissance uniquement ?** |
+| `Safety` (groupé) | ❌ | ✅ latché | ❌ | N2 latché | **conservé** — homogénéité projet (idem translation M3) |
+| `Process` (groupé) | ❌ | ✅ latché | ❌ | N2 latché | **conservé** — homogénéité projet |
+| `Global` axe (18) + `Global` commun (19) + `Global` benne (25) | ❌ | ✅ latché | ❌ | N2 latché | **conservé** — homogénéité projet ; effectif uniquement en MAINT_N2 (mode-gating) |
 
-### Points à trancher par l'humain (⚠️)
-1. **`MecaB` en N2** : autorisé (avec bandeau) ou interdit ?
-2. **`LimitLegal` en N2** : qui porte la responsabilité du dépassement de limite légale ? (procédure, traçabilité, autorisation nominative)
-3. **`Global` / `Safety` / `Process` groupés** : suppression pure, ou `Global` conservé en mode diagnostic **DISABLE + puissance coupée** uniquement ?
-4. **Renommage** : si `Safety`/`Process`/`Global` sont retirés des DUT `ST_BypassWinch`/`ST_BypassCommun`/`ST_BypassBucket` → impact IHM/SCADA (champs retirés) — à coordonner avec la migration variables IHM.
+### Décision utilisateur : structure de bypass **inchangée / homogène projet**
+- On garde la **hiérarchie existante** : groupés `Global` / `Process` / `Safety` **+** granulaire `MecaA..E`, limites, thermiques — identique à la translation M3.
+- **Rien n'est retiré des DUT** `ST_BypassWinch` / `ST_BypassCommun` / `ST_BypassBucket` → **aucun impact IHM/SCADA**.
+- **Seul changement T181-14** : `bypass_effectif := bypass_IHM AND (Mode = MAINT_N2)` pour **tous** (mode-gating de la doctrine déjà écrite mais non appliquée) + l'override FDC N1 momentané (§3) + le re-homing (§5).
+- `MecaB`, `LimitLegal` : bypassables en N2 comme le reste (homogène). La traçabilité de l'action reste assurée par le RETAIN + le journal de bypass existant.
 
 ---
 

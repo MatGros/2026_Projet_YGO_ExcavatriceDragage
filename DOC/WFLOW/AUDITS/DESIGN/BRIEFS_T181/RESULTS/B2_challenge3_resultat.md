@@ -27,7 +27,7 @@
 | Défaut | Correction | Interface ? | Preuve |
 |---|---|---|---|
 | D02 (TC-011) | logique pure | Non — vrai fix interne. Le `SEL` l.248 est logiquement correct aujourd'hui (nom lu « à l'envers » ≠ bug). Vrai FAIL peut-être dans la chaîne `CommandedDirection` 1ᵉʳ scan. | `FB_Winch.st:248,273-282` |
-| D07 (StuckClosed→Safety) | retrait `ContactorsCheck.StuckClosed` | **Oui, sémantique de sortie.** `ContactorsCheck` publié `PRG_04:803,860 → WinchMxState`, consommé IHM/Troubleshooting. | `FB_Winch.st:72,123,292-298` |
+| D07 (ContactorStuck→Safety) | retrait `ContactorsCheck.ContactorStuck` | **Oui, sémantique de sortie.** `ContactorsCheck` publié `PRG_04:803,860 → WinchMxState`, consommé IHM/Troubleshooting. | `FB_Winch.st:72,123,292-298` |
 | D09 (retrait `Mode`) — T181-05 | suppression `VAR_INPUT Mode` | **Oui.** `Mode` = `VAR_INPUT` (`FB_Winch.st:18`), appelant passe `Mode :=` (`PRG_04:671,702`). « extraction interne uniquement » est faux. | `FB_Winch.st:18` ; `PRG_04:671,702` |
 | D01 — T181-01 | `FB_WinchRateInterlock` dans `FB_Winch` avec seuils | **Oui, sauf seuils en dur.** Aucune entrée de seuil de cadence aujourd'hui → nouvelle `VAR_INPUT`/`Config` en Phase 0 = 1ʳᵉ cassure d'interface avant la refonte struct = 2 cassures successives. | `FB_Winch.st:11-52` |
 

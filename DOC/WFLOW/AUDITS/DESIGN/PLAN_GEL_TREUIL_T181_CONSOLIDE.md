@@ -12,7 +12,7 @@
 
 | Source | Apport principal retenu |
 |---|---|
-| **Revue experte #1** (archi / POO) | `FB_Winch` n'est pas un objet propre : entrées mortes `Mode`/`CycleTimeCalc`, `StuckClosed` dupliqué, délais d'interlock direction détournés en tempo de rampe palier (couplage caché), `SEL` direction `FB_Winch.st:248` nommé à l'envers. Blocs sains à **extraire** : direction-interlock (`:198-227`), step-shaper (`:250-271`), garde `Enable=FALSE`→sorties sûres (`:139-159`). Piège : `FirstScanDone` (`:165-168`) capture `CommandedDirection` au 1ᵉʳ scan → bypass interlock au redémarrage à chaud. |
+| **Revue experte #1** (archi / POO) | `FB_Winch` n'est pas un objet propre : entrées mortes `Mode`/`CycleTimeCalc`, `ContactorStuck` dupliqué, délais d'interlock direction détournés en tempo de rampe palier (couplage caché), `SEL` direction `FB_Winch.st:248` nommé à l'envers. Blocs sains à **extraire** : direction-interlock (`:198-227`), step-shaper (`:250-271`), garde `Enable=FALSE`→sorties sûres (`:139-159`). Piège : `FirstScanDone` (`:165-168`) capture `CommandedDirection` au 1ᵉʳ scan → bypass interlock au redémarrage à chaud. |
 | **Revue experte #2** (fonctionnel / garant TC) | `F10.06..09` (Symmetry, SpeedStep, LoadEstimator, DriftGuard) **sans aucun TC**. `M1_Busy`/`M2_Busy` déclarés **jamais lus** → le TC anti-traversée benne teste un chemin mort = **faux vert**. Pas de prolifération de TC : regrouper, chaque TC justifié. |
 | **Challenge #1** (séquencement / « du premier coup ») — verdict **BLOCK** | 5 changements structurants (voir §6). Cœur : (a) **harness d'intégration** paire `M1+M2+PRG_04+PRG_06` — le CI est unitaire STruCpp, aucun test ne fait tourner la chaîne ensemble ; (b) **corriger les C4 rouges AVANT de toucher l'API**, pas après ; (c) extraction sous-FB **après** interface stable ; (d) **contrat formel d'autorité des 2 interlocks** + preuve `FinalInterlockGoverned=FALSE` ; (e) plan **FAT / essais site / rollback / ordre d'import CODESYS**. |
 | **Challenge #2** (interconnexion Grafcets / joystick / IHM) — verdict **`DriveRequest` couvre ~80 %, 4 amendements requis** | (A) le clamp **ne peut pas** être « câblé identique M1=M2 » : les bridages benne (`M2_ForceSlowSpeed`, `ManualBucketLimitsActive`, `BucketNotClosedAscentStep1`) sont **M2-only** → clamp **par instance** ou scindé *commun + plafond M2 propre*, sinon **régression M1**. (B) **précédence Min/Max non définie** → règle écrite « plafond safety gagne » + garde `FB_SpeedStep : LIMIT(1, MinStepNumber, MaxStepClamped)` après le plafond. (C) **aucun producteur de `MinStepDescent` n'existe** → à créer dans `FB_DiveSearch` + contrat de flux `PRG_03→PRG_04`. (D) `MinStepNumber` agit sur la **cible** (`RequestedStep`), lissée par `BusinessStepDelay`/`FB_WinchStepShaper` — **interdiction de forcer `StepNumber` directement** (à-coup plongée). |
@@ -28,12 +28,12 @@
 | ID | Défaut | Preuve | Crit. | Critère de sortie (mesurable) |
 |---|---|---|---|---|
 | **D01** | Barrière finale `FB_WinchOutputInterlock` non fiable | CI 2/7 : FAIL TC-P10-012 (watchdog frein), 013 (latches hors `Enable`), 021/022 (temps morts directionnels), 020 (SITE) | C4 | CI `FB_WinchOutputInterlock` **7/7 PASS** sur interface **inchangée** |
-| **D02** | `FB_Winch` : inversion sens + `StuckClosed` | CI 5/7 : FAIL TC-P10-011 (Fwd/Rev), 018 (StuckClosed) | C4 | CI `FB_Winch` **7/7 PASS**, `StuckClosed` **retiré** de `FB_Winch` (→ D07) |
+| **D02** | `FB_Winch` : inversion sens + `ContactorStuck` | CI 5/7 : FAIL TC-P10-011 (Fwd/Rev), 018 (ContactorStuck) | C4 | CI `FB_Winch` **7/7 PASS**, `ContactorStuck` **retiré** de `FB_Winch` (→ D07) |
 | **D03** | `FB_Bucket` : confirm MAINT + timeouts | CI 14/17 : FAIL TC-P10-030, 046.1, 047.1 | C3 | CI `FB_Bucket` **17/17** ; TC-030 traité en Phase C |
 | **D04** | Anti-traversée benne = chemin mort | `M1_Busy`/`M2_Busy` déclarés, **0 lecture** ; TC-025/030 = faux vert | C3 | `M1_Busy`/`M2_Busy` **consommés** (G200 les voit produits+consommés sur 2 instances) ; TC anti-traversée re-écrit sur le **vrai** chemin |
 | **D05** | Clamp palier M1 ≠ M2, dupliqué inline | `PRG_04:679-681` (M1, 2/5 termes) vs `:716-717` (M2, 3/7 termes) | C4 | **1 seule** fonction d'agrégation clamp en `PRG_04` ; sources **commun vs M2-propre** tabulées (§3-A) ; `SEL()` inline supprimés |
 | **D06** | Garde-fou survitesse mort | `MeasuredSpeedBand:=0` en dur `:682,718` ; `SpeedGuardEnable=FALSE` | C3 | `MeasuredSpeedBand`/`MeasuredSpeedValid` **câblés** via `Sensors` ; survitesse active **ssi** table `{sens,charge}` complète (Q ci-dessous) ; flag débrayable ; TC-055/060 PASS |
-| **D07** | `StuckClosed` : 2 propriétaires (`FB_Winch` 500 ms + `FB_Safety_Winch` Méca B 3 s) | `FB_Winch.st:292-298` vs `FB_Safety_Winch.st:246-256` | C4 | **1 seul** propriétaire = `FB_Safety_Winch` ; `FB_Winch` ne détecte plus rien ; TC-018 déplacé côté Safety |
+| **D07** | `ContactorStuck` : 2 propriétaires (`FB_Winch` 500 ms + `FB_Safety_Winch` Méca B 3 s) | `FB_Winch.st:292-298` vs `FB_Safety_Winch.st:246-256` | C4 | **1 seul** propriétaire = `FB_Safety_Winch` ; `FB_Winch` ne détecte plus rien ; TC-018 déplacé côté Safety |
 | **D08** | `ForceMinSpeedStep` sémantique inversée + pas de `MinStep` | `FB_ExtractionSequence.st:272` `ForceMinSpeedStep := AscentPermit` → `PRG_04:681,717` `SEL(…, EffMax, 1)` | C3 | Renommé `ExtractionControlActive` sur **toute la chaîne** (7 pts, §5) ; `FB_SpeedStep.MinStepNumber` ajouté |
 | **D09** | Entrées mortes `FB_Winch` | `Mode : E_Mode` (`:18`, jamais lu) ; `CycleTimeCalc : FB_CycleTime` (`:82,170`, jamais consommé) | C2 | Retirées ; fiche `FB_Winch_v1.0.md` **réécrite** (aujourd'hui périmée = piège) |
 | **D10** | Délais direction détournés en tempo rampe palier + `SEL` à l'envers | `FB_Winch.st:248` `SEL(CommandedDirection=-1, DelayAscent, DelayDescent)+T#100ms` | C3 | Tempo rampe = **paramètre dédié** (`FB_WinchStepShaper`) ; `SEL` direction corrigé ou justifié par commentaire + TC |
@@ -59,7 +59,7 @@
 | **Fonction unifiée** | `Min/MaxStep{Ascent,Descent}` — **même sémantique et mêmes bornes appliquées à M1 et M2**, calcul unique (⚠️ challenge #2-A : *unique* ≠ *aveuglément identique* — les bornes propres benne restent M2). **Pas de `Force*` dans le vocabulaire du clamp** : `Min`/`Max` seulement. |
 | **Requête « palier plancher »** | Vient d'une **étape de séquence** (ou geste joystick), injectée comme **paramètre** `MinStep*` — pas une variable `Force*` balancée. Responsabilité **cadrée fonctionnellement**. |
 | **Interlock cadence** | **1 FB `FB_WinchRateInterlock`, 2 niveaux** : instancié dans `FB_Winch` (seuils = safety **+ marge**) **ET** dans `PRG_06` (seuils safety nus). Diag `FinalInterlockGoverned` **DOIT rester FALSE en nominal** = critère d'acceptation. *« Si le code logique est bien fait, interlock jamais bloquant = 0. »* Si `PRG_06` limite → **le signaler** (diag + trace). |
-| **`StuckClosed`** | Propriétaire **unique** = `FB_Safety_Winch`. |
+| **`ContactorStuck`** | Propriétaire **unique** = `FB_Safety_Winch`. |
 | **Override FDC logiciel** | N1 : bouton IHM **maintenu momentané**, borné par capteur homing haut. N2 : latché. **Capteur homing top toujours > FDC haut logiciel** : 8,5 m (homing) / 7,5 m (FDC logiciel). Fonctionnement normal : arrêt **7,5 m**. Override ne dépasse **jamais** 8,5 m. |
 | **Plongée Kobold** | Palier **plancher constant 3–4** (hydraulique stable pour validité mesure). Palier 5 **interdit**. Joystick hors neutre à tout % → **≥ plancher** (montée lissée, pas d'à-coup). Relâche → **0 immédiat**. |
 | **Application** | Manuelle par l'humain (copie ST + import PLCopenXML). MainTask **10 ms**. |
@@ -197,7 +197,7 @@ Phase -1  HARNESS + PLAN DE TIR                                    [BLOQUANT tou
 Phase 0   CORRECTIONS C4 — INTERFACE FB_Winch INCHANGÉE           [bloque A, B, C]
           ├─ D01  FB_WinchOutputInterlock 7/7 (TC-012/013/021/022)
           ├─ D02  FB_Winch 7/7 (TC-011 Fwd/Rev)  — SANS toucher l'API
-          ├─ D07  StuckClosed → FB_Safety_Winch (retrait FB_Winch, TC-018 déplacé)
+          ├─ D07  ContactorStuck → FB_Safety_Winch (retrait FB_Winch, TC-018 déplacé)
           ├─ D04  Anti-traversée benne : câbler M1_Busy/M2_Busy, TC ré-écrit
           ├─ §4   Contrat formel autorité 2 interlocks + correction MINIMALE + TC FinalInterlockGoverned
           └─ GATE : CI winch complet vert sur interface actuelle + harness -1 vert
@@ -268,7 +268,7 @@ Phase D   RÉTRO-TC + DETTE                              [bloque_par: A]
 | T181-00 | Harness intégration ST paire + plan de tir FAT/rollback | -1 | — | `fix:` harness `test_integ_winch_pair.*` · `guard:` gate « harness vert » ajouté à `run_all_gates` | — |
 | T181-01 | FB_WinchOutputInterlock 7/7 + contrat autorité 2 interlocks + FB_WinchRateInterlock | 0 | 00 | `fix:` TC-012/013/021/022 · `guard:` `G4xx_check_final_interlock_governed_false` | T177 |
 | T181-02 | FB_Winch 7/7 (TC-011 Fwd/Rev), interface inchangée | 0 | 00 | `fix:` TC-011 · `guard:` TC direction dans harness | — |
-| T181-03 | StuckClosed → propriétaire unique FB_Safety_Winch | 0 | 00 | `fix:` retrait `FB_Winch.st:292-298`, TC-018 côté Safety · `guard:` `G4xx_check_stuckclosed_single_owner` | — |
+| T181-03 | ContactorStuck → propriétaire unique FB_Safety_Winch | 0 | 00 | `fix:` retrait `FB_Winch.st:292-298`, TC-018 côté Safety · `guard:` `G4xx_check_stuckclosed_single_owner` | — |
 | T181-04 | Anti-traversée benne réelle (M1_Busy/M2_Busy consommés) | 0 | 00 | `fix:` câblage + TC-025/030 ré-écrits · `guard:` G200 orphelin sur *_Busy | — |
 | T181-05 | Extraction sous-FB DirectionInterlock + StepShaper + retrait Mode/CycleTimeCalc | 0b | 01,02,03 | `fix:` 3 FB extraits, D09, D10 · `guard:` TC iso sous-FB | — |
 | T181-06 | **Cadrage `ST_fbWinch_DriveRequest`** + mapping sources clamp commun/M2 + AF-10. **ARRÊT VALIDATION HUMAINE** | A | 05 | contrat de cadrage `TASK_CONTRACT_T181-06` | T131 (partiel) |

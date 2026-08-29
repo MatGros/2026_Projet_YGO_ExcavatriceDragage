@@ -39,7 +39,7 @@ manqué. Points d'attaque imposés :
    - Y a-t-il encore un big-bang caché ? (regarde §6 Phase A : A1→A9, chaque pas = 1 commit —
      est-ce honnête, ou A3/A5 restent-ils énormes ?)
    - Phase 0 corrige 5 défauts C4 « à interface inchangée » : est-ce réellement possible sans
-     toucher l'API, ou certains fixes (D02 inversion Fwd/Rev, D07 StuckClosed) forcent-ils déjà
+     toucher l'API, ou certains fixes (D02 inversion Fwd/Rev, D07 ContactorStuck) forcent-ils déjà
      une touche d'interface ?
    - `bloque_par` : dépendances cachées non écrites ? (ex. D06 survitesse a besoin de
      `Sensors.MeasuredSpeedBand` qui n'arrive qu'en Phase A — or D06 est en Phase B/T181-16,

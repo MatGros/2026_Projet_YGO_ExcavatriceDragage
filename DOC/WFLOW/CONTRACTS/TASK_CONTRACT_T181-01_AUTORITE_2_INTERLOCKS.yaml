@@ -37,10 +37,10 @@ contract:
       statement: "REGLE §3bis restructurée dans §5 de la barrière : quand RequestedStep tombe à 0 mais RequestedRelayFwd/Rev reste TRUE, la barrière NE force PLUS RelayFwd/Rev à FALSE immédiatement — elle les TIENT jusqu'à FwdRevSpeedFeedbackOff (feedback) OU T_max (timeout porté par le filet). Le chemin 'ELSIF NOT MotorRequest' de FB_WinchOutputInterlock.st:225-231 est retravaillé en conséquence."
       verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_WinchOutputInterlock : nouveau TC 'sens maintenu apres chute vitesse jusqu a ContactorsAllOff' ; nouveau TC 'T_max atteint sans confirmation -> chute sens forcee + latch'"
     - id: AC7
-      statement: "Bornage §3ter : à T_max sans confirmation ContactorsAllOff -> chute du sens FORCÉE + latch StuckClosed (via FB_Safety_Winch) + escalade SafeStop. Le maintien indéfini du stator sous tension est INTERDIT. Feedback ContactorsAllOff collé 'released' -> la tempo DropConfirmDelay prévaut (pas d'ouverture du sens sur feedback simple voie seul)."
-      verified_by: "TC : ContactorsAllOff force 'not released' + T_max -> RelayFwd = FALSE + StuckClosed latché + SafeStop ; TC : ContactorsAllOff 'released' premature -> sens tenu jusqu'à DropConfirmDelay"
+      statement: "Bornage §3ter : à T_max sans confirmation ContactorsAllOff -> chute du sens FORCÉE + latch ContactorStuck (via FB_Safety_Winch) + escalade SafeStop. Le maintien indéfini du stator sous tension est INTERDIT. Feedback ContactorsAllOff collé 'released' -> la tempo DropConfirmDelay prévaut (pas d'ouverture du sens sur feedback simple voie seul)."
+      verified_by: "TC : ContactorsAllOff force 'not released' + T_max -> RelayFwd = FALSE + ContactorStuck latché + SafeStop ; TC : ContactorsAllOff 'released' premature -> sens tenu jusqu'à DropConfirmDelay"
     - id: AC8
-      statement: "DropConfirmDelay et T_max sont des paramètres DÉDIÉS, distincts de DeadTimeSameDir/OppositeDir et DirectionInterlockDelay* (ne pas répéter D10). Ordre garanti : DropConfirmDelay < T_max."
+      statement: "DropConfirmDelay et T_max sont des paramètres DÉDIÉS, distincts de DeadTimeSameDir/OppositeDir et DirectionInterlockDelay* (ne pas répéter D10). Ordre garanti : DropConfirmDelay (defaut 100 ms) < T_max (defaut 1 s), les 2 modifiables."
       verified_by: "lecture des declarations + grep : aucune reutilisation croisee"
     - id: AC9
       statement: "Coupures dures exemptées (§3bis §M6) : les chemins NOT Enable, PowerCutOff, et la sous-liste 'dure' de Fault.Error coupent RelayFwd/Rev IMMÉDIATEMENT (pas d'ordonnancement). La garde G4xx_check_direction_after_speed exempte explicitement ces chemins."
@@ -71,7 +71,7 @@ contract:
       - CODE/H_TREUILS_BENNE/FB_Winch.st                       # instanciation interne + tenue du relais de sens côté programme
       - CODE/M_MAIN/PRG_06_Outputs.st                          # instance filet + 2 sites
       - CODE/H_TREUILS_BENNE/_TYPES/**                         # enum/diag DirectionDropBlocked, FinalInterlockGoverned si absents
-      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st                # latch StuckClosed sur T_max (interface : entrée déclenchement)
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st                # latch ContactorStuck sur T_max (interface : entrée déclenchement)
       - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winchoutputinterlock.st
       - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st
       - TOOLS/AGENT_WORKFLOW/scripts/                          # G4xx_check_direction_after_speed, G4xx_check_rateinterlock_independence, G4xx_check_final_interlock_governed_false
@@ -104,7 +104,7 @@ contract:
   alert_duty: >
     Si restructurer §5 de la barrière casse un TC C4 vert (012/013/021/022), si la tenue du relais
     de sens entre en conflit avec le temps mort directionnel §4bis, si FB_Safety_Winch ne peut pas
-    recevoir le déclenchement StuckClosed sans nouvelle entrée non prévue, ou si le feedback
+    recevoir le déclenchement ContactorStuck sans nouvelle entrée non prévue, ou si le feedback
     ContactorsAllOff (DI simple voie) se révèle inexploitable pour cette décision C4 :
     REMONTER à l'orchestrateur AVANT de contourner.
 
