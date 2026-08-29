@@ -14,7 +14,7 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Points de validation](#1--points-de-validation)
+1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
 2. [🧱 Règles socle](#2--règles-socle)
 3. [🧩 Profils de composants](#3--profils-de-composants)
 4. [🛑 Cycle de vie, états et défauts](#4--cycle-de-vie-états-et-défauts)
@@ -25,20 +25,97 @@
 9. [❓ TBD](#9--tbd)
 10. [📚 Documents liés](#10--documents-liés)
 
-## 🧪 1 · Points de validation
+## 🧪 1 · Table des points de validation
 
-> **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
+> **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
+> non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Intention | Preuve | Type | Réf | Etat |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P03-001</code></nobr> | Cycle de vie et neutralisation `Enable` | `Enable=FALSE` neutralise commandes et statut (gate) ; `Enable=TRUE` autorise l'état Ready | `💻 AUTO` | <small>§4</small> | `NV-I` |
-| <nobr><code>TC-P03-002</code></nobr> | Reset inconditionnel (Cause/Ack) | Front `Reset` efface l'affichage (interlock reste sur Cause) | `💻 AUTO` | <small>§4</small> | `NV-I` |
-| <nobr><code>TC-P03-003</code></nobr> | Pas de redémarrage auto après Ack | Retour READY, nouvel ordre explicite requis | `💻 AUTO` | <small>§4</small> | `NV-I` |
-| <nobr><code>TC-P03-004</code></nobr> | Pas de `SafeStop`/`StartStop` hors mouvement | Absents des briques E/S, joystick et diag | `💻 AUTO` | <small>§3</small> | `NV` |
-| <nobr><code>TC-P03-005</code></nobr> | Encapsulation stricte | Échanges via interfaces/DUTs publics uniquement | `💻 AUTO` | <small>§2</small> | `NV` |
-| <nobr><code>TC-P03-006</code></nobr> | Re-latch sur ré-apparition Cause | Nouveau front Cause ➔ `Ack=FALSE` | `💻 AUTO` | <small>§4</small> | `NV-I` |
-| <nobr><code>TC-P03-007</code></nobr> | Warning auto-effaçable vs Fault latché | Warning s'efface sans Reset, Fault exige Ack | `💻 AUTO` | <small>§4</small> | `NV-I` |
-| <nobr><code>TC-P03-014</code></nobr> | Bornage du `dt` de cycle (`FB_CycleTime`) | Hors plage nominale (`dt = 0` **ou** `dt > CST_MaxCycleDeltaMs`) ➔ `CycleTimeS = DefaultValueS` ; sinon `dt` réel ; secours non latché | `💻 AUTO` | <small><nobr>§3 →</nobr> <nobr>fiche</nobr></small> | `NV-I` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Cycle de vie &<br>neutralisation</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Enable=FALSE</code> neutralise commandes et statut (gate) ; <code>Enable=TRUE</code> autorise l'état Ready</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-002</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Reset<br>inconditionnel</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Front <code>Reset</code> efface l'affichage (interlock reste sur Cause)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-003</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Pas de redémarrage<br>auto après Ack</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Retour READY, nouvel ordre explicite requis</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-004</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Pas de SafeStop/<br>StartStop hors mvmt</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Absents des briques E/S, joystick et diag</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-005</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Encapsulation<br>stricte</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Échanges via interfaces/DUTs publics uniquement</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-006</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Re-latch sur<br>ré-apparition Cause</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Nouveau front Cause ➔ <code>Ack=FALSE</code></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-007</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Warning auto-eff.<br>vs Fault latché</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Warning s'efface sans Reset, Fault exige Ack</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P03-014</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bornage dt<br>de cycle</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Hors plage nominale (<code>dt = 0</code> <b>ou</b> <code>dt &gt; CST_MaxCycleDeltaMs</code>) ➔ <code>CycleTimeS = DefaultValueS</code> ; sinon <code>dt</code> réel ; secours non latché</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3 → fiche</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 > Catalogue `TC-P03-014.1` à `.3` (détail `FB_CycleTime` — plage nominale, borne basse, borne haute
 > non latchée) **décliné dans la fiche dédiée**, pas dupliqué ici (`GUIDE_EDITION_AF_v1.0.md` §4) :

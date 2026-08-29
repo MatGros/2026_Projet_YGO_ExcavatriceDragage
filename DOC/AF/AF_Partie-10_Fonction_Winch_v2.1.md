@@ -12,7 +12,7 @@
 - **Type de composant** : `FB_Winch` (×2), `FB_Safety_Winch` (×2), `FB_WinchSync`, `FB_Bucket`,
   `FB_WinchOutputInterlock` (×2) et 4 briques diagnostic — Fonction métier.
 
-### Table des fonctions
+### 🎯 Table des fonctions
 
 > **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
 

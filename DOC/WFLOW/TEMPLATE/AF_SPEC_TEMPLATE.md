@@ -14,7 +14,7 @@
 ## 🧭 Sommaire
 
 1. Rôle et périmètre
-2. Table des points de validation (TC)
+2. Table des points de validation (non détaillé)
 3. Pipeline et composition
 4. Interface publique
 5. [Paragraphes de détail — un par comportement notable]
@@ -79,20 +79,23 @@ historique. État actuel uniquement, 3-4 lignes max.
   </tbody>
 </table>
 
-## 🧪 2. Table des points de validation (Cas de Test — TC)
+## 🧪 2. Table des points de validation (non détaillé)
 
 > **Organisation & Standard de Rédaction** :
-> - **Séquence & Déroulé** : Décomposition chronologique complète par étapes numérotées (`💤 Étape 0`, `🚀 Étape 1`, `⚡ Étape 2`, `✅ Étape 3`), avec stimuli, temporisations et résultats attendus.
+> - **Table MACRO (chapô)** : le chapô porte une table **macro** (résumé) qui regroupe les TC par
+>   intention et **renvoie à la fiche FB** pour le détail (`TC-PNN-0X0.1`, `.2`...). ⛔ **Jamais de
+>   duplication** : le détail complet (étapes, timings, formules) vit **uniquement** dans la fiche FB
+>   (`FB_SPEC_TEMPLATE.md §2`).
 > - **État** : `V-I` Validé & Implémenté · `V` Validé (non vérifié) · `NV` Non validé · `NV-I` Implémenté non validé · `R` Refusé · `NA` Non applicable.
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 28px;">
+    <col style="width: 140px;">
+    <col style="width: 150px;">
+    <col style="width: calc(100% - 590px);">
+    <col style="width: 110px;">
+    <col style="width: 140px;">
     <col style="width: 50px;">
-    <col style="width: calc(100% - 165px);">
-    <col style="width: 45px;">
-    <col style="width: 26px;">
-    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
@@ -106,29 +109,12 @@ historique. État actuel uniquement, 3-4 lignes max.
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-PNN-SCEN-NOM</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Nominal</b><br>[Fonction]</small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">
-        💤 <b>Étape 0</b> : Repos initial (conditions nominales saines)<br>
-        🚀 <b>Étape 1</b> : Demande de commande opérateur ou consigne métier<br>
-        ⚡ <b>Étape 2</b> : Exécution de la commande et surveillance dynamique<br>
-        ✅ <b>Étape 3</b> : Atteinte de l'état final cible et confirmation
-      </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small>§N</small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
-    </tr>
-    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold;">TC-PNN-001</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>[Intention<br>courte]</small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">
-        ⚡ <b>Étape 1</b> : Stimulus initial d'entrée<br>
-        🔍 <b>Étape 2</b> : Traitement et évaluation logique<br>
-        🛑 <b>Étape 3</b> : Résultat / Sanction attendue sur les sorties
-      </td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small>§N</small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-PNN-001, TC-PNN-008</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>[Groupe]</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">[Résumé du comportement — le détail vit dans la fiche FB]</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>[Type]</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>[FB_XXX]</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>[État]</code></small></td>
     </tr>
   </tbody>
 </table>

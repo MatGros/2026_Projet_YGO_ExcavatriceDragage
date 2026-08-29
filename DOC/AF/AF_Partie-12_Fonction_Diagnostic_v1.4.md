@@ -15,7 +15,7 @@
 - **Type de composant** : `FB_Diag_CanOpen`, `FB_Diag_Ethercat`, `FB_Diag_IhmHeartbeat` — Fonction
   métier (observation pure, aucun mouvement).
 
-### Table des fonctions
+### 🎯 Table des fonctions
 
 > **Etat** ? `V` valid?, impl?mentation non v?rifi?e ? `V-I` valid? et impl?ment? ? `NV` non valid?, non impl?ment? ? `NV-I` code pr?sent mais non valid? ? `R` refus? ? `NA` non applicable.
 

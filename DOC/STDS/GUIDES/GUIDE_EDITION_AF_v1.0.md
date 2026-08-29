@@ -104,7 +104,7 @@ Exemple de référence : document `AF_Partie-08_Fonction_Joystick` §1 (8 foncti
 
 ---
 
-## 🧪 3. Table des points de validation (Cas de Test — TC)
+## 🧪 3. Table des points de validation (non détaillé)
 
 ### Règle des Identifiants (Immuabilité & Synthèse) :
 1. **Numérotation Immuable** : `TC-P<Partie>-<Numéro>` (ex: `TC-P11-010`, `TC-P11-020`).
@@ -286,7 +286,7 @@ Pour assurer la lisibilité visuelle et supprimer tout risque de dérive entre l
 |---|---|---|---|
 | 📑 | Sommaire | 📜 | Suivi historique |
 | 🎯 | Rôle et périmètre (+ Table des fonctions) | ❓ | TBD (À définir) |
-| 🧪 | Table des points de validation (TC) | 📚 | Documents liés |
+| 🧪 | Table des points de validation (non détaillé) | 📚 | Documents liés |
 | 🔄 | Pipeline et composition | 🔌 | Interface publique |
 | 🖥️ | IHM, Configuration & Dépannage | | |
 
@@ -300,7 +300,7 @@ Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
 
 1. `📑 Sommaire` (§0)
 2. `🎯 Rôle et périmètre` (§1, inclut la `Table des fonctions` §2bis) — état actuel seulement, voir règle §1
-3. `🧪 Table des points de validation (Cas de Test — TC)` (§3)
+3. `🧪 Table des points de validation (non détaillé)` (§3) — si le détail est dans une fiche FB
 4. `🔄 Pipeline et composition` — schéma/diagramme du flux de données et des FB traversés (§3bis)
 5. `🔌 Interface publique` — **table des entrées** et **table des sorties** (nom, type, unité, rôle)
 6. Paragraphes de détail par fonction — libre, un paragraphe par comportement notable (homme-mort, calibration, défauts, intégration programme, alertes...). **Si la fiche porte une Table des fonctions (§2bis)**, le titre de chaque paragraphe référence le(s) code(s) `F<NN>.<seq>` qu'il couvre, entre parenthèses (ex. `## 5. Homme-mort (F08.03, F08.04)`) — le lecteur retrouve depuis le sommaire quelle fonction du catalogue est traitée où, sans deviner. Un paragraphe qui ne couvre aucune fonction du catalogue (ex. Suivi historique, TBD) n'en porte pas.
@@ -326,12 +326,14 @@ Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
 
 ### Répartition chapô / sous-fiches (anti-duplication)
 
-- **Chapô principal (`AF_Partie-XX_*.md`)** : porte le résumé machine, l'intégration programme et le **Catalogue Synthétique des TC Macro**.
-- **Fiches FB sous-dossier (`AF_Partie-XX_*/FB_*.md`)** : si un détail technique est nécessaire, il décline sous forme d'étapes `TC-Pxx-010.1`, `TC-Pxx-010.2` sans inventer de nouveaux identifiants racine. Squelette : `DOC/WFLOW/TEMPLATE/FB_SPEC_TEMPLATE.md`.
+- **Chapô principal (`AF_Partie-XX_*.md`)** : porte le résumé machine, l'intégration programme et le **Catalogue Synthétique des TC Macro** — une table **macro** (résumé) qui regroupe les TC par intention et **renvoie à la fiche FB** pour le détail. Squelette : `DOC/WFLOW/TEMPLATE/AF_SPEC_TEMPLATE.md §2`.
+- **Fiches FB sous-dossier (`AF_Partie-XX_*/FB_*.md`)** : si un détail technique est nécessaire, il décline sous forme d'étapes `TC-Pxx-010.1`, `TC-Pxx-010.2` sans inventer de nouveaux identifiants racine. Squelette : `DOC/WFLOW/TEMPLATE/FB_SPEC_TEMPLATE.md §2`.
 - ⛔ **Jamais les deux à la fois** : soit le détail complet d'une fonction vit **uniquement** dans le
-  chapô (pas de sous-fiche FB pour ce domaine), soit le chapô ne garde qu'un **squelette** qui
-  renvoie vers la fiche FB détaillée. Dupliquer le détail des deux côtés rend les mises à jour
-  ingérables — une info corrigée d'un côté et oubliée de l'autre devient une source d'erreur.
+  chapô (pas de sous-fiche FB pour ce domaine), soit le chapô ne garde qu'un **squelette macro** qui
+  renvoie vers la fiche FB détaillée. **Le chapô ne recopie JAMAIS le détail des TC** (étapes,
+  timings, formules) — il porte un résumé par intention et un lien vers la fiche FB. Dupliquer le
+  détail des deux côtés rend les mises à jour ingérables — une info corrigée d'un côté et oubliée de
+  l'autre devient une source d'erreur.
 
 ---
 
@@ -362,7 +364,7 @@ Ordre attendu (adapter le libellé au domaine, garder l'ordre et l'émoji) :
 | Sommaire | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Rôle et périmètre | ✅ (périmètre machine) | ✅ (intégration et ordonnancement) | ✅ (contrats composants) | ✅ | ✅ |
 | Table des fonctions | ✅ **obligatoire** — catalogue `F01.xx` de la chaîne AU/réarmement (§7), mappé aux `TC-P01-*` existants ; les tables §4 (index vers d'autres AF) ne comptent pas comme ce catalogue | ✅ **obligatoire** — catalogue `F02.xx` des fonctions d'architecture, mappé aux `TC-P02-*` | ❌ (pas de comportement machine propre) | recommandé si la fiche décrit plusieurs comportements | ✅ obligatoire |
-| Table des points de validation (TC) | ✅ **obligatoire** — table macro chapô avec IDs racine réels (`TC-P01-*`), sous-fiche décline le détail | ✅ `TC-P02-*` | ✅ `TC-P03-*` | ✅ | ✅ |
+| Table des points de validation (non détaillé) | ✅ **obligatoire** — table macro chapô avec IDs racine réels (`TC-P01-*`), sous-fiche décline le détail | ✅ `TC-P02-*` | ✅ `TC-P03-*` | ✅ | ✅ |
 | Pipeline et composition | selon pertinence | ✅ diagramme Mermaid vertical des flux et ordonnancement | selon pertinence | ✅ | ✅ |
 | Interface publique (Entrées/Sorties) | ❌ (pas de FB unique à interfacer) | ✅ contrat compact par PRG : lit, produit, responsabilité, latence et AF propriétaire | ✅ contrats FB/DUT | selon domaine | ✅ |
 | Suivi historique | ✅ | ✅ | ✅ | ✅ | ✅ |
