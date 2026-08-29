@@ -317,9 +317,9 @@ instJoystick(
     Enable                    := TRUE,
     Reset                     := PRG_07_Supervision.FaultMachineReset_IHM,
     // 🚨 ArmingPermit = ENTRÉE du joystick (vue joystick), alimentée de n'importe où.
-    // 🔧 Câblage TEMPORAIRE : producteur à analyser plus tard (hors scope LOT_JOYSTICK_ARMINGPERMIT).
-    //    TRUE = armement autorisé en attendant la future chaîne de permission système.
-    ArmingPermit              := TRUE,
+    // 🔧 Producteur = PRG_04_Treuils_Benne (combiné interlock benne) via le bus Data.
+    //    TRUE = armement autorisé (polarité positive NC-100).
+    ArmingPermit              := PRG_04_Treuils_Benne.Data.ArmingPermit,
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,

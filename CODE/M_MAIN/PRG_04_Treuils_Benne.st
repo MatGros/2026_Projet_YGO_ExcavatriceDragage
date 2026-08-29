@@ -36,6 +36,7 @@ VAR
     SyncState                    : ST_SyncState;                 // . [LOC] Etat synchronisation treuils M1/M2
     BucketState                  : ST_BucketHMIState;            // . [LOC] Etat de fonctionnement benne
     Benne_IsRoughlyClosed        : BOOL;                         // . [LOC] Benne consideree fermee
+    ArmingPermit                 : BOOL;                         // . [LOC] Permission d'armement homme-mort (combiné interlock benne, Option B)
 
     CoupledUserRequestActive : BOOL;
     CoupledUserRequestDirection     : INT;
@@ -356,6 +357,18 @@ IF ControlAscentActive THEN
 END_IF;
 
 
+{endregion}
+
+{region "§3bis ArmingPermit (Option B)"}
+// === 🛡️ §3bis ARMINGPERMIT (Option B — combiné interlock benne) ===
+// ArmingPermit = permission d'armement homme-mort (entrée FB_Joystick, consommée PRG_02).
+// Combiné interlock benne : interdit l'armement pendant une action benne
+// (ouverture/fermeture, instBucket.Lifecycle.Busy) et pendant 1 scan après la fin
+// de l'action (BenneBusyFallEdge.Q, déjà câblé §3) — l'opérateur doit re-presser
+// consciemment le bouton homme-mort (pas de ré-armement "surprise" à la ré-acquisition).
+// Délai fin de cycle benne → ré-armement autorisé : 1 scan MainTask = 10 ms
+// (dans la fenêtre 10-20 ms exigée). Polarité positive (NC-100) : TRUE = armement autorisé.
+ArmingPermit := NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
 {endregion}
 
 {region "§4 Synchronisation M1/M2"}
@@ -1000,6 +1013,7 @@ Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
 Data.BucketBusy                   := instBucket.Lifecycle.Busy;
 Data.BucketDone                   := instBucket.Lifecycle.Done;
 Data.BucketError                  := instBucket.Fault.Error;
+Data.ArmingPermit                 := ArmingPermit;
 
 {endregion}
 END_PROGRAM

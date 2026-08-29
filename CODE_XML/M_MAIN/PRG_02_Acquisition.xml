@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:48:14.633844" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:48:14.633844">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T14:14:48.648927" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T14:14:48.648927">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2322,9 +2322,9 @@ instJoystick(
     Enable                    := TRUE,
     Reset                     := PRG_07_Supervision.FaultMachineReset_IHM,
     // 🚨 ArmingPermit = ENTRÉE du joystick (vue joystick), alimentée de n'importe où.
-    // 🔧 Câblage TEMPORAIRE : producteur à analyser plus tard (hors scope LOT_JOYSTICK_ARMINGPERMIT).
-    //    TRUE = armement autorisé en attendant la future chaîne de permission système.
-    ArmingPermit              := TRUE,
+    // 🔧 Producteur = PRG_04_Treuils_Benne (combiné interlock benne) via le bus Data.
+    //    TRUE = armement autorisé (polarité positive NC-100).
+    ArmingPermit              := PRG_04_Treuils_Benne.Data.ArmingPermit,
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
