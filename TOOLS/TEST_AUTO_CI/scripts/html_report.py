@@ -524,7 +524,9 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
         anchor = f"test-{fb_slug}-{i}"
         toc_entries.append((anchor, name, passed_r))
 
-        card_classes = f"test-card test-card-{'pass' if passed_r else 'fail'}" + (" test-card-contract" if is_contract_test else "")
+        # Par défaut : replié pour les tests PASS afin de gagner de la place, ouvert pour les FAIL
+        collapsed_class = " test-card-collapsed" if passed_r else ""
+        card_classes = f"test-card test-card-{'pass' if passed_r else 'fail'}{collapsed_class}" + (" test-card-contract" if is_contract_test else "")
 
         scenario_drawer_html = ""
         if info["comments"]:
