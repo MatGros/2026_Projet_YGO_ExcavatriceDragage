@@ -60,24 +60,30 @@
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease, padding 0.2s ease; }
     .test-card:hover { transform: translateY(-1px); }
     .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    .test-card-collapsed { padding: 10px 18px !important; }
+    .test-card-collapsed .test-card-body { display: none !important; }
+    .test-card-collapsed .test-card-header { margin-bottom: 0 !important; }
+    .test-card-collapsed .test-card-toggle { transform: rotate(-90deg); }
+    .test-card-toggle { transition: transform 0.2s ease; display: inline-block; }
     /* Style distinct pour les tests de contrat et d'interface socle */
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
     .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.02); }
-    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: text; }
+    .checks-details { margin-top: 10px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 13.5px; color: var(--text); font-weight: 700; outline: none; user-select: text; }
     .checks-summary:hover { color: var(--accent); }
-    .checks-label { font-size: 12px; font-weight: 600; }
-    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
-    .checks-list li { font-size: 12px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
-    .scenario-list li { font-size: 12px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
-    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
+    .checks-label { font-size: 13.5px; font-weight: 700; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 12px 0 6px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 5px 0 5px 26px; position: relative; line-height: 1.5; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 2px; color: var(--green-text); font-weight: bold; font-size: 14px; }
+    .scenario-list li { font-size: 14px; color: #f1f5f9; padding: 7px 0 7px 28px; position: relative; line-height: 1.6; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-weight: 500; }
+    .scenario-list li:last-child { border-bottom: none; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 12px; opacity: 0.9; top: 8px; }
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
@@ -301,11 +307,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-28 19:35:46</div>
+    <div class="exec-time">2026-08-29 15:41:38</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (3 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-05-translation-0">PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut</a></li><li class="toc-item toc-pass"><a href="#test-prg-05-translation-1">PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil</a></li><li class="toc-item toc-pass"><a href="#test-prg-05-translation-2">PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-05-translation-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-05-translation-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -314,7 +320,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            3/3 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
@@ -1101,8 +1107,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_CycleTime</code></td>
                 <td>1</td><td>1</td>
-                <td>0</td><td>4</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>5</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (5 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1185,38 +1191,34 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-prg-05-translation-0" class="test-card test-card-pass">
-            <header>
+        <article id="test-prg-05-translation-0" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut </h3>
+                <h3 style="flex: 1;">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-prg-05-translation-1" class="test-card test-card-pass">
-            <header>
+        <article id="test-prg-05-translation-1" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil </h3>
+                <h3 style="flex: 1;">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-prg-05-translation-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau </h3>
-            </header>
-            
-            
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
         </div>
     </details>
@@ -1458,7 +1460,9 @@ END_FUNCTION_BLOCK
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul du dt réel entre deux exécutions successives
    ⚙️ Calcul : Delta horloge système TIME() converti en secondes
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
+   🛡️ Robustesse : dt borné (0 &lt; dt &lt;= CST_MaxCycleDeltaMs) sinon valeur de secours —
+      neutralise les artefacts de rebouclage TIME() (49,7 j) et de reprise (online-change, debug)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md
    ======================================================================= *)
 FUNCTION_BLOCK FB_CycleTime
 VAR_INPUT
@@ -1475,6 +1479,10 @@ VAR
     TimeLast                : TIME;               // . [LOC] Empreinte de temps du cycle precedent
     DeltaTimeMs             : UDINT;              // . [LOC] Ecart brut calcule (ms)
     InitDone                : BOOL;               // . [LOC] Drapeau d&#x27;initialisation du premier cycle
+END_VAR
+VAR CONSTANT
+    // === BORNE HAUTE DU DELTA DE CYCLE ===
+    CST_MaxCycleDeltaMs     : UDINT := 1000;      // Plafond physique du dt entre deux scans (ms) : au-dela -&gt; valeur de secours
 END_VAR
 
 {region &quot;§1 Acquisition temps&quot;}
@@ -1497,9 +1505,27 @@ END_IF;
 DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
 {endregion}
 
-{region &quot;§4 Conversion et secours&quot;}
-// 4. CONVERSION ET CHARGE DE SECOURS
-IF DeltaTimeMs &gt; 0 THEN
+{region &quot;§4 Conversion, secours et bornage&quot;}
+// 4. CONVERSION EN SECONDES, AVEC DOUBLE BORNAGE DU DELTA
+//
+// TIME() est un compteur systeme 32 bits en millisecondes depuis le demarrage de
+// l&#x27;automate. Il n&#x27;est PAS absolu : il reboucle a 0 tous les 2^32 ms (~49,7 jours).
+// La soustraction TimeCurrent - TimeLast est modulo 2^32 : au passage du rebouclage,
+// tant que l&#x27;ecart reel entre deux scans reste &lt; 49,7 j (toujours vrai a 10 ms),
+// DeltaTimeMs reste correct. Le rebouclage seul n&#x27;est donc pas le risque principal.
+//
+// Le vrai risque est un DeltaTimeMs REELLEMENT &gt; CST_MaxCycleDeltaMs : reprise apres
+// un online-change, sortie d&#x27;un point d&#x27;arret / pas-a-pas debug, ou fenetre du
+// rebouclage TIME(). Le chien de garde tache (200 ms, sensibilite 1) borne deja les
+// gels en fonctionnement ; ce plafond couvre les cas hors surveillance.
+// Un dt aberrant publie tel quel donnerait un CycleTimeS enorme, propage en un seul
+// scan dans les rampes de vitesse et les integrateurs de position/frein -&gt; saut
+// physique. Fail-safe : hors de la plage nominale (0 &lt; dt &lt;= plafond), on publie la
+// valeur de secours DefaultValueS au lieu de l&#x27;artefact. Pas de redemarrage auto.
+//
+// Borne basse dt = 0 (anti-zero, ex. premier appel du scan) et borne haute
+// dt &gt; CST_MaxCycleDeltaMs (anti-artefact) partagent la meme branche de secours.
+IF (DeltaTimeMs &gt; 0) AND (DeltaTimeMs &lt;= CST_MaxCycleDeltaMs) THEN
     CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
 ELSE
     CycleTimeS := DefaultValueS;
@@ -3812,15 +3838,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clic simple sur colonne repliee pour la reouvrir
     document.addEventListener('click', function(e) {
         var th = e.target.closest('.chrono-table th.col-collapsed');
-        if (!th) return;
-        var table = th.closest('.chrono-table');
-        if (!table) return;
-        var colIdx = Array.from(th.parentNode.children).indexOf(th);
-        th.classList.remove('col-collapsed');
-        table.querySelectorAll('tbody tr').forEach(function(row) {
-            var cell = row.children[colIdx];
-            if (cell) cell.classList.remove('col-collapsed');
-        });
+        if (th) {
+            var table = th.closest('.chrono-table');
+            if (table) {
+                var colIdx = Array.from(th.parentNode.children).indexOf(th);
+                th.classList.remove('col-collapsed');
+                table.querySelectorAll('tbody tr').forEach(function(row) {
+                    var cell = row.children[colIdx];
+                    if (cell) cell.classList.remove('col-collapsed');
+                });
+            }
+            return;
+        }
+
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        var testHeader = e.target.closest('.test-card-header');
+        if (testHeader) {
+            var card = testHeader.closest('.test-card');
+            if (card) {
+                card.classList.toggle('test-card-collapsed');
+            }
+        }
     });
 
     // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique

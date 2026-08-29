@@ -221,6 +221,38 @@
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020.1</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Armement hors neutre</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Homme-mort : armement hors neutre — front bouton + maintien 100ms + <code>ArmingPermit</code> → <code>DeadmanArmed=TRUE</code> même axes déviés (FB_Joystick.st:172)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020.2</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Désarmement perte permission</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Désarmement perte <code>ArmingPermit</code> : <code>ArmingPermit=FALSE</code> → <code>DeadmanArmed=FALSE</code> immédiat, <code>SpeedTgt=0</code> (FB_Joystick.st:180-183)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020.3</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Pas de réarmement auto</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Pas de réarmement auto : retour <code>ArmingPermit</code> ne réarme pas ; exige nouveau front + maintien 100ms (FB_Joystick.st:167-176)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P08-020.4</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bornes temporelles</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Bornes temporelles : armement 100ms, grâce 3s, neutre 100ms (ST_fbJoystick_Cfg.st:15-17 ; FB_Joystick.st:172,189-191)</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
   </tbody>
 </table>
 
@@ -476,7 +508,7 @@ y est un `BOOL` "au neutre", vs `INT` valeur réelle dans `ST_JoystickState`) �
 ## 10 · ❓ TBD
 
 - **Q1 — `ArmingPermit` non câblé** (🔴 sécurité) : câblé en dur `TRUE` dans
-  `PRG_02_Acquisition.st:303` (« câblage temporaire »), aucun producteur réel. Aucun désarmement
+  `PRG_02_Acquisition.st:322` (« câblage temporaire ») 🆕 2026-08-29, aucun producteur réel. Aucun désarmement
   automatique n'existe aujourd'hui sur changement de mode ou fin de cycle benne — trou de sécurité
   non compensé ailleurs. Piste de câblage proposée (non validée) :
   `DOC/WFLOW/AUDITS/PRG02_20260824/PROPOSITION_ArmingPermit_Cablage_v0.1.md`. Arbitrage humain

@@ -329,6 +329,7 @@ details.sec>.body{{padding-top:8px}}
 .bar{{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid var(--line);margin:8px 0;min-width:220px}}
 .bar>span{{display:block}}
 .bar .b-synced{{background:var(--ok)}}
+.bar .b-covered{{background:var(--accent)}}
 .bar .b-drift{{background:var(--warn)}}
 .bar .b-no_fiche{{background:var(--info)}}
 .bar .b-no_pointer{{background:var(--none)}}
@@ -366,6 +367,7 @@ tbody tr:nth-child(even){{background:var(--row-alt)}}
 td.mono,span.mono{{font-family:"SF Mono",SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;font-size:11px}}
 .pill{{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap}}
 .p-synced{{background:var(--ok-bg);color:var(--ok)}}
+.p-covered{{background:#2a2440;color:var(--accent)}}
 .p-drift{{background:var(--warn-bg);color:var(--warn)}}
 .p-no_fiche{{background:var(--info-bg);color:var(--info)}}
 .p-no_pointer{{background:var(--none-bg);color:var(--none)}}
@@ -477,7 +479,7 @@ function esc(s){{s=(s==null?"":String(s));return s.replace(/[&<>"]/g,function(c)
 /* ---------- bandeau stats ---------- */
 (function(){{
   var c=META.sync_counts, tot=META.sync_total;
-  var order=["synced","drift","no_fiche","no_pointer"];
+  var order=["synced","covered","drift","no_fiche","no_pointer"];
   var seg=order.map(function(k){{
     var w=tot?(100*(c[k]||0)/tot):0;
     return '<span class="b-'+k+'" style="width:'+w.toFixed(2)+'%" title="'+k+' : '+(c[k]||0)+'"></span>';
@@ -498,6 +500,7 @@ function esc(s){{s=(s==null?"":String(s));return s.replace(/[&<>"]/g,function(c)
     + '<div class="stat"><div class="n">'+(TR.counts.functions-TR.fn_no_tc.length)+'</div><div class="l">fonctions tracees</div></div>'
     + '<div class="stat"><div class="n">'+TR.counts.functions_with_gap+'</div><div class="l">fonctions avec trou</div></div>'
     + '<div class="stat"><div class="n">'+(c.synced||0)+'</div><div class="l">&#9989; synced</div></div>'
+    + '<div class="stat"><div class="n">'+(c.covered||0)+'</div><div class="l">&#128260; covered</div></div>'
     + '<div class="stat"><div class="n">'+(c.drift||0)+'</div><div class="l">&#9888; drift</div></div>'
     + '<div class="stat"><div class="n">'+(c.no_fiche||0)+'</div><div class="l">&#128309; no_fiche</div></div>'
     + '<div class="stat"><div class="n">'+(c.no_pointer||0)+'</div><div class="l">&#9898; no_pointer</div></div>'
@@ -505,8 +508,9 @@ function esc(s){{s=(s==null?"":String(s));return s.replace(/[&<>"]/g,function(c)
     + '</div>'
     + '<div class="bar">'+seg+'</div>'
     + '<div class="legend">'
-    + '<span><i style="background:var(--ok)"></i>synced</span>'
-    + '<span><i style="background:var(--warn)"></i>drift</span>'
+    + '<span><i style="background:var(--ok)"></i>synced (fiche dediee)</span>'
+    + '<span><i style="background:var(--accent)"></i>covered (nomme dans chapo domaine)</span>'
+    + '<span><i style="background:var(--warn)"></i>drift (fiche ne nomme pas le FB)</span>'
     + '<span><i style="background:var(--info)"></i>no_fiche</span>'
     + '<span><i style="background:var(--none)"></i>no_pointer</span>'
     + '&nbsp;&nbsp;'+partial
@@ -639,6 +643,7 @@ var Q_TC=[{{label:"Tous",f:null}}];
 var Q_SY=[
   {{label:"Tous",f:null}},
   {{label:"⚠ drift",f:function(r){{return r.statut==="drift";}}}},
+  {{label:"🔄 covered",f:function(r){{return r.statut==="covered";}}}},
   {{label:"✅ synced",f:function(r){{return r.statut==="synced";}}}},
   {{label:"🔹 no_fiche",f:function(r){{return r.statut==="no_fiche";}}}},
   {{label:"○ no_pointer",f:function(r){{return r.statut==="no_pointer";}}}}
@@ -672,7 +677,7 @@ makeTable("t-tc","f-tc","c-tc",TC,[
   {{k:"etat",fmt:function(r){{return esc(r.etat);}}}}
 ],null,Q_TC);
 
-var RANK={{drift:0,no_fiche:1,no_pointer:2,synced:3}};
+var RANK={{drift:0,no_fiche:1,no_pointer:2,covered:3,synced:4}};
 SY.forEach(function(r){{r._rank=RANK[r.statut]==null?9:RANK[r.statut];}});
 makeTable("t-sy","f-sy","c-sy",SY,[
   {{k:"pou_name",cls:"mono",fmt:function(r){{return (r.emoji?esc(r.emoji)+" ":"")+esc(r.pou_name);}}}},

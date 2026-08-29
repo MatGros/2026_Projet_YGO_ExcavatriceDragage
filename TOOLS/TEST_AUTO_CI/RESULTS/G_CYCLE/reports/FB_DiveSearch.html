@@ -60,24 +60,30 @@
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease, padding 0.2s ease; }
     .test-card:hover { transform: translateY(-1px); }
     .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    .test-card-collapsed { padding: 10px 18px !important; }
+    .test-card-collapsed .test-card-body { display: none !important; }
+    .test-card-collapsed .test-card-header { margin-bottom: 0 !important; }
+    .test-card-collapsed .test-card-toggle { transform: rotate(-90deg); }
+    .test-card-toggle { transition: transform 0.2s ease; display: inline-block; }
     /* Style distinct pour les tests de contrat et d'interface socle */
     .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
     .test-card-contract header h3 { color: #818cf8; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
     .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
-    .checks-details { margin-top: 8px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.02); }
-    .checks-summary { cursor: pointer; font-size: 12px; color: var(--text); font-weight: 600; outline: none; user-select: text; }
+    .checks-details { margin-top: 10px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 13.5px; color: var(--text); font-weight: 700; outline: none; user-select: text; }
     .checks-summary:hover { color: var(--accent); }
-    .checks-label { font-size: 12px; font-weight: 600; }
-    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 8px 0 4px; }
-    .checks-list li { font-size: 12px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
-    .checks-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
-    .scenario-list li { font-size: 12px; color: var(--muted); padding: 3px 0 3px 20px; position: relative; }
-    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 10px; opacity: 0.8; }
+    .checks-label { font-size: 13.5px; font-weight: 700; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 12px 0 6px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 5px 0 5px 26px; position: relative; line-height: 1.5; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 2px; color: var(--green-text); font-weight: bold; font-size: 14px; }
+    .scenario-list li { font-size: 14px; color: #f1f5f9; padding: 7px 0 7px 28px; position: relative; line-height: 1.6; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-weight: 500; }
+    .scenario-list li:last-child { border-bottom: none; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 12px; opacity: 0.9; top: 8px; }
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
@@ -301,11 +307,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 01:41:52</div>
+    <div class="exec-time">2026-08-29 15:41:29</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (8 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-divesearch-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-1">TC-P04-010 DiveSearch : mise en service recherche de couche</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-2">TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-3">TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-4">TC-P04-013 : Depassement tempo recherche immersion Kobold -&gt; ERROR_HOLD et capture StepAtFault</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-5">TC-P04-014 : Depassement tempo recherche fond Kobold -&gt; ERROR_HOLD et capture StepAtFault</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-6">TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seulement sur front Reset</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-7">TC-P04-016 : Contacteur Kobold coupe des le relachement de la descente (anti-chauffe, H1)</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-divesearch-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-1">TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-divesearch-2">TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -314,7 +320,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            8/8 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -550,108 +556,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 30 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BOTTOMTOUCHCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BUCKETISOPEN</code> jamais câblé en production</li><li>Pin <code>BYPASSPRECONDITIONS</code> jamais câblé en production</li><li>Pin <code>CABLELIMITASCENT_M</code> jamais câblé en production</li><li>Pin <code>CURRENTSPEEDSTEP</code> jamais câblé en production</li><li>Pin <code>CYCLETIME</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIVESTARTMIN_M</code> jamais câblé en production</li><li>Pin <code>DIVESTATE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>IMMERSIONLOWER_M</code> jamais câblé en production</li><li>Pin <code>IMMERSIONUPPER_M</code> jamais câblé en production</li><li>Pin <code>KOBOLDCONTACTORCMD</code> jamais câblé en production</li><li>Pin <code>KOBOLDIMMERSED</code> jamais câblé en production</li><li>Pin <code>KOBOLDMEASUREENABLE</code> jamais câblé en production</li><li>Pin <code>LIFECYCLE</code> jamais câblé en production</li><li>Pin <code>LIMITLEGALDEPTHMIN_M</code> jamais câblé en production</li><li>Pin <code>M1POSITION_M</code> jamais câblé en production</li><li>Pin <code>M2POSITION_M</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>MOTIONDIRECTION</code> jamais câblé en production</li><li>Pin <code>MOTIONREQUESTACTIVE</code> jamais câblé en production</li><li>Pin <code>OPERATORACTION</code> jamais câblé en production</li><li>Pin <code>OPERATORACTIONID</code> jamais câblé en production</li><li>Pin <code>POSITIONSVALID</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>STEPATFAULT</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MODE <span class="pin-type">IEC_E_MODE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MOTIONREQUESTACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MOTIONDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETISOPEN <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">KOBOLDIMMERSED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1POSITION_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2POSITION_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POSITIONSVALID <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CURRENTSPEEDSTEP <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIVESTARTMIN_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">IMMERSIONUPPER_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">IMMERSIONLOWER_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CABLELIMITASCENT_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">LIMITLEGALDEPTHMIN_M <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLETIME <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSPRECONDITIONS <span class="pin-type">IEC_BOOL</span></div>
-        </div></div>
-            <div class="pin-block">FB_DiveSearch</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">LIFECYCLE <span class="pin-type">ST_LIFECYCLE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DIVESTATE <span class="pin-type">IEC_E_DIVESEARCHSTATE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STEPATFAULT <span class="pin-type">IEC_E_DIVESEARCHSTATE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DESCENDPERMIT <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">KOBOLDMEASUREENABLE <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">KOBOLDCONTACTORCMD <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BOTTOMTOUCHCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">OPERATORACTIONID <span class="pin-type">IEC_WORD</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">OPERATORACTION <span class="pin-type">IECStringVar&lt;120&gt;</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 2 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -739,132 +643,59 @@
         <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-divesearch-0" class="test-card test-card-pass test-card-contract">
-            <header>
+        <article id="test-fb-divesearch-0" class="test-card test-card-pass test-card-collapsed test-card-contract">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3 style="flex: 1;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
+            <div class="test-card-body">
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
                 <ul class="scenario-list"><li>Scan 0 : Enable=FALSE -&gt; Neutralisation standard</li><li>Scan 1 : Enable=TRUE -&gt; Prete en service</li><li>Scan 2 : Enable=FALSE -&gt; Re-neutralisation</li></ul>
             </details>
-            
+                
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE -&gt; Ready=TRUE (nominal)</li><li>Coupure -&gt; Ready retombe a FALSE</li></ul>
             </details>
-            
-            
+                
+                
+            </div>
         </article>
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 7 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-divesearch-1" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-divesearch-1" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-010 DiveSearch : mise en service recherche de couche </h3>
+                <h3 style="flex: 1;">TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
-                <ul class="scenario-list"><li>Demarrage de la descente : passe a SEARCHING_IMMERSION</li><li>Scan suivant dans SEARCHING_IMMERSION : activation du permis et de Busy</li></ul>
-            </details>
-            
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
-                <ul class="checks-list"><li>Module DiveSearch pret</li><li>Pret a descendre</li><li>Passe en recherche immersion</li><li>Permis descente actif en recherche immersion</li><li>Recherche en cours -&gt; Busy</li><li>Contacteur Kobold alimente a la volee</li></ul>
-            </details>
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
-        <article id="test-fb-divesearch-2" class="test-card test-card-pass">
-            <header>
+        <article id="test-fb-divesearch-2" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond </h3>
+                <h3 style="flex: 1;">TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
-            
-            
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
-                <ul class="checks-list"><li>Pret a descendre</li><li>Contacteur Kobold alimente</li><li>Passe en recherche du fond</li><li>Fond confirme</li><li>Contact fond valide</li><li>Coupure contacteur Kobold pour eviter surchauffe</li></ul>
-            </details>
-            
-            
-        </article>
-        <article id="test-fb-divesearch-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut bloquant </h3>
-            </header>
-            
-            
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
-                <ul class="checks-list"><li>Defaut Palier 5 interdit</li><li>Verrouille en ERROR_HOLD</li><li>StepAtFault mémorise SEARCHING_IMMERSION</li><li>Contacteur coupe sur defaut</li></ul>
-            </details>
-            
-            
-        </article>
-        <article id="test-fb-divesearch-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-013 : Depassement tempo recherche immersion Kobold -&gt; ERROR_HOLD et capture StepAtFault </h3>
-            </header>
-            
-            
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
-                <ul class="checks-list"><li>En recherche immersion</li><li>Defaut timeout immersion declenche</li><li>Verrouille en ERROR_HOLD</li><li>StepAtFault memorise SEARCHING_IMMERSION</li><li>Permis descente coupe</li><li>Contacteur Kobold coupe</li></ul>
-            </details>
-            
-            
-        </article>
-        <article id="test-fb-divesearch-5" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-014 : Depassement tempo recherche fond Kobold -&gt; ERROR_HOLD et capture StepAtFault </h3>
-            </header>
-            
-            
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
-                <ul class="checks-list"><li>Passe en recherche fond</li><li>Defaut timeout fond declenche</li><li>Verrouille en ERROR_HOLD</li><li>StepAtFault memorise SEARCHING_BOTTOM</li><li>Permis descente coupe</li><li>Contacteur coupe anti-chauffe</li></ul>
-            </details>
-            
-            
-        </article>
-        <article id="test-fb-divesearch-6" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seulement sur front Reset </h3>
-            </header>
-            
-            
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary>
-                <ul class="checks-list"><li>Latch timeout immersion arme</li><li>Latch conserve sous Enable=FALSE (pas de redemarrage auto)</li><li>Latch toujours actif sur retour Enable=TRUE sans acquittement</li><li>Cause interne realimente Fault.Error au retour Enable</li><li>Verrouille ERROR_HOLD, aucun redemarrage vers READY_TO_DESCEND</li><li>Aucun permis descente au retour Enable sans reset</li><li>Front Reset acquitte le latch timeout</li></ul>
-            </details>
-            
-            
-        </article>
-        <article id="test-fb-divesearch-7" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P04-016 : Contacteur Kobold coupe des le relachement de la descente (anti-chauffe, H1) </h3>
-            </header>
-            
-            
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
-                <ul class="checks-list"><li>En recherche immersion</li><li>Contacteur alimente sous descente active</li><li>Contacteur coupe des le relachement (anti-chauffe)</li><li>Permis descente coupe des le relachement</li><li>Aucun defaut sur simple relachement</li><li>Reste en recherche (pas de bascule)</li></ul>
-            </details>
-            
-            
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
         </article>
         </div>
     </details>
@@ -1712,15 +1543,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clic simple sur colonne repliee pour la reouvrir
     document.addEventListener('click', function(e) {
         var th = e.target.closest('.chrono-table th.col-collapsed');
-        if (!th) return;
-        var table = th.closest('.chrono-table');
-        if (!table) return;
-        var colIdx = Array.from(th.parentNode.children).indexOf(th);
-        th.classList.remove('col-collapsed');
-        table.querySelectorAll('tbody tr').forEach(function(row) {
-            var cell = row.children[colIdx];
-            if (cell) cell.classList.remove('col-collapsed');
-        });
+        if (th) {
+            var table = th.closest('.chrono-table');
+            if (table) {
+                var colIdx = Array.from(th.parentNode.children).indexOf(th);
+                th.classList.remove('col-collapsed');
+                table.querySelectorAll('tbody tr').forEach(function(row) {
+                    var cell = row.children[colIdx];
+                    if (cell) cell.classList.remove('col-collapsed');
+                });
+            }
+            return;
+        }
+
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        var testHeader = e.target.closest('.test-card-header');
+        if (testHeader) {
+            var card = testHeader.closest('.test-card');
+            if (card) {
+                card.classList.toggle('test-card-collapsed');
+            }
+        }
     });
 
     // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique

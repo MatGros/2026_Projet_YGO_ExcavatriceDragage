@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "file": "test_fb_translation.st",
+  "file": "test_fb_winch.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations",
+      "name": "TC-P10-001 Safety_Winch : Enable=FALSE neutralise les autorisations",
       "passed": true
     },
     {
-      "name": "TC-P11-010 Translation : commande variateur nominale",
+      "name": "TC-P10-011 Treuil Nominal : consigne montee active les relais de sens et de vitesse",
       "passed": true
     }
   ],

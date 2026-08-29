@@ -21,10 +21,13 @@ Si ``doc_pointer`` vise un ``.md`` sous ``DOC/`` :
     ``## N  Role``) contient, sous forme normalisee, le ``role`` normalise du .st.
 
   - ``statut`` :
-      * ``synced``     si (fiche_existe ET nom_match ET role_match)
-      * ``drift``      si doc_pointer + fiche presente mais un des deux match echoue
-      * ``no_fiche``   si doc_pointer present mais fichier absent
-      * ``no_pointer`` si aucun doc_pointer dans le cartouche
+      * ``synced``     fiche dediee au FB : H1 nomme le FB ET 1re phrase de role verbatim
+      * ``covered``    le FB est nomme quelque part dans la fiche/chapo pointe (table
+                       de composition, section...) mais sans fiche dediee re-verifiable
+                       ligne a ligne -> documente dans son domaine, pas une desynchro
+      * ``drift``      fiche presente qui ne nomme JAMAIS ce FB -> pointeur suspect
+      * ``no_fiche``   doc_pointer present mais fichier absent
+      * ``no_pointer`` aucun doc_pointer dans le cartouche
 
 --- NORMALISATION (choix a valider par l'orchestrateur, cf. alert_duty T089) ---
 ``_normalize(s)`` applique, dans l'ordre :
@@ -218,6 +221,7 @@ def analyze_fb(st_path: Path) -> dict[str, Any]:
         "doc_line": doc_line,
         "fiche_existe": None,
         "nom_match": None,
+        "nom_in_body": None,
         "role_match": None,
         "statut": None,
     }
@@ -246,7 +250,22 @@ def analyze_fb(st_path: Path) -> dict[str, Any]:
     role_match = bool(role_norm) and role_norm in role_section_norm
     entry["role_match"] = bool(role_match)
 
-    entry["statut"] = "synced" if (nom_match and role_match) else "drift"
+    # Le POU est-il nomme quelque part dans la fiche (pas seulement le H1) ?
+    # Cas frequent : le pointeur vise un chapo de domaine (AF_Partie-NN) ou le FB
+    # apparait dans la table de composition mais jamais dans le titre.
+    nom_in_body = pou_name in md_text
+    entry["nom_in_body"] = bool(nom_in_body)
+
+    if nom_match and role_match:
+        # Fiche dediee au FB, nom + role verbatim : synchronisation stricte.
+        entry["statut"] = "synced"
+    elif nom_in_body:
+        # Le FB est documente dans sa fiche/chapo (nomme quelque part), sans fiche
+        # dediee re-verifiable ligne a ligne : couverture, pas une desynchro.
+        entry["statut"] = "covered"
+    else:
+        # Fiche existante qui ne nomme JAMAIS ce FB -> pointeur suspect.
+        entry["statut"] = "drift"
     return entry
 
 
@@ -257,7 +276,7 @@ def main() -> int:
     )
     entries = [analyze_fb(p) for p in fb_files]
 
-    counts: dict[str, int] = {"synced": 0, "drift": 0, "no_fiche": 0, "no_pointer": 0}
+    counts: dict[str, int] = {"synced": 0, "covered": 0, "drift": 0, "no_fiche": 0, "no_pointer": 0}
     for e in entries:
         counts[e["statut"]] = counts.get(e["statut"], 0) + 1
 
@@ -277,7 +296,8 @@ def main() -> int:
         out_disp = str(OUT_PATH)
     print(f"check_fb_cartouche_sync : {len(entries)} FB analyses -> {out_disp}")
     print(
-        "  synced={synced}  drift={drift}  no_fiche={no_fiche}  no_pointer={no_pointer}".format(**counts)
+        "  synced={synced}  covered={covered}  drift={drift}  no_fiche={no_fiche}  "
+        "no_pointer={no_pointer}".format(**counts)
     )
     for e in entries:
         if e["statut"] in ("drift", "no_fiche"):

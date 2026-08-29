@@ -1,43 +1,19 @@
 {
   "version": 1,
-  "file": "test_fb_hmi_bannerformatter.st",
+  "file": "test_fb_simbench.st",
   "results": [
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM",
-      "passed": true
-    },
-    {
-      "name": "TC-P07-010 AntiFlickerText : affichage instantane force",
-      "passed": true
-    },
-    {
-      "name": "TC-P07-020 RootCause : alarme fille visible quand materiel sain",
-      "passed": true
-    },
-    {
-      "name": "TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO",
-      "passed": true
-    },
-    {
-      "name": "TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END",
-      "passed": true
-    },
-    {
-      "name": "TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT",
-      "passed": true
-    },
-    {
-      "name": "TC-P07-024 Priorite absolue AU sur defaut module E/S",
+      "name": "TC-P13-001 Sim_Safety : neutralisation sans Enable",
       "passed": true
     }
   ],
   "summary": {
-    "total": 8,
-    "passed": 8,
+    "total": 2,
+    "passed": 2,
     "failed": 0
   }
 }
