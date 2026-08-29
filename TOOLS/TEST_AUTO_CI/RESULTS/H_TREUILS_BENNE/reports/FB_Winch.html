@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_Winch [FAIL]</title>
+<title>Rapport de test — FB_Winch [PASS]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -87,6 +87,9 @@
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    /* Bouton discret "retour à l'index" (les rapports vivent dans RESULTS/<domaine>/reports/) */
+    .btn-index { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--btn-border); color: var(--muted); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.15s ease; user-select: none; white-space: nowrap; }
+    .btn-index:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
     .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
     .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
         border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
@@ -239,6 +242,10 @@
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
     .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .wiring-pastille { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 999px;
+        font-size: 11px; font-weight: 700; letter-spacing: 0.3px; vertical-align: 1px; }
+    .wiring-pastille-ok { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+    .wiring-pastille-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
     .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
@@ -303,15 +310,16 @@
             <h1>FB_Winch</h1>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
+            <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-fail">FAIL</span>
+            <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 17:21:05</div>
+    <div class="exec-time">2026-08-29 23:01:26</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (7 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-winch-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-fail"><a href="#test-fb-winch-1">TC-P10-011 Inversion Fwd&lt;-&gt;Rev : neutre-&gt;sens immediat, inversion exige delai + rampe a 0</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-2">TC-P10-017 Config palier invalide : palier 0, sorties sures</a></li><li class="toc-item toc-fail"><a href="#test-fb-winch-3">TC-P10-018 StuckClosed : contacteurs off non confirmes 500ms -&gt; bit1 ErrorId</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-4">TC-P10-019 Ordre MainTask : Safety -&gt; WinchControl -&gt; PRG_06_Outputs</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-5">TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, approche capteur haut=1</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-6">TC-P10-052.1 Garde-fou vitesse : vitesse non-stable -&gt; palier 1 (activation par defaut : T177 en attente)</a></li></ul>
+        <summary>📋 Sommaire (14 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-winch-0">TC-P10-001 Meca A : derive &gt;2.0m a l arret (joystick neutre) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-1">TC-P10-002 Meca B : non confirmation arret 3s -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-2">TC-P10-003 Meca C : glissement M1 &gt;2.0m pendant maintien benne -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-3">TC-P10-004 Meca D : capteur haut sans arret 3s -&gt; SafeStop (immediat) puis PowerCutOff (3s)</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-4">TC-P10-005 Meca E bit12 : ecart &gt;2.5m -&gt; SafeStop SEUL (pas PowerCutOff)</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-5">TC-P10-006 Meca E bit13 : bit12 non confirme 3s -&gt; escalade PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-6">TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -&gt; SafeStop SEUL</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-7">TC-P10-008 Meca G : vitesse nulle malgre commande 3s -&gt; SafeStop SEUL</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-8">TC-P10-009 Masque PowerCutOff : bit2 (surchauffe moteur) coupe, bit14 (sens oppose) ne coupe pas</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-9">TC-P10-010 SafeStop exclut bit3 (mou cable) si SyncEnable=FALSE</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-10">TC-P10-036.1 Warmup 3s : perte com operateur ignoree pendant 3s puis SafeStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-11">TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves, re-Enable exige Reset</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-12">TC-P10-044.1 Mou cable : SyncEnable=FALSE -&gt; DescendPermit=FALSE, AscentPermit autorise, blocage leve au retension</a></li><li class="toc-item toc-pass"><a href="#test-fb-winch-13">TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04-&gt;PRG_06-&gt;AU = essai site</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,7 +328,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/7 vérifications validées
+            14/14 vérifications validées
         </div>
     </div>
     
@@ -615,165 +623,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 49 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BOTTOMLIMITM</code> jamais câblé en production</li><li>Pin <code>BUSINESSSTEPDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BYPASSGLOBAL</code> jamais câblé en production</li><li>Pin <code>CABLEPOSM</code> jamais câblé en production</li><li>Pin <code>CFGMAXSTEPDESCENTE</code> jamais câblé en production</li><li>Pin <code>CFGSLOWDOWNDISTANCEM</code> jamais câblé en production</li><li>Pin <code>CFGSLOWDOWNMAXSTEP</code> jamais câblé en production</li><li>Pin <code>COMMANDEDDIRECTION</code> jamais câblé en production</li><li>Pin <code>CONTACTOR1</code> jamais câblé en production</li><li>Pin <code>CONTACTOR2</code> jamais câblé en production</li><li>Pin <code>CONTACTOR3</code> jamais câblé en production</li><li>Pin <code>CONTACTOR4</code> jamais câblé en production</li><li>Pin <code>CONTACTORFEEDBACKTIMEOUT</code> jamais câblé en production</li><li>Pin <code>CONTACTORSCHECK</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIRECTION</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEPENDING</code> jamais câblé en production</li><li>Pin <code>DIRECTIONINTERLOCKDELAYASCENT</code> jamais câblé en production</li><li>Pin <code>DIRECTIONINTERLOCKDELAYDESCENT</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>FWDREVSPEEDFEEDBACKOFF</code> jamais câblé en production</li><li>Pin <code>HOMED</code> jamais câblé en production</li><li>Pin <code>HOMINGAPPROACHACTIVE</code> jamais câblé en production</li><li>Pin <code>HOMINGSUSPECT</code> jamais câblé en production</li><li>Pin <code>INBOTTOMSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>INTOPSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>MAXSTEPASCENT</code> jamais câblé en production</li><li>Pin <code>MEASUREDSPEEDBAND</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RELAYFWD</code> jamais câblé en production</li><li>Pin <code>RELAYREV</code> jamais câblé en production</li><li>Pin <code>REQUESTEDSTEP</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SAFESTOP</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDENABLE</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDLIMITED</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDREADY</code> jamais câblé en production</li><li>Pin <code>SPEEDSTEPHYSTMARGIN</code> jamais câblé en production</li><li>Pin <code>SPEEDSTEPTABLE</code> jamais câblé en production</li><li>Pin <code>SPEEDTGT_PCT</code> jamais câblé en production</li><li>Pin <code>STARTSTOP</code> jamais câblé en production</li><li>Pin <code>STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>TOPLIMITM</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">STARTSTOP <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDTGT_PCT <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MODE <span class="pin-type">IEC_E_MODE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SAFESTOP <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DESCENDPERMIT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ASCENTPERMIT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDSTEPTABLE <span class="pin-type">ST_SPEEDSTEPTABLE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGMAXSTEPDESCENTE <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MAXSTEPASCENT <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGAPPROACHACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDSTEPHYSTMARGIN <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIRECTIONINTERLOCKDELAYDESCENT <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIRECTIONINTERLOCKDELAYASCENT <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CONTACTORFEEDBACKTIMEOUT <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TOPLIMITM <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BOTTOMLIMITM <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGSLOWDOWNDISTANCEM <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGSLOWDOWNMAXSTEP <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">FWDREVSPEEDFEEDBACKOFF <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGSUSPECT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CABLEPOSM <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MEASUREDSPEEDBAND <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDGUARDENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDGUARDREADY <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSCONTACTORCHECK <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSGLOBAL <span class="pin-type">IEC_BOOL</span></div>
-        </div></div>
-            <div class="pin-block">FB_Winch</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">RELAYFWD <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">RELAYREV <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTOR1 <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTOR2 <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTOR3 <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTOR4 <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">REQUESTEDSTEP <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STEPNUMBER <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BUSINESSSTEPDELAYELAPSED <span class="pin-type">IEC_TIME</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">SPEEDGUARDLIMITED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTORSCHECK <span class="pin-type">ST_CONTACTORCHECK</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">INTOPSLOWDOWNZONE <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">INBOTTOMSLOWDOWNZONE <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">COMMANDEDDIRECTION <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DIRECTIONCHANGEDELAYELAPSED <span class="pin-type">IEC_TIME</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DIRECTIONCHANGEPENDING <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 9 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -906,121 +755,78 @@
         </table>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-winch-0" class="test-card test-card-pass test-card-collapsed test-card-contract">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
-            </header>
-            <div class="test-card-body">
-                
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
-                <ul class="scenario-list"><li>Scan 0 : Enable=FALSE -&gt; Neutralisation initiale</li><li>Scan 1 : Enable=TRUE -&gt; Premier scan d initialisation</li><li>Scan 2 : Regime nominal etabli -&gt; Ready=TRUE</li><li>Scan 3 : Enable=FALSE -&gt; Coupure nette et re-neutralisation</li></ul>
-            </details>
-                
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
-                <ul class="checks-list"><li>Enable=FALSE -&gt; Ready=FALSE (neutralise)</li><li>Enable=TRUE etabli -&gt; Ready=TRUE (nominal)</li><li>Enable=FALSE -&gt; Ready retombe a FALSE</li></ul>
-            </details>
-                
-                
-            </div>
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
         </div>
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 6 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 14 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-fb-winch-1" class="test-card test-card-fail">
+        <article id="test-fb-winch-0" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P10-011 Inversion Fwd&lt;-&gt;Rev : neutre-&gt;sens immediat, inversion exige delai + rampe a 0 </h3>
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-001 Meca A : derive &gt;2.0m a l arret (joystick neutre) -&gt; SafeStop + PowerCutOff </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
-                <ul class="scenario-list"><li>Scan 1 : regime nominal</li><li>Scan 2 : neutre -&gt; montee = IMMEDIAT (pas de DirectionChangePending)</li><li>Scan 3 : arret -&gt; StepNumber=0, CommandedDirection=0</li><li>Scan 4 : inversion directe montee-&gt;descente (StepNumber=0) -&gt; pending + rampe a 0</li><li>Scan 5 : apres DirectionInterlockDelayDescent=400ms -&gt; CommandedDirection=-1</li></ul>
-            </details>
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (9)</span></summary>
-                <ul class="checks-list"><li>Treuil pret</li><li>Neutre-&gt;montee : CommandedDirection=1 immediat</li><li>Neutre-&gt;montee : pas de pending</li><li>Montee -&gt; RelayFwd</li><li>Arret -&gt; StepNumber=0</li><li>Inversion -&gt; DirectionChangePending=TRUE</li><li>Inversion : rampe forcee a 0 pendant attente</li><li>Apres 400ms -&gt; CommandedDirection=-1</li><li>Apres delai -&gt; pending leve</li></ul>
-            </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB_W.DIRECTIONCHANGEPENDING expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_winch.st:102</div><div class='failure-msg'>Inversion -&gt; DirectionChangePending=TRUE</div></div>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-1" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-002 Meca B : non confirmation arret 3s -&gt; SafeStop + PowerCutOff </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+                
                 
             </div>
         </article>
         <article id="test-fb-winch-2" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P10-017 Config palier invalide : palier 0, sorties sures </h3>
+                <h3 style="flex: 1;">TC-P10-003 Meca C : glissement M1 &gt;2.0m pendant maintien benne -&gt; SafeStop + PowerCutOff </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
-                <ul class="scenario-list"><li>Table invalide : seuils non croissants (tous a 0)</li><li>Scan 1 : Enable=TRUE, config invalide -&gt; ConfigError latche</li></ul>
-            </details>
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
-                <ul class="checks-list"><li>Config invalide -&gt; Error</li><li>Config invalide -&gt; palier 0</li><li>Config invalide -&gt; RelayFwd=FALSE (sortie sure)</li><li>Config invalide -&gt; RelayRev=FALSE</li><li>Config invalide -&gt; Contactor1=FALSE</li></ul>
-            </details>
                 
                 
             </div>
         </article>
-        <article id="test-fb-winch-3" class="test-card test-card-fail">
+        <article id="test-fb-winch-3" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P10-018 StuckClosed : contacteurs off non confirmes 500ms -&gt; bit1 ErrorId </h3>
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-004 Meca D : capteur haut sans arret 3s -&gt; SafeStop (immediat) puis PowerCutOff (3s) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
-                <ul class="scenario-list"><li>Scan 1 : regime nominal</li><li>Scan 2 : arret commande mais contacteurs NON retombes (FwdRevSpeedFeedbackOff=FALSE)</li><li>Scan 3 : apres ContactorFeedbackTimeout=500ms -&gt; StuckClosed -&gt; bit1</li></ul>
-            </details>
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
-                <ul class="checks-list"><li>Nominal : pas d erreur</li><li>Avant 500ms : pas encore de defaut</li><li>Contacteurs colles 500ms -&gt; Error</li><li>StuckClosed -&gt; bit1 (2)</li></ul>
-            </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB_W.FAULT.ERROR expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_winch.st:170</div><div class='failure-msg'>Contacteurs colles 500ms -&gt; Error</div></div>
+                
                 
             </div>
         </article>
         <article id="test-fb-winch-4" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P10-019 Ordre MainTask : Safety -&gt; WinchControl -&gt; PRG_06_Outputs </h3>
+                <h3 style="flex: 1;">TC-P10-005 Meca E bit12 : ecart &gt;2.5m -&gt; SafeStop SEUL (pas PowerCutOff) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>(essai site — stub) : l ordre d execution MainTask (Safety -&gt; WinchControl -&gt; PRG_06)
-       est une propriete de la tache CODESYS, non automatisable en boite noire FB. On verifie
-       ici la brique amont : FB_Winch produit bien sa demande sortie (RelayFwd) qui sera
-       consommee par la barriere finale PRG_06.</li></ul>
-            </details>
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
-                <ul class="checks-list"><li>Demande montee produite (consommee par PRG_06)</li><li>Palier 1 demande</li></ul>
-            </details>
                 
                 
             </div>
@@ -1028,20 +834,12 @@
         <article id="test-fb-winch-5" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, approche capteur haut=1 </h3>
+                <h3 style="flex: 1;">TC-P10-006 Meca E bit13 : bit12 non confirme 3s -&gt; escalade PowerCutOff </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
-                <ul class="scenario-list"><li>Scan 1 : regime nominal</li><li>Descente : SpeedTgt_Pct=90 -&gt; RequestedStep cape a CfgMaxStepDescente=3</li><li>Reset + montee : SpeedTgt_Pct=90 -&gt; RequestedStep=5 (MaxStepAscent)</li><li>Approche capteur haut : HomingApproachActive=TRUE -&gt; palier 1</li><li>Zone ralentissement haut : CablePosM &gt;= TopLimitM - CfgSlowdownDistanceM -&gt; palier 1</li></ul>
-            </details>
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
-                <ul class="checks-list"><li>Descente : palier cape a 3 (CfgMaxStepDescente)</li><li>Montee : palier 5 (MaxStepAscent)</li><li>Approche capteur haut : palier 1</li><li>Zone ralentissement haut active</li><li>Zone ralentissement haut : palier 1</li></ul>
-            </details>
                 
                 
             </div>
@@ -1049,21 +847,103 @@
         <article id="test-fb-winch-6" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P10-052.1 Garde-fou vitesse : vitesse non-stable -&gt; palier 1 (activation par defaut : T177 en attente) </h3>
+                <h3 style="flex: 1;">TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -&gt; SafeStop SEUL </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
-                <ul class="scenario-list"><li>(activation par defaut : T177 en attente) — SpeedGuardEnable est FALSE par defaut dans le
-       code (T177 non execute). On force le parametre TRUE dans le setup pour tester le garde-fou.</li><li>Scan 1 : regime nominal</li><li>Scan 2 : SpeedGuardEnable=TRUE, SpeedGuardReady=FALSE (vitesse non stable) -&gt; palier 1</li></ul>
-            </details>
                 
-            <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
-                <ul class="checks-list"><li>Vitesse non stable -&gt; palier 1 (garde-fou)</li><li>Vitesse non stable -&gt; StepNumber=1</li></ul>
-            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-7" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-008 Meca G : vitesse nulle malgre commande 3s -&gt; SafeStop SEUL </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-8" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-009 Masque PowerCutOff : bit2 (surchauffe moteur) coupe, bit14 (sens oppose) ne coupe pas </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-9" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-010 SafeStop exclut bit3 (mou cable) si SyncEnable=FALSE </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-10" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-036.1 Warmup 3s : perte com operateur ignoree pendant 3s puis SafeStop </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-11" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves, re-Enable exige Reset </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-12" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-044.1 Mou cable : SyncEnable=FALSE -&gt; DescendPermit=FALSE, AscentPermit autorise, blocage leve au retension </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-winch-13" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04-&gt;PRG_06-&gt;AU = essai site </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
                 
                 
             </div>

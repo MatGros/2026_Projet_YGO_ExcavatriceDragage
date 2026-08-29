@@ -25,7 +25,11 @@
    ⚙️ Pattern dialecte : les structs de config sont des VAR de SETUP mutables,
       affectés en début de TEST puis passés ENTIERS aux appels (pas de
       membre.cfg := x en argument nommé).
-   ======================================================================= *)
+   =======================================================================
+   NOTE CALIBRATION : chaque appel machine() doit répéter le contexte complet
+   (mode, homme-mort et chaîne puissance) ; une convergence qui ne le fait pas
+   réinitialise le mouvement. Marqueur de calibration interdit avant reprise
+   exhaustive des 32 vecteurs. *)
 
 SETUP
 VAR
@@ -35,6 +39,7 @@ VAR
     seqReqM1     : ST_ProgramWinchRequest;
     seqReqM2     : ST_ProgramWinchRequest;
     seqReqBucket : ST_ProgramBucketRequest;
+    i            : INT;
 END_VAR
 END_SETUP
 
@@ -53,7 +58,7 @@ TEST 'HARN-10 : Cycle semi-auto descente 50 pourcent -> palier 3 M1 ET M2, Relay
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
 
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -73,20 +78,46 @@ TEST 'HARN-10 : Cycle semi-auto descente 50 pourcent -> palier 3 M1 ET M2, Relay
         KoboldImmersed := FALSE, TglEnableKoboldAutoStopDescent := FALSE,
         TglJoystickMaster := FALSE, TglEnableCoupledBucketSequencing := FALSE,
         TglManualBucketLimits := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
+    (* Armement homme-mort au neutre avant toute intention de mouvement. *)
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(150000000);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ASSERT_TRUE(machine.BusAcq.JoystickDeadmanArmed, 'HARN-10: precondition homme-mort arme');
     (* Demande séquenceur : descente couplée 50 %, permis descente dive/benne ouvert *)
     seqReqM1.ReqStartStop := TRUE; seqReqM1.ReqDirection := -1; seqReqM1.SpeedTgtPct := 50.0;
     seqReqM2.ReqStartStop := TRUE; seqReqM2.ReqDirection := -1; seqReqM2.SpeedTgtPct := 50.0;
     seqReqBucket.DescendPermitDiveBucketOpen := TRUE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         ModelReloadPositions := FALSE,
-        SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket
+        SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
     ADVANCE_TIME(200000000);
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    (* Convergence 10 × 300 ms : le dialecte test ne permet pas ADVANCE_TIME dans FOR. *)
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
 
     (* ORACLE (main) : 50 % -> palier 3 sur LES DEUX treuils (pont SEMI_AUTO des deux branches) *)
+    ASSERT_EQ(machine.BusModes.Mode, E_Mode.SEMI_AUTO, 'HARN-10: SEMI_AUTO doit etre arbitre');
+    ASSERT_EQ(machine.BusWinch.WinchM1Safety.ErrorId, 0, 'HARN-10: ErrorId M1 nominal');
+    ASSERT_TRUE(machine.BusWinch.WinchM1FinalInterlockRequest.RequestedStep > 0, 'HARN-10: la demande doit atteindre FB_Winch M1');
     ASSERT_EQ(machine.M1_StepNumber, 3, 'HARN-10: M1 palier 3 attendu pour 50 pourcent');
     ASSERT_EQ(machine.M2_StepNumber, 3, 'HARN-10: M2 palier 3 attendu pour 50 pourcent');
     ASSERT_TRUE(machine.BusOutputs.M1RelayRev, 'HARN-10: RelayRev M1 commande la descente');
@@ -98,22 +129,39 @@ TEST 'HARN-11 : Extraction montee ForceMinSpeedStep -> plafond palier 1 M1 ET M2
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0
     );
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(150000000);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ASSERT_TRUE(machine.BusAcq.JoystickDeadmanArmed, 'HARN-11: precondition homme-mort arme');
     seqReqM1.ReqStartStop := TRUE; seqReqM1.ReqDirection := 1; seqReqM1.SpeedTgtPct := 100.0;
     seqReqM2.ReqStartStop := TRUE; seqReqM2.ReqDirection := 1; seqReqM2.SpeedTgtPct := 100.0;
     seqReqBucket.ForceMinSpeedStep := TRUE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         ModelReloadPositions := FALSE,
-        SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket
+        SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    ADVANCE_TIME(300000000);
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
 
     (* ORACLE (main) : plafond ascension effectif = 1 sur M1 ET M2 malgré demande 100 % *)
     ASSERT_EQ(machine.M1_StepNumber, 1, 'HARN-11: M1 plafonne palier 1 (ForceMinSpeedStep)');
@@ -125,7 +173,7 @@ TEST 'HARN-12 : Zone ralentissement bordure haute -> plafond palier 1, jamais au
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -133,14 +181,34 @@ TEST 'HARN-12 : Zone ralentissement bordure haute -> plafond palier 1, jamais au
         SlowdownDistanceM := 1.0, SlowdownMaxStep := 1,
         ModelM2SpeedFactor := 1.0
     );
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(150000000);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ASSERT_TRUE(machine.BusAcq.JoystickDeadmanArmed, 'HARN-12: precondition homme-mort arme');
     seqReqM1.ReqStartStop := TRUE; seqReqM1.ReqDirection := 1; seqReqM1.SpeedTgtPct := 100.0;
     seqReqM2.ReqStartStop := TRUE; seqReqM2.ReqDirection := 1; seqReqM2.SpeedTgtPct := 100.0;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         ModelReloadPositions := FALSE,
-        SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket
+        SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
     ADVANCE_TIME(500000000);
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
 
     (* ORACLE (main) : en zone (pos >= limite - 1.0 m) plafond 1 ; butée haute jamais dépassée *)
     ASSERT_TRUE(machine.M1_CablePosM_Model <= 7.5, 'HARN-12: position M1 jamais au-dela de la limite haute');
@@ -153,21 +221,39 @@ TEST 'HARN-13a : Table de verite etape remontee 20 pourcent -> palier 2'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0
     );
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(150000000);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ASSERT_TRUE(machine.BusAcq.JoystickDeadmanArmed, 'HARN-13a: precondition homme-mort arme');
     seqReqM1.ReqStartStop := TRUE; seqReqM1.ReqDirection := 1; seqReqM1.SpeedTgtPct := 20.0;
     seqReqM2.ReqStartStop := TRUE; seqReqM2.ReqDirection := 1; seqReqM2.SpeedTgtPct := 20.0;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         ModelReloadPositions := FALSE,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket
     );
     ADVANCE_TIME(200000000);
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
     ASSERT_EQ(machine.M1_StepNumber, 2, 'HARN-13a: 20 pourcent -> palier 2 (table reference)');
     ASSERT_EQ(machine.M2_StepNumber, 2, 'HARN-13a: 20 pourcent -> palier 2 M2');
 END_TEST
@@ -176,22 +262,40 @@ TEST 'HARN-13b : Table de verite etape descente 70 pourcent -> palier 3 (clamp d
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0
     );
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(150000000);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ASSERT_TRUE(machine.BusAcq.JoystickDeadmanArmed, 'HARN-13b: precondition homme-mort arme');
     seqReqM1.ReqStartStop := TRUE; seqReqM1.ReqDirection := -1; seqReqM1.SpeedTgtPct := 70.0;
     seqReqM2.ReqStartStop := TRUE; seqReqM2.ReqDirection := -1; seqReqM2.SpeedTgtPct := 70.0;
     seqReqBucket.DescendPermitDiveBucketOpen := TRUE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         ModelReloadPositions := FALSE,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket
     );
     ADVANCE_TIME(200000000);
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
     (* ORACLE (main) : 70 % demandé, clamp descente effectif = 3 (fallback PRG_04) -> palier 3 *)
     ASSERT_EQ(machine.M1_StepNumber, 3, 'HARN-13b: 70 pourcent descendu au clamp descente 3');
     ASSERT_EQ(machine.M2_StepNumber, 3, 'HARN-13b: idem M2');
@@ -201,21 +305,39 @@ TEST 'HARN-13c : Table de verite etape remontee 90 pourcent -> palier 5'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0
     );
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(150000000);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, CmdMode := E_Mode.SEMI_AUTO,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ASSERT_TRUE(machine.BusAcq.JoystickDeadmanArmed, 'HARN-13c: precondition homme-mort arme');
     seqReqM1.ReqStartStop := TRUE; seqReqM1.ReqDirection := 1; seqReqM1.SpeedTgtPct := 90.0;
     seqReqM2.ReqStartStop := TRUE; seqReqM2.ReqDirection := 1; seqReqM2.SpeedTgtPct := 90.0;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         ModelReloadPositions := FALSE,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket
     );
     ADVANCE_TIME(200000000);
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
+    ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
     ASSERT_EQ(machine.M1_StepNumber, 5, 'HARN-13c: 90 pourcent -> palier 5 (table reference)');
     ASSERT_EQ(machine.M2_StepNumber, 5, 'HARN-13c: 90 pourcent -> palier 5 M2');
 END_TEST
@@ -226,7 +348,7 @@ TEST 'HARN-20 : Rampe deflexion 0 a 100 pourcent -> paliers monotones, jamais de
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -237,28 +359,28 @@ TEST 'HARN-20 : Rampe deflexion 0 a 100 pourcent -> paliers monotones, jamais de
         ModelBrakeFeedbackFaultM1 := FALSE, ModelBrakeFeedbackFaultM2 := FALSE,
         ModelContactorsReleaseFaultM1 := FALSE, ModelContactorsReleaseFaultM2 := FALSE,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
     (* Armement homme-mort (hold 50 ms harnais PRG_02) *)
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* Rampe : 20% -> 40% -> 75% ; 6 cycles (60 ms) par pas *)
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5800, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5800, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(60000000);
-    machine(TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     (* ORACLE (main) : 20 % -> jamais au-dela du palier 2 à ce pas (pas d'accostage brutal) *)
     ASSERT_TRUE(machine.M1_StepNumber <= 2, 'HARN-20: pas de saut au-dela du palier cible (20%)');
 
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 6600, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 6600, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(60000000);
-    machine(TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ASSERT_TRUE(machine.M1_StepNumber <= 3, 'HARN-20: montee monotone (40%)');
 
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(400000000);
-    machine(TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     (* ORACLE (main) : 75 % -> palier 4 (entre 70 et 90) *)
     ASSERT_EQ(machine.M1_StepNumber, 4, 'HARN-20: 75 pourcent -> palier 4 (table reference)');
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd, 'HARN-20: montee commandee');
@@ -268,27 +390,27 @@ TEST 'HARN-21 : Rampe retour 100 a 0 -> decroissance propre, neutre -> palier 0'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(300000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ASSERT_TRUE(machine.M1_StepNumber >= 1, 'HARN-21: precondition - en montee avant rampe retour');
 
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5800, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5800, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(20000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 5000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : neutre -> palier 0 en <= 2 cycles *)
     ASSERT_EQ(machine.M1_StepNumber, 0, 'HARN-21: relache -> palier 0');
@@ -299,20 +421,20 @@ TEST 'HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -> palier 1 s
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5480, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5480, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5480, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5480, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(300000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 5480, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5480, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : déflexion mini constante -> palier 1 stable, hors plongée pas de plancher forcé au-delà *)
     ASSERT_EQ(machine.M1_StepNumber, 1, 'HARN-22: effleurement -> palier 1 stable (pas de plancher hors plongee)');
@@ -322,25 +444,25 @@ TEST 'HARN-23 : Homme-mort relache en mouvement -> arret immediat, frein retombe
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd, 'HARN-23: precondition - montee active');
 
-    machine(JoyDeadmanBtn := FALSE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := FALSE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(50000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : perte homme-mort -> tout retombe *)
     ASSERT_EQ(machine.M1_StepNumber, 0, 'HARN-23: homme-mort relache -> palier 0');
@@ -354,7 +476,7 @@ TEST 'HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -> immersio
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N2, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         TglEnableKoboldAutoStopDescent := TRUE, ImmersionLowerM := 1.0, ImmersionUpperM := 3.0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -363,26 +485,26 @@ TEST 'HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -> immersio
         ModelM2SpeedFactor := 1.0, BucketSeedOpen := TRUE,
         KoboldImmersed := FALSE,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     (* Descente couplée douce (palier 1) — benne ouverte (seed) *)
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(50000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
 
     (* Front montant Kobold dans la fenêtre d'immersion *)
-    machine(KoboldImmersed := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, KoboldImmersed := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(10000000);
-    machine(TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ASSERT_TRUE(machine.KoboldImmersionConfirmed, 'HARN-30: immersion confirmee au front montant en fenetre');
 
     (* Front descendant = toucher fond -> latch + arrêt descente *)
-    machine(KoboldImmersed := FALSE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, KoboldImmersed := FALSE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(50000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
 
     (* ORACLE (main) : fond latché -> descente coupée sur LES DEUX treuils *)
     ASSERT_TRUE(machine.KoboldBottomTouchLatched, 'HARN-30: fond latche au front descendant');
@@ -395,7 +517,7 @@ TEST 'HARN-31 : Interdiction palier 5 en Kobold (D12) -> plafond 4 (CIBLE T181-1
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N2, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         TglEnableKoboldAutoStopDescent := TRUE, ImmersionLowerM := 1.0, ImmersionUpperM := 3.0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -403,11 +525,11 @@ TEST 'HARN-31 : Interdiction palier 5 en Kobold (D12) -> plafond 4 (CIBLE T181-1
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0, KoboldImmersed := TRUE,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 5000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 5000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(300000000);
-    machine(TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 5000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 5000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     (* ORACLE (main) : en contexte Kobold, demande plein pot -> jamais palier 5 (cible D12) *)
     ASSERT_TRUE(machine.M1_StepNumber <= 4, 'HARN-31: palier plafonne a 4 en Kobold (cible D12)');
 END_TEST
@@ -416,7 +538,7 @@ TEST 'HARN-32 : Relache joystick en contexte plongee -> palier 0 immediat, pas d
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N2, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         TglEnableKoboldAutoStopDescent := TRUE, ImmersionLowerM := 1.0, ImmersionUpperM := 3.0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -424,24 +546,24 @@ TEST 'HARN-32 : Relache joystick en contexte plongee -> palier 0 immediat, pas d
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0, KoboldImmersed := TRUE,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ASSERT_TRUE(machine.M1_StepNumber >= 1, 'HARN-32: precondition - descente active en plongee');
 
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 5000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 5000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(30000000);
-    machine(TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 5000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 5000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
 
     (* ORACLE (main) : relâche -> 0 immédiat ; re-demande -> repart du palier bas (pas de plancher collant) *)
     ASSERT_EQ(machine.M1_StepNumber, 0, 'HARN-32: relache -> palier 0 immediat');
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(10000000);
-    machine(TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, KoboldImmersed := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ASSERT_TRUE(machine.M1_StepNumber <= 1, 'HARN-32: reprise depuis palier bas (pas de plancher residuel)');
 END_TEST
 
@@ -449,7 +571,7 @@ TEST 'HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amend
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N2, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -457,11 +579,11 @@ TEST 'HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amend
         SlowdownDistanceM := 1.0, SlowdownMaxStep := 1,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 4200, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N2);
     (* ORACLE (main) : plafond zone basse (1) gagne sur plancher plongee (3) — amendement B *)
     ASSERT_EQ(machine.M1_StepNumber, 1, 'HARN-33: plafond zone basse gagne sur plancher plongee (amendement B)');
 END_TEST
@@ -474,7 +596,7 @@ TEST 'HARN-40 : Jog benne -> M2 bride palier 1, treuils coupes pendant Busy (ant
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -483,22 +605,22 @@ TEST 'HARN-40 : Jog benne -> M2 bride palier 1, treuils coupes pendant Busy (ant
         BucketOffsetOpenM := 0.0, BucketOffsetCloseM := 15.0,
         BucketCoherenceLimitM := 1.0, BucketOpenAnticipationM := 0.2, BucketCloseAnticipationM := 0.2,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* M1 demande palier 4 (75 %) *)
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ASSERT_EQ(machine.M1_StepNumber, 4, 'HARN-40: precondition - M1 au palier 4');
 
     (* Jog fermeture benne maintenu -> Busy -> treuils coupes, M2 force lent *)
-    machine(BucketCmdClose := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, BucketCmdClose := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(50000000);
-    machine(BucketCmdClose := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, BucketCmdClose := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : benne busy -> M1 coupe (anti-traversée amont), M2 <= 1 (clamp benne propre) *)
     ASSERT_TRUE(machine.BusWinch.BucketBusy, 'HARN-40: benne en jog (Busy)');
@@ -510,22 +632,22 @@ TEST 'HARN-41 : SyncDeviationWarn -> plafond palier 1 sur M1 ET M2 (bornes commu
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.3, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     (* Montée couplée demandée plein pot -> écart 0.3 m > warn 0.10 -> clamp 1 sur les deux *)
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(300000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : SyncDeviationWarn -> plafond 1 sur M1 ET M2 (clamp commun, pas juste M2) *)
     ASSERT_TRUE(machine.BusWinch.SyncState.SyncDeviationWarn, 'HARN-41: SyncDeviationWarn actif (ecart 0.3 > 0.10)');
@@ -537,7 +659,7 @@ TEST 'HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 2, TglJoystickMaster := FALSE,
         TglManualBucketLimits := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -547,16 +669,16 @@ TEST 'HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre'
         BucketOffsetOpenM := 0.0, BucketOffsetCloseM := 15.0,
         BucketOpenAnticipationM := 0.2, BucketCloseAnticipationM := 0.2,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglManualBucketLimits := TRUE, CmdWinchSelect := 2, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglManualBucketLimits := TRUE, CmdWinchSelect := 2, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglManualBucketLimits := TRUE, CmdWinchSelect := 2, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglManualBucketLimits := TRUE, CmdWinchSelect := 2, CmdMode := E_Mode.MAINT_N1);
 
     (* Boutons : M1 monte plein pot ET M2 monte plein pot, M2-only clamp actif *)
-    machine(BtnWinchM1Up := TRUE, BtnWinchM2Up := TRUE, JoyDeadmanBtn := TRUE, TglManualBucketLimits := TRUE, CmdWinchSelect := 2, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, BtnWinchM1Up := TRUE, BtnWinchM2Up := TRUE, JoyDeadmanBtn := TRUE, TglManualBucketLimits := TRUE, CmdWinchSelect := 2, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(300000000);
-    machine(BtnWinchM1Up := TRUE, BtnWinchM2Up := TRUE, TglManualBucketLimits := TRUE, CmdWinchSelect := 2, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, BtnWinchM1Up := TRUE, BtnWinchM2Up := TRUE, TglManualBucketLimits := TRUE, CmdWinchSelect := 2, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : M1 libre (5), M2 plafonné 1 — la portée M2-only est respectée *)
     ASSERT_EQ(machine.M1_StepNumber, 5, 'HARN-42: M1 libre jusqu au plafond general (5)');
@@ -569,26 +691,26 @@ TEST 'HARN-50 : Nominal filet passif -> FinalInterlockGoverned FALSE sur toute l
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0, InjectRateBypassFbWinch := FALSE,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     (* ORACLE (main) : à mi-course la barrière est passive *)
     ASSERT_TRUE(machine.FinalInterlockGovernedM1 = FALSE, 'HARN-50: filet passif M1 a mi-course');
     ASSERT_TRUE(machine.FinalInterlockGovernedM2 = FALSE, 'HARN-50: filet passif M2 a mi-course');
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ASSERT_TRUE(machine.FinalInterlockGovernedM1 = FALSE, 'HARN-50: filet passif M1 en regime');
     ASSERT_TRUE(machine.FinalInterlockGovernedM2 = FALSE, 'HARN-50: filet passif M2 en regime');
 END_TEST
@@ -597,7 +719,7 @@ TEST 'HARN-51 : Injection cadence hors instance FB_Winch -> barriere PRG_06 coup
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := FALSE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -605,11 +727,11 @@ TEST 'HARN-51 : Injection cadence hors instance FB_Winch -> barriere PRG_06 coup
         ModelM2SpeedFactor := 1.0,
         InjectRateBypassFbWinch := TRUE, InjectRateStep := 5,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(ModelReloadPositions := FALSE, InjectRateBypassFbWinch := TRUE, InjectRateStep := 5, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, ModelReloadPositions := FALSE, InjectRateBypassFbWinch := TRUE, InjectRateStep := 5, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(InjectRateBypassFbWinch := TRUE, InjectRateStep := 5, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, InjectRateBypassFbWinch := TRUE, InjectRateStep := 5, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : demande forcée hors FB_Winch -> l'instance PRG_06 coupe.
        À la baseline l'interlock de cadence n'existe pas (B2-S1) -> ROUGE référence figée. *)
@@ -622,18 +744,18 @@ TEST 'HARN-52 : Pas de double-freinage -> barriere PRG_06 passive en marge inter
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 6200, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 6200, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 6200, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 6200, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : mouvement nominal -> barrière passive + cohérence frein = OR sens *)
     ASSERT_TRUE(machine.FinalInterlockGovernedM1 = FALSE, 'HARN-52: pas de coupure non voulue');
@@ -648,21 +770,21 @@ TEST 'HARN-60 : Deviation croissante -> warn plafond 1 puis critique SafeStop de
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 0.5, (* biais M2 : l'ecart croit *)
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(300000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) phase warn : écart > 0.10 -> plafond 1 sur les deux *)
     ASSERT_TRUE(machine.SyncDeviationM_Model > 0.10, 'HARN-60: ecart modelise a depasse le seuil warn');
@@ -672,7 +794,7 @@ TEST 'HARN-60 : Deviation croissante -> warn plafond 1 puis critique SafeStop de
 
     (* Laisser l'écart dépasser 0.50 -> critique -> SafeStop des 2 *)
     ADVANCE_TIME(300000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     (* ORACLE (main) phase critique : écart > 0.50 -> coupure des deux (couplage croisé SafeStop) *)
     ASSERT_TRUE(machine.SyncDeviationM_Model > 0.50, 'HARN-60: ecart a depasse le seuil critique');
     ASSERT_TRUE(machine.BusWinch.WinchM1Safety.SafeStop, 'HARN-60: critique -> SafeStop M1');
@@ -685,21 +807,21 @@ TEST 'HARN-61 : Retour dans la tolerance -> plafond relache, pas de latch intemp
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.3, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 2.0, (* M2 remonte plus vite : re-alignement *)
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(400000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : M2 (factor 2.0) a rattrapé -> écart < 0.10 -> warn retombe -> plafond relâché *)
     ASSERT_TRUE(machine.SyncDeviationM_Model < 0.10, 'HARN-61: re-alignement dans la tolerance');
@@ -714,26 +836,26 @@ TEST 'HARN-70 : Chute chaine AU en mouvement couple -> relais FALSE immediat, fr
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd, 'HARN-70: precondition - montee couplee active');
 
-    machine(EmergencyChainClosed := FALSE, PowerContactorEngaged := FALSE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, EmergencyChainClosed := FALSE, PowerContactorEngaged := FALSE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(10000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : coupure immédiate des 2 treuils + freins *)
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd = FALSE, 'HARN-70: RelayFwd M1 FALSE immediat');
@@ -746,29 +868,29 @@ TEST 'HARN-71 : Enable=FALSE sur FB_Winch en marche -> sorties sures ; re-Enable
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 8000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd, 'HARN-71: precondition - montee active');
 
-    machine(CmdMode := E_Mode.DISABLE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, CmdMode := E_Mode.DISABLE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
     ADVANCE_TIME(20000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd = FALSE, 'HARN-71: Enable=FALSE -> sorties sures');
     ASSERT_EQ(machine.M1_StepNumber, 0, 'HARN-71: palier neutralise');
 
-    machine(CmdMode := E_Mode.MAINT_N1, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, CmdMode := E_Mode.MAINT_N1, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
     ADVANCE_TIME(50000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
     (* ORACLE (main) : la reprise exige une NOUVELLE intention — l'adoption immédiate
        au ré-Enable = défaut D18 (rouge baseline attendu, cible T181-05) *)
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd = FALSE, 'HARN-71: pas de redemarrage auto au re-Enable (cible D18)');
@@ -778,7 +900,7 @@ TEST 'HARN-72 : Watchdog frein (retour frein ne suit pas) -> barriere coupe apre
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -786,11 +908,11 @@ TEST 'HARN-72 : Watchdog frein (retour frein ne suit pas) -> barriere coupe apre
         ModelM2SpeedFactor := 1.0,
         ModelBrakeFeedbackFaultM1 := TRUE, (* retour frein M1 ne s ouvre jamais *)
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(5000000000); (* 5 s : tout timeout frein realiste a expire *)
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : frein incohérent -> la barrière coupe la commande de sens (TC-P10-012) *)
     ASSERT_TRUE(machine.BusWinch.WinchM1FinalInterlockRequest.RequestedRelayFwd, 'HARN-72: FB_Winch demande toujours le sens (defaut cote barriere)');
@@ -802,25 +924,25 @@ TEST 'HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -> RelayR
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(20000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 5000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 5000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     (* Inversion 200 ms après l'arrêt *)
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 2000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 2000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 2000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 2000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : délai interlock descente (400 ms) non écoulé -> pas de réengagement (TC-P10-021/022) *)
     ASSERT_TRUE(machine.BusOutputs.M1RelayRev = FALSE, 'HARN-73: temps mort directionnel respecte (cible T175)');
@@ -830,24 +952,24 @@ TEST 'HARN-74a : Coast-down apres relache lourd -> PAS de faux PowerCutOff penda
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 8000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd, 'HARN-74a: precondition - montee plein pot');
 
     (* Relâche homme-mort plein déflexion : coast 500 ms (contacteurs pas encore retombés, v > 0) *)
-    machine(JoyDeadmanBtn := FALSE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := FALSE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000); (* 100 ms au coeur de la fenêtre coast *)
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : pendant le coast — mouvement résiduel SANS commande : Méca A ne doit PAS armer *)
     ASSERT_TRUE(machine.BusWinch.WinchM1Safety.PowerCutOff = FALSE, 'HARN-74a: PAS de faux PowerCutOff pendant le coast (T178)');
@@ -858,21 +980,21 @@ TEST 'HARN-74b : Coast-down prolonge -> Meca B arme a 3 s (CIBLE T178, ROUGE bas
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 8000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
-    machine(JoyDeadmanBtn := FALSE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := FALSE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(4000000000); (* 4 s > 3 s *)
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     (* ORACLE (main) : Méca B (absence confirmation arrêt) arme à 3 s -> SafeStop *)
     ASSERT_TRUE(machine.BusWinch.WinchM1Safety.SafeStop, 'HARN-74b: Meca B arme a 3 s (cible T178)');
 END_TEST
@@ -883,25 +1005,25 @@ TEST 'HARN-75 : Redemarrage a chaud (FirstScanDone) -> temps mort directionnel N
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 8000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd, 'HARN-75: precondition - montee active');
 
-    machine(CmdMode := E_Mode.DISABLE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, CmdMode := E_Mode.DISABLE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
     ADVANCE_TIME(20000000);
-    machine(CmdMode := E_Mode.MAINT_N1, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, CmdMode := E_Mode.MAINT_N1, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1);
     ADVANCE_TIME(100000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : après hot-restart avec direction maintenue, le temps mort directionnel
        est appliqué par AU MOINS UN niveau (métier ou barrière) -> pas de réengagement direct *)
@@ -917,7 +1039,7 @@ TEST 'HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -> d
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -925,11 +1047,11 @@ TEST 'HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -> d
         ModelM2SpeedFactor := 1.0,
         ModelContactorsReleaseFaultM1 := TRUE, (* contacteurs declares retombes ALORS qu on commande *)
         JoyRawX := 5000, JoyRawY := 8000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(300000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 1, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : incohérence commande/feedback en marche -> défaut détecté + mouvement neutralisé *)
     ASSERT_TRUE(machine.BusWinch.WinchM1Safety.Error
@@ -941,7 +1063,7 @@ TEST 'HARN-81 : CAS-012 demande benne pendant mouvement treuil -> demande REFUSE
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -949,19 +1071,19 @@ TEST 'HARN-81 : CAS-012 demande benne pendant mouvement treuil -> demande REFUSE
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
         BucketCmdOpen := FALSE, BucketCmdClose := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(100000000);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
-    machine(JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(200000000);
-    machine(TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ASSERT_TRUE(machine.M1_StepNumber > 0, 'HARN-81: precondition - treuils en mouvement');
 
-    machine(BucketCmdClose := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, BucketCmdClose := TRUE, JoyDeadmanBtn := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
     ADVANCE_TIME(50000000);
-    machine(BucketCmdClose := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, BucketCmdClose := TRUE, TglJoystickMaster := TRUE, JoyRawY := 8000, CmdWinchSelect := 0, CmdMode := E_Mode.MAINT_N1);
 
     (* ORACLE (main) : anti-traversée — la demande benne est refusée tant que les treuils agissent *)
     ASSERT_TRUE(machine.BusWinch.BucketBusy = FALSE, 'HARN-81: CAS-012 demande benne refusee (cible T175 AC3)');
@@ -971,35 +1093,43 @@ TEST 'HARN-82 : CAS-002 AU pendant transition d etape -> coupure propre, pas d e
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
     seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
-    machine(
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
         ModelSeedPosM1 := 2.0, ModelSeedPosM2 := 2.0, ModelReloadPositions := TRUE,
         ModelM2SpeedFactor := 1.0,
         JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
-        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE
     );
-    machine(ModelReloadPositions := FALSE, CmdMode := E_Mode.SEMI_AUTO);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, ModelReloadPositions := FALSE, CmdMode := E_Mode.SEMI_AUTO);
     seqReqM1.ReqStartStop := TRUE; seqReqM1.ReqDirection := 1; seqReqM1.SpeedTgtPct := 50.0;
     seqReqM2.ReqStartStop := TRUE; seqReqM2.ReqDirection := 1; seqReqM2.SpeedTgtPct := 50.0;
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
     ADVANCE_TIME(200000000);
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd, 'HARN-82: precondition - mouvement semi-auto');
 
-    machine(EmergencyChainClosed := FALSE, PowerContactorEngaged := FALSE);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, EmergencyChainClosed := FALSE, PowerContactorEngaged := FALSE);
     ADVANCE_TIME(50000000);
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd = FALSE, 'HARN-82: coupure propre a l AU');
 
     seqReqM1.ReqStartStop := FALSE; seqReqM2.ReqStartStop := FALSE;
-    machine(EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, BtnResetMachine := TRUE,
+    machine(CanBusOperational := TRUE, JoyOperational := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE, BtnResetMachine := TRUE,
             SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
     ADVANCE_TIME(10000000);
-    machine(BtnResetMachine := FALSE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, BtnResetMachine := FALSE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
     ADVANCE_TIME(100000000);
-    machine(SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
+    machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
+        CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
 
     (* ORACLE (main) : après réarmement, aucune reprise sans ordre explicite *)
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd = FALSE, 'HARN-82: pas de reprise apres rearmement sans ordre');

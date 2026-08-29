@@ -3,7 +3,7 @@
 Parse Device.export XML → table [VAR → ADDRESS, TYPE, MODULE]
 
 CODESYS exports configuration en XML propriétaire. Ce parser extrait:
-- Variable names (PRG_OUTPUTS_LD.M1_Fwd_RQ)
+- Variable names (PRG_06_Outputs.M1_Fwd_RQ)
 - Adresses I/O (%QX0.1, %QY1.2, etc.)
 - Types (BOOL, INT, REAL)
 - Modules
@@ -13,7 +13,7 @@ Sortie: dictionnaire {full_name: {address, type, module}}
 Usage:
   from parse_device_export import parse_device_export
   io_map = parse_device_export("Device.export")
-  # {'PRG_OUTPUTS_LD.M1_Fwd_RQ': {'address': '%QX0.1', 'type': 'BOOL', 'module': 'VH601'}}
+  # {'PRG_06_Outputs.M1_Fwd_RQ': {'address': '%QX0.1', 'type': 'BOOL', 'module': 'VH601'}}
 """
 
 import re
@@ -41,7 +41,7 @@ class DeviceExportParser:
         
         Returns:
             {
-              "PRG_OUTPUTS_LD.M1_Fwd_RQ": {
+              "PRG_06_Outputs.M1_Fwd_RQ": {
                 "address": "%QX0.1",
                 "type": "BOOL",
                 "module": "VH601-0808TP"

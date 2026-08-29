@@ -24,55 +24,101 @@
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 170px);">
-    <col style="width: 90px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-002</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Mot incohérent ➔ Bit7 ➔ SafeStop+PowerCutOff</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Mot incoh.</b><br>→ coupure</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Décodage M3 actif, mot capteurs lu<br>
+        🚀 <b>Étape 1</b> : Injection mot capteurs incohérent<br>
+        ⚡ <b>Étape 2</b> : Détection → Safety bit7 levé<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code>+<code>PowerCutOff</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-010</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca A</b><br>mvt résiduel</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Arrêt commandé, <code>DriveActualFreqHz</code> attendu à 0<br>
+        🚀 <b>Étape 1</b> : <code>ABS(DriveActualFreqHz)>0.5Hz</code> maintenu &gt;1s<br>
+        ⚡ <b>Étape 2</b> : Détection Méca A, bit5 levé<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code>+<code>PowerCutOff</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-010.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Absence redémarrage auto : Méca A → latch <code>MecaAFault</code> (FB_Safety_Translation.st:81,95-99,175). Après disparition, défaut reste latché, aucun redémarrage auto — Reset front + nouvelle demande requis</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Pas réarm.</b><br>auto</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Méca A déclenché → <code>MecaAFault</code> latché (FB_Safety_Translation.st:81,95-99,175)<br>
+        🚀 <b>Étape 1</b> : Cause disparaît (freq retombe)<br>
+        ⚡ <b>Étape 2</b> : Défaut reste latché, aucun redémarrage automatique<br>
+        ✅ <b>Étape 3</b> : <code>Reset</code> front + nouvelle demande requis pour réarmer
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-011</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca B</b><br>incoh. arrêt</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Arrêt commandé (<code>Direction=0</code>)<br>
+        🚀 <b>Étape 1</b> : Incohérence arrêt maintenue &gt;3s<br>
+        ⚡ <b>Étape 2</b> : Détection Méca B, bit4 levé<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code>+<code>PowerCutOff</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-011.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca B variante perte IHM : <code>HeartbeatIhmOk=FALSE</code> → condition élargie : <code>ABS(freq)&gt;0.5 OR DriveStatusWord.0 OR NOT BrakeFeedback</code> (FB_Safety_Translation.st:151-152) → SafeStop+PowerCutOff</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca B</b><br>perte IHM</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>HeartbeatIhmOk=FALSE</code> (perte IHM)<br>
+        🚀 <b>Étape 1</b> : Condition élargie : <code>ABS(freq)>0.5 OR DriveStatusWord.0 OR NOT BrakeFeedback</code> (FB_Safety_Translation.st:151-152)<br>
+        ⚡ <b>Étape 2</b> : Méca B variante déclenchée<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code>+<code>PowerCutOff</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-014</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>BypassGlobal</code> efface <code>ErrorId</code>, coupe TONs, Reset fonctionnel</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Bypass</b><br>global</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>BypassGlobal=FALSE</code>, défauts actifs<br>
+        🚀 <b>Étape 1</b> : <code>BypassGlobal=TRUE</code> (mise en service)<br>
+        ⚡ <b>Étape 2</b> : <code>ErrorId</code> effacé, TONs coupés, <code>Reset</code> fonctionnel<br>
+        ✅ <b>Étape 3</b> : Bypass global neutralise la safety M3
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>

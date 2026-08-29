@@ -27,115 +27,231 @@
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 170px);">
-    <col style="width: 90px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-023</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Fermeture seulement si <code>MotionDirection=1</code> ET <code>MotionRequestActive</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Fermeture</b><br>conditionnée</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Benne au repos, <code>State=READY</code><br>
+        🚀 <b>Étape 1</b> : Demande <code>CmdClose</code> avec <code>MotionDirection=1</code> ET <code>MotionRequestActive</code><br>
+        ⚡ <b>Étape 2</b> : Vérification des 2 conditions obligatoires<br>
+        ✅ <b>Étape 3</b> : Fermeture engagée seulement si les 2 conditions réunies
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-024</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Ouverture seulement si <code>MotionDirection=-1</code> ET <code>MotionRequestActive</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Ouverture</b><br>conditionnée</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Benne au repos, <code>State=READY</code><br>
+        🚀 <b>Étape 1</b> : Demande <code>CmdOpen</code> avec <code>MotionDirection=-1</code> ET <code>MotionRequestActive</code><br>
+        ⚡ <b>Étape 2</b> : Vérification des 2 conditions obligatoires<br>
+        ✅ <b>Étape 3</b> : Ouverture engagée seulement si les 2 conditions réunies
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-025</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Demande benne (<code>CmdOpen</code>/<code>CmdClose</code>) refusée si <code>M1_Busy</code> OR <code>M2_Busy</code> à l'entrée (READY). ⚠️ État code : <code>M1_Busy</code>/<code>M2_Busy</code> déclarés (<code>FB_Bucket.st</code>:29-30) mais NON utilisés — anti-traversée non câblée (T175).</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Anti-</b><br>traversée</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>State=READY</code>, entrée manœuvre benne<br>
+        🚀 <b>Étape 1</b> : Demande <code>CmdOpen</code>/<code>CmdClose</code> avec <code>M1_Busy</code> OR <code>M2_Busy</code><br>
+        ⚡ <b>Étape 2</b> : Refus de la demande benne<br>
+        ✅ <b>Étape 3</b> : ⚠️ État code : <code>M1_Busy</code>/<code>M2_Busy</code> déclarés (<code>FB_Bucket.st</code>:29-30) mais NON utilisés — anti-traversée non câblée (T175)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-026</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Glissement M1>1.0m pendant BUSY ➔ bit4 + <code>M1SlipDetected</code> + coupe M2</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Glissement</b><br>M1 couche 1</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Manœuvre benne (<code>State=BUSY</code>)<br>
+        🚀 <b>Étape 1</b> : Glissement M1 &gt;1.0m pendant BUSY<br>
+        ⚡ <b>Étape 2</b> : <code>ErrorId</code> bit4 + <code>M1SlipDetected</code> levés, coupe M2<br>
+        ✅ <b>Étape 3</b> : Protection couche 1 active (dérive M1)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-027</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>M1SlipDetected</code> force <code>SafeStop</code> sur M1 côté Treuils</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>SafeStop</b><br>sur slip</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>M1SlipDetected=FALSE</code><br>
+        🚀 <b>Étape 1</b> : Glissement M1 détecté → <code>M1SlipDetected=TRUE</code><br>
+        ⚡ <b>Étape 2</b> : Propagation du signal vers côté Treuils<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code> forcé sur M1
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-028</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Couche 2 (Méca C) : dérive M1>2.0m ➔ <code>PowerCutOff</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Glissement</b><br>couche 2</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Manœuvre benne, couche 1 (SafeStop) active<br>
+        🚀 <b>Étape 1</b> : Dérive M1 continue &gt;2.0m (Méca C)<br>
+        ⚡ <b>Étape 2</b> : Escalade couche 2<br>
+        ✅ <b>Étape 3</b> : <code>PowerCutOff</code> déclenché (défense en profondeur — 2.0m)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-029</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Recul (sens inverse) borné à la position de départ, jamais au-delà</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Recul</b><br>borné</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Manœuvre benne, position de départ mémorisée<br>
+        🚀 <b>Étape 1</b> : Recul (sens inverse)<br>
+        ⚡ <b>Étape 2</b> : Calcul du recul max autorisé<br>
+        ✅ <b>Étape 3</b> : Recul borné à la position de départ, jamais au-delà
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-030</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>ConfirmOpen/ClosePosition</code> : effet seulement MAINT_N1/N2 arrêtés</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Confirmer</b><br>position</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Machine arrêtée, mode <code>MAINT_N1/N2</code><br>
+        🚀 <b>Étape 1</b> : <code>ConfirmOpen/ClosePosition</code><br>
+        ⚡ <b>Étape 2</b> : Vérification mode MAINT seule acceptée<br>
+        ✅ <b>Étape 3</b> : Effet seulement en <code>MAINT_N1/N2</code> arrêtés
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-031</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Codeur(s) non référencé(s) ➔ bit3 permanent, indépendant de <code>Reset</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Codeur</b><br>non réf.</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Codeur (M1 ou M2) non référencé (<code>Homed=FALSE</code>)<br>
+        🚀 <b>Étape 1</b> : Évaluation des besoins position benne<br>
+        ⚡ <b>Étape 2</b> : <code>ErrorId</code> bit3 levé<br>
+        ✅ <b>Étape 3</b> : bit3 permanent, indépendant de <code>Reset</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-032</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>FB_ExtractionSequence.Busy</code> préserve l'armement joystick en fin benne</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Arm. joystick</b><br>préservé</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Manœuvre benne en cours, fin de fermeture<br>
+        🚀 <b>Étape 1</b> : Vérification <code>FB_ExtractionSequence.Busy</code> actif<br>
+        ⚡ <b>Étape 2</b> : Préservation armement joystick<br>
+        ✅ <b>Étape 3</b> : Armement joystick préservé en fin de benne
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-033</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Butée haute M2 décalée de <code>OffsetCloseM</code> si fermé/en fermeture</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Butée haute</b><br>M2 décalée</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Benne fermée ou en fermeture<br>
+        🚀 <b>Étape 1</b> : Calcul butée haute M2<br>
+        ⚡ <b>Étape 2</b> : Application du décalage <code>OffsetCloseM</code><br>
+        ✅ <b>Étape 3</b> : Butée haute M2 décalée de <code>OffsetCloseM</code> si fermé/en fermeture
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-034</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Terrain : cinématique réelle en charge, amplitude offset validée</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>🟢 SITE</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Terrain</b><br>cinématique</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Essai réel en charge<br>
+        🚀 <b>Étape 1</b> : Manœuvre benne sur le terrain<br>
+        ⚡ <b>Étape 2</b> : Mesure amplitude offset réelle<br>
+        ✅ <b>Étape 3</b> : Cinématique en charge validée, amplitude offset validée sur site
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>🟢 SITE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-045.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Benne partiellement fermée → remontée palier 1 seul : NOT <code>IsClosed</code> + demande montée → paliers 2-5 verrouillés.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Benne</b><br>part. fermée</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Benne partiellement fermée (<code>NOT IsClosed</code>), demande de montée<br>
+        🚀 <b>Étape 1</b> : Vérification état benne<br>
+        ⚡ <b>Étape 2</b> : Verrouillage paliers 2-5<br>
+        ✅ <b>Étape 3</b> : Remontée autorisée en palier 1 seul — paliers 2-5 verrouillés
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§7.5</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-046.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Timeout mouvement T#60s pendant <code>BUSY</code> → bit timeout + latch (<code>CfgTimeoutDuration</code>=60s, code réel — corrige le 30s documenté).</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Timeout</b><br>mouvement</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Manœuvre benne (<code>State=BUSY</code>)<br>
+        🚀 <b>Étape 1</b> : Maintien sans fin de manœuvre (<code>CfgTimeoutDuration</code>=60s)<br>
+        ⚡ <b>Étape 2</b> : Timeout mouvement déclenché<br>
+        ✅ <b>Étape 3</b> : bit timeout + latch (<code>CfgTimeoutDuration</code>=60s, code réel — corrige le 30s documenté)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-047.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Incohérence boot : 1er cycle avec ni <code>IsOpen</code> ni <code>IsClosed</code> → <code>StateIncoherent</code>=TRUE, <code>ActiveOffsetValid</code>=FALSE.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Incoh.</b><br>boot</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : 1er cycle, ni <code>IsOpen</code> ni <code>IsClosed</code><br>
+        🚀 <b>Étape 1</b> : Évaluation état benne<br>
+        ⚡ <b>Étape 2</b> : <code>StateIncoherent=TRUE</code>, <code>ActiveOffsetValid=FALSE</code><br>
+        ✅ <b>Étape 3</b> : Incohérence boot détectée, offset déclaré invalide
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-048.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Offset RETAIN : <code>OffsetCloseM</code>=15.0 persiste après power cycle (<code>_BucketCfgPersist</code> en VAR_GLOBAL PERSISTENT).</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Offset</b><br>RETAIN</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>OffsetCloseM=15.0</code> configuré, stocké dans <code>_BucketCfgPersist</code> (PERSISTENT)<br>
+        🚀 <b>Étape 1</b> : Power cycle (redémarrage PLC)<br>
+        ⚡ <b>Étape 2</b> : Restauration <code>OffsetCloseM</code> depuis <code>_BucketCfgPersist</code><br>
+        ✅ <b>Étape 3</b> : <code>OffsetCloseM=15.0</code> persiste après power cycle
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

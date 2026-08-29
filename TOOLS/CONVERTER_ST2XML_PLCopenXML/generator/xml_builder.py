@@ -181,10 +181,6 @@ def _variable_element(
     return el
 
 
-from .ld_builder import build_ld_body
-from .st_types import BaseType
-
-
 def _build_pou(
     obj: SourceObject, guid: str, objects_by_name: dict[str, SourceObject], diagnostics: DiagnosticCollector
 ) -> ET.Element:
@@ -203,89 +199,11 @@ def _build_pou(
     if obj.header_comment:
         interface.append(_documentation(obj.header_comment))
 
-    # `_LD` identifie la frontière Ladder lisible des PROGRAMMES seulement.
-    # Les FB `_LD` gardent ce marqueur de maintenance, mais restent du ST :
-    # leur logique d'état, TON et R_TRIG ne doit jamais être convertie implicitement.
-    if obj.kind == "program" and obj.name.startswith("PRG_") and obj.name.endswith("_LD"):
-        variables = obj.input_vars + obj.output_vars + obj.inout_vars + obj.local_vars + obj.temp_vars
-        boolean_identifiers = {
-            variable.name
-            for variable in variables
-            if isinstance(variable.type, BaseType) and variable.type.name == "BOOL"
-        }
-        # Les appels de blocs LD reprennent strictement leur type déclaré VAR.
-        # Ne jamais deviner FB_Output depuis le nom d'instance : un interlock
-        # final doit rester lisible/importable avec son interface réelle.
-        instance_types = {
-            variable.name: variable.type.name
-            for variable in variables
-            if isinstance(variable.type, DerivedType)
-        }
-        # The LD renderer must not infer an argument's type from its spelling:
-        # PLCopen `<contact>` is valid for BOOL only.  Supply each called FB's
-        # declared input types so TIME/INT/WORD/REAL use `<inVariable>`.
-        instance_input_types: dict[str, dict[str, str]] = {}
-        instance_output_types: dict[str, list[str]] = {}
-        instance_output_type_map: dict[str, dict[str, str]] = {}
-        # Carte des types de membres de structs pour résoudre les chemins nested
-        # (ex. instSafety.Diag.LockoutActive → ST_Safety_Emergency_Diag.LockoutActive : BOOL)
-        struct_member_types: dict[str, dict[str, str]] = {
-            o.name: {v.name: getattr(v.type, 'name', None) for v in o.struct_fields}
-            for o in objects_by_name.values()
-            if o.kind == "struct"
-        }
-        # Ignorer les membres sans type nommé (StringType, ArrayType, etc.)
-        struct_member_types = {
-            s: {m: t for m, t in members.items() if t is not None}
-            for s, members in struct_member_types.items()
-        }
-        for variable in variables:
-            if not isinstance(variable.type, DerivedType):
-                continue
-            called_fb = objects_by_name.get(variable.type.name)
-            if called_fb is None:
-                continue
-            instance_input_types[variable.name] = {
-                input_var.name: input_var.type.name
-                for input_var in called_fb.input_vars
-            }
-            instance_output_types[variable.name] = [
-                output_var.name
-                for output_var in called_fb.output_vars
-            ]
-            instance_output_type_map[variable.name] = {
-                output_var.name: output_var.type.name
-                for output_var in called_fb.output_vars
-            }
-
-        # Résoudre les chemins nested (struct → membre BOOL) en ajoutant les membres
-        # BOOL des structs à la carte des types d'outputs. Ex. instSafety.Diag : struct
-        # → instSafety.Diag.LockoutActive : BOOL (membre de ST_Safety_Emergency_Diag).
-        # REX 2026-08-04 (PRG_06_Outputs) : recopies BOOL nested étaient rendues en
-        # inVariable → outVariable (IndexOutOfRangeException à l'import CODESYS).
-        for inst_name, out_map in list(instance_output_type_map.items()):
-            for out_name, out_type in list(out_map.items()):
-                if out_type in struct_member_types:
-                    for member_name, member_type in struct_member_types[out_type].items():
-                        nested_key = f"{out_name}.{member_name}"
-                        if nested_key not in out_map:
-                            out_map[nested_key] = member_type
-        pou.append(
-            build_ld_body(
-                obj.body_text or "",
-                boolean_identifiers,
-                instance_types,
-                instance_input_types,
-                instance_output_types,
-                instance_output_type_map,
-            )
-        )
-    else:
-        body = ET.SubElement(pou, "body")
-        st_el = ET.SubElement(body, "ST")
-        xhtml = ET.SubElement(st_el, "xhtml")
-        xhtml.set("xmlns", XHTML_NS)
-        xhtml.text = obj.body_text or ""
+    body = ET.SubElement(pou, "body")
+    st_el = ET.SubElement(body, "ST")
+    xhtml = ET.SubElement(st_el, "xhtml")
+    xhtml.set("xmlns", XHTML_NS)
+    xhtml.text = obj.body_text or ""
 
     pou.append(_objectid_adddata(guid))
     return pou

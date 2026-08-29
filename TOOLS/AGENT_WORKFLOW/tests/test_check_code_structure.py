@@ -48,59 +48,16 @@ def run(root: Path) -> subprocess.CompletedProcess[str]:
 def test_s1_fichier_different_du_nom_program(tmp_path: Path) -> None:
     root = make_project(
         tmp_path,
-        {"PRG_OUTPUTS_LD.st": program("PRG_10_Outputs_LD")},
-        {"PRG_10_Outputs_LD": "LD"},
+        {"PRG_Outputs.st": program("PRG_10_Outputs")},
+        {"PRG_10_Outputs": "ST"},
     )
 
     result = run(root)
 
     assert result.returncode == 1
     assert "[S1]" in result.stderr
-    assert "PRG_OUTPUTS_LD" in result.stderr
-    assert "PRG_10_Outputs_LD" in result.stderr
-
-
-def test_s2_cfc_emis_en_st_est_refuse(tmp_path: Path) -> None:
-    root = make_project(
-        tmp_path,
-        {"PRG_01_Acquisition_CFC.st": program("PRG_01_Acquisition_CFC")},
-        {"PRG_01_Acquisition_CFC": "ST"},
-    )
-
-    result = run(root)
-
-    assert result.returncode == 1
-    assert "[S2]" in result.stderr
-    assert "suffixe CFC mais bundle emet ST" in result.stderr
-
-
-def test_s2_ld_emis_en_st_est_refuse(tmp_path: Path) -> None:
-    """Le .st est correct, mais le bundle doit contenir du Ladder, pas du ST."""
-    root = make_project(
-        tmp_path,
-        {"PRG_02_Inputs_LD.st": program("PRG_02_Inputs_LD")},
-        {"PRG_02_Inputs_LD": "ST"},
-    )
-
-    result = run(root)
-
-    assert result.returncode == 1
-    assert "[S2]" in result.stderr
-    assert "suffixe LD mais bundle emet ST" in result.stderr
-
-
-def test_s2_ld_emis_en_ld_est_accepte(tmp_path: Path) -> None:
-    """Un PRG_*_LD.st est converti en balise LD dans le bundle final."""
-    root = make_project(
-        tmp_path,
-        {"PRG_02_Inputs_LD.st": program("PRG_02_Inputs_LD")},
-        {"PRG_02_Inputs_LD": "LD"},
-    )
-
-    result = run(root)
-
-    assert result.returncode == 0, result.stderr
-    assert "PASS" in result.stdout
+    assert "PRG_Outputs" in result.stderr
+    assert "PRG_10_Outputs" in result.stderr
 
 
 def test_s3_program_non_numerote_est_refuse(tmp_path: Path) -> None:

@@ -1,7 +1,7 @@
 """Shared helpers for CONVERTER_ST2XML_PLCopenXML CLI scripts.
 
 This module ensures the ``generator`` package is importable when scripts are
-run directly (``python scripts/st_to_ld.py ...``) and provides small parsing
+run directly (``python scripts/st_to_pou.py ...``) and provides small parsing
 utilities that reuse ``generator.st_parser`` and ``generator.file_discovery``
 without duplicating their logic.
 """
@@ -82,7 +82,7 @@ def build_multi_file_project(
     """Assemble a full PLCopenXML ``<project>`` bundle from multiple objects.
 
     Wraps :func:`build_project_xml` and serializes the result. Used by the
-    CLI scripts (``st_to_ld.py``, ``st_to_pou.py``, ``cfc_extract.py``,
+    CLI scripts (``st_to_pou.py``, ``cfc_extract.py``,
     ``st_to_dut.py``) when more than one input file is provided.
     """
     root = build_project_xml(

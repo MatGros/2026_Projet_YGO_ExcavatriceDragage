@@ -41,7 +41,7 @@ import yaml
 
 import chronogram
 import prod_wiring
-from af_coverage import check_af_coverage, check_extra_tests
+from af_coverage_v2 import check_af_coverage, check_extra_tests
 from encapsulation_check import check_encapsulation_chain
 from html_report import render_group_report, render_html_report
 

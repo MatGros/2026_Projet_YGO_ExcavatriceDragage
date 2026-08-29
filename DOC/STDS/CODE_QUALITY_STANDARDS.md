@@ -605,7 +605,7 @@ de part et d'autre du titre.
 - L'utiliser dans un `PROGRAM` ou `FUNCTION_BLOCK` ST lorsqu'il regroupe plusieurs responsabilités top-level. Ce n'est pas une règle de longueur : un FB cohésif reste sans Region.
 - Ouvrir/fermer uniquement entre deux structures complètes top-level ; ne jamais couper ou traverser `IF`, `CASE`, `FOR`, `WHILE` ou `REPEAT`. Pas de Regions imbriquées par défaut.
 - Les `PROGRAM` utilisent `§N` et un rôle en français ; un `FUNCTION_BLOCK` utilise un rôle en français, avec `§N` seulement si son ordre est stable. Conserver le commentaire de section avec emoji.
-- Interdit dans `*_LD.st`, `GVL_*`, `ST_*`, `E_*` et les déclarations `VAR_*` dans cette phase. Le convertisseur ST→LD ignore les pragmas par sécurité.
+- Interdit dans `GVL_*`, `ST_*`, `E_*` et les déclarations `VAR_*` dans cette phase.
 - Le garde-fou `TOOLS/AGENT_WORKFLOW/tests/test_region_pragmas.py` vérifie l'équilibrage, le périmètre autorisé et les POU sélectionnés.
 
 ## 8. Non-régression
@@ -695,155 +695,6 @@ Règles obligatoires pour tout programme d'orchestration ST :
 1. **Sections structurées avec emojis** : Chaque programme ST d'orchestration doit obligatoirement découper son flux de haut en bas avec des bannières commentées explicites (ex: `// === 📥 §1 ACQUISITION ===`, `// === 🛡️ §2 SÉCURITÉ ===`, `// === 🔀 §3 ARBITRAGE ===`).
 2. **Aucune logique métier inline** : Le POU ST ne contient aucun `IF` complexe ni calcul métier — uniquement des instanciations et des appels de FB avec liaison par structures DUT publiques (`ST_*`).
 3. **Producteur unique par bus DUT** : Les échanges inter-programmes passent par des structures typées dédiées (`Auth`, `Qualified`, `Measurements`).
-4. **Conservation du Ladder Diagram (`_LD.st`)** : La barrière finale des sorties physiques TOR
-   (`PRG_06_Outputs.st`) reste exclusivement en Ladder Diagram (`<LD>`). `PRG_01_Inputs_LD`
-   et `FB_Input` sont des composants historiques en retrait ; aucune nouvelle page Ladder d'entrée
-   ne doit être créée.
-
-## 11. Règles de génération Ladder (`_LD.st` → `<LD>`) — REX 2026-08
-
-> 🚩 Trois bugs d'import CODESYS sur l'ancien `PRG_01_Inputs_LD` ont révélé que le générateur
-> ST→LD (`TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py`) produisait du
-> PLCopenXML invalide. Les règles ci-dessous restent obligatoires pour toute
-> source `_LD.st` active, notamment `PRG_06_Outputs`, et sont vérifiées par `test_ld_import_guard.py`.
-
-### Structure d'un rung LD complet
-
-Un programme suffixe `_LD` est converti en `<LD>` dans le bundle PLCopenXML.
-Chaque rung doit contenir la **chaîne complète** :
-
-```text
-leftPowerRail → contact → block(FB) → coil → rightPowerRail
-```
-
-CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
-
-### Règles de câblage FB
-
-| FB | Contact principal | Sortie → coil |
-|---|---|---|
-| `FB_Output` | `Command` (contact) | `.State` → coil |
-| `FB_Input` historique | Aucun nouveau câblage | Retrait contrôlé, pas de nouveau rung |
-
-- Le **contact principal** (`InputRaw` ou `Command`) est relié au
-  `leftPowerRail` puis au `formalParameter` du block.
-- La **coil** est reliée à la sortie `State` du block (`formalParameter="State"`).
-- Les paramètres supplémentaires (`FilterTime`, `InvertLogic`)
-  ne sont **pas** représentés en LD — seuls les paramètres BOOL sont câblés
-  comme contacts ; les paramètres typés (TIME, INT…) restent des `inVariable`
-  dans la section multi-paramètres du générateur.
-
-### Expressions BOOL
-
-| Expression | Rendu LD |
-|---|---|
-| `var` (BOOL connu) | contact `negated="false"` |
-| `NOT var` (BOOL connu) | contact `negated="true"` |
-| `var1 AND var2` (2 termes) | série de contacts |
-| `var1 OR var2` (2 termes) | parallèle de contacts |
-| Condition composée ≥3 termes nommés (post §2bis), ou toute condition passée en argument d'un appel (ex. `SEL(A AND B, ...)`) | bloc `AND`/`OR` — 1 broche par terme, résultat à droite. **Jamais** de chaîne série/parallèle au-delà de 2 termes, **jamais** de texte ST brut injecté dans un `<expression>` : illisible à l'import, invérifiable en Watch, et un texte brut défait l'intérêt même de compiler en LD |
-| Expression typée non-BOOL | `inVariable` → `outVariable` (hors page BOOL pure) |
-
-- **`NOT var` ne produit jamais d'`inVariable`/`outVariable`** pour un signal
-  BOOL. Un `inVariable` en page LD BOOL pure est un bug d'import.
-- Une page `_LD` de type BOOL pur (notamment `PRG_06_Outputs`) ne doit contenir
-  **aucun** `inVariable` ni `outVariable` — uniquement des `contact`, `coil`,
-  `block` et `comment`.
-
-#### Structure confirmée du bloc opérateur `AND`/`OR` — REX 2026-08-15 (export/import CODESYS réel réussi)
-
-> 📌 **Portée** : cette structure produit un bloc opérateur compact multi-entrées dans le réseau Ladder.
-> Utilisé lorsque le code ST contient explicitement `Target := OR(A, B, C, ...)` ou `Target := AND(A, B, C, ...)`.
-
-Structure exacte confirmée par export réel CODESYS V3.5 SP19 Patch 1 (`TOOLS/SAMPLES_XML_CODESYS/PRG_OR_AND_BLOC.xml`) :
-
-| Élément | Règle |
-|---|---|
-| `<block typeName="AND"\|"OR">` | `localId` **plus petit** que celui de toutes ses sources |
-| `<addData>` CallType | `<CallType>operator</CallType>` (et non `function`) |
-| Broche `EN` (Entrée 1) | `formalParameter="EN"`, reliée au rail gauche `<connection refLocalId="0"/>` |
-| Broches d'entrée opérandes | `formalParameter="In2"`, `"In3"`, `"In4"`, ... — reliées aux `inVariable` d'entrée |
-| Opérande `NOT x` | `negated="true"` sur la broche `Inn` |
-| Broche `ENO` (Sortie 1) | `formalParameter="ENO"`, `<connectionPointOut/>` sans connexion |
-| Broche de résultat (Sortie 2) | `formalParameter="Out2"`, `<connectionPointOut><expression>TargetVar</expression></connectionPointOut>` |
-| Opérandes sources | `inVariable` déclarées en amont avec leur propre `localId` |
-
-```xml
-<block localId="3" typeName="OR">
-  <position x="0" y="0"/>
-  <inputVariables>
-    <variable formalParameter="EN">
-      <connectionPointIn><connection refLocalId="0"/></connectionPointIn>
-    </variable>
-    <variable formalParameter="In2">
-      <connectionPointIn><connection refLocalId="4"/></connectionPointIn>
-    </variable>
-    <variable formalParameter="In3">
-      <connectionPointIn><connection refLocalId="5"/></connectionPointIn>
-    </variable>
-  </inputVariables>
-  <inOutVariables/>
-  <outputVariables>
-    <variable formalParameter="ENO"><connectionPointOut/></variable>
-    <variable formalParameter="Out2">
-      <connectionPointOut><expression>M1BlockedBySafetyInfo</expression></connectionPointOut>
-    </variable>
-  </outputVariables>
-  <addData>
-    <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-      <CallType xmlns="">operator</CallType>
-    </data>
-  </addData>
-</block>
-```
-
-### Structures conditionnelles (`IF/ELSE`) — REX 2026-08-13
-
-> 🚩 `PRG_02_Acquisition_LD` importé le 2026-08-13 a révélé un `IF WinchInputSourceSimulated
-> THEN HwIn.Winch := instSimBench.Winch; ELSE HwIn.Winch := HwReal.Winch; END_IF;`
-> compacté sur une ligne : le générateur a fuité le texte brut `ELSE ... END_IF` dans un contact.
-
-Sous-ensemble ST **obligatoire** pour tout `_LD.st` contenant une sélection conditionnelle :
-
-- `IF` / `ELSIF` / `ELSE` / `END_IF` chacun sur **sa propre ligne** — le style compact
-  (`IF x THEN a := b; ELSE a := c; END_IF;` sur une seule ligne) est **interdit**.
-- **1 instruction par ligne** — jamais deux `:=` sur la même ligne.
-- Commentaire de fin de ligne (`// ...`) **interdit** dans le corps exécutable d'un `_LD.st` —
-  uniquement en ligne dédiée, précédant l'instruction qu'il documente.
-- `CASE` est **hors périmètre `_LD.st`** : les machines à état restent en ST pur dans le corps
-  d'un FB (§11bis), jamais directement en page LD.
-- Toute construction hors de ce sous-ensemble doit être **refusée** par le générateur
-  (erreur bloquante) — jamais approximée ou silencieusement corrompue en sortie.
-
-### Extraction FC pour logique de sélection typée — REX 2026-08-13
-
-Une logique de sélection/condition répétée sur des structs différents (ex. bascule
-Sim/Réel par domaine machine) ne se duplique **jamais** inline dans le PRG appelant.
-
-**Priorité 1 — `SEL(G, IN0, IN1)`** (brique IEC 61131-3 standard, générique `ANY`,
-composée avant toute réimplémentation — AF_Partie-03 §1) : `SEL(cond, ValeurSiFalse,
-ValeurSiTrue)` remplace directement le `IF/ELSE` à deux branches, y compris sur des
-structs (à confirmer par compilation CODESYS réelle à chaque premier usage sur un type
-sans précédent dans le projet — REX 2026-08-13, aucun antécédent `SEL` sur `STRUCT`
-avant `PRG_02_Acquisition_LD`).
-
-**Priorité 2 — `FC_<Domaine><Action>` dédié** (ex. `FC_SelectWinchSource`) : seulement
-si `SEL` ne compile pas sur le type concerné, ou si la logique dépasse une sélection à
-deux branches. Pas de FC générique paramétrable par type dans ce projet (pas de
-generics en ST standard).
-
-Dans les deux cas, le réseau LD du PRG appelant devient un simple bloc (`SEL` ou appel
-FC) câblé à sa sortie, sans logique conditionnelle à traduire au niveau du PRG.
-
-### Tests de régression
-
-```powershell
-python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v
-```
-
-Les tests couvrent les rungs LD actifs, les contacts inversés, l'absence d'inVariable/outVariable
-sur les pages BOOL et la coil reliée à `.State` pour chaque block actif. `FB_Input` historique ne
-fait plus partie des nouveaux contrats LD.
 
 ## 11bis. Séquenceurs et machines à état (REX 2026-08-12)
 
@@ -860,7 +711,7 @@ fait plus partie des nouveaux contrats LD.
 | R4 | Dernière étape = synchronisation finale nommée et documentée, jamais un simple bit `Done` isolé. |
 | R5 | `TON` scaffold sur chaque bloc de transition, commenté `Xi→Xj : <ce qu'on teste>`. |
 | R6 | Front partagé ≥2 consommateurs (entrée ou `GVL_IHM.*.Cmd`) → centralisé `PRG_02_Acquisition`, jamais `PRG_07_Supervision`. Front à consommateur unique → reste local. |
-| R7 | `FB_Edge` (nouveau, sans lien avec `FB_Input` retiré §10-11) : une instance par entrée qualifiée dans `PRG_02_Acquisition`, sorties `.R`/`.F`, systématique, sans paramètre. |
+| R7 | `FB_Edge` (nouveau, sans lien avec `FB_Input` retiré §10) : une instance par entrée qualifiée dans `PRG_02_Acquisition`, sorties `.R`/`.F`, systématique, sans paramètre. |
 | R8 | Porte d'initialisation en tête de FB (`NOT Enable OR NOT PowerContactorEngaged`) : sorties sûres, retour à la **première** étape (jamais intermédiaire), `RETURN` immédiat. |
 | R9 | `<StateField>AtError` mémorise l'étape **spécifique** (pas `E_State` générique) au moment du défaut, capturée avant la bascule vers `ERROR_HOLD`. |
 

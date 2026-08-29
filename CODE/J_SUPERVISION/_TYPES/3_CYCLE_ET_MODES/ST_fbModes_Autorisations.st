@@ -17,5 +17,17 @@ STRUCT
     JoystickWinchSelectArbitrated : INT;      // 0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)
     HomingApproachEnable        : BOOL;       // Dépassement butée haut (N2)
     MaintenanceM3TargetEnable   : BOOL;       // Cible Translation Maintenance (N2 only)
+
+    // AF-05 §4bis — matrice de maintenance
+    // ⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
+    // vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
+    ModeChangePendingBlocked    : BOOL;       // 🚦 Demande de changement de mode REFUSÉE : les treuils
+                                              //    ne sont pas à l'arrêt mécanique confirmé
+                                              //    (contacteurs retombés ET frein serré ET |v| < seuil).
+                                              //    Le mode courant est maintenu. IHM : « arrêter les
+                                              //    treuils avant de changer de mode ».
+    HomingRequiredM1            : BOOL;       // 🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO
+                                              //    (usage effectif d'un override/bypass position en maintenance)
+    HomingRequiredM2            : BOOL;       // 🧭 M2 : idem
 END_STRUCT
 END_TYPE

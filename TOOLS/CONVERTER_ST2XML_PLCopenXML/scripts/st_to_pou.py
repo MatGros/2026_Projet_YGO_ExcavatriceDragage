@@ -43,14 +43,6 @@ def build_st_pou_xml(st_path: Path, diagnostics: DiagnosticCollector) -> bytes:
             f"converts FB/PROGRAM. Got: {obj.kind} '{obj.name}'."
         )
 
-    # `_build_pou` converts PRG_*_LD programs to <LD>. For st_to_pou.py the
-    # contract is <ST> only, so reject LD programs here (use st_to_ld.py for those).
-    if obj.kind == "program" and obj.name.startswith("PRG_") and obj.name.endswith("_LD"):
-        raise ValueError(
-            f"{st_path.name}: PRG_*_LD programs are converted to <LD> — "
-            f"use st_to_ld.py instead."
-        )
-
     guid = object_guid(obj.kind, obj.name)
     pou = _build_pou(obj, guid, {obj.name: obj}, diagnostics)
     return serialize(pou)
@@ -70,11 +62,6 @@ def build_st_project_xml(
             raise ValueError(
                 f"{st_path.name}: not a FUNCTION_BLOCK or PROGRAM — st_to_pou.py only "
                 f"converts FB/PROGRAM. Got: {obj.kind} '{obj.name}'."
-            )
-        if obj.kind == "program" and obj.name.startswith("PRG_") and obj.name.endswith("_LD"):
-            raise ValueError(
-                f"{st_path.name}: PRG_*_LD programs are converted to <LD> — "
-                f"use st_to_ld.py instead."
             )
         objects_by_name[obj.name] = obj
         root_names.append(obj.name)

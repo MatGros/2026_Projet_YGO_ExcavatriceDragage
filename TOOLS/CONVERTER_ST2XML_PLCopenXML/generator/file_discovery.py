@@ -106,20 +106,6 @@ def discover_objects(code_dir: Path, diagnostics: DiagnosticCollector) -> list[S
         pou_match = re.search(r'<pou\s+name="([^"]+)"', xml_text)
         pou_name = pou_match.group(1) if pou_match else f.stem
 
-        # 🛡️ La livraison Ladder passe exclusivement par le bundle : un export
-        # PLCopenXML individuel *_LD.xml posé à côté de son .st est une source de
-        # désynchronisation (REX 2026-08, import CODESYS "index hors tableau" et
-        # POU homonyme). Il n'est plus jamais exclu silencieusement : il devient
-        # une ERREUR bloquante. Les CFC natifs restent, eux, des sources XML.
-        st_source = f.with_suffix(".st")
-        if pou_name.endswith("_LD") and st_source.is_file():
-            diagnostics.error(
-                f"{f.name} is a forbidden standalone LD export of {st_source.name}; "
-                f"the Ladder delivery is the bundle CODE_Bundle.xml only (REX 2026-08)",
-                rel,
-            )
-            continue
-
         obj = SourceObject(
             kind="program",
             name=pou_name,

@@ -1,0 +1,96 @@
+# Contrat T181-09 — Renommage vocabulaire clamp + actionneurs + ContactorStuck
+# Source : PLAN §6 ; AF10_INTERFACE §5 (table des renommages) ; décisions utilisateur (SpeedStepReq,
+#          RelayFwd_Up, ReqPowerCutOff, ST_WinchFinalInterlockReq, ContactorStuck).
+
+contract:
+  task_id: T181-09_RENOMMAGE_VOCAB
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Propager en UNE passe transverse le lot de renommages T181 (AF10 §5) sur toute la chaîne
+    treuil + supervision + IHM, avec G200 vert immédiat. 1 oubli = liaison rouge.
+
+  acceptance:
+    - id: AC1
+      statement: "Renommages appliqués partout : ForceMinSpeedStep -> ExtractionControlActive (+ fusion ControlAscentActive) ; CfgMaxStepDescente -> MaxStepDown ; MaxStepAscent -> MaxStepUp ; M2_ForceSlowSpeed -> M2_BucketJogLimit ; RelayFwd/RelayRev (sorties FB_Winch) -> RelayFwd_Up/RelayRev_Down ; FwdRevSpeedFeedbackOff -> ContactorsAllOff ; FB_Safety_Winch.PowerCutOff -> ReqPowerCutOff ; ST_WinchFinalInterlockRequest -> ST_WinchFinalInterlockReq (+ drop prefixe Requested des champs) ; ST_TranslationFinalInterlockRequest -> ST_TranslationFinalInterlockReq ; StuckClosed -> ContactorStuck."
+      verified_by: "grep de chaque ancien identifiant dans CODE/ = 0"
+    - id: AC2
+      statement: "Périmètre réel couvert (B4) : M2_ForceSlowSpeed aussi dans PRG_04:405,710,717,969 + ST_BucketHMIState + sortie FB_Bucket ; ContactorStuck dans FB_Winch, FB_Safety_Winch, ST_ContactorCheck/ST_SafetyWinch, PRG_04/06/07, GVL_Troubleshooting, IHM ; RelayFwd_Up dans FB_Winch, PRG_04, PRG_06, FB_TroubleshootingView."
+      verified_by: "grep exhaustif par identifiant sur CODE/**/*.st + CODE/**/_TYPES/**"
+    - id: AC3
+      statement: "Un seul flag de montée contrôlée : ExtractionControlActive ; ControlAscentActive (local PRG_04) supprimé."
+      verified_by: "grep 'ControlAscentActive' = 0"
+    - id: AC4
+      statement: "G200 liaison PASS IMMÉDIATEMENT après le renommage (aucune liaison cassée). Bundle PLCopenXML régénéré."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report"
+    - id: AC5
+      statement: "Gate G4xx_check_no_force_in_clamp_vocab : aucun identifiant 'Force*Step' / 'Force*Speed' dans la chaîne de clamp treuil."
+      verified_by: "exécution du gate PASS ; ajout à run_all_gates palier C"
+    - id: AC6
+      statement: "Fiches AF touchées par le renommage mises à jour sur preuve (diff aligné au code) : AF-10, AF-11 (symétrie M3)."
+      verified_by: "diff AF vs code"
+    - id: AC7
+      statement: "Non-régression : gates palier C PASS ; TC treuils existants verts ; MAIN_EndToEnd vert."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C ; run_tests.py --fb MAIN_EndToEnd"
+    - id: AC8
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (source PRG_04_Treuils_Benne -> POU PRG_04_Treuils_Benne)."
+      verified_by: "comparaison basename sans extension vs identifiant apres PROGRAM/FUNCTION_BLOCK"
+    - id: AC9
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage (_CFC/_LD) apposé ; le suffixe reste identique au langage genere dans le bundle (ST pur)."
+      verified_by: "grep basename *_CFC/_LD absent + inspection CODE_Bundle.xml"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/**
+      - CODE/G_CYCLE/FB_ExtractionSequence.st
+      - CODE/G_CYCLE/_TYPES/**
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/I_TRANSLATION/**                                  # symétrie M3
+      - CODE/J_SUPERVISION/**
+      - DOC/AF/AF_Partie-10_Fonction_Winch/**
+      - DOC/AF/AF_Partie-11_Fonction_Translation/**
+      - TOOLS/TEST_AUTO_CI/RESULTS/**/tests/**
+      - TOOLS/AGENT_WORKFLOW/scripts/
+    forbidden:
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Toute la sémantique (renommage strict, aucun changement de comportement)"
+      - "Tous les consommateurs des identifiants renommés (IHM, Troubleshooting, Supervision)"
+    dropped_on_purpose:
+      - "Le vocabulaire 'Force*' dans le clamp"
+      - "Le flag ControlAscentActive (fusionné)"
+      - "Le préfixe Requested des champs de ST_WinchFinalInterlockReq"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si un identifiant renommé apparaît dans un contexte non prévu (export, doc de pilotage,
+    IHM physique), ou si le renommage ST_WinchFinalInterlockReq casse un accès champ non listé :
+    REMONTER à l'orchestrateur. Ne jamais renommer à moitié (commit atomique).
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: "À remplir : renommage transverse atomique + G200 + gates."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Revue orchestrateur : git diff réel + G200 + suivi migration variables IHM (IHM_VARIABLES_MIGRATION.md). bloque_par : T181-08."

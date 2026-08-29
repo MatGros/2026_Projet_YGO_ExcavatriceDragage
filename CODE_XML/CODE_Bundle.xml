@@ -32722,14 +32722,6 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible % (0.0 a 100.0)</xhtml>
               </documentation>
             </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
-              </documentation>
-            </variable>
             <variable name="SafeStop">
               <type>
                 <BOOL />
@@ -32839,6 +32831,17 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai interlock changement de sens montee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepRampDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1000ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai de cadence montee de palier (D10, dedie)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorFeedbackTimeout">
@@ -33139,12 +33142,20 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
 * [INST] Decodage paliers vitesse</xhtml>
               </documentation>
             </variable>
-            <variable name="CycleTimeCalc">
+            <variable name="DirectionInterlock">
               <type>
-                <derived name="FB_CycleTime" />
+                <derived name="FB_WinchDirectionInterlock" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Calcul temps de cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Interlock changement de sens (D18)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepShaper">
+              <type>
+                <derived name="FB_WinchStepShaper" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Cadencement de palier (D10)</xhtml>
               </documentation>
             </variable>
             <variable name="ResetEdge">
@@ -33156,12 +33167,12 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
 . [LOC] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionChangeDelay">
+            <variable name="EnableRisingEdge">
               <type>
-                <derived name="TON" />
+                <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation changement de sens</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Enable (D18)</xhtml>
               </documentation>
             </variable>
             <variable name="TonContactorsDropped">
@@ -33172,37 +33183,13 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation retombee contacteurs</xhtml>
               </documentation>
             </variable>
-            <variable name="BusinessStepDelay">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation hausse de palier</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EffectiveDirectionInterlockDelay">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
-. [LOC] Delai interlock effectif selon sens</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EffectiveStepDelay">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Delai palier effectif selon sens</xhtml>
-              </documentation>
-            </variable>
             <variable name="AllContactorsCommandedOff">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tous contacteurs commandes a FALSE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
+. [LOC] Tous contacteurs commandes a FALSE</xhtml>
               </documentation>
             </variable>
             <variable name="RampTargetPct">
@@ -33227,14 +33214,6 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond palier actif dynamique</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FirstScanDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur premier cycle passe</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedStepConfigFaultLatched">
@@ -33288,6 +33267,7 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
 {region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
 // 🔑 1. FRONTS &amp; REARMEMENT
 ResetEdge(CLK := Reset);
+EnableRisingEdge(CLK := Enable);
 
 IF ResetEdge.Q OR BypassGlobal THEN
     SpeedStepConfigFaultLatched := FALSE;
@@ -33298,13 +33278,12 @@ IF Enable AND SpeedStep.ConfigError THEN
     SpeedStepConfigFaultLatched := TRUE;
 END_IF;
 
-IF NOT BypassGlobal AND NOT BypassContactorCheck THEN
-    instCauses[1].Active   := ContactorsCheck.StuckClosed;
-    instCauses[1].Latching := TRUE;
-    instCauses[1].Texte    := 'Contacteurs sens ou vitesse bloques fermes';
-ELSE
-    instCauses[1].Active := FALSE;
-END_IF;
+// T181-02/03 : FB_Safety_Winch est l'unique proprietaire de la detection
+// contacteur colle (Meca B). FB_Winch conserve le champ public pour
+// compatibilite IHM/Troubleshooting, mais ne produit plus ce defaut.
+instCauses[1].Active   := FALSE;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := 'Contacteur colle gere par FB_Safety_Winch (T181-08)';
 
 instCauses[2].Active   := SpeedStepConfigFaultLatched;
 instCauses[2].Latching := TRUE;
@@ -33319,15 +33298,17 @@ Fault := instFault.Fault;
 // 🛑 2. GATE
 IF NOT Enable THEN
     SpeedStep(Enable := FALSE, Table := SpeedStepTable);
+    DirectionInterlock(Enable := FALSE, EnableRising := FALSE, ReqDirection := 0,
+                       ChangeDelayUp := DirectionInterlockDelayAscent,
+                       ChangeDelayDown := DirectionInterlockDelayDescent);
+    StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := StepRampDelay);
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     RequestedStep := 0;
-    StepNumber := 0;
-    CommandedDirection := 0;
-    DirectionChangePending := FALSE;
-    BusinessStepDelay(IN := FALSE);
-    DirectionChangeDelay(IN := FALSE);
+    StepNumber := StepShaper.ShapedStep;
+    CommandedDirection := DirectionInterlock.CommandedDirection;
+    DirectionChangePending := DirectionInterlock.DirectionChangePending;
     TonContactorsDropped(IN := FALSE);
     ContactorsCheck.Command := FALSE;
     ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
@@ -33340,16 +33321,7 @@ END_IF;
 Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region "§3 Premier scan et temps de cycle"}
-IF NOT FirstScanDone THEN
-    FirstScanDone := TRUE;
-    CommandedDirection := Direction;
-END_IF;
-
-CycleTimeCalc();
-{endregion}
-
-{region "§4 Permis et zones de ralentissement"}
+{region "§3 Permis et zones de ralentissement"}
 EffectiveSafeStop := SafeStop OR (Direction &gt; 0 AND NOT AscentPermit) OR (Direction &lt; 0 AND NOT DescendPermit);
 
 InTopSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM &gt;= (TopLimitM - CfgSlowdownDistanceM));
@@ -33374,38 +33346,21 @@ IF HomingApproachActive THEN
 END_IF;
 {endregion}
 
-{region "§5 Interlock direction"}
-IF Direction &gt; 0 THEN
-    EffectiveDirectionInterlockDelay := DirectionInterlockDelayAscent;
-ELSE
-    EffectiveDirectionInterlockDelay := DirectionInterlockDelayDescent;
-END_IF;
-
-DirectionChangeDelay(
-    IN := (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) AND (StepNumber = 0) AND FwdRevSpeedFeedbackOff,
-    PT := EffectiveDirectionInterlockDelay
+{region "§4 Interlock direction"}
+// 🔀 4. INTERLOCK DIRECTION (extrait dans FB_WinchDirectionInterlock, D18)
+DirectionInterlock(
+    Enable := (StepNumber = 0) AND FwdRevSpeedFeedbackOff,
+    EnableRising := EnableRisingEdge.Q,
+    ReqDirection := Direction,
+    ChangeDelayUp := DirectionInterlockDelayAscent,
+    ChangeDelayDown := DirectionInterlockDelayDescent
 );
-DirectionChangeDelayElapsed := DirectionChangeDelay.ET;
-
-IF (CommandedDirection = 0) AND (Direction &lt;&gt; 0) THEN
-    CommandedDirection := Direction;
-    DirectionChangePending := FALSE;
-ELSIF DirectionChangeDelay.Q THEN
-    CommandedDirection := Direction;
-    DirectionChangePending := FALSE;
-ELSIF (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) THEN
-    DirectionChangePending := TRUE;
-ELSE
-    DirectionChangePending := FALSE;
-END_IF;
-
-IF Direction = 0 THEN
-    CommandedDirection := 0;
-    DirectionChangePending := FALSE;
-END_IF;
+CommandedDirection := DirectionInterlock.CommandedDirection;
+DirectionChangePending := DirectionInterlock.DirectionChangePending;
+DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
-{region "§6 Paliers vitesse et contacteurs"}
+{region "§5 Paliers vitesse et contacteurs"}
 IF DirectionChangePending OR (Direction = 0) OR EffectiveSafeStop OR NOT StartStop THEN
     RampTargetPct := 0.0;
 ELSE
@@ -33424,30 +33379,15 @@ SpeedStep(
 );
 RequestedStep := SpeedStep.StepNumber;
 
-EffectiveStepDelay := SEL(CommandedDirection = -1, DirectionInterlockDelayAscent, DirectionInterlockDelayDescent) + T#100ms;
-
-BusinessStepDelay(
-    IN := (RequestedStep &gt; StepNumber) AND (StepNumber &gt; 0),
-    PT := EffectiveStepDelay
+// ⚙️ Cadencement de palier (extrait dans FB_WinchStepShaper, D10)
+StepShaper(
+    Enable := Enable,
+    TargetStep := RequestedStep,
+    StepRampDelay := StepRampDelay
 );
-BusinessStepDelayElapsed := BusinessStepDelay.ET;
-
-IF RequestedStep = 0 THEN
-    StepNumber := 0;
-ELSIF RequestedStep &lt; StepNumber THEN
-    StepNumber := RequestedStep;
-ELSIF RequestedStep &gt; StepNumber THEN
-    IF StepNumber = 0 THEN
-        StepNumber := 1;
-    ELSIF BusinessStepDelay.Q THEN
-        IF SpeedGuardEnable AND SpeedGuardReady AND (MeasuredSpeedBand &lt; StepNumber) THEN
-            SpeedGuardLimited := TRUE;
-        ELSE
-            StepNumber := StepNumber + 1;
-            SpeedGuardLimited := FALSE;
-        END_IF;
-    END_IF;
-END_IF;
+StepNumber := StepShaper.ShapedStep;
+BusinessStepDelayElapsed := StepShaper.StepDelayElapsed;
+SpeedGuardLimited := FALSE; // SpeedGuard gere par T181-16 (hors scope)
 
 IF StepNumber &gt; 0 AND CommandedDirection = 1 THEN
     RelayFwd := TRUE;
@@ -33470,10 +33410,8 @@ AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
 
 ContactorsCheck.Command  := NOT AllContactorsCommandedOff;
 ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
-TonContactorsDropped(IN := AllContactorsCommandedOff AND NOT FwdRevSpeedFeedbackOff, PT := ContactorFeedbackTimeout);
-IF TonContactorsDropped.Q THEN
-    ContactorsCheck.StuckClosed := TRUE;
-END_IF;
+TonContactorsDropped(IN := FALSE, PT := ContactorFeedbackTimeout);
+ContactorsCheck.StuckClosed := FALSE; // proprietaire unique : FB_Safety_Winch
 ContactorsCheck.StuckOpen := FALSE;
 
 IF Fault.Error THEN
@@ -33488,6 +33426,169 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>6f83143e-72ec-5e6b-80c8-39f828857ce4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_WinchDirectionInterlock" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Gate TON (TRUE = treuil arrete, contacteurs retombes)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EnableRising">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front montant Enable du FB parent (D18)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChangeDelayUp">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai interlock changement de sens montee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChangeDelayDown">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai interlock changement de sens descente</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="CommandedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Sens interne memorise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionChangePending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Changement de sens en attente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DelayElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule delai changement de sens</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="DirectionChangeDelay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation changement de sens</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectiveDelay">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Delai effectif selon sens</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadTimeArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps mort D18 arme (front Enable)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔀 FB_WinchDirectionInterlock — Interlock de changement de sens
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Temporise le changement de sens d'un treuil (dead time)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Interface : Brique technique (contrat light, pas de defaut)
+   🔒 Sécurité : D18 — au front montant Enable, n'adopte pas le sens
+                 immediatement (temps mort) ; pas de redemarrage inrush
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+// Delai effectif selon le sens demande
+IF ReqDirection &gt; 0 THEN
+    EffectiveDelay := ChangeDelayUp;
+ELSE
+    EffectiveDelay := ChangeDelayDown;
+END_IF;
+
+// D18 : au front montant Enable avec sens maintenu, armer le temps mort
+// (ne pas re-adopter le sens immediatement — pas de redemarrage inrush).
+IF EnableRising AND (ReqDirection &lt;&gt; 0) THEN
+    DeadTimeArmed := TRUE;
+END_IF;
+
+// Temporisation : compte quand un changement de sens est demande et treuil arrete
+DirectionChangeDelay(
+    IN := Enable AND (ReqDirection &lt;&gt; 0) AND (ReqDirection &lt;&gt; CommandedDirection),
+    PT := EffectiveDelay
+);
+DelayElapsed := DirectionChangeDelay.ET;
+
+IF (CommandedDirection = 0) AND (ReqDirection &lt;&gt; 0) AND NOT DeadTimeArmed THEN
+    // Neutre -&gt; sens : adoption immediate (hors temps mort D18)
+    CommandedDirection := ReqDirection;
+    DirectionChangePending := FALSE;
+ELSIF DirectionChangeDelay.Q THEN
+    // Temps mort ecoule : adoption du sens
+    CommandedDirection := ReqDirection;
+    DirectionChangePending := FALSE;
+    DeadTimeArmed := FALSE;
+ELSIF (ReqDirection &lt;&gt; 0) AND (ReqDirection &lt;&gt; CommandedDirection) THEN
+    DirectionChangePending := TRUE;
+ELSE
+    DirectionChangePending := FALSE;
+END_IF;
+
+IF ReqDirection = 0 THEN
+    CommandedDirection := 0;
+    DirectionChangePending := FALSE;
+    DeadTimeArmed := FALSE;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>97add528-91a0-5b3e-8fa4-2513b1dd5dca</ObjectId>
           </data>
         </addData>
       </pou>
@@ -34517,6 +34618,115 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>2a1928e0-077f-59ff-bf93-fa875e0de69c</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_WinchStepShaper" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation FB (TRUE = actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier cible demande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepRampDelay">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai de cadence montee de palier</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="ShapedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Palier metier temporise actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepDelayElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule tempo metier palier</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="StepDelay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation hausse de palier</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_WinchStepShaper — Cadencement de palier (montee cadencee)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Cadence la montee de palier (+1 cran / StepRampDelay),
+             descente immediate a 0 (aucune rampe descendante)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Interface : Brique technique (contrat light, pas de defaut)
+   🔒 Sécurité : D10 — StepRampDelay dedie, decouple des delais direction
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+IF NOT Enable THEN
+    ShapedStep := 0;
+    StepDelay(IN := FALSE);
+    StepDelayElapsed := T#0s;
+    RETURN;
+END_IF;
+
+// Temporisation : compte quand la cible est au-dessus du palier courant
+StepDelay(
+    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0),
+    PT := StepRampDelay
+);
+StepDelayElapsed := StepDelay.ET;
+
+// Cadencement asymetrique : montee +1 cran / StepRampDelay, descente immediate
+IF TargetStep = 0 THEN
+    ShapedStep := 0;
+ELSIF TargetStep &lt; ShapedStep THEN
+    ShapedStep := TargetStep;
+ELSIF TargetStep &gt; ShapedStep THEN
+    IF ShapedStep = 0 THEN
+        ShapedStep := 1;
+    ELSIF StepDelay.Q THEN
+        ShapedStep := ShapedStep + 1;
+    END_IF;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9ff21482-5982-5964-8b75-503c2d5a480e</ObjectId>
           </data>
         </addData>
       </pou>
@@ -37242,7 +37452,8 @@ BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDire
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
 // au §5bis (lag d'un cycle automate nominal, sécurisé en amont par la lecture directe de M2_TensionedCable_DI).
-SlackCableAscentStep1 := NOT PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND (
+SlackCableAscentStep1 := NOT GVL_IHM.Commun.Bypass.SlackCable
+    AND NOT PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND (
     ((instSafetyWinchM1.Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
     ((instSafetyWinchM2.Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
     (NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI)
@@ -37581,7 +37792,8 @@ instSafetyWinchM1(
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M1.SpeedValid,
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
-    BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
+    BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process
+                              OR GVL_IHM.Commun.Bypass.SlackCable,
     // OR avec le bypass commun (Commun.Bypass) -- leve la
     // protection sur les 2 treuils simultanement pour le pilotage "both", sans retirer le
     // bypass individuel pour le pilotage a l'unite.
@@ -37637,7 +37849,8 @@ instSafetyWinchM2(
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.Encoders.M2.SpeedValid,
     BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
-    BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
+    BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process
+                              OR GVL_IHM.Commun.Bypass.SlackCable,
     // OR avec le bypass commun (Commun.Bypass) -- voir M1 ci-dessus
     BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch,
     BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware,
@@ -37696,7 +37909,6 @@ instWinchM1(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := EffectivePermitM1_Descend,
@@ -37727,7 +37939,6 @@ instWinchM2(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
     StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := EffectivePermitM2_Descend,
@@ -41183,8 +41394,10 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_SyncContactor" ObjectId="afd229de-316d-5899-8a37-8c30dbfd06db" />
           <Object Name="FB_SyncDeviation" ObjectId="24ca6948-aaa5-587d-b1af-7e9dbd94d79d" />
           <Object Name="FB_Winch" ObjectId="6f83143e-72ec-5e6b-80c8-39f828857ce4" />
+          <Object Name="FB_WinchDirectionInterlock" ObjectId="97add528-91a0-5b3e-8fa4-2513b1dd5dca" />
           <Object Name="FB_WinchLoadEstimator" ObjectId="1ca57a3d-7abe-5417-80b9-b0b83cdad590" />
           <Object Name="FB_WinchOutputInterlock" ObjectId="2a1928e0-077f-59ff-bf93-fa875e0de69c" />
+          <Object Name="FB_WinchStepShaper" ObjectId="9ff21482-5982-5964-8b75-503c2d5a480e" />
           <Object Name="FB_WinchSync" ObjectId="05970ca2-4250-543c-bfcf-5f8ad1f9efae" />
           <Object Name="FB_Winch_Symmetry" ObjectId="e8df262b-c45d-5348-8aea-652e2cf92204" />
         </Folder>

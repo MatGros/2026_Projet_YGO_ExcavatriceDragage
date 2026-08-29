@@ -53,7 +53,8 @@ Les DUT et chaque champ sont définis dans le cadrage T181-06 §2. `SyncCoupled`
 - Cycle, joystick, IHM et benne restent arbitrés dans `PRG_04 §3`.
 - `FB_DiveSearch → PRG_03 → PRG_04 → MinStepDown` est intra-cycle MainTask 10 ms et s'annule avec `DescentActive` ou `StartStop=FALSE`.
 - `SyncDeviationWarn` plafonne M1 et M2 ; `FB_Winch_Symmetry` est passif et hors interface.
-- Le jog benne utilise `BucketJogStep : INT` et son plafond est M2-only.
+- Le jog benne utilise `BucketJogStep : INT` (palier, défaut 1) et son plafond est M2-only. Le `15.0` % codé en dur (`PRG_04:288`) est retiré (grep `15.0` = 0 après T181-10) — le jog est un **palier**, jamais un % (P1).
+- **D13 (tranché T181-06)** : la reconstruction de table `M2_SpeedStepTableActive` (`PRG_04:405-429`) est **supprimée** — le clamp unifié (`M2_BucketJogLimit` → `MaxStepUp/Down := 1`) suffit, appliqué aux deux sens.
 - `PRG_04` produit `ST_WinchFinalInterlockReq`; `PRG_06` reste la barrière finale.
 
 ## 5. Validation attendue
@@ -73,4 +74,5 @@ Ces preuves ne valent pas qualification terrain : l'import CODESYS et les seuils
 | Version | Date | Changement |
 |---|---|---|
 | v2.0 | 2026-08-29 | Fiche cible T181-06 : interface struct, palier discret, clamp par instance et arrêt visa humain. |
+| v2.0 (additif) | 2026-08-29 | Décisions T181-06 intégrées : D13 (suppression `M2_SpeedStepTableActive`), jog benne = palier `BucketJogStep` (retrait du `15.0` %), clamp M2-only. |
 | v1.0 | antérieure | Interface actuelle, conservée comme référence historique jusqu'à implémentation validée. |

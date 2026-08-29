@@ -1,0 +1,97 @@
+# Contrat T181-15 — FB_WinchSpeedLearning : collecteur passif RETAIN
+# Source : PLAN_GEL_TREUIL_T181_v0.1.md §3 (Q1-Q3) & §8 ; AF10_INTERFACE_TREUIL_CIBLE_T181.md §3 ;
+#          CADRAGE_T181-06_DRIVEREQUEST.md §5 Décision 5. Absorbe T096.
+# Phase B. bloque_par : T181-05.
+
+contract:
+  task_id: T181-15_SPEED_LEARNING
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Créer FB_WinchSpeedLearning, collecteur STRICTEMENT PASSIF (aucune commande moteur) qui
+    apprend les vitesses réelles par palier dans une table RETAIN {M1/M2 x sens x charge/vide x
+    palier 1-5}, sous bit IHM + mesure valide + conditions stables, avec enveloppes de plausibilité
+    par palier (valeur hors borne -> cellule invalidée). TableComplete = TRUE uniquement si charge
+    ET vide complets. Aucune surveillance survitesse activée dans ce lot (reste T181-16).
+
+  acceptance:
+    - id: AC1
+      statement: "FB_WinchSpeedLearning n'écrit jamais de commande moteur : aucune sortie actionneur, aucun ordre contacteur/frein/variateur. Collecteur strictement passif."
+      verified_by: "grep interface FB : VAR_OUTPUT sans champ actionneur (Relay*/Contactor*/Brake*/SpeedCmd)"
+    - id: AC2
+      statement: "Table RETAIN {M1/M2 x sens x charge/vide x palier 1-5} avec Valid, vitesse apprise (m/s) et compteur d'échantillons par cellule."
+      verified_by: "DUT ST_fbWinchSpeedLearning_Table : ARRAY[1..2,1..2,1..2,1..5] OF ST_fbWinchSpeedLearning_Cell {Valid, SpeedMps, SampleCount}"
+    - id: AC3
+      statement: "Bit IHM OFF (LearnStart=FALSE) -> zéro écriture dans la table (aucune cellule modifiée)."
+      verified_by: "TC : LearnStart=FALSE, mesure valide et stable -> Table inchangée"
+    - id: AC4
+      statement: "Collecte uniquement si bit IHM actif ET vitesse mesurée valide ET conditions stables (ET sens non nul ET palier 1..5 ET axe 1..2)."
+      verified_by: "TC : chaque condition manquante -> pas de collecte"
+    - id: AC5
+      statement: "Enveloppes de plausibilité par palier : valeur hors borne min/max -> cellule invalidée (Valid=FALSE, compteur remis à zéro)."
+      verified_by: "TC : injection vitesse hors enveloppe -> cellule invalidée"
+    - id: AC6
+      statement: "TableComplete = TRUE uniquement si charge ET vide sont complets (toutes les cellules valides)."
+      verified_by: "TC : table partielle -> FALSE ; table complète charge+vide -> TRUE"
+    - id: AC7
+      statement: "Aucune surveillance survitesse activée dans ce lot : le FB ne produit ni OverspeedRefMps ni armement survitesse (reste T181-16)."
+      verified_by: "grep FB : aucune sortie Overspeed*/SpeedGuard*"
+    - id: AC8
+      statement: "RETAIN ajouté en FIN de GVL_PERSISTENT (append-only), sans décaler les champs existants."
+      verified_by: "git diff GVL_PERSISTENT.st : ajout uniquement en fin de liste"
+    - id: AC9
+      statement: "Non-régression : aucun FB/PRG existant modifié ; GVL_PERSISTENT append-only."
+      verified_by: "git diff : seuls les fichiers du scope sont touchés"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_WinchSpeedLearning.st          # collecteur passif (nouveau)
+      - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchSpeedLearning_Cell.st   # DUT cellule (nouveau)
+      - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchSpeedLearning_Table.st  # DUT table (nouveau)
+      - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchSpeedLearning_Cfg.st    # DUT config (nouveau)
+      - CODE/GVL_PERSISTENT.st                                 # append-only en fin de liste
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-15_SPEED_LEARNING.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/TASKS.yaml
+      - CODE/H_TREUILS_BENNE/FB_Winch.st                       # refonte interface = T181-08
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                    # câblage = T181-16
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st                # survitesse = T181-16
+
+  conservation:
+    must_survive:
+      - "GVL_PERSISTENT : mapping positionnel des champs existants (aucun décalage)"
+      - "Aucune commande moteur ajoutée (le treuil reste piloté par FB_Winch/PRG_04)"
+      - "La surveillance survitesse reste inactive tant que T181-16 n'est pas livrée"
+    dropped_on_purpose:
+      - "Aucun (lot purement additif : nouveau FB + DUT + RETAIN)"
+
+  evidence_required:
+    - git_diff                 # diff complet des fichiers du scope
+    - check_linkage            # NON EXÉCUTÉ dans ce lot (mission : aucun bundle/test intermédiaire)
+    - run_all_gates            # NON EXÉCUTÉ dans ce lot (mission : aucun bundle/test intermédiaire)
+    - bundle                   # NON EXÉCUTÉ dans ce lot (mission : aucun bundle/test intermédiaire)
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si GVL_PERSISTENT.st porte des modifications non committées d'un autre agent, STOP : ne pas
+    l'écraser, restituer le conflit. Si l'enveloppe de plausibilité par palier entre en conflit
+    avec une valeur théorique existante (SpeedBandMaxMps), le signaler sans l'écraser.
+
+status: IN_REVIEW
+execution:
+  executed_by: "Agent externe E (production) + Agent externe F (TC challengés)"
+  completed_at: "2026-08-30T00:55:00+02:00"
+  status: DELIVERED
+  summary: "À remplir."
+  evidence_submitted:
+    - "Revue contradictoire TC : PASS ; assertions uniquement sur sorties FB"
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Revue orchestrateur : git diff + TC collecte/plausibilité/complétude. bloque_par : T181-05."

@@ -23,103 +23,205 @@
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 40px;">
-    <col style="width: calc(100% - 170px);">
-    <col style="width: 90px;">
-    <col style="width: 40px;">
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence &amp; Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-001</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Armer Méca A (contacteurs+frein coupés, joystick neutre, hors homing). Injecter dérive position >2.0m (canal position, <code>DriftGuardA</code>) → <code>SafeStop</code>+<code>PowerCutOff</code>. 🆕 <b>Mono-canal assumé</b> (décision 2026-08-29) : la détection s'appuie sur le canal position seul ; le seuil vitesse (<code>UncommandedSpeedThresholdMps</code>) reste déclaré mais non utilisé et <b>n'est plus exigé</b> — pas de croisement Cat.3 logiciel sur ce socle.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca A</b><br>roue libre</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Contrôleurs+frein coupés, joystick neutre, hors homing<br>
+        🚀 <b>Étape 1</b> : Injection dérive position &gt;2.0m (canal position, <code>DriftGuardA</code>)<br>
+        ⚡ <b>Étape 2</b> : Détection Méca A, bit7 levé<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code>+<code>PowerCutOff</code> — 🆕 <b>mono-canal assumé</b> (2026-08-29) : seuil vitesse <code>UncommandedSpeedThresholdMps</code> déclaré mais non utilisé, pas de croisement Cat.3 logiciel
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-002</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca B (bit8) : non-confirmation arrêt 3s ➔ SafeStop+PowerCutOff</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca B</b><br>non-conf. arrêt</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Arrêt commandé, <code>FwdRevSpeedFeedbackOff</code> attendu<br>
+        🚀 <b>Étape 1</b> : Maintien de la non-confirmation 3s (<code>PostRampTimeout</code>)<br>
+        ⚡ <b>Étape 2</b> : Détection Méca B, bit8 levé<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code>+<code>PowerCutOff</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-003</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca C (bit9) : dérive M1>2m en maintien M1 ➔ SafeStop+PowerCutOff</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca C</b><br>gliss. M1</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>BenneHoldStillActive</code> (M1 seul), maintien<br>
+        🚀 <b>Étape 1</b> : Dérive M1 &gt;2.0m en maintien<br>
+        ⚡ <b>Étape 2</b> : Détection Méca C, bit9 levé<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code>+<code>PowerCutOff</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-004</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca D (bit11) : capteur haut sans arrêt 3s ➔ SafeStop+PowerCutOff</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca D</b><br>capteur haut</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Capteur/limite haut atteint, hors homing, montée<br>
+        🚀 <b>Étape 1</b> : Maintien sans arrêt confirmé 3s<br>
+        ⚡ <b>Étape 2</b> : Détection Méca D, bit11 levé (marge +0.10m)<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code>+<code>PowerCutOff</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-005</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca E bit12 : écart>2m ➔ SafeStop seul (pas PowerCutOff)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca E</b><br>sync bit12</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>SyncEnable</code>, hors benne/homing<br>
+        🚀 <b>Étape 1</b> : Écart M1/M2 &gt;2m (<code>CriticalSyncToleranceM</code>=2.5m)<br>
+        ⚡ <b>Étape 2</b> : Détection Méca E bit12<br>
+        ✅ <b>Étape 3</b> : <code>SafeStop</code> seul (pas <code>PowerCutOff</code>) — escalade par bit13
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-006</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca E bit13 : bit12 non confirmé 3s ➔ escalade PowerCutOff</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca E</b><br>sync bit13</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Bit12 levé (SafeStop seul), écart persistant<br>
+        🚀 <b>Étape 1</b> : Non-confirmation 3s après bit12<br>
+        ⚡ <b>Étape 2</b> : Détection Méca E bit13<br>
+        ✅ <b>Étape 3</b> : Escalade → <code>PowerCutOff</code> ajouté au <code>SafeStop</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-007</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca F (bit14) : sens mesuré opposé au sens commandé 500ms ➔ SafeStop</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca F</b><br>sens opposé</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Mouvement commandé, hors homing<br>
+        🚀 <b>Étape 1</b> : Signe vitesse mesurée opposé à la commande<br>
+        ⚡ <b>Étape 2</b> : Confirmé 500ms (seuil 0.02 m/s)<br>
+        ✅ <b>Étape 3</b> : Détection Méca F, bit14 → <code>SafeStop</code> seul
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-008</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Méca G (bit15) : vitesse nulle malgré commande 3s ➔ SafeStop seul</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Méca G</b><br>absence mvmt</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Mouvement commandé, hors homing<br>
+        🚀 <b>Étape 1</b> : Vitesse mesurée sous seuil malgré commande<br>
+        ⚡ <b>Étape 2</b> : Maintien 3s<br>
+        ✅ <b>Étape 3</b> : Détection Méca G, bit15 → <code>SafeStop</code> seul
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-009</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>PowerCutOff</code> = exactement bits 2,7,8,9,10,11,13 (masque 16#2F84)</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Masque</b><br>PowerCutOff</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Évaluation combinatoire des bits ErrorId<br>
+        🚀 <b>Étape 1</b> : Vérification du masque <code>16#2F84</code> (bits 2,7,8,9,10,11,13)<br>
+        ⚡ <b>Étape 2</b> : Comparaison <code>PowerCutOff = (ErrorId AND 16#2F84) ≠ 0</code><br>
+        ✅ <b>Étape 3</b> : Masque exact vérifié — aucun bit hors liste ne déclenche <code>PowerCutOff</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-010</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>SafeStop</code> exclut bit3 (mou câble) si <code>SyncEnable=FALSE</code></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>SafeStop</b><br>mou câble</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>SyncEnable=FALSE</code>, mou câble (bit3) actif<br>
+        🚀 <b>Étape 1</b> : Vérification du masque <code>SafeStop = NOT PowerContactorEngaged OR (ErrorId AND 16#FF97)</code><br>
+        ⚡ <b>Étape 2</b> : Bit3 exclu du <code>SafeStop</code> (mou câble = <code>DescendPermit:=FALSE</code> seul)<br>
+        ✅ <b>Étape 3</b> : Masque <code>SafeStop</code> corrigé (bit3 exclu) quand <code>SyncEnable=FALSE</code>
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-036.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Warmup 3s : après Enable, perte com opérateur (cause 0) ne déclenche PAS pendant les 3 premières s (<code>TonStartupWarmup</code>) ; après 3s → <code>SafeStop</code>.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Warmup</b><br>3s</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Après <code>Enable=TRUE</code>, fenêtre warmup 3s (<code>TonStartupWarmup</code>)<br>
+        🚀 <b>Étape 1</b> : Perte com opérateur (cause 0) dans les 3 premières s<br>
+        ⚡ <b>Étape 2</b> : Aucun <code>SafeStop</code> pendant les 3s (anti-faux-défaut au démarrage)<br>
+        ✅ <b>Étape 3</b> : Après 3s → <code>SafeStop</code> déclenché sur perte com
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-037.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Gate Enable=FALSE : <code>SafeStop</code>/<code>Permit</code>/<code>PowerCutOff</code> forcés FALSE, <code>Ready</code>=FALSE, mais latches (<code>MecaAFaultLatched</code>…) préservés ; re-Enable exige Reset front.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Gate</b><br>Enable</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>Enable=FALSE</code><br>
+        🚀 <b>Étape 1</b> : <code>SafeStop</code>/<code>Permit</code>/<code>PowerCutOff</code> forcés FALSE, <code>Ready=FALSE</code><br>
+        ⚡ <b>Étape 2</b> : Latches (<code>MecaAFaultLatched</code>…) préservés<br>
+        ✅ <b>Étape 3</b> : Re-<code>Enable</code> exige un <code>Reset</code> front
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§1</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-044.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Mou câble : <code>SyncEnable</code>=FALSE → <code>DescendPermit</code>=FALSE (blocage descente) mais <code>AscentPermit</code> autorisé palier 1 ; dès <code>M2_TensionedCable_DI</code>=TRUE, blocage levé.</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Mou câble</b><br>permit</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : <code>SyncEnable=FALSE</code>, mou câble détecté<br>
+        🚀 <b>Étape 1</b> : <code>DescendPermit:=FALSE</code> (blocage descente), <code>AscentPermit</code> autorisé palier 1<br>
+        ⚡ <b>Étape 2</b> : Opérateur enroule pour retendre / fermer la benne<br>
+        ✅ <b>Étape 3</b> : Dès <code>M2_TensionedCable_DI=TRUE</code>, blocage descente levé
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-051.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Chaîne <code>PowerCutOff</code> bout-en-bout : demande <code>PRG_04</code> → agrégation <code>PRG_06</code> → coupure AU (bout-en-bout, pas seulement le masque 16#2F84).</td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Chaîne</b><br>PowerCutOff</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : Demande <code>PowerCutOff</code> émise par <code>PRG_04</code><br>
+        🚀 <b>Étape 1</b> : Agrégation dans <code>PRG_06</code><br>
+        ⚡ <b>Étape 2</b> : Propagation → coupure AU<br>
+        ✅ <b>Étape 3</b> : Chaîne bout-en-bout validée (pas seulement le masque <code>16#2F84</code>)
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>

@@ -56,8 +56,34 @@ instModes(
     SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable,
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState <> DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState <> DEVICE_STATE.RUNNING),
     JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch,
-    SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess
+    SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess,
+    // Arrêt mécanique confirmé des treuils (condition de bascule N1/N2, AF-05 §4bis)
+    M1ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
+    M1BrakeIsOpen             := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
+    M1SpeedAbsMps             := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
+    M2ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
+    M2BrakeIsOpen             := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
+    M2SpeedAbsMps             := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
+    // États homing (levée du re-homing obligatoire)
+    M1HomingDone              := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Done,
+    M1Homed                   := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    M1HomingSuspect           := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
+    M2HomingDone              := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Done,
+    M2Homed                   := PRG_02_Acquisition.Data.EncoderM2.Homed,
+    M2HomingSuspect           := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
+    // Usage effectif d'un override/bypass de position (producteur PRG_04, lag 1 scan
+    // assumé : PRG_04 est de rang 04, ce programme de rang 03)
+    M1PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM1,
+    M2PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM2,
+    // Restauration boot des drapeaux de re-homing (miroir PERSISTENT)
+    HomingRequiredM1Persist   := GVL_PERSISTENT._MaintHomingRequiredM1,
+    HomingRequiredM2Persist   := GVL_PERSISTENT._MaintHomingRequiredM2
 );
+
+// Miroir persistant du re-homing obligatoire (pattern FB_MirrorBypassRetain) :
+// FB_Modes est le producteur unique de la décision ; GVL_PERSISTENT n'est que la mémoire.
+GVL_PERSISTENT._MaintHomingRequiredM1 := instModes.Auth.HomingRequiredM1;
+GVL_PERSISTENT._MaintHomingRequiredM2 := instModes.Auth.HomingRequiredM2;
 
 // Qualification de l'intention opérateur couplée (M1+M2) dans le même scan
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN

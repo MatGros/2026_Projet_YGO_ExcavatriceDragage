@@ -1,0 +1,77 @@
+# Contrat T181-13 — Palier plancher plongée Kobold (3-4) + geste joystick lissé + AF-04
+# Source : PLAN §1 (D), §7 ; AF10_INTERFACE §3quater ; décision Kobold plancher 3-4 constant ;
+#          B2 §4.2 (continuité gestuelle). Absorbe T096 (partiel).
+
+contract:
+  task_id: T181-13_PLANCHER_KOBOLD
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    En plongée Kobold, joystick hors neutre à tout % -> palier >= plancher (CfgDiveFloorStep,
+    3-4 constant) ; montée LISSÉE par FB_WinchStepShaper (0->1->2->3 temporisé, pas d'à-coup
+    contacteur) ; relâche -> 0 immédiat. Spec AF-04. Crée la fonction F10.12.
+
+  acceptance:
+    - id: AC1
+      statement: "En plongée Kobold, une déflexion joystick faible (~5 %) -> le plancher CfgDiveFloorStep est injecté comme MinStepNumber (via MinStepDown de T181-12), agissant sur RequestedStep."
+      verified_by: "harnais WINCH_INTEG HARN-30 : effleurement joystick -> le treuil vise le palier plancher"
+    - id: AC2
+      statement: "Montée lissée : les transitions StepNumber 0->1->2->3 sont temporisées par FB_WinchStepShaper (>= 1 cycle par cran). AUCUNE transition StepNumber > +1 par cycle."
+      verified_by: "harnais WINCH_INTEG : TC anti-à-coup, ΔStepNumber <= +1 par cycle en entrée de plongée"
+    - id: AC3
+      statement: "Relâche joystick -> StepNumber = 0 au cycle suivant (arrêt franc préservé, pas de plancher résiduel)."
+      verified_by: "harnais WINCH_INTEG HARN-32 : relâche -> StepNumber 0 cycle N+1"
+    - id: AC4
+      statement: "Le plancher agit sur la cible (RequestedStep) : grep -> aucune affectation directe StepNumber := <plancher>."
+      verified_by: "grep dans FB_Winch.st / FB_SpeedStep.st"
+    - id: AC5
+      statement: "Section AF-04 rédigée : plancher plongée Kobold, valeur configurable, continuité gestuelle (limitation connue : plus de dosage fin 0-40 %, montée directe vers le plancher — décision figée), croisement avec SlowdownMaxStep (le plancher plongée ne doit pas contredire le ralentissement bordure basse -> plafond gagne)."
+      verified_by: "diff AF-04 relu"
+    - id: AC6
+      statement: "Non-régression : G200 PASS, gates palier C PASS, TC treuils/cycle verts."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Winch.st                       # injection MinStepNumber (cible)
+      - CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st             # lissage (déjà extrait T181-05)
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                    # câblage plancher -> DriveRequest
+      - DOC/AF/AF_Partie-04_*
+      - TOOLS/TEST_AUTO_CI/RESULTS/**/tests/**
+    forbidden:
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "L'arrêt franc au relâcher joystick (StartStop=FALSE -> palier 0)"
+      - "La cadence de montée de palier (FB_WinchStepShaper)"
+    dropped_on_purpose:
+      - "Le dosage fin de la descente lente prolongée en plongée (0-40 % -> palier plancher) — décision figée"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si le plancher plongée entre en conflit avec le ralentissement bordure basse sans que le
+    plafond ne gagne clairement, ou si le lissage produit un à-coup mesurable : REMONTER.
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: "À remplir."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Revue orchestrateur : git diff + TC anti-à-coup + AF-04. bloque_par : T181-12."

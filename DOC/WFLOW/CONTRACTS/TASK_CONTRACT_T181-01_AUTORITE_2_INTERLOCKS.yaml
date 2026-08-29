@@ -120,9 +120,9 @@ execution:
   evidence_submitted: []
 
 validation:
-  status: PENDING
-  validated_by: ""
-  validated_at: ""
+  status: APPROVED
+  validated_by: "Humain (utilisateur)"
+  validated_at: "2026-08-29T23:35:00+02:00"
   notes: >
     ARRÊT VALIDATION HUMAINE : contrat d'autorité + valeurs T_max/DropConfirmDelay + classification
     des Fault.Error (dure vs ordonnée) + argument PLr — relus et signés avant écriture code.

@@ -52,12 +52,10 @@ def test_all_main_source_languages_are_accepted(tmp_path: Path) -> None:
         tmp_path,
         {
             "PRG_01_Cycle.st": program("PRG_01_Cycle"),
-            "PRG_02_Inputs_LD.st": program("PRG_02_Inputs_LD"),
             "PRG_03_Acquisition_CFC.xml": native_cfc("PRG_03_Acquisition_CFC"),
         },
         [
             ("PRG_01_Cycle", "ST"),
-            ("PRG_02_Inputs_LD", "LD"),
             ("PRG_03_Acquisition_CFC", "CFC"),
         ],
     )
@@ -67,27 +65,6 @@ def test_all_main_source_languages_are_accepted(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stderr
     assert "Bundle MAIN coverage: PASS" in result.stdout
     assert "Bundle MAIN identity: PASS" in result.stdout
-
-
-def test_standalone_ld_export_is_rejected_as_blocking_error(tmp_path: Path) -> None:
-    """Un *_LD.xml posé à côté de son .st est un artefact de livraison interdit
-    (REX 2026-08) : le Ladder n'est livré QUE par CODE_Bundle.xml."""
-    root = make_project(
-        tmp_path,
-        {
-            "PRG_01_Inputs_LD.st": program("PRG_01_Inputs_LD"),
-            "PRG_01_Inputs_LD.xml": (
-                '<project><pou name="PRG_01_Inputs_LD" pouType="program">'
-                "<body><LD /></body></pou></project>"
-            ),
-        },
-        [("PRG_01_Inputs_LD", "LD")],
-    )
-
-    result = run(root)
-
-    assert result.returncode == 1
-    assert "standalone LD export interdit" in result.stderr
 
 
 def test_missing_main_pou_is_rejected_with_its_name(tmp_path: Path) -> None:
@@ -135,15 +112,15 @@ def test_wrong_main_pou_language_is_rejected_with_its_name(tmp_path: Path) -> No
 def test_filename_and_declared_program_mismatch_is_identity_failure(tmp_path: Path) -> None:
     root = make_project(
         tmp_path,
-        {"PRG_OUTPUTS_LD.st": program("PRG_10_Outputs_LD")},
-        [("PRG_10_Outputs_LD", "LD")],
+        {"PRG_Outputs.st": program("PRG_10_Outputs")},
+        [("PRG_10_Outputs", "ST")],
     )
 
     result = run(root)
 
     assert result.returncode == 1
     assert "[BMI1]" in result.stderr
-    assert "basename `PRG_OUTPUTS_LD` != PROGRAM declare `PRG_10_Outputs_LD`" in result.stderr
+    assert "basename `PRG_Outputs` != PROGRAM declare `PRG_10_Outputs`" in result.stderr
     assert "Bundle MAIN coverage: PASS" in result.stdout
     assert "Bundle MAIN identity: FAIL" in result.stdout
 

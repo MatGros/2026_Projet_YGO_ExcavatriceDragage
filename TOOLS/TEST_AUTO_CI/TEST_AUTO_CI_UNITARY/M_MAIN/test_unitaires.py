@@ -46,6 +46,12 @@ def test_PRG_02_Acquisition():
 
 @pytest.mark.ci_fb
 @pytest.mark.unit
+def test_PRG_02_Acquisition_Archi():
+    _run_fb_test("PRG_02_Acquisition_Archi")
+
+
+@pytest.mark.ci_fb
+@pytest.mark.unit
 def test_PRG_03_Modes_Cycle():
     _run_fb_test("PRG_03_Modes_Cycle")
 

@@ -1,7 +1,7 @@
 # Analyse Fonctionnelle — Partie 10 : Fonction Winch M1/M2 (v2.1)
 
 > La tracabilite des versions programme/document est portee par `DOC/VERSION_HISTORY.md`.
-> Source code actuel : `CODE/H_TREUILS_BENNE/*.st` · instances dans `PRG_04_Treuils_Benne.st` (ST), `PRG_06_Outputs.st` (Ladder généré). 🚩 La conversion CFC natif est **abandonnée** (2026-08-16) : le code reste en **ST + PLCopenXML**, aucune page CFC native cible.
+> Source code actuel : `CODE/H_TREUILS_BENNE/*.st` · instances dans `PRG_04_Treuils_Benne.st` (ST), `PRG_06_Outputs.st` (ST). 🚩 La conversion CFC natif est **abandonnée** (2026-08-16) : le code reste en **ST + PLCopenXML**, aucune page CFC native cible.
 > 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md` §3 et §5.
 > v1.14 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.14.md`.
 

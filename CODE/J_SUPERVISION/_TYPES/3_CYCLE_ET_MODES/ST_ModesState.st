@@ -21,5 +21,10 @@ STRUCT
     EmergencyArmingBusy   : BOOL;   (* ⏳ Auto-test A/B, pulse, confirmation OU verrouillage 5s en cours — nouvelle demande ignorée *)
     RedundancyTestFailed  : BOOL;   (* Canal A ou B non fonctionnel détecté à l'auto-test — bloque tout réarmement (front Reset requis) *)
     EmergencyArmingFailed : BOOL;   (* Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis) *)
+
+    (* Miroir IHM des états de maintenance (AF-05 §4bis) *)
+    ModeChangePendingBlocked : BOOL;   (* 🚦 Changement de mode refusé : treuils non à l'arrêt confirmé (contacteurs retombés + frein serré + |v| < seuil) *)
+    HomingRequiredM1         : BOOL;   (* 🧭 M1 : re-homing obligatoire avant retour SEMI_AUTO *)
+    HomingRequiredM2         : BOOL;   (* 🧭 M2 : re-homing obligatoire avant retour SEMI_AUTO *)
 END_STRUCT
 END_TYPE

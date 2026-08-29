@@ -6,7 +6,7 @@ and produces a single ``<project>`` bundle via ``build_project_xml``.
 Dependencies are resolved automatically by the existing dependency resolver.
 
 Usage:
-    python scripts/build_bundle.py CODE/AU/ CODE/MAIN/PRG_AU_Outputs_LD.st -o CODE_AU_Bundle.xml
+    python scripts/build_bundle.py CODE/AU/ CODE/M_MAIN/PRG_06_Outputs.st -o CODE_AU_Bundle.xml
     python scripts/build_bundle.py CODE/AU/FB_Safety_EmergencyManagement.st -o single.xml
 """
 from __future__ import annotations

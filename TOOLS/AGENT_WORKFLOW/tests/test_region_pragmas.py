@@ -42,7 +42,7 @@ def _relative(path: Path) -> str:
 
 
 def _is_forbidden(path: Path) -> bool:
-    return path.stem.endswith("_LD") or path.name.startswith(("GVL_", "ST_", "E_"))
+    return path.name.startswith(("GVL_", "ST_", "E_"))
 
 
 def test_region_pragmas_are_well_formed_and_limited_to_st_pous() -> None:

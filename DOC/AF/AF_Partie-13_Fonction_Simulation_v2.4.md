@@ -124,12 +124,12 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 140px;">
-    <col style="width: 150px;">
-    <col style="width: calc(100% - 590px);">
-    <col style="width: 110px;">
-    <col style="width: 140px;">
+    <col style="width: 28px;">
     <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">

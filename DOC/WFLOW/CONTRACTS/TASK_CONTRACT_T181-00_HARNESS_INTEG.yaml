@@ -46,6 +46,7 @@ contract:
 
   scope:
     allowed:
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st  # publication Data.Network fidèle à PRG_02
       - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st
       - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st
       - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st   # nouveau

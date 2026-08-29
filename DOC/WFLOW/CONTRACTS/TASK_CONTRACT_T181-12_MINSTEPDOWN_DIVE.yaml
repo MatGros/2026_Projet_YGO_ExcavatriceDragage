@@ -1,0 +1,82 @@
+# Contrat T181-12 — Producteur MinStepDown (FB_DiveSearch) + flux + câblage CurrentSpeedStep
+# Source : PLAN §4 (amendement C), §13 ; AF10_INTERFACE §3-D ; B2 §4.1 (flux intra-cycle) ; D12.
+
+contract:
+  task_id: T181-12_MINSTEPDOWN_DIVE
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Créer le producteur du plancher de palier en plongée : FB_DiveSearch expose MinStepDown ;
+    routage FB_DiveSearch (dans PRG_03) -> PRG_03.Data.ReqProgram -> PRG_04 -> DriveRequest.
+    Câbler FB_DiveSearch.CurrentSpeedStep (aujourd'hui jamais passé -> interdiction palier 5
+    en Kobold MORTE). Flux intra-cycle (PRG_02..07 séquentiels, 10 ms) — pas de latence 3 tâches.
+
+  acceptance:
+    - id: AC1
+      statement: "FB_DiveSearch produit MinStepDown : INT (ou DiveSpeedFloorActive : BOOL mappé au palier CfgDiveFloorStep). Gaté sur DescentActive : retombe au front de sortie de plongée."
+      verified_by: "diff VAR_OUTPUT FB_DiveSearch ; TC : sortie de plongée -> MinStepDown retombe le même cycle"
+    - id: AC2
+      statement: "Flux câblé et consommé : FB_DiveSearch.MinStepDown -> PRG_03.Data.ReqProgram.* -> PRG_04 agrégateur -> DriveRequest.MinStepDown. G200 voit le champ produit ET consommé sur les 2 instances."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report"
+    - id: AC3
+      statement: "FB_DiveSearch.CurrentSpeedStep est câblé (argument non nul, palier arbitré). L'interdiction du palier 5 en plongée Kobold devient EFFECTIVE."
+      verified_by: "grep de l'argument CurrentSpeedStep dans PRG_03 != vide ; TC : en Kobold, demande palier 5 -> StepNumber plafonné à 4"
+    - id: AC4
+      statement: "Cas maintien descente joystick post-fond : KoboldBottomTouchLatched coupe StartStop (PRG_04:487-504) -> le plancher devient sans effet. TC dédié."
+      verified_by: "TC : contact fond confirmé + joystick descente maintenu -> StartStop=FALSE, StepNumber=0, pas de plancher résiduel"
+    - id: AC5
+      statement: "Non-régression : G200 PASS, gates palier C PASS, TC FB_DiveSearch existants verts, harnais WINCH_INTEG HARN-30/31/32/33 exécutables (peuvent rester rouges tant que l'aval T181-13 n'a pas livré, pas par trivialité)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C ; run_tests.py --fb FB_DiveSearch --fb WINCH_INTEG"
+    - id: AC6
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU."
+      verified_by: "comparaison basename sans extension vs identifiant apres PROGRAM/FUNCTION_BLOCK"
+    - id: AC7
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage apposé ; suffixe = langage genere dans le bundle (ST pur)."
+      verified_by: "grep basename *_CFC/_LD absent + inspection CODE_Bundle.xml"
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_DiveSearch.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                    # consommation du plancher (agrégateur déjà fait T181-10)
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/**          # champ ReqProgram si absent
+      - TOOLS/TEST_AUTO_CI/RESULTS/**/tests/**
+    forbidden:
+      - CODE/H_TREUILS_BENNE/FB_Winch.st                       # T181-08
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Toutes les sorties actuelles de FB_DiveSearch (DescendPermit, KoboldMeasureEnable, etc.)"
+      - "La séquence de plongée existante (états Kobold)"
+    dropped_on_purpose:
+      - "L'entrée CurrentSpeedStep non câblée (bug latent D12) — désormais câblée"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si le flux PRG_03 -> PRG_04 du plancher exige un champ de bus nouveau non prévu, ou si câbler
+    CurrentSpeedStep change le comportement de la séquence Kobold au-delà de l'interdiction palier 5 :
+    REMONTER à l'orchestrateur.
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: "À remplir."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Revue orchestrateur : git diff + TC front sortie plongée + TC maintien post-fond. bloque_par : T181-10."

@@ -84,7 +84,6 @@ de `generator/` (pas de réécriture) et produit un artefact PLCopenXML focalis�
 
 | Script | Rôle | Usage |
 |---|---|---|
-| `scripts/st_to_ld.py` | Convertit un fichier `PRG_*_LD.st` en un `<pou>` en `<LD>` | `python scripts/st_to_ld.py CODE/M_MAIN/PRG_06_Outputs.st -o output.xml` |
 | `scripts/st_to_pou.py` | Convertit un fichier `.st` (FB ou PROGRAM) en un `<pou>` en `<ST>` | `python scripts/st_to_pou.py CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st -o output.xml` |
 | `scripts/cfc_extract.py` | Extrait un `<pou>` CFC d'un XML natif (nettoyage namespaces, alignement ObjectIds) | `python scripts/cfc_extract.py CODE/M_MAIN/PRG_02_Acquisition.st -o output.xml` |
 | `scripts/st_to_dut.py` | Convertit un fichier `.st` (STRUCT ou ENUM) en un `<dataType>` | `python scripts/st_to_dut.py CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st -o output.xml` |
@@ -93,9 +92,6 @@ de `generator/` (pas de réécriture) et produit un artefact PLCopenXML focalis�
 ### Exemples
 
 ```powershell
-# Générer juste un Ladder depuis un PRG_*_LD
-python scripts/st_to_ld.py CODE/M_MAIN/PRG_06_Outputs.st -o /tmp/test_ld.xml
-
 # Générer juste un POU ST
 python scripts/st_to_pou.py CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st -o /tmp/test_pou.xml
 
@@ -107,4 +103,3 @@ python scripts/build_bundle.py CODE/AU/ CODE/M_MAIN/PRG_06_Outputs.st -o /tmp/te
 ```
 
 Chaque script dispose de `--help` et gère les erreurs proprement (exit code 1 avec message).
-Le script `st_to_ld.py` rejette les fichiers qui ne sont pas des `PRG_*_LD` avec un message clair.

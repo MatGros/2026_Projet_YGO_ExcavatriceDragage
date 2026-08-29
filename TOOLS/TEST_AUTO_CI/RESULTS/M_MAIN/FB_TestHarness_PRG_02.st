@@ -137,6 +137,12 @@ Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
 Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
 Data.JoystickSpeedPctX    := ABS(instJoystick.AxisCmdX.SpeedTgt);
 
+// Publication réseau : miroir de PRG_02_Acquisition. PRG_04/FB_Safety_Winch
+// consomment Data.Network.Joystick ; ne pas laisser ce bus à sa valeur par défaut.
+Data.Network.CanOpenMaster  := diagCanDev;
+Data.Network.Joystick       := diagCanDev;
+Data.Network.EthercatMaster := diagEcatDev;
+
 
 // 3. Traitement Codeurs Treuils M1 / M2
 HwInM1.RawPosIn := COD1_PosValue;
