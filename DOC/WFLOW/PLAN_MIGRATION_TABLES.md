@@ -77,14 +77,21 @@ Avec des agents experts en **automatisme industriel / sécurité machine (ISO 13
 - Fix : parseur HTML (gabarits) + markdown ; garde-fou unitaire `test_extract_sections_html_tables` ; matrice `af_traceability_matrix.yaml` régénérée (diff sémantique : 0 perte, rafraîchissement d'artefact).
 - Tests consommateurs : 7/7 PASS.
 
-### P3-0 — typographie/gabarit (en cours, sous-agents)
+### P3-0 — typographie/gabarit (✅ committé `b6e44031`)
 
 - a) 33 fiches FB : titre gabarit `🧪 Table des points de validation (détail)` (déplacement du suffixe « propriétaire unique » en note, jamais perdu), entêtes `Etat`→`État`, légendes manquantes, table fonctions de `FB_Acquisition_Preflight` → HTML.
 - b) PRG-02 au gabarit `AF_FICHE_PRG` + cohérence titres/emoji des fiches AF mains.
-- Garde : regex consommateurs (`Points de validation`) et extracteur (`etat`/`état`) restent satisfaits.
+- Garde : regex consommateurs (`Points de validation`) et extracteur (`etat`/`état`) restent satisfaits. Sweep 47/47, tests 7/7, G340 PASS.
+
+### P3-1 — fond par experts (✅ audits + challenger · insertion en cours)
+
+1. **4 audits experts READ-ONLY** (a treuils, b translation+sim, c encoder+joystick, d communs) : verdicts NOMINAL/DÉFAUT/GRANULAIRE par TC + 64 propositions d'IDs nouveaux (suffixes uniquement) + écarts doc↔code.
+2. **Challenger adversarial** : 64 → **30 KEEP · 28 REPLACE · 6 REJECT** (0 fusion — les thèmes transverses = chemins de code distincts par FB). Livrable : `P3_TEST_AUDIT_PROPOSITIONS_v1.0.md`.
+3. **Décisions humaines** (2026-08-29) : insérer après challenge ✔ · corriger doc↔code + tâches CODE ✔ · `FB_Encoder_Safety` mono-canal assumé ✔ · `ArmingPermit` → tâche CODE ✔.
+4. **Insertion en cours, 3 lots parallèles** : lot 1 treuils/benne (11 KEEP + 7 REPLACE), lot 2 translation/sim/encoder/joystick (19 + 11, incl. `TC-P11-015` C4 et homme-mort `020.1..4`), lot 3 communs/diag/TSV (10 REPLACE). Pipeline orchestrateur (regen matrice, tests, G340, commits) après retours.
+5. **Tâches CODE créées** : T174 (tests CI socle — recalibré : 10/12 TC Safety **déjà prouvés** par rapport daté 10/10 PASS ; P0 restant = `test_fb_faultcore.st` écrit — 534b5bcc —, en attente harnais), T175 (4 écarts code treuils), T176 (`ArmingPermit` fix+guard).
 
 ## 🔒 Règles verrouillées pour P3 (fond)
-
 1. **ID TC intouchables** : jamais renommer/déplacer un ID existant (`TC-Pxx-NNN`, suffixes `.n`) — la matrice de traçabilité et G450 en dépendent. La granularisation crée des IDs suffixés nouveaux (`.N+1`).
 2. **Anti-duplication** : le détail des TC vit dans la fiche FB (propriétaire unique) ; les chapôs AF gardent des macro-tables.
 3. **Pipeline obligatoire après chaque lot** : `extract_functions_matrix.py` + tests consommateurs 7/7 + regen matrice + sweep d'orchestrateur + `G340_check_doc_links.py` + commit restreint. Le reformatage fond passe TOUJOURS par des agents experts avec lecture du diff par l'orchestrateur.
