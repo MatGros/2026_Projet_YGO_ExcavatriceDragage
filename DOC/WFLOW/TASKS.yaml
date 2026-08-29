@@ -297,16 +297,16 @@ tasks:
   bloque_par: []
 - id: T081
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C2
   domaine: CYCLE
-  agent: PI-01
+  agent: —
   titre: Séquence détection fond Kobold à 4 étapes
   contexte: ''
   description: AF_Partie-04, FB_DiveSearch (codé, attente essais)
   objectifs: []
   contrat: ''
-  date: '2026-08-28T21:00:16'
+  date: '2026-08-29T07:11:41'
   bloque_par: []
 - id: T084
   parent_id: ''
@@ -1500,7 +1500,9 @@ tasks:
     ou dans un gate dédié (ex. G375 pour les TC de type GATE). Idée remontée par l''utilisateur (2026-08-25) : la matrice
     consolidée rend ce contrôle possible sans parser 14 fichiers AF à la main. À FAIRE PLUS TARD — pas de contrat détaillé
     ni d''implémentation dans ce lot, juste le repère de tâche.'
-  description: "✅ G450 informatif intégré au palier C : matrice fraîche AF → fonctions → TC → titres TEST déclarés, exceptions af_ignore avec provenance, chemins registre manquants signalés. --strict est prêt pour rendre les écarts bloquants après assainissement CI."
+  description: '✅ G450 informatif intégré au palier C : matrice fraîche AF → fonctions → TC → titres TEST déclarés, exceptions
+    af_ignore avec provenance, chemins registre manquants signalés. --strict est prêt pour rendre les écarts bloquants après
+    assainissement CI.'
   contrat: ''
   objectifs:
   - Charger af_traceability_matrix.yaml et croiser, pour chaque domaine AF (domains.<AF-NN>), functions.<ID>.tc_couvrants
@@ -2306,9 +2308,9 @@ tasks:
   updated_at: '2026-08-28T23:30:00+02:00'
   completed_at: '2026-08-28T23:30:00+02:00'
   titre: Refonte & Unification du Grafcet Plongée / Recherche Fond / Extraction
-  contexte: 'A/B/C/CR toutes ✅. B+C VALIDATED (visa humain 2026-08-28, CODESYS OK) apres 3 revues independantes et 2 passes
+  contexte: A/B/C/CR toutes ✅. B+C VALIDATED (visa humain 2026-08-28, CODESYS OK) apres 3 revues independantes et 2 passes
     de durcissement (H1-H5 puis F1-F3). Items D1/D2 (recovery reset FB_ExtractionSequence, garde position basse FB_DiveSearch)
-    = hors scope -> DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md §4, a planifier.'
+    = hors scope -> DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md §4, a planifier.
   description: Famille T167 — Unification des séquences, traitement guard sur le bypass Kobold, gestion des time-outs et capture
     StepAtFault.
   contrat: ''
@@ -2345,8 +2347,8 @@ tasks:
   titre: Durcissement FB_DiveSearch (timers de garde anti-blocage + StepAtFault, bypass Kobold gelé)
   contexte: Patch additif sur la machine d'état existante ; timeouts runtime depuis params site ; bypass Kobold gelé (T167-A
     §3bis).
-  description: 'Contrat VALIDATED (visa humain 2026-08-28, CODESYS 3.5 OK). FB_DiveSearch 8/8. 3 revues indépendantes
-    (deepseek-v4-flash / gpt-5.6-terra-high / gpt-5.6-sol-max), 2 passes durcissement H1-H5 puis F1-F3. G200 + gates + doc-links PASS.'
+  description: Contrat VALIDATED (visa humain 2026-08-28, CODESYS 3.5 OK). FB_DiveSearch 8/8. 3 revues indépendantes (deepseek-v4-flash
+    / gpt-5.6-terra-high / gpt-5.6-sol-max), 2 passes durcissement H1-H5 puis F1-F3. G200 + gates + doc-links PASS.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml
   objectifs:
   - Timers de garde par étape (SEARCHING_IMMERSION / SEARCHING_BOTTOM) calculés au runtime
@@ -2366,8 +2368,9 @@ tasks:
   titre: Durcissement FB_ExtractionSequence (backstop fermeture benne + timeout décollage runtime + StepAtFault)
   contexte: Patch additif ; backstop CfgBucketCloseTimeout verrouillé > BucketMoveTimeout (watchdog benne), timeout CONTROL_ASCENT
     runtime depuis ControlAscentDistance_M.
-  description: 'Contrat VALIDATED (visa humain 2026-08-28, CODESYS 3.5 OK). FB_ExtractionSequence 8/8. 3 revues indépendantes,
-    2 passes durcissement H1-H5 puis F1-F3 (ForceMinSpeedStep suit permis, Reset gardé sur cause physique, backstop borné). G200 + gates + doc-links PASS.'
+  description: Contrat VALIDATED (visa humain 2026-08-28, CODESYS 3.5 OK). FB_ExtractionSequence 8/8. 3 revues indépendantes,
+    2 passes durcissement H1-H5 puis F1-F3 (ForceMinSpeedStep suit permis, Reset gardé sur cause physique, backstop borné).
+    G200 + gates + doc-links PASS.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml
   objectifs:
   - Backstop fermeture benne verrouillé pour ne jamais masquer BucketError
@@ -2475,8 +2478,13 @@ tasks:
   date: '2026-08-29T01:30:00+02:00'
   completed_at: '2026-08-29T01:30:00+02:00'
   titre: Reset déterministe des états assistants dans la branche SEMI_AUTO de PRG_03
-  contexte: 'Audit T168-B + 3 revues indépendantes convergentes : la branche SEMI_AUTO de PRG_03 n''assignait pas 17 feuilles Data.SequenceState.* (Dive* / Extraction* / DumpAtTremie* / Bypass*). DumpAtTremieDescentLocked restait TRUE au passage MAINT->SEMI_AUTO et PRG_04:631 verrouillait la descente treuil pendant le cycle automatique (régression du commit 7e65e566).'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-C_RESET_ASSISTANTS_SEMI_AUTO.yaml. fix : 17 resets ajoutés en fin de branche SEMI_AUTO, valeurs neutres identiques à la branche ELSE. guard : nouveau gate G346_check_mode_branch_completeness.py (câblé run_all_gates palier C). Preuves : G200 PASS 0 err, palier C 17/17, G346 pré-fix FAIL 17 / post-fix PASS, CI cycle inchangée. Livré dans le commit 5c9dca9c.'
+  contexte: 'Audit T168-B + 3 revues indépendantes convergentes : la branche SEMI_AUTO de PRG_03 n''assignait pas 17 feuilles
+    Data.SequenceState.* (Dive* / Extraction* / DumpAtTremie* / Bypass*). DumpAtTremieDescentLocked restait TRUE au passage
+    MAINT->SEMI_AUTO et PRG_04:631 verrouillait la descente treuil pendant le cycle automatique (régression du commit 7e65e566).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-C_RESET_ASSISTANTS_SEMI_AUTO.yaml. fix : 17 resets ajoutés
+    en fin de branche SEMI_AUTO, valeurs neutres identiques à la branche ELSE. guard : nouveau gate G346_check_mode_branch_completeness.py
+    (câblé run_all_gates palier C). Preuves : G200 PASS 0 err, palier C 17/17, G346 pré-fix FAIL 17 / post-fix PASS, CI cycle
+    inchangée. Livré dans le commit 5c9dca9c.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-C_RESET_ASSISTANTS_SEMI_AUTO.yaml
   objectifs:
   - Réinitialiser les 17 feuilles d'état assistant manquantes dans la branche SEMI_AUTO
@@ -2533,68 +2541,64 @@ tasks:
   bloque_par:
   - T169
 - id: T171
-  parent_id: null
-  statut: ⏳
+  parent_id: ''
+  statut: ✅
   criticite: C3
-  domaine: TEST_AUTO_CI
+  domaine: ''
   agent: UTILISATEUR
-  date: '2026-08-28T17:56:00+02:00'
   titre: Animation Visuelle Pilotée par le Code Compilé FB_Cycle
   contexte: Raccordement de l'animation Canvas à la trace d'exécution scan-par-scan du binaire compilé STruCpp (Worktree isolé).
   description: Famille T171 — Éradication de la simulation JS fictive et pilotage cinématique 100% basé sur le code ST IEC
     compilé.
-  contrat: ''
   objectifs:
   - Développer le harnais de simulation dynamique de cycle complet
   - Raccorder l'animation Canvas à la trace JSON du code compilé
   - Audit indépendant par sous-agent Ollama
-  bloque_par:
-  - T170
+  contrat: ''
+  date: '2026-08-28T23:36:41'
+  bloque_par: []
 - id: T171-A
   parent_id: T171
-  statut: ⏳
+  statut: ✅
   criticite: C3
-  domaine: TEST_AUTO_CI
+  domaine: ''
   agent: UTILISATEUR
-  date: '2026-08-28T17:56:00+02:00'
   titre: Harnais ST de simulation dynamique & génération de trace scan-par-scan
   contexte: Exécution de FB_Cycle compilé sur un cycle complet X0..X13 étendant test_fb_cycle.st.
   description: Création du test ST dynamique produisant trace_semi_auto_cycle.json selon le Grafcet AF-04.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE.yaml
   objectifs:
   - Traversée séquentielle ordonnée X0 à X13 sous stimuli réalistes
-  bloque_par:
-  - T171
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-A_HARNESS_SIMULATION_DYNAMIQUE_CYCLE.yaml
+  date: '2026-08-28T23:36:48'
+  bloque_par: []
 - id: T171-B
   parent_id: T171
-  statut: ⬜
+  statut: ✅
   criticite: C2
-  domaine: TEST_AUTO_CI
+  domaine: ''
   agent: UTILISATEUR
-  date: '2026-08-28T17:56:00+02:00'
   titre: Raccordement de l'animation Canvas sur les sorties du code compilé
   contexte: Éradication du moteur JS fictif dans FICHE_SEMI_AUTO_ANIMATION.html et consommation de la trace JSON compilée.
   description: Adaptation du visualiseur interactif Canvas avec scrub par scan, window.__traceScan et lecture temps-réel.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE.yaml
   objectifs:
   - Animer la cinématique machine d'après les consignes réelles du binaire compilé
-  bloque_par:
-  - T171-A
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-B_RACCORDEMENT_ANIMATION_COMPILED_TRACE.yaml
+  date: '2026-08-28T23:36:54'
+  bloque_par: []
 - id: T171-CR
   parent_id: T171
-  statut: ⬜
+  statut: ✅
   criticite: C2
-  domaine: REVIEW
+  domaine: ''
   agent: UTILISATEUR
-  date: '2026-08-28T17:56:00+02:00'
   titre: Revue de Code & Conformité de l'Animation STruCpp
   contexte: Audit de l'animation et vérification de l'absence totale de logique métier résiduelle en JavaScript.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml
   objectifs:
   - Vérifier l'asservissement exclusif du Canvas aux données réelles de la trace JSON
-  bloque_par:
-  - T171-B
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T171-CR_REVUE_ANIMATION_COMPILED_CODE.yaml
+  date: '2026-08-28T23:37:01'
+  bloque_par: []
 - id: T172
   parent_id: null
   statut: ✅
@@ -2653,7 +2657,8 @@ tasks:
     2 TOR manquantes, correction de la note de polarité freins, signalement de la voie VH_0800END Bit5 non nommée.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-B_TABLE_TOR.yaml
   objectifs:
-  - Table §5 exhaustive: 24 voies DI configurées documentées (22 entrées existantes + TremieFull réservée non câblée + voie vide signalée)
+  - Table §5 exhaustive: 24 voies DI configurées documentées (22 entrées existantes + TremieFull réservée non câblée + voie
+      vide signalée)
   - Note polarité freins corrigée: TRUE = frein ouvert (pas « serré »)
   bloque_par: []
 - id: T172-C
@@ -2727,20 +2732,19 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T23:30:00+02:00'
   titre: Suppression des sorties silencieuses du réarmement AU + message IHM
-  contexte: 'Fiche : DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ArningSilencieux_AU_20260828.md.
-    Simulation premier boot : le 1er réarmement AU échoue SANS message (état revient à "chain OK / contacteur OK",
-    ErrorId=0, ArmFailed=FALSE). Un acquittement + 2e tentative réarme. 4 sorties silencieuses identifiées dans
-    FB_Safety_EmergencyManagementLogic.st (lignes 165/168/207/234 + front ArmRequest avalé à l''autotest §2 ligne 145)
-    : aucune ne pose de Cause → aucun message IHM. H1 (PowerCutOff métier) éliminée par preuve (4 snapshots, PowerCutOffRequest=FALSE).'
-  description: 'Famille T173 — Éliminer toute sortie silencieuse de la séquence de réarmement AU et informer
-    l''opérateur de la cause exacte. T173-A : patch de traçage minimal pour CAPTURER la provenance réelle de
-    l''échec au boot (test & validation). T173-B : étude d''impact anti-sortie-silencieuse + modification de la
-    séquence (error/message). T173-C : tests & non-régression (snapshot + CI). Chaque sous-tâche a son contrat
-    C2 dans DOC/WFLOW/CONTRACTS/.'
+  contexte: 'Fiche : DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ArningSilencieux_AU_20260828.md. Simulation premier
+    boot : le 1er réarmement AU échoue SANS message (état revient à "chain OK / contacteur OK", ErrorId=0, ArmFailed=FALSE).
+    Un acquittement + 2e tentative réarme. 4 sorties silencieuses identifiées dans FB_Safety_EmergencyManagementLogic.st (lignes
+    165/168/207/234 + front ArmRequest avalé à l''autotest §2 ligne 145) : aucune ne pose de Cause → aucun message IHM. H1
+    (PowerCutOff métier) éliminée par preuve (4 snapshots, PowerCutOffRequest=FALSE).'
+  description: 'Famille T173 — Éliminer toute sortie silencieuse de la séquence de réarmement AU et informer l''opérateur
+    de la cause exacte. T173-A : patch de traçage minimal pour CAPTURER la provenance réelle de l''échec au boot (test & validation).
+    T173-B : étude d''impact anti-sortie-silencieuse + modification de la séquence (error/message). T173-C : tests & non-régression
+    (snapshot + CI). Chaque sous-tâche a son contrat C2 dans DOC/WFLOW/CONTRACTS/.'
   contrat: ''
   objectifs:
   - Capturer la provenance de l'échec du 1er réarmement au boot (qui coupe la séquence)
-  - Plus aucune sortie silencieuse : chaque abandon de séquence produit error + message IHM actionnable
+  - Plus aucune sortie silencieuse: chaque abandon de séquence produit error + message IHM actionnable
   - Non-regression scénarios armement (nominal, échec contacteur, coupure volontaire, boot)
   bloque_par: []
 - id: T173-A
@@ -2751,13 +2755,13 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T23:30:00+02:00'
   titre: Patch de traçage — capturer la provenance de l'échec du 1er réarmement
-  contexte: 'La preuve manquante est : QUEL signal coupe la séquence AU au 1er boot (chute chaîne step 2/4/5/6,
-    front ArmRequest avalé §2, autre). Les variables actuelles de GVL_Troubleshooting (ArmingStep, ErrorId, Lockout)
-    ne suffisent pas : le step retombe à 0 sans trace. Un patch de traçage minimal doit être appliqué, validé par
-    l''humain (ajout variable trace), puis un snapshot au boot en simulation doit prouver la provenance.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-A_TRACING.yaml. Ajout d''une variable de trace
-    (last abort cause / étape atteinte) dans FB_Safety_EmergencyManagementLogic + exposition GVL_Troubleshooting +
-    liste snapshot, régénérée. Validation humaine, compilation, snapshot au boot simulation : prouver la provenance.'
+  contexte: 'La preuve manquante est : QUEL signal coupe la séquence AU au 1er boot (chute chaîne step 2/4/5/6, front ArmRequest
+    avalé §2, autre). Les variables actuelles de GVL_Troubleshooting (ArmingStep, ErrorId, Lockout) ne suffisent pas : le
+    step retombe à 0 sans trace. Un patch de traçage minimal doit être appliqué, validé par l''humain (ajout variable trace),
+    puis un snapshot au boot en simulation doit prouver la provenance.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-A_TRACING.yaml. Ajout d''une variable de trace (last abort
+    cause / étape atteinte) dans FB_Safety_EmergencyManagementLogic + exposition GVL_Troubleshooting + liste snapshot, régénérée.
+    Validation humaine, compilation, snapshot au boot simulation : prouver la provenance.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-A_TRACING.yaml
   objectifs:
   - Tracer la cause d'abandon de la séquence AU (étape atteinte + signal déclencheur)
@@ -2772,13 +2776,13 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T23:30:00+02:00'
   titre: Étude & modification — plus aucune sortie silencieuse dans le réarmement AU
-  contexte: 'Basé sur la preuve T173-A. Aucun abandon de la séquence de réarmement ne doit être silencieux :
-    chaque sortie (coupure par pouvoir coupant, chute chaîne, timeout restauration, autotest, front avalé)
-    produit un message/erreur IHM explicite + remise à zéro propre du lockout. L''étude décide de la granularité
-    (Cause/Ack ou message direct) sans jamais affaiblir l''interlock de sécurité (Cause brute reste l''arbitre).'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-B_ANTI_SILENT.yaml. Étude d''impact + modification
-    de FB_Safety_EmergencyManagementLogic (+ affichage IHM) pour transformer chaque sortie silencieuse en
-    erreur/message actionnable, en conservant l''interlock de sécurité sur Cause brute.'
+  contexte: 'Basé sur la preuve T173-A. Aucun abandon de la séquence de réarmement ne doit être silencieux : chaque sortie
+    (coupure par pouvoir coupant, chute chaîne, timeout restauration, autotest, front avalé) produit un message/erreur IHM
+    explicite + remise à zéro propre du lockout. L''étude décide de la granularité (Cause/Ack ou message direct) sans jamais
+    affaiblir l''interlock de sécurité (Cause brute reste l''arbitre).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-B_ANTI_SILENT.yaml. Étude d''impact + modification de FB_Safety_EmergencyManagementLogic
+    (+ affichage IHM) pour transformer chaque sortie silencieuse en erreur/message actionnable, en conservant l''interlock
+    de sécurité sur Cause brute.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-B_ANTI_SILENT.yaml
   objectifs:
   - Chaque abandon de séquence AU produit un message IHM explicite (cause + action)
@@ -2793,11 +2797,11 @@ tasks:
   agent: ORCHESTRATEUR
   date: '2026-08-28T23:30:00+02:00'
   titre: Tests & non-régression réarmement AU (snapshot + CI)
-  contexte: 'Après T173-B, valider les 4 scénarios d''armement (nominal, échec contacteur timeout, coupure
-    volontaire, 1er boot) en simulation : chaque échec doit produire le message attendu, le nominal reste sans
-    message. Non-régression CI (gates) et snapshots GVL_Troubleshooting.'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-C_TESTS.yaml. Suite de validation par snapshots
-    en simulation + tests unitaires de la table de vérité des sorties de séquence, gates palier C.'
+  contexte: 'Après T173-B, valider les 4 scénarios d''armement (nominal, échec contacteur timeout, coupure volontaire, 1er
+    boot) en simulation : chaque échec doit produire le message attendu, le nominal reste sans message. Non-régression CI
+    (gates) et snapshots GVL_Troubleshooting.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-C_TESTS.yaml. Suite de validation par snapshots en simulation
+    + tests unitaires de la table de vérité des sorties de séquence, gates palier C.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-C_TESTS.yaml
   objectifs:
   - Les 4 scénarios validés en simulation (messages conformes)
