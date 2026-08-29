@@ -126,7 +126,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
       <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
-      <th style="padding: 4px 2px;"><small>Intention</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
       <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
       <th style="padding: 4px 1px; text-align: center;"><small>Preuve</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
@@ -137,7 +137,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-NOM</span></td>
-      <td style="padding: 4px 2px;"><small><b>Nominal</b><br>Réarm.</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Nominal</b><br>Réarm.</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Repos initial (boucle saine, contacteur au repos, <code>Armable=TRUE</code>)<br>
         🚀 <b>Étape 1</b> : Demande réarmement (<code>ArmRequest</code> ➔ lance TestA)<br>
@@ -155,7 +155,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-DYN</span></td>
-      <td style="padding: 4px 2px;"><small><b>Dynamique</b><br>Perturb.</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Dynamique</b><br>Perturb.</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         🚀 <b>Phase 1</b> : Réarmement nominal réussi et mise en service (<code>Done=TRUE</code>)<br>
         ⚡ <b>Phase 2</b> : Coupure métier en marche (<code>PowerCutOffRequest=TRUE</code> ➔ retombée A/B, <code>Armable=FALSE</code>)<br>
@@ -171,7 +171,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-001</span></td>
-      <td style="padding: 4px 2px;"><small>Coupure AU<br>physique</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Coupure AU<br>physique</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚡ <b>Étape 1</b> : Enfoncement coup de poing AU physique sur site<br>
         🔒 <b>Étape 2</b> : Ouverture matérielle immédiate de la boucle 24V de sécurité<br>
@@ -184,7 +184,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-002</span></td>
-      <td style="padding: 4px 2px;"><small>Perte maintien<br>A/B</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Perte maintien<br>A/B</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         🔍 <b>Étape 1</b> : Surveillance indépendante des canaux A et B en régime nominal établi<br>
         ⚡ <b>Étape 2</b> : Test de coupure unilatérale du canal A (<code>MaintainA_RQ=FALSE</code>, B maintenu)<br>
@@ -198,7 +198,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-003</span></td>
-      <td style="padding: 4px 2px;"><small>Impulsion<br>réarm.</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Impulsion<br>réarm.</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         🚀 <b>Étape 1</b> : Front montant <code>ArmRequest</code> sous préconditions saines (boucle OK, pas de défaut)<br>
         ⚡ <b>Étape 2</b> : Auto-tests A/B croisés validés ➔ Génération impulsion collage contacteur 1.0s (<code>ArmPulse_RQ=TRUE</code>)<br>
@@ -211,7 +211,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-004</span></td>
-      <td style="padding: 4px 2px;"><small>Acquittement<br>Reset</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Acquittement<br>Reset</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚠️ <b>Étape 1</b> : Apparition d'un défaut de sécurité ou d'auto-test (<code>Error=TRUE</code>)<br>
         🔄 <b>Étape 2</b> : Front montant sur <code>Reset</code> ➔ Effacement de l'affichage du défaut (<code>Error=FALSE</code>)<br>
@@ -224,7 +224,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-005</span></td>
-      <td style="padding: 4px 2px;"><small>Séquence<br>2 temps</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Séquence<br>2 temps</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         🔄 <b>Temps 1</b> : Action 1 = Impulsion <code>Reset</code> opérateur pour acquitter et purger l'état de défaut<br>
         🚀 <b>Temps 2</b> : Action 2 = Impulsion <code>ArmRequest</code> distincte et consciente pour engager l'armement
@@ -236,7 +236,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-006</span></td>
-      <td style="padding: 4px 2px;"><small>Auto-test<br>A/B croisé</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Auto-test<br>A/B croisé</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         🚀 <b>Étape 1</b> : Front <code>ArmRequest</code> ➔ Lancement TestA (Step 1, coupure logicielle canal A)<br>
         ⚠️ <b>Étape 2</b> : Détection canal collé (boucle reste fermée malgré coupure A)<br>
@@ -249,7 +249,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-007</span></td>
-      <td style="padding: 4px 2px;"><small>Échec contact.<br>+ Lockout</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Échec contact.<br>+ Lockout</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚡ <b>Étape 1</b> : Fin d'impulsion de collage 1s ➔ Entrée en Step 6 Attente confirmation<br>
         ⏱️ <b>Étape 2</b> : Écoulement timeout 2.0s sans retour <code>PowerContactorEngaged</code><br>
@@ -262,7 +262,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-008</span></td>
-      <td style="padding: 4px 2px;"><small>Coupure métier<br>active</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Coupure métier<br>active</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚡ <b>Étape 1</b> : Détection dérive métier critique (ex. dérive treuil M3 ➔ <code>PowerCutOffRequest=TRUE</code>)<br>
         ⛔ <b>Étape 2</b> : Retombée immédiate et inconditionnelle des canaux A et B (<code>MaintainA/B_RQ=FALSE</code>)<br>
@@ -275,7 +275,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-009</span></td>
-      <td style="padding: 4px 2px;"><small>Interlock<br>PowerCutOff</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Interlock<br>PowerCutOff</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         🛡️ <b>Étape 1</b> : Présence active de <code>PowerCutOffRequest=TRUE</code> (ou défaut non résolu)<br>
         🚫 <b>Étape 2</b> : Tentative d'armement <code>ArmRequest</code> ➔ Refus net, interdiction de transition hors Step 0<br>
@@ -288,7 +288,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold;">TC-P01-010</span></td>
-      <td style="padding: 4px 2px;"><small>Avortement<br>IHM</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Avortement<br>IHM</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚡ <b>Étape 1</b> : Impulsion de réarmement en cours (Step 5, <code>ArmPulse_RQ=TRUE</code>)<br>
         🛑 <b>Étape 2</b> : Appui volontaire opérateur sur <code>BtnEmergencyCutOff</code> pendant le pulse<br>
