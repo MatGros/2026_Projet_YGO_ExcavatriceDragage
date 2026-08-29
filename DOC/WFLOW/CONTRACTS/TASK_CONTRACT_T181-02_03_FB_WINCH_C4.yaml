@@ -1,0 +1,95 @@
+# Contrat T181-02+03 — FB_Winch : corrections C4 Phase 0 (Fwd/Rev + StuckClosed)
+# Fusion des tâches T181-02 et T181-03 (B4 §6 : 2 micro-fix, même fichier, même bloque_par).
+# Source : PLAN_GEL_TREUIL_T181_v0.1.md §1 (D02, D07), §13 ; B2 §1.1 (le vrai FAIL TC-011
+#          peut être dans la chaîne CommandedDirection 1er scan, pas le SEL:248).
+
+contract:
+  task_id: T181-02_03_FB_WINCH_C4
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Rendre FB_Winch vert en CI (TC-P10-011 sens de rotation) et retirer sa détection
+    StuckClosed au profit du propriétaire unique FB_Safety_Winch — SANS refonte d'interface
+    (Phase 0). Le champ de sortie ContactorsCheck.StuckClosed reste publié (consommateurs
+    IHM/Troubleshooting) et sera ré-alimenté depuis FB_Safety_Winch par T181-08.
+
+  acceptance:
+    - id: AC1
+      statement: "Diagnostic du vrai FAIL TC-P10-011 documenté AVANT correction : le SEL FB_Winch.st:248 (SEL(CommandedDirection=-1, DelayAscent, DelayDescent)) est logiquement correct (B2) ; vérifier si la cause est la chaîne CommandedDirection au 1er scan / FirstScanDone, ou ailleurs."
+      verified_by: "note de diagnostic (2-5 lignes) dans le corps du commit + lecture du .st du TC"
+    - id: AC2
+      statement: "CI FB_Winch : TC-P10-011 PASS ; aucune régression sur les TC déjà verts (TC-P10-014..017, 023..034, 042.1)."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Winch"
+    - id: AC3
+      statement: "FB_Winch ne contient plus AUCUNE logique de détection StuckClosed dans son corps exécutable : plus d'affectation de ContactorsCheck.StuckClosed, plus de cause de défaut interne instCauses[*] liée à StuckClosed."
+      verified_by: "grep -n 'StuckClosed' CODE/H_TREUILS_BENNE/FB_Winch.st : 0 dans le corps (declarations de struct tolérées) ; grep 'instCauses' autour de StuckClosed = 0"
+    - id: AC4
+      statement: "Le champ ContactorsCheck.StuckClosed (VAR_OUTPUT, consommé PRG_04:803/860 -> IHM/Troubleshooting) reste DÉCLARÉ et, pendant la Phase 0, forcé à FALSE (valeur sûre) en attendant la ré-alimentation depuis FB_Safety_Winch (T181-08)."
+      verified_by: "lecture FB_Winch.st : StuckClosed := FALSE explicite + commentaire renvoyant à T181-08"
+    - id: AC5
+      statement: "FB_Safety_Winch : la détection StuckClosed (Méca B, ~3 s) devient le SEUL producteur ; un TC côté FB_Safety_Winch couvre le scénario (déplacer/adapter TC-P10-018)."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Safety_Winch : scenario StuckClosed PASS"
+    - id: AC6
+      statement: "L'interface (VAR_INPUT/VAR_OUTPUT/VAR_IN_OUT) de FB_Winch est INCHANGÉE (aucune entrée retirée/ajoutée — le retrait de Mode est T181-08, pas ici)."
+      verified_by: "git diff sur les blocs de déclaration de FB_Winch = vide (hors commentaires)"
+    - id: AC7
+      statement: "Garde anti-régression : un script TOOLS/AGENT_WORKFLOW/scripts/ (nom suggéré G4xx_check_stuckclosed_single_owner) échoue si StuckClosed est assigné dans plus d'un FB."
+      verified_by: "exécution du gate : PASS ; ajout à run_all_gates palier C"
+    - id: AC8
+      statement: "Non-régression : G200 liaison PASS, gates palier C PASS, harnais WINCH_INTEG ne régresse pas (score >= baseline)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report ; python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_safety_winch.st
+      - TOOLS/AGENT_WORKFLOW/scripts/            # gate single-owner
+    forbidden:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st      # retrait Mode = T181-08
+      - CODE/H_TREUILS_BENNE/_TYPES/**           # pas de changement de DUT en Phase 0
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Le champ de sortie ContactorsCheck.StuckClosed (consommé IHM/Troubleshooting) — déclaré, jamais supprimé"
+      - "Toutes les autres protections de FB_Winch (interlock direction, rampe palier, garde Enable=FALSE)"
+      - "Le comportement de FB_Safety_Winch hors StuckClosed"
+    dropped_on_purpose:
+      - "La détection interne de StuckClosed par FB_Winch (déplacée dans FB_Safety_Winch)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si le vrai FAIL TC-P10-011 n'est pas dans FB_Winch mais dans le TC lui-même (attendu
+    faux), ou si retirer la détection StuckClosed de FB_Winch casse un consommateur non
+    prévu, ou si FB_Safety_Winch ne peut pas produire StuckClosed sans une entrée nouvelle :
+    REMONTER à l'orchestrateur avant de contourner.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir : diagnostic TC-011, correction, retrait StuckClosed de FB_Winch, gate single-owner.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Revue orchestrateur : git diff réel + note de diagnostic + CI FB_Winch/FB_Safety_Winch verts.

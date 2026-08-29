@@ -1,0 +1,118 @@
+# Contrat T181-05 — Extraction sous-FB de FB_Winch (Phase 0b, interface FB_Winch inchangée)
+# Source : PLAN_GEL_TREUIL_T181_v0.1.md §1 (D09, D10), §7 Phase 0b ; AF10_INTERFACE §3 + §3bis ;
+#          B4 SEC-4 / §1 (D18 = front montant Enable, PAS FirstScanDone) ;
+#          décision utilisateur : cadencement contacteurs (montée cadencée / retombée immédiate /
+#          sens jamais avant vitesse).
+
+contract:
+  task_id: T181-05_SOUS_FB_EXTRACTION
+  criticality: C3            # extraction interne ; mais porte D18 (sécurité C4) et la règle contacteurs
+  strategy: rebuild         # 2 sous-FB créés
+
+  objective: >
+    Isoler de FB_Winch deux responsabilités en sous-FB testables : (1) l'interlock de changement
+    de sens (FB_WinchDirectionInterlock) avec correction D18 (temps mort au front montant Enable) ;
+    (2) le cadencement de palier (FB_WinchStepShaper) avec comportement ASYMÉTRIQUE (montée cadencée
+    +1 cran / StepRampDelay, descente immédiate à 0). Retirer les entrées mortes Mode et
+    CycleTimeCalc. Formaliser la règle « contacteur de sens jamais relâché avant les contacteurs de
+    vitesse ». Interface EXTERNE de FB_Winch inchangée (au retrait de Mode près -> édite PRG_04).
+
+  acceptance:
+    - id: AC1
+      statement: "FB_WinchDirectionInterlock existe : IN Enable, EnableRising:BOOL, ReqDirection:INT, ChangeDelayUp:TIME, ChangeDelayDown:TIME ; OUT CommandedDirection:INT, DirectionChangePending:BOOL, DelayElapsed:TIME. Extrait de FB_Winch.st:198-227."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_WinchDirectionInterlock (>= 1 TC : changement de sens temporisé)"
+    - id: AC2
+      statement: "D18 : sur EnableRising (front montant Enable), FB_WinchDirectionInterlock N'ADOPTE PAS ReqDirection immédiatement — il arme le temps mort. La cible est le front d'Enable, PAS le flag FirstScanDone (B4)."
+      verified_by: "TC : Enable OFF->ON avec ReqDirection != 0 maintenu -> CommandedDirection reste 0 jusqu'à DelayElapsed ; grep 'FirstScanDone' = absent de cette logique"
+    - id: AC3
+      statement: "FB_WinchStepShaper existe : IN Enable, TargetStep:INT, StepRampDelay:TIME ; OUT ShapedStep:INT, StepDelayElapsed:TIME. Extrait de FB_Winch.st:250-271 (BusinessStepDelay)."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_WinchStepShaper"
+    - id: AC4
+      statement: "FB_WinchStepShaper ASYMÉTRIQUE : montée = ShapedStep monte de +1 cran quand StepDelayElapsed >= StepRampDelay ; descente = ShapedStep -> 0 au cycle suivant (AUCUNE rampe descendante)."
+      verified_by: "TC montée : 0->1->2->3 temporisé (1 cran / StepRampDelay) ; TC descente : TargetStep passe à 0 -> ShapedStep = 0 au cycle N+1"
+    - id: AC5
+      statement: "D10 corrigé : StepRampDelay est un paramètre DÉDIÉ, découplé des DirectionInterlockDelay{Up,Down}. Le +T#100ms en dur de FB_Winch.st:248 est supprimé ou justifié par un commentaire."
+      verified_by: "grep -n 'SEL(.*InterlockDelay' CODE/H_TREUILS_BENNE/FB_Winch.st renvoie 0 ligne pour le calcul du delai de rampe ; lecture du diff FB_Winch.st"
+    - id: AC6
+      statement: "Règle absolue contacteurs (AF10 §3bis) implémentée dans FB_Winch : RelayFwd_Up / RelayRev_Down ne sont mis à FALSE QUE si tous Contactor1..4 sont à 0 (ou ContactorsAllOff confirmé depuis >= DropConfirmDelay). Retombée vitesse = immédiate ; sens = après confirmation."
+      verified_by: "TC : StartStop passe FALSE -> Contactor1..4 = 0 au cycle suivant, RelayFwd_Up encore TRUE ; après ContactorsAllOff -> RelayFwd_Up = FALSE. Aucune affectation non gardée."
+    - id: AC7
+      statement: "Diag DirectionDropBlocked exposé (sens en attente de retombée vitesse) — transitoire en nominal ; un latch prolongé signale un contacteur de vitesse collé."
+      verified_by: "lecture VAR_OUTPUT + TC : nominal -> DirectionDropBlocked <= quelques cycles"
+    - id: AC8
+      statement: "Entrées mortes retirées : Mode (VAR_INPUT E_Mode, jamais lu) et CycleTimeCalc (FB_CycleTime instancié jamais consommé). Le retrait de Mode édite les 2 sites d'appel PRG_04:671,702 au MÊME commit."
+      verified_by: "git diff FB_Winch.st (VAR_INPUT) + grep 'Mode ' / 'CycleTimeCalc' dans FB_Winch.st = 0 ; grep 'Mode :=' dans appels instWinchM1/M2 de PRG_04 = 0"
+    - id: AC9
+      statement: "Garde mécanique G4xx_check_direction_after_speed : toute mise à FALSE de RelayFwd_Up/RelayRev_Down dans FB_Winch.st et FB_WinchOutputInterlock.st est gardée par 'tous Contactor1..4 à 0'. Ajouté à run_all_gates palier C."
+      verified_by: "exécution du gate : PASS ; grep dans run_all_gates.py"
+    - id: AC10
+      statement: "FB_Winch : comportement iso sur le harnais WINCH_INTEG (0 régression du score) et CI FB_Winch inchangée hors les points ci-dessus."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C ; run_tests.py --fb WINCH_INTEG (score >= baseline)"
+    - id: AC11
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (source PRG_04_Treuils_Benne -> POU PRG_04_Treuils_Benne)."
+      verified_by: "comparaison basename sans extension vs identifiant apres PROGRAM/FUNCTION_BLOCK"
+    - id: AC12
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage (_CFC/_LD) apposé ; le suffixe reste identique au langage genere dans le bundle (ST pur)."
+      verified_by: "grep basename *_CFC/_LD absent + inspection CODE_Bundle.xml"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st     # nouveau
+      - CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st             # nouveau
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st        # règle sens-après-vitesse côté barrière
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                    # retrait Mode:= sur les 2 appels
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/**     # TC des 2 sous-FB + FB_Winch
+      - TOOLS/AGENT_WORKFLOW/scripts/                          # gate direction-after-speed
+    forbidden:
+      - CODE/H_TREUILS_BENNE/_TYPES/**                         # pas de refonte DUT (T181-08)
+      - CODE/H_TREUILS_BENNE/FB_SpeedStep.st                   # MinStepNumber = T181-07
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "L'interface externe de FB_Winch (hors retrait Mode) — VAR_INPUT/OUTPUT/IN_OUT"
+      - "Le comportement d'interlock de changement de sens en fonctionnement normal (hors front Enable)"
+      - "La montée cadencée de palier (une seule différence : paramètre dédié au lieu des délais direction)"
+      - "Garde Enable=FALSE -> sorties sûres ; pas de redémarrage auto après défaut"
+    dropped_on_purpose:
+      - "L'entrée VAR_INPUT Mode (morte)"
+      - "L'instance CycleTimeCalc : FB_CycleTime (jamais consommée)"
+      - "Le réemploi des DirectionInterlockDelay pour fabriquer le délai de rampe palier (D10)"
+      - "L'adoption immédiate de la direction au 1er scan / retour d'Enable (D18)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si l'extraction d'un sous-FB change le timing observable de FB_Winch (rampe, interlock),
+    si la règle « sens après vitesse » entre en conflit avec le temps mort directionnel existant
+    (DeadTimeSameDir/OppositeDir de FB_WinchOutputInterlock), ou si retirer Mode révèle un
+    consommateur caché : REMONTER à l'orchestrateur.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir : 2 sous-FB extraits (DirectionInterlock + StepShaper asymétrique), D18, règle
+    contacteurs sens-après-vitesse, retrait Mode/CycleTimeCalc, 2 gates.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Revue orchestrateur : git diff réel + TC des 2 sous-FB + TC règle contacteurs + non-régression
+    harnais. Vérifier D18 cible bien le front d'Enable (pas FirstScanDone).
