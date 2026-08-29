@@ -9,18 +9,18 @@
 
 ## 🧭 Sommaire
 
-1. [🎯 Périmètre et composition](#1--périmètre-et-composition)
-2. [🧪 Table des points de validation (détail)](#2--table-des-points-de-validation-détail)
-3. [🔌 Contrats d'interface](#3--contrats-dinterface)
-4. [⚙️ Comportement et séquence](#4--comportement-et-séquence)
-5. [📡 Polarités et E/S physiques](#5--polarités-et-es-physiques)
-6. [🔗 Intégration programme (architecture cible)](#6--intégration-programme-architecture-cible)
-7. [🖥️ IHM et diagnostics](#7--ihm-et-diagnostics)
-8. [🧬 Simulation](#8--simulation)
-9. [🗂️ Normalisation bus/DUT (cible — plan, pas code)](#9--normalisation-busdut-cible--plan-pas-code)
-10. [📊 Stratégie de test](#10--stratégie-de-test)
-11. [📜 Suivi historique](#11--suivi-historique)
-12. [📚 Documents liés](#12--documents-liés)
+1. [🎯 Périmètre et composition](#1-périmètre-et-composition)
+2. [🧪 Table des points de validation (détail)](#2-table-des-points-de-validation-détail)
+3. [🔌 Contrats d'interface](#3-contrats-dinterface)
+4. [⚙️ Comportement et séquence](#4-comportement-et-séquence)
+5. [📡 Polarités et E/S physiques](#5-polarités-et-es-physiques)
+6. [🔗 Intégration programme (architecture cible)](#6-intégration-programme-architecture-cible)
+7. [🖥️ IHM et diagnostics](#7-ihm-et-diagnostics)
+8. [🧬 Simulation](#8-simulation)
+9. [🗂️ Normalisation bus/DUT (cible — plan, pas code)](#9-normalisation-busdut-cible-plan-pas-code)
+10. [📊 Stratégie de test](#10-stratégie-de-test)
+11. [📜 Suivi historique](#11-suivi-historique)
+12. [📚 Documents liés](#12-documents-liés)
 
 ## 1 · 🎯 Périmètre et composition
 

@@ -11,14 +11,14 @@
 
 ## 🧭 Sommaire
 
-1. [🎯 Rôle et profil](#1--rôle-et-profil)
-2. [🧪 Table des points de validation (détail)](#2--table-des-points-de-validation-détail)
-3. [🔌 Interface](#3--interface)
-4. [⚙️ Comportement — vue live, armement du latch, acquittement](#4--comportement--vue-live-armement-du-latch-acquittement)
-5. [🚨 Changement de convention fail-safe (ex-`IsWarning` → `Latching`)](#5--changement-de-convention-fail-safe-ex-iswarning--latching)
-6. [⚠️ Limites connues](#6--limites-connues)
-7. [📜 Suivi historique](#7--suivi-historique)
-8. [📚 Documents liés](#8--documents-liés)
+1. [🎯 Rôle et profil](#1-rôle-et-profil)
+2. [🧪 Table des points de validation (détail)](#2-table-des-points-de-validation-détail)
+3. [🔌 Interface](#3-interface)
+4. [⚙️ Comportement — vue live, armement du latch, acquittement](#4-comportement-vue-live-armement-du-latch-acquittement)
+5. [🚨 Changement de convention fail-safe (ex-`IsWarning` → `Latching`)](#5-changement-de-convention-fail-safe-ex-iswarning-latching)
+6. [⚠️ Limites connues](#6-limites-connues)
+7. [📜 Suivi historique](#7-suivi-historique)
+8. [📚 Documents liés](#8-documents-liés)
 
 ---
 

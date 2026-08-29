@@ -7,20 +7,20 @@
 
 ## 📑 Sommaire
 
-1. [🎯 Rôle et périmètre](#1--rôle-et-périmètre)
-2. [🧪 Table des points de validation](#2--table-des-points-de-validation)
-3. [🔄 Pipeline et composition](#3--pipeline-et-composition)
-4. [🔌 Interface publique (façade `FB_Encoder`)](#4--interface-publique-façade-fb_encoder)
-5. [📍 Homing (F09.02, F09.03)](#5--homing-f0902-f0903)
-6. [📡 Mise à l'échelle & bornage (F09.04, F09.05, F09.06)](#6--mise-à-léchelle--bornage-f0904-f0905-f0906)
-7. [⚙️ Vitesse (F09.07)](#7--vitesse-f0907)
-8. [🔒 Intégration programme](#8--intégration-programme)
-9. [🖥️ IHM, Configuration & Dépannage](#9--ihm-configuration--dépannage)
-10. [📜 Suivi historique](#10--suivi-historique)
-11. [❓ TBD](#11--tbd)
-12. [📚 Documents liés](#12--documents-liés)
-13. [🔧 Transaction preset E-D1 (T164-4C)](#13--transaction-preset-e-d1-t164-4c)
-14. [🧩 Brique défaut façade `Fault : ST_Fault` (T164-4D)](#14--brique-défaut-façade-fault--st_fault-t164-4d)
+1. [🎯 Rôle et périmètre](#1-rôle-et-périmètre)
+2. [🧪 Table des points de validation](#2-table-des-points-de-validation)
+3. [🔄 Pipeline et composition](#3-pipeline-et-composition)
+4. [🔌 Interface publique (façade `FB_Encoder`)](#4-interface-publique-façade-fb_encoder)
+5. [📍 Homing (F09.02, F09.03)](#5-homing-f0902-f0903)
+6. [📡 Mise à l'échelle & bornage (F09.04, F09.05, F09.06)](#6-mise-à-léchelle-bornage-f0904-f0905-f0906)
+7. [⚙️ Vitesse (F09.07)](#7-vitesse-f0907)
+8. [🔒 Intégration programme](#8-intégration-programme)
+9. [🖥️ IHM, Configuration & Dépannage](#9-ihm-configuration-dépannage)
+10. [📜 Suivi historique](#10-suivi-historique)
+11. [❓ TBD](#11-tbd)
+12. [📚 Documents liés](#12-documents-liés)
+13. [🔧 Transaction preset E-D1 (T164-4C)](#13-transaction-preset-e-d1-t164-4c)
+14. [🧩 Brique défaut façade `Fault : ST_Fault` (T164-4D)](#14-brique-défaut-façade-fault-st_fault-t164-4d)
 
 ---
 

@@ -16,19 +16,19 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
-2. [🎯 Rôle (détail)](#2--rôle-détail)
-3. [🏗️ Chaîne d'acquisition](#3--chaîne-dacquisition)
-   - [3bis. 🧩 Intégration programme — cible `PRG_02_Acquisition`](#3bis--integration-programme--cible-prg_02_acquisition)
-   - [3ter. 🧾 Contrats DUT — image d'acquisition](#3ter--contrats-dut--image-dacquisition)
-4. [📡 Diagnostics bus](#4--diagnostics-bus)
-   - [4bis. 🩺 Diagnostic carte des modules DI (22 TOR réelles)](#4bis--diagnostic-carte-des-modules-di-22-tor-reelles)
-5. [🔌 TOR d'entrée — liste exhaustive de `HwIn`](#5--tor-dentrée--liste-exhaustive-de-hwin)
-6. [⚡ Sorties physiques & Barrières de sécurité](#6--sorties-physiques--barrières-de-sécurité)
-7. [🩺 Preflight (qualification machine arrêtée)](#7--preflight-qualification-machine-arrêtée)
-8. [📜 Suivi historique](#8--suivi-historique)
-9. [❓ TBD](#9--tbd)
-10. [📚 Documents liés](#10--documents-liés)
+1. [🧪 Table des points de validation](#1-table-des-points-de-validation)
+2. [🎯 Rôle (détail)](#2-rôle-détail)
+3. [🏗️ Chaîne d'acquisition](#3-chaîne-dacquisition)
+   - [3bis. 🧩 Intégration programme — cible `PRG_02_Acquisition`](#3bis-integration-programme-cible-prg_02_acquisition)
+   - [3ter. 🧾 Contrats DUT — image d'acquisition](#3ter-contrats-dut-image-dacquisition)
+4. [📡 Diagnostics bus](#4-diagnostics-bus)
+   - [4bis. 🩺 Diagnostic carte des modules DI (22 TOR réelles)](#4bis-diagnostic-carte-des-modules-di-22-tor-reelles)
+5. [🔌 TOR d'entrée — liste exhaustive de `HwIn`](#5-tor-dentrée-liste-exhaustive-de-hwin)
+6. [⚡ Sorties physiques & Barrières de sécurité](#6-sorties-physiques-barrières-de-sécurité)
+7. [🩺 Preflight (qualification machine arrêtée)](#7-preflight-qualification-machine-arrêtée)
+8. [📜 Suivi historique](#8-suivi-historique)
+9. [❓ TBD](#9-tbd)
+10. [📚 Documents liés](#10-documents-liés)
 
 ## 🧪 1 · Table des points de validation
 

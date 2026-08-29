@@ -79,16 +79,16 @@
 
 ## 📑 Sommaire
 
-1. [🧱 Composition — fiches FB dédiées](#1--composition--fiches-fb-dédiées)
-2. [🧪 Table des points de validation](#2--table-des-points-de-validation)
-3. [🎭 Rôles et familles](#3--rôles-et-familles)
-4. [🚌 DUT et bus](#4--dut-et-bus)
-5. [🔄 Flux et consommateurs](#5--flux-et-consommateurs)
-6. [🔗 Intégration programme](#6--intégration-programme)
-7. [📊 ErrorId](#7--errorid)
-8. [📜 Suivi historique](#8--suivi-historique)
-9. [❓ TBD](#9--tbd)
-10. [📚 Documents liés](#10--documents-liés)
+1. [🧱 Composition — fiches FB dédiées](#1-composition-fiches-fb-dédiées)
+2. [🧪 Table des points de validation](#2-table-des-points-de-validation)
+3. [🎭 Rôles et familles](#3-rôles-et-familles)
+4. [🚌 DUT et bus](#4-dut-et-bus)
+5. [🔄 Flux et consommateurs](#5-flux-et-consommateurs)
+6. [🔗 Intégration programme](#6-intégration-programme)
+7. [📊 ErrorId](#7-errorid)
+8. [📜 Suivi historique](#8-suivi-historique)
+9. [❓ TBD](#9-tbd)
+10. [📚 Documents liés](#10-documents-liés)
 
 ---
 

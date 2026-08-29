@@ -4,15 +4,15 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
-2. [🧱 Principes d'architecture](#2--principes-darchitecture)
-3. [🗺️ Organisation cible](#3--organisation-cible)
-4. [🚌 Contrats de flux](#4--contrats-de-flux)
-5. [⏱️ Exécution cible](#5--exécution-cible)
-6. [🔧 Règles de maintenance et migration](#6--règles-de-maintenance-et-migration)
-7. [📜 Suivi historique](#7--suivi-historique)
-8. [❓ TBD](#8--tbd)
-9. [📚 Documents liés](#9--documents-liés)
+1. [🧪 Table des points de validation](#1-table-des-points-de-validation)
+2. [🧱 Principes d'architecture](#2-principes-darchitecture)
+3. [🗺️ Organisation cible](#3-organisation-cible)
+4. [🚌 Contrats de flux](#4-contrats-de-flux)
+5. [⏱️ Exécution cible](#5-exécution-cible)
+6. [🔧 Règles de maintenance et migration](#6-règles-de-maintenance-et-migration)
+7. [📜 Suivi historique](#7-suivi-historique)
+8. [❓ TBD](#8-tbd)
+9. [📚 Documents liés](#9-documents-liés)
 
 ---
 

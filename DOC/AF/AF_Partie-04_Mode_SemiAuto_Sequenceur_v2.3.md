@@ -14,15 +14,15 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
-2. [🧱 Principes](#2--principes)
-3. [🪨 Petits cycles réutilisables](#3--petits-cycles-réutilisables)
-4. [🔄 Cycle semi-auto (grafcet)](#4--cycle-semi-auto-grafcet)
-5. [⚖️ Synchronisation pendant les mouvements](#5--synchronisation-pendant-les-mouvements)
-6. [💬 Messages et diagnostics](#6--messages-et-diagnostics)
-7. [📜 Suivi historique](#7--suivi-historique)
-8. [❓ TBD](#8--tbd)
-9. [📚 Documents liés](#9--documents-liés)
+1. [🧪 Table des points de validation](#1-table-des-points-de-validation)
+2. [🧱 Principes](#2-principes)
+3. [🪨 Petits cycles réutilisables](#3-petits-cycles-réutilisables)
+4. [🔄 Cycle semi-auto (grafcet)](#4-cycle-semi-auto-grafcet)
+5. [⚖️ Synchronisation pendant les mouvements](#5-synchronisation-pendant-les-mouvements)
+6. [💬 Messages et diagnostics](#6-messages-et-diagnostics)
+7. [📜 Suivi historique](#7-suivi-historique)
+8. [❓ TBD](#8-tbd)
+9. [📚 Documents liés](#9-documents-liés)
 
 ## 🧪 1 · Table des points de validation
 

@@ -8,7 +8,13 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "scripts"))
 
-from extract_functions_matrix import build_matrix, extract_sections  # noqa: E402
+from extract_functions_matrix import (  # noqa: E402
+    build_matrix,
+    extract_sections,
+    is_variant_key,
+    quality_report,
+    tc_tokens,
+)
 
 
 def test_extract_sections_html_tables() -> None:
@@ -72,3 +78,53 @@ def test_extract_functions_matrix_af08() -> None:
     af01 = data["domains"]["AF-01"]
     assert "TC-P01-001" in af01["validation_points"]
     assert af01["validation_points"]["TC-P01-001"]["etat"] in {"V", "V-I", "NV", "NV-I", "R", "NA"}
+
+
+def test_tc_tokens_and_variants() -> None:
+    """REX 2026-08-29 : canonisation des clés + familles volontaires .k."""
+    assert tc_tokens("TC-P03-014.1") == ["TC-P03-014"]
+    assert is_variant_key("TC-P03-014.1") is True
+    assert is_variant_key("TC-P03-014") is False
+    assert tc_tokens("TC-P01-001, TC-P01-008") == ["TC-P01-001", "TC-P01-008"]
+    assert tc_tokens("Diagnostic charge 2D") == []
+    assert tc_tokens("TC-P14-TSV-01") == []
+
+
+def test_quality_report_overlap_detection() -> None:
+    """Recouvrement composée+simple détecté ; famille .k et clés libres ignorés."""
+    matrix = {
+        "domains": {
+            "AF-99": {
+                "file": "x.md",
+                "functions": {},
+                "validation_points": {
+                    "TC-P99-001": {"intention": "a"},
+                    "TC-P99-001, TC-P99-002": {"intention": "b"},
+                    "TC-P99-003.1": {"intention": "c"},
+                    "Diagnostic libre": {"intention": "d"},
+                },
+            },
+            "AF-98": {
+                "file": "y.md",
+                "functions": {},
+                "validation_points": {"TC-P99-004": {"intention": "e"}},
+            },
+        }
+    }
+    rep = quality_report(matrix)
+    assert rep["stats"]["unique_tc"] == 4  # 001, 002, 003, 004
+    ov = {(o["domain"], o["tc"]) for o in rep["overlaps"]}
+    assert ("AF-99", "TC-P99-001") in ov  # composée + simple = recouvrement
+    assert ("AF-99", "TC-P99-002") not in ov  # une seule clé le déclare : légitime
+    assert ("AF-99", "TC-P99-003") not in ov  # famille .k = non recouvrante
+    assert rep["cross_domain"] == []
+    assert {n["id"] for n in rep["non_canonical"]} == {"Diagnostic libre"}
+
+
+def test_real_matrix_no_cross_domain_duplicate() -> None:
+    """Sur le dépôt réel : aucun ID canonique partagé entre 2 domaines AF."""
+    data = build_matrix(REPO_ROOT / "DOC" / "AF")
+    rep = quality_report(data)
+    assert rep["cross_domain"] == []
+    assert rep["stats"]["domains"] == 14
+    assert rep["stats"]["validation_points"] >= 200

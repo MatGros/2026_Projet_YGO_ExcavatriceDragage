@@ -13,16 +13,16 @@
 
 ## 📑 Sommaire
 
-1. [🧪 Table des points de validation](#1--table-des-points-de-validation)
-2. [🎯 Principe](#2--principe)
-3. [🌐 Frontière `GVL_IHM`](#3--frontière-gvl_ihm)
-4. [🧱 Structures par domaine](#4--structures-par-domaine)
-5. [💬 Bandeau d'information et messages opérateur](#5--bandeau-dinformation-et-messages-opérateur)
-6. [🚨 Bandeau d'alarme défilant](#6--bandeau-dalarme-défilant)
-7. [🔎 Troubleshooting](#7--troubleshooting)
-8. [📜 Suivi historique](#8--suivi-historique)
-9. [❓ TBD](#9--tbd)
-10. [📚 Documents liés](#10--documents-liés)
+1. [🧪 Table des points de validation](#1-table-des-points-de-validation)
+2. [🎯 Principe](#2-principe)
+3. [🌐 Frontière `GVL_IHM`](#3-frontière-gvl_ihm)
+4. [🧱 Structures par domaine](#4-structures-par-domaine)
+5. [💬 Bandeau d'information et messages opérateur](#5-bandeau-dinformation-et-messages-opérateur)
+6. [🚨 Bandeau d'alarme défilant](#6-bandeau-dalarme-défilant)
+7. [🔎 Troubleshooting](#7-troubleshooting)
+8. [📜 Suivi historique](#8-suivi-historique)
+9. [❓ TBD](#9-tbd)
+10. [📚 Documents liés](#10-documents-liés)
 
 ## 🧪 1 · Table des points de validation
 
