@@ -136,9 +136,9 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-NOM</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-NOM</span></td>
       <td style="padding: 4px 2px;"><small><b>Nominal</b><br>Réarm.</small></td>
-      <td style="padding: 6px 8px; font-size: 13.5px; line-height: 1.6; font-weight: 500;">
+      <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Repos initial (boucle saine, contacteur au repos, <code>Armable=TRUE</code>)<br>
         🚀 <b>Étape 1</b> : Demande réarmement (<code>ArmRequest</code> ➔ lance TestA)<br>
         🔍 <b>Étape 2</b> : Réaction boucle à TestA (chute boucle ➔ RestoreA)<br>
@@ -154,9 +154,9 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-DYN</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-DYN</span></td>
       <td style="padding: 4px 2px;"><small><b>Dynamique</b><br>Perturb.</small></td>
-      <td style="padding: 6px 8px; font-size: 13.5px; line-height: 1.6; font-weight: 500;">
+      <td style="padding: 6px 8px; line-height: 1.55;">
         🚀 <b>Phase 1</b> : Réarmement nominal réussi et mise en service (<code>Done=TRUE</code>)<br>
         ⚡ <b>Phase 2</b> : Coupure métier en marche (<code>PowerCutOffRequest=TRUE</code> ➔ retombée A/B, <code>Armable=FALSE</code>)<br>
         🛡️ <b>Phase 3</b> : Tentative réarmement bloquée sous défaut (refus net, reste Step 0)<br>
