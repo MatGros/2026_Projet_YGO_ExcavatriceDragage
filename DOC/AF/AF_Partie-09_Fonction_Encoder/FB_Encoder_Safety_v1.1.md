@@ -47,7 +47,7 @@ Décline `TC-P09-030` (chapô) :
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.4</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>CablePosM</code> hors <code>[PositionMinM;PositionMaxM]</code> (déf. ±99m) → <code>EncoderIncoherent=TRUE</code>, bit0, auto-effacé au retour en plage</td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>CablePosM</code> hors <code>[PositionMinM;PositionMaxM]</code> → <code>EncoderIncoherent=TRUE</code>, bit0, auto-effacé au retour ; borne haute : <code>PositionMaxM</code> accepté, +ε → incohérent</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
@@ -61,7 +61,7 @@ Décline `TC-P09-030` (chapô) :
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-030.6</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>BypassGlobal=TRUE</code> → neutralise les 2 causes (mise en service)</td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>BypassGlobal=TRUE</code> → neutralise bornage + cohérence boot ; retour FALSE → les 2 causes redeviennent actives au scan suivant</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
@@ -118,6 +118,11 @@ sur perte de disponibilité a déjà eu lieu en amont, côté `FB_Encoder_Abs` (
 ## 6 · ⚠️ Alertes et écarts
 
 Aucun écart identifié — FB simple, conforme au code vérifié.
+
+> 🆕 **Mono-canal assumé (2026-08-29)** : bornage + relais de cohérence — l'exigence cat.3
+> 2-canaux ne s'applique pas à ce FB (décision humaine 2026-08-29). Toute formulation d'exigence
+> « 2 canaux croisés / cat.3 / verrouillage ISO 13849 » appliquée à ce FB monocanal est requalifiée
+> par cette note ; les tests existants restent valides.
 
 ## 7 · 📚 Documents liés
 

@@ -36,7 +36,7 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-040</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Ne publie que les 6 mots thermomètre valides de <code>FB_Translation_PositionDecoder</code> (<code>11111→00000</code>)</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Progression Trémie→Maintenance : chaque intervalle <code>[0;5[</code>, <code>[5;15[</code>, <code>[15;20[</code>, <code>[20;30[</code> publie un seul mot thermomètre valide (<code>11111→00000</code>), aucune zone transitoire à cheval sur deux mots (FB_Sim_Translation.st:104-124)</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>

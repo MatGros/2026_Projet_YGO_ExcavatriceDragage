@@ -42,7 +42,7 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-014</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Sync bit0 (écart > 0.10 m, <b>instantané + latch</b>, sans timer) ➔ SyncWarn IHM seul</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Écart M1/M2 &gt; seuil Warn (<code>_SyncCfgPersist.CfgSyncTolerance_M</code>=0.8m, <code>GVL_PERSISTENT</code> — corrige le 0.10m documenté) → <code>SyncWarn</code> IHM instantané + latch, sans timer. Zone 2 : <code>SyncDeviationWarn</code> force le palier 1 sur M1/M2 SANS coupure (pas de <code>SafeStop</code> sur simple écart).</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
@@ -54,7 +54,7 @@
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-016</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Couplage croisé : <code>SyncActive</code> ➔ arrêt d'un treuil coupe l'autre</td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>SyncActive</code>=TRUE, arrêt sur M1 → M2 coupé au MÊME scan (<code>SafeStopM2_Active</code> := <code>SafeStopM2_Raw</code> OR (<code>SyncActive</code> AND <code>SafeStopM1_Raw</code>)), sans attendre le filtre 500/800ms. Symétrique M2→M1. Suspendu pendant <code>BenneBusy</code> et en butée normale.</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
@@ -77,7 +77,7 @@ partagée par les deux treuils.
 |---|---|
 | `CablePosM1/M2`, `HomedM1/M2` | Position + référencement (sortie Encodeurs) |
 | `SyncEnable` | Autorité mode (voir §3bis Modes) |
-| `CfgSyncToleranceM` :=0.10 m | Seuil warning |
+| `CfgSyncToleranceM` :=0.8m (CfgSyncToleranceM, GVL_PERSISTENT.st:58) | Seuil warning 🆕 correction 2026-08-29 |
 | `CfgSyncCriticalToleranceM` :=0.50 m | Seuil fault |
 | `ActiveOffsetM` | Offset dynamique (0 hors benne, décalage pendant manœuvre benne) |
 | `RelayFwdM1/M2`, `RelayRevM1/M2`, `Contactor1..4_M1/M2` | Cohérence commande |
@@ -89,14 +89,14 @@ partagée par les deux treuils.
 
 ## 3. Niveau 1 vs Méca E (défense en profondeur)
 
-> ⚠️ **Correction v1.1 (vérifié code)** : le **Warn (0.10 m) est instantané + latch, SANS
+> ⚠️ **Correction v1.1 (vérifié code)** : le **Warn (0.8m (CfgSyncToleranceM, GVL_PERSISTENT.st:58)) est instantané + latch, SANS 🆕 correction 2026-08-29
 > temporisation** (`FB_SyncDeviation` : `SyncDeviationWarn := WarnActive OR WarnLatched`). Le
 > **800 ms est sur le Fault (0.50 m)** (`DeviationFaultTimer`). Le `ContactorMismatch` est à
 > **500 ms**. Méca E = **2.5 m** (code, `CriticalSyncToleranceM`), pas 2.0 m/3 s.
 
 | Niveau | Seuil | Délai | Conséquence |
 |---|---|---|---|
-| **1** (ce FB, bit0) | 0.10 m | **instantané + latch** (sans timer) | `SyncWarn` IHM **seul** — pas de SafeStop direct |
+| **1** (ce FB, bit0) | 0.8m (CfgSyncToleranceM, GVL_PERSISTENT.st:58) | **instantané + latch** (sans timer) | `SyncWarn` IHM **seul** — pas de SafeStop direct 🆕 correction 2026-08-29 |
 | **1** (ce FB, bit1) | incohérence commande | 500 ms | **Grave** — remonté SafeStop fast côté Treuils |
 | **1** (ce FB, bit2) | 0.50 m | **800 ms** | `SyncDeviationFault` — block signal / palier 1 |
 | **2** (Méca E, `FB_Safety_Winch`) | 2.5 m (`CriticalSyncToleranceM`) | — | bit12 SafeStop seul, bit13 +PowerCutOff |

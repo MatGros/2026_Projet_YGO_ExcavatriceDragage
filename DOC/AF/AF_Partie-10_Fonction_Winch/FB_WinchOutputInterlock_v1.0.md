@@ -39,13 +39,13 @@
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-012</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Watchdog frein barrière 500ms sans confirmation ➔ FAULT + Inhibit</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Armer le watchdog sur <code>BrakeCmd</code> (<code>BrakeCmd</code>=TRUE, <code>BrakeFeedback</code>=FALSE, <code>RestartInhibit</code>=FALSE). Maintenir 500ms sans confirmation → bit0 <code>ErrorId</code>, <code>RestartInhibit</code>:=TRUE, <code>Reason</code>:=<code>BRAKE_COMMAND_NOT_CONFIRMED</code>, FAULT. Vérifier l'absence de faux défaut au <code>RestartRequired</code> : <code>BrakeCmd</code> retenu par <code>RestartRequired</code> (jusqu'à 1000ms) ne doit PAS armer le watchdog (armé sur <code>BrakeCmd</code> final, jamais sur <code>RequestedRelayFwd/Rev</code>).</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-013</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Anti-redémarrage : Cause + Reset + Neutre ➔ réautorisation</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Provoquer un défaut (timeout frein) → <code>ErrorId</code>/<code>RestartInhibit</code>/<code>ResetRequired</code> latches. Couper <code>Enable</code> (ou AU) → sorties FALSE MAIS <code>ErrorId</code>, <code>RestartInhibit</code>, <code>ResetRequired</code> préservés. Réautorisation : cause disparue + front Reset + demande neutre observée + nouvelle demande distincte → <code>RestartInhibit</code>:=FALSE.</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
@@ -66,6 +66,12 @@
       <td style="padding: 6px 8px; line-height: 1.55;">Temps mort inversion : 1s après arrêt + inversion sens</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-039.1</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Frein couplé direct : pour tout état (Error/RestartInhibit/RestartRequired), <code>BrakeCmd</code> := <code>RelayFwd</code> OR <code>RelayRev</code> — jamais de divergence frein/mouvement.</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
   </tbody>
 </table>

@@ -146,7 +146,7 @@
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-010</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Perte liaison<br>par device</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur M2) : <code>StateRaw≠RUNNING/ACTIVE</code> ➔ <code>Online=FALSE</code>, <code>Operational=FALSE</code>, <code>State=INIT</code>, sans effet sur les autres devices</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Pour chaque device (Joystick CAN, Variateur M3, Encodeur M1, Encodeur M2) : <code>StateRaw≠RUNNING/ACTIVE</code> ➔ <code>Online=FALSE</code>, <code>Operational=FALSE</code>, <code>State=INIT</code>, sans effet sur les autres devices — indépendance inter-devices</td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
@@ -154,7 +154,7 @@
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-020</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>ErrorId bit-level par device</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Défaut isolé sur un seul device ➔ <code>ErrorId</code> de ce device porte <b>exactement</b> son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices (Joystick bit0/1, Variateur bit4, M1 bit5, <b>M2 bit6</b>)</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Défaut isolé sur un seul device ➔ <code>ErrorId</code> de ce device porte <b>exactement</b> son bit attendu, aucun bit croisé sur un autre device — couvre les 4 devices (Joystick bit0/1, Variateur bit4, M1 bit5, <b>M2 bit6</b>). ⚠️ M2 porte <code>16#0030</code> (bug T159, pas <code>16#0040</code>)</td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>FB_Diag_CanOpen</code><br><code>FB_Diag_Ethercat</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>

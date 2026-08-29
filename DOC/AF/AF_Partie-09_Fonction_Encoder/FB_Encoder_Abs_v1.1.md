@@ -48,9 +48,23 @@ Décline `TC-P09-010` (chapô) :
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010.1</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><code>AlarmsIn≠0</code> OU <code>NOT SlaveOperational</code> → <code>EncoderAvailable=FALSE</code>, <code>RawPos</code>/<code>AngleRaw</code>/<code>TurnCount</code> gelés (dernière valeur)</td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>AlarmsIn≠0</code> OU <code>NOT SlaveOperational</code> → <code>EncoderAvailable=FALSE</code>, <code>RawPos</code>/<code>AngleRaw</code>/<code>TurnCount</code> gelés (dernière valeur) ; le gel persiste sur plusieurs scans tant que la cause reste active</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§5</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010.3</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Acquisition nominale : bus OK → <code>RawPos=RawPosIn</code>, <code>AngleRaw=MOD</code>, <code>TurnCount=division</code> (FB_Encoder_Abs.st:116-120)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§3</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P09-010.4</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Front <code>PresetRequest</code> + <code>EncoderAvailable</code> → <code>PresetSeqStep=1</code>, <code>PresetTriggerCmd=2</code> (FB_Encoder_Abs.st:128,134)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>§4</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">

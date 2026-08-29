@@ -107,7 +107,7 @@ machine, organisées dans `GVL_Troubleshooting` :
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P14-TSV-01..05</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Recopie passive — zéro commande, producteurs documentés</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Zéro <code>VAR_OUTPUT</code> de commande, chaque champ a un producteur réel documenté, aucun TBD affiché comme mesure réelle, instance unique dans <code>PRG_07_Supervision</code>, zéro régression gates</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Zéro <code>VAR_OUTPUT</code> de commande — seule sortie <code>Ready:BOOL</code> (<code>SafeStop</code>, <code>Enable</code>, <code>Cmd</code>, <code>Bypass</code>, <code>Config</code> absents), toute publication passe par <code>GVL_Troubleshooting</code> (lecture seule) ; chaque champ a un producteur réel documenté, aucun TBD affiché comme mesure réelle, instance unique dans <code>PRG_07_Supervision</code>, zéro régression gates</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>👁️ REVUE+🔒 GATE</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_TroubleshootingView</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
