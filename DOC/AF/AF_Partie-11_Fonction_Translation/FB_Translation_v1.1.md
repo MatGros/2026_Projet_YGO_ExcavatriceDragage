@@ -25,12 +25,48 @@
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Intention / Comportement attendu | Type | Etat |
-|---|---|---|---|
-| <nobr><code>TC-P11-003</code></nobr> | `Enable=FALSE` coupe tout indépendamment de `SafeStop`/`StartStop` | `⚡ AUTO_PLC` | `NV` |
-| <nobr><code>TC-P11-004</code></nobr> | Ralentissement PV actif si `Direction=1` (Trémie) ET `SlowdownSensor` | `⚡ AUTO_PLC` | `NV` |
-| <nobr><code>TC-P11-005</code></nobr> | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | `⚡ AUTO_PLC` | `NV` |
-| <nobr><code>TC-P11-013</code></nobr> | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` | `⚡ AUTO_PLC` | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: calc(100% - 170px);">
+    <col style="width: 90px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 8px;">Intention / Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-003</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Enable=FALSE</code> coupe tout indépendamment de <code>SafeStop</code>/<code>StartStop</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-004</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Ralentissement PV actif si <code>Direction=1</code> (Trémie) ET <code>SlowdownSensor</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-005</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Interlock sens : bascule directe si vitesse=0, sinon délai 200ms</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-013</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Boutons IHM en MAINT exigent <code>DeadmanArmed=TRUE</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ AUTO_PLC</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 

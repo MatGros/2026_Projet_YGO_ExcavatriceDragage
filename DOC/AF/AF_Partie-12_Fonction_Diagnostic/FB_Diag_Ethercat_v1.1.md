@@ -18,9 +18,30 @@ Distingue `READY` (bus réel online) de `SIMULATED` (bypass actif).
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé, non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Comportement attendu | Type | Etat |
-|---|---|---|---|
-| <nobr><code>TC-P12-030</code></nobr> | `Error` global et synthèse `ErrorId` par nibble (`0x00F0` variateur / `0x0F00` M1 / `0xF000` M2) reflètent l'état `Error` booléen de chaque device, indépendamment du détail bit-level | <nobr><code>💻 AUTO</code></nobr> | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
+  <colgroup>
+    <col style="width: 40px;">
+    <col style="width: calc(100% - 170px);">
+    <col style="width: 90px;">
+    <col style="width: 40px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 8px;">Comportement attendu</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Etat</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P12-030</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>Error</code> global et synthèse <code>ErrorId</code> par nibble (<code>0x00F0</code> variateur / <code>0x0F00</code> M1 / <code>0xF000</code> M2) reflètent l'état <code>Error</code> booléen de chaque device, indépendamment du détail bit-level</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 📥 Entrées
 
