@@ -3093,7 +3093,7 @@ tasks:
     T181-00 (Grafcet↔Winch : chaque étape X exige le bon sens).
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-02_03_FB_WINCH_C4.yaml
   objectifs:
   - CI FB_Winch: TC-P10-011 PASS, aucune régression sur les 5 déjà verts
   - Interface FB_Winch (VAR_INPUT/OUTPUT) strictement inchangée (diff signature = vide)
@@ -3118,7 +3118,7 @@ tasks:
     un seul FB).
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-02_03_FB_WINCH_C4.yaml
   objectifs:
   - FB_Winch ne contient plus aucune logique de détection StuckClosed (grep corps = 0 assignation)
   - FB_Safety_Winch reste seul producteur ; TC-P10-018 exécutable et PASS côté Safety
@@ -3167,7 +3167,7 @@ tasks:
     pour chaque sous-FB extrait ; G200 (les sous-FB apparaissent câblés).
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-05_SOUS_FB_EXTRACTION.yaml
   objectifs:
   - FB_WinchDirectionInterlock et FB_WinchStepShaper existent, testés isolément (≥ 1 TC chacun)
   - Le minuteur de rampe palier n'utilise plus les délais d'interlock direction (grep + diff)
