@@ -115,15 +115,56 @@ Exemple de référence : document `AF_Partie-08_Fonction_Joystick` §1 (8 foncti
    - Fini la démultiplication de micro-tests sur des détails ST internes.
    - **3 à 6 grands tests Macro maximum** par domaine AF.
 
-### 📐 Formatage Ultra-Compact & Compacité Maximale du Tableau :
-- **ID Unique (Cellules)** : Encadré par `<nobr><code>TC-Pxx-010</code></nobr>` (verrouillage mono-ligne strict).
-- **Réf FB** : Écrire en police réduite (`<small>`) et **découper sur plusieurs lignes** (ex: `<small><code>FB_Modes</code><br><code>FB_Translation</code></small>`) pour compacter la colonne au minimum.
-- **Intitulés de Colonnes Concis** : Préférer `<nobr>ID Unique</nobr>`, `Groupe`, `Comportement Attendu`, `<nobr>Type</nobr>`, `<nobr>Réf FB</nobr>` pour éviter les espaces inutiles.
-- **Comportement Attendu (Hauteur & Densité)** : Formulations concises et denses (1 à 2 phrases ultra-courtes avec flèches `➔`) pour éviter d'étirer inutilement le tableau.
+### 📐 Format Standardisé (HTML rigide — modèle `FB_Safety_EmergencyManagement_v1.2.md §2`)
 
-| <nobr>ID Unique</nobr> | Groupe | Comportement Attendu | <nobr>Type</nobr> | <nobr>Réf FB</nobr> |
-|---|---|---|---|---|
-| <nobr><code>TC-Pxx-010</code></nobr> | **[Nom Groupe]** | [Comportement physique et logique ultra-synthétique en 1-2 phrases] | <nobr><code>⚡ AUTO+SITE</code></nobr> | <small><code>FB_NomComposant1</code><br><code>FB_NomComposant2</code></small> |
+Le tableau est un **HTML rigide** à 6 colonnes : **ID** (vertical), **Intention** (centrée, 50px),
+**Séquence & Déroulé des étapes** (colonne large), **Type**, **Réf**, **État**. La colonne
+**Preuve** est **supprimée** (la séquence détaillée porte l'assertion finale).
+
+- **ID** : écriture verticale (`writing-mode: vertical-rl; transform: rotate(180deg)`), mono-ligne.
+- **Intention** : libellé court (2-4 mots), centré, sur 2 lignes max.
+- **Séquence & Déroulé** : décomposition chronologique par étapes numérotées (`💤 Étape 0`,
+  `🚀 Étape 1`, `⚡ Étape 2`, `✅ Étape 3`) avec stimuli, temporisations et résultats attendus.
+  **Ne jamais inventer d'étapes** sur une ligne mono-phrase (lossless).
+- **Type** : `💻 AUTO` / `⚡ AUTO_PLC` / `🟢 SITE` / `⚡ MIXTE` / `🔒 GATE` / `⬜ GAP`.
+- **Réf** : section de la fiche (ex. `§4.3`) ou FB propriétaire.
+- **État** : `V-I` / `V` / `NV` / `NV-I` / `R` / `NA`.
+
+```html
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-Pxx-010</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>[Intention]</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">[Comportement attendu, lossless]</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§N</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
+```
+
+Squelette prêt à copier : `DOC/WFLOW/TEMPLATE/AF_SPEC_TEMPLATE.md §2` (chapô) et
+`DOC/WFLOW/TEMPLATE/FB_SPEC_TEMPLATE.md §2` (sous-fiche FB).
 
 ---
 

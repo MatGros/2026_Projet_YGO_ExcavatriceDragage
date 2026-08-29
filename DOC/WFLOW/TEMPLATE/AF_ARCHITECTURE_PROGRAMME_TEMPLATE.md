@@ -7,7 +7,7 @@
 ## 📑 Sommaire
 
 1. Rôle et périmètre
-2. Points de validation
+2. Table des points de validation
 3. Principes d'architecture
 4. Organisation et pipeline
 5. Contrats de flux
@@ -34,14 +34,41 @@
 |---|---|---|---|---|---|---|---|
 | `F02.01` | [verbe d'action] | [fonction d'architecture testable] | `PRG_XX` / `MainTask` | `C0`-`C4` | <nobr><code>TC-P02-001</code></nobr> | ✅/⚠️/❌ | `NV` |
 
-## 🧪 Points de validation
+## 🧪 Table des points de validation
 
 > **État** — `V` validé, implémentation non vérifiée · `V-I` validé et implémenté · `NV` non validé,
 > non implémenté · `NV-I` code présent mais non validé · `R` refusé · `NA` non applicable.
 
-| ID | Intention | Preuve | Type | Réf | État |
-|---|---|---|---|---|---|
-| <nobr><code>TC-P02-001</code></nobr> | [intention] | [preuve] | `💻 AUTO` | <small>§N</small> | `NV` |
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px;">
+  <colgroup>
+    <col style="width: 28px;">
+    <col style="width: 50px;">
+    <col style="width: calc(100% - 165px);">
+    <col style="width: 45px;">
+    <col style="width: 26px;">
+    <col style="width: 36px;">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom: 2px solid #475569; text-align: left;">
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 10.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P02-001</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>[intention]</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">[comportement attendu, lossless]</td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§N</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 🧱 Principes d'architecture
 
