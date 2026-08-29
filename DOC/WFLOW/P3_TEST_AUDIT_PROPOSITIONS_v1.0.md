@@ -95,6 +95,26 @@ Verdict transversal : 33/33 nominal ✓ ; granulaire quasi absent partout (front
 - **T174 recalibré** (contrat revalidé PASS, 2026-08-29 15:45) : le chantier CI réel restant = **`test_fb_faultcore.st`
   (SOCLE P0)** + traitement TC-P01-005 ; régrésions interdites sur le 10/10 PASS existant.
 
+**Matrice détaillée 12 TC** (code = `FB_Safety_EmergencyManagementLogic.st` · test = `RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st` · preuve = `reports/FB_Safety_EmergencyManagement.json` 12:50:02, 10/10 PASS) :
+
+| TC | CODE (lignes) | TEST (lignes) | Verdict |
+|---|---|---|---|
+| SCEN-NOM | L196-204, 207-223, 226-235, 238-254, 257-266, 269-273, 276-288 | L34-93 « Scenario Nominal » | PREUVE COMPLÈTE |
+| SCEN-DYN | L169-190, 196-204, 276-288, 301-304 (lockout) | L95-176 « Scenario Dynamique » | PREUVE COMPLÈTE |
+| TC-P01-001 (SITE) | L182-188 (chute boucle) | ABSENT | ÉCART (SITE non automatisable) |
+| TC-P01-002 | L207-223, 238-254, 326-327 | L187-228 (partie AUTO) | PREUVE COMPLÈTE (partie AUTO) |
+| TC-P01-003 | L269-273 (pulse 1s, CST L75) | L230-282 | PREUVE COMPLÈTE |
+| TC-P01-004 | L156-163 (Reset front) | L284-322 (004/009 combiné) | PREUVE COMPLÈTE |
+| TC-P01-005 | L156-163, 196-204 | ABSENT (af_ignore registry L105) | ÉCART (af_ignore défendable) |
+| TC-P01-006 | L212-216, 243-247 (`RedundancyTestFailed`) | L324-345 | PREUVE COMPLÈTE |
+| TC-P01-007 | L276-288 (timeout 2s CST L76), L301-304 (lockout 5s CST L77) | L347-406 | PREUVE COMPLÈTE |
+| TC-P01-008 | L175-181 (avortement PowerCutOff), 326-327 | L447-467 | PREUVE COMPLÈTE |
+| TC-P01-009 | L196-204, 334-340 (interlock cause brute) | L284-322 (004/009 combiné) | PREUVE COMPLÈTE |
+| TC-P01-010 | L170-174 (avortement `BtnEmergencyCutOff`, `LastAbortCause` 16#0001), L270, 326-327 | L408-445 | PREUVE COMPLÈTE |
+
+**Spec `test_fb_faultcore.st` (SOCLE P0, manquant)** — `FB_FaultCore.st` (`CODE/A_COMMUN`, 83 lignes, dépendance de ~20 FB registry) ; inputs `Enable`, `Reset`, `Causes[0..15]` (`Active`/`Latching`/`Texte`) → outputs `Ready`, `Fault{Error, ErrorId, Latched, LatchedId}`. 6 scénarios : ① vue LIVE suit `Active` et retombe seule ; ② `Latching` arme le bit conservé après disparition cause ; ③ `Reset` front efface tous latches même `Enable=FALSE` ; ④ ré-apparition cause → ré-alarme ; ⑤ `Latching=FALSE` → LIVE seulement ; ⑥ `Enable=FALSE` → `ErrorId=0` mais `Latched` publié.
+**Preuves immédiates** : `reports/FB_Safety_EmergencyManagement.json|html` (12:50:02) + `archive/20260829_125141_FB_Safety_Emerg…` (12:51:41).
+
 ## ⚠️ Écarts doc↔code vérifiés (fiches à corriger sur la vérité CODE)
 
 | Fiche/TC | Écart | Vérité code | Action doc proposée |
