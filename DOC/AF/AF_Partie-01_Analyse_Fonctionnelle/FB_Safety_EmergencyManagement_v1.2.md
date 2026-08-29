@@ -248,35 +248,38 @@ Succès étape 6 : retour IDLE (`ArmingSeqStep = 0`), lockout off, `Done = TRUE`
    - `EmergencyArmingLockoutActive := TRUE` (verrouillage 5s anti-réessai).
    - `LastAbortCause := 16#0010` (Bit4: Coupure sécurité métier) ou `16#0002` (Bit1: Chute boucle AU).
 
-### 4.3ter Chronogramme d'Essai Global (Nominal + Perturbations)
+### 4.3ter Chronogramme d'Essai Global (Scénarios Temporels & Déroulés)
 
 ```text
-  Phase 0 : REPOS INITIAL (t = 0s)
-  ├── Boucle fermée, contacteur ouvert, aucun défaut -> Armable = TRUE, Contacteur = FALSE.
+  Phase 0 : 💤 [REPOS INITIAL] Machine prête au réarmement
+  ├── Préconditions : Boucle matérielle fermée (EmergencyChainClosed=TRUE), aucun défaut actif.
+  └── Résultat attendu : Armable = TRUE, PowerContactorEngaged = FALSE, Done = FALSE.
   │
-  Phase 1 : ARMEMENT NOMINAL RÉUSSI (t = 1s -> 4s) [TC-P01-SCEN-NOM]
-  ├── Front ArmRequest -> Auto-test croisé A/B (800ms) -> Impulsion ArmPulse (1s) -> Confirm
-  └── Contacteur confirmé engagé -> Done = TRUE, Contacteur = TRUE.
+  Phase 1 : 🚀 [RÉARMEMENT NOMINAL] Cycle complet d'armement sans accroc (TC-P01-SCEN-NOM)
+  ├── Étape 1.1 : Front montant ArmRequest ➔ Lancement séquence (ArmingSeqStep = 1).
+  ├── Étape 1.2 : Auto-test Voie A (200ms) ➔ Coupure canal A, vérification chute boucle ➔ Restauration A.
+  ├── Étape 1.3 : Auto-test Voie B (200ms) ➔ Coupure canal B, vérification chute boucle ➔ Restauration B.
+  ├── Étape 1.4 : Impulsion Contacteur (1s) ➔ ArmPulse_RQ = TRUE pendant 1000ms (ArmingSeqStep = 5).
+  ├── Étape 1.5 : Confirmation Contacteur ➔ PowerContactorEngaged = TRUE (ArmingSeqStep = 6 ➔ 0).
+  └── Résultat attendu : Puissance engagée (Done = TRUE, Busy = FALSE, Error = FALSE).
   │
-  Phase 2 : DÉFAUT COUPURE MÉTIER EN MARCHE (t = 5s) [TC-P01-008]
-  ├── Apparition dérive treuil ou variateur (PowerCutOffRequest = TRUE)
-  └── Retombée immédiate contacteur, MaintainA/B = FALSE, Armable = FALSE.
+  Phase 2 : ⚡ [PERTURBATION 1] Coupure sécurité métier en pleine marche (TC-P01-008)
+  ├── Contexte : Machine armée en production (Done=TRUE).
+  ├── Événement : Dérive treuil M1/M2/M3 détectée (PowerCutOffRequest = TRUE).
+  └── Résultat attendu : Retombée immédiate MaintainA/B_RQ = FALSE, contacteur ouvert, Armable = FALSE.
   │
-  Phase 3 : TENTATIVE DE RÉARMEMENT REFUSÉE & ACQUITTEMENT (t = 6s -> 7s) [TC-P01-005 + 009]
-  ├── Tentative réarmement -> Refusée net (Armable = FALSE, séquence ne démarre pas).
-  └── Acquittement du défaut métier (Reset) -> Retour Armable = TRUE.
+  Phase 3 : 🛡️ [PERTURBATION 2] Tentative de réarmement sous défaut & acquittement (TC-P01-009)
+  ├── Événement : L'opérateur appuie sur ArmRequest alors que PowerCutOffRequest est toujours actif.
+  ├── Résultat attendu : Refus net, la séquence reste verrouillée à l'étape 0 (Armable = FALSE).
+  ├── Étape 3.1 : Disparition de la dérive métier + appui sur Reset.
+  └── Résultat attendu : Défaut acquitté, interlock libéré ➔ Armable redevient TRUE.
   │
-  Phase 4 : ÉCHEC ENCLENCHEMENT CONTACTEUR & LOCKOUT (t = 8s -> 11s) [TC-P01-007]
-  ├── Armement lancé -> Le contacteur ne colle pas à l'étape 6 (timeout 2s)
-  ├── Alarme EmergencyArmingFailed levée + Verrouillage Lockout 5s actif.
-  └── Pendant 5s : Armable = FALSE -> Expiration + Reset -> Retour Armable = TRUE.
-  │
-  Phase 5 : AVORTEMENT VOLONTAIRE IHM (t = 12s -> 14s) [TC-P01-010]
-  ├── Armement lancé -> Opérateur appuie sur BtnEmergencyCutOff pendant l'impulsion (Step 5)
-  └── Avortement immédiat à Step 0 propre SANS alarme d'échec -> Armable = TRUE.
-  │
-  Phase 6 : OUVERTURE MATÉRIELLE COUP-DE-POING (t = 15s -> 17s) [TC-P01-001 + 002]
-  └── Coupure physique EmergencyChainClosed = FALSE -> Retombée immédiate et blocage total.
+  Phase 4 : ⚠️ [PERTURBATION 3] Échec mécanique du contacteur & Lockout 5s (TC-P01-007)
+  ├── Événement : Lancement réarmement, auto-test A/B réussi, impulsion 1s envoyée, mais le contacteur ne colle pas.
+  ├── Étape 4.1 : Timeout confirmation 2s écoulé à l'étape 6 sans retour PowerContactorEngaged.
+  ├── Résultat attendu : Alarme EmergencyArmingFailed levée + Lockout 5s actif (Armable = FALSE, Busy = TRUE).
+  ├── Étape 4.2 : Écoulement du lockout 5s + impulsion Reset.
+  └── Résultat attendu : Lockout purgé ➔ Armable redevient TRUE, machine prête pour un nouvel essai.
 ```
 
 Si `PowerContactorEngaged` ne passe pas TRUE avant timeout 2s à t4 : `EmergencyArmingFailed`
