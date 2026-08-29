@@ -74,7 +74,8 @@ Verdict transversal : 33/33 nominal ✓ ; granulaire quasi absent partout (front
 - **P2 Preflight** : TC-P06-007 — 14/16 bits non testés.
 - **P1 Heartbeat** : TC-P12-050 — `TglHeartbeatPlc`/`TimeSinceIhmEdge` non testés, test mislabellé.
 - ✅ OK : `FB_CycleTime` (TC-P03-014.1/.2/.3) bien couvert.
-- 12 IDs suffixés proposés (`TC-P03-014.4`+, `TC-P12-010.1`+, `TC-P06-007.1`+, …) — détail : rapport P3-1d 2026-08-29.
+- 12 IDs suffixés proposés — **liste explicite** : `TC-P03-008.1`, `.009.1`, `.010.1` (latch cause / disparition cause + Reset front / priorité-masque), `TC-P03-014.4` (CycleTime granulaire), `TC-P06-007.1/.2` (Preflight bits manquants), `TC-P12-030.1/.2` (injection défaut par device + assertion bits ErrorId), `TC-P12-040.1`, `TC-P12-050.1` (heartbeat), `TC-P14-TSV-01.1/.03.1` — toutes sur racines existantes, jamais un ID existant déplacé. Détail : rapport P3-1d 2026-08-29.
+- `test_fb_fbstatus.st` : champs obsolètes cités en preuve (`IsWarning`, `STATUS.WARNING`, `RESETREQUESTED`) → preuve supplémentaire que le fichier ne peut pas compiler contre `FB_FaultCore.st` actuel.
 - **Dérive doc/code** : `FB_TroubleshootingView` — TBD §6 résolus dans le code mais encore listés TBD dans la fiche (à mettre à jour).
 
 ## 🎯 Ordre direct humain — fiche FB_Safety_EmergencyManagement_v1.2
