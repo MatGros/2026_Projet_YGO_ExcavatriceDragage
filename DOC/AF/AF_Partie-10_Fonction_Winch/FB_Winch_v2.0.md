@@ -46,7 +46,7 @@ Les DUT et chaque champ sont définis dans le cadrage T181-06 §2. `SyncCoupled`
 | `FB_Safety_Winch` | propriétaire unique de la détection `StuckClosed`, SafeStop et permis |
 | `PRG_04` | producteur unique de `DriveRequest`, sync, clamp commun et branche M2-only |
 
-`TopLimitEff_M`/`BottomLimitEff_M` sont des données du cycle dans `DriveRequest`, pas de la configuration. La mesure vitesse est `MeasuredSpeedMps`, pas une bande entière.
+`TopLimitM`/`BottomLimitM` sont des données du cycle dans `DriveRequest`, pas de la configuration. La mesure vitesse est `MeasuredSpeedMps`, pas une bande entière.
 
 ## 4. Contrats d'intégration
 

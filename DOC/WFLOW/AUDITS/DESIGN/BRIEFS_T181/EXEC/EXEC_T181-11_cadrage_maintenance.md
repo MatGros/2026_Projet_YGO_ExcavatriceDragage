@@ -37,7 +37,7 @@ Note de cadrage — à créer : `CADRAGE_T181-11_MATRICE_MAINT.md` dans le dossi
 2. **Matrice cible mode × bypass** : chaque `Bypass*` rattaché à `MAINT_N1`, `MAINT_N2`, aux deux, ou **RETIRÉ** (avec justification). **Aucun bypass sans mode.**
 3. **Colonne « N1 momentané / N2 latché »** par bypass concerné : N1 = bouton IHM maintenu (relâche → bypass retombe) ; N2 = latché jusqu'à sortie de mode.
 4. **Règle de bascule de mode** : expression booléenne — passage en/hors N1/N2 refusé si contacteurs non retombés **ET** frein non serré (même composite que l'arrêt confirmé Méca B, `FB_Safety_Winch.st:247`).
-5. **Override FDC logiciel** : N1 momentané, N2 latché, plafond physique = **capteur homing haut 8,5 m** ; fonctionnement normal arrêt **7,5 m** ; comportement au relâchement (retour immédiat 7,5 m). Spécifier le champ `DriveRequest.TopLimitEff_M` alimenté par `PRG_04` (7,5 / 8,5).
+5. **Override FDC logiciel** : N1 momentané, N2 latché, plafond physique = **capteur homing haut 8,5 m** ; fonctionnement normal arrêt **7,5 m** ; comportement au relâchement (retour immédiat 7,5 m). Spécifier le champ `DriveRequest.TopLimitM` alimenté par `PRG_04` (7,5 / 8,5).
 6. **Re-homing obligatoire** au retour d'un mode ayant utilisé un override FDC : condition + déclenchement.
 7. **Alignement T175 AC4** : trancher « MAINT_N1 **et** N2 » ou « N2 seul » pour confirm/ouvre benne (TC-P10-030) et le renvoyer explicitement à l'implémentation T181-14.
 8. **Section AF-05** rédigée (matrice de maintenance treuil), cohérente avec la note.
