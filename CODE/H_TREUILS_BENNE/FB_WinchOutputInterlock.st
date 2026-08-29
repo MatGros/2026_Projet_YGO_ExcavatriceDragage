@@ -27,6 +27,10 @@ VAR_INPUT
     RequestedContactor3             : BOOL;                           // --> [CMD] Demande contacteur vitesse palier 3
     RequestedContactor4             : BOOL;                           // --> [CMD] Demande contacteur vitesse palier 4
     RequestedStep                   : INT;                            // --> [CMD] Palier de vitesse demande
+
+    // === TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
+    DeadTimeSameDir                 : TIME := T#1s;                  // --> [CFG] Temps mort redemarrage meme sens apres arret
+    DeadTimeOppositeDir             : TIME := T#1s;                  // --> [CFG] Temps mort redemarrage inversion sens apres arret
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
@@ -53,6 +57,7 @@ VAR_OUTPUT
     BrakeTimeoutElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation watchdog frein
     RestartInhibit                  : BOOL;                           // <-- [DIAG] Inhibition redemarrage actif
     RestartDelayElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation anti-court-cycle
+    DeadTimeElapsed                 : TIME;                           // <-- [DIAG] Ecoule temps mort directionnel
     StepDelayElapsed                : TIME;                           // <-- [DIAG] Ecoule temporisation palier
 END_VAR
 VAR
@@ -63,6 +68,7 @@ VAR
     BrakeTimeout                    : TON;                            // . [LOC] Temporisation watchdog frein
     StepDelay                       : TON;                            // . [LOC] Temporisation changement de palier
     RestartDelay                    : TON;                            // . [LOC] Temporisation anti-court-cycle redemarrage
+    DeadTime                        : TON;                            // . [LOC] Temporisation temps mort directionnel
 
     // === VARIABLES LOCALES CALCULÉES ===
     RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
@@ -73,6 +79,10 @@ VAR
     MotorRequest                    : BOOL;                           // . [LOC] Demande mouvement moteur active
     BrakeTimeoutCause               : BOOL;                           // . [LOC] Cause timeout frein presente
     BrakeTimeoutAck                 : BOOL := TRUE;                  // . [LOC] Acquittement cause timeout frein
+    LastDirection                   : INT;                            // . [LOC] Dernier sens commande (1 montee / -1 descente)
+    DeadTimePending                 : BOOL;                           // . [LOC] Temps mort directionnel en attente
+    NewDirection                    : INT;                            // . [LOC] Sens de la nouvelle demande
+    RequiredDeadTime                : TIME;                           // . [LOC] Temps mort requis selon sens de la demande
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
@@ -88,6 +98,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     StepDelay(IN := FALSE, PT := T#1s250ms);
     RestartDelay(IN := FALSE, PT := T#1000ms);
+    DeadTime(IN := FALSE);
+    DeadTimePending := FALSE;
+    DeadTimeElapsed := T#0ms;
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     BrakeCmd := FALSE; AuthorizedStep := 0;
@@ -149,6 +162,48 @@ IF RestartDelay.Q THEN
     RestartRequired := FALSE;
 END_IF;
 
+// ── 4bis. Temps mort directionnel (TC-P10-021/022) ─────────────────────────────
+// Distinct du RestartDelay (anti-court-cycle uniforme) : temps mort de redémarrage
+// après arrêt, dépendant du sens de la nouvelle demande. Même sens → DeadTimeSameDir ;
+// inversion → DeadTimeOppositeDir. Neutre↔sens = immédiat (pas de temps mort à l'armement).
+// Le décompte se fait pendant la pause ET pendant l'attente après nouvelle demande
+// (purge pendant la pause, comme RestartDelay). PT = DeadTimeOppositeDir (le plus long) ;
+// à la nouvelle demande, on vérifie si le temps mort requis pour le sens réel est déjà
+// écoulé (cas même sens, plus court).
+IF MotorRequest THEN
+    IF RequestedRelayFwd THEN
+        LastDirection := 1;
+    ELSE
+        LastDirection := -1;
+    END_IF;
+END_IF;
+
+IF NOT MotorRequest THEN
+    DeadTimePending := TRUE;
+END_IF;
+
+DeadTime(IN := DeadTimePending AND NOT BrakeFeedback AND NOT RestartInhibit, PT := DeadTimeOppositeDir);
+DeadTimeElapsed := DeadTime.ET;
+IF DeadTime.Q THEN
+    DeadTimePending := FALSE;
+END_IF;
+
+IF MotorRequest AND DeadTimePending THEN
+    IF RequestedRelayFwd THEN
+        NewDirection := 1;
+    ELSE
+        NewDirection := -1;
+    END_IF;
+    IF NewDirection = LastDirection THEN
+        RequiredDeadTime := DeadTimeSameDir;
+    ELSE
+        RequiredDeadTime := DeadTimeOppositeDir;
+    END_IF;
+    IF DeadTime.ET >= RequiredDeadTime THEN
+        DeadTimePending := FALSE;
+    END_IF;
+END_IF;
+
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -174,7 +229,7 @@ ELSIF NOT MotorRequest THEN
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.READY;
-ELSIF RestartRequired THEN
+ELSIF RestartRequired OR DeadTimePending THEN
     StepDelay(IN := FALSE, PT := T#1s250ms);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;

@@ -255,6 +255,6 @@ Exemple réel équivalent : `CODE/D_JOYSTICK/FB_Joystick.st` (`instFault` + `ins
 | `DOC/STDS/CODE_QUALITY_STANDARDS.md` | §2quinquies (interfaces socle), §3 / §3bis (types `ST_Fault` / `ST_FaultCause`, socle `FB_FaultCore`), §9 (pattern Cause/Ack, `Reset` jamais conditionné) |
 | AF08 (Joystick) | Consommateur confirmé (`instFault` + `instCauses`) |
 | Code | `CODE/A_COMMUN/FB_FaultCore.st`, `CODE/A_COMMUN/_TYPES/ST_Fault.st`, `CODE/A_COMMUN/_TYPES/ST_FaultCause.st`, `CODE/A_COMMUN/_TYPES/ST_Lifecycle.st` |
-| Tests | 🆕 `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_faultcore.st` (TC-P03-008..013 — 6/6 PASS, rapport 2026-08-29) ; ⚠️ l'ancien `test_fb_fbstatus.st` visait un FB supprimé (remplacé) |
+| Tests | 🆕 `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_faultcore.st` (<nobr><code>TC-P03-008..013</code></nobr> — 6/6 PASS, rapport 2026-08-29) ; ⚠️ l'ancien `test_fb_fbstatus.st` visait un FB supprimé (remplacé) |
 </content>
 </invoke>

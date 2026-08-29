@@ -201,7 +201,7 @@ IF FirstCycle THEN
 END_IF;
 
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
-IF ConfirmOpenEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
+IF ConfirmOpenEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
@@ -209,7 +209,7 @@ IF ConfirmOpenEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
 END_IF;
 
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
-IF ConfirmCloseEdge.Q AND (Mode = E_Mode.MAINT_N2) AND NOT Lifecycle.Busy THEN
+IF ConfirmCloseEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
@@ -229,11 +229,12 @@ IF SevereError THEN
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
 ELSE
-    // Prise en compte des demandes IHM
-    IF CmdOpen_IHM AND NOT Lifecycle.Busy THEN
+    // Prise en compte des demandes IHM — anti-traversée (TC-P10-025) :
+    // demande benne refusée si un treuil agit (M1_Busy OR M2_Busy) à l'entrée READY.
+    IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         OpenReq := TRUE;
         CloseReq := FALSE;
-    ELSIF CmdClose_IHM AND NOT Lifecycle.Busy THEN
+    ELSIF CmdClose_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         CloseReq := TRUE;
         OpenReq := FALSE;
     END_IF;
