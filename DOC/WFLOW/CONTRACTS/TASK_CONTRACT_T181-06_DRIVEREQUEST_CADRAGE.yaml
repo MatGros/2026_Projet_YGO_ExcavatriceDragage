@@ -1,0 +1,90 @@
+# Contrat T181-06 — Cadrage de l'interface ST_fbWinch_DriveRequest (clamp unifié)
+# Source : DOC/WFLOW/AUDITS/DESIGN/PLAN_GEL_TREUIL_T181_v0.1.md §3 ; challenge #2 (4 amendements).
+# CADRAGE UNIQUEMENT — aucune écriture CODE/ avant validation humaine de la note produite.
+
+contract:
+  task_id: T181-06_DRIVEREQUEST_CADRAGE
+  criticality: C4            # définit l'interface de l'actionneur treuil pour toute la Phase A
+  strategy: rebuild          # nouvelle interface de FB_Winch
+
+  objective: >
+    Produire la spécification validée de l'interface objet de FB_Winch (struct DriveRequest /
+    Sensors / Cfg) et du calcul de clamp de palier unifié, de sorte que tous les producteurs
+    d'intention treuil (cycle, plongée, extraction, joystick, modes, IHM, benne) s'y connectent
+    sans trou sémantique, et que M1 et M2 reçoivent des bornes cohérentes sans régression M1.
+
+  acceptance:
+    - id: AC1
+      statement: "Les DUT ST_fbWinch_DriveRequest, ST_fbWinch_Sensors, ST_fbWinch_Cfg sont spécifiés champ par champ : nom PascalCase, type, unité, polarité, producteur, consommateur."
+      verified_by: "note de cadrage : tableau interface complet, revue nommage NC-xxx"
+    - id: AC2
+      statement: "Amendement A — tableau des sources de borne de clamp : chaque source (SyncDeviationWarn, zone ralentissement bordure, HomingApproach, dive floor, ExtractionControlActive, M2_BucketJogLimit, ManualBucketLimitsActive, BucketNotClosedAscentStep1, SlackCableAscentStep1) est classée sens (Asc/Desc) x portée (commun M1=M2 / M2-propre) x lieu de calcul."
+      verified_by: "note de cadrage : tableau des ≥ 8 sources, aucune case vide"
+    - id: AC3
+      statement: "Amendement B — règle de précédence écrite noir sur blanc : MaxStep := MIN(sources plafond), MinStep := MAX(sources plancher), le plafond safety gagne toujours ; garde FB_SpeedStep = LIMIT(1, MinStepNumber, MaxStepClamped) après le plafond."
+      verified_by: "note de cadrage : pseudo-code de la règle + cas limite Min=3 & plafond=1 → 1"
+    - id: AC4
+      statement: "Amendement C — le producteur de MinStepDescent est nommé et localisé (FB_DiveSearch), avec le chemin de flux FB_DiveSearch → PRG_03.ReqProgram → PRG_04 → DriveRequest et sa latence en cycles."
+      verified_by: "note de cadrage : schéma de flux + estimation latence"
+    - id: AC5
+      statement: "Amendement D — contrat d'implémentation : MinStepNumber agit sur RequestedStep (cible), lissé par FB_WinchStepShaper ; interdiction explicite d'affecter StepNumber directement."
+      verified_by: "note de cadrage : règle + justification anti-à-coup plongée"
+    - id: AC6
+      statement: "Matrice d'interconnexion producteur → DriveRequest pour les 8 producteurs (Cycle, PRG_03, DiveSearch, ExtractionSequence, Joystick, Modes, IHM, Bucket) : mapping OK / gap sémantique / impossible, avec commentaire par ligne."
+      verified_by: "note de cadrage : matrice 8 lignes"
+    - id: AC7
+      statement: "Point d'arbitrage unique confirmé : StartStop/Direction/SpeedTgt_Pct restent arbitrés dans PRG_04 §3, jamais dans FB_Winch. L'override benne (instBucket.Busy) a une place définie dans la construction du DriveRequest."
+      verified_by: "note de cadrage : localisation de l'arbitrage + place de l'override benne"
+    - id: AC8
+      statement: "Section AF-10 (interface + rôle FB_Winch cible) rédigée et cohérente avec la note."
+      verified_by: "diff AF-10 relu par l'humain"
+
+  scope:
+    allowed:
+      - DOC/WFLOW/AUDITS/DESIGN/**        # note de cadrage
+      - DOC/AF/AF_Partie-10_Fonction_Winch/**   # section interface cible (rédaction, pas suppression)
+    forbidden:
+      - CODE/**                            # AUCUNE écriture code au stade cadrage
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Toutes les intentions actuellement exprimables : commande cycle par étape, jog joystick continu, boutons IHM, commande benne via M2, montée contrôlée extraction"
+      - "L'arbitrage mode-gated de PRG_04 (SEMI_AUTO = branche joystick non évaluée)"
+      - "SafeStop/DescendPermit/AscentPermit restent des entrées plates déjà arbitrées paire+sync"
+    dropped_on_purpose:
+      - "Le vocabulaire 'Force*' dans le clamp (remplacé par Min/Max) — décision utilisateur"
+      - "La granularité gestuelle joystick 0-40 % en plongée (plancher discret assumé, lissé)"
+
+  evidence_required:
+    - note_de_cadrage_validee_humain
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Si un producteur ne peut PAS exprimer son intention dans DriveRequest (trou sémantique
+    irréductible), ou si une source de borne ne peut pas être classée commun/M2 proprement,
+    ou si l'override benne n'a pas de place cohérente : lever l'alerte IMMÉDIATEMENT — ne pas
+    combler par une hypothèse.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir : note de cadrage (interface, sources de clamp, précédence, flux MinStepDescent,
+    matrice d'interconnexion), section AF-10.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    ARRÊT VALIDATION HUMAINE OBLIGATOIRE : la note de cadrage est relue et signée avant que
+    T181-07/08/... n'écrivent la moindre ligne de code.

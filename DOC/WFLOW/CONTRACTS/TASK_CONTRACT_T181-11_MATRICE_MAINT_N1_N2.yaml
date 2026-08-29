@@ -1,0 +1,86 @@
+# Contrat T181-11 — Cadrage de la matrice de maintenance N1/N2 (bypass, override FDC, re-homing)
+# Source : DOC/WFLOW/AUDITS/DESIGN/PLAN_GEL_TREUIL_T181_v0.1.md §1 (D15), Phase C ; décision Q8.
+# CADRAGE UNIQUEMENT — aucune écriture CODE/ avant validation humaine.
+
+contract:
+  task_id: T181-11_MATRICE_MAINT_N1_N2
+  criticality: C3            # rationalise ~20 bypass sécurité épars ; borne un override de fin de course
+  strategy: patch
+
+  objective: >
+    Produire la matrice validée « mode de maintenance x bypass autorisé » pour le sous-système
+    treuil, définir la règle de bascule de mode (tout à l'arrêt), le re-homing obligatoire au
+    retour, et la borne physique de l'override de fin de course logicielle (capteur homing 8,5 m),
+    de sorte que le code T181-14 ait une spécification sans ambiguïté.
+
+  acceptance:
+    - id: AC1
+      statement: "Inventaire exhaustif des Bypass* actuels du périmètre treuil (FB_Safety_Winch, PRG_04, FB_Modes) : chacun listé avec sa condition d'activation actuelle."
+      verified_by: "note de cadrage : tableau des ~20 Bypass* (nom, fichier, condition actuelle)"
+    - id: AC2
+      statement: "Matrice cible : chaque Bypass* est rattaché à MAINT_N1, MAINT_N2, aux deux, ou marqué RETIRÉ (avec justification). Aucun bypass sans mode d'appartenance."
+      verified_by: "note de cadrage : matrice mode x bypass complète"
+    - id: AC3
+      statement: "N1 = bouton IHM maintenu momentané (relâche → bypass retombe) ; N2 = latché (persiste jusqu'à sortie de mode). Distinction écrite pour chaque bypass concerné."
+      verified_by: "note de cadrage : colonne 'N1 momentané / N2 latché' par ligne"
+    - id: AC4
+      statement: "Règle de bascule de mode formalisée : passage en/hors N1/N2 refusé si les contacteurs ne sont pas retombés ET le frein pas serré (même composite que l'arrêt confirmé Méca B)."
+      verified_by: "note de cadrage : expression booléenne de la condition de bascule"
+    - id: AC5
+      statement: "Override de fin de course logicielle : N1 momentané, N2 latché, plafond physique = capteur homing haut 8,5 m ; fonctionnement normal arrêt 7,5 m. Comportement au relâchement (retour immédiat à 7,5 m) spécifié."
+      verified_by: "note de cadrage : spec override + valeurs 7,5 / 8,5 m + comportement relâche"
+    - id: AC6
+      statement: "Re-homing obligatoire au retour d'un mode de maintenance ayant utilisé un override FDC : condition et déclenchement spécifiés."
+      verified_by: "note de cadrage : règle de re-homing"
+    - id: AC7
+      statement: "Cohérence avec T175 AC4 (MAINT_N1/N2 confirm/ouvre benne — TC-P10-030) : le cadrage tranche 'N1 ET N2' ou 'N2 seul' et l'aligne avec l'implémentation T181-14."
+      verified_by: "note de cadrage : renvoi explicite à la décision T175 AC4"
+    - id: AC8
+      statement: "Section AF-05 (matrice de maintenance treuil) rédigée, cohérente avec la note."
+      verified_by: "diff AF-05 relu par l'humain"
+
+  scope:
+    allowed:
+      - DOC/WFLOW/AUDITS/DESIGN/**
+      - DOC/AF/AF_Partie-05_*                 # section matrice maintenance (rédaction)
+    forbidden:
+      - CODE/**
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Toute neutralisation de sécurité réellement nécessaire aujourd'hui à la maintenance (ne pas retirer un bypass utile sans alternative)"
+      - "Le FDC logiciel 7,5 m en fonctionnement normal (l'override est l'exception, pas la règle)"
+    dropped_on_purpose:
+      - "Les Bypass* redondants ou sans usage réel identifié (marqués RETIRÉ avec justification)"
+
+  evidence_required:
+    - note_de_cadrage_validee_humain
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Si un Bypass* actuel n'a pas de mode d'appartenance clair, ou si la borne 8,5 m entre en
+    conflit avec une autre limite (course mécanique, butée), ou si T175 AC4 n'est pas encore
+    tranchée : lever l'alerte IMMÉDIATEMENT vers l'orchestrateur.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir : inventaire Bypass*, matrice mode x bypass, règles de bascule / override / re-homing,
+    section AF-05.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    ARRÊT VALIDATION HUMAINE OBLIGATOIRE avant T181-14 (code).

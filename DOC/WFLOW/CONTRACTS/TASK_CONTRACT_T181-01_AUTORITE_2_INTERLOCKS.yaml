@@ -1,0 +1,100 @@
+# Contrat T181-01 — Barrière finale verte + autorité formelle des 2 interlocks de cadence
+# Source : DOC/WFLOW/AUDITS/DESIGN/PLAN_GEL_TREUIL_T181_v0.1.md §1 (D01), §4 ; décision Q6.
+
+contract:
+  task_id: T181-01_AUTORITE_2_INTERLOCKS
+  criticality: C4            # barrière de sécurité finale du sous-système treuil
+  strategy: patch
+
+  objective: >
+    Rendre FB_WinchOutputInterlock vert en CI (7/7) SANS toucher son interface, et formaliser
+    l'autorité des deux instances de FB_WinchRateInterlock (une dans FB_Winch avec seuils
+    safety+marge, une dans PRG_06 avec seuils safety nus) de sorte que la barrière finale
+    PRG_06 ne gouverne JAMAIS le mouvement en fonctionnement nominal (FinalInterlockGoverned=FALSE).
+
+  acceptance:
+    - id: AC1
+      statement: "CI FB_WinchOutputInterlock : TC-P10-012 (watchdog frein), TC-P10-013 (latches hors Enable), TC-P10-021 et TC-P10-022 (temps morts directionnels) PASS ; les TC déjà verts le restent."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_WinchOutputInterlock"
+    - id: AC2
+      statement: "L'interface (VAR_INPUT/VAR_OUTPUT/VAR_IN_OUT) de FB_WinchOutputInterlock est strictement inchangée."
+      verified_by: "git diff sur la zone de déclaration = vide (hors commentaires)"
+    - id: AC3
+      statement: "FB_WinchRateInterlock existe comme FB unique, instancié dans FB_Winch (jeu de seuils = safety + marge) ET dans PRG_06 (jeu de seuils = safety nus). Les deux jeux de seuils sont des paramètres nommés distincts."
+      verified_by: "grep 'FB_WinchRateInterlock' dans FB_Winch.st et PRG_06_Outputs.st + lecture des seuils"
+    - id: AC4
+      statement: "Diag FinalInterlockGoverned (ou équivalent nommé sur le bus PRG_06) reste FALSE sur 100 % des vecteurs nominaux du harnais T181-00 (Grafcet X0-X13, rampes joystick 0-100 %, plongée, extraction, benne couplée)."
+      verified_by: "harnais intégration T181-00 : assertion FinalInterlockGoverned = FALSE sur toute la matrice nominale"
+    - id: AC5
+      statement: "Test d'injection : en forçant une cadence > seuil safety qui contourne l'instance FB_Winch (stub), l'instance PRG_06 coupe la commande (RelayFwd/Rev = FALSE)."
+      verified_by: "harnais T181-00 : vecteur 'injection cadence' → BusOutputs.M1RelayFwd = FALSE"
+    - id: AC6
+      statement: "Pas de double-freinage : quand l'instance FB_Winch gouverne déjà la cadence (marge active), l'instance PRG_06 reste passive (Busy interne PRG_06 = FALSE)."
+      verified_by: "harnais T181-00 : vecteur 'marge FB_Winch active' → interlock PRG_06 non Busy"
+    - id: AC7
+      statement: "Temps mort directionnel : une SEULE implémentation dans le code (pas de duplication avec T175 AC2). TC-P10-021/022 décrivent 1 s par direction ; la valeur retenue est tranchée et documentée."
+      verified_by: "lecture code (un seul minuteur temps mort) + cohérence avec l'état de T175 AC2"
+    - id: AC8
+      statement: "Non-régression : G200 liaison PASS et gates palier C PASS après le patch."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report ; python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+    - id: AC9
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (PRG_06_Outputs.st -> PRG_06_Outputs ; FB_WinchRateInterlock.st -> FB_WinchRateInterlock)."
+      verified_by: "comparaison basename(fichier) sans extension vs identifiant apres PROGRAM/FUNCTION_BLOCK dans chaque fichier du scope"
+    - id: AC10
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage (_CFC/_LD) n'est apposé aux POU touchés ; le suffixe reste identique au langage genere dans le bundle, c'est-a-dire du ST pur (le generateur PLCopenXML n'emet pas de CFC/LD pour ces POU)."
+      verified_by: "grep basename *_CFC/_LD absent ; inspection du bundle CODE_Bundle.xml : POU concernes en ST"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/H_TREUILS_BENNE/FB_WinchRateInterlock.st          # nouveau FB
+      - CODE/H_TREUILS_BENNE/FB_Winch.st                        # instanciation FB_WinchRateInterlock (interne, pas d'interface)
+      - CODE/M_MAIN/PRG_06_Outputs.st                           # instanciation FB_WinchRateInterlock côté barrière
+      - CODE/H_TREUILS_BENNE/_TYPES/**                          # DUT/enum si un diag FinalInterlockGoverned est ajouté
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winchoutputinterlock.st
+    forbidden:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                     # pas de refactor du clamp ici (Phase A)
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Toutes les protections déjà vertes de FB_WinchOutputInterlock (temps morts, anti-court-cycle, watchdog frein déjà couverts)"
+      - "Le comportement Enable=FALSE → sorties sûres + latches"
+    dropped_on_purpose:
+      - "Aucun — cette tâche n'abandonne rien, elle rend vert et formalise"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Si rendre TC-012/013/021/022 verts exige de modifier l'interface de FB_WinchOutputInterlock,
+    ou si les feedbacks BrakeFeedback / FwdRevSpeedFeedbackOff se révèlent non fiables, ou si le
+    temps mort directionnel ne peut pas être unifié avec T175 sans conflit : lever l'alerte
+    IMMÉDIATEMENT vers l'orchestrateur, ne pas contourner.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    À remplir par l'agent : patchs FB_WinchOutputInterlock, création FB_WinchRateInterlock,
+    instanciation double, preuves CI + harnais + gates.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    ARRÊT VALIDATION HUMAINE : le contrat d'autorité (quel interlock gouverne quoi, jeux de
+    seuils, sémantique FinalInterlockGoverned) est relu et validé par l'humain avant écriture code.
