@@ -86,25 +86,31 @@ machine, organisées dans `GVL_Troubleshooting` :
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 130px;">
-    <col style="width: 100px;">
-    <col style="width: calc(100% - 280px);">
-    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: 150px;">
+    <col style="width: calc(100% - 590px);">
+    <col style="width: 110px;">
+    <col style="width: 140px;">
+    <col style="width: 50px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
-      <th style="padding: 4px 1px; text-align: center;"><small><b>Bloc</b></small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Plage TC</small></th>
-      <th style="padding: 4px 8px;">Points clés</th>
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_TroubleshootingView</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>TC-P14-TSV-01..05</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P14-TSV-01..05</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Recopie passive — zéro commande, producteurs documentés</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">Zéro <code>VAR_OUTPUT</code> de commande, chaque champ a un producteur réel documenté, aucun TBD affiché comme mesure réelle, instance unique dans <code>PRG_07_Supervision</code>, zéro régression gates</td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>👁️ REVUE+🔒 GATE</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_TroubleshootingView</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>V-I</code></small></td>
     </tr>
   </tbody>
 </table>

@@ -124,49 +124,63 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 
 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px;">
   <colgroup>
-    <col style="width: 130px;">
-    <col style="width: 100px;">
-    <col style="width: calc(100% - 280px);">
-    <col style="width: 40px;">
+    <col style="width: 140px;">
+    <col style="width: 150px;">
+    <col style="width: calc(100% - 590px);">
+    <col style="width: 110px;">
+    <col style="width: 140px;">
+    <col style="width: 50px;">
   </colgroup>
   <thead>
     <tr style="border-bottom: 2px solid #475569; text-align: left;">
-      <th style="padding: 4px 1px; text-align: center;"><small><b>Bloc</b></small></th>
-      <th style="padding: 4px 1px; text-align: center;"><small>Plage TC</small></th>
-      <th style="padding: 4px 8px;">Points clés</th>
+      <th style="padding: 4px 1px; text-align: center;"><small><b>ID</b></small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Intention</small></th>
+      <th style="padding: 4px 8px;">Séquence & Déroulé des étapes (Comportement attendu)</th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Type</small></th>
+      <th style="padding: 4px 1px; text-align: center;"><small>Réf</small></th>
       <th style="padding: 4px 1px; text-align: center;"><small>État</small></th>
     </tr>
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_SimBench</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>TC-P13-010..013</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-010..013</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Enveloppe unique de simulation</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">Enveloppe unique, décalage 1 scan, REX StatusWord AC600 corrigé</td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO+👁️ MANUEL</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_SimBench</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Safety</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>TC-P13-020..023</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-020..023</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Chaîne AU/contacteur simulée</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">Chaîne AU simulée, latch contacteur, 🆕 <code>TC-P13-023</code> : défaut réel latché <b>survit</b> au cycle Reset du modèle simulé (§4)</td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO+👁️ MANUEL</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Safety</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Encoder</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>TC-P13-030..033</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-030..033</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Position codeurs M1/M2 simulée</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">Position codeur simulée, persistance reset froid</td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO+👁️ MANUEL</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Encoder</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Translation</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>TC-P13-040..043</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-040..043</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>5 capteurs M3 simulés</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">6 mots thermomètre valides, bornage position, reset Trémie sur <code>Enable=FALSE</code></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Translation</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Joystick</code></small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>TC-P13-050..052</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-050..052</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Entrées joystick brutes</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">Entrées brutes joystick, homme-mort jamais contourné</td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ SITE+AUTO+👁️ MANUEL</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Joystick</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
   </tbody>
 </table>
