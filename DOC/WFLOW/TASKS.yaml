@@ -2808,3 +2808,24 @@ tasks:
   - run_all_gates palier C PASS
   bloque_par:
   - T173-B
+- id: T174
+  statut: ⬜
+  criticite: C3
+  domaine: TEST_AUTO_CI
+  agent: ''
+  date: '2026-08-29T15:26:42'
+  titre: Tests CI socle FaultCore + Safety EmergencyManagement (preuves V-I)
+  contexte: 'Audits experts P3-1 (DOC/WFLOW/P3_TEST_AUDIT_PROPOSITIONS_v1.0.md) : FB_FaultCore
+    (TC-P03-008..013) sans aucun test CI (test_fb_fbstatus.st vise un FB supprimé au commit 51fccce6)
+    ; FB_Safety_EmergencyManagement (12 TC-P01, tous V-I) sans test CI actif (af_ignore TC-P01-005
+    à justifier). Ordre humain : récupérer les preuves exhaustives / prévoir l''implémentation CODE+CI.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T174.yaml — créer test_fb_faultcore.st
+    (TC-P03-008..013) et test_fb_safety_emergency.st (SCEN-NOM, SCEN-DYN, 001..010 ; steps 200ms/1s/2s,
+    lockout 5s) ; enregistrer dans registry.yaml ; zéro modification DOC/AF et CODE/'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T174.yaml
+  objectifs:
+  - test_fb_faultcore.st couvre TC-P03-008..013 et compile contre FB_FaultCore.st actuel
+  - test_fb_safety_emergency.st couvre les 12 TC-P01 conformément à la fiche §2/§4
+  - registry.yaml complet (zéro TC du socle absent) + G450 sans WARN AF-01/AF-03 correspondants
+  - Aucun état de TC modifié dans DOC/AF (preuve : git diff -- DOC/AF vide)
+  bloque_par: []
