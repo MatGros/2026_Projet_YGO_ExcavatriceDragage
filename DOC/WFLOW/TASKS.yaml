@@ -560,7 +560,7 @@ tasks:
   titre: Compléter la vue Troubleshooting (flux chronologique, 18 TBD)
   contexte: ''
   description: FB_TroubleshootingView.st, ST_ChainWinch.st, GVL_Troubleshooting.st
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_REVIEW_T123_STANDARDISATION.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_REVIEW_T123_STANDARDISATION.yaml
   objectifs: []
   bloque_par: []
 - id: T125
@@ -633,7 +633,7 @@ tasks:
     Fault: ST_Fault, Lifecycle: ST_Lifecycle, OperatorActionId).'
   description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-A_TYPES_INTERFACE.yaml. Préservation des sorties nécessaires
     aux consommateurs actuels et aux tests STruCpp.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-A_TYPES_INTERFACE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T127-A_TYPES_INTERFACE.yaml
   objectifs:
   - Définir E_OperatorAxis et E_ProgramSequence dans CODE/G_CYCLE/_TYPES/
   - Normaliser FB_Cycle avec FB_FaultCore et ST_Lifecycle
@@ -653,7 +653,7 @@ tasks:
     maintien joystick, bridage Palier 4, repli et tests automatisés STruCpp.
   description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-B_GRAFCET_LOGIC.yaml. Suite de tests unitaires automatisés
     STruCpp / TEST_AUTO_CI couvrant TC-P04-001 à TC-P04-021.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-B_GRAFCET_LOGIC.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T127-B_GRAFCET_LOGIC.yaml
   objectifs:
   - Valider la séquence Kobold en 4 temps à la volée sans rupture de mouvement
   - Valider l''enchaînement fluide de l''extraction (fermeture -> décollage -> accélération) avec maintien joystick
@@ -677,7 +677,7 @@ tasks:
     jour de la spec AF_Partie-04_Mode_SemiAuto_Sequenceur (v2.2 -> v2.3) et AF_Partie-14.
   description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-C_DIAG_DOC.yaml. Validation G340, bannières dynamiques et
     vue chronologique de dépannage.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-C_DIAG_DOC.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T127-C_DIAG_DOC.yaml
   objectifs:
   - Enrichir ST_ChainCycleSemiAuto avec les attentes opérateur, étapes chronologiques et blocages
   - Raccorder FB_TroubleshootingView et FB_Hmi_BannerFormatter aux métadonnées enrichies
@@ -698,7 +698,7 @@ tasks:
     des accès externes à instCycleSemiAuto.
   description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml. Validé : raccordement et encapsulation
     consolidés suite aux lots T165 et T127.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T127-D_INTEGRATION_PRG03.yaml
   objectifs:
   - Éliminer tout accès externe direct à instCycleSemiAuto
   - Raccorder PRG_03.Data de bout en bout
@@ -741,7 +741,7 @@ tasks:
   description: Génération d'une animation cinématique interactive (SVG/HTML) couplée à un banc de test étendu reproduisant
     le cycle nominal de dragage jusqu'au déversement en trémie, avec injection de défaillances (désynchro treuils -> STABILIZING,
     Palier 5 sous Kobold, lâcher de manche, bascule maintenance).
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T127-F_VISUAL_CI.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T127-F_VISUAL_CI.yaml
   objectifs:
   - Définir le scénario nominal de bout en bout (X0 -> X13) avec simulation de la matière et du fond
   - Intégrer les cas d''anomalie (désynchro treuils, violation séquence/vitesse Kobold, relâchement de manche, bascule de
@@ -818,7 +818,7 @@ tasks:
   description: '⏸️ Décision D-03 de T165-A : conserver temporairement le % tant que le choix humain n''est pas visé. Historique
     : ST_WinchCmdDemand.SpeedPct (REAL %) → FB_SpeedStep ; le cycle hardcode 10/50/20/70% ; l''éventuel palier 1-5 est une
     évolution fonctionnelle séparée, pas un ride-along du remappage inter-PRG.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
   objectifs: []
   bloque_par:
   - T165-A
@@ -853,7 +853,7 @@ tasks:
     redécodés depuis le brut dans les PRG ; consommer les faits qualifiés AF‑08.'
   objectifs:
   - Conserver l'historique ; ne pas déléguer T135
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml
   date: '2026-08-28T11:51:18+02:00'
   bloque_par:
   - T165-A
@@ -905,7 +905,7 @@ tasks:
     lors de la migration de FB_Safety_Winch/FB_Safety_Translation vers ST_FbStatus, **conserver l''ErrorId** (ne pas le reset
     sur Enable=FALSE / mode DISABLE) pour rendre la cause Meca visible — le correctif minimal Enable := TRUE est documenté
     dans T143'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T137.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T137.yaml
   objectifs: []
   bloque_par: []
 - id: T138
@@ -1043,7 +1043,7 @@ tasks:
     : fail-safe incomplet — un codeur non homé mais dans les bornes est cru par l''interlock ; imposer strictement la condition
     positive Homed = TRUE. ② Synchronisation de l''état Homed entre FB_Encoder_Homing et FB_Encoder_Safety. ③ Mise à jour
     de l''AF-09 §5 (acter le homing en configuration benne fermée).'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T146_C4_FBCODER_COMPLET.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T146_C4_FBCODER_COMPLET.yaml
   objectifs:
   - 'Interlock hauteur Translation M3 (M3_HeightInterlockOk) : fail-safe incomplet — un codeur non homé mais dans les bornes
     est cru par l''interlock ; imposer strictement la condition positive Homed = TRUE.'
@@ -1259,7 +1259,7 @@ tasks:
     CLAUDE.md, CODE_QUALITY_STANDARDS, skills .claude/ et TOOLS/AGENT_WORKFLOW/, workflow_diagram.json, tasks/*.yaml, REX).
     G440 PASS, G340 (seul lien mort pré-existant), scripts Python compilent, JSON valide. ⚠️ .vscode/sessions.json non modifié
     (déjà propre).'
-  contrat: TASK_CONTRACT_T151_NETTOYAGE_PI_CODING.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T151_NETTOYAGE_PI_CODING.yaml
   objectifs:
   - Archiver ou supprimer le répertoire d'artéfacts .pi-subagents/
   - Nettoyer les mentions Pi dans AGENTS.md et DOC/STDS/CODE_QUALITY_STANDARDS.md
@@ -1298,7 +1298,7 @@ tasks:
     par §2quater.'
   description: '✅ **Fait 2026-08-25** : 3 blocs de commentaires-journal purgés, `CriticalActionActive` décomposé via nouvelle
     variable intermédiaire `PowerOrChainFault` (3 termes max par expression). 0 diff logique — G200 PASS, gates Palier C PASS.'
-  contrat: TASK_CONTRACT_T152A_BANNERFORMATTER_STYLE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T152A_BANNERFORMATTER_STYLE.yaml
   objectifs:
   - Purger les 3 blocs de commentaires-journal (§2ter) dans FB_Hmi_BannerFormatter.st, historique reporté dans DOC/VERSION_HISTORY.md
     si utile
@@ -1318,7 +1318,7 @@ tasks:
     (aucune region préfixée).'
   description: '✅ **Fait 2026-08-25** : FB_Joystick.st (6 regions, sous-agent) et FB_Encoder.st (8 regions, moi — hook bloquant
     sur le sous-agent) renumérotés §1..§N contigu. 0 diff logique confirmé (git diff = uniquement lignes {region ...}).'
-  contrat: TASK_CONTRACT_T152B_REGIONS_PREFIXE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T152B_REGIONS_PREFIXE.yaml
   objectifs:
   - Renuméroter les regions de FB_Joystick.st en {region \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"§N
     ...\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"}
@@ -1343,7 +1343,7 @@ tasks:
     :` (deux-points orphelin, mot manquant — reliquat d''un search-replace).'
   description: '✅ **Fait 2026-08-25** (sous-agent) : 9 fichiers _TYPES/ corrigés — vocabulaire abandonné remplacé, résidu
     _LD retiré, 6 commentaires cassés reformulés. Grep de vérification 0 résultat, gates Palier A/C PASS.'
-  contrat: TASK_CONTRACT_T152C_VOCABULAIRE_ABANDONNE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T152C_VOCABULAIRE_ABANDONNE.yaml
   objectifs:
   - Remplacer PRG_TREUILS_CFC/PRG_10_Outputs_LD (ST_WinchFinalInterlockRequest.st:4-5) par PRG_04_Treuils_Benne/PRG_06_Outputs
   - Remplacer PRG_10_Outputs_LD (ST_TranslationCmd.st:14) par PRG_06_Outputs
@@ -1370,7 +1370,7 @@ tasks:
   description: '✅ **Fait 2026-08-25** : FB_MirrorBypassRetain créé (CODE/J_SUPERVISION/, déplacé depuis A_COMMUN à la demande
     utilisateur — seul consommateur PRG_07), 10 instances câblées §2c, §2b intact. ⚠️ Validation manuelle CODESYS (Watch/forçage
     bypass) toujours requise avant tout chargement en production — non faite dans cette session (hors périmètre agent).'
-  contrat: TASK_CONTRACT_T152D_EXTRACT_FC_BYPASS_RETAIN.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T152D_EXTRACT_FC_BYPASS_RETAIN.yaml
   objectifs:
   - Créer une FC dédiée (ex. FC_SyncBypassRetain(Hmi, Retain)) portant le motif de synchro bidirectionnelle de §2c UNIQUEMENT
   - Remplacer les 10 blocs dupliqués de PRG_07_Supervision.st §2c (L.227-295, un par variable Prev*) par des appels à cette
@@ -1414,7 +1414,7 @@ tasks:
   description: '✅ **Fait 2026-08-25** : AF_Partie-08_Fonction_Joystick_v2.1.md créée (§3/§4 réécrits sur ArmingPermit réel,
     profil AF03 corrigé standard, TC-P08-003/011/012 marqués RETIRÉ sans réattribution, TC-P08-013 ajouté pour ArmingPermitDenied).
     v2.0 archivée. 4 en-têtes CODE/*.st mis à jour (commentaire doc uniquement, 0 logique touchée). G340 PASS.'
-  contrat: TASK_CONTRACT_T153A_RESYNC_AF08_JOYSTICK.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T153A_RESYNC_AF08_JOYSTICK.yaml
   objectifs:
   - 'Créer DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md : §3/§4 réécrits sur l''interface réelle de FB_Joystick.st (ArmingPermit
     unique, plus de Mode/BenneBusy/PreserveArmingAfterBucket/DeadmanReconfEnable/DeadmanRearmTimeout)'
@@ -1467,7 +1467,7 @@ tasks:
     pytest PASS (vérifié indépendamment). Gates Palier C 16/17 (seul échec pré-existant ARCHIVES/Doc/CONTRACTS, sans rapport).
     ⚠️ Limitation connue non bloquante : détection des sous-fiches multi-domaines (AF-09+, Q-TF6) = heuristique de glob simple,
     à durcir si rétrofit AF-09+ lancé.'
-  contrat: TASK_CONTRACT_T153C_APPLY_TABLE_FONCTIONS_AF08.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T153C_APPLY_TABLE_FONCTIONS_AF08.yaml
   objectifs:
   - Ajouter la section '🎯 Table des fonctions' dans AF_Partie-08_Fonction_Joystick_v2.1.md §1, AVANT les Points de validation,
     format finalisé par T153-B
@@ -1649,7 +1649,7 @@ tasks:
     remappés (0 diff logique), M3_SensorsWord corrigé (alimenté depuis instPosDecoderM3). G200 PASS (0 erreur), gates palier
     C 15/16 (seul échec G390 = PermissionError temp sandbox, fraîcheur bundle vérifiée manuellement OK). ⏳ Validation CODESYS
     (banc) à faire.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T160_ST_ENCODER_MEASUREMENTS.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T160_ST_ENCODER_MEASUREMENTS.yaml
   objectifs:
   - 'PRG_02_Acquisition publie les mesures codeurs via Data.Encoders : ST_EncoderMeasurements (M1/M2) au lieu des champs plats
     codeur de ST_AcquisitionInterPrg'
@@ -1676,7 +1676,7 @@ tasks:
     CI F1-F5 corrigés (harnesses PRG_02/PRG_05, tests, registry.yaml) + script CI aligné + allowlist lint purgée. G200 PASS
     (0 erreur), gates palier C 15/16 (seul échec G390 = PermissionError temp sandbox, fraîcheur bundle vérifiée manuellement
     OK). ⏳ Validation CODESYS (banc) à faire.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T161_MIGRATION_DECODEUR_M3.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T161_MIGRATION_DECODEUR_M3.yaml
   objectifs:
   - Déclarer et appeler instPosDecoderM3 (FB_Translation_PositionDecoder) dans PRG_05_Translation, plus dans PRG_02_Acquisition
   - PRG_02 ne publie plus les faits TranslationPos*/TranslationAt*/M3_LimitSwitch*/M3_SensorWord* dans ST_AcquisitionInterPrg
@@ -1701,7 +1701,7 @@ tasks:
     §5 et T108 mises à jour. CSV Device_IO_20260826.csv déjà aligné (export humain). G200 PASS (0 erreur), gates palier C
     15/16 (seul échec G390 = PermissionError temp sandbox, fraîcheur bundle vérifiée manuellement OK). ⏳ Validation CODESYS
     (banc) à faire.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T162_RENOMMAGE_TREMIEFULL_DI.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T162_RENOMMAGE_TREMIEFULL_DI.yaml
   objectifs:
   - Renommer le point physique TremieFull_OR_GateRaised_DI dans le code ST (PRG_02_Acquisition, ST_HwMachine, FB_SimBench,
     GVL_Troubleshooting) — 0 occurrence HopperFull_OR_GateRaised_DI dans CODE/
@@ -1748,7 +1748,7 @@ tasks:
     sous-agent CC en lecture seule (audit, zéro modif code) 2026-08-27. Livrable unique : DOC/WFLOW/AUDITS/AUDIT_G127_GATES_NEUTRALISATION_20260827.md.
     Les correctifs (surtout C4) sont revus et appliqués par l''orchestrateur (CC), pas par l''agent. Parallélisable avec T164-2.
     Réf méthode : commit 0b0a2785.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1_AUDIT_G127.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1_AUDIT_G127.yaml
   objectifs:
   - Pour chacun des 16 FB: lister les sorties écrites dans le corps mais absentes du gate NOT Enable
   - Classer chaque sortie: BUG (publie une valeur périmée hors Enable) | OK (alimentée autrement / figée volontaire)
@@ -1779,7 +1779,7 @@ tasks:
     5 FB non-C4 (FB_Brake, FB_Cycle, FB_Translation_PositionEstimator, FB_TranslationOutputInterlock, FB_Sim_Joystick). EXCLUS
     : FB_Bucket → T164-1c ; FB_Encoder_Abs → T164-4 (sa refonte d''interface recouvre son gate incomplet, le corriger ici
     = double travail + conflit). 2 commits séparés (lot A / lot C).'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1b_G127_FIXES.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1b_G127_FIXES.yaml
   objectifs:
   - Lot A (4 C4) — gate complété pour MecaADriftM/MecaBElapsedTime/MecaCDriftM, ContactorsCheck/DirectionChangePending/SpeedGuardLimited,
     ErrorId/Reason/RestartInhibit/StateAtError, TargetReached ; ces 4 FB sortent des incomplets G127
@@ -1807,7 +1807,7 @@ tasks:
     dans FB_Bucket + ST_BucketState + publication PRG_04. Méca E / FB_Safety_Winch NE sont PAS touchés (la comparaison stricte
     résulte du seul ActiveOffsetM := 0.0 au gate). Périmètre : FB_Bucket.st, ST_BucketState.st, PRG_04_Treuils_Benne.st, AF-10
     (chapô + fiche FB_Bucket), IHM_VARIABLES_MIGRATION.md.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1c_BUCKET_ACTIVEOFFSET_VALID.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T164-1c_BUCKET_ACTIVEOFFSET_VALID.yaml
   objectifs:
   - 'FB_Bucket : + VAR_OUTPUT ActiveOffsetValid : BOOL (TRUE si offset à jour, FALSE dans le gate NOT Enable)'
   - 'Gate NOT Enable : ActiveOffsetM := 0.0, ActiveOffsetValid := FALSE, DeltaPosition_M := 0.0, RemainingTravelM := 0.0 →
@@ -1868,7 +1868,7 @@ tasks:
     Status:ST_Status jusqu''à T164-5, hérité à plat T137 vide) + test 12 PASS. État repo : 2 forme cible (FB_Joystick + FB_FaultCore),
     16 legacy-status, 0 à plat. G315/G330/G340 PASS. PRE2 de T164-4 LEVÉE. Nettoyage refs commentaire ST_FbStatus (G330, LINTER_ST,
     TEST_AUTO_CI) = suivi T164-5.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-3_SOCLE_ST_FAULT.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T164-3_SOCLE_ST_FAULT.yaml
   objectifs:
   - AF_Partie-03 et CODE_QUALITY_STANDARDS décrivent Fault:ST_Fault comme forme cible du contrat standard
   - Sous-fiche renommée FB_FaultCore_v1.0.md, contenu réécrit sur FB_FaultCore/ST_FaultCause (Latching, pas IsWarning)
@@ -1909,7 +1909,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4A_ENCODER_ARCHITECTURE.yaml. Livrable documentaire terminé
     et revu ; décision d''exécution autonome accordée par l''utilisateur le 2026-08-27. Les confirmations physiques/IHM restantes
     sont tracées dans QUESTIONS_T164-4.md.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4A_ENCODER_ARCHITECTURE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4A_ENCODER_ARCHITECTURE.yaml
   objectifs:
   - Définir un propriétaire public de configuration sans fusionner les réglages M1/M2
   - Figer les constantes mécaniques et formaliser l'exception G127 OK-FIGE de FB_Encoder_Abs
@@ -1926,7 +1926,7 @@ tasks:
   contexte: Implémentation strictement postérieure à la décision 4A ; n'embarque aucune transaction preset ni migration Fault.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4B_ENCODER_CFG_PERSISTENCE.yaml. Propriétaire HMI concret
     : GVL_IHM.Commun.EncoderCfg via ST_CommunHMI ; revu après génération bundle fraîche.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4B_ENCODER_CFG_PERSISTENCE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4B_ENCODER_CFG_PERSISTENCE.yaml
   objectifs:
   - Créer le type de configuration minimal et le bridge de persistance à propriétaire unique
   - Ajouter la persistance sans déplacer les réglages métier M1/M2 ni rendre les constantes modifiables
@@ -1944,7 +1944,7 @@ tasks:
     la façade conserve encore Status:ST_Status.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4C_ENCODER_PRESET_HW.yaml. Ne démarre qu''après les visas
     4A et 4B ; aucun changement de seuil, polarité, tempo ou logique sécurité/homing.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4C_ENCODER_PRESET_HW.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4C_ENCODER_PRESET_HW.yaml
   objectifs:
   - Implémenter PresetConfirmMode/PresetStatusBit et la confirmation par relecture sans ports fantômes
   - Scinder les ports matériel tout en conservant les sous-FB au profil Status:ST_Status
@@ -1964,7 +1964,7 @@ tasks:
     publiques.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4D_ENCODER_FAULT_FACADE.yaml. Sous-FB Abs/Homing/Safety et
     Measurement.HomingStatus/AbsStatus restent Status:ST_Status jusqu''à T164-5.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4D_ENCODER_FAULT_FACADE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T164-4D_ENCODER_FAULT_FACADE.yaml
   objectifs:
   - Remplacer uniquement Status de façade par Fault:ST_Fault via FB_FaultCore et causes justifiées
   - Préserver Reset/latches et l'ordre composite sans lecture de membres privés des sous-FB
@@ -1987,7 +1987,7 @@ tasks:
     par domaine (T164-5a..f : A_COMMUN / E_CODEURS / F_MODES / G_CYCLE / H_TREUILS_BENNE / I_TRANSLATION). Contient la RÈGLE
     DE MAPPING DES CAUSES non négociable (ErrorId→Latching:=TRUE ; WarningId→Latching:=FALSE ; ambigu→TRUE + alerte). Parallélisable
     une fois T164-4 VALIDATED. Chaque lot = son G315 vert, consommateurs remappés, AF métier à jour, commit + revue orchestrateur.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-5_MIGRATION_ST_FAULT_TEMPLATE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T164-5_MIGRATION_ST_FAULT_TEMPLATE.yaml
   objectifs:
   - Chaque FB migré expose Fault:ST_Fault (+ Lifecycle si séquenceur) rempli par FB_FaultCore à causes nommées
   - Consommateurs de Status.* remappés sur Fault.*/Lifecycle.* sans changement de valeur ni de logique
@@ -2037,7 +2037,7 @@ tasks:
   - Figer deux frontières publiques structurées, avec producteurs uniques et fraîcheur explicite
   - Supprimer les accès inter-POU aux instances internes par checkpoints conservatifs
   - Faire contrôler chaque programme par un reviewer indépendant read-only
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165_FLUX_PRG02_PRG03.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165_FLUX_PRG02_PRG03.yaml
   date: '2026-08-28T10:20:02'
   bloque_par: []
 - id: T165-A
@@ -2050,7 +2050,7 @@ tasks:
   contexte: Cadrage documentaire, contrats inter-PRG, registre de conservation, test design et décisions humaines.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml. Validé suite au visa humain
     sur D-01, D-05 et DataValid.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
   objectifs:
   - Valider responsabilités, structures proposées et anti-débordement
   - Trancher ArmingPermit/deadman/Auth/vitesse/Dive-Extraction/Kobold/défaut codeur
@@ -2067,7 +2067,7 @@ tasks:
   contexte: 'Checkpoint producteur : joystick X/Y complet, états codeur et diagnostics réseau déjà calculés.'
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml. Validé : publication complète
     Data.Joystick, Data.Network, Data.EncoderM1/M2 et Data.DataValid.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B1_PRG02_PUBLICATION.yaml
   objectifs:
   - Publier les faits existants dans des sous-DUT structurés sans second calcul
   - Prouver égalité scan par scan et producteur unique
@@ -2084,7 +2084,7 @@ tasks:
   contexte: Remappage conservatif PRG_03/04/05/07 ; aucun changement de logique métier.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml. Validé : 0 accès direct à PRG_02_Acquisition.inst*,
     22/22 gates PASS.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-B2_PRG02_CONSUMERS.yaml
   objectifs:
   - Obtenir zéro accès externe à PRG_02.inst*
   - Conserver manuel, simulation, diagnostics, codeurs et safety à l'identique
@@ -2101,7 +2101,7 @@ tasks:
   contexte: Contrôle du diff réel, des consommateurs, de la matrice manuelle et des faits safety qualifiés.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml. Validé : revue indépendante Ollama
     concluante avec verdict PASS et 22/22 gates PASS.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-BR_REVIEW_PRG02.yaml
   objectifs:
   - Vérifier indépendamment B1/B2 et les preuves CP0→CP2
   - Refuser tout PASS conditionnel sur un invariant safety
@@ -2119,7 +2119,7 @@ tasks:
     à plat.'
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml. Validé : FB_Cycle conforme
     profil AF-03 (Ready, Fault, Lifecycle, CycleStepAtError), aucune reconstruction locale.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C0_AUDIT_FB_CYCLE_PREREQUISITE.yaml
   objectifs:
   - Empêcher PRG_03 de fabriquer Fault/Lifecycle/OperatorActionId localement
   - Réconcilier preuve code et statut catalogue avant C1
@@ -2137,7 +2137,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml. Validé : bus public PRG_03.Data
     créé (Auth, ReqProgram, SequenceState), 7 DUTs, neutralisation déterministe hors SEMI_AUTO, revue Ollama PASS, CI 7/7
     PASS, 22/22 gates PASS.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C1_PRG03_PUBLICATION.yaml
   objectifs:
   - Créer un bus public minimal et lisible sans safety ni sortie physique
   - Publier les demandes/états existants sans recalcul métier
@@ -2155,7 +2155,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml. Validé : 100% des consommateurs
     remappés vers PRG_03.Data, 0 accès direct résiduel, instCycleSemiAuto encapsulée en VAR interne, CI 7/7 PASS, G200 PASS,
     22/22 gates PASS.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml
   objectifs:
   - Obtenir zéro accès à instCycleSemiAuto et aux internals PRG_04/05
   - Conserver demandes, modes, diagnostics et retards N-1 explicités
@@ -2172,7 +2172,7 @@ tasks:
   contexte: Contrôle architecture, ordre de scan, chaîne Req→Tgt→Cmd→Act, conservation et diagnostic opérateur.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml. Validé : revue indépendante Ollama
     concluante avec verdict PASS sur le diff réel et l''absence de régression.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-CR_REVIEW_PRG03.yaml
   objectifs:
   - Vérifier indépendamment C1/C2 et les preuves CP4→CP5
   - Confirmer que PRG_04/05 restent souverains pour arbitrage métier et safety
@@ -2210,7 +2210,7 @@ tasks:
   contexte: Enrichissement ST_WinchInterPrg, ST_TranslationInterPrg et remappage PRG_07.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-A_CONTRACTS_ET_FLUX.yaml. Validé : publication complète PRG_04/05,
     suppression des accès directs dans PRG_07 (instWinchSync remappé vers Data), 0 erreur G200.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-A_CONTRACTS_ET_FLUX.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T166-A_CONTRACTS_ET_FLUX.yaml
   objectifs:
   - Finaliser PRG_04.Data et PRG_05.Data
   - Remapper PRG_07 vers PRG_04.Data (0 fuite)
@@ -2228,7 +2228,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-B_MIGRATION_CYCLES_PRG03.yaml. Validé : instDiveSearch et
     instExtractionSequence déclarées et exécutées en VAR interne de PRG_03, intention CoupledUserRequest calculée au même
     scan, Data.SequenceState produit en continu.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-B_MIGRATION_CYCLES_PRG03.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T166-B_MIGRATION_CYCLES_PRG03.yaml
   objectifs:
   - Instancier DiveSearch et ExtractionSequence dans PRG_03
   - Calculer CoupledUserRequest sans retard de scan
@@ -2247,7 +2247,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-C_ALLEVIATION_PRG04.yaml. Validé : PRG_04 ne contient plus
     aucune instance de cycle, raccordement de CmdBucketCloseArbitrated et KoboldContactorCmdArbitrated sur le bus ReqProgram,
     sécurité locale 100% préservée.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-C_ALLEVIATION_PRG04.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T166-C_ALLEVIATION_PRG04.yaml
   objectifs:
   - Supprimer instDiveSearch et instExtractionSequence de PRG_04
   - Raccorder l'arbitrage benne et Kobold sur PRG_03.Data.ReqProgram.ReqBucket
@@ -2266,7 +2266,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-DOC_ALIGNEMENT_AF.yaml. Validé : rédaction des amendements
     par sous-agent Ollama et intégration dans AF-02 (responsabilités), AF-04 (rattachement cycles) et AF-10 (muscle/sécurité
     PRG_04).'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-DOC_ALIGNEMENT_AF.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T166-DOC_ALIGNEMENT_AF.yaml
   objectifs:
   - Mettre à jour AF-02 avec le tableau des 7 PRG
   - Synchroniser AF-04 et AF-10 avec le contrat ReqProgram.ReqBucket
@@ -2284,7 +2284,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-CR_REVIEW_OLLAMA.yaml. Validé : rapport d''audit Ollama analysant
     le diff, confirmation de l''absence de retard sur l''intention, validation du retard N-1 mécanique admissible et levée
     de tous les points de garde.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T166-CR_REVIEW_OLLAMA.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T166-CR_REVIEW_OLLAMA.yaml
   objectifs:
   - Audit indépendant du diff réel par modèle local
   - Validation croisée des points d'arbitrage (N-1, write-backs, safety)
@@ -2322,7 +2322,7 @@ tasks:
   titre: Spécification fonctionnelle et Grafcet cible unifié
   contexte: Cadrage du Grafcet et des transitions Dive/Extraction.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-A_SPEC_GRAFCET_CIBLE.yaml.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-A_SPEC_GRAFCET_CIBLE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T167-A_SPEC_GRAFCET_CIBLE.yaml
   objectifs:
   - Formaliser les étapes, transitions, timeouts et conditions de reset
   bloque_par:
@@ -2341,7 +2341,7 @@ tasks:
     §3bis).
   description: Contrat VALIDATED (visa humain 2026-08-28, CODESYS 3.5 OK). FB_DiveSearch 8/8. 3 revues indépendantes (deepseek-v4-flash
     / gpt-5.6-terra-high / gpt-5.6-sol-max), 2 passes durcissement H1-H5 puis F1-F3. G200 + gates + doc-links PASS.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T167-B_REFONTE_DIVE_SEARCH.yaml
   objectifs:
   - Timers de garde par étape (SEARCHING_IMMERSION / SEARCHING_BOTTOM) calculés au runtime
   - Capture StepAtFault avant bascule ERROR_HOLD, latch survivant au cycle Enable
@@ -2363,7 +2363,7 @@ tasks:
   description: Contrat VALIDATED (visa humain 2026-08-28, CODESYS 3.5 OK). FB_ExtractionSequence 8/8. 3 revues indépendantes,
     2 passes durcissement H1-H5 puis F1-F3 (ForceMinSpeedStep suit permis, Reset gardé sur cause physique, backstop borné).
     G200 + gates + doc-links PASS.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T167-C_REFONTE_EXTRACTION.yaml
   objectifs:
   - Backstop fermeture benne verrouillé pour ne jamais masquer BucketError
   - Timeout décollage CONTROL_ASCENT calculé au runtime + capture StepAtFault
@@ -2386,7 +2386,7 @@ tasks:
   description: 'Resultats : DOC/WFLOW/T167-CR_REVUE_INDEPENDANTE_CYCLES.md (+ rapport brut T167-CR_ollama_FB_ExtractionSequence.md).
     Garde-fou IF Fault.Error OR Fault.Latched ajoute aux 2 FB. FB_DiveSearch 7/7, FB_ExtractionSequence 6/6, G200 PASS, run_all_gates
     PASS.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T167-CR_REVIEW_CYCLES.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T167-CR_REVIEW_CYCLES.yaml
   objectifs:
   - Certifier securite ISO 13849, non-redemarrage auto, ordre de scan
   bloque_par:
@@ -2417,7 +2417,7 @@ tasks:
   titre: Centralisation de la décision DumpAtTremie dans PRG_03
   contexte: Déplacement de la machine d'état de vidage trémie.
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-A_HARMONISATION_DUMP_AT_TREMIE.yaml.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-A_HARMONISATION_DUMP_AT_TREMIE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T168-A_HARMONISATION_DUMP_AT_TREMIE.yaml
   objectifs:
   - PRG_03 décide et publie via ReqBucket.ReqOpen
   - PRG_04 consomme et applique
@@ -2438,7 +2438,7 @@ tasks:
     FB_TroubleshootingView (Idx208 / Idx307).'
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml. Chaine PRG_03.Data.SequenceState
     -> PRG_07 -> GVL_IHM.DredgingAssist.State -> GVL_Troubleshooting.AssistanceDragage. G200 PASS, gates C 16/16, PRG_07 3/3.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T168-B_DIAGNOSTIC_TROUBLESHOOTING.yaml
   objectifs:
   - Éliminer 100% des écritures directes dans PRG_03 et PRG_04
   - Projeter StepAtFault des assistants (Dive / Extraction) jusqu'a la vue troubleshooting
@@ -2649,7 +2649,7 @@ tasks:
     une tâche T01_Acquisition qui n''existe nulle part (ni CODE ni AF02) — la cadence réelle est MainTask 10 ms.'
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-A_CSV_CADENCE.yaml. Correction documentaire pure (C1/C2 doc)
     : nom du CSV source de vérité et nom de tâche de cadence dans AF-06 v2.4.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-A_CSV_CADENCE.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T172-A_CSV_CADENCE.yaml
   objectifs:
   - Remplacer Device_IO_20260814.csv par Device_IO_20260826.csv dans AF-06 §5
   - Remplacer T01_Acquisition par MainTask dans AF-06 §3ter (2 occurrences)
@@ -2669,7 +2669,7 @@ tasks:
     freins « TRUE=serré » est fausse (le code et le CSV confirment TRUE=ouvert).'
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-B_TABLE_TOR.yaml. Mise à jour de la table §5 : ajout des
     2 TOR manquantes, correction de la note de polarité freins, signalement de la voie VH_0800END Bit5 non nommée.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-B_TABLE_TOR.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T172-B_TABLE_TOR.yaml
   objectifs:
   - Table §5 exhaustive: 24 voies DI configurées documentées (22 entrées existantes + TremieFull réservée non câblée + voie
       vide signalée)
@@ -2691,7 +2691,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-C_NC110.yaml. Décision de convention tracée : soit dérogation
     documentée dans NAMING_CONVENTION (DUT produit par PROGRAM = domaine public), soit renommage planifié. Aucun code touché
     sans décision.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-C_NC110.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T172-C_NC110.yaml
   objectifs:
   - Décision humaine tracée: dérogation NC-110 documentée OU plan de renommage
   - NAMING_CONVENTION.md mis à jour en conséquence (si dérogation)
@@ -2712,7 +2712,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-D_TREMIEFULL.yaml. Levée de contradiction : confirmer l''état
     réel du câblage (export CODESYS frais + terrain), puis aligner CSV/code/doc. Ne pas implémenter l''interlock (T108) —
     juste lever l''ambiguïté matérielle.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-D_TREMIEFULL.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T172-D_TREMIEFULL.yaml
   objectifs:
   - État réel du câblage TremieFull confirmé (câblé ou non) par preuve terrain/export frais
   - CSV, code et AF-06 §5 alignés sur l'état réel
@@ -2733,7 +2733,7 @@ tasks:
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-E_INPUTSQUALIFIED.yaml. Mise à jour documentaire §3ter :
     signaler que ST_InputsQualified* est déjà archivé (ARCHIVES/Code/SUPERVISION/_TYPES/), retrait effectif, conserver la
     règle de non-réintroduction.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T172-E_INPUTSQUALIFIED.yaml
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T172-E_INPUTSQUALIFIED.yaml
   objectifs:
   - §3ter reflète l'état réel: ST_InputsQualified* archivé, zéro consommateur
   - Règle de non-réintroduction conservée
