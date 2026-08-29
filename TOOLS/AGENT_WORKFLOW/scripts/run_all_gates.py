@@ -125,6 +125,8 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "460", "G460 â€” Tests CI TEST_AUTO_CI (harnais STruCpp + nÃ©gatifs + garde animation/fraÃ®cheur, REX 2026-08-28)", [sys.executable, "TOOLS/TEST_AUTO_CI/anim_bench/run_ci_gates.py"]),
     ("C", "461", "G461 â€” ArmingPermit cÃ¢blÃ© (zÃ©ro littÃ©ral, REX 2026-08-29)", [sys.executable, f"{S}/G461_check_arming_permit.py", "."]),
     ("C", "470", "G470 â€” UnicitÃ© catalogue TC (matrice AF, informatif, REX 2026-08-29)", [sys.executable, f"{S}/G470_check_tc_uniqueness.py"]),
+    ("C", "480", "G480 — Harnais integration : stub FB_TestHarness_PRG_04 miroir de PRG_04 (T181-00 AC2)", [sys.executable, f"{S}/G480_check_harness_mirrors_prg04.py"]),
+    ("C", "481", "G481 — Harnais integration treuil WINCH_INTEG compile+execute (T181-00 AC7, baseline rouge OK)", [sys.executable, f"{S}/G481_check_winch_integ.py"]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]
