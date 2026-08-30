@@ -171,6 +171,10 @@ VAR
     BypassM2CableLimitSwitchEff : BOOL;
     BypassM2LimitLegalEff       : BOOL;
     BypassM2MecaDEff            : BOOL;
+
+    // Usage effectif d'un override/bypass de position -> arme le re-homing obligatoire (PRG_03).
+    PositionLimitOverriddenM1 : BOOL;
+    PositionLimitOverriddenM2 : BOOL;
 END_VAR
 
 {region "§1 Intention maintenance et assistants"}

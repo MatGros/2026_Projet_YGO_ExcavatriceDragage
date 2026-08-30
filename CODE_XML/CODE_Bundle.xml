@@ -38565,6 +38565,19 @@ l'armement du re-homing obligatoire publié vers PRG_03 (PositionLimitOverridden
                 <BOOL />
               </type>
             </variable>
+            <variable name="PositionLimitOverriddenM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Usage effectif d'un override/bypass de position -&gt; arme le re-homing obligatoire (PRG_03).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionLimitOverriddenM2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
