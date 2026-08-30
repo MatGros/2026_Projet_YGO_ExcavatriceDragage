@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T12:14:10.507277" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T12:14:10.507277">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:36:20.118879" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:36:20.118879">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -85,57 +85,6 @@
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>31b3ae05-ab16-51e7-b786-307d668b63e5</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_Mode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLE" value="0" />
-              <value name="MAINT_N1" value="1" />
-              <value name="MAINT_N2" value="2" />
-              <value name="SEMI_AUTO" value="3" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N1</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N2</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEMI_AUTO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -287,6 +236,390 @@
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbDiveSearch_Inputs">
+        <baseType>
+          <struct>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== AUTORISATIONS &amp; COMMANDE ===
+Chaine de puissance engagee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitre courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionRequestActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de mouvement couplee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demande (-1 = descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS &amp; MESURES ===
+Benne ouverte confirmee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldImmersed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Kobold immerge</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable M2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionsValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mesures M1/M2 valides</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CurrentSpeedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier reel courant (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveStartMin_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES METIER ===
+Position minimale avant descente (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionUpper_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute fenetre immersion (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionLower_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse fenetre immersion (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Limite haute exploitation (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalDepthMin_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Limite basse legale (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgDiveFloorStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher palier descente (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Periode d'execution du cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassPreconditions">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass reserve au mode maintenance N2/test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Config">
+              <type>
+                <derived name="ST_fbDiveSearch_Config" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Parametres timeout</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a95550e0-af41-55b8-bdc1-94cdc5e2e412</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_fbDiveSearch_Inputs - Bus d'entree du cycle FB_DiveSearch
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbDiveSearch_Outputs">
+        <baseType>
+          <struct>
+            <variable name="StepState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT DU CYCLE ===
+Etape courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape figee au defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS &amp; ORDRES ASSISTES ===
+Autorisation de descente assistee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldMeasureEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation mesure Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande alimentation Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomTouchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher palier descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorActionId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC OPERATEUR ===
+Identifiant numerique de l'action</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorAction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne operateur ASCII</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>bc4f838d-ad60-580e-ba9f-12e889929093</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_fbDiveSearch_Outputs - Bus de sortie du cycle FB_DiveSearch
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_Mode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLE" value="0" />
+              <value name="MAINT_N1" value="1" />
+              <value name="MAINT_N2" value="2" />
+              <value name="SEMI_AUTO" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N2</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEMI_AUTO</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_fbDiveSearch_Config">
+        <baseType>
+          <struct>
+            <variable name="DiveSpeedMin_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse minimale de calcul du timeout (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutMarginFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge appliquee au temps theorique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutMinCourse_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Course minimale prise en compte (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutMaxCourse_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="200" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Course maximale prise en compte (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SecToMs">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conversion secondes vers millisecondes</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a0057069-451b-5e0e-ad42-ec2a185a596c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_fbDiveSearch_Config - Reglages du cycle de recherche du fond
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
     </dataTypes>
     <pous>
       <pou name="FB_DiveSearch" pouType="functionBlock">
@@ -297,8 +630,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
---&gt; [CMD] Activation generale du FB (TRUE=Autorise)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD ===
+--&gt; [CMD] Autorisation generale du FB</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -306,168 +639,16 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerContactorEngaged">
+            <variable name="Inputs">
               <type>
-                <BOOL />
+                <derived name="ST_fbDiveSearch_Inputs" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine de securite OK</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode de fonctionnement arbitre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MotionRequestActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention de mouvement active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MotionDirection">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (-1 = descente)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketIsOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS &amp; ETATS BENNE ===
---&gt; [HW] Benne ouverte confirmee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldImmersed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur Kobold immerge (FALSE=hors eau, TRUE=immerge)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1Position_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M1 (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2Position_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M2 (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PositionsValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Validite des mesures de position</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CurrentSpeedStep">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Palier de vitesse actuel (1..5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DiveStartMin_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; SEUILS ===
---&gt; [CFG] Seuil position min pour debut plongee (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionUpper_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Borne haute fenetre d'immersion (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionLower_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Borne basse fenetre d'immersion (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CableLimitAscent_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="7.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation (m), plafond de course immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LimitLegalDepthMin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="-35" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite legale basse autorisee (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgDiveFloorStep">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier plancher de descente impose pendant la plongee (1..5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CycleTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#10ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Base de temps d'integration (periode MainTask)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassPreconditions">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass preconditions et seuils (mode test)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS FONCTIONNEL ===
+--&gt; [BUS] Commande, capteurs et reglages</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -477,7 +658,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DEFECTUOSITES ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUT IEC ===
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
@@ -486,87 +667,24 @@
                 <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault + ST_Lifecycle)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut live et latche</xhtml>
               </documentation>
             </variable>
             <variable name="Lifecycle">
               <type>
                 <derived name="ST_Lifecycle" />
               </type>
-            </variable>
-            <variable name="DiveState">
-              <type>
-                <derived name="E_DiveSearchState" />
-              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase interne de recherche fond</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cycle en cours / termine</xhtml>
               </documentation>
             </variable>
-            <variable name="StepAtFault">
+            <variable name="Outputs">
               <type>
-                <derived name="E_DiveSearchState" />
+                <derived name="ST_fbDiveSearch_Outputs" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etape active mémorisée lors du défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DescendPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS &amp; AUTORISATIONS ===
-&lt;-- [ACT] Autorisation de descente assistee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldMeasureEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Activation mesure/acquisition Kobold</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldContactorCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Commande alimentation contacteur Kobold (anti-chauffe)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BottomTouchConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contact fond valide et confirme</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MinStepDown">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PLANCHER DE PALIER EN DESCENTE (consomme par PRG_03 -&gt; PRG_04) ===
-&lt;-- [STAT] Palier minimum impose en descente pendant la plongee (0 = aucun plancher)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorActionId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC IHM ===
-&lt;-- [DIAG] ID action operateur requise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorAction">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Message explicatif operateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS FONCTIONNEL ===
+&lt;-- [BUS] Etat, permis et diagnostic</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -576,8 +694,8 @@
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONTS ===
-. [LOC] Detecteur front montant Reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES &amp; FRONTS ===
+. [LOC] Front Reset</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorEdge">
@@ -585,7 +703,7 @@
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant apparition defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Apparition d'un defaut</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldRiseEdge">
@@ -593,7 +711,7 @@
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front entrant eau (0-&gt;1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Entree dans l'eau</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldFallEdge">
@@ -601,136 +719,7 @@
                 <derived name="F_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front sortie eau / fond (1-&gt;0)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionCourse_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCUL DYNAMIQUE RUNTIME DES TIMEOUTS ===
-. [LOC] Course credible max recherche immersion (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BottomCourse_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Course credible max recherche fond (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CalculatedImmersionTimeout">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond anti-blocage immersion calcule au runtime</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CalculatedBottomTimeout">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond anti-blocage fond calcule au runtime</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionTimerAcc">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACCUMULATEURS DE TEMPS ANTI-POMPAGE ===
-. [LOC] Temps cumule recherche immersion sous mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BottomTimerAcc">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps cumule recherche fond sous mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PrevState">
-              <type>
-                <derived name="E_DiveSearchState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etape au scan precedent (maintien survivant au gate)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
-. [LOC] Immersion dans la fenetre d'eau validee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorCausePresent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Presence d'une cause de defaut parametrage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SeqErrorFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch erreur séquence immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Palier5ForbiddenFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch tentative descente en Palier 5 sous Kobold</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimeoutImmersionFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch timeout recherche immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimeoutBottomFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch timeout recherche fond</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DescentActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Descente reellement demandee et sans cause de coupure immediate</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepAtFaultCaptured">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] StepAtFault deja fige pour l'episode de defaut courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sortie de l'eau / fond</xhtml>
               </documentation>
             </variable>
             <variable name="instFault">
@@ -738,8 +727,7 @@
                 <derived name="FB_FaultCore" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOCLE DEFAUT ===
-* [INST] Socle défaut transverse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle defaut transverse</xhtml>
               </documentation>
             </variable>
             <variable name="instCauses">
@@ -752,74 +740,185 @@
                 </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Causes nommees</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_DiveSpeedMin_Mps">
+            <variable name="ImmersionCourse_M">
               <type>
                 <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="0.15" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES DERIVATION TIMEOUT ANTI-BLOCAGE ===
-Vitesse Palier 1 mini sous charge/mou (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS DE GARDE ===
+. [LOC] Course maximale vers immersion (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_TimeoutMarginFactor">
+            <variable name="BottomCourse_M">
               <type>
                 <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="1.5" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Facteur de marge de securite sur la course theorique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Course maximale vers fond (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_TimeoutMinCourse_M">
+            <variable name="CalculatedImmersionTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout immersion calcule</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalculatedBottomTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout fond calcule</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectiveDiveSpeedMin_Mps">
               <type>
                 <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher de course pour le calcul (evite timeout degenere)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse minimale appliquee (m/s)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_TimeoutMaxCourse_M">
+            <variable name="EffectiveTimeoutMargin">
               <type>
                 <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="200" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond de course : borne le calcul avant REAL_TO_UDINT (anti-overflow)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Marge appliquee au calcul</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_SecToMs">
+            <variable name="EffectiveTimeoutMinCourse_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plancher de course applique (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectiveTimeoutMaxCourse_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond de course applique (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectiveSecToMs">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Conversion secondes/millisecondes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionTimerAcc">
+              <type>
+                <TIME />
+              </type>
               <initialValue>
-                <simpleValue value="1000" />
+                <simpleValue value="TIME#0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conversion secondes -&gt; millisecondes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MEMORISATIONS &amp; TEMPORISATIONS ===
+. [LOC] Temps effectif de recherche immersion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomTimerAcc">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps effectif de recherche fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat du scan precedent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Immersion validee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFaultCaptured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etape de defaut deja figee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorCausePresent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES INTERNES ===
+. [LOC] Parametrage invalide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SeqErrorFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Incoherence de sequence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Palier5ForbiddenFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier 5 interdit sous Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutImmersionFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout recherche immersion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutBottomFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout recherche fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Descente demandee et autorisee</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ FB_DiveSearch — Assistance plongée et recherche du fond Kobold
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Qualification du capteur Kobold et autorisation de descente
-   🛡️ Sécurité : Verrouillage si séquence d'immersion 0-&gt;1-&gt;0 invalide
-   🔌 Interface : Intention de descente et mesures vers permis de descente
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+   FB_DiveSearch - Assistance plongee et recherche du fond Kobold
+   Role : qualifier l'immersion et autoriser la descente assistee.
+   Interface : contrat standard + bus Inputs/Outputs.
+   Documentation : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -827,201 +926,192 @@ Vitesse Palier 1 mini sous charge/mou (m/s)</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION ===
-
-{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
-// 🔑 1. FRONTS
+{region "§1 Fronts, calculs et causes"}
 ResetEdge(CLK := Reset);
-KoboldRiseEdge(CLK := KoboldImmersed);
-KoboldFallEdge(CLK := KoboldImmersed);
+KoboldRiseEdge(CLK := Inputs.KoboldImmersed);
+KoboldFallEdge(CLK := Inputs.KoboldImmersed);
 
-// Base de temps nulle = timers de garde inoperants : defaut de parametrage inconditionnel.
-ErrorCausePresent := (CycleTime &lt;= T#0ms)
-                  OR (NOT BypassPreconditions AND ((DiveStartMin_M &lt; ImmersionUpper_M)
-                       OR (ImmersionUpper_M &lt;= ImmersionLower_M)
-                       OR (ImmersionLower_M &lt;= LimitLegalDepthMin_M)
-                       OR (CableLimitAscent_M &lt;= ImmersionLower_M)));
+// Les valeurs par defaut du DUT couvrent l'appel sans configuration explicite.
+// Le repli runtime protege aussi un appel avec une structure entierement nulle.
+EffectiveDiveSpeedMin_Mps := Inputs.Config.DiveSpeedMin_Mps;
+IF EffectiveDiveSpeedMin_Mps &lt;= 0.0 THEN EffectiveDiveSpeedMin_Mps := 0.15; END_IF;
+EffectiveTimeoutMargin := Inputs.Config.TimeoutMarginFactor;
+IF EffectiveTimeoutMargin &lt;= 0.0 THEN EffectiveTimeoutMargin := 1.5; END_IF;
+EffectiveTimeoutMinCourse_M := Inputs.Config.TimeoutMinCourse_M;
+IF EffectiveTimeoutMinCourse_M &lt;= 0.0 THEN EffectiveTimeoutMinCourse_M := 1.0; END_IF;
+EffectiveTimeoutMaxCourse_M := Inputs.Config.TimeoutMaxCourse_M;
+IF EffectiveTimeoutMaxCourse_M &lt; EffectiveTimeoutMinCourse_M THEN EffectiveTimeoutMaxCourse_M := 200.0; END_IF;
+EffectiveSecToMs := Inputs.Config.SecToMs;
+IF EffectiveSecToMs &lt;= 0.0 THEN EffectiveSecToMs := 1000.0; END_IF;
 
-// ⏱️ Plafonds anti-blocage calcules au runtime : course credible max / vitesse Palier 1 mini x marge.
-// Course immersion = du plafond haut d'exploitation a la borne basse d'immersion (depart de plongee
-// possible n'importe ou entre DiveStartMin_M et CableLimitAscent_M -&gt; on prend la borne la plus large).
-// Course bornee [plancher .. plafond] avant conversion REAL-&gt;UDINT-&gt;TIME : une valeur IHM
-// aberrante ne peut pas provoquer d'overflow silencieux sur le timeout de garde (CQS §6).
-ImmersionCourse_M   := LIMIT(CST_TimeoutMinCourse_M, CableLimitAscent_M - ImmersionLower_M, CST_TimeoutMaxCourse_M);
-BottomCourse_M      := LIMIT(CST_TimeoutMinCourse_M, ImmersionLower_M - LimitLegalDepthMin_M, CST_TimeoutMaxCourse_M);
+ErrorCausePresent := (Inputs.CycleTime &lt;= T#0ms)
+                 OR (NOT Inputs.BypassPreconditions AND (
+                       (Inputs.DiveStartMin_M &lt; Inputs.ImmersionUpper_M)
+                    OR (Inputs.ImmersionUpper_M &lt;= Inputs.ImmersionLower_M)
+                    OR (Inputs.ImmersionLower_M &lt;= Inputs.LimitLegalDepthMin_M)
+                    OR (Inputs.CableLimitAscent_M &lt;= Inputs.ImmersionLower_M)));
+
+ImmersionCourse_M := LIMIT(EffectiveTimeoutMinCourse_M,
+                           Inputs.CableLimitAscent_M - Inputs.ImmersionLower_M,
+                           EffectiveTimeoutMaxCourse_M);
+BottomCourse_M := LIMIT(EffectiveTimeoutMinCourse_M,
+                        Inputs.ImmersionLower_M - Inputs.LimitLegalDepthMin_M,
+                        EffectiveTimeoutMaxCourse_M);
 CalculatedImmersionTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
-    ImmersionCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
-CalculatedBottomTimeout    := UDINT_TO_TIME(REAL_TO_UDINT(
-    BottomCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
+    ImmersionCourse_M / EffectiveDiveSpeedMin_Mps * EffectiveTimeoutMargin * EffectiveSecToMs));
+CalculatedBottomTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
+    BottomCourse_M / EffectiveDiveSpeedMin_Mps * EffectiveTimeoutMargin * EffectiveSecToMs));
 
-// ⏱️ Intégrateurs de temps de mouvement effectif (D1 anti-pompage)
-IF (DiveState = E_DiveSearchState.SEARCHING_IMMERSION) AND MotionRequestActive AND (MotionDirection = -1) THEN
-    ImmersionTimerAcc := ImmersionTimerAcc + CycleTime;
-    IF ImmersionTimerAcc &gt;= CalculatedImmersionTimeout THEN
-        TimeoutImmersionFault := TRUE;
-    END_IF;
+IF (Outputs.StepState = E_DiveSearchState.SEARCHING_IMMERSION)
+   AND Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1) THEN
+    ImmersionTimerAcc := ImmersionTimerAcc + Inputs.CycleTime;
+    IF ImmersionTimerAcc &gt;= CalculatedImmersionTimeout THEN TimeoutImmersionFault := TRUE; END_IF;
 END_IF;
 
-IF (DiveState = E_DiveSearchState.SEARCHING_BOTTOM) AND MotionRequestActive AND (MotionDirection = -1) THEN
-    BottomTimerAcc := BottomTimerAcc + CycleTime;
-    IF BottomTimerAcc &gt;= CalculatedBottomTimeout THEN
-        TimeoutBottomFault := TRUE;
-    END_IF;
+IF (Outputs.StepState = E_DiveSearchState.SEARCHING_BOTTOM)
+   AND Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1) THEN
+    BottomTimerAcc := BottomTimerAcc + Inputs.CycleTime;
+    IF BottomTimerAcc &gt;= CalculatedBottomTimeout THEN TimeoutBottomFault := TRUE; END_IF;
 END_IF;
 
-IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
-    SeqErrorFault         := FALSE;
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT Inputs.KoboldImmersed
+   AND NOT Inputs.MotionRequestActive AND NOT (Inputs.CurrentSpeedStep &gt; 4) THEN
+    SeqErrorFault := FALSE;
     Palier5ForbiddenFault := FALSE;
     TimeoutImmersionFault := FALSE;
-    TimeoutBottomFault    := FALSE;
-    ImmersionTimerAcc     := T#0ms;
-    BottomTimerAcc        := T#0ms;
-    ImmersionConfirmed    := FALSE;
-    BottomTouchConfirmed  := FALSE;
-    StepAtFaultCaptured   := FALSE;
-    DiveState             := E_DiveSearchState.WAIT_PRECONDITIONS;
+    TimeoutBottomFault := FALSE;
+    ImmersionTimerAcc := T#0ms;
+    BottomTimerAcc := T#0ms;
+    ImmersionConfirmed := FALSE;
+    Outputs.BottomTouchConfirmed := FALSE;
+    Outputs.StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
+    StepAtFaultCaptured := FALSE;
+    Outputs.StepState := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 
-instCauses[0].Active   := SeqErrorFault;
+instCauses[0].Active := SeqErrorFault;
 instCauses[0].Latching := TRUE;
-instCauses[0].Texte    := 'Incoherence sequence immersion Kobold';
-
-instCauses[2].Active   := ErrorCausePresent;
+instCauses[0].Texte := 'Incoherence sequence immersion Kobold';
+instCauses[1].Active := ErrorCausePresent;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte := 'Parametrage invalide des seuils de plongee';
+instCauses[2].Active := Palier5ForbiddenFault;
 instCauses[2].Latching := TRUE;
-instCauses[2].Texte    := 'Parametrage invalide des seuils de plongee';
-
-instCauses[3].Active   := Palier5ForbiddenFault;
+instCauses[2].Texte := 'Palier 5 interdit pendant la mesure Kobold';
+instCauses[3].Active := TimeoutImmersionFault;
 instCauses[3].Latching := TRUE;
-instCauses[3].Texte    := 'Mesure Kobold impossible : vitesse trop elevee (Palier 5 interdit)';
-
-instCauses[4].Active   := TimeoutImmersionFault;
+instCauses[3].Texte := 'Timeout recherche immersion Kobold';
+instCauses[4].Active := TimeoutBottomFault;
 instCauses[4].Latching := TRUE;
-instCauses[4].Texte    := 'Depassement tempo recherche immersion Kobold';
+instCauses[4].Texte := 'Timeout recherche fond Kobold';
 
-instCauses[5].Active   := TimeoutBottomFault;
-instCauses[5].Latching := TRUE;
-instCauses[5].Texte    := 'Depassement tempo recherche fond Kobold';
-
-// Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
 
-// 📸 Capture ordonnée de StepAtFault (D2). Les défauts levés dans le CASE se figent au site du
-// latch (voir §3) ; ce bloc ne couvre que les défauts détectés en §1 (timeouts, paramétrage),
-// où DiveState/PrevState sont encore l'étape réelle. StepAtFaultCaptured évite l'écrasement.
 ErrorEdge(CLK := Fault.Error);
 IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
-    StepAtFault := PrevState;
+    Outputs.StepAtFault := PrevState;
     StepAtFaultCaptured := TRUE;
-ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
-    StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT Inputs.KoboldImmersed
+      AND NOT Inputs.MotionRequestActive AND NOT (Inputs.CurrentSpeedStep &gt; 4) THEN
+    Outputs.StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 {endregion}
 
-{region "§2 Gate neutralisation"}
-// 🛑 2. GATE
-IF NOT Enable OR NOT PowerContactorEngaged THEN
+{region "§2 Neutralisation et machine d'etat"}
+IF NOT Enable OR NOT Inputs.PowerContactorEngaged THEN
     Ready := FALSE;
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
-    DescendPermit := FALSE;
-    KoboldMeasureEnable := FALSE;
-    KoboldContactorCmd := FALSE;
-    BottomTouchConfirmed := FALSE;
-    DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
-    // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
-    // lisible pour l'IHM/diagnostic apres un cycle Enable OFF-&gt;ON ; seul un front Reset l'efface.
-    OperatorActionId := 0;
-    OperatorAction := '';
+    Outputs.DescendPermit := FALSE;
+    Outputs.KoboldMeasureEnable := FALSE;
+    Outputs.KoboldContactorCmd := FALSE;
+    Outputs.BottomTouchConfirmed := FALSE;
+    Outputs.StepState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    Outputs.OperatorActionId := 0;
+    Outputs.OperatorAction := '';
     ImmersionConfirmed := FALSE;
     ImmersionTimerAcc := T#0ms;
     BottomTimerAcc := T#0ms;
-    MinStepDown := 0;
+    Outputs.MinStepDown := 0;
     PrevState := E_DiveSearchState.WAIT_PRECONDITIONS;
     RETURN;
 END_IF;
 
 Ready := Enable AND NOT Fault.Latched;
-{endregion}
-
-{region "§3 Machine etat plongee recherche fond"}
-DescendPermit := FALSE;
-KoboldMeasureEnable := FALSE;
-KoboldContactorCmd := FALSE;
+Outputs.DescendPermit := FALSE;
+Outputs.KoboldMeasureEnable := FALSE;
+Outputs.KoboldContactorCmd := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
+Outputs.OperatorActionId := 0;
+Outputs.OperatorAction := '';
 
-// Descente reellement demandee ET sans cause de coupure immediate : anti-chauffe contacteur Kobold
-// (H1 : jamais alimente hors descente active), coupure meme-scan sur Palier 5 interdit et incoherence
-// sequence (H2), et double garde sur le mode maintenance (H5, en plus du gate Enable de PRG_03).
-DescentActive := MotionRequestActive AND (MotionDirection = -1)
-             AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
-             AND NOT (CurrentSpeedStep &gt; 4)
-             AND NOT SeqErrorFault;
+DescentActive := Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1)
+              AND ((Inputs.Mode = E_Mode.MAINT_N1) OR (Inputs.Mode = E_Mode.MAINT_N2))
+              AND NOT (Inputs.CurrentSpeedStep &gt; 4)
+              AND NOT SeqErrorFault;
 
-// Garde-fou non-redemarrage auto : un defaut latche non acquitte verrouille la machine
-// d'etat en ERROR_HOLD, meme si la vue live Fault.Error retombe (cause disparue).
 IF Fault.Error OR Fault.Latched THEN
-    DiveState := E_DiveSearchState.ERROR_HOLD;
-    KoboldContactorCmd := FALSE;
-    OperatorActionId := 16#0180;
-    OperatorAction := 'Vérifier les conditions puis réarmer avant une nouvelle plongée.';
+    Outputs.StepState := E_DiveSearchState.ERROR_HOLD;
+    Outputs.KoboldContactorCmd := FALSE;
+    Outputs.OperatorActionId := 384;
+    Outputs.OperatorAction := 'Verifier les conditions puis rearmer avant une nouvelle plongee.';
 ELSE
-    CASE DiveState OF
+    CASE Outputs.StepState OF
         E_DiveSearchState.WAIT_PRECONDITIONS:
-            KoboldContactorCmd := FALSE;
-            IF NOT BypassPreconditions
-               AND (NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
-                    OR (M1Position_M &lt; DiveStartMin_M) OR (M2Position_M &lt; DiveStartMin_M)) THEN
-                OperatorActionId := 16#0100;
-                OperatorAction := 'Vérifier les conditions initiales de plongée.';
+            IF NOT Inputs.BypassPreconditions
+               AND (NOT Inputs.BucketIsOpen OR NOT Inputs.PositionsValid OR Inputs.KoboldImmersed
+                    OR (Inputs.M1Position_M &lt; Inputs.DiveStartMin_M)
+                    OR (Inputs.M2Position_M &lt; Inputs.DiveStartMin_M)) THEN
+                Outputs.OperatorActionId := 256;
+                Outputs.OperatorAction := 'Verifier benne ouverte, positions et Kobold au repos.';
             ELSE
-                DiveState := E_DiveSearchState.READY_TO_DESCEND;
+                Outputs.StepState := E_DiveSearchState.READY_TO_DESCEND;
             END_IF;
 
         E_DiveSearchState.READY_TO_DESCEND:
             Ready := TRUE;
-            KoboldContactorCmd := FALSE;
-            OperatorActionId := 16#0101;
-            OperatorAction := 'Demander une descente pour rechercher le fond.';
-            IF MotionRequestActive AND (MotionDirection = -1) THEN
-                ImmersionTimerAcc := T#0ms; // ⏱️ RAZ à l'entrée exacte de SEARCHING_IMMERSION
-                DiveState := E_DiveSearchState.SEARCHING_IMMERSION;
+            Outputs.OperatorActionId := 257;
+            Outputs.OperatorAction := 'Demander une descente pour rechercher le fond.';
+            IF Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1) THEN
+                ImmersionTimerAcc := T#0ms;
+                Outputs.StepState := E_DiveSearchState.SEARCHING_IMMERSION;
             END_IF;
 
         E_DiveSearchState.SEARCHING_IMMERSION:
             Lifecycle.Busy := TRUE;
-            DescendPermit := DescentActive;
-            KoboldMeasureEnable := DescentActive;
-            KoboldContactorCmd := DescentActive; // Alimentation contacteur uniquement sous descente active (anti-chauffe)
-            OperatorActionId := 16#0102;
-            OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
-
-            // 🛑 Interdiction du Palier 5 pendant la détection Kobold
-            IF (CurrentSpeedStep &gt; 4) AND NOT StepAtFaultCaptured THEN
-                StepAtFault := DiveState;          // fige l'etape reelle avant tout basculement
-                StepAtFaultCaptured := TRUE;
-            END_IF;
-            IF CurrentSpeedStep &gt; 4 THEN
+            Outputs.DescendPermit := DescentActive;
+            Outputs.KoboldMeasureEnable := DescentActive;
+            Outputs.KoboldContactorCmd := DescentActive;
+            Outputs.OperatorActionId := 258;
+            Outputs.OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
+            IF Inputs.CurrentSpeedStep &gt; 4 THEN
+                IF NOT StepAtFaultCaptured THEN
+                    Outputs.StepAtFault := Outputs.StepState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
                 Palier5ForbiddenFault := TRUE;
             END_IF;
-
             IF KoboldRiseEdge.Q THEN
-                IF (M1Position_M &lt;= ImmersionUpper_M) AND (M1Position_M &gt;= ImmersionLower_M)
-                   AND (M2Position_M &lt;= ImmersionUpper_M) AND (M2Position_M &gt;= ImmersionLower_M) THEN
+                IF (Inputs.M1Position_M &lt;= Inputs.ImmersionUpper_M)
+                   AND (Inputs.M1Position_M &gt;= Inputs.ImmersionLower_M)
+                   AND (Inputs.M2Position_M &lt;= Inputs.ImmersionUpper_M)
+                   AND (Inputs.M2Position_M &gt;= Inputs.ImmersionLower_M) THEN
                     ImmersionConfirmed := TRUE;
-                    BottomTimerAcc := T#0ms; // ⏱️ RAZ à l'entrée exacte de SEARCHING_BOTTOM
-                    DiveState := E_DiveSearchState.SEARCHING_BOTTOM;
+                    BottomTimerAcc := T#0ms;
+                    Outputs.StepState := E_DiveSearchState.SEARCHING_BOTTOM;
                 ELSE
                     IF NOT StepAtFaultCaptured THEN
-                        StepAtFault := DiveState;
+                        Outputs.StepAtFault := Outputs.StepState;
                         StepAtFaultCaptured := TRUE;
                     END_IF;
                     SeqErrorFault := TRUE;
                 END_IF;
-            ELSIF (M1Position_M &lt; ImmersionLower_M) OR (M2Position_M &lt; ImmersionLower_M) THEN
+            ELSIF (Inputs.M1Position_M &lt; Inputs.ImmersionLower_M)
+               OR (Inputs.M2Position_M &lt; Inputs.ImmersionLower_M) THEN
                 IF NOT StepAtFaultCaptured THEN
-                    StepAtFault := DiveState;
+                    Outputs.StepAtFault := Outputs.StepState;
                     StepAtFaultCaptured := TRUE;
                 END_IF;
                 SeqErrorFault := TRUE;
@@ -1029,53 +1119,44 @@ ELSE
 
         E_DiveSearchState.SEARCHING_BOTTOM:
             Lifecycle.Busy := TRUE;
-            DescendPermit := DescentActive;
-            KoboldMeasureEnable := DescentActive;
-            KoboldContactorCmd := DescentActive; // Alimentation uniquement sous descente active (anti-chauffe)
-            OperatorActionId := 16#0103;
-            OperatorAction := 'Maintenir la descente : immersion validée, recherche du fond.';
-
-            // 🛑 Interdiction du Palier 5 pendant la détection Kobold
-            IF (CurrentSpeedStep &gt; 4) AND NOT StepAtFaultCaptured THEN
-                StepAtFault := DiveState;
-                StepAtFaultCaptured := TRUE;
-            END_IF;
-            IF CurrentSpeedStep &gt; 4 THEN
+            Outputs.DescendPermit := DescentActive;
+            Outputs.KoboldMeasureEnable := DescentActive;
+            Outputs.KoboldContactorCmd := DescentActive;
+            Outputs.OperatorActionId := 259;
+            Outputs.OperatorAction := 'Maintenir la descente : immersion validee, recherche du fond.';
+            IF Inputs.CurrentSpeedStep &gt; 4 THEN
+                IF NOT StepAtFaultCaptured THEN
+                    Outputs.StepAtFault := Outputs.StepState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
                 Palier5ForbiddenFault := TRUE;
             END_IF;
-
             IF KoboldFallEdge.Q AND ImmersionConfirmed THEN
-                BottomTouchConfirmed := TRUE;
+                Outputs.BottomTouchConfirmed := TRUE;
                 ImmersionConfirmed := FALSE;
-                KoboldContactorCmd := FALSE; // Coupure immédiate à la détection pour éviter surchauffe
-                DiveState := E_DiveSearchState.BOTTOM_CONFIRMED;
+                Outputs.KoboldContactorCmd := FALSE;
+                Outputs.StepState := E_DiveSearchState.BOTTOM_CONFIRMED;
             END_IF;
 
         E_DiveSearchState.BOTTOM_CONFIRMED:
             Lifecycle.Done := TRUE;
-            KoboldContactorCmd := FALSE; // Coupure anti-chauffe
-            OperatorActionId := 16#0104;
-            OperatorAction := 'Fond détecté : demander la fermeture ou l extraction.';
+            Outputs.KoboldContactorCmd := FALSE;
+            Outputs.OperatorActionId := 260;
+            Outputs.OperatorAction := 'Fond detecte : demander la fermeture ou extraction.';
 
         E_DiveSearchState.ERROR_HOLD:
-            KoboldContactorCmd := FALSE;
+            Outputs.KoboldContactorCmd := FALSE;
     END_CASE;
 END_IF;
 
-// 🤿 Plancher de palier en descente impose pendant la plongee.
-// Actif uniquement en phase de recherche (immersion/fond) ET sous descente reellement
-// demandee (DescentActive) : retombe a 0 au front de sortie de plongee (BOTTOM_CONFIRMED /
-// ERROR_HOLD / WAIT_PRECONDITIONS), donc aucun plancher residuel. Ne cree jamais de mouvement
-// par lui-meme : il ne fait que majorer le palier d'une descente deja demandee et permise.
-IF DescentActive AND (DiveState = E_DiveSearchState.SEARCHING_IMMERSION
-                  OR DiveState = E_DiveSearchState.SEARCHING_BOTTOM) THEN
-    MinStepDown := CfgDiveFloorStep;
+IF DescentActive AND ((Outputs.StepState = E_DiveSearchState.SEARCHING_IMMERSION)
+                   OR (Outputs.StepState = E_DiveSearchState.SEARCHING_BOTTOM)) THEN
+    Outputs.MinStepDown := LIMIT(0, Inputs.CfgDiveFloorStep, 5);
 ELSE
-    MinStepDown := 0;
+    Outputs.MinStepDown := 0;
 END_IF;
 
-// 💾 Mémorisation de l'étape précédente en toute fin de scan
-PrevState := DiveState;
+PrevState := Outputs.StepState;
 {endregion}
 </xhtml>
           </ST>
@@ -1260,10 +1341,10 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
           <Object Name="FB_DiveSearch" ObjectId="0e6b7a8e-54c0-5c72-8612-9c2a76db57f8" />
           <Folder Name="_TYPES">
             <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
+            <Object Name="ST_fbDiveSearch_Inputs" ObjectId="a95550e0-af41-55b8-bdc1-94cdc5e2e412" />
+            <Object Name="ST_fbDiveSearch_Outputs" ObjectId="bc4f838d-ad60-580e-ba9f-12e889929093" />
+            <Object Name="ST_fbDiveSearch_Config" ObjectId="a0057069-451b-5e0e-ad42-ec2a185a596c" />
           </Folder>
-        </Folder>
-        <Folder Name="F_MODES">
-          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
@@ -1272,6 +1353,9 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
             <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
             <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
           </Folder>
+        </Folder>
+        <Folder Name="F_MODES">
+          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
       </ProjectStructure>
     </data>

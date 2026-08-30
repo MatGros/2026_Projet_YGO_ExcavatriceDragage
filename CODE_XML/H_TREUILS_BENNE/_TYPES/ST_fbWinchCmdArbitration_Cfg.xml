@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:31:39.145109" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:31:39.145109">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_fbWinchCmdArbitration_Cfg">
+        <baseType>
+          <struct>
+            <variable name="BucketOverrideSpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse M2 pendant action benne (ex littéral 15.0)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>975ccf22-73db-5c3e-bfac-c985552bde6f</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_fbWinchCmdArbitration_Cfg — Config treuil (partagé M1/M2)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Config statique de FB_WinchCommandArbitrationM1/M2.
+       Structure UNIQUE partagée : M2 consomme BucketOverrideSpeedPct (chemin benne),
+       M1 l'ignore (pas de chemin benne).
+   📤 Producteur : PRG_04_Treuils_Benne (câblage).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Remplace le littéral 15.0 (PRG_04 §3) par une constante nommée.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="H_TREUILS_BENNE">
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbWinchCmdArbitration_Cfg" ObjectId="975ccf22-73db-5c3e-bfac-c985552bde6f" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

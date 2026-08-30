@@ -141,6 +141,7 @@ AbortEdge(CLK := AbortCycle);
 EnableEdge(CLK := Enable);
 
 // ⏱️ Surveillance indépendante de la remontée lente
+// X7_CTRL_ASCENT -> X8_ASCENT_LOADED : TON de stabilisation palier 1.
 StabilizationTimer(IN := (State = E_CycleStep.X7_CTRL_ASCENT), PT := CtrlAscentTimeout);
 
 // 📏 Comparaison vitesse réelle M1/M2
@@ -150,10 +151,12 @@ SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
                        AND (SpeedMismatchThresholdMps > 0.0)
                        AND (SpeedMismatchTimeout > T#0ms)
                        AND (SpeedMismatchMps > SpeedMismatchThresholdMps);
+// X7_CTRL_ASCENT -> STABILIZING : TON confirmation écart vitesse.
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
 // Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
+// Xi -> STABILIZING : TON backstop durée d'état pour tous les états de mouvement.
 StepMaxTimer(IN := CycleMotionPermit AND (State <> E_CycleStep.X0_PREPARATION)
                   AND (State <> E_CycleStep.X13_DONE_SYNC)
                   AND (State <> E_CycleStep.STABILIZING),
@@ -439,7 +442,9 @@ CASE State OF
         OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
         WinchM1Cmd.StartStop := FALSE;
-        BucketCmd.Close := TRUE;
+        // L'ordre benne reste soumis au même homme-mort que le cycle : aucune
+        // commande d'actionneur ne doit survivre à la perte du permis opérateur.
+        BucketCmd.Close := CycleMotionPermit;
 
         IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.Close := FALSE;
@@ -549,11 +554,14 @@ CASE State OF
         OperatorActionId := 16#040B;
         OperatorAction := 'Deflechir vers le bas pour ouvrir la benne et vider la charge.';
 
-        WinchM1Cmd.StartStop := CycleMotionPermit AND (WinchM1Cmd.Direction = 1);
-        WinchM1Cmd.Direction := 1;
+        // X11 est une ouverture par déflexion vers le bas : la direction doit
+        // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
+        // précédent). Les deux treuils restent synchrones et sous homme-mort.
+        WinchM1Cmd.Direction := -1;
+        WinchM1Cmd.StartStop := CycleMotionPermit;
         WinchM1Cmd.SpeedPct  := 20.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit AND (WinchM2Cmd.Direction = 1);
-        WinchM2Cmd.Direction := 1;
+        WinchM2Cmd.Direction := -1;
+        WinchM2Cmd.StartStop := CycleMotionPermit;
         WinchM2Cmd.SpeedPct  := 20.0;
 
         BucketCmd.Open := CycleMotionPermit AND (WinchM1Cmd.Direction = -1);

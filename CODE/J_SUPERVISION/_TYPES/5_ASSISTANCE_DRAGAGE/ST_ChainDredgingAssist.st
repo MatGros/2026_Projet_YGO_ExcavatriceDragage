@@ -16,10 +16,10 @@ STRUCT
     Idx301_ExtractionReady           : BOOL; // 1 = Assistance Extraction Prête | 0 = Non Prête
     Idx302_ExtractionBusy            : BOOL; // 1 = Séquence Extraction En Cours | 0 = Repos
     Idx303_ExtractionDone            : BOOL; // 1 = Extraction Terminée | 0 = En Cours
-    Idx304_ExtractionState           : E_ExtractionSequenceState; // État interne séquenceur extraction
+    Idx304_ExtractionState           : E_ExtractionAssistState; // État interne séquenceur extraction
     Idx305_ExtractionError           : BOOL; // 0 = Sain | 1 = Défaut Extraction
     Idx306_ExtractionErrorId          : WORD; // bit0: fond absent, bit1: fermeture, bit2: contrôle remontée, bit3: config
-    Idx307_ExtractionStepAtFault     : E_ExtractionSequenceState; // Étape figée à l'apparition du défaut extraction (ERROR_HOLD masque l'état vivant)
+    Idx307_ExtractionStepAtFault     : E_ExtractionAssistState; // Étape figée à l'apparition du défaut extraction (ERROR_HOLD masque l'état vivant)
 
     Idx401_OperatorActionId          : WORD;       // Identifiant consigne opérateur conduite (0 = aucune)
     Idx402_OperatorAction            : STRING(120); // Texte consigne opérateur (secours affichage)

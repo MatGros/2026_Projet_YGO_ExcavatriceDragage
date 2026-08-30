@@ -24,6 +24,9 @@ VAR
     instSafetyTranslationM3     : FB_Safety_Translation;
     instPosEstimatorM3          : FB_Translation_PositionEstimator;
     instPosDecoderM3            : FB_Translation_PositionDecoder; // 🧩 Decodage position M3 (migre de PRG_02, AF-02 TBD §8 #5)
+    instArbM3                   : FB_TranslationCmdArbitrationM3; // * [INST] Arbitrage commande translation M3
+    ArbM3_IHM                   : ST_fbTranslationCmdArbitration_IHM;     // . [LOC] Entrées IHM FB d'arbitrage M3
+    ArbM3_Context               : ST_fbTranslationCmdArbitration_Context; // . [LOC] Contexte gating FB d'arbitrage M3
 
     // === 📊 STRUCTS INTERNES (publiés via Data) ===
     TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // . [LOC] Demande finale et interlocks translation M3
@@ -37,7 +40,6 @@ VAR
     M3_PositionSensorTarget : BOOL;
 
     SelTarget       : INT;
-    FreqPct                 : REAL;
 
     M3_SafeStop_Active      : BOOL; // SafeStop sur défaut module d'entrée (InputModuleFault, AF06 §3bis)
     M3_SafeStop_Aggregate   : BOOL; // 🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)
@@ -170,75 +172,34 @@ END_IF;
 {region "§1 Arbitrage cible et direction"}
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
-IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO : consomme la demande du séquenceur de cycle.
-    // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
-    M3_PositioningActive  := TRUE;
-    SelTarget    := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt;
-    M3_StartStop_Active  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart;
+// ── Arbitrage M3 (FB_TranslationCmdArbitrationM3) ──
+// Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
+ArbM3_IHM.TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+ArbM3_IHM.BtnFwd            := GVL_IHM.TranslationM3.Cmd.BtnFwd;
+ArbM3_IHM.BtnRev            := GVL_IHM.TranslationM3.Cmd.BtnRev;
+ArbM3_IHM.SelPositioning    := GVL_IHM.TranslationM3.Cmd.SelPositioning;
+ArbM3_IHM.SetFreq_Hz        := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
+ArbM3_IHM.BypassGlobal      := GVL_IHM.TranslationM3.Bypass.Global;
 
-    // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
-    // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
-    IF M3_StartStop_Active THEN
-        M3_SpeedCmd_Active := 100.0;
-        // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
-        IF SelTarget = 1 THEN
-            M3_Direction_Active := 1;
-        ELSE
-            M3_Direction_Active := -1;
-        END_IF;
-    ELSE
-        M3_SpeedCmd_Active := 0.0;
-        M3_Direction_Active := 0;
-    END_IF;
-ELSIF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1)
-   OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2) THEN
-    M3_PositioningActive := GVL_IHM.TranslationM3.Cmd.SelPositioning;
-    SelTarget := 0;
+ArbM3_Context.HeightInterlockOk := M3_HeightInterlockOk;
+ArbM3_Context.MaxFreq_Hz        := GVL_PERSISTENT._TranslationMaxFreq_Hz;
 
-    IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnFwd THEN
-        M3_Direction_Active := 1;
-    ELSIF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
-        M3_Direction_Active := -1;
-    ELSIF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-        M3_Direction_Active := PRG_02_Acquisition.Data.JoystickDirectionX;
-    ELSE
-        M3_Direction_Active := 0;
-    END_IF;
-
-    // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2
-    // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
-    // TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd).
-    M3_StartStop_Active := (M3_Direction_Active <> 0)
-                           AND (GVL_IHM.TranslationM3.Bypass.Global
-                                OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
-                                OR GVL_IHM.Modes.Cmd.TglJoystickMaster)
-                           AND PRG_02_Acquisition.Data.JoystickDeadmanArmed
-                           AND M3_HeightInterlockOk; // Hauteur mini M1/M2 (risque collision)
-
-    FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz > 0.0,
-                  100.0,
-                  (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz > 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
-    // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
-    M3_SpeedCmd_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
-                              FreqPct,
-                              (PRG_02_Acquisition.Data.JoystickSpeedPctX / 100.0) * FreqPct);
-ELSE
-    M3_PositioningActive := FALSE;
-    SelTarget    := 0;
-    M3_StartStop_Active  := FALSE;
-    M3_Direction_Active  := 0;
-    M3_SpeedCmd_Active   := 0.0;
-END_IF;
+instArbM3(
+    Enable         := TRUE,
+    Joystick       := PRG_02_Acquisition.Data.Joystick,
+    Auth           := PRG_03_Modes_Cycle.Data.Auth,
+    ReqTranslation := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation,
+    IHM            := ArbM3_IHM,
+    Context        := ArbM3_Context
+);
+M3_PositioningActive := instArbM3.PositioningActive;
+SelTarget := instArbM3.SelTarget;
+M3_StartStop_Active := instArbM3.StartStop;
+M3_Direction_Active := instArbM3.Direction;
+M3_SpeedCmd_Active := instArbM3.SpeedPct;
 
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
 // de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
-
-M3_SpeedCmd_Active := LIMIT(0.0, ABS(M3_SpeedCmd_Active), 100.0);
-
-IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable THEN
-    SelTarget := 0;
-END_IF;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.

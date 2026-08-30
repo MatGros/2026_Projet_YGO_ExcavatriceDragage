@@ -1,0 +1,1226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:47:08.369458" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:47:08.369458">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_ExtractionAssistState">
+        <baseType>
+          <enum>
+            <values>
+              <value name="WAIT_BOTTOM_CONFIRMATION" value="0" />
+              <value name="READY_TO_CLOSE" value="1" />
+              <value name="CLOSING_BUCKET" value="2" />
+              <value name="CONTROL_ASCENT" value="3" />
+              <value name="NOMINAL_ASCENT" value="4" />
+              <value name="ERROR_HOLD" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>WAIT_BOTTOM_CONFIRMATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente fond Kobold ou attestation opérateur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY_TO_CLOSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à fermer la benne</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CLOSING_BUCKET</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Bucket ferme M2 seul</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CONTROL_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">M1/M2 synchronisés au palier sans contacteur vitesse</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>NOMINAL_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montée couplée avec vitesse demandée opérateur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR_HOLD</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut extraction, reprise interdite avant reset</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>52924d25-cfcc-5dc2-a673-d7581dfb2d37</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_Mode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLE" value="0" />
+              <value name="MAINT_N1" value="1" />
+              <value name="MAINT_N2" value="2" />
+              <value name="SEMI_AUTO" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N2</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEMI_AUTO</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Fault">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ErrorId figé à l'apparition du défaut, effacé au Reset</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ffe904a3-501c-5aac-bc38-202f178a61f2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'état défaut d'un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu'au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l'acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_FaultCause">
+        <baseType>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente maintenant (interlock sur cette valeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latching">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause à acquitter (arme Latched) ; 0 = live seulement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Texte">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>dafea4e6-0b73-5895-8c57-ef302142ebf7</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n'alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Lifecycle">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b6983c9c-4d76-5d4e-899b-e996cbf34849</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d'exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'avancement d'une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_ExtractionAssist" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Activation generale du FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine de securite OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode de fonctionnement arbitre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionRequestActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention de mouvement active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (+1 = montee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomPositionConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Attestation fond confirme (Kobold ou op)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS &amp; ETATS MATERIELS ===
+--&gt; [HW] Benne fermee confirmee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mouvement benne en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Defaut sur sous-systeme benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Defaut de desynchronisme treuils M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1MeasuredSpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Validite mesure vitesse M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2MeasuredSpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Validite mesure vitesse M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionsValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Validite des mesures de position</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ControlAscentDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; REGLAGES ===
+--&gt; [CFG] Distance palier 1 de controle remontee (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgBucketCloseTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#75s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Backstop fermeture benne (doit rester &gt; BucketMoveTimeout)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketMoveTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#60s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Reference watchdog mouvement FB_Bucket (verrouillage ordre backstop)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#10ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Base de temps d'integration (periode MainTask)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DEFECTUOSITES ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault + ST_Lifecycle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Lifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+            </variable>
+            <variable name="ExtractionState">
+              <type>
+                <derived name="E_ExtractionAssistState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase interne extraction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFault">
+              <type>
+                <derived name="E_ExtractionAssistState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Phase active memorisee lors du defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketCloseRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES &amp; AUTORISATIONS ===
+&lt;-- [ACT] Demande de fermeture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Autorisation de remontee assistee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionControlActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Plafond palier 1 pendant la montee controlee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomConfirmationConsumed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Signal confirmation fond consomme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorActionId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC IHM ===
+&lt;-- [DIAG] ID action operateur requise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorAction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Message explicatif operateur</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONTS ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant apparition defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ControlStartM1Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MEMORISATIONS &amp; POSITIONS INTERNES ===
+. [LOC] Position M1 au debut du palier de controle (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ControlStartM2Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 au debut du palier de controle (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevState">
+              <type>
+                <derived name="E_ExtractionAssistState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Phase au scan precedent (survit au gate)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalculatedControlAscentTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCUL DYNAMIQUE RUNTIME DU TIMEOUT DECOLLAGE ===
+. [LOC] Plafond anti-blocage decollage calcule au runtime</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketCloseTimerAcc">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACCUMULATEURS DE TEMPS ANTI-POMPAGE ===
+. [LOC] Temps cumule fermeture benne sous montee demandee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ControlAscentTimerAcc">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps cumule decollage controle sous montee demandee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorCausePresent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Presence d'une cause de defaut parametrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketErrorFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch erreur benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncOrSpeedErrorFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch erreur synchro/vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutBucketCloseFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch backstop fermeture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutControlAscentFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch timeout decollage controle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFaultCaptured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] StepAtFault deja fige pour l'episode de defaut courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AssistPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Montee assistee reellement demandee (sens + mode)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentControlSafe">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Entrees [SAFE] saines pour le decollage controle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentNominalSafe">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Entrees [SAFE] saines pour la remontee nominale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CausesPhysiquesEffacees">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Toutes les entrees defaut treuil/benne revenues a l'etat sain</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOCLE DEFAUT ===
+* [INST] Socle défaut transverse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_MinSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES DERIVATION TIMEOUT ANTI-BLOCAGE ===
+Vitesse Palier 1 mini sous charge/mou (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ControlAscentMargin">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Facteur de marge sur la course de decollage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_TimeoutMinDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher de distance pour le calcul (evite timeout degenere)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_TimeoutMaxDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond de distance : borne le calcul avant REAL_TO_UDINT (anti-overflow)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_BackstopMax">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#600s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond du backstop fermeture benne : au-dela, risque d'overflow de l'accumulateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_SecToMs">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conversion secondes -&gt; millisecondes</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_ExtractionAssist — Fermeture benne et remontée assistée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Séquence d'extraction (fermeture benne, remontée de contrôle, remontée nominale)
+   🛡️ Sécurité : Aucune remontée assistée sans fond confirmé, contrôle palier 1
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+// Parametrage invalide : distance nulle, backstop nul, base de temps nulle, ou backstop
+// qui fauterait AVANT le watchdog benne (masquerait BucketError - ordre des watchdogs).
+ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0)
+                  OR (CfgBucketCloseTimeout &lt;= T#0ms)
+                  OR (CycleTime &lt;= T#0ms)
+                  OR (CfgBucketCloseTimeout &lt;= BucketMoveTimeout)
+                  OR (CfgBucketCloseTimeout &gt; CST_BackstopMax);  // borne haute : evite l'overflow de BucketCloseTimerAcc (F3)
+
+// ⏱️ Plafond anti-blocage decollage calcule au runtime : course de controle bornee [plancher..plafond]
+// avant conversion REAL-&gt;UDINT-&gt;TIME (anti-overflow sur valeur IHM aberrante, CQS §6).
+CalculatedControlAscentTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
+    LIMIT(CST_TimeoutMinDistance_M, ControlAscentDistance_M, CST_TimeoutMaxDistance_M)
+    / CST_MinSpeed_Mps * CST_ControlAscentMargin * CST_SecToMs));
+
+// ⏱️ Integrateurs de temps de montee effective (anti-pompage homme-mort)
+IF (ExtractionState = E_ExtractionAssistState.CLOSING_BUCKET) AND MotionRequestActive AND (MotionDirection = 1) THEN
+    BucketCloseTimerAcc := BucketCloseTimerAcc + CycleTime;
+    IF BucketCloseTimerAcc &gt;= CfgBucketCloseTimeout THEN
+        TimeoutBucketCloseFault := TRUE;
+    END_IF;
+END_IF;
+
+IF (ExtractionState = E_ExtractionAssistState.CONTROL_ASCENT) AND MotionRequestActive AND (MotionDirection = 1) THEN
+    ControlAscentTimerAcc := ControlAscentTimerAcc + CycleTime;
+    IF ControlAscentTimerAcc &gt;= CalculatedControlAscentTimeout THEN
+        TimeoutControlAscentFault := TRUE;
+    END_IF;
+END_IF;
+
+// Etat physique des causes treuil/benne : conditionne l'acquittement des latches a cause persistante (F2).
+CausesPhysiquesEffacees := NOT BucketError AND NOT WinchSyncError
+                        AND PositionsValid AND M1MeasuredSpeedValid AND M2MeasuredSpeedValid;
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
+    // Latches sans cause physique persistante (timeouts, backstop) : acquittables sur simple front Reset.
+    TimeoutBucketCloseFault   := FALSE;
+    TimeoutControlAscentFault := FALSE;
+    BucketCloseTimerAcc       := T#0ms;
+    ControlAscentTimerAcc     := T#0ms;
+    StepAtFaultCaptured       := FALSE;
+    ExtractionState := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
+    // Latches de cause physique : acquittables SEULEMENT si l'entree de defaut est revenue saine (F2).
+    IF CausesPhysiquesEffacees THEN
+        BucketErrorFault      := FALSE;
+        SyncOrSpeedErrorFault := FALSE;
+    END_IF;
+END_IF;
+
+instCauses[1].Active   := BucketErrorFault;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := 'Defaut sous-systeme benne pendant fermeture';
+
+instCauses[2].Active   := SyncOrSpeedErrorFault;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := 'Defaut synchro ou capteurs treuils pendant remontee';
+
+instCauses[3].Active   := ErrorCausePresent;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := 'Parametrage distance de controle ou backstop invalide';
+
+instCauses[4].Active   := TimeoutBucketCloseFault;
+instCauses[4].Latching := TRUE;
+instCauses[4].Texte    := 'Depassement backstop fermeture benne';
+
+instCauses[5].Active   := TimeoutControlAscentFault;
+instCauses[5].Latching := TRUE;
+instCauses[5].Texte    := 'Depassement tempo decollage controle';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+
+// 📸 Capture ordonnee de StepAtFault (D2). Les defauts leves dans le CASE se figent au site du
+// latch (voir §3) ; ce bloc ne couvre que les defauts detectes en §1 (backstop, timeout, parametrage),
+// ou ExtractionState/PrevState sont encore l'etape reelle. StepAtFaultCaptured evite l'ecrasement.
+ErrorEdge(CLK := Fault.Error);
+IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
+    StepAtFault := PrevState;
+    StepAtFaultCaptured := TRUE;
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
+    StepAtFault := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
+END_IF;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Ready := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    BucketCloseRequest := FALSE;
+    AscentPermit := FALSE;
+    ExtractionControlActive := FALSE;
+    BottomConfirmationConsumed := FALSE;
+    ExtractionState := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
+    // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
+    // lisible pour l'IHM/diagnostic apres un cycle Enable OFF-&gt;ON ; seul un front Reset l'efface.
+    PrevState := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
+    BucketCloseTimerAcc := T#0ms;
+    ControlAscentTimerAcc := T#0ms;
+    OperatorActionId := 0;
+    OperatorAction := '';
+    RETURN;
+END_IF;
+
+Ready := Enable AND NOT Fault.Latched;
+{endregion}
+
+{region "§3 Machine etat fermeture remontee"}
+BucketCloseRequest := FALSE;
+AscentPermit := FALSE;
+ExtractionControlActive := FALSE;
+BottomConfirmationConsumed := FALSE;
+Lifecycle.Busy := FALSE;
+Lifecycle.Done := FALSE;
+
+// Montee assistee reellement demandee : sens montee + mode maintenance (H5, double garde vs Enable PRG_03).
+AssistPermit := MotionRequestActive AND (MotionDirection = 1)
+            AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2);
+// Entrees [SAFE] saines : coupure meme-scan des permis si defaut treuil/synchro (H2), avant meme le latch.
+AscentControlSafe := NOT WinchSyncError AND PositionsValid AND M1MeasuredSpeedValid AND M2MeasuredSpeedValid;
+AscentNominalSafe := NOT WinchSyncError AND PositionsValid;
+
+// Garde-fou non-redemarrage auto : un defaut latche non acquitte verrouille la machine
+// d'etat en ERROR_HOLD, meme si la vue live Fault.Error retombe (cause disparue).
+IF Fault.Error OR Fault.Latched THEN
+    ExtractionState := E_ExtractionAssistState.ERROR_HOLD;
+    OperatorActionId := 16#0280;
+    OperatorAction := 'Vérifier la benne et les treuils puis réarmer avant de reprendre.';
+ELSE
+    CASE ExtractionState OF
+        E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION:
+            IF BottomPositionConfirmed THEN
+                ExtractionState := E_ExtractionAssistState.READY_TO_CLOSE;
+            ELSE
+                OperatorActionId := 16#0200;
+                OperatorAction := 'Confirmer que la benne est posée au fond avant extraction.';
+            END_IF;
+
+        E_ExtractionAssistState.READY_TO_CLOSE:
+            Ready := TRUE;
+            OperatorActionId := 16#0201;
+            OperatorAction := 'Demander la montée pour fermer la benne.';
+            IF MotionRequestActive AND (MotionDirection = 1) THEN
+                BottomConfirmationConsumed := TRUE;
+                BucketCloseTimerAcc := T#0ms;   // ⏱️ RAZ a l'entree exacte de CLOSING_BUCKET
+                ExtractionState := E_ExtractionAssistState.CLOSING_BUCKET;
+            END_IF;
+
+        E_ExtractionAssistState.CLOSING_BUCKET:
+            Lifecycle.Busy := TRUE;
+            BucketCloseRequest := AssistPermit AND NOT BucketError; // coupure meme-scan sur defaut benne (H2)
+            OperatorActionId := 16#0202;
+            OperatorAction := 'Maintenir la montée : fermeture de la benne en cours.';
+            IF BucketError THEN
+                IF NOT StepAtFaultCaptured THEN
+                    StepAtFault := ExtractionState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
+                BucketErrorFault := TRUE;
+            ELSIF BucketIsClosed AND NOT BucketBusy THEN
+                ControlStartM1Position_M := M1Position_M;
+                ControlStartM2Position_M := M2Position_M;
+                ControlAscentTimerAcc := T#0ms;   // ⏱️ RAZ a l'entree exacte de CONTROL_ASCENT
+                ExtractionState := E_ExtractionAssistState.CONTROL_ASCENT;
+            END_IF;
+
+        E_ExtractionAssistState.CONTROL_ASCENT:
+            Lifecycle.Busy := TRUE;
+            AscentPermit := AssistPermit AND AscentControlSafe; // coupure meme-scan sur defaut synchro/capteurs (H2)
+            ExtractionControlActive := AscentPermit;            // plafond palier 1 suit le permis de montee
+            OperatorActionId := 16#0203;
+            OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
+            IF NOT AscentControlSafe THEN
+                IF NOT StepAtFaultCaptured THEN
+                    StepAtFault := ExtractionState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
+                SyncOrSpeedErrorFault := TRUE;
+            ELSIF (M1Position_M &gt;= (ControlStartM1Position_M + ControlAscentDistance_M))
+               AND (M2Position_M &gt;= (ControlStartM2Position_M + ControlAscentDistance_M)) THEN
+                ExtractionState := E_ExtractionAssistState.NOMINAL_ASCENT;
+            END_IF;
+
+        E_ExtractionAssistState.NOMINAL_ASCENT:
+            Lifecycle.Busy := TRUE;
+            AscentPermit := AssistPermit AND AscentNominalSafe; // coupure meme-scan sur defaut synchro/position (H2)
+            OperatorActionId := 16#0204;
+            OperatorAction := 'Maintenir la montée : extraction en cours.';
+            IF NOT AscentNominalSafe THEN
+                IF NOT StepAtFaultCaptured THEN
+                    StepAtFault := ExtractionState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
+                SyncOrSpeedErrorFault := TRUE;
+            END_IF;
+
+        E_ExtractionAssistState.ERROR_HOLD:
+            ;
+    END_CASE;
+END_IF;
+
+// 💾 Memorisation de la phase precedente en toute fin de scan (capture StepAtFault fiable)
+PrevState := ExtractionState;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8b9bdcda-4c34-51c8-981b-7a07151907c3</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_FaultCore" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation générale du FB porteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement (jamais conditionné, §9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Causes">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB porteur autorisé (= Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latch">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bit laté par cause, jusqu'au Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="i">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de parcours de la liste</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d'une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l'apparition d'une
+          cause `Active AND Latching`, conservé jusqu'au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d'effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Reset (front, toujours effectif)"}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region "§2 Vue LIVE — Error / ErrorId"}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region "§3 Armement des latches (causes à acquitter)"}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu'au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region "§4 Vue LATCHÉE — Latched / LatchedId"}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>182a55ac-4f1f-5204-b2e2-869f3904964e</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="G_CYCLE">
+          <Object Name="FB_ExtractionAssist" ObjectId="8b9bdcda-4c34-51c8-981b-7a07151907c3" />
+          <Folder Name="_TYPES">
+            <Object Name="E_ExtractionAssistState" ObjectId="52924d25-cfcc-5dc2-a673-d7581dfb2d37" />
+          </Folder>
+        </Folder>
+        <Folder Name="F_MODES">
+          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
+            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
