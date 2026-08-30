@@ -203,6 +203,24 @@ FB_ExtractionSequence:
     - CODE/G_CYCLE/FB_ExtractionSequence.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_extractionsequence.st
 
+FB_WinchStepShaper:
+  domain: H_TREUILS_BENNE
+  sources:
+    - CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winchstepshaper.st
+
+FB_WinchDirectionInterlock:
+  domain: H_TREUILS_BENNE
+  sources:
+    - CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winchdirectioninterlock.st
+
+FB_DriftGuard:
+  domain: H_TREUILS_BENNE
+  sources:
+    - CODE/H_TREUILS_BENNE/FB_DriftGuard.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_driftguard.st
+
 FB_SpeedStep:
   domain: H_TREUILS_BENNE
   sources:
