@@ -61,10 +61,10 @@ instModes(
     // Arrêt mécanique confirmé des treuils (condition de bascule N1/N2, AF-05 §4bis)
     M1ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     M1BrakeIsOpen             := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
-    M1SpeedAbsMps             := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
+    M1SpeedAbsMps             := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps,
     M2ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     M2BrakeIsOpen             := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
-    M2SpeedAbsMps             := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
+    M2SpeedAbsMps             := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps,
     // États homing (levée du re-homing obligatoire)
     M1HomingDone              := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Done,
     M1Homed                   := PRG_02_Acquisition.Data.EncoderM1.Homed,
@@ -76,7 +76,7 @@ instModes(
     // assumé : PRG_04 est de rang 04, ce programme de rang 03)
     M1PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM1,
     M2PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM2,
-    MachineHomed     := PRG_02_Acquisition.MachineHomed,
+    MachineHomed     := PRG_02_Acquisition.MachineHoming.Homed,
     // Restauration boot des drapeaux de re-homing (miroir PERSISTENT)
     BootHomingRequiredM1      := GVL_PERSISTENT._MaintM1HomingRequired,
     BootHomingRequiredM2      := GVL_PERSISTENT._MaintM2HomingRequired
@@ -88,12 +88,12 @@ GVL_PERSISTENT._MaintM1HomingRequired := instModes.Auth.HomingRequiredM1;
 GVL_PERSISTENT._MaintM2HomingRequired := instModes.Auth.HomingRequiredM2;
 
 // Qualification de l'intention opérateur both (M1+M2) dans le même scan.
-// Homme-mort QUALIFIÉ (JoystickDeadmanArmed) — même source que l'arbitrage
+// Homme-mort QUALIFIÉ (Data.Joystick.DeadmanArmed) — même source que l'arbitrage
 // (Joystick.DeadmanArmed) : les assistants et la commande réelle partagent
 // la même décision, plus de divergence raw/qualifié.
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     WinchBothMotionDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
-    WinchBothMotionActive := PRG_02_Acquisition.Data.JoystickDeadmanArmed
+    WinchBothMotionActive := PRG_02_Acquisition.Data.Joystick.DeadmanArmed
                                      AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
@@ -139,10 +139,10 @@ DiveSearchInputs.MotionRequestActive   := WinchBothMotionActive;
 DiveSearchInputs.MotionDirection       := WinchBothMotionDirection;
 DiveSearchInputs.BucketIsOpen          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen;
 DiveSearchInputs.KoboldImmersed        := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
-DiveSearchInputs.M1Position_M          := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
-DiveSearchInputs.M2Position_M          := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
-DiveSearchInputs.PositionsValid        := NOT PRG_02_Acquisition.Data.M1_EncoderFault
-                                          AND NOT PRG_02_Acquisition.Data.M2_EncoderFault;
+DiveSearchInputs.M1Position_M          := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
+DiveSearchInputs.M2Position_M          := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
+DiveSearchInputs.PositionsValid        := NOT PRG_02_Acquisition.Data.EncoderM1.EncoderFault
+                                          AND NOT PRG_02_Acquisition.Data.EncoderM2.EncoderFault;
 // Palier actuel M1 reellement commande (public PRG_04 §8). PRG_03 est de rang 03,
 // PRG_04 de rang 04 : lecture du scan PRECEDENT (lag 1 scan assume, meme pratique que
 // le reste de PRG_03). Rend effectif le refus interne du Palier 5 en plongee Kobold.
@@ -183,12 +183,12 @@ instExtractionAssist(
     BucketBusy := PRG_04_Treuils_Benne.Data.BucketBusy,
     BucketError := PRG_04_Treuils_Benne.Data.BucketError,
     WinchSyncError := PRG_04_Treuils_Benne.Data.WinchSyncError,
-    M1Position_M := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
-    M2Position_M := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
-    M1MeasuredSpeedValid := PRG_02_Acquisition.Data.Encoders.M1.SpeedValid,
-    M2MeasuredSpeedValid := PRG_02_Acquisition.Data.Encoders.M2.SpeedValid,
-    PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
-                       AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
+    M1Position_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
+    M2Position_M := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
+    M1MeasuredSpeedValid := PRG_02_Acquisition.Data.EncoderM1.Measurement.SpeedValid,
+    M2MeasuredSpeedValid := PRG_02_Acquisition.Data.EncoderM2.Measurement.SpeedValid,
+    PositionsValid := NOT PRG_02_Acquisition.Data.EncoderM1.EncoderFault
+                       AND NOT PRG_02_Acquisition.Data.EncoderM2.EncoderFault,
     ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M,
     CfgBucketCloseTimeout := T#75s,
     BucketMoveTimeout := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
@@ -213,7 +213,7 @@ instCycleSemiAuto(
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := instModes.Auth.Mode,
     CycleMotionPermit       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
-    DeadmanArmed            := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
+    DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
     AbortCycle              := GVL_IHM.Cycle.Cmd.BtnAbort,
@@ -225,10 +225,10 @@ instCycleSemiAuto(
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
     WinchSyncError          := PRG_04_Treuils_Benne.Data.WinchSyncError,
     WinchSyncDeltaM         := PRG_04_Treuils_Benne.Data.WinchSyncSignedDeltaPosM,
-    M1_CablePosM            := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
-    M2_CablePosM            := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
-    M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
-    M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
+    M1_CablePosM            := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
+    M2_CablePosM            := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
+    M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps,
+    M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,

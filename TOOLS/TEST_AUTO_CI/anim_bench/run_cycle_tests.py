@@ -66,9 +66,9 @@ SOURCES = [
     "CODE/G_CYCLE/_TYPES/E_CycleStep.st",
     "CODE/G_CYCLE/_TYPES/E_OperatorAxis.st",
     "CODE/G_CYCLE/_TYPES/E_ProgramSequence.st",
-    "CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st",
-    "CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st",
-    "CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st",
     "CODE/G_CYCLE/FB_Cycle.st",
 ]
 

@@ -5,8 +5,8 @@ test = sys.argv[3]
 converted = [str(pathlib.Path(tmp) / n) for n in [
     "E_State.st","ST_Fault.st","ST_FaultCause.st","ST_Lifecycle.st","FB_FaultCore.st",
     "E_Mode.st","E_CycleStep.st","E_OperatorAxis.st","E_ProgramSequence.st",
-    "ST_fbCycle_WinchCmdDemand.st","ST_fbCycle_TranslationCmdDemand.st",
-    "ST_fbCycle_BucketCmdDemand.st","FB_Cycle.st"]]
+    "ST_ProgramWinchRequest.st","ST_ProgramTranslationRequest.st",
+    "ST_ProgramBucketRequest.st","FB_Cycle.st"]]
 out = str(pathlib.Path(tmp) / "FB_Cycle.cpp")
 tmp_root = pathlib.Path(tempfile.gettempdir())
 before = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}

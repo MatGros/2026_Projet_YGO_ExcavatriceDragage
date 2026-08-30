@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:32:01.337771" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:32:01.337771">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:29:56.443516" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:29:56.443516">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -52,20 +52,12 @@ Etape courante</xhtml>
 Autorisation de descente assistee</xhtml>
               </documentation>
             </variable>
-            <variable name="KoboldMeasureEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation mesure Kobold</xhtml>
-              </documentation>
-            </variable>
             <variable name="KoboldContactorCmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande alimentation Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande alimentation Kobold (fail-safe, coupe au front de fond)</xhtml>
               </documentation>
             </variable>
             <variable name="BottomTouchConfirmed">

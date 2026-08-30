@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:40:22.362771" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:40:22.362771">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_MachineHoming">
+        <baseType>
+          <struct>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification conjointe reference machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetPosBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valider position actuelle = reference benne ouverte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetPosBucketClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valider position actuelle = reference benne fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingLoss">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte reference en mouvement : arret controle SafeStop</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Instruction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne IHM reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Failed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction reference abandonnee</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>719346ef-3775-5b4e-ac3c-37b255640eba</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧭 ST_MachineHoming — Etat publie du homing conjoint machine (M1/M2/benne)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les 8 sorties homing a plat de PRG_02_Acquisition en
+             un bus struct unique, publie sur le bus inter-PRG.
+   🔒 Sécurité : Homed = qualification conjointe reference machine (gate SEMI_AUTO).
+                 HomingLoss = perte reference en mouvement : arret controle SafeStop.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="G_CYCLE">
+          <Folder Name="_TYPES">
+            <Object Name="ST_MachineHoming" ObjectId="719346ef-3775-5b4e-ac3c-37b255640eba" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

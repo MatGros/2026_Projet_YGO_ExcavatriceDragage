@@ -22,14 +22,7 @@ VAR_OUTPUT
     HwReal                   : ST_HardwareImage; // <-- [STAT] Image brute reelle physique
     HwSim                    : ST_HardwareImage; // <-- [STAT] Image simulee banc
     HwIn                     : ST_HardwareImage; // <-- [STAT] Image utilisee par le metier (arbitree)
-    MachineHomed    : BOOL;             // <-- [STAT] Qualification conjointe reference machine
-    MachineHomingCommitOpen      : BOOL;             // <-- [CMD] Commit atomique benne ouverte
-    MachineHomingCommitClose     : BOOL;             // <-- [CMD] Commit atomique benne fermee
-    MachineHomingActive : BOOL;           // <-- [STAT] Homing conjoint en cours
-    MachineHomingLossSafeStop    : BOOL;             // <-- [SAFE] Perte reference en mouvement : arret controle
-    MachineHomingStep            : INT;              // <-- [STAT] Etape guidee reference
-    MachineHomingInstruction     : STRING(120);      // <-- [STAT] Consigne IHM reference
-    MachineHomingFailed          : BOOL;             // <-- [STAT] Transaction reference abandonnee
+    MachineHoming    : ST_MachineHoming; // <-- [BUS] Etat homing conjoint machine (M1/M2/benne)
 END_VAR
 
 VAR
@@ -349,13 +342,6 @@ Data.Joystick.Ready              := instJoystick.Ready;
 Data.Joystick.Fault              := instJoystick.Fault;
 Data.Joystick.NeutralXAct        := instJoystick.NeutralXAct;
 Data.Joystick.NeutralYAct        := instJoystick.NeutralYAct;
-
-// 📤 Publication des états et axes joystick (compatibilité de transition)
-Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
-Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
-Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
-Data.JoystickSpeedPctX    := ABS(instJoystick.AxisCmdX.SpeedTgt);
-Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
 {endregion}
 
 {region "§4 Codeurs et homing — M1/M2"}
@@ -376,9 +362,9 @@ MachineHomingM2Status.HomingBusy       := Data.EncoderM2.Measurement.HomingLifec
 MachineHomingM2Status.HomingDone       := Data.EncoderM2.Measurement.HomingLifecycle.Done;
 MachineHomingM2Status.HomingError      := Data.EncoderM2.Measurement.HomingFault.Error;
 MachineHomingMechanicalStopOk := HwIn.Winch.M1_ContactorsReleased_DI AND NOT HwIn.Winch.M1_BrakeIsOpen_DI
-                                 AND (ABS(Data.Encoders.M1.Speed_Mps) < 0.02)
+                                 AND (ABS(Data.EncoderM1.Measurement.Speed_Mps) < 0.02)
                                  AND HwIn.Winch.M2_ContactorsReleased_DI AND NOT HwIn.Winch.M2_BrakeIsOpen_DI
-                                 AND (ABS(Data.Encoders.M2.Speed_Mps) < 0.02);
+                                 AND (ABS(Data.EncoderM2.Measurement.Speed_Mps) < 0.02);
 instMachineHomingCycle(
     Enable                     := TRUE,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -394,14 +380,14 @@ instMachineHomingCycle(
     CfgOffsetOpenM             := _BucketCfgPersist.Config.OffsetOpenM,
     CfgOffsetCloseM            := _BucketCfgPersist.Config.OffsetCloseM
 );
-MachineHomed := instMachineHomingCycle.MachineHomed;
-MachineHomingCommitOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
-MachineHomingCommitClose := instMachineHomingCycle.BucketCommit.CommitClose;
-MachineHomingActive := instMachineHomingCycle.MachineHomingActive;
-MachineHomingLossSafeStop := instMachineHomingCycle.MachineHomingLossSafeStop;
-MachineHomingStep := TO_INT(instMachineHomingCycle.MachineHomingStep);
-MachineHomingInstruction := instMachineHomingCycle.MachineHomingInstruction;
-MachineHomingFailed := instMachineHomingCycle.MachineHomingFailed;
+MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
+MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
+MachineHoming.SetPosBucketClose := instMachineHomingCycle.BucketCommit.CommitClose;
+MachineHoming.Active           := instMachineHomingCycle.MachineHomingActive;
+MachineHoming.HomingLoss       := instMachineHomingCycle.MachineHomingLossSafeStop;
+MachineHoming.Step             := TO_INT(instMachineHomingCycle.MachineHomingStep);
+MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstruction;
+MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
@@ -441,11 +427,6 @@ Data.EncoderM1.EncoderFault             := instEncoderM1.EncoderFault;
 Data.EncoderM1.HomedAndReliable         := instEncoderM1.HomedAndReliable;
 Data.EncoderM1.PresetConfirmationFailed := instEncoderM1.PresetConfirmationFailed;
 Data.EncoderM1.HwOut                    := instEncoderM1.HwOut;
-
-// Compatibilité de transition
-Data.Encoders.M1           := instEncoderM1.Measurement;
-Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
-Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
 COD1_PresettTrigCmd := instEncoderM1.HwOut.PresetTriggerCmd;
 COD1_CodeSeqTrigCmd := instEncoderM1.HwOut.CodeSeqTriggerCmd;
 COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
@@ -493,11 +474,6 @@ Data.EncoderM2.EncoderFault             := instEncoderM2.EncoderFault;
 Data.EncoderM2.HomedAndReliable         := instEncoderM2.HomedAndReliable;
 Data.EncoderM2.PresetConfirmationFailed := instEncoderM2.PresetConfirmationFailed;
 Data.EncoderM2.HwOut                    := instEncoderM2.HwOut;
-
-// Compatibilité de transition
-Data.Encoders.M2           := instEncoderM2.Measurement;
-Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
-Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
 COD2_PresettTrigCmd := instEncoderM2.HwOut.PresetTriggerCmd;
 COD2_CodeSeqTrigCmd := instEncoderM2.HwOut.CodeSeqTriggerCmd;
 COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;

@@ -71,10 +71,13 @@ VAR_OUTPUT
     SpeedMismatchConfirmed  : BOOL;         // <-- [DIAG] Ecart vitesse confirme pendant timeout
 
     // === ORDRES ACTIONNEURS (COMMANDES STRUCTUREES) ===
-    WinchM1Cmd              : ST_fbCycle_WinchCmdDemand;        // <-- [ACT] Demande treuil M1
-    WinchM2Cmd              : ST_fbCycle_WinchCmdDemand;        // <-- [ACT] Demande treuil M2
-    TranslationCmd          : ST_fbCycle_TranslationCmdDemand;  // <-- [ACT] Demande translation M3
-    BucketCmd               : ST_fbCycle_BucketCmdDemand;       // <-- [ACT] Demande benne
+    // Types de contrat inter-PRG uniques (ST_Program*Request) : FB_Cycle produit
+    // directement les demandes consommées par PRG_04/05/07 — plus de DUT
+    // ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
+    WinchM1Cmd              : ST_ProgramWinchRequest;        // <-- [ACT] Demande treuil M1
+    WinchM2Cmd              : ST_ProgramWinchRequest;        // <-- [ACT] Demande treuil M2
+    TranslationCmd          : ST_ProgramTranslationRequest;  // <-- [ACT] Demande translation M3
+    BucketCmd               : ST_ProgramBucketRequest;       // <-- [ACT] Demande benne
 
     // === METADONNEES & SYNOPTIQUE ===
     CycleStep               : E_CycleStep;          // <-- [STAT] Etape active du Grafcet
@@ -195,20 +198,20 @@ ErrorEdge(CLK := Fault.Error);
 {region "§2 Gate securite & Bascule Mode"}
 // 🛑 2. GATES DE SÉCURITÉ ET NEUTRALISATION
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    WinchM1Cmd.StartStop   := FALSE;
-    WinchM1Cmd.Direction   := 0;
-    WinchM1Cmd.SpeedPct    := 0.0;
+    WinchM1Cmd.ReqStartStop   := FALSE;
+    WinchM1Cmd.ReqDirection   := 0;
+    WinchM1Cmd.SpeedTgtPct    := 0.0;
 
-    WinchM2Cmd.StartStop   := FALSE;
-    WinchM2Cmd.Direction   := 0;
-    WinchM2Cmd.SpeedPct    := 0.0;
+    WinchM2Cmd.ReqStartStop   := FALSE;
+    WinchM2Cmd.ReqDirection   := 0;
+    WinchM2Cmd.SpeedTgtPct    := 0.0;
 
-    TranslationCmd.Start   := FALSE;
-    TranslationCmd.Target  := 0;
+    TranslationCmd.ReqStart   := FALSE;
+    TranslationCmd.PositionTgt  := 0;
 
-    BucketCmd.Open         := FALSE;
-    BucketCmd.Close        := FALSE;
-    BucketCmd.KoboldContactorCmd := FALSE;
+    BucketCmd.ReqOpen         := FALSE;
+    BucketCmd.ReqClose        := FALSE;
+    BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
     // Si on quitte le semi-auto alors qu'un cycle était en cours, on mémorise l'étape pour la pause
     IF (State <> E_CycleStep.X0_PREPARATION) AND (State <> E_CycleStep.X13_DONE_SYNC) AND (State <> E_CycleStep.STABILIZING) THEN
@@ -267,17 +270,17 @@ END_IF;
 // l'étape est figée : aucun redémarrage automatique du mouvement au retour en semi-auto.
 // La reprise n'est possible que par un front StartCycle (appui conscient).
 IF WaitingResume THEN
-    WinchM1Cmd.StartStop   := FALSE;
-    WinchM1Cmd.Direction   := 0;
-    WinchM1Cmd.SpeedPct    := 0.0;
-    WinchM2Cmd.StartStop   := FALSE;
-    WinchM2Cmd.Direction   := 0;
-    WinchM2Cmd.SpeedPct    := 0.0;
-    TranslationCmd.Start   := FALSE;
-    TranslationCmd.Target  := 0;
-    BucketCmd.Open         := FALSE;
-    BucketCmd.Close        := FALSE;
-    BucketCmd.KoboldContactorCmd := FALSE;
+    WinchM1Cmd.ReqStartStop   := FALSE;
+    WinchM1Cmd.ReqDirection   := 0;
+    WinchM1Cmd.SpeedTgtPct    := 0.0;
+    WinchM2Cmd.ReqStartStop   := FALSE;
+    WinchM2Cmd.ReqDirection   := 0;
+    WinchM2Cmd.SpeedTgtPct    := 0.0;
+    TranslationCmd.ReqStart   := FALSE;
+    TranslationCmd.PositionTgt  := 0;
+    BucketCmd.ReqOpen         := FALSE;
+    BucketCmd.ReqClose        := FALSE;
+    BucketCmd.ReqKoboldMeasureEnable := FALSE;
     CycleStep              := PausedState;
     CycleStateStr          := 'Cycle en pause : reprise consciente requise (StartCycle).';
     WaitingForOperator     := TRUE;
@@ -293,6 +296,13 @@ IF WaitingResume THEN
     END_IF;
     RETURN;
 END_IF;
+
+// SEMI_AUTO : FB_Cycle est le SEUL producteur des demandes benne. Les champs
+// assistants (DiveSearch/ExtractionAssist) sont inactifs en cycle automatique
+// -> valeurs neutres déterministes (identiques à la branche SEMI_AUTO de PRG_03).
+BucketCmd.DescendPermitDiveBucketOpen := TRUE;
+BucketCmd.ExtractionControlActive := FALSE;
+BucketCmd.MinStepDown := 0;
 {endregion}
 
 {region "§3 Machine etat cycle automatique"}
@@ -302,10 +312,10 @@ CASE State OF
     E_CycleStep.X0_PREPARATION:
         CycleStep := E_CycleStep.X0_PREPARATION;
         CycleStateStr := 'X0 - Verification coherence systeme';
-        WinchM1Cmd.StartStop := FALSE; WinchM1Cmd.Direction := 0; WinchM1Cmd.SpeedPct := 0.0;
-        WinchM2Cmd.StartStop := FALSE; WinchM2Cmd.Direction := 0; WinchM2Cmd.SpeedPct := 0.0;
-        TranslationCmd.Start := FALSE; TranslationCmd.Target := 0;
-        BucketCmd.Open := FALSE; BucketCmd.Close := FALSE; BucketCmd.KoboldContactorCmd := FALSE;
+        WinchM1Cmd.ReqStartStop := FALSE; WinchM1Cmd.ReqDirection := 0; WinchM1Cmd.SpeedTgtPct := 0.0;
+        WinchM2Cmd.ReqStartStop := FALSE; WinchM2Cmd.ReqDirection := 0; WinchM2Cmd.SpeedTgtPct := 0.0;
+        TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
+        BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
         Lifecycle.Busy := FALSE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -337,12 +347,12 @@ CASE State OF
 
         // Vitesses lentes pour chercher capteur top + référencement
         IF NOT HomedM1 OR NOT HomedM2 THEN
-            WinchM1Cmd.StartStop := CycleMotionPermit;
-            WinchM1Cmd.Direction := 1;   // montée lente vers capteur top
-            WinchM1Cmd.SpeedPct := 10.0;
-            WinchM2Cmd.StartStop := CycleMotionPermit;
-            WinchM2Cmd.Direction := 1;
-            WinchM2Cmd.SpeedPct := 10.0;
+            WinchM1Cmd.ReqStartStop := CycleMotionPermit;
+            WinchM1Cmd.ReqDirection := 1;   // montée lente vers capteur top
+            WinchM1Cmd.SpeedTgtPct := 10.0;
+            WinchM2Cmd.ReqStartStop := CycleMotionPermit;
+            WinchM2Cmd.ReqDirection := 1;
+            WinchM2Cmd.SpeedTgtPct := 10.0;
             IF HomingRequest THEN
                 State := E_CycleStep.X2_WORK_POS_SELECT;
             END_IF;
@@ -365,14 +375,14 @@ CASE State OF
 
         IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
             SelectedWorkTarget := SelTarget;
-            TranslationCmd.Target := SelTarget;
-            TranslationCmd.Start := CycleMotionPermit;
+            TranslationCmd.PositionTgt := SelTarget;
+            TranslationCmd.ReqStart := CycleMotionPermit;
             // Arrivée à la cible (Trémie/P1/Maintenance)
             IF CycleMotionPermit AND (
                 (SelTarget = 1 AND Translation_At_Tremie) OR
                 (SelTarget = 3 AND Translation_At_P1) OR
                 (SelTarget = 4 AND Translation_At_Maintenance)) THEN
-                TranslationCmd.Start := FALSE;
+                TranslationCmd.ReqStart := FALSE;
                 State := E_CycleStep.X3_OPEN_BUCKET;
             END_IF;
         END_IF;
@@ -392,9 +402,9 @@ CASE State OF
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
         ELSE
-            BucketCmd.Open := CycleMotionPermit;
+            BucketCmd.ReqOpen := CycleMotionPermit;
             IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
-                BucketCmd.Open := FALSE;
+                BucketCmd.ReqOpen := FALSE;
                 State := E_CycleStep.X4_DESCEND_OPEN;
             END_IF;
         END_IF;
@@ -412,19 +422,19 @@ CASE State OF
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.Direction := -1;
-        WinchM1Cmd.SpeedPct  := 50.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.Direction := -1;
-        WinchM2Cmd.SpeedPct  := 50.0;
-        BucketCmd.KoboldContactorCmd := TRUE;
+        WinchM1Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM1Cmd.ReqDirection := -1;
+        WinchM1Cmd.SpeedTgtPct  := 50.0;
+        WinchM2Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM2Cmd.ReqDirection := -1;
+        WinchM2Cmd.SpeedTgtPct  := 50.0;
+        BucketCmd.ReqKoboldMeasureEnable := TRUE;
 
         // Transition uniquement sur le retour dédié Kobold.
         IF CycleMotionPermit AND KoboldContactFond THEN
-            WinchM1Cmd.StartStop := FALSE;
-            WinchM2Cmd.StartStop := FALSE;
-            BucketCmd.KoboldContactorCmd := FALSE;
+            WinchM1Cmd.ReqStartStop := FALSE;
+            WinchM2Cmd.ReqStartStop := FALSE;
+            BucketCmd.ReqKoboldMeasureEnable := FALSE;
             TouchPositionM := M1_CablePosM;
             IF LimitLegalDepthM < -0.01 THEN
                 RaiseTargetM := MAX(TouchPositionM + 0.5, LimitLegalDepthM + 0.5);
@@ -446,16 +456,16 @@ CASE State OF
         OperatorActionId := 16#0405;
         OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.Direction := 1;
-        WinchM1Cmd.SpeedPct := 20.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.Direction := 1;
-        WinchM2Cmd.SpeedPct := 20.0;
+        WinchM1Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM1Cmd.ReqDirection := 1;
+        WinchM1Cmd.SpeedTgtPct := 20.0;
+        WinchM2Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM2Cmd.ReqDirection := 1;
+        WinchM2Cmd.SpeedTgtPct := 20.0;
 
         IF CycleMotionPermit AND (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
-            WinchM1Cmd.StartStop := FALSE;
-            WinchM2Cmd.StartStop := FALSE;
+            WinchM1Cmd.ReqStartStop := FALSE;
+            WinchM2Cmd.ReqStartStop := FALSE;
             State := E_CycleStep.X6_CLOSE_BUCKET;
         END_IF;
 
@@ -471,11 +481,11 @@ CASE State OF
         OperatorActionId := 16#0406;
         OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
-        WinchM1Cmd.StartStop := FALSE;
-        BucketCmd.Close := TRUE;
+        WinchM1Cmd.ReqStartStop := FALSE;
+        BucketCmd.ReqClose := TRUE;
 
         IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
-            BucketCmd.Close := FALSE;
+            BucketCmd.ReqClose := FALSE;
             State := E_CycleStep.X7_CTRL_ASCENT;
         END_IF;
 
@@ -491,12 +501,12 @@ CASE State OF
         OperatorActionId := 16#0407;
         OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.Direction := 1;
-        WinchM1Cmd.SpeedPct  := 20.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.Direction := 1;
-        WinchM2Cmd.SpeedPct  := 20.0;
+        WinchM1Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM1Cmd.ReqDirection := 1;
+        WinchM1Cmd.SpeedTgtPct  := 20.0;
+        WinchM2Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM2Cmd.ReqDirection := 1;
+        WinchM2Cmd.SpeedTgtPct  := 20.0;
 
         IF CycleMotionPermit
            AND (M1_CablePosM >= (TouchPositionM + CtrlAscentDistM))
@@ -517,16 +527,16 @@ CASE State OF
         OperatorActionId := 16#0408;
         OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.Direction := 1;
-        WinchM1Cmd.SpeedPct  := 70.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.Direction := 1;
-        WinchM2Cmd.SpeedPct  := 70.0;
+        WinchM1Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM1Cmd.ReqDirection := 1;
+        WinchM1Cmd.SpeedTgtPct  := 70.0;
+        WinchM2Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM2Cmd.ReqDirection := 1;
+        WinchM2Cmd.SpeedTgtPct  := 70.0;
 
         IF CycleMotionPermit AND M1_CablePosM >= CableLimitM1AscentM THEN
-            WinchM1Cmd.StartStop := FALSE;
-            WinchM2Cmd.StartStop := FALSE;
+            WinchM1Cmd.ReqStartStop := FALSE;
+            WinchM2Cmd.ReqStartStop := FALSE;
             State := E_CycleStep.X9_DRAIN_PAUSE;
         END_IF;
 
@@ -541,8 +551,8 @@ CASE State OF
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0409;
         OperatorAction := 'Egouttage du godet en cours (temporisation).';
-        WinchM1Cmd.StartStop := FALSE;
-        WinchM2Cmd.StartStop := FALSE;
+        WinchM1Cmd.ReqStartStop := FALSE;
+        WinchM2Cmd.ReqStartStop := FALSE;
 
         DrainingTimer(IN := TRUE, PT := DrainingTime);
         IF CycleMotionPermit AND DrainingTimer.Q THEN
@@ -562,11 +572,11 @@ CASE State OF
         OperatorActionId := 16#040A;
         OperatorAction := 'Maintenir la translation vers la tremie de dechargement.';
 
-        TranslationCmd.Target := 1; // Trémie
-        TranslationCmd.Start := CycleMotionPermit;
+        TranslationCmd.PositionTgt := 1; // Trémie
+        TranslationCmd.ReqStart := CycleMotionPermit;
 
         IF CycleMotionPermit AND Translation_At_Tremie THEN
-            TranslationCmd.Start := FALSE;
+            TranslationCmd.ReqStart := FALSE;
             State := E_CycleStep.X11_OPEN_DUMP;
         END_IF;
 
@@ -583,31 +593,31 @@ CASE State OF
         OperatorAction := 'Deflechir vers le bas pour ouvrir la benne et vider la charge.';
 
         // 🔒 F1 (correctif WORKING_COPY) : suppression du read-before-write.
-        // L'original évaluait BucketCmd.Open avec (WinchM1Cmd.Direction = -1) APRÈS avoir forcé
-        // Direction := 1 → ouverture jamais commandée. Ici, l'ouverture est commandée quand le
+        // L'original évaluait BucketCmd.ReqOpen avec (WinchM1Cmd.ReqDirection = -1) APRÈS avoir forcé
+        // ReqDirection := 1 → ouverture jamais commandée. Ici, l'ouverture est commandée quand le
         // manche est défléchi (pattern cohérent avec X3), et la sortie se fait sur Benne_Done
         // AND Benne_IsOpen. (La sémantique "descente ouvre" nécessiterait une entrée joystick,
         // absente de l'interface — remontée à l'orchestrateur.)
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.Direction := 1;
-        WinchM1Cmd.SpeedPct  := 20.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.Direction := 1;
-        WinchM2Cmd.SpeedPct  := 20.0;
+        WinchM1Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM1Cmd.ReqDirection := 1;
+        WinchM1Cmd.SpeedTgtPct  := 20.0;
+        WinchM2Cmd.ReqStartStop := CycleMotionPermit;
+        WinchM2Cmd.ReqDirection := 1;
+        WinchM2Cmd.SpeedTgtPct  := 20.0;
 
-        BucketCmd.Open := CycleMotionPermit;
+        BucketCmd.ReqOpen := CycleMotionPermit;
 
         IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
-            BucketCmd.Open := FALSE;
+            BucketCmd.ReqOpen := FALSE;
             State := E_CycleStep.X13_DONE_SYNC;
         END_IF;
 
     E_CycleStep.X13_DONE_SYNC:
         CycleStep := E_CycleStep.X13_DONE_SYNC;
         CycleStateStr := 'X13 - Cycle automatique complete - pret';
-        WinchM1Cmd.StartStop := FALSE;
-        WinchM2Cmd.StartStop := FALSE;
-        TranslationCmd.Start := FALSE;
+        WinchM1Cmd.ReqStartStop := FALSE;
+        WinchM2Cmd.ReqStartStop := FALSE;
+        TranslationCmd.ReqStart := FALSE;
         Lifecycle.Done := TRUE;
         Lifecycle.Busy := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -634,12 +644,12 @@ CASE State OF
     E_CycleStep.STABILIZING:
         CycleStep := E_CycleStep.STABILIZING;
         CycleStateStr := 'X14 - Cycle en attente / stabilisation (STAB)';
-        WinchM1Cmd.StartStop := FALSE;
-        WinchM2Cmd.StartStop := FALSE;
-        TranslationCmd.Start := FALSE;
-        BucketCmd.Open := FALSE;
-        BucketCmd.Close := FALSE;
-        BucketCmd.KoboldContactorCmd := FALSE;   // coupure contacteur Kobold au repli defaut (0 ordre residuel)
+        WinchM1Cmd.ReqStartStop := FALSE;
+        WinchM2Cmd.ReqStartStop := FALSE;
+        TranslationCmd.ReqStart := FALSE;
+        BucketCmd.ReqOpen := FALSE;
+        BucketCmd.ReqClose := FALSE;
+        BucketCmd.ReqKoboldMeasureEnable := FALSE;   // coupure contacteur Kobold au repli defaut (0 ordre residuel)
         Lifecycle.Busy := FALSE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -655,15 +665,15 @@ END_CASE;
 {region "§4 Repli homme mort & Syntheses"}
 // 🛑 Relâchement du manche (retour au centre) : neutralisation des demandes actives
 IF Lifecycle.Busy AND NOT CycleMotionPermit THEN
-    WinchM1Cmd.StartStop := FALSE;
-    WinchM2Cmd.StartStop := FALSE;
-    TranslationCmd.Start := FALSE;
-    BucketCmd.Open := FALSE;
-    BucketCmd.Close := FALSE;
-    BucketCmd.KoboldContactorCmd := FALSE;
+    WinchM1Cmd.ReqStartStop := FALSE;
+    WinchM2Cmd.ReqStartStop := FALSE;
+    TranslationCmd.ReqStart := FALSE;
+    BucketCmd.ReqOpen := FALSE;
+    BucketCmd.ReqClose := FALSE;
+    BucketCmd.ReqKoboldMeasureEnable := FALSE;
 END_IF;
 
-RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.Start OR BucketCmd.Open OR BucketCmd.Close OR BucketCmd.KoboldContactorCmd; // somme logique complete des demandes (contacteur Kobold inclus)
+RequestActive := WinchM1Cmd.ReqStartStop OR WinchM2Cmd.ReqStartStop OR TranslationCmd.ReqStart OR BucketCmd.ReqOpen OR BucketCmd.ReqClose OR BucketCmd.ReqKoboldMeasureEnable; // somme logique complete des demandes (contacteur Kobold inclus)
 {endregion}
 
 END_FUNCTION_BLOCK

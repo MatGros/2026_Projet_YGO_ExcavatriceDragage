@@ -299,21 +299,21 @@ async function doScan() {
   render(data.outputs);
 
   // Monde simulé (🟡) : la benne s'ouvre/se ferme quand FB la commande ET l'opérateur tient le joystick.
-  // (ex. X3 : BucketCmd.Open=1, OperatorAction "maintenir le joystick : ouverture complète de la benne")
+  // (ex. X3 : BucketCmd.ReqOpen=1, OperatorAction "maintenir le joystick : ouverture complète de la benne")
   const opActive = deadman && (Math.abs(joyY) > 0.2 || Math.abs(joyX) > 0.2);
-  if (opActive && data.outputs['BUCKETCMD.OPEN']==='1') {
+  if (opActive && data.outputs['BUCKETCMD.REQOPEN']==='1') {
     const cb = document.getElementById('BENNE_ISOPEN'); if (cb) cb.checked = true;
     const cb2 = document.getElementById('BENNE_ISCLOSED'); if (cb2) cb2.checked = false;
   }
-  if (opActive && data.outputs['BUCKETCMD.CLOSE']==='1') {
+  if (opActive && data.outputs['BUCKETCMD.REQCLOSE']==='1') {
     const cb2 = document.getElementById('BENNE_ISCLOSED'); if (cb2) cb2.checked = true;
     const cb = document.getElementById('BENNE_ISOPEN'); if (cb) cb.checked = false;
   }
 
   // Simulation physique : le treuil bouge si le FB le commande ET l'opérateur est d'accord
   // (intention joystick même sens + homme-mort). C'est la réponse du MONDE, pas du FB.
-  const cmdStart = data.outputs['WINCHM1CMD.STARTSTOP'] === '1';
-  const cmdDir = parseInt(data.outputs['WINCHM1CMD.DIRECTION'] || '0', 10);
+  const cmdStart = data.outputs['WINCHM1CMD.REQSTARTSTOP'] === '1';
+  const cmdDir = parseInt(data.outputs['WINCHM1CMD.REQDIRECTION'] || '0', 10);
   const agree = (joyY > 0.2 && cmdDir === 1) || (joyY < -0.2 && cmdDir === -1);
   if (cmdStart && agree && deadman) {
     simM1 = Math.max(-10.5, Math.min(8.5, simM1 + cmdDir * speed * 0.2));
@@ -382,12 +382,12 @@ function render(o) {
   const step = parseInt(o.CYCLESTEP, 10);
   document.getElementById('out').querySelector('.step').innerHTML = '🟢 Étape <b>' + (STEP_NAMES[step] || 'X'+step) + '</b> — sortie du séquenceur';
   document.getElementById('out').querySelector('.op').innerHTML = '🖐️ ' + (o.OPERATORACTION || '—');
-  document.getElementById('oM1').innerHTML = fmtAct(o['WINCHM1CMD.STARTSTOP'], o['WINCHM1CMD.DIRECTION'], o['WINCHM1CMD.SPEEDPCT']);
-  document.getElementById('oM2').innerHTML = fmtAct(o['WINCHM2CMD.STARTSTOP'], o['WINCHM2CMD.DIRECTION'], o['WINCHM2CMD.SPEEDPCT']);
-  document.getElementById('oTrans').innerHTML = fmtAct(o['TRANSLATIONCMD.START'], o['TRANSLATIONCMD.TARGET'], null);
-  const bOpen = o['BUCKETCMD.OPEN']==='1', bClose = o['BUCKETCMD.CLOSE']==='1';
+  document.getElementById('oM1').innerHTML = fmtAct(o['WINCHM1CMD.REQSTARTSTOP'], o['WINCHM1CMD.REQDIRECTION'], o['WINCHM1CMD.SPEEDTGTPCT']);
+  document.getElementById('oM2').innerHTML = fmtAct(o['WINCHM2CMD.REQSTARTSTOP'], o['WINCHM2CMD.REQDIRECTION'], o['WINCHM2CMD.SPEEDTGTPCT']);
+  document.getElementById('oTrans').innerHTML = fmtAct(o['TRANSLATIONCMD.REQSTART'], o['TRANSLATIONCMD.POSITIONTGT'], null);
+  const bOpen = o['BUCKETCMD.REQOPEN']==='1', bClose = o['BUCKETCMD.REQCLOSE']==='1';
   document.getElementById('oBucket').innerHTML = (bOpen?'<span class="on">🟢 OUVERTURE</span>':'') + (bClose?'<span class="on">🟢 FERMETURE</span>':'') + ((!bOpen&&!bClose)?'<span class="off">⚪ neutre</span>':'');
-  document.getElementById('oKobold').innerHTML = o['BUCKETCMD.KOBOLDCONTACTORCMD']==='1' ? '<span class="on">🟢 demandé</span>' : '<span class="off">⚪ non demandé</span>';
+  document.getElementById('oKobold').innerHTML = o['BUCKETCMD.REQKOBOLDMEASUREENABLE']==='1' ? '<span class="on">🟢 demandé</span>' : '<span class="off">⚪ non demandé</span>';
   const fault = o['FAULT.ERROR']==='1';
   document.getElementById('oFault').innerHTML = fault ? '<span class="err">⚠️ DÉFAUT (id ' + o['FAULT.ERRORID'] + ')</span>' : '<span class="off">aucun</span>';
   document.getElementById('oLife').innerHTML = (o['LIFECYCLE.BUSY']==='1'?'Busy ':'') + (o['LIFECYCLE.DONE']==='1'?'Done':'');

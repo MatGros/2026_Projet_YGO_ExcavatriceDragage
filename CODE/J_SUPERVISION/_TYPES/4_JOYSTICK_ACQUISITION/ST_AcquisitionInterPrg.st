@@ -20,22 +20,6 @@ STRUCT
     EncoderM1                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M1 (Retenue)
     EncoderM2                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M2 (Benne)
 
-    // === 🧲 Mesures codeurs M1/M2 (compatibilité de transition) ===
-    Encoders                     : ST_EncoderMeasurements;             // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
-
-    // === 🛡️ Gates fiabilité codeurs (compatibilité de transition) ===
-    M1_EncoderFault              : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
-    M2_EncoderFault              : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
-    M1_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
-    M2_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
-
-    // === 🕹️ États joystick qualifiés (compatibilité de transition) ===
-    JoystickDeadmanArmed         : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
-    JoystickYNeutral             : BOOL; // 🟢 Axe Y joystick au neutre
-    JoystickDirectionX           : INT;  // 🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
-    JoystickSpeedPctX            : REAL; // 📈 Magnitude deviation axe X en % (0..100)
-    JoystickXNeutral             : BOOL; // 🟢 Axe X joystick au neutre
-
     // === 🩺 Diagnostics modules E/S ===
     LocalDigitalIoOk             : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
     Vh0800EndOk                  : BOOL; // 🟢 Module VH_0800END OK (DI8)

@@ -68,9 +68,9 @@ SOURCES = [
     "CODE/G_CYCLE/_TYPES/E_CycleStep.st",
     "CODE/G_CYCLE/_TYPES/E_OperatorAxis.st",
     "CODE/G_CYCLE/_TYPES/E_ProgramSequence.st",
-    "CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st",
-    "CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st",
-    "CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st",
     "CODE/G_CYCLE/FB_Cycle.st",
 ]
 
@@ -84,10 +84,10 @@ COMPILED_FIELDS = {
     "OperatorActionId", "OperatorAction", "ExpectedAxis", "ExpectedDirection",
     "WaitingForOperator", "WaitingForProcess", "RequestActive",
     "SpeedMismatchMps", "SpeedMismatchActive", "SpeedMismatchConfirmed",
-    "WinchM1Cmd.StartStop", "WinchM1Cmd.Direction", "WinchM1Cmd.SpeedPct",
-    "WinchM2Cmd.StartStop", "WinchM2Cmd.Direction", "WinchM2Cmd.SpeedPct",
-    "TranslationCmd.Start", "TranslationCmd.Target",
-    "BucketCmd.Open", "BucketCmd.Close", "BucketCmd.KoboldContactorCmd",
+    "WinchM1Cmd.ReqStartStop", "WinchM1Cmd.ReqDirection", "WinchM1Cmd.SpeedTgtPct",
+    "WinchM2Cmd.ReqStartStop", "WinchM2Cmd.ReqDirection", "WinchM2Cmd.SpeedTgtPct",
+    "TranslationCmd.ReqStart", "TranslationCmd.PositionTgt",
+    "BucketCmd.ReqOpen", "BucketCmd.ReqClose", "BucketCmd.ReqKoboldMeasureEnable",
     "Fault.Error", "Fault.Latched", "Lifecycle.Busy", "Lifecycle.Done",
 }
 # HARNESS_STIMULUS = entrées capteurs/positions injectées par le harnais (simulé)
@@ -157,12 +157,12 @@ def _check_coherence(entries: list) -> list:
     for i in range(1, len(entries)):
         prev, cur = entries[i - 1], entries[i]
         pf, cf = prev["fields"], cur["fields"]
-        # M1 : StartStop + Direction -> M1_CablePosM doit évoluer dans le bon sens
-        if pf.get("WINCHM1CMD.STARTSTOP") == "1" and cf.get("WINCHM1CMD.STARTSTOP") == "1":
+        # M1 : ReqStartStop + ReqDirection -> M1_CablePosM doit évoluer dans le bon sens
+        if pf.get("WINCHM1CMD.REQSTARTSTOP") == "1" and cf.get("WINCHM1CMD.REQSTARTSTOP") == "1":
             try:
                 ppos = float(pf.get("M1_CABLEPOSM", "0"))
                 cpos = float(cf.get("M1_CABLEPOSM", "0"))
-                direction = int(cf.get("WINCHM1CMD.DIRECTION", "0"))
+                direction = int(cf.get("WINCHM1CMD.REQDIRECTION", "0"))
                 if direction == 1 and cpos < ppos - 1e-6:
                     problems.append(f"scan {cur['scan']}: M1 commandé montée (dir=1) mais position décroît")
                 if direction == -1 and cpos > ppos + 1e-6:
