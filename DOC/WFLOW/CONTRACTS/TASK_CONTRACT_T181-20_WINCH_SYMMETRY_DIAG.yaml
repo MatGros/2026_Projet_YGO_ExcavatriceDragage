@@ -1,0 +1,73 @@
+# Contrat T181-20 — Câblage diagnostic passif de symétrie M1/M2
+# Source : AF_Partie-10_Fonction_Winch_v2.1.md §7.3bis ; audit T181-16 (2026-08-30).
+
+contract:
+  task_id: T181-20_WINCH_SYMMETRY_DIAG
+  criticality: C2
+  strategy: patch
+  objective: >
+    Instancier FB_Winch_Symmetry dans PRG_07_Supervision conformément à AF-10 §7.3bis,
+    l'alimenter depuis les états réels M1/M2 et publier son diagnostic IHM. Ce FB reste
+    un observateur strict : aucune commande, aucun SafeStop ni aucune autorité de mouvement.
+
+  acceptance:
+    - id: AC1
+      statement: "Une instance de FB_Winch_Symmetry est appelée à chaque cycle dans PRG_07_Supervision, avec données M1/M2 réelles, configuration et données persistantes déjà déclarées."
+      verified_by: "G200 : FB_Winch_Symmetry n'est plus orphelin."
+    - id: AC2
+      statement: "Les sorties de validité et état de symétrie sont publiées vers la structure IHM existante ST_WinchSymmetryHMI."
+      verified_by: "lecture du câblage PRG_07 et du type IHM."
+    - id: AC3
+      statement: "Le lot ne crée aucun chemin vers Relay, Brake, StartStop, SafeStop, PowerCutOff ou Enable d'un actionneur."
+      verified_by: "diff + grep des affectations du nouveau bloc."
+    - id: AC4
+      statement: "L'entrée périmée FB_Acquisition_Preflight est retirée de KNOWN_ORPHANS_PENDING_DECISION, sans modifier le câblage Preflight existant."
+      verified_by: "G200 : aucun faux orphelin Preflight."
+    - id: AC5
+      statement: "G200, bundle et gates palier C sont exécutés ; tout rouge extérieur au lot est identifié séparément."
+      verified_by: "rapports de commandes."
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU pour tout PROGRAM modifié sous CODE/M_MAIN."
+      verified_by: "contrôle structurel du POU et du nom de fichier."
+    - id: AC7
+      statement: "Le suffixe est identique au langage ST du bundle PLCopenXML ; aucun suffixe CFC ou LD n'est ajouté."
+      verified_by: "diff et bundle PLCopenXML."
+
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/**
+      - TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py
+    forbidden:
+      - CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Tous les câblages existants de PRG_07, notamment FB_Acquisition_Preflight."
+      - "FB_Winch_Symmetry reste un diagnostic passif sans effet sur la commande machine."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    Si les données requises ne sont pas disponibles sans créer un nouveau flux inter-PRG,
+    ou si la structure IHM existante ne porte pas les sorties du FB, remonter avant de créer
+    une donnée concurrente ou de déduire une valeur.
+
+status: PENDING
+execution:
+  executed_by: "Agent externe"
+  status: IMPLEMENTED_PENDING_HUMAN_CHECKPOINT
+  evidence_submitted:
+    - "Bundle frais ; G200 : FB_Winch_Symmetry câblé, seul KO L13 = FB_WinchSpeedLearning hors scope."
+    - "Gates palier C : 23/25 ; G340/G430 rouges pré-existants hors scope."
+validation:
+  status: PENDING
+  validated_by: ""
+  notes: "Revue humaine du diff réel avant commit ; aucune autorité de mouvement ne doit apparaître."

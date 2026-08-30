@@ -96,11 +96,6 @@ KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
         "M3, non investiguee en detail, necessite un audit dedie avant toute "
         "decision"
     ),
-    "FB_Acquisition_Preflight": (
-        "orpheline revelee 2026-08-05 par le premier passage du hook Stop sur "
-        "CODE/*.st depuis son introduction — non investiguee, hors perimetre "
-        "de la session M3, necessite un audit dedie"
-    ),
     "FB_Encoder_Safety": (
         "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
         "— non investiguee, hors perimetre M3, necessite un audit dedie"
@@ -114,10 +109,6 @@ KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
         "— non investiguee, hors perimetre M3, necessite un audit dedie"
     ),
     "FB_WinchLoadEstimator": (
-        "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
-        "— non investiguee, hors perimetre M3, necessite un audit dedie"
-    ),
-    "FB_Winch_Symmetry": (
         "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
         "— non investiguee, hors perimetre M3, necessite un audit dedie"
     ),

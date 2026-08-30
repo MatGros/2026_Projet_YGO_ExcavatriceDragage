@@ -324,7 +324,7 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx305_KoboldBottomTouchLatched := C
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx306_ErrorIdRaw := WinchM2.Bucket.State.ErrorId;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
-GVL_Troubleshooting.BenneOuvertureFermeture.Idx403_ControlAscentActive := WinchM2.Bucket.State.ControlAscentActive;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx403_ExtractionControlActive := WinchM2.Bucket.State.ExtractionControlActive;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
 
 {endregion}

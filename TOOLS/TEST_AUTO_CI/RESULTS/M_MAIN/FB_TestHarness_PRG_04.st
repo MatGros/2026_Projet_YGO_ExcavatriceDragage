@@ -180,6 +180,14 @@ VAR
     instWinchM1   : FB_Winch;
     instWinchM2   : FB_Winch;
 
+    // === STRUCTS D'ENTRÉE FB_Winch (miroir PRG_04 §6) ===
+    WinchM1DriveReq : ST_fbWinch_DriveRequest;
+    WinchM1Sens     : ST_fbWinch_Sensors;
+    WinchM1Cfg      : ST_fbWinch_Cfg;
+    WinchM2DriveReq : ST_fbWinch_DriveRequest;
+    WinchM2Sens     : ST_fbWinch_Sensors;
+    WinchM2Cfg      : ST_fbWinch_Cfg;
+
     // === 📊 STRUCTS INTERNES (publiés via Data) — miroir PRG_04 VAR ===
     WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest;
     WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest;
@@ -205,7 +213,7 @@ VAR
     BucketBusyRiseEdge             : R_TRIG;
     BucketBusyFallEdge             : F_TRIG;
     ControlAscentArmedForThisClose : BOOL;
-    ControlAscentActive            : BOOL;
+    ExtractionControlActive        : BOOL;
     ControlAscentStartM1PosM       : REAL;
     ControlAscentStartM2PosM       : REAL;
 
@@ -463,16 +471,16 @@ IF BucketBusyRiseEdge.Q THEN
     ControlAscentArmedForThisClose := CoupledAscentBucketCloseArmed;
 END_IF;
 IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
-    ControlAscentActive := TRUE;
+    ExtractionControlActive := TRUE;
     ControlAscentStartM1PosM := AcqData.Encoders.M1.CablePosM;
     ControlAscentStartM2PosM := AcqData.Encoders.M2.CablePosM;
 END_IF;
-IF ControlAscentActive THEN
+IF ExtractionControlActive THEN
     IF (ABS(AcqData.Encoders.M1.CablePosM - ControlAscentStartM1PosM) >= ExtractionControlDistanceM)
        AND (ABS(AcqData.Encoders.M2.CablePosM - ControlAscentStartM2PosM) >= ExtractionControlDistanceM) THEN
-        ControlAscentActive := FALSE;
+        ExtractionControlActive := FALSE;
     ELSIF NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)) THEN
-        ControlAscentActive := FALSE;
+        ExtractionControlActive := FALSE;
     END_IF;
 END_IF;
 {endregion}
@@ -513,7 +521,7 @@ instWinchSync(
     BypassGlobal    := BypassSync.Global
 );
 
-IF instBucket.M2_ForceSlowSpeed THEN
+IF instBucket.M2_BucketJogLimit THEN
     M2_SpeedStepTableActive.P1R1 := SpeedStepTable.P1R1;
     M2_SpeedStepTableActive.P1R2 := SpeedStepTable.P1R2;
     M2_SpeedStepTableActive.P1R3 := SpeedStepTable.P1R3;
@@ -728,61 +736,67 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinch
 {region "§6 Execution treuils M1/M2"}
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 & M2) (miroir PRG_04 §6 — agrégateur clamp SEL) ===
 
+WinchM1DriveReq.StartStop := M1LogicRequestStartStop;
+WinchM1DriveReq.Direction := M1LogicRequestDirection;
+WinchM1DriveReq.SpeedTgt_Pct := M1LogicRequestSpeedCmd_Pct;
+WinchM1DriveReq.MaxStepUp := SEL(ReqProgram.ReqBucket.ExtractionControlActive OR ExtractionControlActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1);
+WinchM1DriveReq.MaxStepDown := SEL(instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1);
+WinchM1DriveReq.HomingApproachActive := ModesAuth.HomingApproachEnable;
+WinchM1DriveReq.TopLimitM := CfgCableLimitAscentM;
+WinchM1DriveReq.BottomLimitM := BottomLimitM1_Active;
+WinchM1Sens.CablePosM := AcqData.Encoders.M1.CablePosM;
+WinchM1Sens.Homed := AcqData.EncoderM1.Homed;
+WinchM1Sens.HomingSuspect := AcqData.EncoderM1.HomingSuspect;
+WinchM1Sens.ContactorsAllOff := M1_ContactorsReleased;
+WinchM1Sens.MeasuredSpeedBand := 0;
+WinchM1Sens.SpeedGuardEnable := SpeedGuardEnableM1;
+WinchM1Sens.SpeedGuardReady := NOT instWinchSync.Fault.Error;
+WinchM1Cfg.SpeedStepTable := SpeedStepTable;
+WinchM1Cfg.SlowdownDistance_M := WinchSlowdownDistanceM;
+WinchM1Cfg.SlowdownMaxStep := WinchSlowdownMaxStep;
 instWinchM1(
     Enable                  := (ModesAuth.Mode <> E_Mode.DISABLE) AND NOT ModesAuth.InhibitM1,
     Reset                   := FaultMachineResetIHM,
     PowerContactorEngaged   := PowerContactorEngaged,
-    StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := EffectivePermitM1_Descend,
     AscentPermit            := EffectivePermitM1_Ascent,
-    Direction               := M1LogicRequestDirection,
-    SpeedTgt_Pct            := M1LogicRequestSpeedCmd_Pct,
-    SpeedStepTable          := SpeedStepTable,
-    CfgMaxStepDescente      := SEL(instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
-    MeasuredSpeedBand       := 0,
-    SpeedGuardEnable        := SpeedGuardEnableM1,
-    SpeedGuardReady         := NOT instWinchSync.Fault.Error,
-    HomingApproachActive    := ModesAuth.HomingApproachEnable,
-    FwdRevSpeedFeedbackOff  := M1_ContactorsReleased,
+    DriveRequest            := WinchM1DriveReq,
+    Sensors                 := WinchM1Sens,
+    Config                  := WinchM1Cfg,
     BypassContactorCheck    := BypassM1.Global OR BypassM1.ContactorFeedback,
-    Homed                   := AcqData.EncoderM1.Homed,
-    HomingSuspect           := AcqData.EncoderM1.HomingSuspect,
-    CablePosM               := AcqData.Encoders.M1.CablePosM,
-    TopLimitM               := CfgCableLimitAscentM,
-    BottomLimitM            := BottomLimitM1_Active,
-    CfgSlowdownDistanceM    := WinchSlowdownDistanceM,
-    CfgSlowdownMaxStep      := WinchSlowdownMaxStep,
     BypassGlobal            := BypassM1.Global
 );
 
+WinchM2DriveReq.StartStop := M2LogicRequestStartStop;
+WinchM2DriveReq.Direction := M2LogicRequestDirection;
+WinchM2DriveReq.SpeedTgt_Pct := M2LogicRequestSpeedCmd_Pct;
+WinchM2DriveReq.MaxStepUp := SEL(ReqProgram.ReqBucket.ExtractionControlActive OR ExtractionControlActive OR instBucket.M2_BucketJogLimit OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1);
+WinchM2DriveReq.MaxStepDown := SEL(instBucket.M2_BucketJogLimit OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1);
+WinchM2DriveReq.HomingApproachActive := ModesAuth.HomingApproachEnable;
+WinchM2DriveReq.TopLimitM := CfgCableLimitAscentM + M2_LimitShift;
+WinchM2DriveReq.BottomLimitM := BottomLimitM2_Active;
+WinchM2Sens.CablePosM := AcqData.Encoders.M2.CablePosM;
+WinchM2Sens.Homed := AcqData.EncoderM2.Homed;
+WinchM2Sens.HomingSuspect := AcqData.EncoderM2.HomingSuspect;
+WinchM2Sens.ContactorsAllOff := M2_ContactorsReleased;
+WinchM2Sens.MeasuredSpeedBand := 0;
+WinchM2Sens.SpeedGuardEnable := SpeedGuardEnableM2;
+WinchM2Sens.SpeedGuardReady := NOT instWinchSync.Fault.Error;
+WinchM2Cfg.SpeedStepTable := M2_SpeedStepTableActive;
+WinchM2Cfg.SlowdownDistance_M := WinchSlowdownDistanceM;
+WinchM2Cfg.SlowdownMaxStep := WinchSlowdownMaxStep;
 instWinchM2(
     Enable                  := (ModesAuth.Mode <> E_Mode.DISABLE) AND NOT ModesAuth.InhibitM2,
     Reset                   := FaultMachineResetIHM,
     PowerContactorEngaged   := PowerContactorEngaged,
-    StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := EffectivePermitM2_Descend,
     AscentPermit            := EffectivePermitM2_Ascent,
-    Direction               := M2LogicRequestDirection,
-    SpeedTgt_Pct            := M2LogicRequestSpeedCmd_Pct,
-    SpeedStepTable          := M2_SpeedStepTableActive,
-    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
-    MeasuredSpeedBand       := 0,
-    SpeedGuardEnable        := SpeedGuardEnableM2,
-    SpeedGuardReady         := NOT instWinchSync.Fault.Error,
-    HomingApproachActive    := ModesAuth.HomingApproachEnable,
-    FwdRevSpeedFeedbackOff  := M2_ContactorsReleased,
+    DriveRequest            := WinchM2DriveReq,
+    Sensors                 := WinchM2Sens,
+    Config                  := WinchM2Cfg,
     BypassContactorCheck    := BypassM2.Global OR BypassM2.ContactorFeedback,
-    Homed                   := AcqData.EncoderM2.Homed,
-    HomingSuspect           := AcqData.EncoderM2.HomingSuspect,
-    CablePosM               := AcqData.Encoders.M2.CablePosM,
-    TopLimitM               := CfgCableLimitAscentM + M2_LimitShift,
-    BottomLimitM            := BottomLimitM2_Active,
-    CfgSlowdownDistanceM    := WinchSlowdownDistanceM,
-    CfgSlowdownMaxStep      := WinchSlowdownMaxStep,
     BypassGlobal            := BypassM2.Global
 );
 {endregion}
@@ -1008,7 +1022,7 @@ BucketState.FBState := E_State.READY;
 BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
 BucketState.M2StartStop := instBucket.M2_StartStop;
 BucketState.M2Direction := instBucket.M2_Direction;
-BucketState.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
+BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
 BucketState.M2PositionCorrected := AcqData.Encoders.M2.CablePosM - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;
@@ -1019,10 +1033,10 @@ BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
 BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
-BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ControlAscentActive;
+BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ExtractionControlActive;
 BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
 BucketState.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
-BucketState.ControlAscentActive := ControlAscentActive;
+BucketState.ExtractionControlActive := ExtractionControlActive;
 BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 KoboldImmersionConfirmed := KoboldImmersionConfirmedInt;
 KoboldBottomTouchLatched := KoboldBottomTouchLatchedInt;

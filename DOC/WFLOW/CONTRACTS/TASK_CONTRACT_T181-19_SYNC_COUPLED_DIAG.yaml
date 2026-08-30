@@ -1,0 +1,67 @@
+# Contrat T181-19 — SyncCoupled diagnostic strict
+
+contract:
+  task_id: T181-19_SYNC_COUPLED_DIAG
+  criticality: C2
+  strategy: patch
+  objective: >
+    Publier l’état réel de synchronisation dans DriveRequest.SyncCoupled à chaque cycle,
+    exclusivement à des fins diagnostic/IHM, et empêcher mécaniquement qu’il devienne un
+    intrant de décision de FB_Winch.
+  acceptance:
+    - id: AC1
+      statement: "Les deux appels instWinchM1/M2 reçoivent DriveRequest.SyncCoupled := instWinchSync.SyncActive dans PRG_04."
+      verified_by: "lecture des deux appels PRG_04 et test de liaison ciblé."
+    - id: AC2
+      statement: "FB_Winch ne lit SyncCoupled dans aucune condition, affectation de commande ou calcul de palier."
+      verified_by: "gate statique dédié : aucune occurrence exécutable hors déclaration/commentaire d’interface."
+    - id: AC3
+      statement: "Le garde échoue si SyncCoupled est injecté dans une condition IF/ELSIF/CASE ou dans une affectation Relay/StepNumber/RequestedStep."
+      verified_by: "tests positifs et mutations contrôlées du garde."
+    - id: AC4
+      statement: "La CI ciblée FB_Winch reste exécutable sans régression."
+      verified_by: "run_tests.py --fb FB_Winch."
+    - id: AC5
+      statement: "Le nom de fichier est identique au nom de POU ; le suffixe est identique au langage du bundle pour PRG_04_Treuils_Benne.st."
+      verified_by: "comparaison basename/PROGRAM et inspection du fichier source."
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G4xx_check_synccoupled_diag_only.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-19_SYNC_COUPLED_DIAG.yaml
+    forbidden:
+      - CODE_XML/**
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_WinchSpeedLearning.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "SyncCoupled reste diagnostic strict et ne modifie aucune commande ou permission de mouvement."
+      - "Les deux appels FB_Winch conservent les mêmes signaux actionneurs et de sécurité."
+    dropped_on_purpose: []
+  evidence_required:
+    - "git diff --check"
+    - "gate G4xx SyncCoupled ciblé"
+    - "run_tests.py --fb FB_Winch"
+  alert_duty: >
+    Si SyncActive n’est pas disponible à un des deux appels, ou si la structure active ne porte
+    pas SyncCoupled, ne pas créer de voie parallèle : remonter le conflit d’interface.
+
+status: VERIFIED
+execution:
+  executed_by: "Agent delegue T181-19 + revue orchestrateur"
+  completed_at: "2026-08-30T16:22:00+02:00"
+  status: DELIVERED
+  evidence_submitted:
+    - "G485 nominal et auto-test : PASS, deux mutations rejetees"
+    - "run_tests.py --fb FB_Winch : 8/8 PASS"
+    - "git diff --check scope cible : PASS"
+validation:
+  status: VERIFIED
+  validated_by: "Orchestrateur"
+  validated_at: "2026-08-30T16:22:00+02:00"
+  notes: "Lot diagnostic C2 : relecture du diff réel et preuves ciblées avant checkpoint humain."

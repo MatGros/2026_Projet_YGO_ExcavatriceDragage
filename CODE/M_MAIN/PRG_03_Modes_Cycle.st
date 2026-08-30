@@ -272,7 +272,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.ReqProgram.ReqBucket.ReqClose                    := instCycleSemiAuto.BucketCmd.Close;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
-    Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    Data.ReqProgram.ReqBucket.ExtractionControlActive     := FALSE;
     // SEMI_AUTO : aucun assistant de plongee actif -> plancher neutre (0 = aucun).
     Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
@@ -351,7 +351,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequestActive
                                                                 AND (CoupledUserRequestDirection = -1)
                                                                 AND NOT PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
-    Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := instExtractionSequence.ForceMinSpeedStep;
+    Data.ReqProgram.ReqBucket.ExtractionControlActive     := instExtractionSequence.ExtractionControlActive;
     // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
     Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.MinStepDown;
 
@@ -435,7 +435,7 @@ ELSE
     Data.ReqProgram.ReqBucket.ReqClose                    := FALSE;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := FALSE;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
-    Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    Data.ReqProgram.ReqBucket.ExtractionControlActive     := FALSE;
     // DISABLE : plancher neutre (0 = aucun).
     Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 

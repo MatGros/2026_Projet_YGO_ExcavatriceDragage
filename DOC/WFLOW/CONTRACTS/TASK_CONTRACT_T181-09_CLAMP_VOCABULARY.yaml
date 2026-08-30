@@ -1,0 +1,73 @@
+# Contrat T181-09 — vocabulaire clamp et drapeau unique de montée contrôlée
+
+contract:
+  task_id: T181-09_CLAMP_VOCABULARY
+  criticality: C3
+  strategy: patch
+  objective: >
+    Remplacer les noms Force* employés pour les bornes de palier par des noms MaxStep ou
+    BucketJogLimit, et fusionner ControlAscentActive dans ExtractionControlActive sans modifier
+    les décisions de clamp, les sorties de mouvement, ni les séquences métier.
+  acceptance:
+    - id: AC1
+      statement: "ForceMinSpeedStep, M2_ForceSlowSpeed et CfgMaxStepDescente ne subsistent plus dans CODE/, hors historique explicitement exclu."
+      verified_by: "garde statique cible et recherche CODE/."
+    - id: AC2
+      statement: "ExtractionControlActive est l’unique drapeau de montée contrôlée ; ControlAscentActive n’est plus un état ou une décision active."
+      verified_by: "garde statique et lecture PRG_03/PRG_04."
+    - id: AC3
+      statement: "Les deux axes conservent les mêmes plafonds calculés : commun puis M2-propre, sans aucun changement de priorité des limites."
+      verified_by: "tests ciblés FB_Winch et WINCH_INTEG."
+    - id: AC4
+      statement: "Le garde échoue si un ancien identifiant réapparait dans CODE/ ou si les deux drapeaux de montée contrôlée coexistent dans PRG_04."
+      verified_by: "auto-test du garde avec mutations contrôlées."
+    - id: AC5
+      statement: "Nom de fichier est identique au nom de POU ; suffixe est identique au langage du bundle pour PRG_03_Modes_Cycle et PRG_04_Treuils_Benne."
+      verified_by: "inspection des deux declarations PROGRAM."
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_ExtractionSequence.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G486_check_clamp_vocabulary.py
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-09_CLAMP_VOCABULARY.yaml
+    forbidden:
+      - CODE_XML/**
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "MaxStepDown/MaxStepUp, plancher plongée et toutes les priorités de clamp existantes."
+      - "Les états IHM portent la même information avec le nom nouveau."
+      - "Aucune logique de sécurité, SafeStop ou PowerCutOff n’est modifiée."
+    dropped_on_purpose:
+      - "Les anciens identifiants Force* du vocabulaire de clamp."
+      - "Le doublon ControlAscentActive."
+  evidence_required:
+    - "G486 nominal et auto-test"
+    - "run_tests.py --fb FB_Winch"
+    - "run_tests.py --fb WINCH_INTEG"
+    - "git diff --check"
+  alert_duty: >
+    Si une occurrence Force* porte une sémantique hors clamp, ne pas la renommer par recherche
+    globale : signaler le fichier et separer le lot. Ne pas modifier les priorités de limites.
+
+status: APPROVED
+execution:
+  executed_by: ""
+  status: PENDING
+validation:
+  status: PENDING
+  notes: "Renommage bit-identique ; relecture du diff réel avant checkpoint humain."

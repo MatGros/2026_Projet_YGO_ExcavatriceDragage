@@ -1,9 +1,10 @@
 @echo off
+rem Fichier volontairement ASCII pur : le parseur cmd deforme les emojis UTF-8 et le "&" du title
 chcp 65001 >nul
-title TASK MANAGER — Visualiseur & Synchronisation TASKS.yaml
+title TASK MANAGER - Visualiseur et synchronisation TASKS.yaml
 
 echo ============================================================
-echo 📋 LANCEMENT DU TASK MANAGER (SERVEUR LOCAL)
+echo  LANCEMENT DU TASK MANAGER (SERVEUR LOCAL)
 echo ============================================================
 echo.
 

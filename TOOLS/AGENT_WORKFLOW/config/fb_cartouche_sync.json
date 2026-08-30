@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-29T21:07:11+02:00",
-  "source_head": "0dae6c5c",
+  "generated_at": "2026-08-30T13:54:06+02:00",
+  "source_head": "ed9356e3",
   "counts": {
     "synced": 1,
     "covered": 42,
-    "drift": 13,
+    "drift": 15,
     "no_fiche": 0,
-    "no_pointer": 3
+    "no_pointer": 4
   },
-  "total": 59,
+  "total": 62,
   "fb": [
     {
       "file": "CODE/A_COMMUN/FB_Acquisition_Preflight.st",
@@ -355,7 +355,7 @@
       "role": "Source unique du mode arbitré et calcul du bus d'autorisations",
       "role_label": "Rôle",
       "doc_pointer": "DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md",
-      "doc_line": 7,
+      "doc_line": 10,
       "fiche_existe": true,
       "nom_match": false,
       "nom_in_body": true,
@@ -462,17 +462,17 @@
       "file": "CODE/H_TREUILS_BENNE/FB_SpeedStep.st",
       "st_line": 2,
       "pou_name": "FB_SpeedStep",
-      "emoji": "🪜",
-      "title": "Décodeur palier vitesse vers contacteurs",
-      "role": "Décodage consigne vitesse 0..100% en paliers et pilotage contacteurs",
-      "role_label": "Rôle",
-      "doc_pointer": "DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md",
-      "doc_line": 5,
-      "fiche_existe": true,
-      "nom_match": false,
-      "nom_in_body": true,
-      "role_match": false,
-      "statut": "covered"
+      "emoji": null,
+      "title": "Décodeur palier vers contacteurs",
+      "role": null,
+      "role_label": null,
+      "doc_pointer": null,
+      "doc_line": null,
+      "fiche_existe": null,
+      "nom_match": null,
+      "nom_in_body": null,
+      "role_match": null,
+      "statut": "no_pointer"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_SyncContactor.st",
@@ -523,6 +523,22 @@
       "statut": "covered"
     },
     {
+      "file": "CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st",
+      "st_line": 2,
+      "pou_name": "FB_WinchDirectionInterlock",
+      "emoji": "🔀",
+      "title": "Interlock de changement de sens",
+      "role": "Temporise le changement de sens d'un treuil (dead time)",
+      "role_label": "Rôle",
+      "doc_pointer": "DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md",
+      "doc_line": 5,
+      "fiche_existe": true,
+      "nom_match": false,
+      "nom_in_body": false,
+      "role_match": false,
+      "statut": "drift"
+    },
+    {
       "file": "CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st",
       "st_line": 2,
       "pou_name": "FB_WinchLoadEstimator",
@@ -553,6 +569,38 @@
       "nom_in_body": true,
       "role_match": false,
       "statut": "covered"
+    },
+    {
+      "file": "CODE/H_TREUILS_BENNE/FB_WinchSpeedLearning.st",
+      "st_line": 2,
+      "pou_name": "FB_WinchSpeedLearning",
+      "emoji": "💾",
+      "title": "Collecteur passif vitesse par palier",
+      "role": "Apprentissage passif des vitesses reelles par palier (RETAIN)",
+      "role_label": "Rôle",
+      "doc_pointer": "DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md",
+      "doc_line": 5,
+      "fiche_existe": true,
+      "nom_match": false,
+      "nom_in_body": true,
+      "role_match": false,
+      "statut": "covered"
+    },
+    {
+      "file": "CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st",
+      "st_line": 2,
+      "pou_name": "FB_WinchStepShaper",
+      "emoji": "⚙️",
+      "title": "Cadencement de palier (montee cadencee)",
+      "role": "Cadence la montee de palier (+1 cran / StepRampDelay),",
+      "role_label": "Rôle",
+      "doc_pointer": "DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md",
+      "doc_line": 6,
+      "fiche_existe": true,
+      "nom_match": false,
+      "nom_in_body": false,
+      "role_match": false,
+      "statut": "drift"
     },
     {
       "file": "CODE/H_TREUILS_BENNE/FB_WinchSync.st",

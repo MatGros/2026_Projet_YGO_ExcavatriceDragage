@@ -178,15 +178,15 @@ TEST 'TC-P10-004 Meca D : capteur haut sans arret 3s -> SafeStop (immediat) puis
 END_TEST
 
 TEST 'TC-P10-005 Meca E bit12 : ecart >2.5m -> SafeStop SEUL (pas PowerCutOff)'
-    (* JoystickYNeutral=FALSE pour isoler Meca E : evite d armer Meca A (derive) qui est dans
-       le masque PowerCutOff. Seul Meca E (bit12) doit se declencher. *)
+    (* BypassMecaA=TRUE isole Meca E : l armement Meca A est desormais base sur le retour
+       mecanique, pas sur JoystickYNeutral. Seul Meca E (bit12) doit se declencher. *)
     (* Scan 1 : regime nominal avec SyncEnable=TRUE *)
     fb(Enable := TRUE, Reset := FALSE, SyncEnable := TRUE,
        PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
        HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := FALSE, BenneHoldStillActive := FALSE, BenneBusy := FALSE,
-       OtherWinchInhibited := FALSE, InReferencingMode := FALSE,
+       OtherWinchInhibited := FALSE, InReferencingMode := FALSE, BypassMecaA := TRUE,
        CablePosM := 0.0, ExpectedOtherWinchPosM := 0.0, CfgCableLimitDescentM := -20.0,
        Homed := TRUE, TopLimitM := 8.5);
     ADVANCE_TIME(10000000);
@@ -196,7 +196,7 @@ TEST 'TC-P10-005 Meca E bit12 : ecart >2.5m -> SafeStop SEUL (pas PowerCutOff)'
        HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := FALSE, BenneHoldStillActive := FALSE, BenneBusy := FALSE,
-       OtherWinchInhibited := FALSE, InReferencingMode := FALSE,
+       OtherWinchInhibited := FALSE, InReferencingMode := FALSE, BypassMecaA := TRUE,
        CablePosM := 3.0, ExpectedOtherWinchPosM := 0.0, CfgCableLimitDescentM := -20.0,
        Homed := TRUE, TopLimitM := 8.5);
     ASSERT_TRUE(fb.SafeStop, 'Ecart critique -> SafeStop (bit12 dans masque SafeStop)');

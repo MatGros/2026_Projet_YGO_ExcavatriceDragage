@@ -58,8 +58,29 @@ def atomic_write(path: Path, text: str) -> None:
     os.replace(temporary, path)
 
 
+def describe_yaml_error(exc: yaml.YAMLError, path: Path) -> str:
+    """Erreur YAML en une ligne : probleme + position + ligne fautive + tache concernee."""
+    problem = str(exc).splitlines()[0] if str(exc) else type(exc).__name__
+    mark = getattr(exc, "problem_mark", None) or getattr(exc, "context_mark", None)
+    if mark is None:
+        return f"syntaxe YAML invalide — {problem}"
+    lines = path.read_text(encoding="utf-8").splitlines()
+    culprit = lines[mark.line].strip()[:100] if mark.line < len(lines) else "?"
+    # Remonter au bloc de la tache fautive pour designer l'ID, pas seulement la ligne
+    import re
+    for previous in range(mark.line, -1, -1):
+        match = re.match(r"^-\s+id:\s*(\S+)", lines[previous])
+        if match:
+            return (f"syntaxe YAML invalide ligne {mark.line + 1} (tache {match.group(1)}) "
+                    f"— {problem} — ligne fautive : « {culprit} »")
+    return f"syntaxe YAML invalide ligne {mark.line + 1} — {problem} — ligne fautive : « {culprit} »"
+
+
 def tasks() -> list[dict]:
-    data = yaml.safe_load(TASKS_PATH.read_text(encoding="utf-8")) or {}
+    try:
+        data = yaml.safe_load(TASKS_PATH.read_text(encoding="utf-8")) or {}
+    except yaml.YAMLError as exc:
+        raise ValueError(f"TASKS.yaml : {describe_yaml_error(exc, TASKS_PATH)}") from exc
     result = data.get("tasks")
     if not isinstance(result, list):
         raise ValueError("TASKS.yaml invalide : cle tasks absente")
@@ -76,7 +97,10 @@ def save_tasks(value: list[dict]) -> None:
 def locks() -> dict[str, dict[str, dict]]:
     if not LOCKS_PATH.exists():
         return {"work_locks": {}, "edit_flags": {}}
-    data = json.loads(LOCKS_PATH.read_text(encoding="utf-8"))
+    try:
+        data = json.loads(LOCKS_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"TASK_LOCKS.json : JSON invalide — {exc}") from exc
     if not isinstance(data, dict):
         raise ValueError("TASK_LOCKS.json invalide")
     # Migration automatique de l'ancien format : les anciens locks etaient des flags d'edition.
@@ -148,8 +172,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if path == "/api/tasks/json":
                 state = locks(); self.reply(200, [public(t, state) for t in tasks()]); return
             super().do_GET()
+        except ValueError as exc:  # Donnees invalides (TASKS.yaml / TASK_LOCKS.json casses)
+            print(f"[ERREUR DONNEES] {exc}")
+            self.reply(500, {"success": False, "error": str(exc), "kind": "data_error"})
         except Exception as exc:
-            self.reply(500, {"success": False, "error": str(exc)})
+            print(f"[ERREUR SERVEUR] {type(exc).__name__} : {exc}")
+            self.reply(500, {"success": False, "error": f"{type(exc).__name__} : {exc}", "kind": "server_error"})
 
     def do_POST(self):
         try:

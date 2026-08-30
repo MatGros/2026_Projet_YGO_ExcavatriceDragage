@@ -1,0 +1,51 @@
+# Contrat T181-23 — STruCpp : accès tableau multidimensionnel
+
+contract:
+  task_id: T181-23_STRUCPP_ARRAY_INDEXING
+  criticality: C2
+  strategy: patch
+  objective: >
+    Le convertisseur STruCpp conserve les accès 2D à virgule compatibles avec
+    le runtime et convertit seulement les accès 3D ou plus en crochets imbriqués,
+    afin que WINCH_INTEG compile de nouveau sans perdre le support de tables 4D.
+  acceptance:
+    - id: AC1
+      statement: "Une expression 2D Table[i,j] reste convertie vers l'accès runtime à deux indices, sans .at(i).at(j)."
+      verified_by: "test unitaire du convertisseur sur une table 2D."
+    - id: AC2
+      statement: "Une expression 3D ou 4D Table[i,j,k,l] devient des crochets imbriqués avant STruCpp et ne génère plus un appel at à plus de deux indices."
+      verified_by: "tests unitaires convertisseur sur tableaux 3D et 4D."
+    - id: AC3
+      statement: "WINCH_INTEG compile et renvoie son JSON de résultats ; aucun changement ne touche CODE/ production."
+      verified_by: "run_tests.py --fb WINCH_INTEG."
+  scope:
+    allowed:
+      - TOOLS/COMPILER_ST2C_STruCpp/convert_codesys_to_iec.py
+      - TOOLS/COMPILER_ST2C_STruCpp/tests/**
+      - TOOLS/TEST_AUTO_CI/**
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/**
+      - CODE_XML/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  evidence_required:
+    - "tests ciblés convertisseur"
+    - "run_tests.py --fb WINCH_INTEG"
+  alert_duty: >
+    Si le runtime STruCpp ne supporte pas une forme d'accès nécessaire, ne pas
+    modifier le code ST métier : joindre le C++ généré et remonter.
+
+status: VERIFIED
+execution:
+  executed_by: "Agent délégué T181-23 + revue orchestrateur"
+  completed_at: "2026-08-30T16:05:00+02:00"
+  status: DELIVERED
+  evidence_submitted:
+    - "pytest TOOLS/COMPILER_ST2C_STruCpp/tests/test_compiler_tool.py : 4/4 PASS"
+    - "run_tests.py --fb WINCH_INTEG : compilation OK, 32 vecteurs exécutés, 15/32"
+    - "git diff --check sur les deux fichiers du scope : PASS"
+validation:
+  status: VERIFIED
+  validated_by: "Orchestrateur"
+  validated_at: "2026-08-30T16:05:00+02:00"
+  notes: "Micro-lot outillage validé sur tests ciblés ; aucun bundle ni gates globaux requis."

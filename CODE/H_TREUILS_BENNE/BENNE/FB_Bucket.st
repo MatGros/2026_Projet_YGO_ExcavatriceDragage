@@ -52,7 +52,7 @@ VAR_OUTPUT
     OpenReq                         : BOOL;                           // <-- [STAT] Demande d'ouverture memorisee
     M2_StartStop                    : BOOL;                           // <-- [ACT] Ordre StartStop vers Winch M2
     M2_Direction                    : INT;                            // <-- [ACT] Ordre Direction vers Winch M2
-    M2_ForceSlowSpeed               : BOOL;                           // <-- [ACT] Forcage vitesse lente sur M2
+    M2_BucketJogLimit               : BOOL;                           // <-- [ACT] Plafond palier 1 du jog benne M2
 
     // === DIAGNOSTICS ET MESURES ===
     M1SlipDetected                  : BOOL;                           // <-- [DIAG] Glissement M1 detecte
@@ -183,7 +183,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Lifecycle.Done := FALSE;
     M2_StartStop := FALSE;
     M2_Direction := 0;
-    M2_ForceSlowSpeed := FALSE;
+    M2_BucketJogLimit := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
     RETURN;
@@ -223,7 +223,7 @@ SevereError := Fault.Error;
 IF SevereError THEN
     M2_StartStop := FALSE;
     M2_Direction := 0;
-    M2_ForceSlowSpeed := FALSE;
+    M2_BucketJogLimit := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
     Lifecycle.Busy := FALSE;
@@ -254,7 +254,7 @@ ELSE
     IF Lifecycle.Busy THEN
         IF CloseReq THEN
             RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
-            M2_ForceSlowSpeed := TRUE;
+            M2_BucketJogLimit := TRUE;
             IF MotionRequestActive AND (MotionDirection = 1) THEN
                 M2_StartStop := TRUE;
                 M2_Direction := 1;
@@ -267,7 +267,7 @@ ELSE
             END_IF;
         ELSIF OpenReq THEN
             RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
-            M2_ForceSlowSpeed := TRUE;
+            M2_BucketJogLimit := TRUE;
             IF MotionRequestActive AND (MotionDirection = -1) THEN
                 M2_StartStop := TRUE;
                 M2_Direction := -1;
@@ -281,7 +281,7 @@ ELSE
         ELSE
             M2_StartStop := FALSE;
             M2_Direction := 0;
-            M2_ForceSlowSpeed := FALSE;
+            M2_BucketJogLimit := FALSE;
         END_IF;
 
         IF (CloseReq AND (CablePosM2 > M2StartPosM)) OR (OpenReq AND (CablePosM2 < M2StartPosM)) THEN
@@ -336,7 +336,7 @@ ELSE
     ELSIF Lifecycle.Done THEN
         M2_StartStop := FALSE;
         M2_Direction := 0;
-        M2_ForceSlowSpeed := FALSE;
+        M2_BucketJogLimit := FALSE;
         RemainingTravelM := 0.0;
         IF NOT MotionRequestActive THEN
             Lifecycle.Done := FALSE;

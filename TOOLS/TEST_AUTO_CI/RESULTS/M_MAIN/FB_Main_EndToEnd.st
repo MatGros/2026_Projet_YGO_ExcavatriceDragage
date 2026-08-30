@@ -76,7 +76,7 @@ VAR_INPUT
     // === ⚙️ Configuration Treuils/Sync/Benne (0/0.0 = à fournir par la suite de test) ===
     SpeedTable              : ST_SpeedStepTable;
     CfgMaxStepAscent        : INT := 0;
-    CfgMaxStepDescente      : INT := 0;
+    MaxStepDescent          : INT := 0;
     CfgAscentLimitM         : REAL := 0.0;    // cote capteur haut / limite logicielle haute
     CfgDescentLimitM1       : REAL := 0.0;
     CfgDescentLimitM2       : REAL := 0.0;
@@ -391,7 +391,7 @@ prg04(
     HeartbeatIhmOk          := HeartbeatIhmOk,
     LimitLegalReached       := LimitLegalReached,
     CfgWinchMaxStepAscent   := CfgMaxStepAscent,
-    CfgWinchMaxStepDescente := CfgMaxStepDescente,
+    CfgWinchMaxStepDescente := MaxStepDescent,
     LimitLegalEnabled       := LimitLegalEnabled,
     LimitLegalDepthMinAllowedM := LimitLegalDepthMinAllowedM,
     CfgCableLimitAscentM    := CfgAscentLimitM,

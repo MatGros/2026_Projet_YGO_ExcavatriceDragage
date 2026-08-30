@@ -37,6 +37,12 @@ SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+# Module de post-traitement du test_main.cpp généré par STruCpp (T181-21) :
+# injection du copy-out des VAR_IN_OUT après chaque appel s.FB().
+COMPILER_DIR = pathlib.Path(__file__).resolve().parents[3] / "TOOLS" / "COMPILER_ST2C_STruCpp"
+if str(COMPILER_DIR) not in sys.path:
+    sys.path.insert(0, str(COMPILER_DIR))
+
 import yaml
 
 import chronogram
@@ -44,6 +50,7 @@ import prod_wiring
 from af_coverage_v2 import check_af_coverage, check_extra_tests
 from encapsulation_check import check_encapsulation_chain
 from html_report import render_group_report, render_html_report
+import inject_var_in_out_copyout
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 TEST_AUTO_CI = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI"
@@ -231,7 +238,25 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         t_exec = 0.0
         t_chrono = 0.0
         if strucpp_temp_dir is not None:
-            test_runner = strucpp_temp_dir / "test_runner.exe"
+            # --- T181-21 : post-traitement VAR_IN_OUT (copy-out) ---
+            # STruCpp génère un copy-in seul (s.FB.X = s.X;) sans copy-out. On injecte
+            # le copy-out des VAR_IN_OUT du FB testé après chaque appel, puis on
+            # recompile le runner avec g++. Mapping sans ambiguïté (ligne de copy-in).
+            copyout_exe = None
+            fb_st_path = next((s for s in sources if s.name == f"{fb_name}.st"), None)
+            if fb_st_path is not None:
+                try:
+                    modified = inject_var_in_out_copyout.postprocess_file(
+                        strucpp_temp_dir / "test_main.cpp", fb_st_path, fb_var="FB")
+                    if modified:
+                        copyout_exe = inject_var_in_out_copyout.recompile_test_runner(
+                            strucpp_temp_dir, RUNTIME_INCLUDE, RUNTIME_TEST)
+                        if copyout_exe is None:
+                            _log(f"[var_in_out] recompilation copy-out échouée pour {fb_name} -- "
+                                 f"retour au test_runner.exe original de STruCpp")
+                except Exception as exc:
+                    _log(f"[var_in_out] post-traitement indisponible pour {fb_name} : {exc}")
+            test_runner = copyout_exe or (strucpp_temp_dir / "test_runner.exe")
             if test_runner.exists():
                 t_exec_start = _time.perf_counter()
                 json_result = subprocess.run([str(test_runner), "--json"], capture_output=True, text=True, encoding="utf-8",
@@ -329,6 +354,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             base.with_suffix(".html").write_text(html, encoding="utf-8")
             report_path = base.with_suffix(".html")
         elif generate_reports:
+            base = reports_dir / fb_name
             base.with_suffix(".txt").write_text(text_report, encoding="utf-8")
             report_path = base.with_suffix(".txt")
 
