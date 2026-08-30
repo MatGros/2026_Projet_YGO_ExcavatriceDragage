@@ -26,7 +26,7 @@ VAR
     DirectionChangeDelay : TON;      // . [LOC] Temporisation changement de sens
     EffectiveDelay       : TIME;     // . [LOC] Delai effectif selon sens
     DeadTimeArmed        : BOOL;     // . [LOC] Temps mort D18 arme (front Enable)
-    LastDirection        : INT;      // . [LOC] Dernier sens non nul memorise (interlock apres neutre, T181-02)
+    LastDirection        : INT;      // . [LOC] Dernier sens non nul memorise (interlock apres neutre)
     ResetEdge            : R_TRIG;   // . [LOC] Front Reset : purge la memoire de direction
 END_VAR
 
