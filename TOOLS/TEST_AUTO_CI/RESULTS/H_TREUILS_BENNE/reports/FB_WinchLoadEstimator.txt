@@ -1,0 +1,49 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchLoadEstimator_xdpwdcnv\strucpp-test-YR6F0L\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchLoadEstimator_xdpwdcnv\strucpp-test-YR6F0L\test_main.cpp:62:43: error: no matching function for call to 'strucpp::IEC_ARRAY_2D<strucpp::IECVar<float>, strucpp::ArrayBounds<1, 5>, strucpp::ArrayBounds<1, 5> >::at(int)'
+   62 |         s.TBL.LOADPCTBYSTEPANDSPEEDBAND.at(2).at(2) = 45.0;
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+  • there are 2 candidates
+In file included from C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchLoadEstimator_xdpwdcnv\strucpp-test-YR6F0L\generated.hpp:9,
+                 from C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchLoadEstimator_xdpwdcnv\strucpp-test-YR6F0L\test_main.cpp:1:
+    • candidate 1: 'strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::var_type& strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::at(int64_t, int64_t) [with T = strucpp::IECVar<float>; Bounds1 = strucpp::ArrayBounds<1, 5>; Bounds2 = strucpp::ArrayBounds<1, 5>; var_type = strucpp::IECVar<float>; int64_t = long long int]'
+      C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_array.hpp:174:15:
+        174 |     var_type& at(int64_t i, int64_t j) {
+            |               ^~
+      • candidate expects 2 arguments, 1 provided
+    • candidate 2: 'const strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::var_type& strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::at(int64_t, int64_t) const [with T = strucpp::IECVar<float>; Bounds1 = strucpp::ArrayBounds<1, 5>; Bounds2 = strucpp::ArrayBounds<1, 5>; var_type = strucpp::IECVar<float>; int64_t = long long int]'
+      C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_array.hpp:185:21:
+        185 |     const var_type& at(int64_t i, int64_t j) const {
+            |                     ^~
+      • candidate expects 2 arguments, 1 provided
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchLoadEstimator_xdpwdcnv\strucpp-test-YR6F0L\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchLoadEstimator_xdpwdcnv\strucpp-test-YR6F0L\test_main.cpp:94:43: error: no matching function for call to 'strucpp::IEC_ARRAY_2D<strucpp::IECVar<float>, strucpp::ArrayBounds<1, 5>, strucpp::ArrayBounds<1, 5> >::at(int)'
+   94 |         s.TBL.LOADPCTBYSTEPANDSPEEDBAND.at(2).at(2) = 45.0;
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+  • there are 2 candidates
+    • candidate 1: 'strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::var_type& strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::at(int64_t, int64_t) [with T = strucpp::IECVar<float>; Bounds1 = strucpp::ArrayBounds<1, 5>; Bounds2 = strucpp::ArrayBounds<1, 5>; var_type = strucpp::IECVar<float>; int64_t = long long int]'
+      C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_array.hpp:174:15:
+        174 |     var_type& at(int64_t i, int64_t j) {
+            |               ^~
+      • candidate expects 2 arguments, 1 provided
+    • candidate 2: 'const strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::var_type& strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::at(int64_t, int64_t) const [with T = strucpp::IECVar<float>; Bounds1 = strucpp::ArrayBounds<1, 5>; Bounds2 = strucpp::ArrayBounds<1, 5>; var_type = strucpp::IECVar<float>; int64_t = long long int]'
+      C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_array.hpp:185:21:
+        185 |     const var_type& at(int64_t i, int64_t j) const {
+            |                     ^~
+      • candidate expects 2 arguments, 1 provided
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchLoadEstimator_xdpwdcnv\strucpp-test-YR6F0L\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchLoadEstimator_xdpwdcnv\strucpp-test-YR6F0L\test_main.cpp:125:43: error: no matching function for call to 'strucpp::IEC_ARRAY_2D<strucpp::IECVar<float>, strucpp::ArrayBounds<1, 5>, strucpp::ArrayBounds<1, 5> >::at(int)'
+  125 |         s.TBL.LOADPCTBYSTEPANDSPEEDBAND.at(2).at(2) = 45.0;
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+  • there are 2 candidates
+    • candidate 1: 'strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::var_type& strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::at(int64_t, int64_t) [with T = strucpp::IECVar<float>; Bounds1 = strucpp::ArrayBounds<1, 5>; Bounds2 = strucpp::ArrayBounds<1, 5>; var_type = strucpp::IECVar<float>; int64_t = long long int]'
+      C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_array.hpp:174:15:
+        174 |     var_type& at(int64_t i, int64_t j) {
+            |               ^~
+      • candidate expects 2 arguments, 1 provided
+    • candidate 2: 'const strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::var_type& strucpp::IEC_ARRAY_2D<T, Bounds1, Bounds2>::at(int64_t, int64_t) const [with T = strucpp::IECVar<float>; Bounds1 = strucpp::ArrayBounds<1, 5>; Bounds2 = strucpp::ArrayBounds<1, 5>; var_type = strucpp::IECVar<float>; int64_t = long long int]'
+      C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_array.hpp:185:21:
+        185 |     const var_type& at(int64_t i, int64_t j) const {
+            |                     ^~
+      • candidate expects 2 arguments, 1 provided
+

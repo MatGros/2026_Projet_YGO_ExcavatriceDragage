@@ -20,6 +20,7 @@ WORKFLOW_DIRS = {
     "tests",
     "tasks",
     "hooks",
+    "status",  # checkpoints de progression agents (agent_heartbeat.py, git-ignore)
 }
 
 DOC_FILE_PATTERNS = (

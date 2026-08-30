@@ -43,6 +43,31 @@ tout critère générique d'acceptation. Ta restitution se juge **contre eux**, 
 - Ne jamais apposer `_CFC`, `_LD` ou un autre suffixe de langage si le générateur ne produit pas le langage correspondant dans le bundle PLCopenXML.
 - Une exemption de gate ou une allowlist n'est jamais une décision d'agent : remonter le fait, son usage réel et sa condition de retrait à l'orchestrateur. Seul l'orchestrateur peut la valider et la tracer.
 
+## 📊 Checkpoint de progression — obligatoire
+
+> Pourquoi : le suivi d'état en direct exige que chaque agent journalise ses étapes.
+> Un agent LLM ne bat pas un heartbeat 5s natif (il travaille par tours de 10-60s+) :
+> on journalise donc un **checkpoint à chaque étape**, cible maximale ~10s sans log.
+
+- À **chaque étape franchie** (début, lecture specs, avant/pendant/après écriture,
+  après chaque gate, attente validation, fin), append une ligne dans le fichier
+  partagé de ta session :
+  ```bash
+  python TOOLS/AGENT_WORKFLOW/scripts/agent_heartbeat.py record <SESSION> <ETAPE> <etat> --agent <nom> --msg "<resume>"
+  ```
+  - `<SESSION>` : id unique de ta mission (ex. `task-AF10`, ou horodatage).
+  - `<etat>` : `en_cours | ok | fail | attente_validation | termine`.
+- Les fichiers vivent dans `TOOLS/AGENT_WORKFLOW/status/` (git-ignore, jamais commités).
+- Le suivi en direct se fait via :
+  ```bash
+  python TOOLS/AGENT_WORKFLOW/scripts/agent_heartbeat.py watch            # tous
+  python TOOLS/AGENT_WORKFLOW/scripts/agent_heartbeat.py watch <SESSION>  # une session
+  ```
+- **Cible** : ne pas dépasser ~10s sans un log d'étape, autant que les tours le
+  permettent (un outil long peut déroger — le signaler dans le log suivant).
+- Ne journalise jamais ailleurs que dans cette zone dédiée (pas de fichiers
+  temp jetables `_tmp_*`, cf. Interdits absolus).
+
 ## 🚨 Devoir d'alerte — non négociable
 
 Tout problème constaté **en cours de route** (incohérence de spec, bug préexistant, risque hors

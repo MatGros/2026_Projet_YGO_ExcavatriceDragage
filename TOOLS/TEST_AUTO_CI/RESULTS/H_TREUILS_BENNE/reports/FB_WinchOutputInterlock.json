@@ -4,14 +4,7 @@
   "results": [
     {
       "name": "TC-P10-012 Watchdog frein : BrakeCmd sans confirmation 500ms -> bit0, RestartInhibit, FAULT ; pas de faux defaut au RestartRequired",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.ERROR expected TRUE, got FALSE",
-        "file": "test_fb_winchoutputinterlock.st",
-        "line": 55,
-        "message": "Timeout frein 500ms -> Error"
-      }
+      "passed": true
     },
     {
       "name": "TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne doit pas armer le watchdog",
@@ -22,22 +15,15 @@
       "passed": false,
       "failure": {
         "assertType": "ASSERT_TRUE",
-        "detail": "FB.ERROR expected TRUE, got FALSE",
+        "detail": "FB.RELAYFWD expected TRUE, got FALSE",
         "file": "test_fb_winchoutputinterlock.st",
-        "line": 152,
-        "message": "Precondition : defaut frein"
+        "line": 204,
+        "message": "Reautorisation -> mouvement autorise"
       }
     },
     {
       "name": "TC-P10-020 Watchdog frein reel terrain : temps/contacteur/bobine",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.ERROR expected TRUE, got FALSE",
-        "file": "test_fb_winchoutputinterlock.st",
-        "line": 231,
-        "message": "Watchdog frein logiciel 500ms -> Error (brique du diagnostic terrain)"
-      }
+      "passed": true
     },
     {
       "name": "TC-P10-021 Temps mort meme sens : 1s apres arret -> nouvelle demande (DeadTimeSameDir)",
@@ -46,7 +32,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.RELAYFWD expected TRUE, got FALSE",
         "file": "test_fb_winchoutputinterlock.st",
-        "line": 261,
+        "line": 271,
         "message": "Mouvement autorise -> RelayFwd"
       }
     },
@@ -57,18 +43,30 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.RELAYFWD expected TRUE, got FALSE",
         "file": "test_fb_winchoutputinterlock.st",
-        "line": 319,
+        "line": 329,
         "message": "Mouvement montee -> RelayFwd"
       }
     },
     {
       "name": "TC-P10-039.1 Frein couple direct : BrakeCmd = RelayFwd OR RelayRev dans tous les etats",
       "passed": true
+    },
+    {
+      "name": "TC-P10-023a \u00a73bis : sens maintenu apres chute de palier a 0 tant que contacteurs non confirmes, puis chute sur DropConfirmDelay",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-023b \u00a73bis : T_max atteint sans confirmation -> chute du sens FORCEE + latch ContactorStuck",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-023c \u00a73bis : coupure dure (Enable=FALSE) pendant le maintien -> RelayFwd=FALSE immediat",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 7,
-    "passed": 2,
-    "failed": 5
+    "total": 10,
+    "passed": 7,
+    "failed": 3
   }
 }

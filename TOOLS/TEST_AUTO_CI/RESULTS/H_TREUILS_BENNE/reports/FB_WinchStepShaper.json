@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "file": "test_fb_winchstepshaper.st",
+  "results": [
+    {
+      "name": "TC-P10-T181-18a Depart immediat 0 vers 1",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-T181-18b Montee 1 vers 2 seulement apres StepRampDelay",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-T181-18c Descente immediate : aucune rampe descendante",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-T181-18d Enable FALSE force le palier 0",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0
+  }
+}

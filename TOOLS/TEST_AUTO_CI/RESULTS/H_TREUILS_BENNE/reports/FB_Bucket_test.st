@@ -77,7 +77,7 @@ TEST 'TC-P10-023 Fermeture seulement si MotionDirection=1 ET MotionRequestActive
     ASSERT_TRUE(FB.CloseReq, 'CmdClose -> CloseReq');
     ASSERT_TRUE(FB.M2_StartStop, 'Fermeture -> M2_StartStop=TRUE');
     ASSERT_EQ(FB.M2_Direction, 1, 'Fermeture -> M2_Direction=1');
-    ASSERT_TRUE(FB.M2_ForceSlowSpeed, 'Fermeture -> vitesse lente forcee');
+    ASSERT_TRUE(FB.M2_BucketJogLimit, 'Fermeture -> vitesse lente forcee');
 END_TEST
 
 TEST 'TC-P10-024 Ouverture seulement si MotionDirection=-1 ET MotionRequestActive'
@@ -107,7 +107,7 @@ TEST 'TC-P10-024 Ouverture seulement si MotionDirection=-1 ET MotionRequestActiv
     ASSERT_TRUE(FB.OpenReq, 'CmdOpen -> OpenReq');
     ASSERT_TRUE(FB.M2_StartStop, 'Ouverture -> M2_StartStop=TRUE');
     ASSERT_EQ(FB.M2_Direction, -1, 'Ouverture -> M2_Direction=-1');
-    ASSERT_TRUE(FB.M2_ForceSlowSpeed, 'Ouverture -> vitesse lente forcee');
+    ASSERT_TRUE(FB.M2_BucketJogLimit, 'Ouverture -> vitesse lente forcee');
 END_TEST
 
 TEST 'TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)'

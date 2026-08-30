@@ -1,18 +1,10 @@
-Error compiling source files:
-
-FB_Bucket.st:47:39: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_BUCKET'
-  47 |     Fault                           : ST_Fault;
-     |                                       ^
-
-FB_Bucket.st:48:39: error: Undefined type 'ST_LIFECYCLE' in FUNCTION_BLOCK 'FB_BUCKET'
-  48 |     Lifecycle                       : ST_Lifecycle;
-     |                                       ^
-
-FB_Bucket.st:94:39: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_BUCKET'
-  94 |     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
-     |                                       ^
-
-FB_Bucket.st:95:5: error: Undefined type 'ST_FAULTCAUSE' in FUNCTION_BLOCK 'FB_BUCKET'
-  95 |     instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
-     |     ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_xzxvzy3_\strucpp-test-0Or0W4\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_xzxvzy3_\strucpp-test-0Or0W4\test_main.cpp:117:53: error: 'class strucpp::FB_BUCKET' has no member named 'M2_FORCESLOWSPEED'
+  117 |         if (!ctx.assert_true(static_cast<bool>(s.FB.M2_FORCESLOWSPEED), "FB.M2_FORCESLOWSPEED", 80, "Fermeture -> vitesse lente forcee")) return false;
+      |                                                     ^~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_xzxvzy3_\strucpp-test-0Or0W4\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_xzxvzy3_\strucpp-test-0Or0W4\test_main.cpp:172:53: error: 'class strucpp::FB_BUCKET' has no member named 'M2_FORCESLOWSPEED'
+  172 |         if (!ctx.assert_true(static_cast<bool>(s.FB.M2_FORCESLOWSPEED), "FB.M2_FORCESLOWSPEED", 110, "Ouverture -> vitesse lente forcee")) return false;
+      |                                                     ^~~~~~~~~~~~~~~~~
 
