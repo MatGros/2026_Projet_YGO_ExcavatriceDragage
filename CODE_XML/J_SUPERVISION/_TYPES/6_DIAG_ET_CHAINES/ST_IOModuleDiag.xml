@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:46:13.272295" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:46:13.272295">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_IOModuleDiag">
+        <baseType>
+          <struct>
+            <variable name="LocalDigitalIoOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module Local_Digital_IO OK (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0800END OK (DI8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808EtpOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0808ETP OK (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008ErOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0008ER OK (DO8 Relais Freins/Kobold)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008Er1Ok">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut sur au moins un module E/S</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>99ce8dd2-5922-55d3-a0f2-73eba184a540</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🩺 ST_IOModuleDiag — Diagnostic carte des 5 modules E/S physiques
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3bis
+   🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
+      pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
+      TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
+   🔗 Producteur : PRG_02_Acquisition (5 appels GetDeviceState()).
+   🔌 Consommateurs : PRG_04 (SafeStop treuils), PRG_05 (SafeStop M3),
+      PRG_07 (recopie IHM GVL_IHM.Network.InputModules + FB_TroubleshootingView).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="6_DIAG_ET_CHAINES">
+              <Object Name="ST_IOModuleDiag" ObjectId="99ce8dd2-5922-55d3-a0f2-73eba184a540" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

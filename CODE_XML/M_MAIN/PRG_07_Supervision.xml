@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:30:58.731629" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:30:58.731629">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:48:12.085416" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:48:12.085416">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -7017,7 +7017,7 @@ GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationMod
 GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
-GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.WinchInputSourceChanged;
+GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.InputSource.WinchInputSourceChanged;
 
 // ---------- §3e. Structures d'état &amp; safety (recopies directes des bus) ----------
 GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.Data.WinchM1State;
@@ -7040,7 +7040,7 @@ GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs.EmergencyDiag.ArmFai
 // OR avec les défauts d'arbitrage de mode (refus Semi-Auto, bascule de mode refusée) —
 // publiés par PRG_03 : sans eux ces refus restaient silencieux pour l'opérateur.
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
-                                      OR PRG_02_Acquisition.Data.InputModuleFault
+                                      OR PRG_02_Acquisition.Data.InputModules.Fault
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Error
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Latched;
 GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs.PowerCutOffActive;
@@ -7081,12 +7081,12 @@ GVL_IHM.Network.EcatErrorId := GVL_IHM.Network.BusEthercat.ErrorId OR GVL_IHM.Ne
 
 // 🩺 Diagnostic carte des 5 modules d'E/S physiques (AF06 §3bis) — lecture seule, calculé
 // dans PRG_02_Acquisition, simple recopie ici pour l'IHM (même patron que Network.*).
-GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.Data.LocalDigitalIoOk;
-GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Data.Vh0800EndOk;
-GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Data.Vh0808EtpOk;
-GVL_IHM.Network.InputModules.Vh0008ErOk       := PRG_02_Acquisition.Data.Vh0008ErOk;
-GVL_IHM.Network.InputModules.Vh0008Er1Ok      := PRG_02_Acquisition.Data.Vh0008Er1Ok;
-GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputModuleFault;
+GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.Data.InputModules.LocalDigitalIoOk;
+GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Data.InputModules.Vh0800EndOk;
+GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Data.InputModules.Vh0808EtpOk;
+GVL_IHM.Network.InputModules.Vh0008ErOk       := PRG_02_Acquisition.Data.InputModules.Vh0008ErOk;
+GVL_IHM.Network.InputModules.Vh0008Er1Ok      := PRG_02_Acquisition.Data.InputModules.Vh0008Er1Ok;
+GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputModules.Fault;
 
 // ---------- §3g. État cycle semi-auto &amp; bandeau ----------
 GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.Data.SequenceState.Ready;
@@ -7203,10 +7203,10 @@ instTroubleshootingView(
     Enable               := TRUE,
     HwIn                 := PRG_02_Acquisition.HwIn,
     HwReal               := PRG_02_Acquisition.HwReal,
-    InputModuleFault     := PRG_02_Acquisition.Data.InputModuleFault,
-    LocalDigitalIoOk     := PRG_02_Acquisition.Data.LocalDigitalIoOk,
-    Vh0800EndOk          := PRG_02_Acquisition.Data.Vh0800EndOk,
-    Vh0808EtpOk          := PRG_02_Acquisition.Data.Vh0808EtpOk,
+    InputModuleFault     := PRG_02_Acquisition.Data.InputModules.Fault,
+    LocalDigitalIoOk     := PRG_02_Acquisition.Data.InputModules.LocalDigitalIoOk,
+    Vh0800EndOk          := PRG_02_Acquisition.Data.InputModules.Vh0800EndOk,
+    Vh0808EtpOk          := PRG_02_Acquisition.Data.InputModules.Vh0808EtpOk,
     Auth                 := PRG_03_Modes_Cycle.Data.Auth,
     M1LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct,
     M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
