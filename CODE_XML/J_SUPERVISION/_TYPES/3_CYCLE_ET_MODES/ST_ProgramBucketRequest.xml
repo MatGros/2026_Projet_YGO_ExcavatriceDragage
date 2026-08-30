@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T14:08:12.822267" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T14:08:12.822267">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:12:03.416590" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:12:03.416590">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -64,6 +64,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier 1 pendant la montée contrôlée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de remontée assistée (ExtractionAssist)</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepDown">

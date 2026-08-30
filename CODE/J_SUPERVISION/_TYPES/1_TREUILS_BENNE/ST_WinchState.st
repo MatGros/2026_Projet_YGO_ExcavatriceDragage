@@ -27,8 +27,8 @@ STRUCT
     ErrorId                 : WORD;             (* ❌ Code bitfield du défaut treuil *)
 
     (* 🔌 Sorties Physiques / Indicateurs LEDs *)
-    RelayFwd                : BOOL;             (* 🛗 Relais Montée activé *)
-    RelayRev                : BOOL;             (* 🛗 Relais Descente activé *)
+    RelayFwd                : BOOL;             (* 🛗 Relais Ascending activé *)
+    RelayRev                : BOOL;             (* 🛗 Relais Descending activé *)
     Contactor1              : BOOL;             (* 🔌 Contacteur vitesse palier 1 *)
     Contactor2              : BOOL;             (* 🔌 Contacteur vitesse palier 2 *)
     Contactor3              : BOOL;             (* 🔌 Contacteur vitesse palier 3 *)

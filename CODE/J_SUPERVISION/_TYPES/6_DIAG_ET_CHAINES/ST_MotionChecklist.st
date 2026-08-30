@@ -17,7 +17,7 @@ STRUCT
 
     (* 2. Intention & Demande *)
     Step4_MotionRequested        : BOOL; (* TRUE = Demande active (Bouton IHM ou Joystick) ➔ Si IHM : TglJoystickMaster doit être à 0 ! *)
-    RequestedDirection           : INT;  (* +1 = Montée, -1 = Descente, 0 = Repos *)
+    RequestedDirection           : INT;  (* +1 = Ascending, -1 = Descending, 0 = Repos *)
     RequestedSpeedPct            : REAL; (* 0..100 % consigne demandée *)
 
     (* 3. Chaîne de Sécurité & Verrous *)
@@ -28,8 +28,8 @@ STRUCT
 
     (* 4. Bilan & Exécution Physiques *)
     AllConditionsMet             : BOOL; (* 🟢 TRUE = TOUTES LES CONDITIONS SONT REMPLIES, LES RELAIS DOIVENT COLLER ! *)
-    RelayFwdActive               : BOOL; (* 🛗 Relais Montée physiquement commandé *)
-    RelayRevActive               : BOOL; (* 🛗 Relais Descente physiquement commandé *)
+    RelayFwdActive               : BOOL; (* 🛗 Relais Ascending physiquement commandé *)
+    RelayRevActive               : BOOL; (* 🛗 Relais Descending physiquement commandé *)
     SpeedContactor1Active        : BOOL; (* 🔌 Contacteur de vitesse Palier 1 commandé *)
 END_STRUCT
 END_TYPE

@@ -908,7 +908,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descending M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre</xhtml>
               </documentation>
             </variable>
             <variable name="Idx601_BypassDiveActive">
@@ -1079,7 +1079,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M1 Autorisée | 0 = Bloquée (Fdc/Safety)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending M1 Autorisée | 0 = Bloquée (Fdc/Safety)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx304_M2_AscentPermit">
@@ -1087,7 +1087,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M2 Autorisée | 0 = Bloquée (Fdc/Safety)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending M2 Autorisée | 0 = Bloquée (Fdc/Safety)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_SyncMotionAllowed">
@@ -1119,7 +1119,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M1 ON | 0 = OFF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending M1 ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
             <variable name="Idx502_M2_CmdRelayFwd_DQ">
@@ -1127,7 +1127,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M2 ON | 0 = OFF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending M2 ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1566,7 +1566,7 @@ TRUE = Demande active (Bouton IHM ou Joystick) ➔ Si IHM : TglJoystickMaster do
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée, -1 = Descente, 0 = Repos</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Ascending, -1 = Descending, 0 = Repos</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedSpeedPct">
@@ -1624,7 +1624,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Montée physiquement commandé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Ascending physiquement commandé</xhtml>
               </documentation>
             </variable>
             <variable name="RelayRevActive">
@@ -1632,7 +1632,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descente physiquement commandé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descending physiquement commandé</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedContactor1Active">
@@ -2211,7 +2211,7 @@ TRUE = Défaut sécurité actif</xhtml>
               <EnumValue>
                 <Name>SEARCHING_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0-&gt;1 dans fenêtre eau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descending : attente front 0-&gt;1 dans fenêtre eau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -2288,7 +2288,7 @@ TRUE = Défaut sécurité actif</xhtml>
               <EnumValue>
                 <Name>NOMINAL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montée couplée avec vitesse demandée opérateur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ascending couplée avec vitesse demandée opérateur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -2873,7 +2873,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Montée IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Ascending IHM | 0 = Relâché</xhtml>
               </documentation>
             </variable>
             <variable name="Idx204_HmiManualCmd_BtnDown">
@@ -2881,7 +2881,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Descente IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Descending IHM | 0 = Relâché</xhtml>
               </documentation>
             </variable>
             <variable name="Idx205_CycleAutoCmd_Pct">
@@ -2921,7 +2921,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée | 0 = Neutre | -1 = Descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Ascending | 0 = Neutre | -1 = Descending</xhtml>
               </documentation>
             </variable>
             <variable name="Idx210_CoupledUserRequestDirection">
@@ -2929,7 +2929,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée | 0 = Neutre | -1 = Descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Ascending | 0 = Neutre | -1 = Descending</xhtml>
               </documentation>
             </variable>
             <variable name="Idx211_CoupledUserRequestActive">
@@ -3007,7 +3007,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Montée ON | 0 = OFF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Ascending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
             <variable name="Idx502_CmdRelayRev_Down_DQ">
@@ -3015,7 +3015,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Descente ON | 0 = OFF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Descending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
             <variable name="Idx503_CmdSpeedContactor1_DQ">
@@ -3098,7 +3098,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending Autorisée | 0 = ASCENDING BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx307_SlackCablePhysical_DI">
@@ -3122,7 +3122,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descending Autorisée | 0 = DESCENDING BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx310_ErrorOperatorComm">

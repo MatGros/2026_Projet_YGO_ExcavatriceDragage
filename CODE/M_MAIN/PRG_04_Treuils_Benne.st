@@ -32,6 +32,7 @@ VAR
     // === FB D'ARBITRAGE DE COMMANDE (POO) ===
     instArbM1 : FB_WinchCmdArbitrationM1;  // * [INST] Arbitrage commande treuil M1
     instArbM2 : FB_WinchCmdArbitrationM2;  // * [INST] Arbitrage commande treuil M2
+    instArbBucket : FB_BucketCmdArbitration;  // * [INST] Arbitrage commande benne (POO §5)
 
     // === REQUETES D'AXE ASSEMBLEES AVANT APPEL FB_WINCH ===
     // CODESYS n'accepte pas l'initialiseur de struct anonyme en parametre d'appel :
@@ -87,6 +88,8 @@ VAR
     ArbIHM     : ST_fbWinchCmdArbitration_IHM;      // . [LOC] Entrées IHM FB d'arbitrage (partagé M1/M2)
     ArbContext : ST_fbWinchCmdArbitration_Context;  // . [LOC] Contexte gating FB d'arbitrage (partagé M1/M2)
     ArbM2Cfg   : ST_fbWinchCmdArbitration_Cfg;      // . [LOC] Config M2 (vitesse override benne)
+    ArbBucketIHM     : ST_fbBucketCmdArbitration_IHM;      // . [LOC] Entrées IHM FB d'arbitrage benne
+    ArbBucketContext : ST_fbBucketCmdArbitration_Context;  // . [LOC] Contexte gating FB d'arbitrage benne
 
     M1LogicRequestStartStop     : BOOL;
     M1LogicRequestDirection     : INT;
@@ -152,7 +155,7 @@ VAR
     M2_LimitShift                : REAL;
 
     EffectiveMaxStepAscent    : INT;
-    EffectiveMaxStepDescente  : INT;
+    EffectiveMaxStepDescending  : INT;
 
     // Agrégateur de clamp de palier — bornes communes M1=M2 puis M2-propre
     CommonMaxStepUp   : INT;
@@ -173,6 +176,7 @@ VAR
     // FB_Bucket ne connaissent que des booléens déjà gatés, jamais le mode (encapsulation AF03 §2).
     MaintN1 : BOOL;   // . [LOC] Mode MAINT_N1 arbitré (override FDC logiciel momentané)
     MaintN2 : BOOL;   // . [LOC] Mode MAINT_N2 arbitré (seul mode où un bypass est effectif)
+    ExtractionAssistActive : BOOL; // . [LOC] Séquence d'extraction active (mode MAINT + toggle) — gate permis de montée assistée
 
     // Override du FDC haut LOGICIEL — MAINT_N1, bouton IHM MAINTENU (jamais latché).
     // Le FDC haut CAPTEUR (TopPositionSensor ≈ 8,5 m) n'est JAMAIS ouvert par cet override.
@@ -204,9 +208,9 @@ END_VAR
 {region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE & ASSISTANTS ===
 
-// Consommation de l'intention both continue opérateur (cerveau unique PRG_03, tous modes)
-WinchBothMotionActive    := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Active;
-WinchBothMotionDirection := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Direction;
+// Consommation de l'intention both continue opérateur (source unique PRG_03, tous modes)
+WinchBothMotionActive    := PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;
+WinchBothMotionDirection := PRG_03_Modes_Cycle.Data.WinchBothIntent.Direction;
 
 // Récupération de l'état fond synthétisé par PRG_03
 BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
@@ -216,29 +220,35 @@ BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConf
 // momentané du FDC haut logiciel (§5).
 MaintN1 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1);
 MaintN2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
+// Séquence d'extraction active (mode MAINT + toggle) : gate le permis de montée assistée (§5).
+// Le permis lui-même (AscentPermit) est produit par FB_ExtractionAssist et consommé via le contrat benne.
+ExtractionAssistActive := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                          AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence;
 
 // Règle absolue en pilotage both normal --
 // descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
-WinchBothDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
-    AND (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.SEMI_AUTO)
-    AND WinchBothMotionActive AND (WinchBothMotionDirection = -1)
-    AND NOT _BucketState.IsOpen;
-WinchBothAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
-    AND (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.SEMI_AUTO)
-    AND WinchBothMotionActive AND (WinchBothMotionDirection = 1)
-    AND NOT _BucketState.IsClosed;
+// Décision déléguée à FB_BucketCmdArbitration (POO §5) : flags armés + commandes
+// arbitrées (ouverture, fermeture, contacteur Kobold). Bit-identique PRG_04 §1/§2.
+ArbBucketIHM.BtnOpen  := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen;
+ArbBucketIHM.BtnClose := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
 
-// Arbitrage de fermeture benne (CmdBucketCloseArbitrated)
-IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose THEN
-    CmdBucketCloseArbitrated := TRUE;
-ELSIF WinchBothAscentBucketCloseArmed THEN
-    CmdBucketCloseArbitrated := TRUE;
-ELSE
-    CmdBucketCloseArbitrated := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
-END_IF;
+ArbBucketContext.TglEnableCoupledBucketSequencing := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing;
+ArbBucketContext.MotionActive   := WinchBothMotionActive;
+ArbBucketContext.MotionDirection := WinchBothMotionDirection;
+ArbBucketContext.BucketIsOpen   := _BucketState.IsOpen;
+ArbBucketContext.BucketIsClosed := _BucketState.IsClosed;
 
-// Arbitrage contacteur Kobold (KoboldContactorCmdArbitrated)
-KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
+instArbBucket(
+    Enable    := TRUE,
+    Auth      := PRG_03_Modes_Cycle.Data.Auth,
+    ReqBucket := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket,
+    IHM       := ArbBucketIHM,
+    Context   := ArbBucketContext
+);
+WinchBothDiveBucketOpenArmed    := instArbBucket.WinchBothDiveBucketOpenArmed;
+WinchBothAscentBucketCloseArmed := instArbBucket.WinchBothAscentBucketCloseArmed;
+CmdBucketCloseArbitrated        := instArbBucket.CmdClose_IHM;
+KoboldContactorCmdArbitrated    := instArbBucket.KoboldContactorCmdArbitrated;
 
 {endregion}
 
@@ -250,8 +260,7 @@ instBucket(
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
-    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR WinchBothDiveBucketOpenArmed
-                           OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen,
+    CmdOpen_IHM         := instArbBucket.CmdOpen_IHM,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := WinchBothMotionActive,
     MotionDirection     := WinchBothMotionDirection,
@@ -305,10 +314,10 @@ ELSE
     EffectiveMaxStepAscent := _CommunCfgPersist.WinchMaxStepAscent;
 END_IF;
 
-IF _CommunCfgPersist.WinchMaxStepDescente <= 0 THEN
-    EffectiveMaxStepDescente := 3;
+IF _CommunCfgPersist.WinchMaxStepDescending <= 0 THEN
+    EffectiveMaxStepDescending := 3;
 ELSE
-    EffectiveMaxStepDescente := _CommunCfgPersist.WinchMaxStepDescente;
+    EffectiveMaxStepDescending := _CommunCfgPersist.WinchMaxStepDescending;
 END_IF;
 
 
@@ -323,7 +332,6 @@ BucketM2Open  := (instBucket.M2_Direction = 1);
 BucketM2Close := (instBucket.M2_Direction = -1);
 
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
-ArbIHM.TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster;
 ArbIHM.BtnUpM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnUp;
 ArbIHM.BtnDownM1         := GVL_IHM.M1TreuilRetenue.Cmd.BtnDown;
 ArbIHM.BtnUpM2           := GVL_IHM.M2TreuilBenne.Cmd.BtnUp;
@@ -347,8 +355,9 @@ instArbM1(
     Joystick   := PRG_02_Acquisition.Data.Joystick,
     Auth       := PRG_03_Modes_Cycle.Data.Auth,
     ReqWinch   := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1,
-    BothIntent := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent,
+    BothIntent := PRG_03_Modes_Cycle.Data.WinchBothIntent,
     IHM        := ArbIHM,
+    TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext
 );
 M1LogicRequestStartStop := instArbM1.StartStop;
@@ -361,8 +370,9 @@ instArbM2(
     Joystick   := PRG_02_Acquisition.Data.Joystick,
     Auth       := PRG_03_Modes_Cycle.Data.Auth,
     ReqWinch   := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2,
-    BothIntent := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent,
+    BothIntent := PRG_03_Modes_Cycle.Data.WinchBothIntent,
     IHM        := ArbIHM,
+    TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
     Cfg        := ArbM2Cfg
 );
@@ -392,7 +402,7 @@ IF ExtractionControlActive THEN
        AND (ABS(PRG_02_Acquisition.Data.Encoders.M2.CablePosM - ControlAscentStartM2PosM) >= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
         ExtractionControlActive := FALSE;         // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (WinchBothMotionActive AND (WinchBothMotionDirection = 1)) THEN
-        ExtractionControlActive := FALSE;         // Montée relâchée/interrompue : annule la phase
+        ExtractionControlActive := FALSE;         // Ascending relâchée/interrompue : annule la phase
     END_IF;
 END_IF;
 
@@ -748,8 +758,14 @@ IF PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
     ProcessAndSafetyPermitM2_Descend := FALSE;
 END_IF;
-ProcessAndSafetyPermitM1_Ascent := SafetyPermitM1_Ascent;
+// Permis de montée assistée : consommé depuis FB_ExtractionAssist (via le contrat benne).
+// Hors extraction (NOT ExtractionAssistActive), la montée reste libre ; pendant l'extraction,
+// la montée n'est autorisée que si l'assistant la délivre (AscentPermit, qui intègre les
+// conditions process AscentControlSafe/AscentNominalSafe). Polarité fail-safe (TRUE = autorisé).
+ProcessAndSafetyPermitM1_Ascent := SafetyPermitM1_Ascent
+    AND (NOT ExtractionAssistActive OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit);
 ProcessAndSafetyPermitM2_Ascent := SafetyPermitM2_Ascent
+    AND (NOT ExtractionAssistActive OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit)
     // Même anticipation que ProcessPermitM2_Descend ci-dessus.
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM >= (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
@@ -772,7 +788,7 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinch
 
 // --- Sources communes (M1 = M2) ---
 CommonMaxStepUp   := EffectiveMaxStepAscent;
-CommonMaxStepDown := EffectiveMaxStepDescente;
+CommonMaxStepDown := EffectiveMaxStepDescending;
 IF instWinchSync.SyncDeviationWarn THEN
     CommonMaxStepUp   := 1;
     CommonMaxStepDown := 1;

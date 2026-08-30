@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.254608" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-17T05:53:47.254608">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:54.078324" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:54.078324">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -90,7 +90,7 @@ TRUE = Demande active (Bouton IHM ou Joystick) ➔ Si IHM : TglJoystickMaster do
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée, -1 = Descente, 0 = Repos</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Ascending, -1 = Descending, 0 = Repos</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedSpeedPct">
@@ -148,7 +148,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Montée physiquement commandé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Ascending physiquement commandé</xhtml>
               </documentation>
             </variable>
             <variable name="RelayRevActive">
@@ -156,7 +156,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descente physiquement commandé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descending physiquement commandé</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedContactor1Active">

@@ -130,7 +130,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         LimitLegalDepthMinAllowed_M := -15.0,
         LimitLegalEnabled := TRUE,
         SelHomingApproachEnable := FALSE,
-        WinchMaxStepDescente := 3,
+        WinchMaxStepDescending := 3,
         WinchMaxStepAscent := 5,
         WinchSlowdownDistance_M := 1.0,
         WinchSlowdownMaxStep := 1,

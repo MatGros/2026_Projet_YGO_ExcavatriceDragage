@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:39:03.261027" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:39:03.261027">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.445513" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.445513">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -116,42 +116,6 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_OperatorCoupledIntent">
-        <baseType>
-          <struct>
-            <variable name="Active">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention couplée active (JoyBtnRaw + Select=0 OU boutons BothUp/BothDown)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Direction">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descente, 0: Neutre, +1: Montée)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>ebcc0c47-ef53-54b6-9967-6c3fa0d26f58</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🎮 ST_OperatorCoupledIntent — Intention couplée continue de l'opérateur
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Transmet l'intention de mouvement couplé (homme-mort / boutons)
-      produite inconditionnellement par PRG_03 vers PRG_04 (tous modes).
-   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_ProgramWinchRequest">
         <baseType>
           <struct>
@@ -168,7 +132,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedTgtPct">
@@ -191,6 +155,43 @@
    🔌 ST_ProgramWinchRequest — Demande de mouvement treuil par le programme
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_WinchBothIntent">
+        <baseType>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both active (homme-mort qualifié + Select=0 OU boutons BothUp/BothDown)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descending, 0: Neutre, +1: Ascending)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>27a8fd28-e07a-5ea0-8328-eea98b482fb9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🎮 ST_WinchBothIntent — Intention both continue de l'opérateur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Transmet l'intention de mouvement both (2 treuils ensemble,
+      homme-mort / boutons) produite inconditionnellement par PRG_03 vers
+      PRG_04 et l'arbitrage (tous modes). Source UNIQUE de la décision both.
    📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
         </documentation>
@@ -387,14 +388,6 @@ treuils avant de changer de mode ».
       <dataType name="ST_fbWinchCmdArbitration_IHM">
         <baseType>
           <struct>
-            <variable name="TglJoystickMaster">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd)</xhtml>
-              </documentation>
-            </variable>
             <variable name="BtnUpM1">
               <type>
                 <BOOL />
@@ -455,7 +448,9 @@ treuils avant de changer de mode ».
    🎛️ ST_fbWinchCmdArbitration_IHM — Entrées IHM de l'arbitrage treuil
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Encapsuler les commandes IHM consommées par FB_WinchCommandArbitrationM1/M2
-       (boutons par treuil, nommage hardware propagé, toggle joystick maître).
+       (boutons par treuil, nommage hardware propagé).
+       Le toggle joystick maître global (Modes.Cmd.TglJoystickMaster) est passé en
+       paramètre séparé des FB (I4 — factorisation, source unique GVL_IHM.Modes.Cmd).
    📤 Producteur : PRG_04_Treuils_Benne (câblage GVL_IHM).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Nommage : BtnUpM1/BtnUpM2 = nommage hardware propagé (convention projet).
@@ -698,10 +693,10 @@ treuils avant de changer de mode ».
             </variable>
             <variable name="BothIntent">
               <type>
-                <derived name="ST_OperatorCoupledIntent" />
+                <derived name="ST_WinchBothIntent" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both opérateur (WinchBothMotionActive/Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both opérateur (source unique PRG_03)</xhtml>
               </documentation>
             </variable>
             <variable name="IHM">
@@ -710,6 +705,14 @@ treuils avant de changer de mode ».
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnUpM1/BtnDownM1, both)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglJoystickMaster">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd, source unique)</xhtml>
               </documentation>
             </variable>
             <variable name="Context">
@@ -743,7 +746,7 @@ treuils avant de changer de mode ».
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPct">
@@ -801,13 +804,18 @@ ELSE
         Direction := ReqWinch.ReqDirection;
         SpeedPct  := ReqWinch.SpeedTgtPct;
     ELSE
-        // ── Mode manuel : boutons IHM ou joystick maître ──
-        IF NOT IHM.TglJoystickMaster THEN
+        // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
+        //    commande unitaire M1 dérivée des boutons/joystick (Select=1). ──
+        IF NOT TglJoystickMaster THEN
             // Mode Boutons IHM
-            IF IHM.BtnWinchBothUp OR IHM.BtnUpM1 THEN
+            IF BothIntent.Active THEN
+                // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
+                Direction := BothIntent.Direction;
+                SpeedPct  := 100.0;
+            ELSIF IHM.BtnUpM1 THEN
                 Direction := 1;
                 SpeedPct  := 100.0;
-            ELSIF IHM.BtnWinchBothDown OR IHM.BtnDownM1 THEN
+            ELSIF IHM.BtnDownM1 THEN
                 Direction := -1;
                 SpeedPct  := 100.0;
             ELSE
@@ -815,9 +823,13 @@ ELSE
                 SpeedPct  := 0.0;
             END_IF;
         ELSE
-            // Mode Joystick Maître — M1 autorisé si Select = 0 (both) ou 1 (M1)
-            IF (Auth.JoystickWinchSelectArbitrated = 0 OR Auth.JoystickWinchSelectArbitrated = 1) THEN
+            // Mode Joystick Maître — M1 unitaire si Select = 1, both si Select = 0
+            IF Auth.JoystickWinchSelectArbitrated = 1 THEN
                 Direction := Joystick.AxisY.Direction;
+                SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+            ELSIF BothIntent.Active THEN
+                // Both (Select=0) — source unique PRG_03, plus de re-dérivation
+                Direction := BothIntent.Direction;
                 SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
             ELSE
                 Direction := 0;
@@ -825,13 +837,13 @@ ELSE
             END_IF;
         END_IF;
 
-        // Gating StartStop (bit-identique PRG_04 §3)
+        // Gating StartStop (bit-identique PRG_04 §3) — homme-mort qualifié en joystick
         StartStop := (Direction &lt;&gt; 0)
                   AND NOT Context.BucketBusy
                   AND NOT Context.WinchBothMotionBlockedByBucket
                   AND NOT ((Context.SyncBlocksUp   AND (Direction = 1))
                         OR (Context.SyncBlocksDown AND (Direction = -1)))
-                  AND (NOT IHM.TglJoystickMaster OR Joystick.DeadmanArmed);
+                  AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
     END_IF;
 
     // Front de fin d'action benne : arrêt forcé sauf mouvement both actif
@@ -869,8 +881,8 @@ END_IF;
               <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
             </Folder>
             <Folder Name="3_CYCLE_ET_MODES">
-              <Object Name="ST_OperatorCoupledIntent" ObjectId="ebcc0c47-ef53-54b6-9967-6c3fa0d26f58" />
               <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
+              <Object Name="ST_WinchBothIntent" ObjectId="27a8fd28-e07a-5ea0-8328-eea98b482fb9" />
               <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
             </Folder>
           </Folder>

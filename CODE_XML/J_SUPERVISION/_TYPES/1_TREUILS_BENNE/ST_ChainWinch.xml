@@ -206,7 +206,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Montée IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Ascending IHM | 0 = Relâché</xhtml>
               </documentation>
             </variable>
             <variable name="Idx204_HmiManualCmd_BtnDown">
@@ -214,7 +214,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Descente IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Descending IHM | 0 = Relâché</xhtml>
               </documentation>
             </variable>
             <variable name="Idx205_CycleAutoCmd_Pct">
@@ -254,7 +254,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée | 0 = Neutre | -1 = Descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Ascending | 0 = Neutre | -1 = Descending</xhtml>
               </documentation>
             </variable>
             <variable name="Idx210_CoupledUserRequestDirection">
@@ -262,7 +262,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée | 0 = Neutre | -1 = Descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Ascending | 0 = Neutre | -1 = Descending</xhtml>
               </documentation>
             </variable>
             <variable name="Idx211_CoupledUserRequestActive">
@@ -340,7 +340,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Montée ON | 0 = OFF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Ascending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
             <variable name="Idx502_CmdRelayRev_Down_DQ">
@@ -348,7 +348,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Descente ON | 0 = OFF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Descending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
             <variable name="Idx503_CmdSpeedContactor1_DQ">
@@ -431,7 +431,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending Autorisée | 0 = ASCENDING BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx307_SlackCablePhysical_DI">
@@ -455,7 +455,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descending Autorisée | 0 = DESCENDING BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx310_ErrorOperatorComm">

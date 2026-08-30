@@ -272,7 +272,7 @@ END_IF;
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
 IF CommandedDirection = -1 THEN
-    EffectiveStepRampDelay := Config.StepRampDelayDescente;
+    EffectiveStepRampDelay := Config.StepRampDelayDescending;
 ELSE
     EffectiveStepRampDelay := Config.StepRampDelayAscent;
 END_IF;

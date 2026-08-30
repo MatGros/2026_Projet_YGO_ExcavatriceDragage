@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:47:20.386469" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:47:20.386469">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:12:15.736961" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:12:15.736961">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -32,6 +32,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Bus d'autorisations machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchBothIntent">
+              <type>
+                <derived name="ST_WinchBothIntent" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Intention both continue opérateur (source unique PRG_03, TOUS modes)</xhtml>
               </documentation>
             </variable>
             <variable name="ReqProgram">
@@ -452,10 +460,10 @@ un interlock qu'on ne voit pas est un interlock qu'on contourne.
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_fbCycle_BucketCmdDemand">
+      <dataType name="ST_ProgramBucketRequest">
         <baseType>
           <struct>
-            <variable name="Open">
+            <variable name="ReqOpen">
               <type>
                 <BOOL />
               </type>
@@ -463,7 +471,7 @@ un interlock qu'on ne voit pas est un interlock qu'on contourne.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture benne</xhtml>
               </documentation>
             </variable>
-            <variable name="Close">
+            <variable name="ReqClose">
               <type>
                 <BOOL />
               </type>
@@ -471,105 +479,137 @@ un interlock qu'on ne voit pas est un interlock qu'on contourne.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
               </documentation>
             </variable>
-            <variable name="KoboldContactorCmd">
+            <variable name="ReqKoboldMeasureEnable">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande contacteur puissance Kobold (recherche fond)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande activation mesure/contacteur Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermitDiveBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de descente conditionnée benne ouverte (DiveSearch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionControlActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier 1 pendant la montée contrôlée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de remontée assistée (ExtractionAssist)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier plancher de descente imposé pendant la plongée (FB_DiveSearch, 0 = aucun)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e16788cb-2d99-53eb-b97c-ee6cf1555f75</ObjectId>
+            <ObjectId>5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🪣 ST_fbCycle_BucketCmdDemand — Demande de commande benne
+   🪣 ST_ProgramBucketRequest — Demande de mouvement benne par le programme
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de consigne de mouvement benne (Ouverture, Fermeture, Kobold)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🎯 Rôle : Regroupe les demandes logiques de manœuvre benne et mesure Kobold
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_fbCycle_TranslationCmdDemand">
+      <dataType name="ST_ProgramTranslationRequest">
         <baseType>
           <struct>
-            <variable name="Start">
+            <variable name="ReqStart">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de demarrage du mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de démarrage mouvement translation</xhtml>
               </documentation>
             </variable>
-            <variable name="Target">
+            <variable name="PositionTgt">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Cible de position (1=Tremie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible de position demandée (1=Trémie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e3302f93-57a8-5949-b90f-a1621e17cb50</ObjectId>
+            <ObjectId>478a938b-bb21-5d74-8556-79842696e566</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🎯 ST_fbCycle_TranslationCmdDemand — Demande de commande translation M3
+   🎯 ST_ProgramTranslationRequest — Demande de mouvement translation par le programme
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupement des consignes de mouvement translation M3
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   🎯 Rôle : Regroupe les demandes logiques de translation M3 formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_fbCycle_WinchCmdDemand">
+      <dataType name="ST_ProgramWinchRequest">
         <baseType>
           <struct>
-            <variable name="StartStop">
+            <variable name="ReqStartStop">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arret mouvement (TRUE=Marche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arrêt demandé par le programme (TRUE=Marche)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqDirection">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens de marche (-1: Descente, 0: Stop, 1: Montee)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedPct">
+            <variable name="SpeedTgtPct">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse (0.0 a 100.0 %)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne de vitesse cible demandée (0.0 à 100.0 %)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c006fffa-8ec1-5ea5-83e5-adad08ef4202</ObjectId>
+            <ObjectId>edbf7141-2109-5344-bf49-1cd29f4686cd</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_fbCycle_WinchCmdDemand — Structure de demande de commande treuil
+   🔌 ST_ProgramWinchRequest — Demande de mouvement treuil par le programme
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupement des consignes de mouvement treuil (StartStop, Direction, Vitesse)
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -604,7 +644,7 @@ un interlock qu'on ne voit pas est un interlock qu'on contourne.
               <EnumValue>
                 <Name>SEARCHING_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0-&gt;1 dans fenêtre eau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descending : attente front 0-&gt;1 dans fenêtre eau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -943,7 +983,7 @@ Identifiant numerique de l'action</xhtml>
               <EnumValue>
                 <Name>NOMINAL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montée couplée avec vitesse demandée opérateur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ascending couplée avec vitesse demandée opérateur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -1108,14 +1148,6 @@ treuils avant de changer de mode ».
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorCoupledIntent">
-              <type>
-                <derived name="ST_OperatorCoupledIntent" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention couplée continue opérateur (joystick/boutons), TOUS modes</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1431,7 +1463,7 @@ Assistance plongée prête</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente treuil verrouillée à la trémie</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Descending treuil verrouillée à la trémie</xhtml>
               </documentation>
             </variable>
             <variable name="BypassDiveActive">
@@ -1462,6 +1494,43 @@ Assistance plongée prête</xhtml>
    📊 ST_SequencePublicState — État public et synoptique de la séquence
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Expose l'état, l'étape, le cycle de vie et les attentes opérateur du séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_WinchBothIntent">
+        <baseType>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both active (homme-mort qualifié + Select=0 OU boutons BothUp/BothDown)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descending, 0: Neutre, +1: Ascending)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>27a8fd28-e07a-5ea0-8328-eea98b482fb9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🎮 ST_WinchBothIntent — Intention both continue de l'opérateur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Transmet l'intention de mouvement both (2 treuils ensemble,
+      homme-mort / boutons) produite inconditionnellement par PRG_03 vers
+      PRG_04 et l'arbitrage (tous modes). Source UNIQUE de la décision both.
    📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
         </documentation>
@@ -1534,187 +1603,6 @@ Assistance plongée prête</xhtml>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ST_fbDiveSearch_Config - Reglages du cycle de recherche du fond
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_OperatorCoupledIntent">
-        <baseType>
-          <struct>
-            <variable name="Active">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention couplée active (JoyBtnRaw + Select=0 OU boutons BothUp/BothDown)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Direction">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descente, 0: Neutre, +1: Montée)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>ebcc0c47-ef53-54b6-9967-6c3fa0d26f58</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🎮 ST_OperatorCoupledIntent — Intention couplée continue de l'opérateur
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Transmet l'intention de mouvement couplé (homme-mort / boutons)
-      produite inconditionnellement par PRG_03 vers PRG_04 (tous modes).
-   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_ProgramBucketRequest">
-        <baseType>
-          <struct>
-            <variable name="ReqOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReqClose">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReqKoboldMeasureEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande activation mesure/contacteur Kobold</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DescendPermitDiveBucketOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de descente conditionnée benne ouverte (DiveSearch)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ExtractionControlActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier 1 pendant la montée contrôlée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MinStepDown">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier plancher de descente imposé pendant la plongée (FB_DiveSearch, 0 = aucun)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🪣 ST_ProgramBucketRequest — Demande de mouvement benne par le programme
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupe les demandes logiques de manœuvre benne et mesure Kobold
-   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_ProgramTranslationRequest">
-        <baseType>
-          <struct>
-            <variable name="ReqStart">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de démarrage mouvement translation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PositionTgt">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible de position demandée (1=Trémie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>478a938b-bb21-5d74-8556-79842696e566</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🎯 ST_ProgramTranslationRequest — Demande de mouvement translation par le programme
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupe les demandes logiques de translation M3 formulées par le séquenceur
-   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_ProgramWinchRequest">
-        <baseType>
-          <struct>
-            <variable name="ReqStartStop">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arrêt demandé par le programme (TRUE=Marche)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReqDirection">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descente, 0: Stop, 1: Montée)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedTgtPct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne de vitesse cible demandée (0.0 à 100.0 %)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>edbf7141-2109-5344-bf49-1cd29f4686cd</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_ProgramWinchRequest — Demande de mouvement treuil par le programme
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
-   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1833,7 +1721,7 @@ Assistance plongée prête</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens mouvement both (-1: Descente, 0: Neutre, +1: Montée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens mouvement both (-1: Descending, 0: Neutre, +1: Ascending)</xhtml>
               </documentation>
             </variable>
             <variable name="ManualBottomPositionConfirmed">
@@ -1957,10 +1845,13 @@ instModes(
 GVL_PERSISTENT._MaintM1HomingRequired := instModes.Auth.HomingRequiredM1;
 GVL_PERSISTENT._MaintM2HomingRequired := instModes.Auth.HomingRequiredM2;
 
-// Qualification de l'intention opérateur couplée (M1+M2) dans le même scan
+// Qualification de l'intention opérateur both (M1+M2) dans le même scan.
+// Homme-mort QUALIFIÉ (JoystickDeadmanArmed) — même source que l'arbitrage
+// (Joystick.DeadmanArmed) : les assistants et la commande réelle partagent
+// la même décision, plus de divergence raw/qualifié.
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     WinchBothMotionDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
-    WinchBothMotionActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
+    WinchBothMotionActive := PRG_02_Acquisition.Data.JoystickDeadmanArmed
                                      AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
@@ -2120,33 +2011,24 @@ Data.Auth := instModes.Auth;
 // publiés pour que l'IHM les affiche : un interlock invisible est un interlock contourné.
 Data.ModesFault := instModes.Fault;
 
-// 1bis. Intention couplée continue opérateur (inconditionnelle, TOUS modes)
-Data.ReqProgram.OperatorCoupledIntent.Active    := WinchBothMotionActive;
-Data.ReqProgram.OperatorCoupledIntent.Direction := WinchBothMotionDirection;
+// 1bis. Intention both continue opérateur (inconditionnelle, TOUS modes) — source unique
+Data.WinchBothIntent.Active    := WinchBothMotionActive;
+Data.WinchBothIntent.Direction := WinchBothMotionDirection;
 
 // 2. Demandes programme et état public de séquence
 IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Demandes treuils M1 / M2
-    Data.ReqProgram.ReqWinchM1.ReqStartStop := instCycleSemiAuto.WinchM1Cmd.StartStop;
-    Data.ReqProgram.ReqWinchM1.ReqDirection := instCycleSemiAuto.WinchM1Cmd.Direction;
-    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := instCycleSemiAuto.WinchM1Cmd.SpeedPct;
-
-    Data.ReqProgram.ReqWinchM2.ReqStartStop := instCycleSemiAuto.WinchM2Cmd.StartStop;
-    Data.ReqProgram.ReqWinchM2.ReqDirection := instCycleSemiAuto.WinchM2Cmd.Direction;
-    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+    // Demandes treuils M1 / M2 — copie struct entière : FB_Cycle produit directement
+    // le type de contrat inter-PRG (ST_Program*Request). Plus de re-mapping
+    // champ-à-champ ni de DUT ST_fbCycle_*CmdDemand redondants (NC-090).
+    Data.ReqProgram.ReqWinchM1 := instCycleSemiAuto.WinchM1Cmd;
+    Data.ReqProgram.ReqWinchM2 := instCycleSemiAuto.WinchM2Cmd;
 
     // Demande translation M3
-    Data.ReqProgram.ReqTranslation.ReqStart    := instCycleSemiAuto.TranslationCmd.Start;
-    Data.ReqProgram.ReqTranslation.PositionTgt := instCycleSemiAuto.TranslationCmd.Target;
+    Data.ReqProgram.ReqTranslation := instCycleSemiAuto.TranslationCmd;
 
-    // Demande benne
-    Data.ReqProgram.ReqBucket.ReqOpen                     := instCycleSemiAuto.BucketCmd.Open;
-    Data.ReqProgram.ReqBucket.ReqClose                    := instCycleSemiAuto.BucketCmd.Close;
-    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
-    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
-    Data.ReqProgram.ReqBucket.ExtractionControlActive     := FALSE;
-    // SEMI_AUTO : aucun assistant de plongee actif -&gt; plancher neutre (0 = aucun).
-    Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
+    // Demande benne — FB_Cycle fournit aussi les champs assistants neutres
+    // (DescendPermitDiveBucketOpen=TRUE, ExtractionControlActive=FALSE, AscentPermit=FALSE, MinStepDown=0).
+    Data.ReqProgram.ReqBucket := instCycleSemiAuto.BucketCmd;
 
     // État séquence active
     IF instCycleSemiAuto.Lifecycle.Busy THEN
@@ -2217,13 +2099,17 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
 
     Data.ReqProgram.ReqBucket.ReqOpen                     := DumpAtTremieBucketOpenArmed;
     Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionAssist.BucketCloseRequest;
-    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.KoboldMeasureEnable
+    // Contacteur Kobold : sortie FB_DiveSearch consommee (plus de recalcul inline).
+    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.Outputs.KoboldContactorCmd
                                                             OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
                                                                 AND WinchBothMotionActive AND (WinchBothMotionDirection = -1));
-    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND WinchBothMotionActive
-                                                                AND (WinchBothMotionDirection = -1)
-                                                                AND NOT PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
+    // Permis de descente plongee : sortie FB_DiveSearch consommee. Hors plongee (Enable=FALSE),
+    // la descente reste libre ; pendant la plongee, elle n'est autorisee que si l'assistant la
+    // delivre (Outputs.DescendPermit, qui integre la precondition benne ouverte).
+    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := (NOT instDiveSearch.Enable) OR instDiveSearch.Outputs.DescendPermit;
     Data.ReqProgram.ReqBucket.ExtractionControlActive     := instExtractionAssist.ExtractionControlActive;
+    // Permis de remontee assistee : sortie FB_ExtractionAssist consommee (PRG_04 §5).
+    Data.ReqProgram.ReqBucket.AscentPermit                := instExtractionAssist.AscentPermit;
     // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
     Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.MinStepDown;
 
@@ -2308,6 +2194,7 @@ ELSE
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := FALSE;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
     Data.ReqProgram.ReqBucket.ExtractionControlActive     := FALSE;
+    Data.ReqProgram.ReqBucket.AscentPermit                := FALSE;
     // DISABLE : plancher neutre (0 = aucun).
     Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
@@ -2732,16 +2619,19 @@ END_IF;
             </variable>
             <variable name="WinchM1Cmd">
               <type>
-                <derived name="ST_fbCycle_WinchCmdDemand" />
+                <derived name="ST_ProgramWinchRequest" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES ACTIONNEURS (COMMANDES STRUCTUREES) ===
+Types de contrat inter-PRG uniques (ST_Program*Request) : FB_Cycle produit
+directement les demandes consommées par PRG_04/05/07 — plus de DUT
+ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
 &lt;-- [ACT] Demande treuil M1</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM2Cmd">
               <type>
-                <derived name="ST_fbCycle_WinchCmdDemand" />
+                <derived name="ST_ProgramWinchRequest" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande treuil M2</xhtml>
@@ -2749,7 +2639,7 @@ END_IF;
             </variable>
             <variable name="TranslationCmd">
               <type>
-                <derived name="ST_fbCycle_TranslationCmdDemand" />
+                <derived name="ST_ProgramTranslationRequest" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande translation M3</xhtml>
@@ -2757,7 +2647,7 @@ END_IF;
             </variable>
             <variable name="BucketCmd">
               <type>
-                <derived name="ST_fbCycle_BucketCmdDemand" />
+                <derived name="ST_ProgramBucketRequest" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande benne</xhtml>
@@ -2904,6 +2794,71 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Enable (retour en semi-auto)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProcessPermitM1_Ascending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATE CONTINU HOMME-MORT (permis par action hardware) ===
+. [LOC] Permis ascending treuil M1 = CycleMotionPermit AND DeadmanArmed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProcessPermitM1_Descending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M1 = CycleMotionPermit AND DeadmanArmed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProcessPermitM2_Ascending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ascending treuil M2 = CycleMotionPermit AND DeadmanArmed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProcessPermitM2_Descending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M2 = CycleMotionPermit AND DeadmanArmed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProcessPermitBucket_Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ouverture benne = CycleMotionPermit AND DeadmanArmed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProcessPermitBucket_Close">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis fermeture benne = CycleMotionPermit AND DeadmanArmed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProcessPermitM3_Tremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis translation M3 cote tremie = CycleMotionPermit AND DeadmanArmed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProcessPermitM3_Maintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis translation M3 cote maintenance = CycleMotionPermit AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -3170,20 +3125,20 @@ ErrorEdge(CLK := Fault.Error);
 {region "§2 Gate securite &amp; Bascule Mode"}
 // 🛑 2. GATES DE SÉCURITÉ ET NEUTRALISATION
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    WinchM1Cmd.StartStop   := FALSE;
-    WinchM1Cmd.Direction   := 0;
-    WinchM1Cmd.SpeedPct    := 0.0;
+    WinchM1Cmd.ReqStartStop   := FALSE;
+    WinchM1Cmd.ReqDirection   := 0;
+    WinchM1Cmd.SpeedTgtPct    := 0.0;
 
-    WinchM2Cmd.StartStop   := FALSE;
-    WinchM2Cmd.Direction   := 0;
-    WinchM2Cmd.SpeedPct    := 0.0;
+    WinchM2Cmd.ReqStartStop   := FALSE;
+    WinchM2Cmd.ReqDirection   := 0;
+    WinchM2Cmd.SpeedTgtPct    := 0.0;
 
-    TranslationCmd.Start   := FALSE;
-    TranslationCmd.Target  := 0;
+    TranslationCmd.ReqStart   := FALSE;
+    TranslationCmd.PositionTgt  := 0;
 
-    BucketCmd.Open         := FALSE;
-    BucketCmd.Close        := FALSE;
-    BucketCmd.KoboldContactorCmd := FALSE;
+    BucketCmd.ReqOpen         := FALSE;
+    BucketCmd.ReqClose        := FALSE;
+    BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
     // Si on quitte le semi-auto alors qu'un cycle était en cours, on mémorise l'étape pour la pause
     IF (State &lt;&gt; E_CycleStep.X0_PREPARATION) AND (State &lt;&gt; E_CycleStep.X13_DONE_SYNC) AND (State &lt;&gt; E_CycleStep.STABILIZING) THEN
@@ -3212,6 +3167,19 @@ END_IF;
 
 Ready := Enable AND NOT Fault.Latched;
 
+// 🛡️ Gate continu homme-mort : le mouvement n'est autorisé que si le manche est
+// défléchi (CycleMotionPermit) ET l'homme-mort est armé (DeadmanArmed). Chaque
+// commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
+// démarrage). Le séquenceur (transitions X0→X13) reste piloté par CycleMotionPermit.
+ProcessPermitM1_Ascending        := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM1_Descending      := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM2_Ascending        := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM2_Descending      := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitBucket_Open := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitBucket_Close := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM3_Tremie        := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM3_Maintenance   := CycleMotionPermit AND DeadmanArmed;
+
 // Au retour en Semi-Auto (front montant Enable), si une étape était en cours, on exige une reprise consciente
 IF EnableEdge.Q AND WaitingResume THEN
     // Sécurité anti-redémarrage automatique : reste en attente de StartCycle
@@ -3237,6 +3205,13 @@ IF AbortEdge.Q THEN
     WaitingResume := FALSE;
     PausedState := E_CycleStep.X0_PREPARATION;
 END_IF;
+
+// SEMI_AUTO : FB_Cycle est le SEUL producteur des demandes benne. Les champs
+// assistants (DiveSearch/ExtractionAssist) sont inactifs en cycle automatique
+// -&gt; valeurs neutres déterministes (identiques à la branche SEMI_AUTO de PRG_03).
+BucketCmd.DescendPermitDiveBucketOpen := TRUE;
+BucketCmd.ExtractionControlActive := FALSE;
+BucketCmd.MinStepDown := 0;
 {endregion}
 
 {region "§3 Machine etat cycle automatique"}
@@ -3246,10 +3221,10 @@ CASE State OF
     E_CycleStep.X0_PREPARATION:
         CycleStep := E_CycleStep.X0_PREPARATION;
         CycleStateStr := 'X0 - Verification coherence systeme';
-        WinchM1Cmd.StartStop := FALSE; WinchM1Cmd.Direction := 0; WinchM1Cmd.SpeedPct := 0.0;
-        WinchM2Cmd.StartStop := FALSE; WinchM2Cmd.Direction := 0; WinchM2Cmd.SpeedPct := 0.0;
-        TranslationCmd.Start := FALSE; TranslationCmd.Target := 0;
-        BucketCmd.Open := FALSE; BucketCmd.Close := FALSE; BucketCmd.KoboldContactorCmd := FALSE;
+        WinchM1Cmd.ReqStartStop := FALSE; WinchM1Cmd.ReqDirection := 0; WinchM1Cmd.SpeedTgtPct := 0.0;
+        WinchM2Cmd.ReqStartStop := FALSE; WinchM2Cmd.ReqDirection := 0; WinchM2Cmd.SpeedTgtPct := 0.0;
+        TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
+        BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
         Lifecycle.Busy := FALSE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -3280,12 +3255,12 @@ CASE State OF
 
         // Vitesses lentes pour chercher capteur top + référencement
         IF NOT HomedM1 OR NOT HomedM2 THEN
-            WinchM1Cmd.StartStop := CycleMotionPermit;
-            WinchM1Cmd.Direction := 1;   // montée lente vers capteur top
-            WinchM1Cmd.SpeedPct := 10.0;
-            WinchM2Cmd.StartStop := CycleMotionPermit;
-            WinchM2Cmd.Direction := 1;
-            WinchM2Cmd.SpeedPct := 10.0;
+            WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+            WinchM1Cmd.ReqDirection := 1;   // montée lente vers capteur top
+            WinchM1Cmd.SpeedTgtPct := 10.0;
+            WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+            WinchM2Cmd.ReqDirection := 1;
+            WinchM2Cmd.SpeedTgtPct := 10.0;
             IF HomingRequest THEN
                 State := E_CycleStep.X2_WORK_POS_SELECT;
             END_IF;
@@ -3308,14 +3283,14 @@ CASE State OF
 
         IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
             SelectedWorkTarget := SelTarget;
-            TranslationCmd.Target := SelTarget;
-            TranslationCmd.Start := CycleMotionPermit;
+            TranslationCmd.PositionTgt := SelTarget;
+            TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
             // Arrivée à la cible (Trémie/P1/Maintenance)
             IF CycleMotionPermit AND (
                 (SelTarget = 1 AND Translation_At_Tremie) OR
                 (SelTarget = 3 AND Translation_At_P1) OR
                 (SelTarget = 4 AND Translation_At_Maintenance)) THEN
-                TranslationCmd.Start := FALSE;
+                TranslationCmd.ReqStart := FALSE;
                 State := E_CycleStep.X3_OPEN_BUCKET;
             END_IF;
         END_IF;
@@ -3335,9 +3310,9 @@ CASE State OF
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
         ELSE
-            BucketCmd.Open := CycleMotionPermit;
+            BucketCmd.ReqOpen := ProcessPermitBucket_Open;
             IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
-                BucketCmd.Open := FALSE;
+                BucketCmd.ReqOpen := FALSE;
                 State := E_CycleStep.X4_DESCEND_OPEN;
             END_IF;
         END_IF;
@@ -3355,19 +3330,19 @@ CASE State OF
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.Direction := -1;
-        WinchM1Cmd.SpeedPct  := 50.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.Direction := -1;
-        WinchM2Cmd.SpeedPct  := 50.0;
-        BucketCmd.KoboldContactorCmd := TRUE;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
+        WinchM1Cmd.ReqDirection := -1;
+        WinchM1Cmd.SpeedTgtPct  := 50.0;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
+        WinchM2Cmd.ReqDirection := -1;
+        WinchM2Cmd.SpeedTgtPct  := 50.0;
+        BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descending;
 
         // Transition uniquement sur le retour dédié Kobold.
         IF CycleMotionPermit AND KoboldContactFond THEN
-            WinchM1Cmd.StartStop := FALSE;
-            WinchM2Cmd.StartStop := FALSE;
-            BucketCmd.KoboldContactorCmd := FALSE;
+            WinchM1Cmd.ReqStartStop := FALSE;
+            WinchM2Cmd.ReqStartStop := FALSE;
+            BucketCmd.ReqKoboldMeasureEnable := FALSE;
             TouchPositionM := M1_CablePosM;
             IF LimitLegalDepthM &lt; -0.01 THEN
                 RaiseTargetM := MAX(TouchPositionM + 0.5, LimitLegalDepthM + 0.5);
@@ -3389,16 +3364,16 @@ CASE State OF
         OperatorActionId := 16#0405;
         OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.Direction := 1;
-        WinchM1Cmd.SpeedPct := 20.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.Direction := 1;
-        WinchM2Cmd.SpeedPct := 20.0;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqDirection := 1;
+        WinchM1Cmd.SpeedTgtPct := 20.0;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqDirection := 1;
+        WinchM2Cmd.SpeedTgtPct := 20.0;
 
         IF CycleMotionPermit AND (M1_CablePosM &gt;= RaiseTargetM) AND (M2_CablePosM &gt;= RaiseTargetM) THEN
-            WinchM1Cmd.StartStop := FALSE;
-            WinchM2Cmd.StartStop := FALSE;
+            WinchM1Cmd.ReqStartStop := FALSE;
+            WinchM2Cmd.ReqStartStop := FALSE;
             State := E_CycleStep.X6_CLOSE_BUCKET;
         END_IF;
 
@@ -3414,13 +3389,13 @@ CASE State OF
         OperatorActionId := 16#0406;
         OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
-        WinchM1Cmd.StartStop := FALSE;
+        WinchM1Cmd.ReqStartStop := FALSE;
         // L'ordre benne reste soumis au même homme-mort que le cycle : aucune
         // commande d'actionneur ne doit survivre à la perte du permis opérateur.
-        BucketCmd.Close := CycleMotionPermit;
+        BucketCmd.ReqClose := ProcessPermitBucket_Close;
 
         IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
-            BucketCmd.Close := FALSE;
+            BucketCmd.ReqClose := FALSE;
             State := E_CycleStep.X7_CTRL_ASCENT;
         END_IF;
 
@@ -3436,12 +3411,12 @@ CASE State OF
         OperatorActionId := 16#0407;
         OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.Direction := 1;
-        WinchM1Cmd.SpeedPct  := 20.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.Direction := 1;
-        WinchM2Cmd.SpeedPct  := 20.0;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqDirection := 1;
+        WinchM1Cmd.SpeedTgtPct  := 20.0;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqDirection := 1;
+        WinchM2Cmd.SpeedTgtPct  := 20.0;
 
         IF CycleMotionPermit
            AND (M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
@@ -3462,16 +3437,16 @@ CASE State OF
         OperatorActionId := 16#0408;
         OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.Direction := 1;
-        WinchM1Cmd.SpeedPct  := 70.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.Direction := 1;
-        WinchM2Cmd.SpeedPct  := 70.0;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqDirection := 1;
+        WinchM1Cmd.SpeedTgtPct  := 70.0;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqDirection := 1;
+        WinchM2Cmd.SpeedTgtPct  := 70.0;
 
         IF CycleMotionPermit AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
-            WinchM1Cmd.StartStop := FALSE;
-            WinchM2Cmd.StartStop := FALSE;
+            WinchM1Cmd.ReqStartStop := FALSE;
+            WinchM2Cmd.ReqStartStop := FALSE;
             State := E_CycleStep.X9_DRAIN_PAUSE;
         END_IF;
 
@@ -3486,8 +3461,8 @@ CASE State OF
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0409;
         OperatorAction := 'Egouttage du godet en cours (temporisation).';
-        WinchM1Cmd.StartStop := FALSE;
-        WinchM2Cmd.StartStop := FALSE;
+        WinchM1Cmd.ReqStartStop := FALSE;
+        WinchM2Cmd.ReqStartStop := FALSE;
 
         DrainingTimer(IN := TRUE, PT := DrainingTime);
         IF CycleMotionPermit AND DrainingTimer.Q THEN
@@ -3507,11 +3482,11 @@ CASE State OF
         OperatorActionId := 16#040A;
         OperatorAction := 'Maintenir la translation vers la tremie de dechargement.';
 
-        TranslationCmd.Target := 1; // Trémie
-        TranslationCmd.Start := CycleMotionPermit;
+        TranslationCmd.PositionTgt := 1; // Trémie
+        TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
 
         IF CycleMotionPermit AND Translation_At_Tremie THEN
-            TranslationCmd.Start := FALSE;
+            TranslationCmd.ReqStart := FALSE;
             State := E_CycleStep.X11_OPEN_DUMP;
         END_IF;
 
@@ -3530,26 +3505,26 @@ CASE State OF
         // X11 est une ouverture par déflexion vers le bas : la direction doit
         // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
         // précédent). Les deux treuils restent synchrones et sous homme-mort.
-        WinchM1Cmd.Direction := -1;
-        WinchM1Cmd.StartStop := CycleMotionPermit;
-        WinchM1Cmd.SpeedPct  := 20.0;
-        WinchM2Cmd.Direction := -1;
-        WinchM2Cmd.StartStop := CycleMotionPermit;
-        WinchM2Cmd.SpeedPct  := 20.0;
+        WinchM1Cmd.ReqDirection := -1;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
+        WinchM1Cmd.SpeedTgtPct  := 20.0;
+        WinchM2Cmd.ReqDirection := -1;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
+        WinchM2Cmd.SpeedTgtPct  := 20.0;
 
-        BucketCmd.Open := CycleMotionPermit AND (WinchM1Cmd.Direction = -1);
+        BucketCmd.ReqOpen := ProcessPermitBucket_Open AND (WinchM1Cmd.ReqDirection = -1);
 
         IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
-            BucketCmd.Open := FALSE;
+            BucketCmd.ReqOpen := FALSE;
             State := E_CycleStep.X13_DONE_SYNC;
         END_IF;
 
     E_CycleStep.X13_DONE_SYNC:
         CycleStep := E_CycleStep.X13_DONE_SYNC;
         CycleStateStr := 'X13 - Cycle automatique complete - pret';
-        WinchM1Cmd.StartStop := FALSE;
-        WinchM2Cmd.StartStop := FALSE;
-        TranslationCmd.Start := FALSE;
+        WinchM1Cmd.ReqStartStop := FALSE;
+        WinchM2Cmd.ReqStartStop := FALSE;
+        TranslationCmd.ReqStart := FALSE;
         Lifecycle.Done := TRUE;
         Lifecycle.Busy := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -3570,12 +3545,12 @@ CASE State OF
     E_CycleStep.STABILIZING:
         CycleStep := E_CycleStep.STABILIZING;
         CycleStateStr := 'X14 - Cycle en attente / stabilisation (STAB)';
-        WinchM1Cmd.StartStop := FALSE;
-        WinchM2Cmd.StartStop := FALSE;
-        TranslationCmd.Start := FALSE;
-        BucketCmd.Open := FALSE;
-        BucketCmd.Close := FALSE;
-        BucketCmd.KoboldContactorCmd := FALSE;   // Coupure contacteur Kobold au repli defaut (0 ordre residuel)
+        WinchM1Cmd.ReqStartStop := FALSE;
+        WinchM2Cmd.ReqStartStop := FALSE;
+        TranslationCmd.ReqStart := FALSE;
+        BucketCmd.ReqOpen := FALSE;
+        BucketCmd.ReqClose := FALSE;
+        BucketCmd.ReqKoboldMeasureEnable := FALSE;   // Coupure contacteur Kobold au repli defaut (0 ordre residuel)
         Lifecycle.Busy := FALSE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -3589,17 +3564,19 @@ END_CASE;
 {endregion}
 
 {region "§4 Repli homme mort &amp; Syntheses"}
-// 🛑 Relâchement du manche (retour au centre) : neutralisation des demandes actives
-IF Lifecycle.Busy AND NOT CycleMotionPermit THEN
-    WinchM1Cmd.StartStop := FALSE;
-    WinchM2Cmd.StartStop := FALSE;
-    TranslationCmd.Start := FALSE;
-    BucketCmd.Open := FALSE;
-    BucketCmd.Close := FALSE;
-    BucketCmd.KoboldContactorCmd := FALSE;
+// 🛑 Relâchement du manche (retour au centre) OU de l'homme-mort : neutralisation
+// des demandes actives. Gate continu : aucune commande d'actionneur ne survit à la
+// perte du permis opérateur (manche défléchi ET homme-mort armé).
+IF Lifecycle.Busy AND NOT ProcessPermitM1_Ascending THEN
+    WinchM1Cmd.ReqStartStop := FALSE;
+    WinchM2Cmd.ReqStartStop := FALSE;
+    TranslationCmd.ReqStart := FALSE;
+    BucketCmd.ReqOpen := FALSE;
+    BucketCmd.ReqClose := FALSE;
+    BucketCmd.ReqKoboldMeasureEnable := FALSE;
 END_IF;
 
-RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.Start OR BucketCmd.Open OR BucketCmd.Close OR BucketCmd.KoboldContactorCmd; // Somme logique complete des demandes (contacteur Kobold inclus)
+RequestActive := WinchM1Cmd.ReqStartStop OR WinchM2Cmd.ReqStartStop OR TranslationCmd.ReqStart OR BucketCmd.ReqOpen OR BucketCmd.ReqClose OR BucketCmd.ReqKoboldMeasureEnable; // Somme logique complete des demandes (contacteur Kobold inclus)
 {endregion}
 </xhtml>
           </ST>
@@ -3897,7 +3874,7 @@ RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Descente demandee et autorisee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Descending demandee et autorisee</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -4550,7 +4527,7 @@ PrevState := Outputs.StepState;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Montee assistee reellement demandee (sens + mode)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ascending assistee reellement demandee (sens + mode)</xhtml>
               </documentation>
             </variable>
             <variable name="AscentControlSafe">
@@ -4801,7 +4778,7 @@ BottomConfirmationConsumed := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
 
-// Montee assistee reellement demandee : sens montee + mode maintenance (H5, double garde vs Enable PRG_03).
+// Ascending assistee reellement demandee : sens ascending + mode maintenance (H5, double garde vs Enable PRG_03).
 AssistPermit := MotionRequestActive AND (MotionDirection = 1)
             AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2);
 // Entrees [SAFE] saines : coupure meme-scan des permis si defaut treuil/synchro (H2), avant meme le latch.
@@ -4837,6 +4814,9 @@ ELSE
         E_ExtractionAssistState.CLOSING_BUCKET:
             Lifecycle.Busy := TRUE;
             BucketCloseRequest := AssistPermit AND NOT BucketError; // coupure meme-scan sur defaut benne (H2)
+            // Autorisation de montee pendant la fermeture : la benne se ferme en montant.
+            // Consommee par l'arbitrage (PRG_04) comme permis de montee assistee (H2).
+            AscentPermit := AssistPermit AND AscentControlSafe;
             OperatorActionId := 16#0202;
             OperatorAction := 'Maintenir la montée : fermeture de la benne en cours.';
             IF BucketError THEN
@@ -5710,13 +5690,13 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
           <Folder Name="_TYPES">
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_ModesCycleInterPrg" ObjectId="c66e2ea9-61f6-5705-86e7-b9f19e28d4f1" />
-              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
-              <Object Name="ST_ProgramRequest" ObjectId="a28c1dba-faf7-5919-ab72-3a069b551a0d" />
-              <Object Name="ST_SequencePublicState" ObjectId="b0390064-912d-5ff4-8765-d2f9a7be3f8e" />
-              <Object Name="ST_OperatorCoupledIntent" ObjectId="ebcc0c47-ef53-54b6-9967-6c3fa0d26f58" />
               <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
               <Object Name="ST_ProgramTranslationRequest" ObjectId="478a938b-bb21-5d74-8556-79842696e566" />
               <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
+              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
+              <Object Name="ST_ProgramRequest" ObjectId="a28c1dba-faf7-5919-ab72-3a069b551a0d" />
+              <Object Name="ST_SequencePublicState" ObjectId="b0390064-912d-5ff4-8765-d2f9a7be3f8e" />
+              <Object Name="ST_WinchBothIntent" ObjectId="27a8fd28-e07a-5ea0-8328-eea98b482fb9" />
               <Object Name="E_ProgramSequence" ObjectId="e8e8ebc2-bfbe-517a-8c98-48abc432cba8" />
             </Folder>
           </Folder>
@@ -5727,21 +5707,6 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
             <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
             <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
             <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
-          </Folder>
-        </Folder>
-        <Folder Name="H_TREUILS_BENNE">
-          <Folder Name="BENNE">
-            <Folder Name="_TYPES">
-              <Object Name="ST_fbCycle_BucketCmdDemand" ObjectId="e16788cb-2d99-53eb-b97c-ee6cf1555f75" />
-            </Folder>
-          </Folder>
-          <Folder Name="_TYPES">
-            <Object Name="ST_fbCycle_WinchCmdDemand" ObjectId="c006fffa-8ec1-5ea5-83e5-adad08ef4202" />
-          </Folder>
-        </Folder>
-        <Folder Name="I_TRANSLATION">
-          <Folder Name="_TYPES">
-            <Object Name="ST_fbCycle_TranslationCmdDemand" ObjectId="e3302f93-57a8-5949-b90f-a1621e17cb50" />
           </Folder>
         </Folder>
       </ProjectStructure>

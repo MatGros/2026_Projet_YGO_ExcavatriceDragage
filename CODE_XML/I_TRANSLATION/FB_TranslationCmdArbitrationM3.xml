@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:39:03.286017" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:39:03.286017">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:05:27.616379" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:05:27.616379">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -261,6 +261,38 @@ treuils avant de changer de mode ».
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbTranslationCmdArbitration_Cfg">
+        <baseType>
+          <struct>
+            <variable name="MaxFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Fréquence max (échelle FreqPct, _TranslationMaxFreq_Hz)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d19be78f-ae08-5524-b3c5-c586ae8fb613</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_fbTranslationCmdArbitration_Cfg — Config translation M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Config statique de FB_TranslationCmdArbitrationM3.
+       Porte la fréquence max (échelle FreqPct) — paramètre de config,
+       pas un fait de gating (I5). Le Context ne garde que les faits
+       de gating (HeightInterlockOk).
+   📤 Producteur : PRG_05_Translation (câblage).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   🔌 Source : GVL_PERSISTENT._TranslationMaxFreq_Hz (source unique).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_fbTranslationCmdArbitration_Context">
         <baseType>
           <struct>
@@ -270,14 +302,6 @@ treuils avant de changer de mode ».
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Hauteur mini M1/M2 OK (anti-collision translation)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaxFreq_Hz">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Fréquence max (échelle FreqPct, _TranslationMaxFreq_Hz)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -292,7 +316,8 @@ treuils avant de changer de mode ».
    🧩 ST_fbTranslationCmdArbitration_Context — Contexte de gating M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Encapsuler les faits de gating consommés par FB_TranslationCommandArbitration
-       (interlock hauteur M1/M2, échelle fréquence max).
+       (interlock hauteur M1/M2).
+       La fréquence max (config) vit dans ST_fbTranslationCmdArbitration_Cfg (I5).
    📤 Producteur : PRG_05_Translation (câblage).
    📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -301,14 +326,6 @@ treuils avant de changer de mode ».
       <dataType name="ST_fbTranslationCmdArbitration_IHM">
         <baseType>
           <struct>
-            <variable name="TglJoystickMaster">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd)</xhtml>
-              </documentation>
-            </variable>
             <variable name="BtnFwd">
               <type>
                 <BOOL />
@@ -361,7 +378,9 @@ treuils avant de changer de mode ».
    🎛️ ST_fbTranslationCmdArbitration_IHM — Entrées IHM de l'arbitrage M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Encapsuler les commandes IHM consommées par FB_TranslationCommandArbitration
-       (boutons, sélecteur positionnement, consigne fréquence, toggle joystick maître).
+       (boutons, sélecteur positionnement, consigne fréquence).
+       Le toggle joystick maître global (Modes.Cmd.TglJoystickMaster) est passé en
+       paramètre séparé du FB (I4 — factorisation, source unique GVL_IHM.Modes.Cmd).
    📤 Producteur : PRG_05_Translation (câblage GVL_IHM).
    📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -609,12 +628,28 @@ treuils avant de changer de mode ».
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM, sélecteur, fréquence</xhtml>
               </documentation>
             </variable>
+            <variable name="TglJoystickMaster">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd, source unique)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Context">
               <type>
                 <derived name="ST_fbTranslationCmdArbitration_Context" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Interlock hauteur + échelle fréquence</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Interlock hauteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_fbTranslationCmdArbitration_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Fréquence max (échelle FreqPct)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -713,7 +748,7 @@ ELSE
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         PositioningActive := TRUE;
         SelTarget := ReqTranslation.PositionTgt;
-        StartStop := ReqTranslation.ReqStart;
+        StartStop := ReqTranslation.ReqStart AND Context.HeightInterlockOk;
         IF StartStop THEN
             SpeedPct := 100.0;
             IF SelTarget = 1 THEN
@@ -730,11 +765,11 @@ ELSE
         PositioningActive := IHM.SelPositioning;
         SelTarget := 0;
 
-        IF NOT IHM.TglJoystickMaster AND IHM.BtnFwd THEN
+        IF NOT TglJoystickMaster AND IHM.BtnFwd THEN
             Direction := 1;
-        ELSIF NOT IHM.TglJoystickMaster AND IHM.BtnRev THEN
+        ELSIF NOT TglJoystickMaster AND IHM.BtnRev THEN
             Direction := -1;
-        ELSIF IHM.TglJoystickMaster THEN
+        ELSIF TglJoystickMaster THEN
             Direction := Joystick.AxisX.Direction;
         ELSE
             Direction := 0;
@@ -743,15 +778,15 @@ ELSE
         // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2.
         // ⚠️ Tautologie conservée bit-identique : (BypassGlobal OR NOT Tgl OR Tgl) = toujours TRUE.
         StartStop := (Direction &lt;&gt; 0)
-                     AND (IHM.BypassGlobal OR NOT IHM.TglJoystickMaster OR IHM.TglJoystickMaster)
+                     AND (IHM.BypassGlobal OR NOT TglJoystickMaster OR TglJoystickMaster)
                      AND Joystick.DeadmanArmed
                      AND Context.HeightInterlockOk;
 
         // Échelle fréquence : SetFreq_Hz (ou 100% si non renseignée), manche mis à l'échelle si joystick maître
         FreqPct := SEL(IHM.SetFreq_Hz &gt; 0.0,
                        100.0,
-                       (IHM.SetFreq_Hz / SEL(Context.MaxFreq_Hz &gt; 0.0, 50.0, Context.MaxFreq_Hz)) * 100.0);
-        SpeedPct := SEL(IHM.TglJoystickMaster,
+                       (IHM.SetFreq_Hz / SEL(Cfg.MaxFreq_Hz &gt; 0.0, 50.0, Cfg.MaxFreq_Hz)) * 100.0);
+        SpeedPct := SEL(TglJoystickMaster,
                         FreqPct,
                         (ABS(Joystick.AxisX.SpeedTgt) / 100.0) * FreqPct);
     ELSE
@@ -791,6 +826,7 @@ END_IF;
         <Folder Name="I_TRANSLATION">
           <Object Name="FB_TranslationCmdArbitrationM3" ObjectId="36ea547a-49af-554a-909b-ff3e7bde3897" />
           <Folder Name="_TYPES">
+            <Object Name="ST_fbTranslationCmdArbitration_Cfg" ObjectId="d19be78f-ae08-5524-b3c5-c586ae8fb613" />
             <Object Name="ST_fbTranslationCmdArbitration_Context" ObjectId="51283f1a-e013-501f-a126-0ba75d0b9a1a" />
             <Object Name="ST_fbTranslationCmdArbitration_IHM" ObjectId="ce120c8d-0245-5e38-851c-8c02205c89fc" />
           </Folder>

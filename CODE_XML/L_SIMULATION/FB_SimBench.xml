@@ -2047,7 +2047,7 @@ RawPosOut := RawPos;
       (forcer `RawButton` en instance CODESYS) pour armer — comportement
       métier testé pour de vrai, pas contourné.
    🕹️ Comportement dynamique (conception validée) :
-      - Montée : bouton actif → `RawX`/`RawY` monte de `NeutralRaw` vers la cible
+      - Ascending : bouton actif → `RawX`/`RawY` monte de `NeutralRaw` vers la cible
         (0 ou `MaxRaw`) en `RiseTimeS`, avec un bruit pseudo-aléatoire léger.
       - Dépassement (`OvershootActive`) : la cible de montée DÉPASSE la butée
         (MaxRaw+AMT ou 0−AMT) → déclenche le défaut capteur hors plage.
@@ -2141,7 +2141,7 @@ ELSE
 END_IF;
 {endregion}
 
-{region "§5 Montée (rampe + bruit)"}
+{region "§5 Ascending (rampe + bruit)"}
 IF State = CST_ST_RISE THEN
     // Pas de montée : pleine course (MaxRaw−NeutralRaw) en RiseTimeS.
     RiseStep := INT_TO_REAL(MaxRaw - NeutralRaw) / (RiseTimeS / CycleTimeS);

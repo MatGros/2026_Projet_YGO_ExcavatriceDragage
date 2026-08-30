@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.182791" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.182791">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:54.047493" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:54.047493">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -185,7 +185,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Sorties Physiques / Indicateurs LEDs
-🛗 Relais Montée activé</xhtml>
+🛗 Relais Ascending activé</xhtml>
               </documentation>
             </variable>
             <variable name="RelayRev">
@@ -193,7 +193,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descente activé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descending activé</xhtml>
               </documentation>
             </variable>
             <variable name="Contactor1">

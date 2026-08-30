@@ -76,7 +76,7 @@ VAR
     TimeoutBucketCloseFault     : BOOL;     // . [LOC] Latch backstop fermeture benne
     TimeoutControlAscentFault   : BOOL;     // . [LOC] Latch timeout decollage controle
     StepAtFaultCaptured         : BOOL;     // . [LOC] StepAtFault deja fige pour l'episode de defaut courant
-    AssistPermit                : BOOL;     // . [LOC] Montee assistee reellement demandee (sens + mode)
+    AssistPermit                : BOOL;     // . [LOC] Ascending assistee reellement demandee (sens + mode)
     AscentControlSafe           : BOOL;     // . [LOC] Entrees [SAFE] saines pour le decollage controle
     AscentNominalSafe           : BOOL;     // . [LOC] Entrees [SAFE] saines pour la remontee nominale
     CausesPhysiquesEffacees     : BOOL;     // . [LOC] Toutes les entrees defaut treuil/benne revenues a l'etat sain
@@ -215,7 +215,7 @@ BottomConfirmationConsumed := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
 
-// Montee assistee reellement demandee : sens montee + mode maintenance (H5, double garde vs Enable PRG_03).
+// Ascending assistee reellement demandee : sens ascending + mode maintenance (H5, double garde vs Enable PRG_03).
 AssistPermit := MotionRequestActive AND (MotionDirection = 1)
             AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2);
 // Entrees [SAFE] saines : coupure meme-scan des permis si defaut treuil/synchro (H2), avant meme le latch.
@@ -251,6 +251,9 @@ ELSE
         E_ExtractionAssistState.CLOSING_BUCKET:
             Lifecycle.Busy := TRUE;
             BucketCloseRequest := AssistPermit AND NOT BucketError; // coupure meme-scan sur defaut benne (H2)
+            // Autorisation de montee pendant la fermeture : la benne se ferme en montant.
+            // Consommee par l'arbitrage (PRG_04) comme permis de montee assistee (H2).
+            AscentPermit := AssistPermit AND AscentControlSafe;
             OperatorActionId := 16#0202;
             OperatorAction := 'Maintenir la montée : fermeture de la benne en cours.';
             IF BucketError THEN

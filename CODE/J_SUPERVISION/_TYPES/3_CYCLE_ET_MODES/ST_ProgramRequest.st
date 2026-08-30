@@ -10,6 +10,5 @@ STRUCT
     ReqWinchM2            : ST_ProgramWinchRequest;       // Demande programme treuil M2
     ReqTranslation        : ST_ProgramTranslationRequest; // Demande programme translation M3
     ReqBucket             : ST_ProgramBucketRequest;      // Demande programme benne
-    OperatorCoupledIntent : ST_OperatorCoupledIntent;     // Intention couplée continue opérateur (joystick/boutons), TOUS modes
 END_STRUCT
 END_TYPE

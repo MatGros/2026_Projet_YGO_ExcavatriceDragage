@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:31:56.656886" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:31:56.656886">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:05:14.519626" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:05:14.519626">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -34,14 +34,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Hauteur mini M1/M2 OK (anti-collision translation)</xhtml>
               </documentation>
             </variable>
-            <variable name="MaxFreq_Hz">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Fréquence max (échelle FreqPct, _TranslationMaxFreq_Hz)</xhtml>
-              </documentation>
-            </variable>
           </struct>
         </baseType>
         <addData>
@@ -54,7 +46,8 @@
    🧩 ST_fbTranslationCmdArbitration_Context — Contexte de gating M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Encapsuler les faits de gating consommés par FB_TranslationCommandArbitration
-       (interlock hauteur M1/M2, échelle fréquence max).
+       (interlock hauteur M1/M2).
+       La fréquence max (config) vit dans ST_fbTranslationCmdArbitration_Cfg (I5).
    📤 Producteur : PRG_05_Translation (câblage).
    📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ═══════════════════════════════════════════════════════════════</xhtml>

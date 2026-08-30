@@ -1,0 +1,557 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:14:36.223064" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:14:36.223064">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_ProgramBucketRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqKoboldMeasureEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande activation mesure/contacteur Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermitDiveBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de descente conditionnée benne ouverte (DiveSearch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionControlActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier 1 pendant la montée contrôlée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de remontée assistée (ExtractionAssist)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier plancher de descente imposé pendant la plongée (FB_DiveSearch, 0 = aucun)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪣 ST_ProgramBucketRequest — Demande de mouvement benne par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de manœuvre benne et mesure Kobold
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbBucketCmdArbitration_Context">
+        <baseType>
+          <struct>
+            <variable name="TglEnableCoupledBucketSequencing">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Activation séquencement couplé benne (Commun.Cfg)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention mouvement both active (WinchBothMotionActive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens mouvement both (1: montée, -1: descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne ouverte (BucketState.IsOpen)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne fermée (BucketState.IsClosed)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f4f3035a-b2f5-50cc-b957-e5b6b46c9e58</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧩 ST_fbBucketCmdArbitration_Context — Contexte de gating benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les faits de gating consommés par FB_BucketCmdArbitration
+       pour le séquencement couplé benne (config, intention both, état benne).
+       Le FB dérive les flags armés (WinchBothDiveBucketOpenArmed /
+       WinchBothAscentBucketCloseArmed) et les commandes arbitrées.
+   📤 Producteur : PRG_04_Treuils_Benne (câblage).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 État benne : 2 bits BOOL (BucketIsOpen/Closed) dérivés de _BucketState.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbBucketCmdArbitration_IHM">
+        <baseType>
+          <struct>
+            <variable name="BtnOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton ouverture benne (M2TreuilBenne.Bucket.Cmd.BtnOpen)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton fermeture benne (M2TreuilBenne.Bucket.Cmd.BtnClose)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5b838e78-9adc-50c9-abda-c67738f00353</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎛️ ST_fbBucketCmdArbitration_IHM — Entrées IHM de l'arbitrage benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes IHM consommées par FB_BucketCmdArbitration
+       (boutons ouverture/fermeture benne, nommage hardware propagé).
+   📤 Producteur : PRG_04_Treuils_Benne (câblage GVL_IHM).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Nommage : BtnOpen/BtnClose = nommage hardware propagé (convention projet).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbModes_Autorisations">
+        <baseType>
+          <struct>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickWinchSelectArbitrated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingApproachEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 §4bis — matrice de maintenance
+⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
+vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
+🚦 Demande de changement de mode REFUSÉE : les treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas à l'arrêt mécanique confirmé
+(contacteurs retombés ET frein serré ET |v| &lt; seuil).
+Le mode courant est maintenu. IHM : « arrêter les
+treuils avant de changer de mode ».
+🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(usage effectif d'un override/bypass position en maintenance)
+🧭 M2 : idem</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
+      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_Mode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLE" value="0" />
+              <value name="MAINT_N1" value="1" />
+              <value name="MAINT_N2" value="2" />
+              <value name="SEMI_AUTO" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N2</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEMI_AUTO</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_BucketCmdArbitration" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation FB (TRUE=arbitre actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Auth">
+              <type>
+                <derived name="ST_fbModes_Autorisations" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisations mode (Mode, gating séquencement couplé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqBucket">
+              <type>
+                <derived name="ST_ProgramBucketRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [REQ] Demande cycle benne (SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IHM">
+              <type>
+                <derived name="ST_fbBucketCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM benne (BtnOpen/BtnClose)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Context">
+              <type>
+                <derived name="ST_fbBucketCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gating séquencement couplé benne</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdOpen_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande ouverture benne arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdClose_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande fermeture benne arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmdArbitrated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Ordre contacteur capteur fond Kobold arbitré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchBothDiveBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Séquencement couplé : descente benne ouverte armé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchBothAscentBucketCloseArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Séquencement couplé : montée benne fermée armé</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🪣 FB_BucketCmdArbitration — Arbitrage de commande benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Arbitrer la source de commande benne (boutons IHM /
+       séquencement couplé both / demande cycle selon le mode) et produire
+       les commandes arbitrées (ouverture, fermeture, contacteur Kobold).
+   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni StartStop
+       de sécurité — il produit la commande logique, la safety reste dans
+       FB_Bucket / FB_Safety_Winch.
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔒 Bit-identique à l'ancien PRG_04 §1/§2 (refactor POO §5 : décision dans
+       le FB, plus dans le PRG). Symétrique à FB_WinchCmdArbitrationM1/M2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+Ready := Enable;
+
+IF NOT Enable THEN
+    CmdOpen_IHM  := FALSE;
+    CmdClose_IHM := FALSE;
+    KoboldContactorCmdArbitrated := FALSE;
+    WinchBothDiveBucketOpenArmed    := FALSE;
+    WinchBothAscentBucketCloseArmed := FALSE;
+ELSE
+    // ── Règle absolue en pilotage both normal (bit-identique PRG_04 §1) ──
+    // Descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
+    WinchBothDiveBucketOpenArmed := Context.TglEnableCoupledBucketSequencing
+        AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND Context.MotionActive AND (Context.MotionDirection = -1)
+        AND NOT Context.BucketIsOpen;
+    WinchBothAscentBucketCloseArmed := Context.TglEnableCoupledBucketSequencing
+        AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND Context.MotionActive AND (Context.MotionDirection = 1)
+        AND NOT Context.BucketIsClosed;
+
+    // ── Ouverture benne : bouton IHM OU séquencement couplé descente benne ouverte
+    //    OU demande cycle (bit-identique PRG_04 §2) ──
+    CmdOpen_IHM := IHM.BtnOpen OR WinchBothDiveBucketOpenArmed OR ReqBucket.ReqOpen;
+
+    // ── Fermeture benne : demande cycle &gt; séquencement couplé montée benne fermée
+    //    &gt; bouton IHM (bit-identique PRG_04 §1) ──
+    IF ReqBucket.ReqClose THEN
+        CmdClose_IHM := TRUE;
+    ELSIF WinchBothAscentBucketCloseArmed THEN
+        CmdClose_IHM := TRUE;
+    ELSE
+        CmdClose_IHM := IHM.BtnClose;
+    END_IF;
+
+    // ── Contacteur Kobold : demande cycle (source unique PRG_03, bit-identique PRG_04 §1) ──
+    KoboldContactorCmdArbitrated := ReqBucket.ReqKoboldMeasureEnable;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b8ad945e-7e2a-5240-a4b2-f1248035c5df</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="H_TREUILS_BENNE">
+          <Object Name="FB_BucketCmdArbitration" ObjectId="b8ad945e-7e2a-5240-a4b2-f1248035c5df" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbBucketCmdArbitration_Context" ObjectId="f4f3035a-b2f5-50cc-b957-e5b6b46c9e58" />
+            <Object Name="ST_fbBucketCmdArbitration_IHM" ObjectId="5b838e78-9adc-50c9-abda-c67738f00353" />
+          </Folder>
+        </Folder>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
+              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
+            </Folder>
+          </Folder>
+        </Folder>
+        <Folder Name="F_MODES">
+          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

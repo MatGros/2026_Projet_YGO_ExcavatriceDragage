@@ -32,7 +32,7 @@ VAR
 
     // === 🎛️ VARIABLES LOCALES & DÉTECTEURS ===
     WinchBothMotionActive      : BOOL;   // . [LOC] Intention de mouvement both active (joystick ou boutons)
-    WinchBothMotionDirection   : INT;    // . [LOC] Sens mouvement both (-1: Descente, 0: Neutre, +1: Montée)
+    WinchBothMotionDirection   : INT;    // . [LOC] Sens mouvement both (-1: Descending, 0: Neutre, +1: Ascending)
     ManualBottomPositionConfirmed : BOOL;   // . [LOC] Confirmation manuelle "fond touché" opérateur
     BottomPositionConfirmed       : BOOL;   // . [LOC] Synthèse fond touché (Kobold OR Manuel OR Bypass)
     BypassKoboldBottomTouched     : BOOL;   // . [LOC] Détection fond sur front Kobold en mode bypass
@@ -86,10 +86,13 @@ instModes(
 GVL_PERSISTENT._MaintM1HomingRequired := instModes.Auth.HomingRequiredM1;
 GVL_PERSISTENT._MaintM2HomingRequired := instModes.Auth.HomingRequiredM2;
 
-// Qualification de l'intention opérateur couplée (M1+M2) dans le même scan
+// Qualification de l'intention opérateur both (M1+M2) dans le même scan.
+// Homme-mort QUALIFIÉ (JoystickDeadmanArmed) — même source que l'arbitrage
+// (Joystick.DeadmanArmed) : les assistants et la commande réelle partagent
+// la même décision, plus de divergence raw/qualifié.
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     WinchBothMotionDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
-    WinchBothMotionActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
+    WinchBothMotionActive := PRG_02_Acquisition.Data.JoystickDeadmanArmed
                                      AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
@@ -249,33 +252,24 @@ Data.Auth := instModes.Auth;
 // publiés pour que l'IHM les affiche : un interlock invisible est un interlock contourné.
 Data.ModesFault := instModes.Fault;
 
-// 1bis. Intention couplée continue opérateur (inconditionnelle, TOUS modes)
-Data.ReqProgram.OperatorCoupledIntent.Active    := WinchBothMotionActive;
-Data.ReqProgram.OperatorCoupledIntent.Direction := WinchBothMotionDirection;
+// 1bis. Intention both continue opérateur (inconditionnelle, TOUS modes) — source unique
+Data.WinchBothIntent.Active    := WinchBothMotionActive;
+Data.WinchBothIntent.Direction := WinchBothMotionDirection;
 
 // 2. Demandes programme et état public de séquence
 IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Demandes treuils M1 / M2
-    Data.ReqProgram.ReqWinchM1.ReqStartStop := instCycleSemiAuto.WinchM1Cmd.StartStop;
-    Data.ReqProgram.ReqWinchM1.ReqDirection := instCycleSemiAuto.WinchM1Cmd.Direction;
-    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := instCycleSemiAuto.WinchM1Cmd.SpeedPct;
-
-    Data.ReqProgram.ReqWinchM2.ReqStartStop := instCycleSemiAuto.WinchM2Cmd.StartStop;
-    Data.ReqProgram.ReqWinchM2.ReqDirection := instCycleSemiAuto.WinchM2Cmd.Direction;
-    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+    // Demandes treuils M1 / M2 — copie struct entière : FB_Cycle produit directement
+    // le type de contrat inter-PRG (ST_Program*Request). Plus de re-mapping
+    // champ-à-champ ni de DUT ST_fbCycle_*CmdDemand redondants (NC-090).
+    Data.ReqProgram.ReqWinchM1 := instCycleSemiAuto.WinchM1Cmd;
+    Data.ReqProgram.ReqWinchM2 := instCycleSemiAuto.WinchM2Cmd;
 
     // Demande translation M3
-    Data.ReqProgram.ReqTranslation.ReqStart    := instCycleSemiAuto.TranslationCmd.Start;
-    Data.ReqProgram.ReqTranslation.PositionTgt := instCycleSemiAuto.TranslationCmd.Target;
+    Data.ReqProgram.ReqTranslation := instCycleSemiAuto.TranslationCmd;
 
-    // Demande benne
-    Data.ReqProgram.ReqBucket.ReqOpen                     := instCycleSemiAuto.BucketCmd.Open;
-    Data.ReqProgram.ReqBucket.ReqClose                    := instCycleSemiAuto.BucketCmd.Close;
-    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
-    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
-    Data.ReqProgram.ReqBucket.ExtractionControlActive     := FALSE;
-    // SEMI_AUTO : aucun assistant de plongee actif -> plancher neutre (0 = aucun).
-    Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
+    // Demande benne — FB_Cycle fournit aussi les champs assistants neutres
+    // (DescendPermitDiveBucketOpen=TRUE, ExtractionControlActive=FALSE, AscentPermit=FALSE, MinStepDown=0).
+    Data.ReqProgram.ReqBucket := instCycleSemiAuto.BucketCmd;
 
     // État séquence active
     IF instCycleSemiAuto.Lifecycle.Busy THEN
@@ -346,13 +340,17 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
 
     Data.ReqProgram.ReqBucket.ReqOpen                     := DumpAtTremieBucketOpenArmed;
     Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionAssist.BucketCloseRequest;
-    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.KoboldMeasureEnable
+    // Contacteur Kobold : sortie FB_DiveSearch consommee (plus de recalcul inline).
+    Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.Outputs.KoboldContactorCmd
                                                             OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
                                                                 AND WinchBothMotionActive AND (WinchBothMotionDirection = -1));
-    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND WinchBothMotionActive
-                                                                AND (WinchBothMotionDirection = -1)
-                                                                AND NOT PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
+    // Permis de descente plongee : sortie FB_DiveSearch consommee. Hors plongee (Enable=FALSE),
+    // la descente reste libre ; pendant la plongee, elle n'est autorisee que si l'assistant la
+    // delivre (Outputs.DescendPermit, qui integre la precondition benne ouverte).
+    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := (NOT instDiveSearch.Enable) OR instDiveSearch.Outputs.DescendPermit;
     Data.ReqProgram.ReqBucket.ExtractionControlActive     := instExtractionAssist.ExtractionControlActive;
+    // Permis de remontee assistee : sortie FB_ExtractionAssist consommee (PRG_04 §5).
+    Data.ReqProgram.ReqBucket.AscentPermit                := instExtractionAssist.AscentPermit;
     // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
     Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.MinStepDown;
 
@@ -437,6 +435,7 @@ ELSE
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := FALSE;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
     Data.ReqProgram.ReqBucket.ExtractionControlActive     := FALSE;
+    Data.ReqProgram.ReqBucket.AscentPermit                := FALSE;
     // DISABLE : plancher neutre (0 = aucun).
     Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 

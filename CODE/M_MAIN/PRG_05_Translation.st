@@ -27,6 +27,7 @@ VAR
     instArbM3                   : FB_TranslationCmdArbitrationM3; // * [INST] Arbitrage commande translation M3
     ArbM3_IHM                   : ST_fbTranslationCmdArbitration_IHM;     // . [LOC] Entrées IHM FB d'arbitrage M3
     ArbM3_Context               : ST_fbTranslationCmdArbitration_Context; // . [LOC] Contexte gating FB d'arbitrage M3
+    ArbM3_Cfg                   : ST_fbTranslationCmdArbitration_Cfg;     // . [LOC] Config FB d'arbitrage M3 (fréquence max)
 
     // === 📊 STRUCTS INTERNES (publiés via Data) ===
     TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // . [LOC] Demande finale et interlocks translation M3
@@ -174,7 +175,6 @@ END_IF;
 
 // ── Arbitrage M3 (FB_TranslationCmdArbitrationM3) ──
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
-ArbM3_IHM.TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster;
 ArbM3_IHM.BtnFwd            := GVL_IHM.TranslationM3.Cmd.BtnFwd;
 ArbM3_IHM.BtnRev            := GVL_IHM.TranslationM3.Cmd.BtnRev;
 ArbM3_IHM.SelPositioning    := GVL_IHM.TranslationM3.Cmd.SelPositioning;
@@ -182,7 +182,7 @@ ArbM3_IHM.SetFreq_Hz        := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
 ArbM3_IHM.BypassGlobal      := GVL_IHM.TranslationM3.Bypass.Global;
 
 ArbM3_Context.HeightInterlockOk := M3_HeightInterlockOk;
-ArbM3_Context.MaxFreq_Hz        := GVL_PERSISTENT._TranslationMaxFreq_Hz;
+ArbM3_Cfg.MaxFreq_Hz            := GVL_PERSISTENT._TranslationMaxFreq_Hz;
 
 instArbM3(
     Enable         := TRUE,
@@ -190,7 +190,9 @@ instArbM3(
     Auth           := PRG_03_Modes_Cycle.Data.Auth,
     ReqTranslation := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation,
     IHM            := ArbM3_IHM,
-    Context        := ArbM3_Context
+    TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
+    Context        := ArbM3_Context,
+    Cfg            := ArbM3_Cfg
 );
 M3_PositioningActive := instArbM3.PositioningActive;
 SelTarget := instArbM3.SelTarget;

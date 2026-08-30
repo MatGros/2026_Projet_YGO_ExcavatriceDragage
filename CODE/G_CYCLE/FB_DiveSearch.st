@@ -55,7 +55,7 @@ VAR
     Palier5ForbiddenFault   : BOOL;                   // . [LOC] Palier 5 interdit sous Kobold
     TimeoutImmersionFault   : BOOL;                   // . [LOC] Timeout recherche immersion
     TimeoutBottomFault      : BOOL;                   // . [LOC] Timeout recherche fond
-    DescentActive           : BOOL;                   // . [LOC] Descente demandee et autorisee
+    DescentActive           : BOOL;                   // . [LOC] Descending demandee et autorisee
 END_VAR
 
 {region "§1 Fronts, calculs et causes"}
