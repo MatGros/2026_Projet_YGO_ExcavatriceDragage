@@ -48,9 +48,9 @@ Le refactor doit **finir la conformité sans casser l'intégration verte** ni r�
    ======================================================================= *)
 ```
 
-## 2. `E_MachineReferenceStep` — nouvel enum (remplace `ReferenceStep : INT` + 12 littéraux)
+## 2. `E_MachineHomingStep` — nouvel enum (remplace `ReferenceStep : INT` + 12 littéraux)
 
-Fichier : **`CODE/G_CYCLE/_TYPES/E_MachineReferenceStep.st`** (le FB vit dans `G_CYCLE`, cf. `E_CycleStep`).
+Fichier : **`CODE/G_CYCLE/_TYPES/E_MachineHomingStep.st`** (le FB vit dans `G_CYCLE`, cf. `E_CycleStep`).
 Syntaxe `ENUM … END_ENUM` (alignée sur `E_Mode`, `E_CycleStep`).
 
 ```pascal
@@ -223,17 +223,17 @@ END_VAR
 
 | Fichier | Nature |
 |---|---|
-| `CODE/G_CYCLE/FB_ReferenceCycle.st` | refactor interface + corps (Stage B) |
-| `CODE/G_CYCLE/_TYPES/E_MachineReferenceStep.st` | **nouveau** |
-| `CODE/G_CYCLE/_TYPES/ST_fbRef_AxisHomingStatus.st` | **nouveau** |
-| `CODE/G_CYCLE/_TYPES/ST_fbRef_HomingDemand.st` | **nouveau** |
-| `CODE/G_CYCLE/_TYPES/ST_fbRef_BucketCommit.st` | **nouveau** |
+| `CODE/G_CYCLE/FB_MachineHomingCycle.st` | refactor interface + corps (Stage B) |
+| `CODE/G_CYCLE/_TYPES/E_MachineHomingStep.st` | **nouveau** |
+| `CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_AxisHomingStatus.st` | **nouveau** |
+| `CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_HomingDemand.st` | **nouveau** |
+| `CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_BucketCommit.st` | **nouveau** |
 | `CODE/M_MAIN/PRG_02_Acquisition.st` | adapter l'appel (structs in/out) + splitter `WinchesMechanicallyStopped` (N-8) |
 | `CODE/M_MAIN/PRG_04_Treuils_Benne.st` | lecture `BucketCommit.*` |
 | `CODE/M_MAIN/PRG_07_Supervision.st` | publier `Fault`/`Lifecycle`/`ReferenceStep` |
 | `CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st` | casser la boucle croisée (cf. C-3) — **si arbitrage le demande** |
 | `CODE/J_SUPERVISION/FB_TroubleshootingView.st` | comparaisons `ReferenceStep` → enum |
-| `TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_referencecycle.st` | réécriture AC1-AC9 (Stage C) |
+| `TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_machinehomingcycle.st` | réécriture AC1-AC12 (Stage C) |
 
 ## 7. Corrections orchestrateur apportées au retour Ollama
 

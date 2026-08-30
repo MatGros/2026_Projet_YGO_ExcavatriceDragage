@@ -125,7 +125,7 @@ Auto-verification liaison (G200_check_linkage.py) — FAIL (1 erreur PRÉ-EXISTA
   annonce que cet orphelin « reste en WARN », mais il n'est **pas** dans la liste
   `KNOWN_ORPHANS_PENDING_DECISION` de `G200_check_linkage.py` → il s'affiche en **ERROR**, pas en
   WARN. `G200_check_linkage.py` est **hors `scope.allowed`** → non modifié. **Traitement** : tâche
-  T181-16 (`ORCHESTRATION_RAPPORTS/RAPPORT_T181-16_AUDIT_ORPHELINES.md`) — à ajouter à la liste
+  T181-16 (`RAPPORT_T181-16_AUDIT_ORPHELINES.md`) — à ajouter à la liste
   d'exemption ou à instancier/supprimer.
 
 ### 4.2 run_all_gates --palier C
@@ -182,7 +182,7 @@ G483 passe. Aucun patch nécessaire.
 
 **Aucun fichier modifié** (matrice déjà implémentée et conforme). Seul livrable créé : ce rapport.
 
-- `ORCHESTRATION_RAPPORTS/RAPPORT_T181-14_MATRICE_BYPASS.md` (créé)
+- `RAPPORT_T181-14_MATRICE_BYPASS.md` (créé)
 
 ---
 
