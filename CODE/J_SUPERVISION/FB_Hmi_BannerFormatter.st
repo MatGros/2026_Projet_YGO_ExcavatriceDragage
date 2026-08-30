@@ -47,7 +47,7 @@ VAR_INPUT
     BucketIsClosed       : BOOL;   // --> [HW] Benne fermee (montee non bridée)
     DiveActive           : BOOL;   // --> [HW] Plongée active
     TopLimitReached      : BOOL; // --> [SAFE] Agrégat M1/M2 par OR — toute limite haute affichée
-    CoupledUserRequestDirection : INT;   // --> [CMD] Direction demandée couplée
+    WinchBothMotionDirection : INT;   // --> [CMD] Direction demandée couplée
     M1LogicRequestDirection     : INT;   // --> [CMD] Direction logique M1
     M2LogicRequestDirection     : INT;   // --> [CMD] Direction logique M2
     CycleRequestDirection      : INT;   // --> [CMD] Direction cycle
@@ -302,7 +302,7 @@ Banner.SpecialConditionText := AntiFlickSpecial.Text;
 IF CurrentMode = E_Mode.SEMI_AUTO THEN
     CurrentDirection := CycleRequestDirection;
 ELSIF BothAxesCoupled THEN
-    CurrentDirection := CoupledUserRequestDirection;
+    CurrentDirection := WinchBothMotionDirection;
 ELSIF WinchSelected = 1 THEN
     CurrentDirection := M1LogicRequestDirection;
 ELSIF WinchSelected = 2 THEN
