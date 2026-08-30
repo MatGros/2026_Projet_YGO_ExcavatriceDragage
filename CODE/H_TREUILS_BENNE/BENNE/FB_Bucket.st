@@ -17,8 +17,12 @@ VAR_INPUT
     CmdClose_IHM                    : BOOL;                           // --> [CMD] Demande fermeture depuis IHM
     MotionRequestActive             : BOOL;                           // --> [CMD] Intention mouvement arbitree
     MotionDirection                 : INT;                            // --> [CMD] Sens arbitre (1: montee, -1: descente)
-    ConfirmOpenPosition             : BOOL;                           // --> [CMD] Bouton IHM confirmation benne ouvert
-    ConfirmClosePosition            : BOOL;                           // --> [CMD] Bouton IHM confirmation benne ferme
+    ReferenceCommitOpen             : BOOL;                           // --> [CMD] Commit atomique reference benne ouverte
+    ReferenceCommitClose            : BOOL;                           // --> [CMD] Commit atomique reference benne fermee
+    MachineReferenceReady           : BOOL;                           // --> [STAT] Qualification conjointe M1/M2/benne
+    ReferenceTransactionActive      : BOOL;                           // --> [STAT] Homing conjoint en cours
+    ConfirmOpenPosition             : BOOL;                           // --> [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle
+    ConfirmClosePosition            : BOOL;                           // --> [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle
 
     // === SECOURS ET HARDWARE ===
     PowerContactorEngaged           : BOOL;                           // --> [SAFE] Condition d'arret d'urgence / puissance
@@ -68,8 +72,6 @@ VAR
     // === DETECTEURS ET TIMERS INTERNES ===
     ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
     BusyEdge                        : R_TRIG;                         // . [LOC] Detecteur entree en etat Busy
-    ConfirmOpenEdge                 : R_TRIG;                         // . [LOC] Detecteur front confirmation ouverture
-    ConfirmCloseEdge                : R_TRIG;                         // . [LOC] Detecteur front confirmation fermeture
     TonTimeout                      : TON;                            // . [LOC] Temporisateur timeout de mouvement
 
     // === VARIABLES LOCALES CALCULÉES ===
@@ -200,16 +202,14 @@ IF FirstCycle THEN
     END_IF;
 END_IF;
 
-ConfirmOpenEdge(CLK := ConfirmOpenPosition);
-IF ConfirmOpenEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
+IF ReferenceCommitOpen AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
-ConfirmCloseEdge(CLK := ConfirmClosePosition);
-IF ConfirmCloseEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
+IF ReferenceCommitClose AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
@@ -363,7 +363,9 @@ END_IF;
 
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
-                     AND (Fault.ErrorId = 16#0000);
+                     AND (Fault.ErrorId = 16#0000)
+                     AND (MachineReferenceReady OR (BucketState.IsOpen XOR BucketState.IsClosed))
+                     AND NOT ReferenceTransactionActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
 {endregion}
 

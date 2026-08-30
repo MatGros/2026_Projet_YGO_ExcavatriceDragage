@@ -13,6 +13,15 @@ STRUCT
     Idx111_BucketIsIntermediate  : BOOL; // ↔️ Position intermédiaire (entrebâillée entre ouvert et fermé)
     Idx112_DeltaPosition_M       : REAL; // 📏 Écart réel signé M2 - M1 (mètres) en direct
 
+    Idx113_MachineReferenceReady : BOOL; // Reference M1/M2/benne qualifiee
+    Idx114_ReferenceStep         : INT;  // Etape guidee reference machine
+    Idx115_ReferenceFailed       : BOOL; // Transaction reference abandonnee
+    Idx116_M1ReferenceMissing    : BOOL; // M1 non reference ou mesure douteuse
+    Idx117_M2ReferenceMissing    : BOOL; // M2 non reference ou mesure douteuse
+    Idx118_BucketOffsetUnknown   : BOOL; // Offset benne non confirme
+    Idx119_ReferenceTransaction  : BOOL; // Homing conjoint en cours
+    Idx120_ReferenceLossSafeStop : BOOL; // Perte reference pendant mouvement
+
     Idx201_HmiCmd_BtnOpen        : BOOL; // 1 = Demande Ouverture IHM | 0 = Relâché
     Idx202_HmiCmd_BtnClose       : BOOL; // 1 = Demande Fermeture IHM | 0 = Relâché
     Idx203_CycleCmd_Open         : BOOL; // 1 = Demande Ouverture par le Cycle Auto

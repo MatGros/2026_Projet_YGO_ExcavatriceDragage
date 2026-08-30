@@ -451,6 +451,8 @@ centre-plage, `LastKnownRawPos` vit près du centre : un wrap ne peut plus produ
 `BtnHome`. **`BtnHomingAtZero`** : force homing au centre exact (0.0m), usage mise en service —
 le compteur est centré à l'identique de tout autre mode.
 
+**Référence conjointe benne (T184)** : `PRG_02_Acquisition` appelle `FB_ReferenceCycle` avant les deux façades `FB_Encoder`. Après confirmation visuelle en N2, capteur haut commun actif et arrêt mécanique confirmé, le cycle émet les deux demandes dans le même scan. M1 reçoit la cible haut configurée ; M2 reçoit exclusivement `CfgTopHomingTargetM_M1 + OffsetOpenM|OffsetCloseM`, jamais une position M1 live. Les consommateurs de position restent gelés pendant `HomingLifecycle.Busy`. Le résultat des deux homings est ensuite committé atomiquement par `FB_Bucket`.
+
 ---
 
 ## 6 · 📡 Mise à l'échelle & bornage (F09.04, F09.05, F09.06)

@@ -456,6 +456,8 @@ de leur **combinaison**. Une seule page les porte, avec leur safety.
 
 > 📌 **Neutralisation et validité offset benne (`FB_Bucket`)** : lorsque `FB_Bucket` est désactivé (`InhibitM2`), son gate neutralise `ActiveOffsetM := 0.0` (comparaison M1/M2 stricte sans fuite d'offset périmé vers Méca E `FB_Safety_Winch`) et publie la sortie `ActiveOffsetValid := FALSE` (exposée dans `ST_fbBucket_State` pour l'IHM et le diagnostic).
 
+> 📌 **Référence machine T184** : un offset benne n'est utilisable pour la conduite nominale que lorsque M1 et M2 sont `HomedAndReliable` et que l'état visuel benne a été committé après homing conjoint. Sans cette qualification, aucun bypass de `SyncDeviationWarn` n'est autorisé : le clamp palier 1 reste actif. Pendant le preset des codeurs, `PRG_04` désactive seulement le consommateur `FB_WinchSync`; les protections de mouvement restent actives.
+
 ⚠️ **Aucune sémantique safety ne change** : les mécanismes Méca A→E, les bits `ErrorId` 14/15,
 `AscentPermit`/`DescendPermit` (logique positive fail-safe), les seuils et les polarités restent ceux décrits dans les fiches FB.
 Seule **l'affectation POU** change : la safety devient visible en parallèle des blocs métier sur

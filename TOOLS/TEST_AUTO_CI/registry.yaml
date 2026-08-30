@@ -354,6 +354,13 @@ FB_Translation:
     - CODE/I_TRANSLATION/FB_Translation.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
 
+FB_ReferenceCycle:
+  domain: G_CYCLE
+  sources:
+    - CODE/F_MODES/E_Mode.st
+    - CODE/G_CYCLE/FB_ReferenceCycle.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_referencecycle.st
+
 FB_SimBench:
   domain: L_SIMULATION
   sources:
@@ -1369,7 +1376,6 @@ WINCH_INTEG:
     - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st
     - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st
-
 
 
 

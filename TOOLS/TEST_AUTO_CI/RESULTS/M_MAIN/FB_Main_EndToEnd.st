@@ -109,6 +109,7 @@ VAR_INPUT
     ModelStepSpeedMps       : ARRAY[0..5] OF REAL; // vitesse m/s par palier (table de la suite)
     ModelSeedPosM1          : REAL := 2.0;         // position de départ M1 (cohérente COD défaut)
     ModelSeedPosM2          : REAL := 2.0;
+    ModelMachineReferenceReady : BOOL := TRUE;     // qualification de référence du modèle de banc
     ContactorFeedbackTimeout : TIME := T#500ms;
 
     // === 🧪 Injections modèle (doctrine SPEC §2.1 : capteurs pilotés depuis la suite) ===
@@ -341,6 +342,7 @@ BusAcq.Network.EncoderM2.Operational := TRUE;
 prg03(
     SelMode                 := CmdMode,
     SelJoystickWinch        := CmdWinchSelect,
+    MachineReferenceReady   := ModelMachineReferenceReady,
     PowerContactorEngaged   := PowerContactorEngaged,
     DeadmanArmed            := BusAcq.JoystickDeadmanArmed,
     JoystickDeflected       := NOT BusAcq.JoystickYNeutral,
