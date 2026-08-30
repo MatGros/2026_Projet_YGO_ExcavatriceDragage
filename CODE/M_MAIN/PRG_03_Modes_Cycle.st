@@ -76,7 +76,7 @@ instModes(
     // assumé : PRG_04 est de rang 04, ce programme de rang 03)
     M1PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM1,
     M2PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM2,
-    MachineHomed     := PRG_02_Acquisition.MachineHoming.Homed,
+    MachineHomed     := PRG_02_Acquisition.Data.MachineHoming.Homed,
     // Restauration boot des drapeaux de re-homing (miroir PERSISTENT)
     BootHomingRequiredM1      := GVL_PERSISTENT._MaintM1HomingRequired,
     BootHomingRequiredM2      := GVL_PERSISTENT._MaintM2HomingRequired

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:40:26.635757" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:40:26.635757">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:43:59.895582" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:43:59.895582">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -66,6 +66,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Façade codeur qualifiée M2 (Benne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHoming">
+              <type>
+                <derived name="ST_MachineHoming" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 État homing conjoint machine (M1/M2/benne)</xhtml>
               </documentation>
             </variable>
             <variable name="LocalDigitalIoOk">
@@ -210,92 +218,6 @@
    ───────────────────────────────────────────────────────────────
    🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
    ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_MachineHoming">
-        <baseType>
-          <struct>
-            <variable name="Homed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification conjointe reference machine</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SetPosBucketOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valider position actuelle = reference benne ouverte</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SetPosBucketClose">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valider position actuelle = reference benne fermee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Active">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingLoss">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte reference en mouvement : arret controle SafeStop</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Step">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee reference</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Instruction">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne IHM reference</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Failed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction reference abandonnee</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>719346ef-3775-5b4e-ac3c-37b255640eba</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧭 ST_MachineHoming — Etat publie du homing conjoint machine (M1/M2/benne)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupe les 8 sorties homing a plat de PRG_02_Acquisition en
-             un bus struct unique, publie sur le bus inter-PRG.
-   🔒 Sécurité : Homed = qualification conjointe reference machine (gate SEMI_AUTO).
-                 HomingLoss = perte reference en mouvement : arret controle SafeStop.
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
-   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_fbEncoder_HwIn">
@@ -1962,6 +1884,92 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_MachineHoming">
+        <baseType>
+          <struct>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification conjointe reference machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetPosBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valider position actuelle = reference benne ouverte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetPosBucketClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valider position actuelle = reference benne fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingLoss">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte reference en mouvement : arret controle SafeStop</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Instruction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne IHM reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Failed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction reference abandonnee</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>719346ef-3775-5b4e-ac3c-37b255640eba</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧭 ST_MachineHoming — Etat publie du homing conjoint machine (M1/M2/benne)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les 8 sorties homing a plat de PRG_02_Acquisition en
+             un bus struct unique, publie sur le bus inter-PRG.
+   🔒 Sécurité : Homed = qualification conjointe reference machine (gate SEMI_AUTO).
+                 HomingLoss = perte reference en mouvement : arret controle SafeStop.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_Diag_State">
         <baseType>
           <enum>
@@ -2109,14 +2117,6 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Image utilisee par le metier (arbitree)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineHoming">
-              <type>
-                <derived name="ST_MachineHoming" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [BUS] Etat homing conjoint machine (M1/M2/benne)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -2653,14 +2653,14 @@ instMachineHomingCycle(
     CfgOffsetOpenM             := _BucketCfgPersist.Config.OffsetOpenM,
     CfgOffsetCloseM            := _BucketCfgPersist.Config.OffsetCloseM
 );
-MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
-MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
-MachineHoming.SetPosBucketClose := instMachineHomingCycle.BucketCommit.CommitClose;
-MachineHoming.Active           := instMachineHomingCycle.MachineHomingActive;
-MachineHoming.HomingLoss       := instMachineHomingCycle.MachineHomingLossSafeStop;
-MachineHoming.Step             := TO_INT(instMachineHomingCycle.MachineHomingStep);
-MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstruction;
-MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
+Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
+Data.MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
+Data.MachineHoming.SetPosBucketClose := instMachineHomingCycle.BucketCommit.CommitClose;
+Data.MachineHoming.Active           := instMachineHomingCycle.MachineHomingActive;
+Data.MachineHoming.HomingLoss       := instMachineHomingCycle.MachineHomingLossSafeStop;
+Data.MachineHoming.Step             := TO_INT(instMachineHomingCycle.MachineHomingStep);
+Data.MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstruction;
+Data.MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
@@ -9694,11 +9694,11 @@ TimeLast := TimeCurrent;
         <Folder Name="G_CYCLE">
           <Object Name="FB_MachineHomingCycle" ObjectId="107b39d9-e311-549c-ac0a-91b020a05df9" />
           <Folder Name="_TYPES">
-            <Object Name="ST_MachineHoming" ObjectId="719346ef-3775-5b4e-ac3c-37b255640eba" />
             <Object Name="ST_fbMachineHomingCycle_AxisHomingStatus" ObjectId="796b0dad-a243-58d0-a47d-362338c07aeb" />
             <Object Name="E_MachineHomingStep" ObjectId="91b3da89-8226-5d1f-92ee-cf29483801dd" />
             <Object Name="ST_fbMachineHomingCycle_BucketCommit" ObjectId="8bbe6b1c-b915-5c25-90f5-ca9c8b430b97" />
             <Object Name="ST_fbMachineHomingCycle_HomingDemand" ObjectId="a0819120-1e85-5b22-8a6d-414f9c7d9a11" />
+            <Object Name="ST_MachineHoming" ObjectId="719346ef-3775-5b4e-ac3c-37b255640eba" />
           </Folder>
         </Folder>
         <Folder Name="L_SIMULATION">
