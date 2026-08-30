@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T20:32:44.928139" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T20:32:44.928139">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T14:08:12.231118" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T14:08:12.231118">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -521,12 +521,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Autorisation de remontee assistee</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceMinSpeedStep">
+            <variable name="ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Forcage vitesse minimale (palier de controle)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Plafond palier 1 pendant la montee controlee</xhtml>
               </documentation>
             </variable>
             <variable name="BottomConfirmationConsumed">
@@ -911,7 +911,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Lifecycle.Done := FALSE;
     BucketCloseRequest := FALSE;
     AscentPermit := FALSE;
-    ForceMinSpeedStep := FALSE;
+    ExtractionControlActive := FALSE;
     BottomConfirmationConsumed := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
     // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
@@ -930,7 +930,7 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Machine etat fermeture remontee"}
 BucketCloseRequest := FALSE;
 AscentPermit := FALSE;
-ForceMinSpeedStep := FALSE;
+ExtractionControlActive := FALSE;
 BottomConfirmationConsumed := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
@@ -989,7 +989,7 @@ ELSE
         E_ExtractionSequenceState.CONTROL_ASCENT:
             Lifecycle.Busy := TRUE;
             AscentPermit := AssistPermit AND AscentControlSafe; // coupure meme-scan sur defaut synchro/capteurs (H2)
-            ForceMinSpeedStep := AscentPermit;                  // bridage suit le permis (F1), jamais actif sans montee autorisee
+            ExtractionControlActive := AscentPermit;            // plafond palier 1 suit le permis de montee
             OperatorActionId := 16#0203;
             OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
             IF NOT AscentControlSafe THEN

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T18:10:13.901931" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T18:10:13.901931">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T14:08:13.409287" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T14:08:13.409287">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -250,12 +250,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Cible Atteinte | 0 = En cours</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx403_ControlAscentActive">
+            <variable name="Idx403_ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 1 = Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 1 = Phase vitesse contrôlée montée en cours</xhtml>
               </documentation>
             </variable>
             <variable name="Idx501_M2_CmdRev_DQ">

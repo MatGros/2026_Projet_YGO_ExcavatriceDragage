@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T12:14:10.571318" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T12:14:10.571318">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T14:08:12.822267" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T14:08:12.822267">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -58,12 +58,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de descente conditionnée benne ouverte (DiveSearch)</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceMinSpeedStep">
+            <variable name="ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Forçage vitesse minimale (palier de contrôle extraction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier 1 pendant la montée contrôlée</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepDown">

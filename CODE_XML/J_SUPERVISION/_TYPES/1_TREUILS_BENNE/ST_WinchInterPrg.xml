@@ -263,12 +263,12 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande direction forcée vers M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2ForceSlowSpeed">
+            <variable name="M2BucketJogLimit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Blocage vitesse rapide de M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Plafond palier du jog benne M2</xhtml>
               </documentation>
             </variable>
             <variable name="Ready">
@@ -375,12 +375,12 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: Fermeture auto armée (montée couplée demandée, benne pas fermée)</xhtml>
               </documentation>
             </variable>
-            <variable name="ControlAscentActive">
+            <variable name="ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Phase vitesse contrôlée montée en cours</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledMotionBlockedByBucket">

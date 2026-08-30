@@ -153,12 +153,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de descente conditionnée benne ouverte (DiveSearch)</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceMinSpeedStep">
+            <variable name="ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Forçage vitesse minimale (palier de contrôle extraction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier 1 pendant la montée contrôlée</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepDown">
