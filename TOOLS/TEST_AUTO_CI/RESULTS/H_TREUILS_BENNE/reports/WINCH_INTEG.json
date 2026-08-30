@@ -214,14 +214,7 @@
     },
     {
       "name": "HARN-72 : Watchdog frein (retour frein ne suit pas) -> barriere coupe apres timeout",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "MACHINE.BUSOUTPUTS.M1RELAYFWD = FALSE expected TRUE, got FALSE",
-        "file": "test_winch_integ.st",
-        "line": 996,
-        "message": "HARN-72: barriere a coupe (watchdog frein)"
-      }
+      "passed": true
     },
     {
       "name": "HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -> RelayRev retenu (CIBLE T175/T181-05)",
@@ -268,7 +261,7 @@
   ],
   "summary": {
     "total": 32,
-    "passed": 15,
-    "failed": 17
+    "passed": 16,
+    "failed": 16
   }
 }

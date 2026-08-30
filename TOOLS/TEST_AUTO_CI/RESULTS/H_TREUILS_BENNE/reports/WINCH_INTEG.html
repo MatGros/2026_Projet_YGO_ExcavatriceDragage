@@ -315,11 +315,11 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-30 18:15:39</div>
+    <div class="exec-time">2026-08-30 19:28:31</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (32 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-winch-integ-0">HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-1">HARN-11 : Extraction montee ExtractionControlActive -&gt; plafond palier 1 M1 ET M2</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-2">HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-3">HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-4">HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-5">HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-6">HARN-20 : Rampe deflexion 0 a 100 pourcent -&gt; paliers monotones, jamais de saut brutal</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-7">HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-8">HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-9">HARN-23 : Homme-mort relache en mouvement -&gt; arret immediat, frein retombe</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-10">HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -&gt; immersion confirmee puis arret latche</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-11">HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-12">HARN-32 : Relache joystick en contexte plongee -&gt; palier 0 immediat, pas de plancher residuel</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-13">HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-14">HARN-40 : Jog benne -&gt; M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-15">HARN-41 : SyncDeviationWarn -&gt; plafond palier 1 sur M1 ET M2 (bornes communes identiques)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-16">HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-17">HARN-50 : Nominal filet passif -&gt; FinalInterlockGoverned FALSE sur toute la montee couplee</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-18">HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-19">HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-20">HARN-60 : Deviation croissante -&gt; warn plafond 1 puis critique SafeStop des 2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-21">HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-22">HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-23">HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-24">HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-25">HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-26">HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-27">HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-28">HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-29">HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-30">HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-31">HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-winch-integ-0">HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-1">HARN-11 : Extraction montee ExtractionControlActive -&gt; plafond palier 1 M1 ET M2</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-2">HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-3">HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-4">HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-5">HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-6">HARN-20 : Rampe deflexion 0 a 100 pourcent -&gt; paliers monotones, jamais de saut brutal</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-7">HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-8">HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-9">HARN-23 : Homme-mort relache en mouvement -&gt; arret immediat, frein retombe</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-10">HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -&gt; immersion confirmee puis arret latche</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-11">HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-12">HARN-32 : Relache joystick en contexte plongee -&gt; palier 0 immediat, pas de plancher residuel</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-13">HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-14">HARN-40 : Jog benne -&gt; M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-15">HARN-41 : SyncDeviationWarn -&gt; plafond palier 1 sur M1 ET M2 (bornes communes identiques)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-16">HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-17">HARN-50 : Nominal filet passif -&gt; FinalInterlockGoverned FALSE sur toute la montee couplee</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-18">HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-19">HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-20">HARN-60 : Deviation croissante -&gt; warn plafond 1 puis critique SafeStop des 2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-21">HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-22">HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-23">HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-24">HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-25">HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-26">HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-27">HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-28">HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-29">HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-30">HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-31">HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -328,7 +328,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            15/32 vérifications validées
+            16/32 vérifications validées
         </div>
     </div>
     
@@ -1911,9 +1911,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Winch</code></td>
-                <td>11</td><td>18</td>
-                <td>0</td><td>19</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>11</td><td>19</td>
+                <td>0</td><td>23</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (23 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -2547,9 +2547,9 @@
                 
             </div>
         </article>
-        <article id="test-winch-integ-24" class="test-card test-card-fail">
+        <article id="test-winch-integ-24" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2564,7 +2564,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-72: FB_Winch demande toujours le sens (defaut cote barriere)</li><li>HARN-72: barriere a coupe (watchdog frein)</li><li>HARN-72: FinalInterlockGoverned TRUE</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD = FALSE expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:996</div><div class='failure-msg'>HARN-72: barriere a coupe (watchdog frein)</div></div>
+                
                 
             </div>
         </article>
@@ -8294,6 +8294,22 @@ IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
 ELSE
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
+
+// ── 6ter. Synchronisation defaut frein en fin de scan (TC-P10-012/013/020) ──
+// ErrorId bit0 (defaut frein) est pose en §6bis, APRES la machine d&#x27;etat §5.
+// Sans ce bloc, la synthese Error et l&#x27;etat FAULT accusaient un retard d&#x27;un scan
+// (~10 ms) sur le watchdog frein. On resynchronise Error/State et on coupe les
+// sorties le MEME scan que l&#x27;apparition du defaut : c&#x27;est un defaut FINAL, coupure
+// immediate (jamais un maintien ordonne §3bis).
+Error := (ErrorId &lt;&gt; 16#0000);
+IF Error THEN
+    RelayFwd := FALSE; RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    BrakeCmd := FALSE;
+    AuthorizedStep := 0;
+    Busy := FALSE; Done := FALSE; Ready := FALSE;
+    State := E_WinchFinalInterlockState.FAULT;
+END_IF;
 </pre>
             </details>
             <details>
@@ -9564,6 +9580,9 @@ VAR_OUTPUT
     CommandedDirection              : INT;                            // &lt;-- [DIAG] Sens interne memorise
     DirectionChangeDelayElapsed     : TIME;                           // &lt;-- [DIAG] Ecoule delai changement de sens
     DirectionChangePending          : BOOL;                           // &lt;-- [DIAG] Changement de sens en attente
+
+    // === INTENTION DE MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+    SenseHoldRequest                : BOOL;                           // &lt;-- [ACT] Demande a la barriere finale de TENIR le contacteur de sens apres chute de palier a 0 (inertie moteur), bornee par T_hold_internal
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
@@ -9587,6 +9606,12 @@ VAR
     EffectiveSafeStop               : BOOL;                           // . [LOC] SafeStop effectif incluant permis
     ActiveMaxStep                   : INT;                            // . [LOC] Plafond palier actif dynamique
     EffectiveStepRampDelay          : TIME;                           // . [LOC] Cadence palier selon sens, distincte interlock
+
+    // === MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+    SenseHoldTimer                  : TON;                            // . [LOC] Garde interne T_hold_internal (&lt; MaxSenseHoldTime barriere)
+    SenseHoldActiveInt              : BOOL;                           // . [LOC] Maintien de sens interne en cours
+    PrevStepNumber                  : INT;                            // . [LOC] Palier temporise du scan precedent (detection chute a 0)
+    SenseHoldHardCut                : BOOL;                           // . [LOC] Coupure dure active (interdit tout maintien)
 
     // Latches défauts
     SpeedStepConfigFaultLatched     : BOOL;
@@ -9648,6 +9673,11 @@ IF NOT Enable THEN
     ContactorsCheck.Feedback := NOT Sensors.ContactorsAllOff;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
+    // §3bis : coupure dure -&gt; aucun maintien de sens possible, etat interne purge.
+    SenseHoldRequest := FALSE;
+    SenseHoldActiveInt := FALSE;
+    SenseHoldTimer(IN := FALSE, PT := T#900ms);
+    PrevStepNumber := 0;
     Ready := FALSE;
     RETURN;
 END_IF;
@@ -9805,6 +9835,32 @@ IF Fault.Error THEN
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
+{endregion}
+
+{region &quot;§5bis Intention de maintien du contacteur de sens (§3bis / T181-01)&quot;}
+// Quand le palier temporise StepNumber vient de retomber a 0 alors qu&#x27;un sens etait
+// commande, FB_Winch DEMANDE a la barriere finale (FB_WinchOutputInterlock) de TENIR
+// le contacteur de sens le temps que le moteur ralentisse (inertie). Borne par
+// T_hold_internal (garde interne, &lt; MaxSenseHoldTime de la barriere = T#1s).
+// Coupures dures -&gt; retombee immediate, jamais de maintien (SafeStop / defaut / perte
+// puissance / NOT Enable geree a la gate §2).
+SenseHoldHardCut := (NOT PowerContactorEngaged) OR EffectiveSafeStop OR Fault.Error;
+
+IF SenseHoldHardCut THEN
+    SenseHoldActiveInt := FALSE;
+ELSIF (PrevStepNumber &gt; 0) AND (StepNumber = 0) AND (CommandedDirection &lt;&gt; 0) THEN
+    SenseHoldActiveInt := TRUE;   // front de chute de palier a 0 avec sens encore actif
+END_IF;
+
+// T_hold_internal PROVISOIRE essai site (base physique : inertie moteur + chute de couple) ;
+// tenu &lt; MaxSenseHoldTime de FB_WinchOutputInterlock pour que la barriere garde le dernier mot.
+SenseHoldTimer(IN := SenseHoldActiveInt, PT := T#900ms);
+IF SenseHoldTimer.Q OR (StepNumber &gt; 0) THEN
+    SenseHoldActiveInt := FALSE;  // borne de temps atteinte, ou nouveau mouvement demande
+END_IF;
+
+SenseHoldRequest := SenseHoldActiveInt AND NOT SenseHoldHardCut;
+PrevStepNumber := StepNumber;
 {endregion}
 
 END_FUNCTION_BLOCK
@@ -15332,10 +15388,7 @@ test_winch_integ.st
   [FAIL] HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif
   [PASS] HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent
   [PASS] HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD = FALSE expected TRUE, got FALSE
-         at test_winch_integ.st:996
-         Message: HARN-72: barriere a coupe (watchdog frein)
-  [FAIL] HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout
+  [PASS] HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout
          ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1FINALINTERLOCKREQUEST.REQUESTEDRELAYREV expected TRUE, got FALSE
          at test_winch_integ.st:1031
          Message: HARN-73: precondition - inversion descente reellement demandee
@@ -15351,7 +15404,7 @@ test_winch_integ.st
   [PASS] HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement
 
 -----------------------------------------
-32 tests, 15 passed, 17 failed
+32 tests, 16 passed, 16 failed
 </pre>
     </details>
 </div>

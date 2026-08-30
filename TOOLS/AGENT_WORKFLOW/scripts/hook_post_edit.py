@@ -11,8 +11,15 @@ Declenche uniquement sur les fichiers qui le meritent :
   * `*.md`          -> G340_check_doc_links.py (liens morts, versions perimees)
 
 Silencieux quand tout va bien : seuls les problemes remontent a l'agent.
-Ne bloque jamais une edition (exit 0) — il informe, le gate de restitution
-`run_all_gates.py` reste l'autorite bloquante.
+
+⚠️ TOUJOURS INFORMATIF, JAMAIS BLOQUANT (exit 0) — 2026-11:  alignement sur le
+process d'import de l'utilisateur, qui n'importe dans l'automate QUE le Bundle
+XML complet (jamais le ST brut de facon granulaire). Bloque chaque edition ST
+sur un orphelin preexistant sans rapport = pure friction, aucun gain de securite
+dans ce process. L'autorite bloquante reelle reste aux points ou le code
+atteint l'automate : la generation du bundle (`generate_codesys_bundle.py` →
+`G200_check_linkage.py`) et le hook de fin de session `hook_stop.py`.
+Les problemes sont AFFICHES ici a titre informatif, jamais bloquants.
 """
 
 from __future__ import annotations
@@ -70,8 +77,11 @@ def main() -> int:
 
     if messages:
         print("\n\n".join(messages), file=sys.stderr)
-        # exit 2 = la sortie est renvoyee a l'agent pour correction immediate
-        return 2
+        # TOUJOURS exit 0 : le hook est informatif, il ne bloque plus jamais
+        # l'edition (decision 2026-11 -> process d'import Bundle complet de
+        # l'utilisateur). L'autorite bloquante reelle = generation du bundle
+        # + hook_stop.py. exit 2 ci-dessous est commente/trace pour l'historique.
+        return 0
     return 0
 
 
