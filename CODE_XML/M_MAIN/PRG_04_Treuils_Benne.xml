@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T11:38:00.609665" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T11:38:00.609665">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T12:19:59.197346" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T12:19:59.197346">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1835,6 +1835,99 @@ Seuils de changement de palier (0..100%)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbWinchLoadEstimator_SpeedCfg">
+        <baseType>
+          <struct>
+            <variable name="MaxMeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesuree de reference (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandMaxMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafonds vitesse mesuree par palier (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandHysteresisMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hysteresis anti-battement classement vitesse (m/s)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6a16b928-26ae-52c7-b420-4064d7e5d0dc</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbWinchLoadEstimator_SpeedCfg — Configuration des plages de vitesse linéaire
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchLoadEstimator_Table">
+        <baseType>
+          <struct>
+            <variable name="IsConfigured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validation explicite de la table</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadPctByStepAndSpeedBand">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <array>
+                      <dimension lower="1" upper="5" />
+                      <baseType>
+                        <REAL />
+                      </baseType>
+                    </array>
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Matrice [palier][bande_vitesse] charge (%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ac09a372-08ec-5811-90f7-baec46ade641</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_fbWinchLoadEstimator_Table — Table empirique de charge estimée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Matrice 5x5 d'estimation de charge (palier commandé x bande vitesse)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -2228,6 +2321,20 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <derived name="FB_Winch" />
               </type>
             </variable>
+            <variable name="instWinchLoadEstimatorM1">
+              <type>
+                <derived name="FB_WinchLoadEstimator" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Estimateurs bande vitesse réelle : alimentent le garde-fou palier FB_Winch
+via MeasuredSpeedBand, 1 instance par treuil, mêmes sources que FB_Safety_Winch.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instWinchLoadEstimatorM2">
+              <type>
+                <derived name="FB_WinchLoadEstimator" />
+              </type>
+            </variable>
             <variable name="WinchM1FinalInterlockRequest">
               <type>
                 <derived name="ST_WinchFinalInterlockRequest" />
@@ -2444,22 +2551,6 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
               <type>
                 <REAL />
               </type>
-            </variable>
-            <variable name="SpeedGuardEnableM1">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-            </variable>
-            <variable name="SpeedGuardEnableM2">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
             </variable>
             <variable name="BottomLimitM1_Active">
               <type>
@@ -3483,9 +3574,12 @@ IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAsce
     CommonMaxStepUp := 1;
 END_IF;
 
-// Planchers communs : aucune source actuelle (réservé T181-12, MinStepDown DiveSearch).
+// Planchers communs : 1 (neutre) en montée ; en descente, MAX(1, plancher plongée FB_DiveSearch).
+// Règle de l'agrégateur : plancher = MAX des sources plancher ; si plancher &gt; plafond,
+// LE PLAFOND GAGNE — le clamp final (consommation FB_Winch, lot aval) borne au plafond,
+// on ne force donc jamais ici un palier au-delà de CommonMaxStepDown.
 CommonMinStepUp   := 1;
-CommonMinStepDown := 1;
+CommonMinStepDown := MAX(1, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStepDown);
 
 // --- M2-propre (jamais vu par M1) ---
 M2MaxStepUp   := CommonMaxStepUp;
@@ -3504,6 +3598,33 @@ M2MinStepDown := CommonMinStepDown;
 {region "§6 Execution treuils M1/M2"}
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 &amp; M2) ===
 
+// Estimateurs de bande vitesse réelle appelés AVANT instWinchM1/M2 : leur sortie
+// SpeedBand alimente MeasuredSpeedBand (2e étage du garde-fou FB_Winch) sur le même
+// scan. Sources vitesse identiques à FB_Safety_Winch (§5bis).
+instWinchLoadEstimatorM1(
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
+    Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    ActiveSpeedStep         := instWinchM1.StepNumber,
+    PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    MeasuredSpeedMps        := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
+    MeasuredSpeedSignedMps  := PRG_02_Acquisition.Data.Encoders.M1.SignedSpeed_Mps,
+    SpeedConfig             := _WinchSpeedConfig,
+    LoadTable               := _WinchLoadEstimateTable
+);
+
+instWinchLoadEstimatorM2(
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
+    Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    ActiveSpeedStep         := instWinchM2.StepNumber,
+    PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    MeasuredSpeedMps        := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
+    MeasuredSpeedSignedMps  := PRG_02_Acquisition.Data.Encoders.M2.SignedSpeed_Mps,
+    SpeedConfig             := _WinchSpeedConfig,
+    LoadTable               := _WinchLoadEstimateTable
+);
+
 instWinchM1(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -3517,8 +3638,11 @@ instWinchM1(
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := CommonMaxStepDown,
     MaxStepAscent           := CommonMaxStepUp,
-    MeasuredSpeedBand       := 0,
-    SpeedGuardEnable        := SpeedGuardEnableM1,
+    // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
+    // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
+    MinStepDown             := CommonMinStepDown,
+    MeasuredSpeedBand       := instWinchLoadEstimatorM1.SpeedBand,
+    SpeedGuardEnable        := TRUE,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
     HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
@@ -3553,8 +3677,11 @@ instWinchM2(
     // (StepNumber ≤ 1 → seuls les états P1 sont commandés).
     CfgMaxStepDescente      := M2MaxStepDown,
     MaxStepAscent           := M2MaxStepUp,
-    MeasuredSpeedBand       := 0,
-    SpeedGuardEnable        := SpeedGuardEnableM2,
+    // Plancher palier descente plongée Kobold : plancher M2-propre agrégé en §5ter, injecté
+    // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
+    MinStepDown             := M2MinStepDown,
+    MeasuredSpeedBand       := instWinchLoadEstimatorM2.SpeedBand,
+    SpeedGuardEnable        := TRUE,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
     HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
@@ -5985,6 +6112,17 @@ PowerCutOff := (Fault.ErrorId AND 16#2F84) &lt;&gt; 16#0000;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond palier dans zone de ralentissement (1..5)</xhtml>
               </documentation>
             </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plancher palier en descente impose (0 = aucun) -- plongee Kobold</xhtml>
+              </documentation>
+            </variable>
             <variable name="FwdRevSpeedFeedbackOff">
               <type>
                 <BOOL />
@@ -6543,6 +6681,22 @@ IF SpeedGuardEnable THEN
     END_IF;
 END_IF;
 
+// 🤿 Plancher palier descente -- plongee Kobold.
+// Injecte MinStepDown sur la CIBLE (RequestedStep, consommee par le shaper ci-dessous),
+// JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
+// (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -&gt; aucun plancher,
+// l'arret franc RequestedStep=0 / RampTargetPct=0 est preserve.
+// Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
+// ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
+IF StartStop AND (Direction = -1) AND (MinStepDown &gt; 0) THEN
+    IF RequestedStep &lt; MinStepDown THEN
+        RequestedStep := MinStepDown;
+    END_IF;
+    IF RequestedStep &gt; ActiveMaxStep THEN
+        RequestedStep := ActiveMaxStep;
+    END_IF;
+END_IF;
+
 // ⚙️ Cadencement de palier (extrait dans FB_WinchStepShaper, D10).
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
@@ -6596,6 +6750,326 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>6f83143e-72ec-5e6b-80c8-39f828857ce4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_WinchLoadEstimator" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD] Autorisation generale FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveSpeedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier commande actif (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SECOURS ET HARDWARE ===
+--&gt; [SAFE] Chaine AU rearmee et puissance OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse cable absolue (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedSignedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse signee (+: montee, -: descente) (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedConfig">
+              <type>
+                <derived name="ST_fbWinchLoadEstimator_SpeedCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET TABLES ===
+--&gt; [CFG] Configuration des plages de vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadTable">
+              <type>
+                <derived name="ST_fbWinchLoadEstimator_Table" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table empirique d'estimation 5x5</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC ET SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBand">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS ET ESTIMATIONS ===
+&lt;-- [DIAG] Bande de vitesse courante (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EstimatedLoadPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Estimation de charge (0..100%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Configured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Table explicitement validee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ascending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Montee effective mesuree en cours</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PreviousSpeedBand">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
+. [LOC] Memoire bande de vitesse cycle precedent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HasPreviousBand">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur premiere bande memorisee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelectedLoadPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur de charge extraite de la table</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfigOrSpeedFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch défaut configuration / vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOCLE DEFAUT ===
+* [INST] Socle défaut transverse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_WinchLoadEstimator — Estimation empirique de charge treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Estimation informative de la charge par croisement palier/vitesse
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Interface : Brique de diagnostic/mesure (1 instance par treuil)
+   🔒 Sécurité : Aucune commande moteur ni action sur SafeStop (information IHM)
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+
+IF ResetEdge.Q AND (MeasuredSpeedMps &gt;= 0.0) THEN
+    ConfigOrSpeedFault := FALSE;
+END_IF;
+
+instCauses[0].Active   := ConfigOrSpeedFault;
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Parametrage ou vitesse estimation charge invalide';
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region "§2 Gate neutralisation"}
+// 🛑 2. GATE
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Ready := FALSE;
+    SpeedBand := 0;
+    EstimatedLoadPct := 0.0;
+    Configured := FALSE;
+    Ascending := FALSE;
+    HasPreviousBand := FALSE;
+    RETURN;
+END_IF;
+
+Ready := Enable AND NOT Fault.Latched;
+Configured := LoadTable.IsConfigured;
+Ascending := (MeasuredSpeedSignedMps &gt; 0.0);
+{endregion}
+
+{region "§3 Classement vitesse"}
+// 📏 3. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
+IF (MeasuredSpeedMps &lt; 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps &lt;= 0.0) THEN
+    ConfigOrSpeedFault := TRUE;
+    SpeedBand := 0;
+ELSIF NOT HasPreviousBand THEN
+    IF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[1] THEN
+        PreviousSpeedBand := 1;
+    ELSIF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[2] THEN
+        PreviousSpeedBand := 2;
+    ELSIF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[3] THEN
+        PreviousSpeedBand := 3;
+    ELSIF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[4] THEN
+        PreviousSpeedBand := 4;
+    ELSE
+        PreviousSpeedBand := 5;
+    END_IF;
+    HasPreviousBand := TRUE;
+    SpeedBand := PreviousSpeedBand;
+ELSE
+    IF PreviousSpeedBand &lt; 1 OR PreviousSpeedBand &gt; 5 THEN
+        PreviousSpeedBand := 1;
+        ConfigOrSpeedFault := TRUE;
+    END_IF;
+
+    IF PreviousSpeedBand &lt; 5 THEN
+        IF MeasuredSpeedMps &gt; (SpeedConfig.SpeedBandMaxMps[PreviousSpeedBand]
+                               + SpeedConfig.SpeedBandHysteresisMps) THEN
+            PreviousSpeedBand := PreviousSpeedBand + 1;
+        END_IF;
+    END_IF;
+    IF PreviousSpeedBand &gt; 1 THEN
+        IF MeasuredSpeedMps &lt; (SpeedConfig.SpeedBandMaxMps[PreviousSpeedBand - 1]
+                               - SpeedConfig.SpeedBandHysteresisMps) THEN
+            PreviousSpeedBand := PreviousSpeedBand - 1;
+        END_IF;
+    END_IF;
+    SpeedBand := PreviousSpeedBand;
+END_IF;
+{endregion}
+
+{region "§4 Lecture table"}
+// 📊 4. LECTURE TABLE
+EstimatedLoadPct := 0.0;
+IF Configured THEN
+    IF Ascending THEN
+        IF ActiveSpeedStep &gt;= 1 THEN
+            IF ActiveSpeedStep &lt;= 5 THEN
+                IF SpeedBand &gt;= 1 THEN
+                    IF SpeedBand &lt;= 5 THEN
+                        SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep][SpeedBand];
+                        IF (SelectedLoadPct &lt; 0.0) OR (SelectedLoadPct &gt; 100.0) THEN
+                            ConfigOrSpeedFault := TRUE;
+                        ELSE
+                            EstimatedLoadPct := SelectedLoadPct;
+                        END_IF;
+                    END_IF;
+                END_IF;
+            END_IF;
+        END_IF;
+    END_IF;
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1ca57a3d-7abe-5417-80b9-b0b83cdad590</ObjectId>
           </data>
         </addData>
       </pou>
@@ -8353,6 +8827,7 @@ END_IF;
           </Folder>
           <Object Name="FB_Safety_Winch" ObjectId="afbb4ccb-2339-5f22-9bee-0ed046924779" />
           <Object Name="FB_Winch" ObjectId="6f83143e-72ec-5e6b-80c8-39f828857ce4" />
+          <Object Name="FB_WinchLoadEstimator" ObjectId="1ca57a3d-7abe-5417-80b9-b0b83cdad590" />
           <Object Name="FB_WinchSync" ObjectId="05970ca2-4250-543c-bfcf-5f8ad1f9efae" />
           <Object Name="FB_DriftGuard" ObjectId="e215f19f-4c29-5289-9559-f2cf7fa9d55e" />
           <Object Name="FB_SpeedStep" ObjectId="12afad9c-c87d-50d6-b33c-dd7c6f83a8e4" />
@@ -8362,6 +8837,8 @@ END_IF;
           <Object Name="FB_SyncDeviation" ObjectId="24ca6948-aaa5-587d-b1af-7e9dbd94d79d" />
           <Folder Name="_TYPES">
             <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
+            <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
+            <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
             <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
             <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
           </Folder>

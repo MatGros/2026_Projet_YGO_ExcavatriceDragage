@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T20:31:27.700532" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T20:31:27.700532">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T12:14:10.507277" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T12:14:10.507277">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -437,6 +437,17 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite legale basse autorisee (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgDiveFloorStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier plancher de descente impose pendant la plongee (1..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleTime">
               <type>
                 <TIME />
@@ -530,6 +541,15 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contact fond valide et confirme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PLANCHER DE PALIER EN DESCENTE (consomme par PRG_03 -&gt; PRG_04) ===
+&lt;-- [STAT] Palier minimum impose en descente pendant la plongee (0 = aucun plancher)</xhtml>
               </documentation>
             </variable>
             <variable name="OperatorActionId">
@@ -916,6 +936,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     ImmersionConfirmed := FALSE;
     ImmersionTimerAcc := T#0ms;
     BottomTimerAcc := T#0ms;
+    MinStepDown := 0;
     PrevState := E_DiveSearchState.WAIT_PRECONDITIONS;
     RETURN;
 END_IF;
@@ -1039,6 +1060,18 @@ ELSE
         E_DiveSearchState.ERROR_HOLD:
             KoboldContactorCmd := FALSE;
     END_CASE;
+END_IF;
+
+// 🤿 Plancher de palier en descente impose pendant la plongee.
+// Actif uniquement en phase de recherche (immersion/fond) ET sous descente reellement
+// demandee (DescentActive) : retombe a 0 au front de sortie de plongee (BOTTOM_CONFIRMED /
+// ERROR_HOLD / WAIT_PRECONDITIONS), donc aucun plancher residuel. Ne cree jamais de mouvement
+// par lui-meme : il ne fait que majorer le palier d'une descente deja demandee et permise.
+IF DescentActive AND (DiveState = E_DiveSearchState.SEARCHING_IMMERSION
+                  OR DiveState = E_DiveSearchState.SEARCHING_BOTTOM) THEN
+    MinStepDown := CfgDiveFloorStep;
+ELSE
+    MinStepDown := 0;
 END_IF;
 
 // 💾 Mémorisation de l'étape précédente en toute fin de scan

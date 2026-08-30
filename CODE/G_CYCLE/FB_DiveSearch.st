@@ -30,6 +30,7 @@ VAR_INPUT
     ImmersionLower_M        : REAL;         // --> [CFG] Borne basse fenetre d'immersion (m)
     CableLimitAscent_M      : REAL := 7.5;  // --> [CFG] Limite haute d'exploitation (m), plafond de course immersion
     LimitLegalDepthMin_M    : REAL := -35.0;// --> [CFG] Limite legale basse autorisee (m)
+    CfgDiveFloorStep        : INT := 3;     // --> [CFG] Palier plancher de descente impose pendant la plongee (1..5)
     CycleTime               : TIME := T#10ms;// --> [CFG] Base de temps d'integration (periode MainTask)
     BypassPreconditions     : BOOL := FALSE;// --> [TST] Bypass preconditions et seuils (mode test)
 END_VAR
@@ -47,6 +48,9 @@ VAR_OUTPUT
     KoboldMeasureEnable     : BOOL;         // <-- [ACT] Activation mesure/acquisition Kobold
     KoboldContactorCmd      : BOOL;         // <-- [ACT] Commande alimentation contacteur Kobold (anti-chauffe)
     BottomTouchConfirmed    : BOOL;         // <-- [STAT] Contact fond valide et confirme
+
+    // === PLANCHER DE PALIER EN DESCENTE (consomme par PRG_03 -> PRG_04) ===
+    MinStepDown             : INT;          // <-- [STAT] Palier minimum impose en descente pendant la plongee (0 = aucun plancher)
 
     // === DIAGNOSTIC IHM ===
     OperatorActionId        : WORD;         // <-- [DIAG] ID action operateur requise
@@ -202,6 +206,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     ImmersionConfirmed := FALSE;
     ImmersionTimerAcc := T#0ms;
     BottomTimerAcc := T#0ms;
+    MinStepDown := 0;
     PrevState := E_DiveSearchState.WAIT_PRECONDITIONS;
     RETURN;
 END_IF;
@@ -325,6 +330,18 @@ ELSE
         E_DiveSearchState.ERROR_HOLD:
             KoboldContactorCmd := FALSE;
     END_CASE;
+END_IF;
+
+// 🤿 Plancher de palier en descente impose pendant la plongee.
+// Actif uniquement en phase de recherche (immersion/fond) ET sous descente reellement
+// demandee (DescentActive) : retombe a 0 au front de sortie de plongee (BOTTOM_CONFIRMED /
+// ERROR_HOLD / WAIT_PRECONDITIONS), donc aucun plancher residuel. Ne cree jamais de mouvement
+// par lui-meme : il ne fait que majorer le palier d'une descente deja demandee et permise.
+IF DescentActive AND (DiveState = E_DiveSearchState.SEARCHING_IMMERSION
+                  OR DiveState = E_DiveSearchState.SEARCHING_BOTTOM) THEN
+    MinStepDown := CfgDiveFloorStep;
+ELSE
+    MinStepDown := 0;
 END_IF;
 
 // 💾 Mémorisation de l'étape précédente en toute fin de scan

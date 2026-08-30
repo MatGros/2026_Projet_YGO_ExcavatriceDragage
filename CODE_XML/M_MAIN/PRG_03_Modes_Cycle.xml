@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T23:30:15.044134" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T23:30:15.044134">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T12:14:10.538661" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T12:14:10.538661">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1283,6 +1283,14 @@ Assistance plongée prête</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Forçage vitesse minimale (palier de contrôle extraction)</xhtml>
               </documentation>
             </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier plancher de descente imposé pendant la plongée (FB_DiveSearch, 0 = aucun)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -1670,6 +1678,10 @@ instDiveSearch(
     M2Position_M := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
                        AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
+    // Palier actuel M1 reellement commande (public PRG_04 §8). PRG_03 est de rang 03,
+    // PRG_04 de rang 04 : lecture du scan PRECEDENT (lag 1 scan assume, meme pratique que
+    // le reste de PRG_03). Rend effectif le refus interne du Palier 5 en plongee Kobold.
+    CurrentSpeedStep := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
@@ -1799,6 +1811,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
     Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    // SEMI_AUTO : aucun assistant de plongee actif -&gt; plancher neutre (0 = aucun).
+    Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
     // État séquence active
     IF instCycleSemiAuto.Lifecycle.Busy THEN
@@ -1876,6 +1890,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
                                                                 AND (CoupledUserRequestDirection = -1)
                                                                 AND NOT PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
     Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := instExtractionSequence.ForceMinSpeedStep;
+    // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
+    Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.MinStepDown;
 
     // États de séquence
     IF instDiveSearch.Lifecycle.Busy THEN
@@ -1958,6 +1974,8 @@ ELSE
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := FALSE;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
     Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    // DISABLE : plancher neutre (0 = aucun).
+    Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
     Data.SequenceState.SequenceId              := E_ProgramSequence.NONE;
     Data.SequenceState.Ready                   := FALSE;
@@ -3397,6 +3415,17 @@ RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite legale basse autorisee (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgDiveFloorStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier plancher de descente impose pendant la plongee (1..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleTime">
               <type>
                 <TIME />
@@ -3490,6 +3519,15 @@ RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contact fond valide et confirme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PLANCHER DE PALIER EN DESCENTE (consomme par PRG_03 -&gt; PRG_04) ===
+&lt;-- [STAT] Palier minimum impose en descente pendant la plongee (0 = aucun plancher)</xhtml>
               </documentation>
             </variable>
             <variable name="OperatorActionId">
@@ -3876,6 +3914,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     ImmersionConfirmed := FALSE;
     ImmersionTimerAcc := T#0ms;
     BottomTimerAcc := T#0ms;
+    MinStepDown := 0;
     PrevState := E_DiveSearchState.WAIT_PRECONDITIONS;
     RETURN;
 END_IF;
@@ -3999,6 +4038,18 @@ ELSE
         E_DiveSearchState.ERROR_HOLD:
             KoboldContactorCmd := FALSE;
     END_CASE;
+END_IF;
+
+// 🤿 Plancher de palier en descente impose pendant la plongee.
+// Actif uniquement en phase de recherche (immersion/fond) ET sous descente reellement
+// demandee (DescentActive) : retombe a 0 au front de sortie de plongee (BOTTOM_CONFIRMED /
+// ERROR_HOLD / WAIT_PRECONDITIONS), donc aucun plancher residuel. Ne cree jamais de mouvement
+// par lui-meme : il ne fait que majorer le palier d'une descente deja demandee et permise.
+IF DescentActive AND (DiveState = E_DiveSearchState.SEARCHING_IMMERSION
+                  OR DiveState = E_DiveSearchState.SEARCHING_BOTTOM) THEN
+    MinStepDown := CfgDiveFloorStep;
+ELSE
+    MinStepDown := 0;
 END_IF;
 
 // 💾 Mémorisation de l'étape précédente en toute fin de scan
