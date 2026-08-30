@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:10:58.119697" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:10:58.119697">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:22:14.245502" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:22:14.245502">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1524,7 +1524,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par OR — toute limite haute affichée</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledUserRequestDirection">
+            <variable name="WinchBothMotionDirection">
               <type>
                 <INT />
               </type>
@@ -2254,7 +2254,7 @@ Banner.SpecialConditionText := AntiFlickSpecial.Text;
 IF CurrentMode = E_Mode.SEMI_AUTO THEN
     CurrentDirection := CycleRequestDirection;
 ELSIF BothAxesCoupled THEN
-    CurrentDirection := CoupledUserRequestDirection;
+    CurrentDirection := WinchBothMotionDirection;
 ELSIF WinchSelected = 1 THEN
     CurrentDirection := M1LogicRequestDirection;
 ELSIF WinchSelected = 2 THEN

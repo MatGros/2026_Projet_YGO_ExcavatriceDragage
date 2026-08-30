@@ -8584,7 +8584,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par OR — toute limite haute affichée</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledUserRequestDirection">
+            <variable name="WinchBothMotionDirection">
               <type>
                 <INT />
               </type>
@@ -9314,7 +9314,7 @@ Banner.SpecialConditionText := AntiFlickSpecial.Text;
 IF CurrentMode = E_Mode.SEMI_AUTO THEN
     CurrentDirection := CycleRequestDirection;
 ELSIF BothAxesCoupled THEN
-    CurrentDirection := CoupledUserRequestDirection;
+    CurrentDirection := WinchBothMotionDirection;
 ELSIF WinchSelected = 1 THEN
     CurrentDirection := M1LogicRequestDirection;
 ELSIF WinchSelected = 2 THEN
@@ -9911,7 +9911,7 @@ Prev := Hmi;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens M2</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledUserRequestDirection">
+            <variable name="WinchBothMotionDirection">
               <type>
                 <INT />
               </type>
@@ -9919,7 +9919,7 @@ Prev := Hmi;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction couplée</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledUserRequestActive">
+            <variable name="WinchBothMotionActive">
               <type>
                 <BOOL />
               </type>
@@ -10422,8 +10422,8 @@ GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx206_ModeActive := Auth.Mode
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm := WinchM1.Bypass.OperatorComm;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := M1LogicRequestSpeedCmd_Pct;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := M1LogicRequestDirection;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx210_CoupledUserRequestDirection := CoupledUserRequestDirection;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx211_CoupledUserRequestActive := CoupledUserRequestActive;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx210_CoupledUserRequestDirection := WinchBothMotionDirection;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx211_CoupledUserRequestActive := WinchBothMotionActive;
 
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
@@ -10494,8 +10494,8 @@ GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx206_ModeActive := Auth.Mode
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm := WinchM2.Bypass.OperatorComm;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct := M2LogicRequestSpeedCmd_Pct;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection := M2LogicRequestDirection;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx210_CoupledUserRequestDirection := CoupledUserRequestDirection;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx211_CoupledUserRequestActive := CoupledUserRequestActive;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx210_CoupledUserRequestDirection := WinchBothMotionDirection;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx211_CoupledUserRequestActive := WinchBothMotionActive;
 
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive := WinchM2.Safety.SafeStop;
