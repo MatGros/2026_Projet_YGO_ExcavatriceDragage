@@ -22,8 +22,11 @@ import re
 import sys
 from pathlib import Path
 
-# Scan global : docs, standards, outillage, consignes et code ST.
-SCAN_GLOBS = ("*.md", ".claude/skills/*.md", "DOC/**/*.md", "TOOLS/**/*.md", "CODE/**/*.st")
+# Scan du produit (DOC + CODE) uniquement — rien d'autre.
+# Le but : verifier la coherence DOC <-> CODE. On n'audite PAS les transcripts
+# de session (*.md en racine), ni l'outillage (TOOLS/), ni les consignes
+# (.claude/), qui sont hors produit et generaient bruit + lenteur.
+SCAN_GLOBS = ("DOC/**/*.md", "CODE/**/*.st")
 EXCLUDED_PARTS = {"ARCHIVES", "node_modules", ".venv", "venv", ".git"}
 
 # Journaux historiques : ils citent des documents tels qu'ils existaient a la date

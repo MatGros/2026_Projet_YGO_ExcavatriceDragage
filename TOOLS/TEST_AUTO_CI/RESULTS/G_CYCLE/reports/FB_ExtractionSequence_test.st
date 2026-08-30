@@ -92,7 +92,7 @@ TEST 'TC-P04-021 : Sequence extraction complete et continue avec maintien consta
        M1Position_M := -10.0, M2Position_M := -10.0, BucketIsClosed := TRUE,
        MotionRequestActive := TRUE, MotionDirection := 1);
     ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.CONTROL_ASCENT, 'Enchaîne sur palier de controle');
-    ASSERT_TRUE(FB.ForceMinSpeedStep, 'Vitesse bridee au palier de controle');
+    ASSERT_TRUE(FB.ExtractionControlActive, 'Vitesse bridee au palier de controle');
     ASSERT_TRUE(FB.AscentPermit, 'Permis montee actif');
 
     // 4. Franchissement distance de controle (Scan 1: transition -> NOMINAL_ASCENT, Scan 2: execution)
@@ -107,7 +107,7 @@ TEST 'TC-P04-021 : Sequence extraction complete et continue avec maintien consta
        M1Position_M := -7.5, M2Position_M := -7.5, BucketIsClosed := TRUE,
        MotionRequestActive := TRUE, MotionDirection := 1);
     ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.NOMINAL_ASCENT, 'Transition vers remontee nominale');
-    ASSERT_FALSE(FB.ForceMinSpeedStep, 'Liberation de la vitesse nominale');
+    ASSERT_FALSE(FB.ExtractionControlActive, 'Liberation de la vitesse nominale');
     ASSERT_TRUE(FB.AscentPermit, 'Maintien continu du permis de montee');
 END_TEST
 
@@ -157,7 +157,7 @@ TEST 'TC-P04-022 : Depassement tempo decollage controle -> ERROR_HOLD et capture
     ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.ERROR_HOLD, 'Verrouille en ERROR_HOLD');
     ASSERT_EQ(FB.StepAtFault, E_ExtractionSequenceState.CONTROL_ASCENT, 'StepAtFault memorise CONTROL_ASCENT');
     ASSERT_FALSE(FB.AscentPermit, 'Permis montee coupe');
-    ASSERT_FALSE(FB.ForceMinSpeedStep, 'Consignes automatiques arretees');
+    ASSERT_FALSE(FB.ExtractionControlActive, 'Consignes automatiques arretees');
 END_TEST
 
 TEST 'TC-P04-023 : Backstop fermeture benne (FB_Bucket sans faute) -> ERROR_HOLD et capture StepAtFault'
@@ -268,7 +268,7 @@ TEST 'TC-P04-025 : Defaut benne coupe BucketCloseRequest le meme scan (H2), avan
     ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.ERROR_HOLD, 'Verrouille en ERROR_HOLD');
 END_TEST
 
-TEST 'TC-P04-026 : Reset refuse tant que la cause physique persiste, ForceMinSpeedStep suit le permis (F1/F2)'
+TEST 'TC-P04-026 : Reset refuse tant que la cause physique persiste, ExtractionControlActive suit le permis (F1/F2)'
     // Mise en CONTROL_ASCENT
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
        ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
@@ -290,16 +290,16 @@ TEST 'TC-P04-026 : Reset refuse tant que la cause physique persiste, ForceMinSpe
        M1Position_M := -9.5, M2Position_M := -9.5, BucketIsClosed := TRUE,
        MotionRequestActive := TRUE, MotionDirection := 1);
     ASSERT_EQ(FB.ExtractionState, E_ExtractionSequenceState.CONTROL_ASCENT, 'En decollage controle');
-    ASSERT_TRUE(FB.ForceMinSpeedStep, 'Bridage actif sous permis positif');
+    ASSERT_TRUE(FB.ExtractionControlActive, 'Bridage actif sous permis positif');
 
-    // Relachement de la demande : F1 -> ForceMinSpeedStep suit AscentPermit (tombe), sans defaut
+    // Relachement de la demande : F1 -> ExtractionControlActive suit AscentPermit (tombe), sans defaut
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
        ControlAscentDistance_M := 2.0, BottomPositionConfirmed := TRUE,
        PositionsValid := TRUE, M1MeasuredSpeedValid := TRUE, M2MeasuredSpeedValid := TRUE,
        M1Position_M := -9.5, M2Position_M := -9.5, BucketIsClosed := TRUE,
        MotionRequestActive := FALSE, MotionDirection := 0);
     ASSERT_FALSE(FB.AscentPermit, 'Permis coupe au relachement');
-    ASSERT_FALSE(FB.ForceMinSpeedStep, 'ForceMinSpeedStep suit le permis (F1), jamais actif sans montee autorisee');
+    ASSERT_FALSE(FB.ExtractionControlActive, 'ExtractionControlActive suit le permis (F1), jamais actif sans montee autorisee');
 
     // Defaut synchro persistant -> latch
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,

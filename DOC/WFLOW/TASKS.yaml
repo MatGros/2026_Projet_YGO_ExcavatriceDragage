@@ -967,18 +967,19 @@ tasks:
     non déclarés dans les .st (globals uniquement dans Device.export) → source non auto-consistant ; ③ la commande drive M3
     n''est PAS dans le bus Data (ST_OutputsInterPrg ne porte que TranslationBrakeCmd) ; ④ diag plats en VAR_OUTPUT (M3BlockedBySafetyInfo,
     EmergencyState, EmergencyDiag…) au lieu d''un struct/bus diag propre.'
-  description: '✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T144_ASSAINIR_PRG06_v0.1.md`) : 4 faits confirmés (sorties
-    mortes L51-52, globals non déclarés L270-271, commande M3 absente du bus Data, diag plats). Plan : ① supprimer/réassigner
-    mortes, ② déclarer globals .st, ③ étendre ST_OutputsInterPrg (commande drive M3, producteur unique), ④ struct ST_OutputsDiag.
-    ⏳ **Implémentation en attente** : choix supprimer/réassigner, impact sim, validation humaine.'
+  description: '✅ **Faits ①② RÉSOLUS (2026-08-25, T121)** : `M3_DriveControlWord`/`M3_DriveFreqCmdWord` désormais déclarés
+    (L51-52) ET assignés (L270-271) depuis `instTranslationOutputInterlockM3` ; les globals `M3_CommandWord`/`M3_SetpointFrequencyHz`
+    ne sont plus dans le .st (source auto-consistante). ✅ **Design T144B livré** (`DOC/WFLOW/AUDITS/DESIGN/DESIGN_T144B_INTERFACES_PRG6_v0.1.md`,
+    2026-08-30) : challenge inter-PRG → D1 (supprimer la boucle PRG_04→PRG_06, bus diag `ST_OutputsDiag` sur PRG_06, assemblage
+    IHM PRG_07 sur 2 bus), D2 (source unique `PowerCutOff` dans `…FinalInterlockRequest`), D3 (commande drive M3 sur `ST_OutputsInterPrg`).
+    ⏳ **Implémentation en attente** : arbitrages Q1-Q4 (variante IHM A/B, D2-A/B, D3-A/B, fusion T181-01) + validation humaine.'
   objectifs:
-  - M3_DriveControlWord/M3_DriveFreqRefWord (VAR_OUTPUT l.43-44) jamais assignés (morts, toujours 0) ;
-  - M3_CommandWord/M3_SetpointFrequencyHz (assignés l.215-216) non déclarés dans les .st (globals uniquement dans Device.export)
-    → source non auto-consistant ;
-  - la commande drive M3 n'est PAS dans le bus Data (ST_OutputsInterPrg ne porte que TranslationBrakeCmd) ;
-  - diag plats en VAR_OUTPUT (M3BlockedBySafetyInfo, EmergencyState, EmergencyDiag…) au lieu d'un struct/bus diag propre.
+  - 'D1 : supprimer la boucle de lecture arrière PRG_04→PRG_06 (read-back instance + aller-retour diag) ; PRG_06 publie Data.Diag:ST_OutputsDiag ; PRG_07 assemble l''IHM depuis PRG_04.Data + PRG_06.Data.Diag'
+  - 'D2 : source de vérité unique PowerCutOff/SafeStop (recommandé : dans ST_WinchFinalInterlockRequest) ; ST_SafetyWinch ne garde que BlockedBySafety'
+  - 'D3 : monter la commande drive M3 (M3DriveControlWord/M3DriveFreqCmdWord) sur ST_OutputsInterPrg (producteur unique)'
+  - '④ : regrouper les diag plats (M1/M2/M3*SafetyInfo, PowerCutOffActive…) dans un struct/bus diag propre'
   contrat: ''
-  date: '2026-08-28T21:07:19'
+  date: '2026-08-30T18:00:37+02:00'
   bloque_par: []
 - id: T145
   parent_id: ''

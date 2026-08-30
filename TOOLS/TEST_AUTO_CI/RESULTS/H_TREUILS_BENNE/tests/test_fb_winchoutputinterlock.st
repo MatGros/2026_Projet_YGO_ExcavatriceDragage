@@ -216,6 +216,15 @@ TEST 'TC-P10-020 Watchdog frein reel terrain : temps/contacteur/bobine'
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0);
     ADVANCE_TIME(1500000000);
+    // Scan neutre temporise : purge RestartRequired/DeadTimePending (TON tickes apres la pause,
+    // comme les ~150 scans de 10ms d'une vraie pause automate) avant la demande mouvement.
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0);
+    ADVANCE_TIME(10000000);
     fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,

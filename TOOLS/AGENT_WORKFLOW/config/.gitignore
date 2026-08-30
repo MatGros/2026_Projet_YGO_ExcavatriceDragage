@@ -23,3 +23,6 @@ __pycache__/
 # IDE
 .DS_Store
 Thumbs.db
+
+# Checkpoints de progression des agents (transitoires, regenerables)
+status/

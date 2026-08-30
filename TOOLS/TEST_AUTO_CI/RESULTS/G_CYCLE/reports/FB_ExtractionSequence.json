@@ -1,67 +1,43 @@
 {
   "version": 1,
-  "file": "test_fb_safety_winch.st",
+  "file": "test_fb_extractionsequence.st",
   "results": [
     {
-      "name": "TC-P10-001 Meca A : derive >2.0m a l arret (joystick neutre) -> SafeStop + PowerCutOff",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P10-002 Meca B : non confirmation arret 3s -> SafeStop + PowerCutOff",
+      "name": "TC-P04-020 Extraction : mise en service sequence extraction",
       "passed": true
     },
     {
-      "name": "TC-P10-003 Meca C : glissement M1 >2.0m pendant maintien benne -> SafeStop + PowerCutOff",
+      "name": "TC-P04-021 : Sequence extraction complete et continue avec maintien constant du joystick operateur",
       "passed": true
     },
     {
-      "name": "TC-P10-004 Meca D : capteur haut sans arret 3s -> SafeStop (immediat) puis PowerCutOff (3s)",
+      "name": "TC-P04-022 : Depassement tempo decollage controle -> ERROR_HOLD et capture StepAtFault",
       "passed": true
     },
     {
-      "name": "TC-P10-005 Meca E bit12 : ecart >2.5m -> SafeStop SEUL (pas PowerCutOff)",
+      "name": "TC-P04-023 : Backstop fermeture benne (FB_Bucket sans faute) -> ERROR_HOLD et capture StepAtFault",
       "passed": true
     },
     {
-      "name": "TC-P10-006 Meca E bit13 : bit12 non confirme 3s -> escalade PowerCutOff",
+      "name": "TC-P04-024 : Latch timeout extraction survit au cycle Enable OFF/ON, acquitte seulement sur front Reset",
       "passed": true
     },
     {
-      "name": "TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -> SafeStop SEUL",
+      "name": "TC-P04-025 : Defaut benne coupe BucketCloseRequest le meme scan (H2), avant ERROR_HOLD",
       "passed": true
     },
     {
-      "name": "TC-P10-008 Meca G : vitesse nulle malgre commande 3s -> SafeStop SEUL",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-009 Masque PowerCutOff : bit2 (surchauffe moteur) coupe, bit14 (sens oppose) ne coupe pas",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-010 SafeStop exclut bit3 (mou cable) si SyncEnable=FALSE",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-036.1 Warmup 3s : perte com operateur ignoree pendant 3s puis SafeStop",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves, re-Enable exige Reset",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-044.1 Mou cable : SyncEnable=FALSE -> DescendPermit=FALSE, AscentPermit autorise, blocage leve au retension",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04->PRG_06->AU = essai site",
+      "name": "TC-P04-026 : Reset refuse tant que la cause physique persiste, ExtractionControlActive suit le permis (F1/F2)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 14,
-    "passed": 14,
+    "total": 8,
+    "passed": 8,
     "failed": 0
   }
 }

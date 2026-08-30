@@ -1,0 +1,146 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam packageBackgroundColor #FFFFFF
+skinparam packageBorderColor #4A5568
+skinparam classBackgroundColor #EDF2F7
+skinparam classBorderColor #2B6CB0
+skinparam classHeaderBackgroundColor #2B6CB0
+skinparam classFontStyle bold
+skinparam classFontColor #FFFFFF
+skinparam classAttributeFontColor #2D3748
+skinparam arrowColor #2B6CB0
+skinparam arrowThickness 1.5
+
+title Architecture ST - 2026_Projet_YGO_ExcavatriceDragage/CODE/
+
+package "Programmes Principaux (POU ST)" {
+    class "PRG_01_Inputs" as PRG01 <<PROGRAM (ST)>>
+    class "PRG_02_Acquisition" as PRG02 <<PROGRAM (ST)>>
+    class "PRG_03_Modes_Cycle" as PRG03 <<PROGRAM (ST)>>
+    class "PRG_04_Treuils_Benne" as PRG04 <<PROGRAM (ST)>>
+    class "PRG_05_Translation" as PRG05 <<PROGRAM (ST)>>
+    class "PRG_06_Outputs" as PRG06 <<PROGRAM (ST)>>
+    class "PRG_07_Supervision" as PRG07 <<PROGRAM (ST)>>
+}
+
+package "Modules Fonctionnels /CODE/" {
+    package "A_COMMUN" {
+        class FB_Acquisition_Preflight
+        class FB_Brake
+        class FB_CycleTime
+        class FB_FaultCore
+        class FB_Filter
+        class FB_Ramp
+    }
+
+    package "B_AU_SECURITE" {
+        class FB_Safety_EmergencyManagement
+        class FB_Safety_EmergencyManagementLogic
+        class FB_Safety_EmergencyManagementOutput
+    }
+
+    package "C_DIAG_RESEAUX" {
+        class FB_Diag_CanOpen
+        class FB_Diag_Ethercat
+        class FB_Diag_IhmHeartbeat
+    }
+
+    package "D_JOYSTICK" {
+        class FB_Joystick
+        class FB_AxisScale
+    }
+
+    package "E_CODEURS" {
+        class FB_Encoder
+        class FB_Encoder_Abs
+        class FB_Encoder_Homing
+        class FB_Encoder_Safety
+        class FB_Encoder_Scale
+        class FB_Encoder_SpeedMeasure
+        class FB_EncoderReliability
+    }
+
+    package "F_MODES" {
+        class FB_Modes
+    }
+
+    package "G_CYCLE" {
+        class FB_Cycle
+        class FB_DiveSearch
+        class FB_ExtractionSequence
+    }
+
+    package "H_TREUILS_BENNE" {
+        class FB_Bucket
+        class FB_Winch
+        class FB_WinchSync
+        class FB_Safety_Winch
+        class FB_Winch_Symmetry
+        class FB_WinchDirectionInterlock
+        class FB_WinchOutputInterlock
+        class FB_DriftGuard
+        class FB_SpeedStep
+        class FB_SyncContactor
+        class FB_SyncDeviation
+        class FB_WinchLoadEstimator
+        class FB_WinchSpeedLearning
+        class FB_WinchStepShaper
+    }
+
+    package "I_TRANSLATION" {
+        class FB_Translation
+        class FB_Safety_Translation
+        class FB_Translation_PositionDecoder
+        class FB_Translation_PositionEstimator
+        class FB_TranslationOutputInterlock
+    }
+
+    package "J_SUPERVISION" {
+        class FB_Hmi_BannerFormatter
+        class FB_TroubleshootingView
+        class FB_AntiFlickerText
+        class FB_MirrorBypassRetain
+        class FB_CfgPersistBridge_*
+    }
+}
+
+' Ordonnancement cyclique des programmes
+PRG01 -down-> PRG02 : 1. E/S brutes
+PRG02 -down-> PRG03 : 2. Données qualifiées, Sécurité, Joysticks, Codeurs
+PRG03 -down-> PRG04 : 3. Consignes Treuils / Benne
+PRG03 -down-> PRG05 : 4. Consignes Translation
+PRG04 -down-> PRG06 : 5. Commandes Treuils & Freins
+PRG05 -down-> PRG06 : 6. Commandes Translation & Freins
+PRG06 -down-> PRG07 : 7. États Sorties & Freins
+PRG07 .up.> PRG03   : Retours IHM & Paramètres
+
+' Relations Programmes -> Blocs fonctionnels
+PRG01 ..> FB_Acquisition_Preflight : appelle
+PRG02 ..> FB_Safety_EmergencyManagement : appelle
+PRG02 ..> FB_Diag_CanOpen : appelle
+PRG02 ..> FB_Diag_Ethercat : appelle
+PRG02 ..> FB_Joystick : appelle
+PRG02 ..> FB_Encoder : appelle
+
+PRG03 ..> FB_Modes : appelle
+PRG03 ..> FB_Cycle : appelle
+PRG03 ..> FB_DiveSearch : appelle
+PRG03 ..> FB_ExtractionSequence : appelle
+
+PRG04 ..> FB_Bucket : appelle
+PRG04 ..> FB_Winch : appelle
+PRG04 ..> FB_WinchSync : appelle
+PRG04 ..> FB_Safety_Winch : appelle
+PRG04 ..> FB_Winch_Symmetry : appelle
+
+PRG05 ..> FB_Translation : appelle
+PRG05 ..> FB_Safety_Translation : appelle
+PRG05 ..> FB_Translation_PositionDecoder : appelle
+
+PRG06 ..> FB_Brake : appelle
+
+PRG07 ..> FB_Hmi_BannerFormatter : appelle
+PRG07 ..> FB_TroubleshootingView : appelle
+PRG07 ..> FB_Diag_IhmHeartbeat : appelle
+
+@enduml

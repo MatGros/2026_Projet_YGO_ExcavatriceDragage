@@ -1,0 +1,117 @@
+@'
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam defaultFontColor #1E293B
+
+skinparam package {
+    borderColor #94A3B8
+    backgroundColor #F8FAFC
+    fontStyle bold
+    fontColor #334155
+}
+
+skinparam class {
+    backgroundColor #FFFFFF
+    borderColor #3B82F6
+    headerBackgroundColor #EFF6FF
+    fontColor #1E293B
+    attributeFontColor #475569
+    fontSize 11
+}
+
+skinparam arrow {
+    color #2563EB
+    thickness 1.2
+    fontColor #64748B
+    fontSize 10
+}
+
+title Architecture d'Execution IEC 61131-3 (PRG_01 a PRG_07)
+
+package "1. Entrees Physiques" {
+    class "PRG_01_Inputs (LD)" as PRG01 <<PROGRAM>> {
+        + Lecture entrees TOR / ANA
+        + FB_Input
+        + FB_DigitalInputFilter
+    }
+}
+
+package "2. Acquisition & Qualification" {
+    class "PRG_02_Acquisition (CFC)" as PRG02 <<PROGRAM>> {
+        + FB_Safety_EmergencyManagement
+        + FB_Joystick (Levage, Fermeture, Translation)
+        + FB_Encoder (Codeurs Abs/Rel)
+        + FB_Diag_CanOpen / FB_Diag_Ethercat
+        --
+        * Qualification IO & Securite
+    }
+}
+
+package "3. Gestion des Modes & Cycle" {
+    class "PRG_03_Modes_Cycle (CFC)" as PRG03 <<PROGRAM>> {
+        + FB_Modes (Manuel, Semi-Auto, Maint.)
+        + FB_Cycle (Sequenceur Dragage)
+        + FB_DiveSearch (Recherche Fond)
+        + FB_ExtractionSequence
+        --
+        * Arbitrage des consignes operateur / cycle
+    }
+}
+
+package "4. Controle Treuils & Benne" {
+    class "PRG_04_Treuils_Benne (CFC)" as PRG04 <<PROGRAM>> {
+        + FB_Bucket (Cinematique benne)
+        + FB_Winch (Treuil Levage & Fermeture)
+        + FB_WinchSync (Synchronisation)
+        + FB_Safety_Winch (Verrous & Derive)
+        + FB_Winch_Symmetry
+    }
+}
+
+package "5. Controle Translation" {
+    class "PRG_05_Translation (CFC)" as PRG05 <<PROGRAM>> {
+        + FB_Translation
+        + FB_Safety_Translation
+        + FB_Translation_PositionDecoder
+        + FB_Translation_PositionEstimator
+        + FB_TranslationOutputInterlock
+    }
+}
+
+package "6. Sorties Physiques" {
+    class "PRG_06_Outputs (LD)" as PRG06 <<PROGRAM>> {
+        + Ecriture sorties TOR / ANA
+        + FB_Output
+        + FB_Brake (Pilotage freins de securite)
+        + Consignes variateurs
+    }
+}
+
+package "7. Supervision & IHM" {
+    class "PRG_07_Supervision (CFC)" as PRG07 <<PROGRAM>> {
+        + FB_Hmi_BannerFormatter
+        + FB_TroubleshootingView
+        + FB_CfgPersistBridge_*
+        + FB_Diag_IhmHeartbeat
+    }
+}
+
+PRG01 -down-> PRG02 : g_stInputsRaw
+PRG02 -down-> PRG03 : g_stInputsQualified\nConsignes Joysticks\nStatuts Securite (AU)
+PRG03 -down-> PRG04 : Consignes Treuils/Benne\n(Manuel / Auto Cycle)
+PRG03 -down-> PRG05 : Consignes Translation\n(Manuel / Auto)
+
+PRG04 -down-> PRG06 : Commandes Vitesse/Couple Treuils\nEtats Freins
+PRG05 -down-> PRG06 : Commandes Variateurs Translation\nEtats Freins
+
+PRG02 .right.> PRG07 : Diagnostics & Alertes
+PRG03 .right.> PRG07 : Etats Cycle & Modes
+PRG04 .right.> PRG07 : Positions & Tensions cables
+PRG05 .right.> PRG07 : Position Pont & Vitesse
+PRG07 .up.> PRG03 : Commandes Operateur IHM\nParametres Recettes
+@enduml
+'@ | Out-File -FilePath "C:\Users\ZEDVICTUS\MAIN2.puml" -Encoding utf8
