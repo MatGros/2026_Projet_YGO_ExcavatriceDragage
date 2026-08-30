@@ -2257,6 +2257,31 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis)</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir IHM des états de maintenance (AF-05 §4bis)
+🚦 Changement de mode refusé : treuils non à l'arrêt confirmé (contacteurs retombés + frein serré + |v| &lt; seuil)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 M1 : re-homing obligatoire avant retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 M2 : re-homing obligatoire avant retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -4090,6 +4115,14 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le homing à 0 m (points codeur centre),</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnOverrideTopSoftware">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation MAINTENUE de dépasser le FDC</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -5429,6 +5462,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <value name="NONE" value="0" />
               <value name="BRAKE_COMMAND_NOT_CONFIRMED" value="1" />
               <value name="RESTART_INHIBITED" value="2" />
+              <value name="SENSE_DROP_TIMEOUT" value="3" />
             </values>
           </enum>
         </baseType>
@@ -5451,6 +5485,12 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <Name>RESTART_INHIBITED</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SENSE_DROP_TIMEOUT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">T_max §3bis depasse sans confirmation retombee (AC7)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -5476,6 +5516,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <value name="WAIT_STEP_DELAY" value="3" />
               <value name="WAIT_RESTART_DELAY" value="4" />
               <value name="FAULT" value="5" />
+              <value name="WAIT_SENSE_DROP_CONFIRM" value="6" />
             </values>
           </enum>
         </baseType>
@@ -5516,6 +5557,12 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <Name>FAULT</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat de defaut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_SENSE_DROP_CONFIRM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien §3bis du contacteur de sens (AC6/AC7)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

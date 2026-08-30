@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:37:02.512167" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:37:02.512167">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T23:00:21.513526" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T23:00:21.513526">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -80,6 +80,38 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 §4bis — matrice de maintenance
+⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
+vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
+🚦 Demande de changement de mode REFUSÉE : les treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas à l'arrêt mécanique confirmé
+(contacteurs retombés ET frein serré ET |v| &lt; seuil).
+Le mode courant est maintenu. IHM : « arrêter les
+treuils avant de changer de mode ».
+🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(usage effectif d'un override/bypass position en maintenance)
+🧭 M2 : idem</xhtml>
               </documentation>
             </variable>
           </struct>

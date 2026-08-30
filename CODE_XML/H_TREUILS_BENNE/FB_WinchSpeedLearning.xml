@@ -1,0 +1,610 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T22:39:51.067927" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T22:39:51.067927">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_fbWinchSpeedLearning_Cell">
+        <baseType>
+          <struct>
+            <variable name="Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cellule validee (vitesse apprise exploitable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse apprise (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCount">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur d'echantillons collectes</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8341fe63-7ea1-5607-8731-d295248cd6cb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 ST_fbWinchSpeedLearning_Cell — Cellule de vitesse apprise
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Cellule unitaire de la table d'apprentissage vitesse par palier
+   📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchSpeedLearning_Cfg">
+        <baseType>
+          <struct>
+            <variable name="MinSpeedMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne min vitesse apprise par palier (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSpeedMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne max vitesse apprise par palier (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinSamples">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nb min d'echantillons pour valider une cellule</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e33b18ad-d4ff-5cd1-939b-74be82c01450</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbWinchSpeedLearning_Cfg — Enveloppes de plausibilite par palier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Bornes min/max de vitesse apprise par palier + seuil d'echantillons
+   📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchSpeedLearning_Table">
+        <baseType>
+          <struct />
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e53cb50d-fd3d-5709-9494-4694f689ff17</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 ST_fbWinchSpeedLearning_Table — Table RETAIN apprentissage vitesse
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Matrice {axe x sens x charge/vide x palier} de vitesses apprises
+   📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_WinchSpeedLearning" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT (Enable) ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LearnStart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bit IHM lancer apprentissage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchId">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Axe cible (1=M1, 2=M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens mesure (-1 descente, 0 stop, +1 montee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Palier actif (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse mesuree (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mesure exploitable</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadPresent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Charge presente (TRUE=charge, FALSE=vide)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StableForLearn">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Conditions stables pour apprentissage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Config">
+              <type>
+                <derived name="ST_fbWinchSpeedLearning_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES &amp; CONFIGURATION ===
+--&gt; [CFG] Enveloppes de plausibilite par palier</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT (Ready) ===
+&lt;-- [STAT] FB pret (Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Learning">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS &amp; DIAGNOSTIC ===
+&lt;-- [STAT] Collecte en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TableComplete">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Table charge ET vide complete</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LampLearn">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Voyant IHM apprentissage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CellsFilled">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Nombre de cellules validees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CellsTotal">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Nombre total de cellules</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Table">
+              <type>
+                <derived name="ST_fbWinchSpeedLearning_Table" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURES DE DONNEES PARTAGEES ===
+&lt;-&gt; [BUS] Table RETAIN apprentissage</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="LearnRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULEES ===
+. [LOC] Bit IHM + Enable</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasureUsable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mesure valide + conditions stables</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens non nul</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepInRange">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier dans 1..5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxeInRange">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Axe dans 1..2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContextValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens, palier et axe dans le domaine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CollectAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Conditions de collecte reunies</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedPlausible">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse dans l'enveloppe du palier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index sens (1=montee, 2=descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChargeIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index charge (1=vide, 2=charge)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CurrentCell">
+              <type>
+                <derived name="ST_fbWinchSpeedLearning_Cell" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cellule courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxeIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index axe boucle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensLoopIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index sens boucle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChargeLoopIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index charge boucle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PalierIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index palier boucle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_AxeCount">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre d'axes (M1, M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_SensCount">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de sens (montee, descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ChargeCount">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre d'etats de charge (vide, charge)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_PalierCount">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de paliers (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_IdxMontee">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Index sens montee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_IdxDescente">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Index sens descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_IdxVide">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Index charge vide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_IdxCharge">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Index charge presente</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_WinchSpeedLearning — Collecteur passif vitesse par palier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Apprentissage passif des vitesses reelles par palier (RETAIN)
+   📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔒 Collecteur pur : aucune commande moteur, aucune surveillance survitesse
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Gate et conditions de collecte"}
+Ready := Enable;
+Learning := FALSE;
+LampLearn := FALSE;
+
+// Conditions de collecte scindees (lisibilite Watch, &lt;=3 termes par predicat)
+LearnRequested := Enable AND LearnStart;
+MeasureUsable := MeasuredSpeedValid AND StableForLearn;
+SensActive := (Direction &lt;&gt; 0);
+StepInRange := (StepNumber &gt;= 1) AND (StepNumber &lt;= CST_PalierCount);
+AxeInRange := (WinchId &gt;= 1) AND (WinchId &lt;= CST_AxeCount);
+ContextValid := SensActive AND StepInRange AND AxeInRange;
+CollectAllowed := LearnRequested AND MeasureUsable AND ContextValid;
+{endregion}
+
+{region "§2 Collecte passive"}
+IF CollectAllowed THEN
+    // Index sens et charge
+    IF Direction &gt; 0 THEN SensIdx := CST_IdxMontee; ELSE SensIdx := CST_IdxDescente; END_IF;
+    IF LoadPresent THEN ChargeIdx := CST_IdxCharge; ELSE ChargeIdx := CST_IdxVide; END_IF;
+
+    // Plausibilite : vitesse dans l'enveloppe du palier (borne min/max)
+    SpeedPlausible := (MeasuredSpeedMps &gt;= Config.MinSpeedMps[StepNumber])
+                      AND (MeasuredSpeedMps &lt;= Config.MaxSpeedMps[StepNumber]);
+
+    CurrentCell := Table.Cell[WinchId, SensIdx, ChargeIdx, StepNumber];
+    IF SpeedPlausible THEN
+        // Accumulation (moyenne glissante)
+        IF CurrentCell.SampleCount = 0 THEN
+            CurrentCell.SpeedMps := MeasuredSpeedMps;
+            CurrentCell.SampleCount := 1;
+        ELSE
+            CurrentCell.SpeedMps := (CurrentCell.SpeedMps * REAL(CurrentCell.SampleCount) + MeasuredSpeedMps)
+                                    / REAL(CurrentCell.SampleCount + 1);
+            CurrentCell.SampleCount := CurrentCell.SampleCount + 1;
+        END_IF;
+        CurrentCell.Valid := (CurrentCell.SampleCount &gt;= Config.MinSamples);
+    ELSE
+        // Valeur hors enveloppe -&gt; cellule invalidee
+        CurrentCell.Valid := FALSE;
+        CurrentCell.SampleCount := 0;
+        CurrentCell.SpeedMps := 0.0;
+    END_IF;
+    Table.Cell[WinchId, SensIdx, ChargeIdx, StepNumber] := CurrentCell;
+
+    Learning := TRUE;
+    LampLearn := TRUE;
+END_IF;
+{endregion}
+
+{region "§3 Comptage et completude"}
+CellsTotal := CST_AxeCount * CST_SensCount * CST_ChargeCount * CST_PalierCount;
+CellsFilled := 0;
+FOR AxeIdx := 1 TO CST_AxeCount DO
+    FOR SensLoopIdx := 1 TO CST_SensCount DO
+        FOR ChargeLoopIdx := 1 TO CST_ChargeCount DO
+            FOR PalierIdx := 1 TO CST_PalierCount DO
+                IF Table.Cell[AxeIdx, SensLoopIdx, ChargeLoopIdx, PalierIdx].Valid THEN
+                    CellsFilled := CellsFilled + 1;
+                END_IF;
+            END_FOR;
+        END_FOR;
+    END_FOR;
+END_FOR;
+TableComplete := (CellsFilled &gt;= CellsTotal);
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6afdf87d-eb65-57d6-8e0e-3c8115a778a0</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="H_TREUILS_BENNE">
+          <Object Name="FB_WinchSpeedLearning" ObjectId="6afdf87d-eb65-57d6-8e0e-3c8115a778a0" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbWinchSpeedLearning_Cell" ObjectId="8341fe63-7ea1-5607-8731-d295248cd6cb" />
+            <Object Name="ST_fbWinchSpeedLearning_Cfg" ObjectId="e33b18ad-d4ff-5cd1-939b-74be82c01450" />
+            <Object Name="ST_fbWinchSpeedLearning_Table" ObjectId="e53cb50d-fd3d-5709-9494-4694f689ff17" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

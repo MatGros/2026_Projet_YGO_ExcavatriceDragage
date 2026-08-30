@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T17:46:36.414687" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T17:46:36.414687">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T23:30:01.168092" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T23:30:01.168092">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2386,6 +2386,38 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 §4bis — matrice de maintenance
+⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
+vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
+🚦 Demande de changement de mode REFUSÉE : les treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas à l'arrêt mécanique confirmé
+(contacteurs retombés ET frein serré ET |v| &lt; seuil).
+Le mode courant est maintenu. IHM : « arrêter les
+treuils avant de changer de mode ».
+🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(usage effectif d'un override/bypass position en maintenance)
+🧭 M2 : idem</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -4744,6 +4776,14 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le homing à 0 m (points codeur centre),</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnOverrideTopSoftware">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation MAINTENUE de dépasser le FDC</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -5691,6 +5731,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <value name="NONE" value="0" />
               <value name="BRAKE_COMMAND_NOT_CONFIRMED" value="1" />
               <value name="RESTART_INHIBITED" value="2" />
+              <value name="SENSE_DROP_TIMEOUT" value="3" />
             </values>
           </enum>
         </baseType>
@@ -5713,6 +5754,12 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <Name>RESTART_INHIBITED</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SENSE_DROP_TIMEOUT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">T_max §3bis depasse sans confirmation retombee (AC7)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -5738,6 +5785,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <value name="WAIT_STEP_DELAY" value="3" />
               <value name="WAIT_RESTART_DELAY" value="4" />
               <value name="FAULT" value="5" />
+              <value name="WAIT_SENSE_DROP_CONFIRM" value="6" />
             </values>
           </enum>
         </baseType>
@@ -5778,6 +5826,12 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <Name>FAULT</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat de defaut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_SENSE_DROP_CONFIRM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien §3bis du contacteur de sens (AC6/AC7)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -6732,8 +6786,17 @@ GVL_IHM.Modes.State.EmergencyArmable := PRG_06_Outputs.EmergencyState.Armable;
 GVL_IHM.Modes.State.EmergencyArmingBusy := PRG_06_Outputs.EmergencyState.ArmingBusy;
 GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed;
 GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs.EmergencyDiag.ArmFailed;
-GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error OR PRG_02_Acquisition.Data.InputModuleFault;
+// OR avec les défauts d'arbitrage de mode (refus Semi-Auto, bascule de mode refusée) —
+// publiés par PRG_03 : sans eux ces refus restaient silencieux pour l'opérateur.
+GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
+                                      OR PRG_02_Acquisition.Data.InputModuleFault
+                                      OR PRG_03_Modes_Cycle.Data.ModesFault.Error
+                                      OR PRG_03_Modes_Cycle.Data.ModesFault.Latched;
 GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs.PowerCutOffActive;
+// Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
+GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
+GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
+GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
 
 // ---------- §3f. État joystick &amp; réseau (diagnostic bus) ----------
 GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;
