@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:05:11.970936" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:05:11.970936">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:14:31.353637" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:14:31.353637">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,66 +23,67 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_fbTranslationCmdArbitration_IHM">
+      <dataType name="ST_fbBucketCmdArbitration_Context">
         <baseType>
           <struct>
-            <variable name="BtnFwd">
+            <variable name="TglEnableCoupledBucketSequencing">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation avant (TranslationM3.Cmd.BtnFwd)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Activation séquencement couplé benne (Commun.Cfg)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnRev">
+            <variable name="MotionActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation arrière (TranslationM3.Cmd.BtnRev)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention mouvement both active (WinchBothMotionActive)</xhtml>
               </documentation>
             </variable>
-            <variable name="SelPositioning">
+            <variable name="MotionDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens mouvement both (1: montée, -1: descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsOpen">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sélecteur positionnement (TranslationM3.Cmd.SelPositioning)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne ouverte (BucketState.IsOpen)</xhtml>
               </documentation>
             </variable>
-            <variable name="SetFreq_Hz">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne fréquence (TranslationM3.Cmd.SetFreq_Hz)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassGlobal">
+            <variable name="BucketIsClosed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass global translation (TranslationM3.Bypass.Global)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne fermée (BucketState.IsClosed)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>ce120c8d-0245-5e38-851c-8c02205c89fc</ObjectId>
+            <ObjectId>f4f3035a-b2f5-50cc-b957-e5b6b46c9e58</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎛️ ST_fbTranslationCmdArbitration_IHM — Entrées IHM de l'arbitrage M3
+   🧩 ST_fbBucketCmdArbitration_Context — Contexte de gating benne
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Encapsuler les commandes IHM consommées par FB_TranslationCommandArbitration
-       (boutons, sélecteur positionnement, consigne fréquence).
-       Le toggle joystick maître global (Modes.Cmd.TglJoystickMaster) est passé en
-       paramètre séparé du FB (I4 — factorisation, source unique GVL_IHM.Modes.Cmd).
-   📤 Producteur : PRG_05_Translation (câblage GVL_IHM).
-   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   🎯 Rôle : Encapsuler les faits de gating consommés par FB_BucketCmdArbitration
+       pour le séquencement couplé benne (config, intention both, état benne).
+       Le FB dérive les flags armés (WinchBothDiveBucketOpenArmed /
+       WinchBothAscentBucketCloseArmed) et les commandes arbitrées.
+   📤 Producteur : PRG_04_Treuils_Benne (câblage).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 État benne : 2 bits BOOL (BucketIsOpen/Closed) dérivés de _BucketState.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -95,9 +96,9 @@
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="I_TRANSLATION">
+        <Folder Name="H_TREUILS_BENNE">
           <Folder Name="_TYPES">
-            <Object Name="ST_fbTranslationCmdArbitration_IHM" ObjectId="ce120c8d-0245-5e38-851c-8c02205c89fc" />
+            <Object Name="ST_fbBucketCmdArbitration_Context" ObjectId="f4f3035a-b2f5-50cc-b957-e5b6b46c9e58" />
           </Folder>
         </Folder>
       </ProjectStructure>

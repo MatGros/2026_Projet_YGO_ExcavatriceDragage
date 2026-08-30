@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:48:29.854796" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:48:29.854796">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:14:48.461556" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:14:48.461556">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -287,7 +287,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Descente autorisée (TRUE = OK | FALSE = mou de câble / limite basse)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Descending autorisée (TRUE = OK | FALSE = mou de câble / limite basse)</xhtml>
               </documentation>
             </variable>
             <variable name="AscentPermit">
@@ -295,7 +295,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Montée autorisée (TRUE = OK | FALSE = fin de course haut)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Ascending autorisée (TRUE = OK | FALSE = fin de course haut)</xhtml>
               </documentation>
             </variable>
             <variable name="SlackCable">
@@ -1048,7 +1048,7 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Sorties Physiques / Indicateurs LEDs
-🛗 Relais Montée activé</xhtml>
+🛗 Relais Ascending activé</xhtml>
               </documentation>
             </variable>
             <variable name="RelayRev">
@@ -1056,7 +1056,7 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descente activé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descending activé</xhtml>
               </documentation>
             </variable>
             <variable name="Contactor1">
@@ -1278,6 +1278,108 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbBucketCmdArbitration_Context">
+        <baseType>
+          <struct>
+            <variable name="TglEnableCoupledBucketSequencing">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Activation séquencement couplé benne (Commun.Cfg)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention mouvement both active (WinchBothMotionActive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens mouvement both (1: montée, -1: descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne ouverte (BucketState.IsOpen)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne fermée (BucketState.IsClosed)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f4f3035a-b2f5-50cc-b957-e5b6b46c9e58</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧩 ST_fbBucketCmdArbitration_Context — Contexte de gating benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les faits de gating consommés par FB_BucketCmdArbitration
+       pour le séquencement couplé benne (config, intention both, état benne).
+       Le FB dérive les flags armés (WinchBothDiveBucketOpenArmed /
+       WinchBothAscentBucketCloseArmed) et les commandes arbitrées.
+   📤 Producteur : PRG_04_Treuils_Benne (câblage).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 État benne : 2 bits BOOL (BucketIsOpen/Closed) dérivés de _BucketState.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbBucketCmdArbitration_IHM">
+        <baseType>
+          <struct>
+            <variable name="BtnOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton ouverture benne (M2TreuilBenne.Bucket.Cmd.BtnOpen)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton fermeture benne (M2TreuilBenne.Bucket.Cmd.BtnClose)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5b838e78-9adc-50c9-abda-c67738f00353</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎛️ ST_fbBucketCmdArbitration_IHM — Entrées IHM de l'arbitrage benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes IHM consommées par FB_BucketCmdArbitration
+       (boutons ouverture/fermeture benne, nommage hardware propagé).
+   📤 Producteur : PRG_04_Treuils_Benne (câblage GVL_IHM).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Nommage : BtnOpen/BtnClose = nommage hardware propagé (convention projet).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_fbWinchCmdArbitration_Cfg">
         <baseType>
           <struct>
@@ -1394,14 +1496,6 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
       <dataType name="ST_fbWinchCmdArbitration_IHM">
         <baseType>
           <struct>
-            <variable name="TglJoystickMaster">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd)</xhtml>
-              </documentation>
-            </variable>
             <variable name="BtnUpM1">
               <type>
                 <BOOL />
@@ -1462,7 +1556,9 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
    🎛️ ST_fbWinchCmdArbitration_IHM — Entrées IHM de l'arbitrage treuil
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Encapsuler les commandes IHM consommées par FB_WinchCommandArbitrationM1/M2
-       (boutons par treuil, nommage hardware propagé, toggle joystick maître).
+       (boutons par treuil, nommage hardware propagé).
+       Le toggle joystick maître global (Modes.Cmd.TglJoystickMaster) est passé en
+       paramètre séparé des FB (I4 — factorisation, source unique GVL_IHM.Modes.Cmd).
    📤 Producteur : PRG_04_Treuils_Benne (câblage GVL_IHM).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Nommage : BtnUpM1/BtnUpM2 = nommage hardware propagé (convention projet).
@@ -1527,7 +1623,7 @@ Delai interlock changement de sens montee</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier montee (D10, dedie)</xhtml>
               </documentation>
             </variable>
-            <variable name="StepRampDelayDescente">
+            <variable name="StepRampDelayDescending">
               <type>
                 <TIME />
               </type>
@@ -1535,7 +1631,7 @@ Delai interlock changement de sens montee</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier descente (D10, dedie)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier descending (D10, dedie)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorFeedbackTimeout">
@@ -1624,7 +1720,7 @@ TRUE = mouvement demandÃ©</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1: Descente, 0: Stop, 1: Montee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1: Descending, 0: Stop, 1: Ascending</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedStepReq">
@@ -2212,6 +2308,191 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_ProgramBucketRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqKoboldMeasureEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande activation mesure/contacteur Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermitDiveBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de descente conditionnée benne ouverte (DiveSearch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionControlActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier 1 pendant la montée contrôlée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de remontée assistée (ExtractionAssist)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier plancher de descente imposé pendant la plongée (FB_DiveSearch, 0 = aucun)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪣 ST_ProgramBucketRequest — Demande de mouvement benne par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de manœuvre benne et mesure Kobold
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbModes_Autorisations">
+        <baseType>
+          <struct>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickWinchSelectArbitrated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingApproachEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 §4bis — matrice de maintenance
+⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
+vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
+🚦 Demande de changement de mode REFUSÉE : les treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas à l'arrêt mécanique confirmé
+(contacteurs retombés ET frein serré ET |v| &lt; seuil).
+Le mode courant est maintenu. IHM : « arrêter les
+treuils avant de changer de mode ».
+🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(usage effectif d'un override/bypass position en maintenance)
+🧭 M2 : idem</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
+      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_ContactorCheck">
         <baseType>
           <struct>
@@ -2357,42 +2638,6 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_OperatorCoupledIntent">
-        <baseType>
-          <struct>
-            <variable name="Active">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention couplée active (JoyBtnRaw + Select=0 OU boutons BothUp/BothDown)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Direction">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descente, 0: Neutre, +1: Montée)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>ebcc0c47-ef53-54b6-9967-6c3fa0d26f58</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🎮 ST_OperatorCoupledIntent — Intention couplée continue de l'opérateur
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Transmet l'intention de mouvement couplé (homme-mort / boutons)
-      produite inconditionnellement par PRG_03 vers PRG_04 (tous modes).
-   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_ProgramWinchRequest">
         <baseType>
           <struct>
@@ -2409,7 +2654,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedTgtPct">
@@ -2436,114 +2681,41 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_fbModes_Autorisations">
+      <dataType name="ST_WinchBothIntent">
         <baseType>
           <struct>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SyncEnable">
+            <variable name="Active">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both active (homme-mort qualifié + Select=0 OU boutons BothUp/BothDown)</xhtml>
               </documentation>
             </variable>
-            <variable name="InhibitM1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InhibitM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickWinchSelectArbitrated">
+            <variable name="Direction">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingApproachEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceM3TargetEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ModeChangePendingBlocked">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 §4bis — matrice de maintenance
-⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
-vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
-🚦 Demande de changement de mode REFUSÉE : les treuils</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingRequiredM1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas à l'arrêt mécanique confirmé
-(contacteurs retombés ET frein serré ET |v| &lt; seuil).
-Le mode courant est maintenu. IHM : « arrêter les
-treuils avant de changer de mode ».
-🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingRequiredM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(usage effectif d'un override/bypass position en maintenance)
-🧭 M2 : idem</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descending, 0: Neutre, +1: Ascending)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
+            <ObjectId>27a8fd28-e07a-5ea0-8328-eea98b482fb9</ObjectId>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🎮 ST_WinchBothIntent — Intention both continue de l'opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
-                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
-   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
-      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Transmet l'intention de mouvement both (2 treuils ensemble,
+      homme-mort / boutons) produite inconditionnellement par PRG_03 vers
+      PRG_04 et l'arbitrage (tous modes). Source UNIQUE de la décision both.
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_fbWinchLoadEstimator_SpeedCfg">
@@ -3347,6 +3519,14 @@ via MeasuredSpeedBand, 1 instance par treuil, mêmes sources que FB_Safety_Winch
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Arbitrage commande treuil M2</xhtml>
               </documentation>
             </variable>
+            <variable name="instArbBucket">
+              <type>
+                <derived name="FB_BucketCmdArbitration" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Arbitrage commande benne (POO §5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1DriveRequest">
               <type>
                 <derived name="ST_fbWinch_DriveRequest" />
@@ -3627,6 +3807,22 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Config M2 (vitesse override benne)</xhtml>
               </documentation>
             </variable>
+            <variable name="ArbBucketIHM">
+              <type>
+                <derived name="ST_fbBucketCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Entrées IHM FB d'arbitrage benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArbBucketContext">
+              <type>
+                <derived name="ST_fbBucketCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Contexte gating FB d'arbitrage benne</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1LogicRequestStartStop">
               <type>
                 <BOOL />
@@ -3884,7 +4080,7 @@ front descendant Kobold</xhtml>
                 <INT />
               </type>
             </variable>
-            <variable name="EffectiveMaxStepDescente">
+            <variable name="EffectiveMaxStepDescending">
               <type>
                 <INT />
               </type>
@@ -3962,6 +4158,14 @@ FB_Bucket ne connaissent que des booléens déjà gatés, jamais le mode (encaps
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mode MAINT_N2 arbitré (seul mode où un bypass est effectif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionAssistActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Séquence d'extraction active (mode MAINT + toggle) — gate permis de montée assistée</xhtml>
               </documentation>
             </variable>
             <variable name="OverrideTopSoftwareN1M1">
@@ -4076,9 +4280,9 @@ l'armement du re-homing obligatoire publié vers PRG_03 (PositionLimitOverridden
 {region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
-// Consommation de l'intention both continue opérateur (cerveau unique PRG_03, tous modes)
-WinchBothMotionActive    := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Active;
-WinchBothMotionDirection := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Direction;
+// Consommation de l'intention both continue opérateur (source unique PRG_03, tous modes)
+WinchBothMotionActive    := PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;
+WinchBothMotionDirection := PRG_03_Modes_Cycle.Data.WinchBothIntent.Direction;
 
 // Récupération de l'état fond synthétisé par PRG_03
 BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
@@ -4088,29 +4292,35 @@ BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConf
 // momentané du FDC haut logiciel (§5).
 MaintN1 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1);
 MaintN2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
+// Séquence d'extraction active (mode MAINT + toggle) : gate le permis de montée assistée (§5).
+// Le permis lui-même (AscentPermit) est produit par FB_ExtractionAssist et consommé via le contrat benne.
+ExtractionAssistActive := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                          AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence;
 
 // Règle absolue en pilotage both normal --
 // descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
-WinchBothDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
-    AND (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
-    AND WinchBothMotionActive AND (WinchBothMotionDirection = -1)
-    AND NOT _BucketState.IsOpen;
-WinchBothAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
-    AND (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
-    AND WinchBothMotionActive AND (WinchBothMotionDirection = 1)
-    AND NOT _BucketState.IsClosed;
+// Décision déléguée à FB_BucketCmdArbitration (POO §5) : flags armés + commandes
+// arbitrées (ouverture, fermeture, contacteur Kobold). Bit-identique PRG_04 §1/§2.
+ArbBucketIHM.BtnOpen  := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen;
+ArbBucketIHM.BtnClose := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
 
-// Arbitrage de fermeture benne (CmdBucketCloseArbitrated)
-IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose THEN
-    CmdBucketCloseArbitrated := TRUE;
-ELSIF WinchBothAscentBucketCloseArmed THEN
-    CmdBucketCloseArbitrated := TRUE;
-ELSE
-    CmdBucketCloseArbitrated := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
-END_IF;
+ArbBucketContext.TglEnableCoupledBucketSequencing := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing;
+ArbBucketContext.MotionActive   := WinchBothMotionActive;
+ArbBucketContext.MotionDirection := WinchBothMotionDirection;
+ArbBucketContext.BucketIsOpen   := _BucketState.IsOpen;
+ArbBucketContext.BucketIsClosed := _BucketState.IsClosed;
 
-// Arbitrage contacteur Kobold (KoboldContactorCmdArbitrated)
-KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
+instArbBucket(
+    Enable    := TRUE,
+    Auth      := PRG_03_Modes_Cycle.Data.Auth,
+    ReqBucket := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket,
+    IHM       := ArbBucketIHM,
+    Context   := ArbBucketContext
+);
+WinchBothDiveBucketOpenArmed    := instArbBucket.WinchBothDiveBucketOpenArmed;
+WinchBothAscentBucketCloseArmed := instArbBucket.WinchBothAscentBucketCloseArmed;
+CmdBucketCloseArbitrated        := instArbBucket.CmdClose_IHM;
+KoboldContactorCmdArbitrated    := instArbBucket.KoboldContactorCmdArbitrated;
 
 {endregion}
 
@@ -4122,8 +4332,7 @@ instBucket(
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
-    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR WinchBothDiveBucketOpenArmed
-                           OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen,
+    CmdOpen_IHM         := instArbBucket.CmdOpen_IHM,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := WinchBothMotionActive,
     MotionDirection     := WinchBothMotionDirection,
@@ -4177,10 +4386,10 @@ ELSE
     EffectiveMaxStepAscent := _CommunCfgPersist.WinchMaxStepAscent;
 END_IF;
 
-IF _CommunCfgPersist.WinchMaxStepDescente &lt;= 0 THEN
-    EffectiveMaxStepDescente := 3;
+IF _CommunCfgPersist.WinchMaxStepDescending &lt;= 0 THEN
+    EffectiveMaxStepDescending := 3;
 ELSE
-    EffectiveMaxStepDescente := _CommunCfgPersist.WinchMaxStepDescente;
+    EffectiveMaxStepDescending := _CommunCfgPersist.WinchMaxStepDescending;
 END_IF;
 
 
@@ -4195,7 +4404,6 @@ BucketM2Open  := (instBucket.M2_Direction = 1);
 BucketM2Close := (instBucket.M2_Direction = -1);
 
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
-ArbIHM.TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster;
 ArbIHM.BtnUpM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnUp;
 ArbIHM.BtnDownM1         := GVL_IHM.M1TreuilRetenue.Cmd.BtnDown;
 ArbIHM.BtnUpM2           := GVL_IHM.M2TreuilBenne.Cmd.BtnUp;
@@ -4219,8 +4427,9 @@ instArbM1(
     Joystick   := PRG_02_Acquisition.Data.Joystick,
     Auth       := PRG_03_Modes_Cycle.Data.Auth,
     ReqWinch   := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1,
-    BothIntent := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent,
+    BothIntent := PRG_03_Modes_Cycle.Data.WinchBothIntent,
     IHM        := ArbIHM,
+    TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext
 );
 M1LogicRequestStartStop := instArbM1.StartStop;
@@ -4233,8 +4442,9 @@ instArbM2(
     Joystick   := PRG_02_Acquisition.Data.Joystick,
     Auth       := PRG_03_Modes_Cycle.Data.Auth,
     ReqWinch   := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2,
-    BothIntent := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent,
+    BothIntent := PRG_03_Modes_Cycle.Data.WinchBothIntent,
     IHM        := ArbIHM,
+    TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
     Cfg        := ArbM2Cfg
 );
@@ -4264,7 +4474,7 @@ IF ExtractionControlActive THEN
        AND (ABS(PRG_02_Acquisition.Data.Encoders.M2.CablePosM - ControlAscentStartM2PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
         ExtractionControlActive := FALSE;         // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (WinchBothMotionActive AND (WinchBothMotionDirection = 1)) THEN
-        ExtractionControlActive := FALSE;         // Montée relâchée/interrompue : annule la phase
+        ExtractionControlActive := FALSE;         // Ascending relâchée/interrompue : annule la phase
     END_IF;
 END_IF;
 
@@ -4620,8 +4830,14 @@ IF PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
     ProcessAndSafetyPermitM2_Descend := FALSE;
 END_IF;
-ProcessAndSafetyPermitM1_Ascent := SafetyPermitM1_Ascent;
+// Permis de montée assistée : consommé depuis FB_ExtractionAssist (via le contrat benne).
+// Hors extraction (NOT ExtractionAssistActive), la montée reste libre ; pendant l'extraction,
+// la montée n'est autorisée que si l'assistant la délivre (AscentPermit, qui intègre les
+// conditions process AscentControlSafe/AscentNominalSafe). Polarité fail-safe (TRUE = autorisé).
+ProcessAndSafetyPermitM1_Ascent := SafetyPermitM1_Ascent
+    AND (NOT ExtractionAssistActive OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit);
 ProcessAndSafetyPermitM2_Ascent := SafetyPermitM2_Ascent
+    AND (NOT ExtractionAssistActive OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit)
     // Même anticipation que ProcessPermitM2_Descend ci-dessus.
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.Encoders.M2.CablePosM &gt;= (PRG_02_Acquisition.Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
@@ -4644,7 +4860,7 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinch
 
 // --- Sources communes (M1 = M2) ---
 CommonMaxStepUp   := EffectiveMaxStepAscent;
-CommonMaxStepDown := EffectiveMaxStepDescente;
+CommonMaxStepDown := EffectiveMaxStepDescending;
 IF instWinchSync.SyncDeviationWarn THEN
     CommonMaxStepUp   := 1;
     CommonMaxStepDown := 1;
@@ -5889,6 +6105,168 @@ BucketState.ActiveOffsetValid := ActiveOffsetValid;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>82efa9a6-05fa-5372-9d4c-1316f7f70a0b</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_BucketCmdArbitration" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation FB (TRUE=arbitre actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Auth">
+              <type>
+                <derived name="ST_fbModes_Autorisations" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisations mode (Mode, gating séquencement couplé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqBucket">
+              <type>
+                <derived name="ST_ProgramBucketRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [REQ] Demande cycle benne (SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IHM">
+              <type>
+                <derived name="ST_fbBucketCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM benne (BtnOpen/BtnClose)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Context">
+              <type>
+                <derived name="ST_fbBucketCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gating séquencement couplé benne</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdOpen_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande ouverture benne arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdClose_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande fermeture benne arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmdArbitrated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Ordre contacteur capteur fond Kobold arbitré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchBothDiveBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Séquencement couplé : descente benne ouverte armé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchBothAscentBucketCloseArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Séquencement couplé : montée benne fermée armé</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🪣 FB_BucketCmdArbitration — Arbitrage de commande benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Arbitrer la source de commande benne (boutons IHM /
+       séquencement couplé both / demande cycle selon le mode) et produire
+       les commandes arbitrées (ouverture, fermeture, contacteur Kobold).
+   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni StartStop
+       de sécurité — il produit la commande logique, la safety reste dans
+       FB_Bucket / FB_Safety_Winch.
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔒 Bit-identique à l'ancien PRG_04 §1/§2 (refactor POO §5 : décision dans
+       le FB, plus dans le PRG). Symétrique à FB_WinchCmdArbitrationM1/M2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+Ready := Enable;
+
+IF NOT Enable THEN
+    CmdOpen_IHM  := FALSE;
+    CmdClose_IHM := FALSE;
+    KoboldContactorCmdArbitrated := FALSE;
+    WinchBothDiveBucketOpenArmed    := FALSE;
+    WinchBothAscentBucketCloseArmed := FALSE;
+ELSE
+    // ── Règle absolue en pilotage both normal (bit-identique PRG_04 §1) ──
+    // Descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
+    WinchBothDiveBucketOpenArmed := Context.TglEnableCoupledBucketSequencing
+        AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND Context.MotionActive AND (Context.MotionDirection = -1)
+        AND NOT Context.BucketIsOpen;
+    WinchBothAscentBucketCloseArmed := Context.TglEnableCoupledBucketSequencing
+        AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND Context.MotionActive AND (Context.MotionDirection = 1)
+        AND NOT Context.BucketIsClosed;
+
+    // ── Ouverture benne : bouton IHM OU séquencement couplé descente benne ouverte
+    //    OU demande cycle (bit-identique PRG_04 §2) ──
+    CmdOpen_IHM := IHM.BtnOpen OR WinchBothDiveBucketOpenArmed OR ReqBucket.ReqOpen;
+
+    // ── Fermeture benne : demande cycle &gt; séquencement couplé montée benne fermée
+    //    &gt; bouton IHM (bit-identique PRG_04 §1) ──
+    IF ReqBucket.ReqClose THEN
+        CmdClose_IHM := TRUE;
+    ELSIF WinchBothAscentBucketCloseArmed THEN
+        CmdClose_IHM := TRUE;
+    ELSE
+        CmdClose_IHM := IHM.BtnClose;
+    END_IF;
+
+    // ── Contacteur Kobold : demande cycle (source unique PRG_03, bit-identique PRG_04 §1) ──
+    KoboldContactorCmdArbitrated := ReqBucket.ReqKoboldMeasureEnable;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b8ad945e-7e2a-5240-a4b2-f1248035c5df</ObjectId>
           </data>
         </addData>
       </pou>
@@ -7650,7 +8028,7 @@ END_IF;
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
 IF CommandedDirection = -1 THEN
-    EffectiveStepRampDelay := Config.StepRampDelayDescente;
+    EffectiveStepRampDelay := Config.StepRampDelayDescending;
 ELSE
     EffectiveStepRampDelay := Config.StepRampDelayAscent;
 END_IF;
@@ -7765,10 +8143,10 @@ PrevStepNumber := StepNumber;
             </variable>
             <variable name="BothIntent">
               <type>
-                <derived name="ST_OperatorCoupledIntent" />
+                <derived name="ST_WinchBothIntent" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both opérateur (WinchBothMotionActive/Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both opérateur (source unique PRG_03)</xhtml>
               </documentation>
             </variable>
             <variable name="IHM">
@@ -7777,6 +8155,14 @@ PrevStepNumber := StepNumber;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnUpM1/BtnDownM1, both)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglJoystickMaster">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd, source unique)</xhtml>
               </documentation>
             </variable>
             <variable name="Context">
@@ -7810,7 +8196,7 @@ PrevStepNumber := StepNumber;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPct">
@@ -7868,13 +8254,18 @@ ELSE
         Direction := ReqWinch.ReqDirection;
         SpeedPct  := ReqWinch.SpeedTgtPct;
     ELSE
-        // ── Mode manuel : boutons IHM ou joystick maître ──
-        IF NOT IHM.TglJoystickMaster THEN
+        // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
+        //    commande unitaire M1 dérivée des boutons/joystick (Select=1). ──
+        IF NOT TglJoystickMaster THEN
             // Mode Boutons IHM
-            IF IHM.BtnWinchBothUp OR IHM.BtnUpM1 THEN
+            IF BothIntent.Active THEN
+                // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
+                Direction := BothIntent.Direction;
+                SpeedPct  := 100.0;
+            ELSIF IHM.BtnUpM1 THEN
                 Direction := 1;
                 SpeedPct  := 100.0;
-            ELSIF IHM.BtnWinchBothDown OR IHM.BtnDownM1 THEN
+            ELSIF IHM.BtnDownM1 THEN
                 Direction := -1;
                 SpeedPct  := 100.0;
             ELSE
@@ -7882,9 +8273,13 @@ ELSE
                 SpeedPct  := 0.0;
             END_IF;
         ELSE
-            // Mode Joystick Maître — M1 autorisé si Select = 0 (both) ou 1 (M1)
-            IF (Auth.JoystickWinchSelectArbitrated = 0 OR Auth.JoystickWinchSelectArbitrated = 1) THEN
+            // Mode Joystick Maître — M1 unitaire si Select = 1, both si Select = 0
+            IF Auth.JoystickWinchSelectArbitrated = 1 THEN
                 Direction := Joystick.AxisY.Direction;
+                SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+            ELSIF BothIntent.Active THEN
+                // Both (Select=0) — source unique PRG_03, plus de re-dérivation
+                Direction := BothIntent.Direction;
                 SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
             ELSE
                 Direction := 0;
@@ -7892,13 +8287,13 @@ ELSE
             END_IF;
         END_IF;
 
-        // Gating StartStop (bit-identique PRG_04 §3)
+        // Gating StartStop (bit-identique PRG_04 §3) — homme-mort qualifié en joystick
         StartStop := (Direction &lt;&gt; 0)
                   AND NOT Context.BucketBusy
                   AND NOT Context.WinchBothMotionBlockedByBucket
                   AND NOT ((Context.SyncBlocksUp   AND (Direction = 1))
                         OR (Context.SyncBlocksDown AND (Direction = -1)))
-                  AND (NOT IHM.TglJoystickMaster OR Joystick.DeadmanArmed);
+                  AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
     END_IF;
 
     // Front de fin d'action benne : arrêt forcé sauf mouvement both actif
@@ -7952,10 +8347,10 @@ END_IF;
             </variable>
             <variable name="BothIntent">
               <type>
-                <derived name="ST_OperatorCoupledIntent" />
+                <derived name="ST_WinchBothIntent" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both opérateur (WinchBothMotionActive/Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both opérateur (source unique PRG_03)</xhtml>
               </documentation>
             </variable>
             <variable name="IHM">
@@ -7964,6 +8359,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnUpM2/BtnDownM2, both)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglJoystickMaster">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd, source unique)</xhtml>
               </documentation>
             </variable>
             <variable name="Context">
@@ -8005,7 +8408,7 @@ END_IF;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPct">
@@ -8070,13 +8473,18 @@ ELSE
             Direction := ReqWinch.ReqDirection;
             SpeedPct  := ReqWinch.SpeedTgtPct;
         ELSE
-            // ── Mode manuel : boutons IHM ou joystick maître ──
-            IF NOT IHM.TglJoystickMaster THEN
+            // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
+            //    commande unitaire M2 dérivée des boutons/joystick (Select=2). ──
+            IF NOT TglJoystickMaster THEN
                 // Mode Boutons IHM
-                IF IHM.BtnWinchBothUp OR IHM.BtnUpM2 THEN
+                IF BothIntent.Active THEN
+                    // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
+                    Direction := BothIntent.Direction;
+                    SpeedPct  := 100.0;
+                ELSIF IHM.BtnUpM2 THEN
                     Direction := 1;
                     SpeedPct  := 100.0;
-                ELSIF IHM.BtnWinchBothDown OR IHM.BtnDownM2 THEN
+                ELSIF IHM.BtnDownM2 THEN
                     Direction := -1;
                     SpeedPct  := 100.0;
                 ELSE
@@ -8084,9 +8492,13 @@ ELSE
                     SpeedPct  := 0.0;
                 END_IF;
             ELSE
-                // Mode Joystick Maître — M2 autorisé si Select = 0 (both) ou 2 (M2)
-                IF (Auth.JoystickWinchSelectArbitrated = 0 OR Auth.JoystickWinchSelectArbitrated = 2) THEN
+                // Mode Joystick Maître — M2 unitaire si Select = 2, both si Select = 0
+                IF Auth.JoystickWinchSelectArbitrated = 2 THEN
                     Direction := Joystick.AxisY.Direction;
+                    SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+                ELSIF BothIntent.Active THEN
+                    // Both (Select=0) — source unique PRG_03, plus de re-dérivation
+                    Direction := BothIntent.Direction;
                     SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
                 ELSE
                     Direction := 0;
@@ -8094,12 +8506,13 @@ ELSE
                 END_IF;
             END_IF;
 
-            // Gating StartStop (bit-identique PRG_04 §3) — synchro INVERSÉE vs M1
+            // Gating StartStop (bit-identique PRG_04 §3) — synchro INVERSÉE vs M1,
+            // homme-mort qualifié en joystick
             StartStop := (Direction &lt;&gt; 0)
                       AND NOT Context.WinchBothMotionBlockedByBucket
                       AND NOT ((Context.SyncBlocksUp   AND (Direction = -1))
                             OR (Context.SyncBlocksDown AND (Direction = 1)))
-                      AND (NOT IHM.TglJoystickMaster OR Joystick.DeadmanArmed);
+                      AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
         END_IF;
     END_IF;
 
@@ -8244,7 +8657,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Montee effective mesuree en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Ascending effective mesuree en cours</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -9392,7 +9805,7 @@ END_CASE;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
             <variable name="ChangeDelayUp">
@@ -10189,6 +10602,7 @@ END_IF;
               <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />
             </Folder>
           </Folder>
+          <Object Name="FB_BucketCmdArbitration" ObjectId="b8ad945e-7e2a-5240-a4b2-f1248035c5df" />
           <Object Name="FB_Safety_Winch" ObjectId="afbb4ccb-2339-5f22-9bee-0ed046924779" />
           <Object Name="FB_Winch" ObjectId="6f83143e-72ec-5e6b-80c8-39f828857ce4" />
           <Object Name="FB_WinchCmdArbitrationM1" ObjectId="ed58a992-e090-5b40-8cf2-91ea992d9d52" />
@@ -10202,6 +10616,8 @@ END_IF;
           <Object Name="FB_SyncContactor" ObjectId="afd229de-316d-5899-8a37-8c30dbfd06db" />
           <Object Name="FB_SyncDeviation" ObjectId="24ca6948-aaa5-587d-b1af-7e9dbd94d79d" />
           <Folder Name="_TYPES">
+            <Object Name="ST_fbBucketCmdArbitration_Context" ObjectId="f4f3035a-b2f5-50cc-b957-e5b6b46c9e58" />
+            <Object Name="ST_fbBucketCmdArbitration_IHM" ObjectId="5b838e78-9adc-50c9-abda-c67738f00353" />
             <Object Name="ST_fbWinchCmdArbitration_Cfg" ObjectId="975ccf22-73db-5c3e-bfac-c985552bde6f" />
             <Object Name="ST_fbWinchCmdArbitration_Context" ObjectId="58dd8b92-25cb-5b24-b149-4d148f2014bb" />
             <Object Name="ST_fbWinchCmdArbitration_IHM" ObjectId="b2c6293b-40b7-50ed-85f4-51c0c572dd06" />
@@ -10227,14 +10643,15 @@ END_IF;
             <Folder Name="7_COMMUN_CONFIG">
               <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
             </Folder>
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
+              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
+              <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
+              <Object Name="ST_WinchBothIntent" ObjectId="27a8fd28-e07a-5ea0-8328-eea98b482fb9" />
+            </Folder>
             <Folder Name="4_JOYSTICK_ACQUISITION">
               <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
               <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
-            </Folder>
-            <Folder Name="3_CYCLE_ET_MODES">
-              <Object Name="ST_OperatorCoupledIntent" ObjectId="ebcc0c47-ef53-54b6-9967-6c3fa0d26f58" />
-              <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
-              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
             </Folder>
           </Folder>
         </Folder>

@@ -17,15 +17,16 @@ VAR_INPUT
     Joystick   : ST_AcquisitionJoystickQualified;  // --> [HW] Données joystick qualifiées (AxisY, DeadmanArmed)
     Auth       : ST_fbModes_Autorisations;          // --> [CMD] Autorisations mode (Mode, JoystickWinchSelectArbitrated)
     ReqWinch   : ST_ProgramWinchRequest;            // --> [REQ] Demande cycle treuil M2 (SEMI_AUTO)
-    BothIntent : ST_OperatorCoupledIntent;           // --> [CMD] Intention both opérateur (WinchBothMotionActive/Direction)
+    BothIntent : ST_WinchBothIntent;           // --> [CMD] Intention both opérateur (source unique PRG_03)
     IHM        : ST_fbWinchCmdArbitration_IHM;  // --> [CMD] Boutons IHM (BtnUpM2/BtnDownM2, both)
+    TglJoystickMaster : BOOL;  // --> [CMD] Toggle joystick maître global (Modes.Cmd, source unique)
     Context    : ST_fbWinchCmdArbitration_Context; // --> [STAT] Gating benne/synchro + chemin benne (partagé M1/M2)
     Cfg        : ST_fbWinchCmdArbitration_Cfg;     // --> [CFG] Vitesse override benne
 END_VAR
 VAR_OUTPUT
     Ready     : BOOL;  // <-- [STAT] FB prêt à arbitrer (Enable)
     StartStop : BOOL;  // <-- [CMD] Commande marche/arrêt arbitrée
-    Direction : INT;   // <-- [CMD] Sens arbitré (-1: Descente, 0: Stop, 1: Montée)
+    Direction : INT;   // <-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)
     SpeedPct  : REAL;  // <-- [CMD] Consigne vitesse arbitrée (0..100 %)
 END_VAR
 VAR
@@ -56,13 +57,18 @@ ELSE
             Direction := ReqWinch.ReqDirection;
             SpeedPct  := ReqWinch.SpeedTgtPct;
         ELSE
-            // ── Mode manuel : boutons IHM ou joystick maître ──
-            IF NOT IHM.TglJoystickMaster THEN
+            // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
+            //    commande unitaire M2 dérivée des boutons/joystick (Select=2). ──
+            IF NOT TglJoystickMaster THEN
                 // Mode Boutons IHM
-                IF IHM.BtnWinchBothUp OR IHM.BtnUpM2 THEN
+                IF BothIntent.Active THEN
+                    // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
+                    Direction := BothIntent.Direction;
+                    SpeedPct  := 100.0;
+                ELSIF IHM.BtnUpM2 THEN
                     Direction := 1;
                     SpeedPct  := 100.0;
-                ELSIF IHM.BtnWinchBothDown OR IHM.BtnDownM2 THEN
+                ELSIF IHM.BtnDownM2 THEN
                     Direction := -1;
                     SpeedPct  := 100.0;
                 ELSE
@@ -70,9 +76,13 @@ ELSE
                     SpeedPct  := 0.0;
                 END_IF;
             ELSE
-                // Mode Joystick Maître — M2 autorisé si Select = 0 (both) ou 2 (M2)
-                IF (Auth.JoystickWinchSelectArbitrated = 0 OR Auth.JoystickWinchSelectArbitrated = 2) THEN
+                // Mode Joystick Maître — M2 unitaire si Select = 2, both si Select = 0
+                IF Auth.JoystickWinchSelectArbitrated = 2 THEN
                     Direction := Joystick.AxisY.Direction;
+                    SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+                ELSIF BothIntent.Active THEN
+                    // Both (Select=0) — source unique PRG_03, plus de re-dérivation
+                    Direction := BothIntent.Direction;
                     SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
                 ELSE
                     Direction := 0;
@@ -80,12 +90,13 @@ ELSE
                 END_IF;
             END_IF;
 
-            // Gating StartStop (bit-identique PRG_04 §3) — synchro INVERSÉE vs M1
+            // Gating StartStop (bit-identique PRG_04 §3) — synchro INVERSÉE vs M1,
+            // homme-mort qualifié en joystick
             StartStop := (Direction <> 0)
                       AND NOT Context.WinchBothMotionBlockedByBucket
                       AND NOT ((Context.SyncBlocksUp   AND (Direction = -1))
                             OR (Context.SyncBlocksDown AND (Direction = 1)))
-                      AND (NOT IHM.TglJoystickMaster OR Joystick.DeadmanArmed);
+                      AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
         END_IF;
     END_IF;
 

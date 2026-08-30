@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T13:28:47.525054" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T13:28:47.525054">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:10.472315" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:10.472315">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -81,7 +81,7 @@ Delai interlock changement de sens montee</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier montee (D10, dedie)</xhtml>
               </documentation>
             </variable>
-            <variable name="StepRampDelayDescente">
+            <variable name="StepRampDelayDescending">
               <type>
                 <TIME />
               </type>
@@ -89,7 +89,7 @@ Delai interlock changement de sens montee</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier descente (D10, dedie)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier descending (D10, dedie)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorFeedbackTimeout">

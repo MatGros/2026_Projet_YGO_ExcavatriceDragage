@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:47:33.730807" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:47:33.730807">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.512567" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.512567">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -223,7 +223,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descending M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre</xhtml>
               </documentation>
             </variable>
             <variable name="Idx601_BypassDiveActive">
@@ -281,7 +281,7 @@
               <EnumValue>
                 <Name>SEARCHING_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0-&gt;1 dans fenêtre eau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descending : attente front 0-&gt;1 dans fenêtre eau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -358,7 +358,7 @@
               <EnumValue>
                 <Name>NOMINAL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montée couplée avec vitesse demandée opérateur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ascending couplée avec vitesse demandée opérateur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>

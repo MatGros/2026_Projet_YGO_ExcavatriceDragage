@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.246496" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-17T05:53:47.246496">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.591661" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.591661">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Montée IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Ascending IHM | 0 = Relâché</xhtml>
               </documentation>
             </variable>
             <variable name="Idx204_HmiManualCmd_BtnDown">
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Descente IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Descending IHM | 0 = Relâché</xhtml>
               </documentation>
             </variable>
             <variable name="Idx205_CycleAutoCmd_Pct">
@@ -95,7 +95,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée | 0 = Neutre | -1 = Descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Ascending | 0 = Neutre | -1 = Descending</xhtml>
               </documentation>
             </variable>
             <variable name="Idx210_CoupledUserRequestDirection">
@@ -103,7 +103,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée | 0 = Neutre | -1 = Descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Ascending | 0 = Neutre | -1 = Descending</xhtml>
               </documentation>
             </variable>
             <variable name="Idx211_CoupledUserRequestActive">

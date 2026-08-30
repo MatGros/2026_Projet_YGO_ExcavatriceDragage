@@ -44,7 +44,7 @@ STRUCT
     DumpAtTremieAssistActive    : BOOL;                    // Assistance vidage trémie active
     DumpAtTremieAtTremie        : BOOL;                    // Chariot M3 positionné à la trémie
     DumpAtTremieBucketOpenArmed : BOOL;                    // Commande ouverture benne à la trémie
-    DumpAtTremieDescentLocked   : BOOL;                    // Descente treuil verrouillée à la trémie
+    DumpAtTremieDescentLocked   : BOOL;                    // Descending treuil verrouillée à la trémie
     BypassDiveActive            : BOOL;                    // Bypass séquence plongée armé
     BypassKoboldBottomTouched   : BOOL;                    // Fond touché sous bypass
 END_STRUCT

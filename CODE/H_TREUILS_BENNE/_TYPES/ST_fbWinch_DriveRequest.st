@@ -13,7 +13,7 @@ TYPE ST_fbWinch_DriveRequest :
 STRUCT
     // === ORDRE DE MOUVEMENT ===
     StartStop                       : BOOL;   // TRUE = mouvement demandÃ©
-    Direction                       : INT;    // -1: Descente, 0: Stop, 1: Montee
+    Direction                       : INT;    // -1: Descending, 0: Stop, 1: Ascending
     SpeedStepReq                    : INT;    // [cible] Palier demandÃ© dÃ©codÃ© en amont (usage aval)
     SpeedTgt_Pct                    : REAL;   // [08a] Consigne vitesse % (0.0..100.0) â€” dÃ©codage conservÃ© dans FB_Winch
 

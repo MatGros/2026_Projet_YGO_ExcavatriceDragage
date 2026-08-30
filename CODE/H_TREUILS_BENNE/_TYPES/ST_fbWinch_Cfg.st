@@ -22,7 +22,7 @@ STRUCT
     // === CADENCE DE RAMPE PALIER ===
     StepRampDelay                   : TIME := T#1000ms;  // [cible] Tempo de rampe palier (usage aval)
     StepRampDelayAscent             : TIME := T#1000ms;  // [08a] Cadence palier montee (D10, dedie)
-    StepRampDelayDescente           : TIME := T#500ms;   // [08a] Cadence palier descente (D10, dedie)
+    StepRampDelayDescending         : TIME := T#500ms;   // [08a] Cadence palier descending (D10, dedie)
 
     // === RETOMBÃ‰E CONTACTEURS ===
     ContactorFeedbackTimeout        : TIME := T#500ms;   // Delai d'attente retombee des contacteurs

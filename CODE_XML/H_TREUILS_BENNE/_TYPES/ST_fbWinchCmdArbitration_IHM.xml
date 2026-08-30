@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:31:08.215601" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:31:08.215601">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:05:11.952769" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:05:11.952769">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,14 +26,6 @@
       <dataType name="ST_fbWinchCmdArbitration_IHM">
         <baseType>
           <struct>
-            <variable name="TglJoystickMaster">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd)</xhtml>
-              </documentation>
-            </variable>
             <variable name="BtnUpM1">
               <type>
                 <BOOL />
@@ -94,7 +86,9 @@
    🎛️ ST_fbWinchCmdArbitration_IHM — Entrées IHM de l'arbitrage treuil
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Encapsuler les commandes IHM consommées par FB_WinchCommandArbitrationM1/M2
-       (boutons par treuil, nommage hardware propagé, toggle joystick maître).
+       (boutons par treuil, nommage hardware propagé).
+       Le toggle joystick maître global (Modes.Cmd.TglJoystickMaster) est passé en
+       paramètre séparé des FB (I4 — factorisation, source unique GVL_IHM.Modes.Cmd).
    📤 Producteur : PRG_04_Treuils_Benne (câblage GVL_IHM).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Nommage : BtnUpM1/BtnUpM2 = nommage hardware propagé (convention projet).

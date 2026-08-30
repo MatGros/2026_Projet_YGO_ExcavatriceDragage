@@ -13,7 +13,7 @@ VAR_INPUT
     Enable          : BOOL;   // --> [CMD] Gate TON (TRUE = treuil arrete, contacteurs retombes)
     EnableRising    : BOOL;   // --> [CMD] Front montant Enable du FB parent (D18)
     Reset           : BOOL;   // --> [CMD] Acquittement defaut (front) : purge la memoire de direction
-    ReqDirection    : INT;    // --> [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)
+    ReqDirection    : INT;    // --> [CMD] Sens demande (-1: Descending, 0: Stop, 1: Ascending)
     ChangeDelayUp   : TIME;   // --> [CFG] Delai interlock changement de sens montee
     ChangeDelayDown : TIME;   // --> [CFG] Delai interlock changement de sens descente
 END_VAR

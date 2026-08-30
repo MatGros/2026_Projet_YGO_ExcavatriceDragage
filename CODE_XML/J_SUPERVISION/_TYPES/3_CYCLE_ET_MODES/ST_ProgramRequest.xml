@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T15:07:12.528891" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T15:07:12.528891">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:58:47.660471" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:58:47.660471">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -58,14 +58,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande programme benne</xhtml>
               </documentation>
             </variable>
-            <variable name="OperatorCoupledIntent">
-              <type>
-                <derived name="ST_OperatorCoupledIntent" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention couplée continue opérateur (joystick/boutons), TOUS modes</xhtml>
-              </documentation>
-            </variable>
           </struct>
         </baseType>
         <addData>
@@ -78,42 +70,6 @@
    📋 ST_ProgramRequest — Ensemble des demandes de mouvements du programme
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupe les demandes formulées vers PRG_04 (Treuils/Benne) et PRG_05 (Translation)
-   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_OperatorCoupledIntent">
-        <baseType>
-          <struct>
-            <variable name="Active">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention couplée active (JoyBtnRaw + Select=0 OU boutons BothUp/BothDown)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Direction">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descente, 0: Neutre, +1: Montée)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>ebcc0c47-ef53-54b6-9967-6c3fa0d26f58</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🎮 ST_OperatorCoupledIntent — Intention couplée continue de l'opérateur
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Transmet l'intention de mouvement couplé (homme-mort / boutons)
-      produite inconditionnellement par PRG_03 vers PRG_04 (tous modes).
    📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
         </documentation>
@@ -159,6 +115,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier 1 pendant la montée contrôlée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de remontée assistée (ExtractionAssist)</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepDown">
@@ -236,7 +200,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedTgtPct">
@@ -276,7 +240,6 @@
           <Folder Name="_TYPES">
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_ProgramRequest" ObjectId="a28c1dba-faf7-5919-ab72-3a069b551a0d" />
-              <Object Name="ST_OperatorCoupledIntent" ObjectId="ebcc0c47-ef53-54b6-9967-6c3fa0d26f58" />
               <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
               <Object Name="ST_ProgramTranslationRequest" ObjectId="478a938b-bb21-5d74-8556-79842696e566" />
               <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />

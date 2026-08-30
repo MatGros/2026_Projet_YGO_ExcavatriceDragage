@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:47:08.369458" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:47:08.369458">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:12:07.033491" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:12:07.033491">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -66,7 +66,7 @@
               <EnumValue>
                 <Name>NOMINAL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montée couplée avec vitesse demandée opérateur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ascending couplée avec vitesse demandée opérateur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -684,7 +684,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Montee assistee reellement demandee (sens + mode)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ascending assistee reellement demandee (sens + mode)</xhtml>
               </documentation>
             </variable>
             <variable name="AscentControlSafe">
@@ -935,7 +935,7 @@ BottomConfirmationConsumed := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
 
-// Montee assistee reellement demandee : sens montee + mode maintenance (H5, double garde vs Enable PRG_03).
+// Ascending assistee reellement demandee : sens ascending + mode maintenance (H5, double garde vs Enable PRG_03).
 AssistPermit := MotionRequestActive AND (MotionDirection = 1)
             AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2);
 // Entrees [SAFE] saines : coupure meme-scan des permis si defaut treuil/synchro (H2), avant meme le latch.
@@ -971,6 +971,9 @@ ELSE
         E_ExtractionAssistState.CLOSING_BUCKET:
             Lifecycle.Busy := TRUE;
             BucketCloseRequest := AssistPermit AND NOT BucketError; // coupure meme-scan sur defaut benne (H2)
+            // Autorisation de montee pendant la fermeture : la benne se ferme en montant.
+            // Consommee par l'arbitrage (PRG_04) comme permis de montee assistee (H2).
+            AscentPermit := AssistPermit AND AscentControlSafe;
             OperatorActionId := 16#0202;
             OperatorAction := 'Maintenir la montée : fermeture de la benne en cours.';
             IF BucketError THEN

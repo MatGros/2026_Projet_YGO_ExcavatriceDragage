@@ -19,7 +19,9 @@ VAR_INPUT
     Auth           : ST_fbModes_Autorisations;           // --> [CMD] Autorisations mode (Mode, MaintenanceM3TargetEnable)
     ReqTranslation : ST_ProgramTranslationRequest;        // --> [REQ] Demande cycle translation (SEMI_AUTO)
     IHM            : ST_fbTranslationCmdArbitration_IHM;  // --> [CMD] Boutons IHM, sélecteur, fréquence
-    Context        : ST_fbTranslationCmdArbitration_Context; // --> [SAFE] Interlock hauteur + échelle fréquence
+    TglJoystickMaster : BOOL;  // --> [CMD] Toggle joystick maître global (Modes.Cmd, source unique)
+    Context        : ST_fbTranslationCmdArbitration_Context; // --> [SAFE] Interlock hauteur
+    Cfg            : ST_fbTranslationCmdArbitration_Cfg;     // --> [CFG] Fréquence max (échelle FreqPct)
 END_VAR
 VAR_OUTPUT
     Ready             : BOOL;  // <-- [STAT] FB prêt à arbitrer (Enable)
@@ -48,7 +50,7 @@ ELSE
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         PositioningActive := TRUE;
         SelTarget := ReqTranslation.PositionTgt;
-        StartStop := ReqTranslation.ReqStart;
+        StartStop := ReqTranslation.ReqStart AND Context.HeightInterlockOk;
         IF StartStop THEN
             SpeedPct := 100.0;
             IF SelTarget = 1 THEN
@@ -65,11 +67,11 @@ ELSE
         PositioningActive := IHM.SelPositioning;
         SelTarget := 0;
 
-        IF NOT IHM.TglJoystickMaster AND IHM.BtnFwd THEN
+        IF NOT TglJoystickMaster AND IHM.BtnFwd THEN
             Direction := 1;
-        ELSIF NOT IHM.TglJoystickMaster AND IHM.BtnRev THEN
+        ELSIF NOT TglJoystickMaster AND IHM.BtnRev THEN
             Direction := -1;
-        ELSIF IHM.TglJoystickMaster THEN
+        ELSIF TglJoystickMaster THEN
             Direction := Joystick.AxisX.Direction;
         ELSE
             Direction := 0;
@@ -78,15 +80,15 @@ ELSE
         // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2.
         // ⚠️ Tautologie conservée bit-identique : (BypassGlobal OR NOT Tgl OR Tgl) = toujours TRUE.
         StartStop := (Direction <> 0)
-                     AND (IHM.BypassGlobal OR NOT IHM.TglJoystickMaster OR IHM.TglJoystickMaster)
+                     AND (IHM.BypassGlobal OR NOT TglJoystickMaster OR TglJoystickMaster)
                      AND Joystick.DeadmanArmed
                      AND Context.HeightInterlockOk;
 
         // Échelle fréquence : SetFreq_Hz (ou 100% si non renseignée), manche mis à l'échelle si joystick maître
         FreqPct := SEL(IHM.SetFreq_Hz > 0.0,
                        100.0,
-                       (IHM.SetFreq_Hz / SEL(Context.MaxFreq_Hz > 0.0, 50.0, Context.MaxFreq_Hz)) * 100.0);
-        SpeedPct := SEL(IHM.TglJoystickMaster,
+                       (IHM.SetFreq_Hz / SEL(Cfg.MaxFreq_Hz > 0.0, 50.0, Cfg.MaxFreq_Hz)) * 100.0);
+        SpeedPct := SEL(TglJoystickMaster,
                         FreqPct,
                         (ABS(Joystick.AxisX.SpeedTgt) / 100.0) * FreqPct);
     ELSE

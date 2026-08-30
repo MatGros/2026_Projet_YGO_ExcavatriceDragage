@@ -35,7 +35,7 @@ VAR_OUTPUT
     SpeedBand                       : INT;                            // <-- [DIAG] Bande de vitesse courante (0..5)
     EstimatedLoadPct                : REAL;                           // <-- [DIAG] Estimation de charge (0..100%)
     Configured                      : BOOL;                           // <-- [STAT] Table explicitement validee
-    Ascending                       : BOOL;                           // <-- [STAT] Montee effective mesuree en cours
+    Ascending                       : BOOL;                           // <-- [STAT] Ascending effective mesuree en cours
 END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===

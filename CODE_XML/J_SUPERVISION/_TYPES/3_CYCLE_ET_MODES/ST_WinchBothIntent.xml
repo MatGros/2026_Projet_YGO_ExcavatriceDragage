@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:54.019567" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:54.019567">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.659560" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.659560">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,45 +23,39 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_ProgramWinchRequest">
+      <dataType name="ST_WinchBothIntent">
         <baseType>
           <struct>
-            <variable name="ReqStartStop">
+            <variable name="Active">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arrêt demandé par le programme (TRUE=Marche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both active (homme-mort qualifié + Select=0 OU boutons BothUp/BothDown)</xhtml>
               </documentation>
             </variable>
-            <variable name="ReqDirection">
+            <variable name="Direction">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedTgtPct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne de vitesse cible demandée (0.0 à 100.0 %)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descending, 0: Neutre, +1: Ascending)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>edbf7141-2109-5344-bf49-1cd29f4686cd</ObjectId>
+            <ObjectId>27a8fd28-e07a-5ea0-8328-eea98b482fb9</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_ProgramWinchRequest — Demande de mouvement treuil par le programme
+   🎮 ST_WinchBothIntent — Intention both continue de l'opérateur
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
+   🎯 Rôle : Transmet l'intention de mouvement both (2 treuils ensemble,
+      homme-mort / boutons) produite inconditionnellement par PRG_03 vers
+      PRG_04 et l'arbitrage (tous modes). Source UNIQUE de la décision both.
    📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
         </documentation>
@@ -78,7 +72,7 @@
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
             <Folder Name="3_CYCLE_ET_MODES">
-              <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
+              <Object Name="ST_WinchBothIntent" ObjectId="27a8fd28-e07a-5ea0-8328-eea98b482fb9" />
             </Folder>
           </Folder>
         </Folder>

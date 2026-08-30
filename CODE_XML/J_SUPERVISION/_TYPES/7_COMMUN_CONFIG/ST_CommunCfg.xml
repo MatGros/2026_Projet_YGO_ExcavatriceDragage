@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:48:59.978440" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:48:59.978440">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:10.488530" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:10.488530">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -58,7 +58,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchMaxStepDescente">
+            <variable name="WinchMaxStepDescending">
               <type>
                 <INT />
               </type>
@@ -66,7 +66,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <simpleValue value="3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Limitation palier vitesse en descente (1..5), commun M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Limitation palier vitesse en descending (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="WinchMaxStepAscent">

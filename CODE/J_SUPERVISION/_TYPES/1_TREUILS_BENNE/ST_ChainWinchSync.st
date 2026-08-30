@@ -10,14 +10,14 @@ STRUCT
 
     Idx301_EmergencyChainClosed  : BOOL; // 1 = Boucle Urgence OK | 0 = Arrêt Urgence
     Idx302_SyncFaultActive       : BOOL; // 0 = Synchro OK | 1 = Écart Synchro Bloquant
-    Idx303_M1_AscentPermit       : BOOL; // 1 = Montée M1 Autorisée | 0 = Bloquée (Fdc/Safety)
-    Idx304_M2_AscentPermit       : BOOL; // 1 = Montée M2 Autorisée | 0 = Bloquée (Fdc/Safety)
+    Idx303_M1_AscentPermit       : BOOL; // 1 = Ascending M1 Autorisée | 0 = Bloquée (Fdc/Safety)
+    Idx304_M2_AscentPermit       : BOOL; // 1 = Ascending M2 Autorisée | 0 = Bloquée (Fdc/Safety)
 
     Idx401_SyncMotionAllowed     : BOOL; // 1 = Mouvement Synchro Autorisé | 0 = Bloqué
     Idx402_M1_SetpointSpeed_Pct  : REAL; // [%] Consigne Vitesse Calculée M1
     Idx403_M2_SetpointSpeed_Pct  : REAL; // [%] Consigne Vitesse Calculée M2
 
-    Idx501_M1_CmdRelayFwd_DQ     : BOOL; // 1 = Montée M1 ON | 0 = OFF
-    Idx502_M2_CmdRelayFwd_DQ     : BOOL; // 1 = Montée M2 ON | 0 = OFF
+    Idx501_M1_CmdRelayFwd_DQ     : BOOL; // 1 = Ascending M1 ON | 0 = OFF
+    Idx502_M2_CmdRelayFwd_DQ     : BOOL; // 1 = Ascending M2 ON | 0 = OFF
 END_STRUCT
 END_TYPE

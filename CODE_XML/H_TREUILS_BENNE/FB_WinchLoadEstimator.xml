@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.413625" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.413625">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.496100" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.496100">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -406,7 +406,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Montee effective mesuree en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Ascending effective mesuree en cours</xhtml>
               </documentation>
             </variable>
           </outputVars>

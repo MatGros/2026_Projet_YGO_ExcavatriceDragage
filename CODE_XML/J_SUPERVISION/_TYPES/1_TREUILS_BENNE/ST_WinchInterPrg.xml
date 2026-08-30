@@ -484,7 +484,7 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Descente autorisée (TRUE = OK | FALSE = mou de câble / limite basse)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Descending autorisée (TRUE = OK | FALSE = mou de câble / limite basse)</xhtml>
               </documentation>
             </variable>
             <variable name="AscentPermit">
@@ -492,7 +492,7 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Montée autorisée (TRUE = OK | FALSE = fin de course haut)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Ascending autorisée (TRUE = OK | FALSE = fin de course haut)</xhtml>
               </documentation>
             </variable>
             <variable name="SlackCable">
@@ -1048,7 +1048,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Sorties Physiques / Indicateurs LEDs
-🛗 Relais Montée activé</xhtml>
+🛗 Relais Ascending activé</xhtml>
               </documentation>
             </variable>
             <variable name="RelayRev">
@@ -1056,7 +1056,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descente activé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descending activé</xhtml>
               </documentation>
             </variable>
             <variable name="Contactor1">

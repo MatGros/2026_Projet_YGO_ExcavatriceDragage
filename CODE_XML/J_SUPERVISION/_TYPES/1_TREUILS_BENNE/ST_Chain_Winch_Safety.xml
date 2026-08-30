@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T23:15:42.091495" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T23:15:42.091495">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.642040" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.642040">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -71,7 +71,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending Autorisée | 0 = ASCENDING BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx307_SlackCablePhysical_DI">
@@ -95,7 +95,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descending Autorisée | 0 = DESCENDING BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx310_ErrorOperatorComm">

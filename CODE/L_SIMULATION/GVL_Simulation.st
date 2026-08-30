@@ -33,8 +33,8 @@ VAR_GLOBAL
     // 🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE; // Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)
     SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE; // Translation M3 Avant vers Maintenance (RawX=10000, RawY=5000)
-    SimJoystickFwd_Up_Close_Active     : BOOL := FALSE; // Treuils Montée M1/M2 / Fermeture Benne M2 (RawX=5000, RawY=10000)
-    SimJoystickRev_Down_Open_Active    : BOOL := FALSE; // Treuils Descente M1/M2 / Ouverture Benne M2 (RawX=5000, RawY=0)
+    SimJoystickFwd_Up_Close_Active     : BOOL := FALSE; // Treuils Ascending M1/M2 / Fermeture Benne M2 (RawX=5000, RawY=10000)
+    SimJoystickRev_Down_Open_Active    : BOOL := FALSE; // Treuils Descending M1/M2 / Ouverture Benne M2 (RawX=5000, RawY=0)
     SimJoystickRawX                    : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
     SimJoystickRawY                    : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
     SimJoystickRawButton               : BOOL := FALSE; // Homme-mort brut : TRUE = bouton joystick appuyé

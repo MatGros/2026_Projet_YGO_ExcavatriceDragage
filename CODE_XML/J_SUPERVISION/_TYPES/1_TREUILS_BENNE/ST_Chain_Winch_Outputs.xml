@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-27T13:56:34.389295" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-27T13:56:34.389295">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.607536" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.607536">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Montée ON | 0 = OFF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Ascending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
             <variable name="Idx502_CmdRelayRev_Down_DQ">
@@ -39,7 +39,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Descente ON | 0 = OFF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Descending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
             <variable name="Idx503_CmdSpeedContactor1_DQ">

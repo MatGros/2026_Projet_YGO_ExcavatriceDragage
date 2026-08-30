@@ -28,7 +28,7 @@ STRUCT
     Idx502_DumpAtTremieAssistActive  : BOOL; // 1 = Mode réellement actif (armé ET Mode MAINT_N1/N2) | 0 = Inactif
     Idx503_DumpAtTremieAtTremie      : BOOL; // 1 = M3 à la position Trémie | 0 = Ailleurs
     Idx504_DumpAtTremieBucketOpenArmed : BOOL; // 1 = Ouverture benne armée par ce mode | 0 = Non armée
-    Idx505_DumpAtTremieDescentLocked : BOOL; // 1 = Descente M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre
+    Idx505_DumpAtTremieDescentLocked : BOOL; // 1 = Descending M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre
 
     Idx601_BypassDiveActive          : BOOL; // 1 = Bypass séquence DiveSearch armé (IHM)
     Idx602_BypassKoboldBottomTouched : BOOL; // 1 = Fond confirmé par le bypass (front montant Kobold en descente)
