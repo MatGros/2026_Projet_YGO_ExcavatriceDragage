@@ -151,7 +151,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     // ⚙️ CONFIGURATION TECHNOLOGIQUE CODEUR COMMUNE M1/M2
     _EncoderCfgPersist : ST_fbEncoder_Cfg; // 🌉 Pont FB_CfgPersistBridge_fbEncoder_Cfg
 
-    // 💾 APPRENTISSAGE VITESSE PAR PALIER (T181-15) — collecteur passif FB_WinchSpeedLearning
+    // 💾 APPRENTISSAGE VITESSE PAR PALIER — collecteur passif FB_WinchSpeedLearning
     _WinchSpeedLearnTable : ST_fbWinchSpeedLearning_Table; // Table RETAIN {axe x sens x charge/vide x palier}
 
     // 🧭 RE-HOMING OBLIGATOIRE PAR AXE (AF-05 §4bis) — AJOUTÉ EN FIN DE LISTE

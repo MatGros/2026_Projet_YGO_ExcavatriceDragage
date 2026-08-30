@@ -141,7 +141,7 @@ VAR
     EffectiveMaxStepAscent    : INT;
     EffectiveMaxStepDescente  : INT;
 
-    // Agrégateur de clamp de palier (T181-10) — bornes communes M1=M2 puis M2-propre
+    // Agrégateur de clamp de palier — bornes communes M1=M2 puis M2-propre
     CommonMaxStepUp   : INT;
     CommonMaxStepDown : INT;
     CommonMinStepUp   : INT;
@@ -462,8 +462,8 @@ instWinchSync(
     BypassGlobal    := GVL_IHM.M1M2Sync.Bypass.Global
 );
 
-// D13 (T181-10) : reconstruction de table M2 supprimée — le clamp de palier agrégé
-// (§5ter, M2MaxStep* := 1) suffit : StepNumber ≤ 1 → seuls les états P1 sont commandés.
+// Pas de reconstruction de table M2 : le clamp §5ter (M2MaxStep* := 1) suffit
+// — StepNumber ≤ 1 → seuls les états P1 sont commandés.
 // M2 consomme directement _WinchSpeedStepTable (table normale).
 
 
@@ -778,7 +778,7 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinch
 {endregion}
 
 {region "§5ter Agrégateur de clamp de palier (commun M1=M2 + M2-propre)"}
-// === 🧮 §5ter AGRÉGATEUR DE CLAMP DE PALIER (T181-10) ===
+// === 🧮 §5ter AGRÉGATEUR DE CLAMP DE PALIER ===
 // Bornes communes identiques M1=M2, puis M2 applique ses limites benne propres.
 // Plafond = MIN des sources plafond ; plancher = MAX des sources plancher ; plafond gagne.
 // Synchro (instWinchSync) calculée en §4, en amont : SyncDeviationWarn réduit les DEUX treuils.
