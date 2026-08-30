@@ -62,6 +62,6 @@ Le garde **bride désormais `RequestedStep` à la bande mesurée** en fonctionne
 
 ## 7. Notes annexes
 - `_WinchLoadEstimateTable.IsConfigured := FALSE` (table vide) → `EstimatedLoadPct` restera 0 tant que non calibré ; `SpeedBand` fonctionne indépendamment (§3 de l'estimateur). **Non bloquant**.
-- `TOOLS/TEST_AUTO_CI/FB_TestHarness_PRG_04.st` référence encore `SpeedGuardEnableM1/M2` supprimées → **sera cassé** au prochain run harnais ; à re-synchroniser au lot tests (hors scope).
+- `TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st` référence encore `SpeedGuardEnableM1/M2` supprimées → **sera cassé** au prochain run harnais ; à re-synchroniser au lot tests (hors scope).
 
 **Clôture : aucun commit effectué · diff prêt à validation orchestrateur + intégration CODESYS manuelle.**

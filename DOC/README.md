@@ -65,6 +65,7 @@ Ils restent des **POU du code actuel**, cibles de migration, jamais des cibles d
 | Historique CODE ↔ DOC | [VERSION_HISTORY.md](VERSION_HISTORY.md) |
 | Décisions de conception | [ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md](../ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md) (archive) |
 | Mise en service | [WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService.md](WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService.md) |
+| Rapports d'orchestration | [WFLOW/ORCHESTRATION_RAPPORTS/](WFLOW/ORCHESTRATION_RAPPORTS/) — livrables Markdown issus des revues et handoffs |
 | Post-mise en service | [WFLOW/REGISTRES/REGISTRE_Suivi_PostMES.md](WFLOW/REGISTRES/REGISTRE_Suivi_PostMES.md) |
 | Fiches d'essais | `WFLOW/CHECKLISTS/` · Audits : `WFLOW/AUDITS/` · REX : `WFLOW/REX/` · Schémas : `DIA/` |
 | Décision d'architecture actée | `AF_Partie-02` §2/§4 (source unique, voir ci-dessus) — décision historique dans [ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/RU_C4_ARCHITECTURE_PROCEDES.md](../ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/RU_C4_ARCHITECTURE_PROCEDES.md) (archive) |

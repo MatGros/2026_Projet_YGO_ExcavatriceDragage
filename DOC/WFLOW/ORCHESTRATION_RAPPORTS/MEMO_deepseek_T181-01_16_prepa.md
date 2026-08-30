@@ -1,4 +1,3 @@
-```markdown
 # Mémo d'analyse préparatoire — T181 « Gel du treuil » (T181-01 & T181-16)
 
 > **Préambule obligatoire** — Toute tâche déléguée doit respecter les règles du projet. Ce mémo est une pré‑analyse, aucun code n'est produit.
@@ -126,4 +125,3 @@ Méthode : à chaque transition `PalierChanged` (signal fourni par la table T181
 5. **Le patch non committé dans FB_WinchOutputInterlock.st** : doit‑il être conservé comme référence pour le redesign, ou totalement ignoré ?
 6. **Quelle est la politique de priorité entre `ContactorStuck` et `OverspeedHardTrip`** en cas de simultanéité ?
 7. **Le `FinalInterlockGoverned` doit‑il être utilisé comme critère de déclenchement d'un diagnostic** ou uniquement comme indicateur de surveillance ?
-```
