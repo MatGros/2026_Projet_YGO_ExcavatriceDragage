@@ -991,6 +991,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Façade codeur qualifiée M2 (Benne)</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineHoming">
+              <type>
+                <derived name="ST_MachineHoming" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 État homing conjoint machine (M1/M2/benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="LocalDigitalIoOk">
               <type>
                 <BOOL />
@@ -39493,14 +39501,6 @@ PreviousQualified := Qualified;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Image utilisee par le metier (arbitree)</xhtml>
               </documentation>
             </variable>
-            <variable name="MachineHoming">
-              <type>
-                <derived name="ST_MachineHoming" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [BUS] Etat homing conjoint machine (M1/M2/benne)</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="instSimBench">
@@ -40035,14 +40035,14 @@ instMachineHomingCycle(
     CfgOffsetOpenM             := _BucketCfgPersist.Config.OffsetOpenM,
     CfgOffsetCloseM            := _BucketCfgPersist.Config.OffsetCloseM
 );
-MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
-MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
-MachineHoming.SetPosBucketClose := instMachineHomingCycle.BucketCommit.CommitClose;
-MachineHoming.Active           := instMachineHomingCycle.MachineHomingActive;
-MachineHoming.HomingLoss       := instMachineHomingCycle.MachineHomingLossSafeStop;
-MachineHoming.Step             := TO_INT(instMachineHomingCycle.MachineHomingStep);
-MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstruction;
-MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
+Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
+Data.MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
+Data.MachineHoming.SetPosBucketClose := instMachineHomingCycle.BucketCommit.CommitClose;
+Data.MachineHoming.Active           := instMachineHomingCycle.MachineHomingActive;
+Data.MachineHoming.HomingLoss       := instMachineHomingCycle.MachineHomingLossSafeStop;
+Data.MachineHoming.Step             := TO_INT(instMachineHomingCycle.MachineHomingStep);
+Data.MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstruction;
+Data.MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
@@ -40341,7 +40341,7 @@ instModes(
     // assumé : PRG_04 est de rang 04, ce programme de rang 03)
     M1PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM1,
     M2PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM2,
-    MachineHomed     := PRG_02_Acquisition.MachineHoming.Homed,
+    MachineHomed     := PRG_02_Acquisition.Data.MachineHoming.Homed,
     // Restauration boot des drapeaux de re-homing (miroir PERSISTENT)
     BootHomingRequiredM1      := GVL_PERSISTENT._MaintM1HomingRequired,
     BootHomingRequiredM2      := GVL_PERSISTENT._MaintM2HomingRequired
@@ -41669,10 +41669,10 @@ instBucket(
     HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
     M2_Busy             := (instWinchM2.StepNumber &gt; 0),
-    MachineHomingCommitOpen  := PRG_02_Acquisition.MachineHoming.SetPosBucketOpen,
-    MachineHomingCommitClose := PRG_02_Acquisition.MachineHoming.SetPosBucketClose,
-    MachineHomed := PRG_02_Acquisition.MachineHoming.Homed,
-    MachineHomingActive := PRG_02_Acquisition.MachineHoming.Active,
+    MachineHomingCommitOpen  := PRG_02_Acquisition.Data.MachineHoming.SetPosBucketOpen,
+    MachineHomingCommitClose := PRG_02_Acquisition.Data.MachineHoming.SetPosBucketClose,
+    MachineHomed := PRG_02_Acquisition.Data.MachineHoming.Homed,
+    MachineHomingActive := PRG_02_Acquisition.Data.MachineHoming.Active,
     Config              := _BucketCfgPersist.Config,
     CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
@@ -41885,9 +41885,9 @@ END_IF;
 // deux treuils, sans PowerCutOff additionnel. Le cycle libere la demande
 // seulement apres le composite d'arret mecanique confirme.
 SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault
-                       OR PRG_02_Acquisition.MachineHoming.HomingLoss;
+                       OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
 SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault
-                       OR PRG_02_Acquisition.MachineHoming.HomingLoss;
+                       OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
 // : signal HwIn.Machine.M1_M2_KoboldBottomTouch_DI (même que instDiveSearch §1).
@@ -42593,12 +42593,12 @@ BucketState.OpenActive := instBucket.OpenReq;
 BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (WinchBothDiveBucketOpenArmed OR WinchBothAscentBucketCloseArmed)) OR ExtractionControlActive;
 BucketState.CoupledDiveOpenArmed := WinchBothDiveBucketOpenArmed;
 BucketState.CoupledAscentCloseArmed := WinchBothAscentBucketCloseArmed;
-BucketState.MachineHomed := PRG_02_Acquisition.MachineHoming.Homed;
-BucketState.MachineHomingStep := PRG_02_Acquisition.MachineHoming.Step;
-BucketState.MachineHomingInstruction := PRG_02_Acquisition.MachineHoming.Instruction;
-BucketState.MachineHomingFailed := PRG_02_Acquisition.MachineHoming.Failed;
-BucketState.MachineHomingActive := PRG_02_Acquisition.MachineHoming.Active;
-BucketState.MachineHomingLossSafeStop := PRG_02_Acquisition.MachineHoming.HomingLoss;
+BucketState.MachineHomed := PRG_02_Acquisition.Data.MachineHoming.Homed;
+BucketState.MachineHomingStep := PRG_02_Acquisition.Data.MachineHoming.Step;
+BucketState.MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction;
+BucketState.MachineHomingFailed := PRG_02_Acquisition.Data.MachineHoming.Failed;
+BucketState.MachineHomingActive := PRG_02_Acquisition.Data.MachineHoming.Active;
+BucketState.MachineHomingLossSafeStop := PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
 BucketState.ExtractionControlActive := ExtractionControlActive;
 BucketState.CoupledMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;

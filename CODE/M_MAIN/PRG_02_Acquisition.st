@@ -22,7 +22,6 @@ VAR_OUTPUT
     HwReal                   : ST_HardwareImage; // <-- [STAT] Image brute reelle physique
     HwSim                    : ST_HardwareImage; // <-- [STAT] Image simulee banc
     HwIn                     : ST_HardwareImage; // <-- [STAT] Image utilisee par le metier (arbitree)
-    MachineHoming    : ST_MachineHoming; // <-- [BUS] Etat homing conjoint machine (M1/M2/benne)
 END_VAR
 
 VAR
@@ -380,14 +379,14 @@ instMachineHomingCycle(
     CfgOffsetOpenM             := _BucketCfgPersist.Config.OffsetOpenM,
     CfgOffsetCloseM            := _BucketCfgPersist.Config.OffsetCloseM
 );
-MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
-MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
-MachineHoming.SetPosBucketClose := instMachineHomingCycle.BucketCommit.CommitClose;
-MachineHoming.Active           := instMachineHomingCycle.MachineHomingActive;
-MachineHoming.HomingLoss       := instMachineHomingCycle.MachineHomingLossSafeStop;
-MachineHoming.Step             := TO_INT(instMachineHomingCycle.MachineHomingStep);
-MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstruction;
-MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
+Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
+Data.MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
+Data.MachineHoming.SetPosBucketClose := instMachineHomingCycle.BucketCommit.CommitClose;
+Data.MachineHoming.Active           := instMachineHomingCycle.MachineHomingActive;
+Data.MachineHoming.HomingLoss       := instMachineHomingCycle.MachineHomingLossSafeStop;
+Data.MachineHoming.Step             := TO_INT(instMachineHomingCycle.MachineHomingStep);
+Data.MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstruction;
+Data.MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
