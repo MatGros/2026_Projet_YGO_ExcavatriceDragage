@@ -203,6 +203,18 @@ FB_ExtractionSequence:
     - CODE/G_CYCLE/FB_ExtractionSequence.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_extractionsequence.st
 
+FB_WinchLoadEstimator:
+  domain: H_TREUILS_BENNE
+  sources:
+    - CODE/F_MODES/E_Mode.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/FB_FaultCore.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_SpeedCfg.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_Table.st
+    - CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winchloadestimator.st
+
 FB_WinchStepShaper:
   domain: H_TREUILS_BENNE
   sources:
