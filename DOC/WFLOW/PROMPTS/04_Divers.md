@@ -7,3 +7,11 @@ Super , je veux que tu fasse auditer et challenger ton travail et ta solution ..
 Si besoin context agent précédent 
  C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\codex-session-01a04e67-c2ec-7553-afff-b97432fbf6e8.md
 Tu ne codes pas tu vérifie contrôle et tu utilise le script python ollama deepskeek v4 flash pour les subagent
+
+
+
+Analyse T131
+
+et
+
+fait un point poussé avec un agent pour savoir qu'est ce qui est intégré dans la dans le code? Qu'est ce qui est intégré dans l'analyse fonctionnelle et dans le dans la documentation projet? Qu'est ce que est ce que le cette tâche est est périmée ou est ce qu'elle encore lieu d'être?

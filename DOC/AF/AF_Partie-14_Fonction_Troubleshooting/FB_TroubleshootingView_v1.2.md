@@ -139,6 +139,11 @@ Recopie depuis `WinchM2.Bucket : ST_BucketHMI` (déjà complet : `MechState.IsOp
 
 Recopie depuis `Translation : ST_TranslationHMI` (`Cmd`, `State`, `Safety`).
 
+🆕 `Idx317_ErrorId` (WORD) — **T129** : masque brut complet d'`ErrorId` (latch cause), source
+d'arbitrage `PowerCutOff` (`FB_Safety_Translation`). Recopié depuis `Translation.Safety.ErrorId`
+(producteur unique `PRG_05_Translation.st:462`). Complète les 8 bits décapsulés `Idx309..316` :
+il restitue le masque exact et le latch, indispensable pour diagnostiquer l'éjection SEMI_AUTO.
+
 ## 6. TBD — à trancher avant implémentation complète
 
 | # | Point | Statut |

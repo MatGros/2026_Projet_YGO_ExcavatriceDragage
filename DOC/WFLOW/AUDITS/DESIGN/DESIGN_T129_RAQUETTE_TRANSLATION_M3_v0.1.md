@@ -31,18 +31,24 @@ Ajouter 2 champs dans les structs de la raquette Translation + le câblage dans
 
 | Struct | Champ | Source | Sens |
 |---|---|---|---|
-| `ST_Chain_Translation_Safety` | `Idx317_ErrorId` : WORD | `Translation.Safety.ErrorId` (= `instSafetyTranslationM3.Status.ErrorId`, `PRG_05:433`) | Masque brut complet |
-| `ST_Chain_Translation_Control` | `Idx408_DirectionActive` : INT | `Translation.State.ActiveDirection` (= `SEL(..., M3_Direction_Active, 0)`, `PR_05:393`) | Sens réel appliqué |
+| `ST_Chain_Translation_Safety` | `Idx317_ErrorId` : WORD | `Translation.Safety.ErrorId` (= `instSafetyTranslationM3.Fault.ErrorId`, `PRG_05:462`) | Masque brut complet |
+| `ST_Chain_Translation_Control` | `Idx408_DirectionActive` : INT | `Translation.State.ActiveDirection` (= `SEL(..., M3_Direction_Active, 0)`, `PRG_05_Translation.st:423`) | Sens réel appliqué |
 
 Câblage `FB_TroubleshootingView` (région §5 TranslationPontM3) :
 ```
-GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx318_ErrorId := Translation.Safety.ErrorId;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx317_ErrorId := Translation.Safety.ErrorId;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx408_DirectionActive := Translation.State.ActiveDirection;
 ```
 
 > 🛠️ **Cohérence producteur unique** : ces 2 sources sont déjà des producteurs uniques
 > (`Translation.Safety.ErrorId`, `Translation.State.ActiveDirection`) — on ne recompose rien,
 > on expose simplement un miroir (conforme esprit bus, cf. T142).
+
+> ✅ **Résolution implémentation (2026-08-31)** : l'index retenu est **`Idx317_ErrorId`** (le
+> snippet ci-dessus utilisait `Idx318` par erreur — corrigé). **`Idx408_DirectionActive` n'a PAS
+> été implémenté** : la direction réelle est déjà exposée via `MotionM3.RequestedDirection`
+> (`FB_TroubleshootingView` §10) — l'ajout serait redondant. Seul `Idx317_ErrorId` (WORD) a été
+> ajouté à `ST_Chain_Translation_Safety` + câblé dans `FB_TroubleshootingView` §5.
 
 ---
 

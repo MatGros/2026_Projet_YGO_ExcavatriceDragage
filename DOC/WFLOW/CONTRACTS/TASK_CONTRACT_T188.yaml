@@ -1,0 +1,132 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T188 Refactor POO : arbitrage de commande PRG_04/05 → FB
+# projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# ⚠️ BLOQUÉ sur la fin de l'implémentation actuelle (T181 ⏳). Ne pas démarrer avant.
+# ⚠️ Aucun changement de comportement machine : refactor bit-identique.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T188_REFACTOR_POO_ARBITRAGE_COMMANDE
+  criticality: C2            # C0 | C1 | C2 | C3 | C4
+  strategy: patch            # patch | rebuild
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Déplacer l'arbitrage de commande (choix de la source joystick / boutons IHM /
+    demande cycle selon le mode) de PRG_04_Treuils_Benne §3 et PRG_05_Translation §1
+    vers des FB d'arbitrage dédiés (FB_WinchCommandArbitration, FB_TranslationCommandArbitration),
+    conformément à CODE_QUALITY_STANDARDS.md §5 (une décision combinant plusieurs causes
+    est calculée par son propriétaire fonctionnel, pas par le programme d'orchestration).
+    Aucun changement de comportement machine : refactor bit-identique.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_WinchCommandArbitration existe, est instancié 2 fois (M1, M2) dans PRG_04, et produit StartStop/Direction/SpeedPct bit-identiques à l'actuel §3 pour chaque mode (SEMI_AUTO, MAINT_N1, MAINT_N2, manuel joystick, boutons IHM)."
+      verified_by: "Tests harness par mode : sorties FB == sorties §3 actuel (bit-identique), pour chaque combinaison de mode/source."
+    - id: AC2
+      statement: "FB_TranslationCommandArbitration existe, est instancié 1 fois (M3) dans PRG_05, et produit StartStop/Direction/SpeedPct/SelTarget/PositioningActive bit-identiques à l'actuel §1 pour chaque mode."
+      verified_by: "Tests harness par mode : sorties FB == sorties §1 actuel (bit-identique)."
+    - id: AC3
+      statement: "PRG_04 §3 ne contient plus de logique d'arbitrage (IF Mode / boutons / joystick) : uniquement câblage des entrées FB + publication des sorties."
+      verified_by: "Revue du diff : aucune instruction IF/ELSIF/ELSE d'arbitrage de source dans §3 ; grep 'E_Mode.SEMI_AUTO' absent de §3."
+    - id: AC4
+      statement: "PRG_05 §1 ne contient plus de logique d'arbitrage : uniquement câblage des entrées FB + publication des sorties."
+      verified_by: "Revue du diff : aucune instruction IF/ELSIF/ELSE d'arbitrage de source dans §1 ; grep 'E_Mode.SEMI_AUTO' absent de §1."
+    - id: AC5
+      statement: "La liaison inter-PRG est intacte après chaque raccordement (PRG_04 puis PRG_05)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report → PASS (0 erreur)."
+    - id: AC6
+      statement: "Tous les gates mécaniques passent en fin de lot."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py → 100% PASS (palier C à chaque lot, complet en T188-F)."
+    - id: AC7
+      statement: "Aucune régression sur les publications legacy du bus (Data.JoystickDeadmanArmed, Data.JoystickYNeutral, Data.JoystickDirectionX, Data.JoystickSpeedPctX, Data.JoystickXNeutral)."
+      verified_by: "Grep : ces champs restent publiés et consommés à l'identique ; tests harness sur les consommateurs (PRG_03/04/05/07)."
+    - id: AC8
+      statement: "Le bundle PLCopenXML est régénéré et valide après chaque lot."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . → CODE/CODE_Bundle.xml régénéré, bandeau 'BUNDLE EXPORTÉ'."
+    - id: AC9
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (PRG_04_Treuils_Benne.st -> PRG_04_Treuils_Benne, PRG_05_Translation.st -> PRG_05_Translation)."
+      verified_by: "comparaison basename sans extension vs identifiant apres PROGRAM/FUNCTION_BLOCK pour chaque fichier du scope"
+    - id: AC10
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage (_CFC/_LD) n'est apposé ; le suffixe reste identique au langage genere dans le bundle, c'est-a-dire du ST pur."
+      verified_by: "grep basename *_CFC/_LD absent + inspection CODE_Bundle.xml : POU concernes en ST"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:                 # fichiers que la tache PEUT modifier
+      - CODE/H_TREUILS_BENNE/FB_WinchCommandArbitration.st
+      - CODE/I_TRANSLATION/FB_TranslationCommandArbitration.st
+      - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchCommandArbitration_*.st
+      - CODE/I_TRANSLATION/_TYPES/ST_fbTranslationCommandArbitration_*.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+      - DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md
+      - TOOLS/TEST_AUTO_CI/scripts/ (tests harness)
+    forbidden:               # explicitement hors scope — ne pas y toucher
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  # OBLIGATOIRE si strategy = rebuild. Ecrit AVANT toute suppression de lien.
+  conservation:
+    must_survive:            # comportements/donnees a preserver imperativement
+      - "Comportement bit-identique de l'arbitrage pour chaque mode (SEMI_AUTO, MAINT_N1/N2, manuel joystick, boutons IHM)"
+      - "Gating StartStop (bucket busy, CoupledMotionBlocked, SyncMinorDeviationBlocks, deadman) — inchangé"
+      - "Publications legacy du bus (JoystickDeadmanArmed, JoystickYNeutral, JoystickDirectionX, JoystickSpeedPctX, JoystickXNeutral)"
+      - "Lag 1 scan assumé (PRG_04 §2 lit M1LogicRequestDirection avant son calcul §3)"
+      - "Interface FB_Winch / FB_Translation / FB_Bucket inchangée (hors scope)"
+    dropped_on_purpose:      # abandonne sciemment — decision humaine, tracee
+      - "Aucun (refactor bit-identique, aucun comportement abandonné)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison" (G200)
+    - run_all_gates          # resultat des gates
+    - bundle                 # CODE/CODE_Bundle.xml regenere
+    - harness_tests          # tests par mode bit-identique
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout ecart de comportement detecte en cours de route (sortie FB != sortie §3/§1
+    actuel, regression liaison, incoherence de spec) est remonte IMMEDIATEMENT a
+    l'orchestrateur, pas a la fin et jamais silencieusement. Un refactor POO sur la
+    commande de treuils/translation est critique : signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "..."         # Ex: sonnet-5 (antigravity)
+  completed_at: "..."        # Timestamp ISO (ex: 2026-08-12T06:27:00+02:00)
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []     # Preuves clés (ex: "run_all_gates: PASS", "linkage: PASS")
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: "..."        # Ex: Claude Code (Orchestrateur)
+  validated_at: "..."        # Timestamp ISO
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

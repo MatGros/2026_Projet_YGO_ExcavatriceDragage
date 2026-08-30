@@ -230,6 +230,8 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Etabli en X4_DESCEND_OPEN');
     ASSERT_TRUE(FB.WinchM1Cmd.StartStop, 'Descente M1 commandee avant relache');
+    ASSERT_TRUE(FB.BucketCmd.KoboldContactorCmd, 'Kobold contacteur arme en X4 pendant plongee (T186)');
+    ASSERT_TRUE(FB.RequestActive, 'RequestActive=TRUE en X4 (plongee active, T186)');
 
     (* Call 6 : relache homme-mort / manche au centre pendant la plongee -> neutralisation, etape maintenue *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,

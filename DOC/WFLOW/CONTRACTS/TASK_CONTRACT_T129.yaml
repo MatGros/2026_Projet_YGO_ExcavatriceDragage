@@ -1,0 +1,96 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# T129 — Trou dans la raquette troubleshooting Translation M3
+#   Exposer le masque brut ErrorId de la Translation M3 dans GVL_Troubleshooting.
+#   Design : DOC/WFLOW/AUDITS/DESIGN/DESIGN_T129_RAQUETTE_TRANSLATION_M3_v0.1.md
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T129
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Exposer le masque brut complet ErrorId (WORD, latch cause) de la Translation M3 dans la
+    raquette troubleshooting TranslationPontM3 (Idx317_ErrorId), pour permettre de diagnostiquer
+    l'éjection SEMI_AUTO. La direction réelle n'est PAS dupliquée (déjà couverte par
+    MotionM3.RequestedDirection).
+
+  acceptance:
+    - id: AC1
+      statement: "ST_Chain_Translation_Safety porte le champ Idx317_ErrorId : WORD, documenté comme masque brut (latch cause, source d'arbitrage PowerCutOff)."
+      verified_by: "Lecture CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st"
+    - id: AC2
+      statement: "FB_TroubleshootingView §5 câble GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx317_ErrorId := Translation.Safety.ErrorId (producteur unique PRG_05:462)."
+      verified_by: "Lecture CODE/J_SUPERVISION/FB_TroubleshootingView.st + G200_check_linkage.py"
+    - id: AC3
+      statement: "Aucun champ Idx408_DirectionActive ajouté : la direction réelle reste exposée via MotionM3.RequestedDirection (pas de duplication)."
+      verified_by: "Lecture CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st (s'arrête à Idx407)"
+    - id: AC4
+      statement: "La spec AF_Partie-14 §5.5 documente Idx317_ErrorId et sa source."
+      verified_by: "Lecture DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md"
+
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_05_Translation.st   # producteur existant — non modifié, lecture seule
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st  # hors scope (pas d'Idx408)
+
+  conservation:
+    must_survive:
+      - "Les 8 bits décapsulés Idx309..316 restent exposés (pas de suppression)."
+      - "Le producteur unique Translation.Safety.ErrorId reste inchangé (PRG_05:462)."
+      - "La direction réelle reste exposée via MotionM3.RequestedDirection."
+    dropped_on_purpose:
+      - "Idx408_DirectionActive (design initial) : non ajouté — redondant avec MotionM3.RequestedDirection."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout problème constaté en cours de route (incohérence de spec, bug préexistant, risque hors
+    scope) est remonté immédiatement à l'orchestrateur, pas à la fin et jamais silencieusement.
+    Signaler n'est pas élargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED
+
+execution:
+  executed_by: "DSH (DeepSeek)"
+  completed_at: "2026-08-31T00:00:00"
+  status: COMPLETED
+  summary: >
+    Ajout Idx317_ErrorId (WORD) dans ST_Chain_Translation_Safety + câblage FB_TroubleshootingView
+    §5 (source Translation.Safety.ErrorId). Spec AF_Partie-14 §5.5 mise à jour. Idx408 non ajouté
+    (direction déjà couverte par MotionM3). Design doc corrigé (Idx317/Idx318, sources PRG_05).
+  evidence_submitted:
+    - "bundle: CODE_XML/CODE_Bundle.xml (216/216, contient Idx317_ErrorId)"
+    - "check_task_contract: PASS"
+    - "G200 liaison (T129): L1-L7 101 OK, 0 KO"
+    - "G430 commentaires (T129): corrigé, plus signalé"
+
+validation:
+  status: APPROVED
+  validated_by: "Humain (utilisateur)"
+  validated_at: "2026-08-31T00:00:00"
+  notes: >
+    Validation humaine reçue 2026-08-31. T129 clôturée. L'utilisateur applique manuellement dans
+    CODESYS 3.5 (copie ST puis import PLCopenXML).
