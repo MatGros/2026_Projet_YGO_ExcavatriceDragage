@@ -59,6 +59,9 @@ VAR_OUTPUT
     CommandedDirection              : INT;                            // <-- [DIAG] Sens interne memorise
     DirectionChangeDelayElapsed     : TIME;                           // <-- [DIAG] Ecoule delai changement de sens
     DirectionChangePending          : BOOL;                           // <-- [DIAG] Changement de sens en attente
+
+    // === INTENTION DE MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+    SenseHoldRequest                : BOOL;                           // <-- [ACT] Demande a la barriere finale de TENIR le contacteur de sens apres chute de palier a 0 (inertie moteur), bornee par T_hold_internal
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
@@ -82,6 +85,12 @@ VAR
     EffectiveSafeStop               : BOOL;                           // . [LOC] SafeStop effectif incluant permis
     ActiveMaxStep                   : INT;                            // . [LOC] Plafond palier actif dynamique
     EffectiveStepRampDelay          : TIME;                           // . [LOC] Cadence palier selon sens, distincte interlock
+
+    // === MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+    SenseHoldTimer                  : TON;                            // . [LOC] Garde interne T_hold_internal (< MaxSenseHoldTime barriere)
+    SenseHoldActiveInt              : BOOL;                           // . [LOC] Maintien de sens interne en cours
+    PrevStepNumber                  : INT;                            // . [LOC] Palier temporise du scan precedent (detection chute a 0)
+    SenseHoldHardCut                : BOOL;                           // . [LOC] Coupure dure active (interdit tout maintien)
 
     // Latches défauts
     SpeedStepConfigFaultLatched     : BOOL;
@@ -143,6 +152,11 @@ IF NOT Enable THEN
     ContactorsCheck.Feedback := NOT Sensors.ContactorsAllOff;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
+    // §3bis : coupure dure -> aucun maintien de sens possible, etat interne purge.
+    SenseHoldRequest := FALSE;
+    SenseHoldActiveInt := FALSE;
+    SenseHoldTimer(IN := FALSE, PT := T#900ms);
+    PrevStepNumber := 0;
     Ready := FALSE;
     RETURN;
 END_IF;
@@ -300,6 +314,32 @@ IF Fault.Error THEN
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
+{endregion}
+
+{region "§5bis Intention de maintien du contacteur de sens (§3bis / T181-01)"}
+// Quand le palier temporise StepNumber vient de retomber a 0 alors qu'un sens etait
+// commande, FB_Winch DEMANDE a la barriere finale (FB_WinchOutputInterlock) de TENIR
+// le contacteur de sens le temps que le moteur ralentisse (inertie). Borne par
+// T_hold_internal (garde interne, < MaxSenseHoldTime de la barriere = T#1s).
+// Coupures dures -> retombee immediate, jamais de maintien (SafeStop / defaut / perte
+// puissance / NOT Enable geree a la gate §2).
+SenseHoldHardCut := (NOT PowerContactorEngaged) OR EffectiveSafeStop OR Fault.Error;
+
+IF SenseHoldHardCut THEN
+    SenseHoldActiveInt := FALSE;
+ELSIF (PrevStepNumber > 0) AND (StepNumber = 0) AND (CommandedDirection <> 0) THEN
+    SenseHoldActiveInt := TRUE;   // front de chute de palier a 0 avec sens encore actif
+END_IF;
+
+// T_hold_internal PROVISOIRE essai site (base physique : inertie moteur + chute de couple) ;
+// tenu < MaxSenseHoldTime de FB_WinchOutputInterlock pour que la barriere garde le dernier mot.
+SenseHoldTimer(IN := SenseHoldActiveInt, PT := T#900ms);
+IF SenseHoldTimer.Q OR (StepNumber > 0) THEN
+    SenseHoldActiveInt := FALSE;  // borne de temps atteinte, ou nouveau mouvement demande
+END_IF;
+
+SenseHoldRequest := SenseHoldActiveInt AND NOT SenseHoldHardCut;
+PrevStepNumber := StepNumber;
 {endregion}
 
 END_FUNCTION_BLOCK

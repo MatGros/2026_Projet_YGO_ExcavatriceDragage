@@ -865,7 +865,12 @@ M1WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM1.Homed;
 M1WinchSensors.HomingSuspect      := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect;
 M1WinchSensors.ContactorsAllOff   := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;
 M1WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM1.SpeedBand;
-M1WinchSensors.SpeedGuardEnable   := TRUE;
+// Garde-fou vitesse mesuree : DESACTIVE par defaut (AF_Partie-10 §9bis, FB_Winch_v2.1 /
+// FB_SpeedStep_v1.0 SpeedGuardEnable := FALSE). Le TRUE code en dur etait un reste de
+// mise en service : il rendait la capacite de palier otage de instWinchSync (tout ecart
+// sync -> SpeedGuardReady=FALSE -> clamp palier 1, y compris en montee). La gouvernance
+// nominale du palier passe par FB_WinchRateInterlock (T181-01), pas par cette bande.
+M1WinchSensors.SpeedGuardEnable   := FALSE;
 M1WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
 
 M1WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
@@ -912,7 +917,8 @@ M2WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM2.Homed;
 M2WinchSensors.HomingSuspect      := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect;
 M2WinchSensors.ContactorsAllOff   := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;
 M2WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM2.SpeedBand;
-M2WinchSensors.SpeedGuardEnable   := TRUE;
+// Garde-fou vitesse mesuree : DESACTIVE par defaut (idem M1 ci-dessus, AF_Partie-10 §9bis).
+M2WinchSensors.SpeedGuardEnable   := FALSE;
 M2WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
 
 M2WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
