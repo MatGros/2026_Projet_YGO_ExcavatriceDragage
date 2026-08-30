@@ -11,5 +11,6 @@ STRUCT
     ReqKoboldMeasureEnable      : BOOL; // Demande activation mesure/contacteur Kobold
     DescendPermitDiveBucketOpen : BOOL; // Autorisation de descente conditionnée benne ouverte (DiveSearch)
     ForceMinSpeedStep           : BOOL; // Forçage vitesse minimale (palier de contrôle extraction)
+    MinStepDown                 : INT;  // Palier plancher de descente imposé pendant la plongée (FB_DiveSearch, 0 = aucun)
 END_STRUCT
 END_TYPE

@@ -7872,6 +7872,14 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Forçage vitesse minimale (palier de contrôle extraction)</xhtml>
               </documentation>
             </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier plancher de descente imposé pendant la plongée (FB_DiveSearch, 0 = aucun)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -17308,6 +17316,17 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite legale basse autorisee (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgDiveFloorStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier plancher de descente impose pendant la plongee (1..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleTime">
               <type>
                 <TIME />
@@ -17401,6 +17420,15 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contact fond valide et confirme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PLANCHER DE PALIER EN DESCENTE (consomme par PRG_03 -&gt; PRG_04) ===
+&lt;-- [STAT] Palier minimum impose en descente pendant la plongee (0 = aucun plancher)</xhtml>
               </documentation>
             </variable>
             <variable name="OperatorActionId">
@@ -17787,6 +17815,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     ImmersionConfirmed := FALSE;
     ImmersionTimerAcc := T#0ms;
     BottomTimerAcc := T#0ms;
+    MinStepDown := 0;
     PrevState := E_DiveSearchState.WAIT_PRECONDITIONS;
     RETURN;
 END_IF;
@@ -17910,6 +17939,18 @@ ELSE
         E_DiveSearchState.ERROR_HOLD:
             KoboldContactorCmd := FALSE;
     END_CASE;
+END_IF;
+
+// 🤿 Plancher de palier en descente impose pendant la plongee.
+// Actif uniquement en phase de recherche (immersion/fond) ET sous descente reellement
+// demandee (DescentActive) : retombe a 0 au front de sortie de plongee (BOTTOM_CONFIRMED /
+// ERROR_HOLD / WAIT_PRECONDITIONS), donc aucun plancher residuel. Ne cree jamais de mouvement
+// par lui-meme : il ne fait que majorer le palier d'une descente deja demandee et permise.
+IF DescentActive AND (DiveState = E_DiveSearchState.SEARCHING_IMMERSION
+                  OR DiveState = E_DiveSearchState.SEARCHING_BOTTOM) THEN
+    MinStepDown := CfgDiveFloorStep;
+ELSE
+    MinStepDown := 0;
 END_IF;
 
 // 💾 Mémorisation de l'étape précédente en toute fin de scan
@@ -33203,6 +33244,17 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond palier dans zone de ralentissement (1..5)</xhtml>
               </documentation>
             </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plancher palier en descente impose (0 = aucun) -- plongee Kobold</xhtml>
+              </documentation>
+            </variable>
             <variable name="FwdRevSpeedFeedbackOff">
               <type>
                 <BOOL />
@@ -33758,6 +33810,22 @@ IF SpeedGuardEnable THEN
     ELSIF (MeasuredSpeedBand &gt;= 1) AND (MeasuredSpeedBand &lt;= 5) AND (RequestedStep &gt; MeasuredSpeedBand) THEN
         RequestedStep := MeasuredSpeedBand;
         SpeedGuardLimited := TRUE;
+    END_IF;
+END_IF;
+
+// 🤿 Plancher palier descente -- plongee Kobold.
+// Injecte MinStepDown sur la CIBLE (RequestedStep, consommee par le shaper ci-dessous),
+// JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
+// (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -&gt; aucun plancher,
+// l'arret franc RequestedStep=0 / RampTargetPct=0 est preserve.
+// Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
+// ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
+IF StartStop AND (Direction = -1) AND (MinStepDown &gt; 0) THEN
+    IF RequestedStep &lt; MinStepDown THEN
+        RequestedStep := MinStepDown;
+    END_IF;
+    IF RequestedStep &gt; ActiveMaxStep THEN
+        RequestedStep := ActiveMaxStep;
     END_IF;
 END_IF;
 
@@ -37574,6 +37642,10 @@ instDiveSearch(
     M2Position_M := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
                        AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
+    // Palier actuel M1 reellement commande (public PRG_04 §8). PRG_03 est de rang 03,
+    // PRG_04 de rang 04 : lecture du scan PRECEDENT (lag 1 scan assume, meme pratique que
+    // le reste de PRG_03). Rend effectif le refus interne du Palier 5 en plongee Kobold.
+    CurrentSpeedStep := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
@@ -37703,6 +37775,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
     Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    // SEMI_AUTO : aucun assistant de plongee actif -&gt; plancher neutre (0 = aucun).
+    Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
     // État séquence active
     IF instCycleSemiAuto.Lifecycle.Busy THEN
@@ -37780,6 +37854,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
                                                                 AND (CoupledUserRequestDirection = -1)
                                                                 AND NOT PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
     Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := instExtractionSequence.ForceMinSpeedStep;
+    // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
+    Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.MinStepDown;
 
     // États de séquence
     IF instDiveSearch.Lifecycle.Busy THEN
@@ -37862,6 +37938,8 @@ ELSE
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := FALSE;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
     Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    // DISABLE : plancher neutre (0 = aucun).
+    Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
     Data.SequenceState.SequenceId              := E_ProgramSequence.NONE;
     Data.SequenceState.Ready                   := FALSE;
@@ -37963,6 +38041,20 @@ END_IF;
             <variable name="instWinchM2">
               <type>
                 <derived name="FB_Winch" />
+              </type>
+            </variable>
+            <variable name="instWinchLoadEstimatorM1">
+              <type>
+                <derived name="FB_WinchLoadEstimator" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Estimateurs bande vitesse réelle : alimentent le garde-fou palier FB_Winch
+via MeasuredSpeedBand, 1 instance par treuil, mêmes sources que FB_Safety_Winch.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instWinchLoadEstimatorM2">
+              <type>
+                <derived name="FB_WinchLoadEstimator" />
               </type>
             </variable>
             <variable name="WinchM1FinalInterlockRequest">
@@ -38181,22 +38273,6 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
               <type>
                 <REAL />
               </type>
-            </variable>
-            <variable name="SpeedGuardEnableM1">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-            </variable>
-            <variable name="SpeedGuardEnableM2">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
             </variable>
             <variable name="BottomLimitM1_Active">
               <type>
@@ -39220,9 +39296,12 @@ IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAsce
     CommonMaxStepUp := 1;
 END_IF;
 
-// Planchers communs : aucune source actuelle (réservé T181-12, MinStepDown DiveSearch).
+// Planchers communs : 1 (neutre) en montée ; en descente, MAX(1, plancher plongée FB_DiveSearch).
+// Règle de l'agrégateur : plancher = MAX des sources plancher ; si plancher &gt; plafond,
+// LE PLAFOND GAGNE — le clamp final (consommation FB_Winch, lot aval) borne au plafond,
+// on ne force donc jamais ici un palier au-delà de CommonMaxStepDown.
 CommonMinStepUp   := 1;
-CommonMinStepDown := 1;
+CommonMinStepDown := MAX(1, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStepDown);
 
 // --- M2-propre (jamais vu par M1) ---
 M2MaxStepUp   := CommonMaxStepUp;
@@ -39241,6 +39320,33 @@ M2MinStepDown := CommonMinStepDown;
 {region "§6 Execution treuils M1/M2"}
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 &amp; M2) ===
 
+// Estimateurs de bande vitesse réelle appelés AVANT instWinchM1/M2 : leur sortie
+// SpeedBand alimente MeasuredSpeedBand (2e étage du garde-fou FB_Winch) sur le même
+// scan. Sources vitesse identiques à FB_Safety_Winch (§5bis).
+instWinchLoadEstimatorM1(
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
+    Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    ActiveSpeedStep         := instWinchM1.StepNumber,
+    PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    MeasuredSpeedMps        := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
+    MeasuredSpeedSignedMps  := PRG_02_Acquisition.Data.Encoders.M1.SignedSpeed_Mps,
+    SpeedConfig             := _WinchSpeedConfig,
+    LoadTable               := _WinchLoadEstimateTable
+);
+
+instWinchLoadEstimatorM2(
+    Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
+    Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
+    Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    ActiveSpeedStep         := instWinchM2.StepNumber,
+    PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    MeasuredSpeedMps        := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
+    MeasuredSpeedSignedMps  := PRG_02_Acquisition.Data.Encoders.M2.SignedSpeed_Mps,
+    SpeedConfig             := _WinchSpeedConfig,
+    LoadTable               := _WinchLoadEstimateTable
+);
+
 instWinchM1(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -39254,8 +39360,11 @@ instWinchM1(
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := CommonMaxStepDown,
     MaxStepAscent           := CommonMaxStepUp,
-    MeasuredSpeedBand       := 0,
-    SpeedGuardEnable        := SpeedGuardEnableM1,
+    // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
+    // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
+    MinStepDown             := CommonMinStepDown,
+    MeasuredSpeedBand       := instWinchLoadEstimatorM1.SpeedBand,
+    SpeedGuardEnable        := TRUE,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
     HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
@@ -39290,8 +39399,11 @@ instWinchM2(
     // (StepNumber ≤ 1 → seuls les états P1 sont commandés).
     CfgMaxStepDescente      := M2MaxStepDown,
     MaxStepAscent           := M2MaxStepUp,
-    MeasuredSpeedBand       := 0,
-    SpeedGuardEnable        := SpeedGuardEnableM2,
+    // Plancher palier descente plongée Kobold : plancher M2-propre agrégé en §5ter, injecté
+    // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
+    MinStepDown             := M2MinStepDown,
+    MeasuredSpeedBand       := instWinchLoadEstimatorM2.SpeedBand,
+    SpeedGuardEnable        := TRUE,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
     HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,

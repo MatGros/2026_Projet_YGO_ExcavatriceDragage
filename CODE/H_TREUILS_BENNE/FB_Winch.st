@@ -37,6 +37,7 @@ VAR_INPUT
     BottomLimitM                    : REAL := -20.0;                  // --> [CFG] Position limite basse active (m)
     CfgSlowdownDistanceM            : REAL := 1.0;                    // --> [CFG] Distance d'approche avant limite pour ralentir (m)
     CfgSlowdownMaxStep              : INT := 1;                       // --> [CFG] Plafond palier dans zone de ralentissement (1..5)
+    MinStepDown                     : INT := 0;                       // --> [CFG] Plancher palier en descente impose (0 = aucun) -- plongee Kobold
 
     // === MESURES ET FEEDBACKS SENSORS ===
     FwdRevSpeedFeedbackOff          : BOOL;                           // --> [HW] Retour unique contacteurs sens+vitesse retombes
@@ -252,6 +253,22 @@ IF SpeedGuardEnable THEN
     ELSIF (MeasuredSpeedBand >= 1) AND (MeasuredSpeedBand <= 5) AND (RequestedStep > MeasuredSpeedBand) THEN
         RequestedStep := MeasuredSpeedBand;
         SpeedGuardLimited := TRUE;
+    END_IF;
+END_IF;
+
+// 🤿 Plancher palier descente -- plongee Kobold.
+// Injecte MinStepDown sur la CIBLE (RequestedStep, consommee par le shaper ci-dessous),
+// JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
+// (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -> aucun plancher,
+// l'arret franc RequestedStep=0 / RampTargetPct=0 est preserve.
+// Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
+// ActiveMaxStep (ex. SlowdownMaxStep -> palier 1 en bordure basse), on borne au plafond.
+IF StartStop AND (Direction = -1) AND (MinStepDown > 0) THEN
+    IF RequestedStep < MinStepDown THEN
+        RequestedStep := MinStepDown;
+    END_IF;
+    IF RequestedStep > ActiveMaxStep THEN
+        RequestedStep := ActiveMaxStep;
     END_IF;
 END_IF;
 

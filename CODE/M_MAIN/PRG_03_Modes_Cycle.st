@@ -140,6 +140,10 @@ instDiveSearch(
     M2Position_M := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
                        AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
+    // Palier actuel M1 reellement commande (public PRG_04 §8). PRG_03 est de rang 03,
+    // PRG_04 de rang 04 : lecture du scan PRECEDENT (lag 1 scan assume, meme pratique que
+    // le reste de PRG_03). Rend effectif le refus interne du Palier 5 en plongee Kobold.
+    CurrentSpeedStep := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
@@ -269,6 +273,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
     Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    // SEMI_AUTO : aucun assistant de plongee actif -> plancher neutre (0 = aucun).
+    Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
     // État séquence active
     IF instCycleSemiAuto.Lifecycle.Busy THEN
@@ -346,6 +352,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
                                                                 AND (CoupledUserRequestDirection = -1)
                                                                 AND NOT PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
     Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := instExtractionSequence.ForceMinSpeedStep;
+    // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
+    Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.MinStepDown;
 
     // États de séquence
     IF instDiveSearch.Lifecycle.Busy THEN
@@ -428,6 +436,8 @@ ELSE
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := FALSE;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
     Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    // DISABLE : plancher neutre (0 = aucun).
+    Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
     Data.SequenceState.SequenceId              := E_ProgramSequence.NONE;
     Data.SequenceState.Ready                   := FALSE;

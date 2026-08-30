@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T09:36:03.745225" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T09:36:03.745225">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T12:14:10.631392" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T12:14:10.631392">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -617,6 +617,17 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond palier dans zone de ralentissement (1..5)</xhtml>
               </documentation>
             </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plancher palier en descente impose (0 = aucun) -- plongee Kobold</xhtml>
+              </documentation>
+            </variable>
             <variable name="FwdRevSpeedFeedbackOff">
               <type>
                 <BOOL />
@@ -1172,6 +1183,22 @@ IF SpeedGuardEnable THEN
     ELSIF (MeasuredSpeedBand &gt;= 1) AND (MeasuredSpeedBand &lt;= 5) AND (RequestedStep &gt; MeasuredSpeedBand) THEN
         RequestedStep := MeasuredSpeedBand;
         SpeedGuardLimited := TRUE;
+    END_IF;
+END_IF;
+
+// 🤿 Plancher palier descente -- plongee Kobold.
+// Injecte MinStepDown sur la CIBLE (RequestedStep, consommee par le shaper ci-dessous),
+// JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
+// (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -&gt; aucun plancher,
+// l'arret franc RequestedStep=0 / RampTargetPct=0 est preserve.
+// Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
+// ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
+IF StartStop AND (Direction = -1) AND (MinStepDown &gt; 0) THEN
+    IF RequestedStep &lt; MinStepDown THEN
+        RequestedStep := MinStepDown;
+    END_IF;
+    IF RequestedStep &gt; ActiveMaxStep THEN
+        RequestedStep := ActiveMaxStep;
     END_IF;
 END_IF;
 
