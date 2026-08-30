@@ -50,6 +50,7 @@ VAR_INPUT
     M2HomingSuspect           : BOOL; // --> [HW] M2 : référencement suspect
     M1PositionLimitOverridden : BOOL; // --> [CMD] M1 : limite de position levée (override N1 ou bypass N2 effectif)
     M2PositionLimitOverridden : BOOL; // --> [CMD] M2 : limite de position levée (override N1 ou bypass N2 effectif)
+    MachineReferenceReady     : BOOL; // --> [STAT] M1/M2 fiables et offset benne valide
 
     // === RESTAURATION BOOT DES DRAPEAUX PERSISTANTS ===
     BootHomingRequiredM1      : BOOL; // --> [CFG] M1 : valeur PERSISTENT relue au premier scan
@@ -83,6 +84,7 @@ VAR
     MaintHomingRequiredM1   : BOOL;   // . [LOC] M1 : re-homing obligatoire avant tout SEMI_AUTO
     MaintHomingRequiredM2   : BOOL;   // . [LOC] M2 : re-homing obligatoire avant tout SEMI_AUTO
     SemiAutoRefusedHoming   : BOOL;   // . [LOC] Latch refus semi-auto pour re-homing obligatoire
+    SemiAutoRefusedReference : BOOL;   // . [LOC] Refus live : reference machine incomplete
     FirstScanDone           : BOOL;   // . [LOC] Initialisation premier scan (restauration PERSISTENT)
 END_VAR
 
@@ -133,6 +135,7 @@ END_IF;
 IF (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
     SemiAutoRefusedHoming := TRUE;
 END_IF;
+SemiAutoRefusedReference := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineReferenceReady;
 
 instCauses[0].Active   := SemiAutoRefusedFault;
 instCauses[0].Latching := TRUE;
@@ -141,6 +144,10 @@ instCauses[0].Texte    := 'Mode Semi-Auto refuse car defaut codeur present';
 instCauses[2].Active   := SemiAutoRefusedHoming;
 instCauses[2].Latching := TRUE;
 instCauses[2].Texte    := 'Mode Semi-Auto refuse car re-homing obligatoire (depassement de limite de position)';
+
+instCauses[3].Active   := SemiAutoRefusedReference;
+instCauses[3].Latching := FALSE;
+instCauses[3].Texte    := 'Mode Semi-Auto refuse : referencement M1/M2/benne incomplet';
 
 // Cause 1 — changement de mode refusé : treuils non à l'arrêt mécanique confirmé.
 // Non latchée (live) : l'information disparaît dès que la condition redevient vraie, sans
@@ -194,7 +201,7 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
 
 // 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
 IF (SelMode = E_Mode.SEMI_AUTO)
-   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
+   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineReferenceReady) THEN
     // Défaut codeur ou re-homing obligatoire : SEMI_AUTO interdit, repli MAINT_N1.
     Auth.Mode := E_Mode.MAINT_N1;
     Auth.ModeChangePendingBlocked := FALSE;

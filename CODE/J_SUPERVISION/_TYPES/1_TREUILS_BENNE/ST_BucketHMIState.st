@@ -24,5 +24,11 @@ STRUCT
     CoupledAscentCloseArmed : BOOL;         (* : Fermeture auto armée (montée couplée demandée, benne pas fermée) *)
     ExtractionControlActive : BOOL;         (* : Phase vitesse contrôlée montée en cours *)
     CoupledMotionBlockedByBucket : BOOL;    (* : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition) *)
+    MachineReferenceReady : BOOL;           (* Reference M1/M2/benne atomiquement valide *)
+    ReferenceStep         : INT;            (* Etape guidee de recuperation reference machine *)
+    ReferenceInstruction  : STRING(120);    (* Instruction IHM unique et actionnable *)
+    ReferenceFailed       : BOOL;           (* Transaction de homing conjoint abandonnee *)
+    ReferenceTransactionActive : BOOL;      (* Homing conjoint en cours *)
+    ReferenceLossSafeStop : BOOL;           (* Perte reference en mouvement : arret controle *)
 END_STRUCT
 END_TYPE

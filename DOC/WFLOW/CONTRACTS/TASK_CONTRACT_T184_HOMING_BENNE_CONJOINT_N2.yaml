@@ -1,0 +1,93 @@
+contract:
+  task_id: T184_CYCLE_REFERENCEMENT_MACHINE
+  criticality: C4
+  strategy: patch
+  objective: >
+    Au demarrage ou apres perte de coherence, publier une qualification machine et
+    un guide de referencement M1/M2/benne ; les actions restent libres en MAINT_N2,
+    mais SEMI_AUTO est interdit tant que deux codeurs fiables et un offset benne
+    confirme visuellement ne rendent pas la reference machine valide.
+  acceptance:
+    - id: AC1
+      statement: "Une confirmation Ouverte/Fermee est refusee hors MAINT_N2, hors capteur haut commun ou lorsque les treuils ne sont pas a l'arret mecanique confirme."
+      verified_by: "TC integration N2 : trois vecteurs de refus et assertion ActiveOffsetValid=FALSE."
+    - id: AC2
+      statement: "Une confirmation admissible declenche le homing M1 et M2 dans le meme cycle de commande ; M2 utilise la cible dynamique correspondant a l'etat visuellement confirme."
+      verified_by: "TC integration : assertions HomingAtTargetM M1/M2 et cible M2."
+    - id: AC3
+      statement: "IsOpen/IsClosed et ActiveOffsetValid restent invalides jusqu'au succes des deux homings, puis sont publies atomiquement."
+      verified_by: "TC integration multi-scan : assertions avant/apres les deux retours HomingLifecycle.Done."
+    - id: AC4
+      statement: "Echec homing M1 ou M2, perte du capteur haut, ou mouvement pendant la sequence invalide l'etat benne et conserve ActiveOffsetValid=FALSE."
+      verified_by: "TC integration : quatre vecteurs d'abandon."
+    - id: AC5
+      statement: "La recuperation Both conserve le clamp palier 1 tant que ActiveOffsetValid est FALSE ; SyncDeviationWarn n'est pas bypassed globalement."
+      verified_by: "HARN WINCH_INTEG : demande Both en N2 sans offset valide -> M1=M2=palier 1."
+    - id: AC6
+      statement: "G200, bundle et gates palier C sont verts ; aucun TC vert existant ne regresse."
+      verified_by: "generate_codesys_bundle.py, G200_check_linkage.py --report, run_all_gates.py --palier C."
+    - id: AC7
+      statement: "L'IHM publie une instruction unique et actionnable pour chaque etape de recuperation : selection N2, montee Both lente, arret mecanique, choix visuel benne, homing conjoint en cours, succes ou echec."
+      verified_by: "TC integration : oracle sur le code et le texte de l'etape publiee pour chaque precondition manquante et chaque transition."
+    - id: AC8
+      statement: "Le cycle distingue explicitement codeur M1 non reference, codeur M2 non reference, doute de coherence codeur et offset benne inconnu ; aucune de ces causes n'est masquee par un message SyncDeviationWarn generique."
+      verified_by: "TC simulateur : injection de chaque cause et assertion de l'etape/diagnostic publie."
+    - id: AC9
+      statement: "L'operateur peut demander M1, M2 ou choisir l'etat benne dans un ordre libre ; le choix benne est memorise comme attente et ne devient valide qu'apres les deux homings fiables."
+      verified_by: "TC integration : trois ordres d'action distincts, meme etat final ReferenceMachineReady."
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_ReferenceCycle.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/F_MODES/tests/test_fb_modes.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_referencecycle.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+  conservation:
+    must_survive:
+      - "Les commandes de homing unitaire existantes BtnHome M1 et M2."
+      - "Les sequences normales d'ouverture et fermeture de FB_Bucket."
+      - "Les interlocks materiels et le clamp SyncDeviationWarn hors recuperation explicite."
+    dropped_on_purpose:
+      - "Le recalage immediat de M2 seul par BtnConfirmOpenPos/BtnConfirmClosePos en MAINT_N1 ou MAINT_N2."
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "deepseek-v4-flash:cloud"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Stopper avant toute approximation si le capteur haut commun n'est pas exploitable
+    comme precondition booleenne active, si le retour de succes homing M1/M2 ne peut
+    pas etre observe sans acces aux internes, ou si le harnais ne peut pas couvrir
+    l'atomicite multi-scan.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex + Ollama deepseek-v4-flash:cloud (revue contradictoire)"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Architecture atomique validee humainement ; implementation en cours."
+  evidence_submitted: []
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-08-30T00:00:00+02:00"
+  notes: "Validation : cycle de referencement guide, actions libres en N2, conditions de securite normales et validation finale atomique."

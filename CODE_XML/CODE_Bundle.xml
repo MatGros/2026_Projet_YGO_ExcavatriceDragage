@@ -1615,6 +1615,54 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineReferenceReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference M1/M2/benne atomiquement valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee de recuperation reference machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceInstruction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instruction IHM unique et actionnable</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction de homing conjoint abandonnee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceTransactionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceLossSafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte reference en mouvement : arret controle</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2319,6 +2367,70 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) en direct</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx113_MachineReferenceReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference M1/M2/benne qualifiee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx114_ReferenceStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee reference machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx115_ReferenceFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction reference abandonnee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx116_M1ReferenceMissing">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 non reference ou mesure douteuse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx117_M2ReferenceMissing">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 non reference ou mesure douteuse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx118_BucketOffsetUnknown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Offset benne non confirme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx119_ReferenceTransaction">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx120_ReferenceLossSafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte reference pendant mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="Idx201_HmiCmd_BtnOpen">
@@ -14033,12 +14145,44 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens arbitre (1: montee, -1: descente)</xhtml>
               </documentation>
             </variable>
+            <variable name="ReferenceCommitOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commit atomique reference benne ouverte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceCommitClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commit atomique reference benne fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineReferenceReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Qualification conjointe M1/M2/benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceTransactionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
             <variable name="ConfirmOpenPosition">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton IHM confirmation benne ouvert</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle</xhtml>
               </documentation>
             </variable>
             <variable name="ConfirmClosePosition">
@@ -14046,7 +14190,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton IHM confirmation benne ferme</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -14299,22 +14443,6 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur entree en etat Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ConfirmOpenEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front confirmation ouverture</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ConfirmCloseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front confirmation fermeture</xhtml>
               </documentation>
             </variable>
             <variable name="TonTimeout">
@@ -14572,16 +14700,14 @@ IF FirstCycle THEN
     END_IF;
 END_IF;
 
-ConfirmOpenEdge(CLK := ConfirmOpenPosition);
-IF ConfirmOpenEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
+IF ReferenceCommitOpen AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
-ConfirmCloseEdge(CLK := ConfirmClosePosition);
-IF ConfirmCloseEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
+IF ReferenceCommitClose AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
@@ -14735,7 +14861,9 @@ END_IF;
 
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
-                     AND (Fault.ErrorId = 16#0000);
+                     AND (Fault.ErrorId = 16#0000)
+                     AND (MachineReferenceReady OR (BucketState.IsOpen XOR BucketState.IsClosed))
+                     AND NOT ReferenceTransactionActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
 {endregion}
 </xhtml>
@@ -23979,6 +24107,14 @@ ET frein serré, redondés par la mesure de vitesse.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] M2 : limite de position levée (override N1 ou bypass N2 effectif)</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineReferenceReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] M1/M2 fiables et offset benne valide</xhtml>
+              </documentation>
+            </variable>
             <variable name="BootHomingRequiredM1">
               <type>
                 <BOOL />
@@ -24123,6 +24259,14 @@ ET frein serré, redondés par la mesure de vitesse.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch refus semi-auto pour re-homing obligatoire</xhtml>
               </documentation>
             </variable>
+            <variable name="SemiAutoRefusedReference">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Refus live : reference machine incomplete</xhtml>
+              </documentation>
+            </variable>
             <variable name="FirstScanDone">
               <type>
                 <BOOL />
@@ -24198,6 +24342,7 @@ END_IF;
 IF (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
     SemiAutoRefusedHoming := TRUE;
 END_IF;
+SemiAutoRefusedReference := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineReferenceReady;
 
 instCauses[0].Active   := SemiAutoRefusedFault;
 instCauses[0].Latching := TRUE;
@@ -24206,6 +24351,10 @@ instCauses[0].Texte    := 'Mode Semi-Auto refuse car defaut codeur present';
 instCauses[2].Active   := SemiAutoRefusedHoming;
 instCauses[2].Latching := TRUE;
 instCauses[2].Texte    := 'Mode Semi-Auto refuse car re-homing obligatoire (depassement de limite de position)';
+
+instCauses[3].Active   := SemiAutoRefusedReference;
+instCauses[3].Latching := FALSE;
+instCauses[3].Texte    := 'Mode Semi-Auto refuse : referencement M1/M2/benne incomplet';
 
 // Cause 1 — changement de mode refusé : treuils non à l'arrêt mécanique confirmé.
 // Non latchée (live) : l'information disparaît dès que la condition redevient vraie, sans
@@ -24259,7 +24408,7 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
 
 // 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
 IF (SelMode = E_Mode.SEMI_AUTO)
-   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
+   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineReferenceReady) THEN
     // Défaut codeur ou re-homing obligatoire : SEMI_AUTO interdit, repli MAINT_N1.
     Auth.Mode := E_Mode.MAINT_N1;
     Auth.ModeChangePendingBlocked := FALSE;
@@ -24464,6 +24613,387 @@ Current := LIMIT(-100.0, Current, 100.0);
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>2e0d5247-7675-56fe-94d4-1cdd52e2e6fb</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_ReferenceCycle" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+            </variable>
+            <variable name="TopPositionActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WinchesMechanicallyStopped">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1HomingBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2HomingBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1HomingDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2HomingDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1HomingError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2HomingError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BucketOffsetValid">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ConfirmOpenPosition">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ConfirmClosePosition">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CfgTopHomingTargetM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CfgOffsetOpenM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CfgOffsetCloseM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="MachineReferenceReady">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ReferenceStep">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ReferenceInstruction">
+              <type>
+                <string length="120" />
+              </type>
+            </variable>
+            <variable name="HomingRequestM1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomingRequestM2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2DynamicTargetM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M2UseDynamicTarget">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CommitOpenPosition">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CommitClosePosition">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ReferenceFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ReferenceTransactionActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ReferenceLossSafeStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="ConfirmOpenEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="ConfirmCloseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="PendingOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PendingClose">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomingStarted">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomingBusyObserved">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CommitPublished">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ReferenceWasReady">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ReferenceLossLatched">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   FB_ReferenceCycle -- qualification guidee de reference M1/M2/benne
+   Producteur unique des demandes de homing conjoint et du commit benne.
+   Aucun mouvement n'est commande par ce FB.
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+ResetEdge(CLK := Reset);
+ConfirmOpenEdge(CLK := ConfirmOpenPosition);
+ConfirmCloseEdge(CLK := ConfirmClosePosition);
+
+HomingRequestM1 := FALSE;
+HomingRequestM2 := FALSE;
+CommitOpenPosition := FALSE;
+CommitClosePosition := FALSE;
+M2UseDynamicTarget := PendingOpen OR PendingClose;
+IF PendingClose THEN
+    M2DynamicTargetM := CfgTopHomingTargetM + CfgOffsetCloseM;
+ELSE
+    M2DynamicTargetM := CfgTopHomingTargetM + CfgOffsetOpenM;
+END_IF;
+
+IF ResetEdge.Q THEN
+    PendingOpen := FALSE;
+    PendingClose := FALSE;
+    HomingStarted := FALSE;
+    HomingBusyObserved := FALSE;
+    CommitPublished := FALSE;
+    ReferenceFailed := FALSE;
+    ReferenceWasReady := FALSE;
+    ReferenceLossLatched := FALSE;
+END_IF;
+
+(* Une reference precedemment committee reste exploitable tant que les deux
+   codeurs restent fiables. Toute perte de fiabilite requalifie le guide. *)
+MachineReferenceReady := M1HomedAndReliable AND M2HomedAndReliable
+                         AND (CommitPublished OR BucketOffsetValid) AND NOT ReferenceFailed;
+ReferenceTransactionActive := HomingStarted;
+
+(* Perte d'une reference auparavant valide en mouvement : SafeStop demande
+   jusqu'a l'arret mecanique. Une absence de reference deja arretee au boot
+   va directement au guide et ne declenche jamais cette demande. *)
+IF MachineReferenceReady THEN
+    ReferenceWasReady := TRUE;
+END_IF;
+IF ReferenceWasReady AND NOT MachineReferenceReady AND NOT WinchesMechanicallyStopped THEN
+    ReferenceLossLatched := TRUE;
+END_IF;
+IF NOT MachineReferenceReady AND WinchesMechanicallyStopped THEN
+    ReferenceWasReady := FALSE;
+END_IF;
+IF ReferenceLossLatched AND WinchesMechanicallyStopped THEN
+    ReferenceLossLatched := FALSE;
+END_IF;
+ReferenceLossSafeStop := ReferenceLossLatched;
+
+IF NOT Enable THEN
+    ReferenceStep := 0;
+    ReferenceInstruction := 'Referencement indisponible';
+    MachineReferenceReady := FALSE;
+    RETURN;
+END_IF;
+
+(* Demande visuelle acceptee uniquement dans la fenetre mecanique sure. *)
+IF (ConfirmOpenEdge.Q OR ConfirmCloseEdge.Q) AND NOT HomingStarted THEN
+    IF (Mode = E_Mode.MAINT_N2) AND TopPositionActive AND WinchesMechanicallyStopped THEN
+        PendingOpen := ConfirmOpenEdge.Q;
+        PendingClose := ConfirmCloseEdge.Q;
+        HomingStarted := TRUE;
+        HomingBusyObserved := FALSE;
+        CommitPublished := FALSE;
+        ReferenceFailed := FALSE;
+        HomingRequestM1 := TRUE;
+        HomingRequestM2 := TRUE;
+        M2UseDynamicTarget := TRUE;
+        IF PendingClose THEN
+            M2DynamicTargetM := CfgTopHomingTargetM + CfgOffsetCloseM;
+        ELSE
+            M2DynamicTargetM := CfgTopHomingTargetM + CfgOffsetOpenM;
+        END_IF;
+    END_IF;
+END_IF;
+
+(* Pendant la transaction, la perte de butee ou un mouvement est un abandon
+   fail-safe. Le commit n'est jamais realise partiellement. *)
+IF HomingStarted THEN
+    M2UseDynamicTarget := TRUE;
+    IF PendingClose THEN
+        M2DynamicTargetM := CfgTopHomingTargetM + CfgOffsetCloseM;
+    ELSE
+        M2DynamicTargetM := CfgTopHomingTargetM + CfgOffsetOpenM;
+    END_IF;
+
+    IF (NOT TopPositionActive) OR (NOT WinchesMechanicallyStopped)
+       OR M1HomingError OR M2HomingError THEN
+        ReferenceFailed := TRUE;
+        HomingStarted := FALSE;
+        PendingOpen := FALSE;
+        PendingClose := FALSE;
+    ELSIF M1HomingBusy OR M2HomingBusy THEN
+        HomingBusyObserved := TRUE;
+    ELSIF HomingBusyObserved AND M1HomedAndReliable AND M2HomedAndReliable
+          AND M1HomingDone AND M2HomingDone THEN
+        (* Publication atomique : les deux etats benne sont ecrits par FB_Bucket
+           dans le meme scan, uniquement apres les deux succes observes. *)
+        CommitOpenPosition := PendingOpen;
+        CommitClosePosition := PendingClose;
+        CommitPublished := TRUE;
+        HomingStarted := FALSE;
+        PendingOpen := FALSE;
+        PendingClose := FALSE;
+    END_IF;
+END_IF;
+
+MachineReferenceReady := M1HomedAndReliable AND M2HomedAndReliable
+                         AND (CommitPublished OR BucketOffsetValid) AND NOT ReferenceFailed;
+ReferenceTransactionActive := HomingStarted;
+
+IF ReferenceFailed THEN
+    ReferenceStep := 70;
+    ReferenceInstruction := 'Referencement incomplet : rester en N2 et recommencer';
+ELSIF ReferenceLossSafeStop THEN
+    ReferenceStep := 5;
+    ReferenceInstruction := 'Reference perdue en mouvement : arret controle en cours';
+ELSIF HomingStarted OR M1HomingBusy OR M2HomingBusy THEN
+    ReferenceStep := 50;
+    ReferenceInstruction := 'Referencement conjoint M1/M2 en cours : ne pas manoeuvrer';
+ELSIF NOT M1HomedAndReliable AND NOT M2HomedAndReliable THEN
+    ReferenceStep := 10;
+    ReferenceInstruction := 'Codeurs M1 et M2 non references : passer en maintenance N2';
+ELSIF NOT M1HomedAndReliable THEN
+    ReferenceStep := 11;
+    ReferenceInstruction := 'Codeur M1 non reference ou mesure douteuse : homer M1';
+ELSIF NOT M2HomedAndReliable THEN
+    ReferenceStep := 12;
+    ReferenceInstruction := 'Codeur M2 non reference ou mesure douteuse : homer M2';
+ELSIF NOT (CommitPublished OR BucketOffsetValid) THEN
+    IF Mode &lt;&gt; E_Mode.MAINT_N2 THEN
+        ReferenceStep := 20;
+        ReferenceInstruction := 'Offset benne inconnu : passer en maintenance N2';
+    ELSIF NOT TopPositionActive THEN
+        ReferenceStep := 30;
+        ReferenceInstruction := 'Monter Both a vitesse lente jusqu au capteur haut';
+    ELSIF NOT WinchesMechanicallyStopped THEN
+        ReferenceStep := 40;
+        ReferenceInstruction := 'Capteur haut atteint : relacher la commande et attendre l arret';
+    ELSE
+        ReferenceStep := 45;
+        ReferenceInstruction := 'Confirmer visuellement la benne : Fermee ou Ouverte';
+    END_IF;
+ELSE
+    ReferenceStep := 60;
+    ReferenceInstruction := 'Referencement machine valide : mode nominal disponible';
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8bd09e6c-ee3b-5062-a800-37a7b9aa89a4</ObjectId>
           </data>
         </addData>
       </pou>
@@ -33008,6 +33538,14 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx109_BucketTooOpen := WinchM2.Buck
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx110_BucketTooClosed := WinchM2.Bucket.State.MechState.TooClosed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx111_BucketIsIntermediate := WinchM2.Bucket.State.MechState.IsIntermediate;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx112_DeltaPosition_M := WinchM2.Bucket.State.DeltaPosition_M;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx113_MachineReferenceReady := WinchM2.Bucket.State.MachineReferenceReady;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx114_ReferenceStep := WinchM2.Bucket.State.ReferenceStep;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx115_ReferenceFailed := WinchM2.Bucket.State.ReferenceFailed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx116_M1ReferenceMissing := NOT WinchM1.State.Encoder.Homed OR WinchM1.State.Encoder.HomingSuspect;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx117_M2ReferenceMissing := NOT WinchM2.State.Encoder.Homed OR WinchM2.State.Encoder.HomingSuspect;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx118_BucketOffsetUnknown := NOT WinchM2.Bucket.State.MechState.ActiveOffsetValid;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx119_ReferenceTransaction := WinchM2.Bucket.State.ReferenceTransactionActive;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx120_ReferenceLossSafeStop := WinchM2.Bucket.State.ReferenceLossSafeStop;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := CycleBucketOpen;
@@ -33652,6 +34190,15 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Changement de sens en attente</xhtml>
               </documentation>
             </variable>
+            <variable name="SenseHoldRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTENTION DE MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+&lt;-- [ACT] Demande a la barriere finale de TENIR le contacteur de sens apres chute de palier a 0 (inertie moteur), bornee par T_hold_internal</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="SpeedStep">
@@ -33785,6 +34332,39 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cadence palier selon sens, distincte interlock</xhtml>
               </documentation>
             </variable>
+            <variable name="SenseHoldTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+. [LOC] Garde interne T_hold_internal (&lt; MaxSenseHoldTime barriere)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SenseHoldActiveInt">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien de sens interne en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevStepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier temporise du scan precedent (detection chute a 0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SenseHoldHardCut">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Coupure dure active (interdit tout maintien)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SpeedStepConfigFaultLatched">
               <type>
                 <BOOL />
@@ -33885,6 +34465,11 @@ IF NOT Enable THEN
     ContactorsCheck.Feedback := NOT Sensors.ContactorsAllOff;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
+    // §3bis : coupure dure -&gt; aucun maintien de sens possible, etat interne purge.
+    SenseHoldRequest := FALSE;
+    SenseHoldActiveInt := FALSE;
+    SenseHoldTimer(IN := FALSE, PT := T#900ms);
+    PrevStepNumber := 0;
     Ready := FALSE;
     RETURN;
 END_IF;
@@ -34042,6 +34627,32 @@ IF Fault.Error THEN
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
+{endregion}
+
+{region "§5bis Intention de maintien du contacteur de sens (§3bis / T181-01)"}
+// Quand le palier temporise StepNumber vient de retomber a 0 alors qu'un sens etait
+// commande, FB_Winch DEMANDE a la barriere finale (FB_WinchOutputInterlock) de TENIR
+// le contacteur de sens le temps que le moteur ralentisse (inertie). Borne par
+// T_hold_internal (garde interne, &lt; MaxSenseHoldTime de la barriere = T#1s).
+// Coupures dures -&gt; retombee immediate, jamais de maintien (SafeStop / defaut / perte
+// puissance / NOT Enable geree a la gate §2).
+SenseHoldHardCut := (NOT PowerContactorEngaged) OR EffectiveSafeStop OR Fault.Error;
+
+IF SenseHoldHardCut THEN
+    SenseHoldActiveInt := FALSE;
+ELSIF (PrevStepNumber &gt; 0) AND (StepNumber = 0) AND (CommandedDirection &lt;&gt; 0) THEN
+    SenseHoldActiveInt := TRUE;   // front de chute de palier a 0 avec sens encore actif
+END_IF;
+
+// T_hold_internal PROVISOIRE essai site (base physique : inertie moteur + chute de couple) ;
+// tenu &lt; MaxSenseHoldTime de FB_WinchOutputInterlock pour que la barriere garde le dernier mot.
+SenseHoldTimer(IN := SenseHoldActiveInt, PT := T#900ms);
+IF SenseHoldTimer.Q OR (StepNumber &gt; 0) THEN
+    SenseHoldActiveInt := FALSE;  // borne de temps atteinte, ou nouveau mouvement demande
+END_IF;
+
+SenseHoldRequest := SenseHoldActiveInt AND NOT SenseHoldHardCut;
+PrevStepNumber := StepNumber;
 {endregion}
 </xhtml>
           </ST>
@@ -35457,6 +36068,22 @@ IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
     ErrorId := ErrorId OR 16#0001;
 ELSE
     ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+// ── 6ter. Synchronisation defaut frein en fin de scan (TC-P10-012/013/020) ──
+// ErrorId bit0 (defaut frein) est pose en §6bis, APRES la machine d'etat §5.
+// Sans ce bloc, la synthese Error et l'etat FAULT accusaient un retard d'un scan
+// (~10 ms) sur le watchdog frein. On resynchronise Error/State et on coupe les
+// sorties le MEME scan que l'apparition du defaut : c'est un defaut FINAL, coupure
+// immediate (jamais un maintien ordonne §3bis).
+Error := (ErrorId &lt;&gt; 16#0000);
+IF Error THEN
+    RelayFwd := FALSE; RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    BrakeCmd := FALSE;
+    AuthorizedStep := 0;
+    Busy := FALSE; Done := FALSE; Ready := FALSE;
+    State := E_WinchFinalInterlockState.FAULT;
 END_IF;
 </xhtml>
           </ST>
@@ -36926,6 +37553,70 @@ PreviousQualified := Qualified;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Image utilisee par le metier (arbitree)</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineReferenceReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Qualification conjointe reference machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceCommitOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commit atomique benne ouverte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceCommitClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commit atomique benne fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceTransactionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceLossSafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Perte reference en mouvement : arret controle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etape guidee reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceInstruction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne IHM reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Transaction reference abandonnee</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="instSimBench">
@@ -36977,37 +37668,12 @@ PreviousQualified := Qualified;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Facade codeur complet M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2BucketRefOpenEdge">
+            <variable name="instReferenceCycle">
               <type>
-                <derived name="R_TRIG" />
+                <derived name="FB_ReferenceCycle" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎛️ VARIABLES LOCALES &amp; DÉTECTEURS ===
-. [LOC] Front demande reference benne ouverte</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2BucketRefCloseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front demande reference benne fermee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2BucketRefRequested">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande d'etalonnage M2 active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2BucketRefTargetM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible metrique etalonnage M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Guide reference machine et homing conjoint benne</xhtml>
               </documentation>
             </variable>
             <variable name="HwInM1">
@@ -37015,7 +37681,8 @@ PreviousQualified := Qualified;
                 <derived name="ST_fbEncoder_HwIn" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Entrees hardware codeur M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎛️ VARIABLES LOCALES &amp; DÉTECTEURS ===
+. [LOC] Entrees hardware codeur M1</xhtml>
               </documentation>
             </variable>
             <variable name="HwInM2">
@@ -37438,6 +38105,40 @@ Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
 // Facade codeur complete : Abs→Homing→Scale→Safety→Reliability→Speed.
 // L'autorisation de homing est calculee ici (mode + treuil selectionne).
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
+(* Centralise les fronts IHM avant les deux facades codeur. La polarite du DI
+   est explicite : Free=TRUE signifie capteur haut non atteint. *)
+instReferenceCycle(
+    Enable                     := TRUE,
+    Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
+    Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    TopPositionActive          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
+    WinchesMechanicallyStopped := HwIn.Winch.M1_ContactorsReleased_DI AND NOT HwIn.Winch.M1_BrakeIsOpen_DI
+                                  AND (ABS(Data.Encoders.M1.Speed_Mps) &lt; 0.02)
+                                  AND HwIn.Winch.M2_ContactorsReleased_DI AND NOT HwIn.Winch.M2_BrakeIsOpen_DI
+                                  AND (ABS(Data.Encoders.M2.Speed_Mps) &lt; 0.02),
+    M1HomedAndReliable         := Data.EncoderM1.HomedAndReliable,
+    M2HomedAndReliable         := Data.EncoderM2.HomedAndReliable,
+    M1HomingBusy               := Data.EncoderM1.Measurement.HomingLifecycle.Busy,
+    M2HomingBusy               := Data.EncoderM2.Measurement.HomingLifecycle.Busy,
+    M1HomingDone               := Data.EncoderM1.Measurement.HomingLifecycle.Done,
+    M2HomingDone               := Data.EncoderM2.Measurement.HomingLifecycle.Done,
+    M1HomingError              := Data.EncoderM1.Measurement.HomingFault.Error,
+    M2HomingError              := Data.EncoderM2.Measurement.HomingFault.Error,
+    BucketOffsetValid          := PRG_04_Treuils_Benne.Data.BucketState.MechState.ActiveOffsetValid,
+    ConfirmOpenPosition        := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
+    ConfirmClosePosition       := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos,
+    CfgTopHomingTargetM        := _WinchM1CfgPersist.CfgTopSensorPos_M,
+    CfgOffsetOpenM             := _BucketCfgPersist.Config.OffsetOpenM,
+    CfgOffsetCloseM            := _BucketCfgPersist.Config.OffsetCloseM
+);
+MachineReferenceReady := instReferenceCycle.MachineReferenceReady;
+ReferenceCommitOpen := instReferenceCycle.CommitOpenPosition;
+ReferenceCommitClose := instReferenceCycle.CommitClosePosition;
+ReferenceTransactionActive := instReferenceCycle.ReferenceTransactionActive;
+ReferenceLossSafeStop := instReferenceCycle.ReferenceLossSafeStop;
+ReferenceStep := instReferenceCycle.ReferenceStep;
+ReferenceInstruction := instReferenceCycle.ReferenceInstruction;
+ReferenceFailed := instReferenceCycle.ReferenceFailed;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
@@ -37446,9 +38147,9 @@ HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2),
-    HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome,
+    HomingPermit          := ((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2)) OR instReferenceCycle.HomingRequestM1,
+    HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR instReferenceCycle.HomingRequestM1,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
     CfgHomingTargetM      := _WinchM1CfgPersist.CfgHomingTarget_M,
@@ -37486,18 +38187,6 @@ COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
 // ── TREUIL M2 (Benne) ──
 // Ordre POO : synchronisation benne, puis Homing, puis facade.
 
-// Synchronisation référencement M2 sur ouverture/fermeture benne
-M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
-M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
-M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
-    AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-    AND NOT (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber &gt; 0) AND NOT (PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber &gt; 0);
-IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
-    M2BucketRefTargetM := Data.Encoders.M1.CablePosM;
-ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
-    M2BucketRefTargetM := Data.Encoders.M1.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
-END_IF;
-
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
 HwInM2.RawPosIn          := HwIn.Winch.COD2_PosValue;
 HwInM2.AlarmsIn          := HwIn.Winch.COD2_Alarms;
@@ -37507,15 +38196,15 @@ HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1),
-    HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR M2BucketRefRequested,
+    HomingPermit          := ((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1)) OR instReferenceCycle.HomingRequestM2,
+    HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR instReferenceCycle.HomingRequestM2,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
     CfgHomingTargetM      := _WinchM2CfgPersist.CfgHomingTarget_M,
     CfgTopSensorPosM      := _WinchM2CfgPersist.CfgTopSensorPos_M,
-    UseDynamicTarget      := M2BucketRefRequested,
-    DynamicHomingTargetM  := M2BucketRefTargetM,
+    UseDynamicTarget      := instReferenceCycle.M2UseDynamicTarget,
+    DynamicHomingTargetM  := instReferenceCycle.M2DynamicTargetM,
     TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
     HwIn                  := HwInM2,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
@@ -37744,6 +38433,7 @@ instModes(
     // assumé : PRG_04 est de rang 04, ce programme de rang 03)
     M1PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM1,
     M2PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM2,
+    MachineReferenceReady     := PRG_02_Acquisition.MachineReferenceReady,
     // Restauration boot des drapeaux de re-homing (miroir PERSISTENT)
     BootHomingRequiredM1      := GVL_PERSISTENT._MaintM1HomingRequired,
     BootHomingRequiredM2      := GVL_PERSISTENT._MaintM2HomingRequired
@@ -38968,8 +39658,10 @@ instBucket(
     HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
     M2_Busy             := (instWinchM2.StepNumber &gt; 0),
-    ConfirmOpenPosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
-    ConfirmClosePosition:= GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos,
+    ReferenceCommitOpen  := PRG_02_Acquisition.ReferenceCommitOpen,
+    ReferenceCommitClose := PRG_02_Acquisition.ReferenceCommitClose,
+    MachineReferenceReady := PRG_02_Acquisition.MachineReferenceReady,
+    ReferenceTransactionActive := PRG_02_Acquisition.ReferenceTransactionActive,
     Config              := _BucketCfgPersist.Config,
     CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
@@ -39156,6 +39848,8 @@ ArmingPermit := NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
 
 instWinchSync(
     Enable          := PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND NOT instBucket.Lifecycle.Busy
+                        AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
+                        AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
                         AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     Mode            := PRG_03_Modes_Cycle.Data.Auth.Mode,
@@ -39210,8 +39904,13 @@ END_IF;
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/contacteurs/fin de course des DEUX treuils (VH_0800END,
 // Local_Digital_IO) — pas de granularité par treuil possible, donc SafeStop des DEUX.
-SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault;
-SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault;
+// Perte d'une reference auparavant valide en mouvement : arret controle des
+// deux treuils, sans PowerCutOff additionnel. Le cycle libere la demande
+// seulement apres le composite d'arret mecanique confirme.
+SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault
+                       OR PRG_02_Acquisition.ReferenceLossSafeStop;
+SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault
+                       OR PRG_02_Acquisition.ReferenceLossSafeStop;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
 // : signal HwIn.Machine.M1_M2_KoboldBottomTouch_DI (même que instDiveSearch §1).
@@ -39585,7 +40284,12 @@ M1WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM1.Homed;
 M1WinchSensors.HomingSuspect      := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect;
 M1WinchSensors.ContactorsAllOff   := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;
 M1WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM1.SpeedBand;
-M1WinchSensors.SpeedGuardEnable   := TRUE;
+// Garde-fou vitesse mesuree : DESACTIVE par defaut (AF_Partie-10 §9bis, FB_Winch_v2.1 /
+// FB_SpeedStep_v1.0 SpeedGuardEnable := FALSE). Le TRUE code en dur etait un reste de
+// mise en service : il rendait la capacite de palier otage de instWinchSync (tout ecart
+// sync -&gt; SpeedGuardReady=FALSE -&gt; clamp palier 1, y compris en montee). La gouvernance
+// nominale du palier passe par FB_WinchRateInterlock (T181-01), pas par cette bande.
+M1WinchSensors.SpeedGuardEnable   := FALSE;
 M1WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
 
 M1WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
@@ -39632,7 +40336,8 @@ M2WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM2.Homed;
 M2WinchSensors.HomingSuspect      := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect;
 M2WinchSensors.ContactorsAllOff   := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;
 M2WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM2.SpeedBand;
-M2WinchSensors.SpeedGuardEnable   := TRUE;
+// Garde-fou vitesse mesuree : DESACTIVE par defaut (idem M1 ci-dessus, AF_Partie-10 §9bis).
+M2WinchSensors.SpeedGuardEnable   := FALSE;
 M2WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
 
 M2WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
@@ -39905,6 +40610,12 @@ BucketState.OpenActive := instBucket.OpenReq;
 BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ExtractionControlActive;
 BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
 BucketState.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
+BucketState.MachineReferenceReady := PRG_02_Acquisition.MachineReferenceReady;
+BucketState.ReferenceStep := PRG_02_Acquisition.ReferenceStep;
+BucketState.ReferenceInstruction := PRG_02_Acquisition.ReferenceInstruction;
+BucketState.ReferenceFailed := PRG_02_Acquisition.ReferenceFailed;
+BucketState.ReferenceTransactionActive := PRG_02_Acquisition.ReferenceTransactionActive;
+BucketState.ReferenceLossSafeStop := PRG_02_Acquisition.ReferenceLossSafeStop;
 BucketState.ExtractionControlActive := ExtractionControlActive;
 BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
@@ -42920,6 +43631,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_Cycle" ObjectId="17fb99b4-f1ad-50d8-8736-de2357b93935" />
           <Object Name="FB_DiveSearch" ObjectId="0e6b7a8e-54c0-5c72-8612-9c2a76db57f8" />
           <Object Name="FB_ExtractionSequence" ObjectId="db0a276d-2eae-5fdc-b5fd-93390d06b89e" />
+          <Object Name="FB_ReferenceCycle" ObjectId="8bd09e6c-ee3b-5062-a800-37a7b9aa89a4" />
         </Folder>
         <Folder Name="C_DIAG_RESEAUX">
           <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />

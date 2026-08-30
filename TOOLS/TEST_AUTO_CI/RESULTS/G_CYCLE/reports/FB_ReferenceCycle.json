@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "file": "test_fb_referencecycle.st",
+  "results": [
+    {
+      "name": "TC-T184-001 : semi-auto interdit sans offset benne confirme",
+      "passed": true
+    },
+    {
+      "name": "TC-T184-002 : confirmation benne refusee hors conditions N2 top arret",
+      "passed": true
+    },
+    {
+      "name": "TC-T184-003 : homing conjoint et commit atomique benne fermee",
+      "passed": true
+    },
+    {
+      "name": "TC-T184-004 : perte reference en mouvement demande SafeStop",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0
+  }
+}

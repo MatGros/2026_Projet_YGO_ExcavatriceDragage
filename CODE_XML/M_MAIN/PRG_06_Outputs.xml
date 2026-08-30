@@ -2832,6 +2832,22 @@ IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
 ELSE
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
+
+// ── 6ter. Synchronisation defaut frein en fin de scan (TC-P10-012/013/020) ──
+// ErrorId bit0 (defaut frein) est pose en §6bis, APRES la machine d'etat §5.
+// Sans ce bloc, la synthese Error et l'etat FAULT accusaient un retard d'un scan
+// (~10 ms) sur le watchdog frein. On resynchronise Error/State et on coupe les
+// sorties le MEME scan que l'apparition du defaut : c'est un defaut FINAL, coupure
+// immediate (jamais un maintien ordonne §3bis).
+Error := (ErrorId &lt;&gt; 16#0000);
+IF Error THEN
+    RelayFwd := FALSE; RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    BrakeCmd := FALSE;
+    AuthorizedStep := 0;
+    Busy := FALSE; Done := FALSE; Ready := FALSE;
+    State := E_WinchFinalInterlockState.FAULT;
+END_IF;
 </xhtml>
           </ST>
         </body>

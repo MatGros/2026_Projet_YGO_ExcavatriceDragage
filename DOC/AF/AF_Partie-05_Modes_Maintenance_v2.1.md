@@ -239,14 +239,17 @@ Après **toute** sortie d'un mode maintenance qui a **effectivement** utilisé :
 - `HomingRequired` retombe uniquement sur **cycle de homing complet réussi** (`EncoderMx.HomingLifecycle.Done` + `Homed AND NOT HomingSuspect`).
 - Raison : un dépassement des limites de position invalide la confiance dans `CablePosM` — la re-référence est la seule remise à zéro sûre.
 
-### Confirm / ouvre benne en maintenance (alignement T175 AC4)
+### Référencement benne guidé (T184)
 
 T175 AC4 : *« FB_Bucket confirme/ouvre sous MAINT_N1 ET N2 comme décrit (TC-P10-030), ou la fiche est corrigée MAINT_N2 seul — décision tracée »*.
 
-**Décision : MAINT_N1 ET MAINT_N2.**
-- Rationale : ouvrir/fermer la benne est une **manœuvre de service courante** (dégagement, entretien du grappin) qui ne nécessite aucun bypass de sécurité — elle doit rester possible avec toutes sécurités actives (N1).
-- N2 ajoute seulement la possibilité de la faire **avec** des bypass position/méca actifs (ex. benne bloquée en butée).
-- ⇒ `FB_Bucket.ConfirmOpen` / `ConfirmClose` gatés sur `Mode IN {MAINT_N1, MAINT_N2}` (pas N2 seul). À implémenter en **T181-14** ; le TC-P10-030 est réécrit en conséquence.
+**Décision T184 : MAINT_N2 seul pour confirmer la position visuelle de benne.** Cette confirmation n'est pas une commande d'ouverture/fermeture : elle engage une référence géométrique commune M1/M2/benne.
+
+- Préconditions cumulatives : `MAINT_N2`, capteur haut commun actif, M1 et M2 arrêtés mécaniquement (contacteurs relâchés, freins serrés, vitesse sous seuil).
+- L'opérateur choisit **Ouverte** ou **Fermée** selon ce qu'il voit ; l'état n'est jamais imposé par le PLC.
+- `FB_ReferenceCycle` demande le homing conjoint M1/M2. `FB_Bucket` reste l'unique propriétaire de `IsOpen`/`IsClosed` et ne les commit qu'après les deux succès.
+- `SEMI_AUTO` est refusé tant que `MachineReferenceReady = FALSE` ; `MAINT_N2` conserve les actions de récupération autorisées.
+- Si une référence valide est perdue pendant le mouvement : `SafeStop` contrôlé, puis retour au guide de référence. Aucun redémarrage automatique.
 
 ---
 

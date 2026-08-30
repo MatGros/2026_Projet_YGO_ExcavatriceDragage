@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T14:08:12.526986" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T14:08:12.526986">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T18:28:44.499011" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T18:28:44.499011">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -440,12 +440,44 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens arbitre (1: montee, -1: descente)</xhtml>
               </documentation>
             </variable>
+            <variable name="ReferenceCommitOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commit atomique reference benne ouverte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceCommitClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commit atomique reference benne fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineReferenceReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Qualification conjointe M1/M2/benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceTransactionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
             <variable name="ConfirmOpenPosition">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton IHM confirmation benne ouvert</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle</xhtml>
               </documentation>
             </variable>
             <variable name="ConfirmClosePosition">
@@ -453,7 +485,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton IHM confirmation benne ferme</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -706,22 +738,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur entree en etat Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ConfirmOpenEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front confirmation ouverture</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ConfirmCloseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front confirmation fermeture</xhtml>
               </documentation>
             </variable>
             <variable name="TonTimeout">
@@ -979,16 +995,14 @@ IF FirstCycle THEN
     END_IF;
 END_IF;
 
-ConfirmOpenEdge(CLK := ConfirmOpenPosition);
-IF ConfirmOpenEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
+IF ReferenceCommitOpen AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
-ConfirmCloseEdge(CLK := ConfirmClosePosition);
-IF ConfirmCloseEdge.Q AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) AND NOT Lifecycle.Busy THEN
+IF ReferenceCommitClose AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
@@ -1142,7 +1156,9 @@ END_IF;
 
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
-                     AND (Fault.ErrorId = 16#0000);
+                     AND (Fault.ErrorId = 16#0000)
+                     AND (MachineReferenceReady OR (BucketState.IsOpen XOR BucketState.IsClosed))
+                     AND NOT ReferenceTransactionActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
 {endregion}
 </xhtml>

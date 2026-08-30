@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T14:08:13.409287" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T14:08:13.409287">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T18:18:20.275668" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T18:18:20.275668">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -120,6 +120,70 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) en direct</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx113_MachineReferenceReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference M1/M2/benne qualifiee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx114_ReferenceStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee reference machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx115_ReferenceFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction reference abandonnee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx116_M1ReferenceMissing">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 non reference ou mesure douteuse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx117_M2ReferenceMissing">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 non reference ou mesure douteuse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx118_BucketOffsetUnknown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Offset benne non confirme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx119_ReferenceTransaction">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx120_ReferenceLossSafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte reference pendant mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="Idx201_HmiCmd_BtnOpen">

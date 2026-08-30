@@ -4,44 +4,78 @@
   "results": [
     {
       "name": "HARN-10 : Cycle semi-auto descente 50 pourcent -> palier 3 M1 ET M2, RelayRev",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.BUSMODES.MODE expected 3, got 1",
+        "file": "test_winch_integ.st",
+        "line": 120,
+        "message": "HARN-10: SEMI_AUTO doit etre arbitre",
+        "expected": "3",
+        "actual": "1"
+      }
     },
     {
       "name": "HARN-11 : Extraction montee ExtractionControlActive -> plafond palier 1 M1 ET M2",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 1, got 0",
+        "file": "test_winch_integ.st",
+        "line": 170,
+        "message": "HARN-11: M1 plafonne palier 1 (ExtractionControlActive)",
+        "expected": "1",
+        "actual": "0"
+      }
     },
     {
       "name": "HARN-12 : Zone ralentissement bordure haute -> plafond palier 1, jamais au-dela de 7.5 m",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.M1_STEPNUMBER >= 1 expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 220,
+        "message": "HARN-12: precondition - montee en zone haute engagee M1"
+      }
     },
     {
       "name": "HARN-13a : Table de verite etape remontee 20 pourcent -> palier 2",
       "passed": false,
       "failure": {
         "assertType": "ASSERT_EQ",
-        "detail": "MACHINE.M1_STEPNUMBER expected 2, got 1",
+        "detail": "MACHINE.M1_STEPNUMBER expected 2, got 0",
         "file": "test_winch_integ.st",
         "line": 269,
         "message": "HARN-13a: 20 pourcent -> palier 2 (table reference)",
         "expected": "2",
-        "actual": "1"
+        "actual": "0"
       }
     },
     {
       "name": "HARN-13b : Table de verite etape descente 70 pourcent -> palier 3 (clamp descente effective)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 3, got 0",
+        "file": "test_winch_integ.st",
+        "line": 313,
+        "message": "HARN-13b: 70 pourcent descendu au clamp descente 3",
+        "expected": "3",
+        "actual": "0"
+      }
     },
     {
       "name": "HARN-13c : Table de verite etape remontee 90 pourcent -> palier 5",
       "passed": false,
       "failure": {
         "assertType": "ASSERT_EQ",
-        "detail": "MACHINE.M1_STEPNUMBER expected 5, got 1",
+        "detail": "MACHINE.M1_STEPNUMBER expected 5, got 0",
         "file": "test_winch_integ.st",
         "line": 356,
         "message": "HARN-13c: 90 pourcent -> palier 5 (table reference)",
         "expected": "5",
-        "actual": "1"
+        "actual": "0"
       }
     },
     {
@@ -256,12 +290,19 @@
     },
     {
       "name": "HARN-82 : CAS-002 AU pendant transition d etape -> coupure propre, pas d etat incoherent au rearmement",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 1223,
+        "message": "HARN-82: precondition - mouvement semi-auto"
+      }
     }
   ],
   "summary": {
     "total": 32,
-    "passed": 16,
-    "failed": 16
+    "passed": 11,
+    "failed": 21
   }
 }

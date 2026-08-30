@@ -5835,6 +5835,54 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineReferenceReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference M1/M2/benne atomiquement valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee de recuperation reference machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceInstruction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instruction IHM unique et actionnable</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction de homing conjoint abandonnee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceTransactionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReferenceLossSafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte reference en mouvement : arret controle</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -10518,6 +10566,14 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx109_BucketTooOpen := WinchM2.Buck
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx110_BucketTooClosed := WinchM2.Bucket.State.MechState.TooClosed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx111_BucketIsIntermediate := WinchM2.Bucket.State.MechState.IsIntermediate;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx112_DeltaPosition_M := WinchM2.Bucket.State.DeltaPosition_M;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx113_MachineReferenceReady := WinchM2.Bucket.State.MachineReferenceReady;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx114_ReferenceStep := WinchM2.Bucket.State.ReferenceStep;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx115_ReferenceFailed := WinchM2.Bucket.State.ReferenceFailed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx116_M1ReferenceMissing := NOT WinchM1.State.Encoder.Homed OR WinchM1.State.Encoder.HomingSuspect;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx117_M2ReferenceMissing := NOT WinchM2.State.Encoder.Homed OR WinchM2.State.Encoder.HomingSuspect;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx118_BucketOffsetUnknown := NOT WinchM2.Bucket.State.MechState.ActiveOffsetValid;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx119_ReferenceTransaction := WinchM2.Bucket.State.ReferenceTransactionActive;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx120_ReferenceLossSafeStop := WinchM2.Bucket.State.ReferenceLossSafeStop;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := CycleBucketOpen;
