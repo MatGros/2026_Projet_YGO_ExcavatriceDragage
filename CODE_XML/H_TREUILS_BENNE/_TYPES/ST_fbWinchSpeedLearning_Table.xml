@@ -25,7 +25,28 @@
     <dataTypes>
       <dataType name="ST_fbWinchSpeedLearning_Table">
         <baseType>
-          <struct />
+          <struct>
+            <variable name="Cell">
+              <type>
+                <array>
+                  <dimension lower="1" upper="2" />
+                  <dimension lower="1" upper="2" />
+                  <dimension lower="1" upper="2" />
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <derived name="ST_fbWinchSpeedLearning_Cell" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[axe][sens][charge][palier]
+axe    : 1=M1, 2=M2
+sens   : 1=montee, 2=descente
+charge : 1=vide, 2=charge
+palier : 1..5</xhtml>
+              </documentation>
+            </variable>
+          </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
@@ -37,6 +58,49 @@
    💾 ST_fbWinchSpeedLearning_Table — Table RETAIN apprentissage vitesse
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Matrice {axe x sens x charge/vide x palier} de vitesses apprises
+   📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchSpeedLearning_Cell">
+        <baseType>
+          <struct>
+            <variable name="Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cellule validee (vitesse apprise exploitable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse apprise (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCount">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur d'echantillons collectes</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8341fe63-7ea1-5607-8731-d295248cd6cb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 ST_fbWinchSpeedLearning_Cell — Cellule de vitesse apprise
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Cellule unitaire de la table d'apprentissage vitesse par palier
    📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
@@ -53,6 +117,7 @@
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="_TYPES">
             <Object Name="ST_fbWinchSpeedLearning_Table" ObjectId="e53cb50d-fd3d-5709-9494-4694f689ff17" />
+            <Object Name="ST_fbWinchSpeedLearning_Cell" ObjectId="8341fe63-7ea1-5607-8731-d295248cd6cb" />
           </Folder>
         </Folder>
       </ProjectStructure>

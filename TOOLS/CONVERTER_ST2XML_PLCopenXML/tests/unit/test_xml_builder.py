@@ -89,6 +89,23 @@ def test_string_and_array_type_rendering():
     assert array_type.find("baseType/REAL") is not None
 
 
+def test_multi_dimension_array_renders_one_dimension_per_bound_pair():
+    # REX : ARRAY[1..2, 1..2] OF T doit produire un <array> avec 2 <dimension>, jamais
+    # des <array> imbriqués (qui changerait la syntaxe d'indexation Table.Cell[a,b] en
+    # Table.Cell[a][b] côté CODESYS).
+    obj = _fb(
+        "FB_Demo",
+        input_vars=[VariableDecl("A", ArrayType(1, 2, BaseType("REAL"), extra_dims=((1, 3),)))],
+        body_text="",
+    )
+    diag = DiagnosticCollector()
+    root = build_project_xml("FB_Demo", {"FB_Demo": obj}, diag, include_deps=False)
+    array_type = root.find("types/pous/pou/interface/inputVars/variable/type/array")
+    dims = array_type.findall("dimension")
+    assert [(d.get("lower"), d.get("upper")) for d in dims] == [("1", "2"), ("1", "3")]
+    assert array_type.find("baseType/REAL") is not None
+
+
 def test_reference_to_type_renders_as_derived_with_literal_prefix():
     """Confirmé sur échantillon réel CODESYS (FB_TestReference.xml, 2026-07-17) :
     REFERENCE TO FB_Winch -> <derived name="REFERENCE TO FB_Winch" />, PAS un <pointer>."""

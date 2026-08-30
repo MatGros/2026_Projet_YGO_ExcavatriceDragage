@@ -81,9 +81,10 @@ def _type_inner(type_ref: TypeRef) -> ET.Element:
         return el
     if isinstance(type_ref, ArrayType):
         el = ET.Element("array")
-        dim = ET.SubElement(el, "dimension")
-        dim.set("lower", str(type_ref.lower))
-        dim.set("upper", str(type_ref.upper))
+        for lower, upper in ((type_ref.lower, type_ref.upper), *type_ref.extra_dims):
+            dim = ET.SubElement(el, "dimension")
+            dim.set("lower", str(lower))
+            dim.set("upper", str(upper))
         base_type_el = ET.SubElement(el, "baseType")
         base_type_el.append(_type_inner(type_ref.base))
         return el

@@ -58,6 +58,21 @@ def test_array_with_negative_bounds():
     assert result == ArrayType(-2, 2, BaseType("INT"))
 
 
+def test_array_multi_dimension():
+    # REX : ARRAY[1..2, 1..2, 1..2, 1..5] OF T (FB_WinchSpeedLearning, T181-15) était
+    # silencieusement ignoré par _ARRAY_RE (une seule paire de bornes gérée) -> le champ
+    # struct était absent du <struct/> exporté -> CODESYS C0046/C0004 "Cell non défini".
+    result = parse_type("ARRAY[1..2, 1..2, 1..2, 1..5] OF ST_fbWinchSpeedLearning_Cell")
+    assert result == ArrayType(
+        1, 2, DerivedType("ST_fbWinchSpeedLearning_Cell"), extra_dims=((1, 2), (1, 2), (1, 5))
+    )
+
+
+def test_array_single_dimension_has_no_extra_dims():
+    result = parse_type("ARRAY[1..5] OF REAL")
+    assert result.extra_dims == ()
+
+
 def test_empty_type_raises():
     with pytest.raises(ValueError):
         parse_type("")
