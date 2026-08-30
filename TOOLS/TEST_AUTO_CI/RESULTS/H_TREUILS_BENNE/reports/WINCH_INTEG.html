@@ -315,11 +315,11 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 23:50:26</div>
+    <div class="exec-time">2026-08-30 12:48:58</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (32 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-fail"><a href="#test-winch-integ-0">HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-1">HARN-11 : Extraction montee ForceMinSpeedStep -&gt; plafond palier 1 M1 ET M2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-2">HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-3">HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-4">HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-5">HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-6">HARN-20 : Rampe deflexion 0 a 100 pourcent -&gt; paliers monotones, jamais de saut brutal</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-7">HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-8">HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-9">HARN-23 : Homme-mort relache en mouvement -&gt; arret immediat, frein retombe</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-10">HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -&gt; immersion confirmee puis arret latche</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-11">HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-12">HARN-32 : Relache joystick en contexte plongee -&gt; palier 0 immediat, pas de plancher residuel</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-13">HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-14">HARN-40 : Jog benne -&gt; M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-15">HARN-41 : SyncDeviationWarn -&gt; plafond palier 1 sur M1 ET M2 (bornes communes identiques)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-16">HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-17">HARN-50 : Nominal filet passif -&gt; FinalInterlockGoverned FALSE sur toute la montee couplee</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-18">HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-19">HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-20">HARN-60 : Deviation croissante -&gt; warn plafond 1 puis critique SafeStop des 2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-21">HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-22">HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-23">HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-24">HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-25">HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-26">HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-27">HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-28">HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-29">HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-30">HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-31">HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-winch-integ-0">HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-1">HARN-11 : Extraction montee ForceMinSpeedStep -&gt; plafond palier 1 M1 ET M2</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-2">HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-3">HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-4">HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-5">HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-6">HARN-20 : Rampe deflexion 0 a 100 pourcent -&gt; paliers monotones, jamais de saut brutal</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-7">HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-8">HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-9">HARN-23 : Homme-mort relache en mouvement -&gt; arret immediat, frein retombe</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-10">HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -&gt; immersion confirmee puis arret latche</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-11">HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-12">HARN-32 : Relache joystick en contexte plongee -&gt; palier 0 immediat, pas de plancher residuel</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-13">HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-14">HARN-40 : Jog benne -&gt; M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-15">HARN-41 : SyncDeviationWarn -&gt; plafond palier 1 sur M1 ET M2 (bornes communes identiques)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-16">HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-17">HARN-50 : Nominal filet passif -&gt; FinalInterlockGoverned FALSE sur toute la montee couplee</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-18">HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-19">HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-20">HARN-60 : Deviation croissante -&gt; warn plafond 1 puis critique SafeStop des 2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-21">HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-22">HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-23">HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-24">HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-25">HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-26">HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-27">HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-28">HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-29">HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-30">HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-31">HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -328,12 +328,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/32 vérifications validées
+            15/32 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 126 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 128 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -755,7 +755,7 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>E_WinchFinalInterlockState.st</code></td>
-                <td>DUT (Enum)</td>
+                <td>DUT</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -763,7 +763,7 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>E_WinchFinalInterlockReason.st</code></td>
-                <td>DUT (Enum)</td>
+                <td>DUT</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -859,6 +859,22 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>FB_SyncContactor.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_WinchDirectionInterlock.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_WinchStepShaper.st</code></td>
                 <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -1566,7 +1582,7 @@
     
     
     <details class="encaps-details" >
-        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 47 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 49 FB de la chaine, encapsulation propre (0 violation)</summary>
         
         <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
             <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
@@ -1759,9 +1775,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Modes</code></td>
-                <td>11</td><td>3</td>
-                <td>0</td><td>6</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (6 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>28</td><td>3</td>
+                <td>0</td><td>12</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (12 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1794,9 +1810,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_SpeedStep</code></td>
-                <td>8</td><td>8</td>
-                <td>0</td><td>10</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (10 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>5</td><td>7</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1808,14 +1824,14 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_WinchOutputInterlock</code></td>
-                <td>15</td><td>21</td>
-                <td>0</td><td>19</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>17</td><td>24</td>
+                <td>0</td><td>24</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (24 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Safety_Winch</code></td>
-                <td>58</td><td>9</td>
+                <td>58</td><td>10</td>
                 <td>0</td><td>27</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (27 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
@@ -1856,10 +1872,24 @@
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_WinchDirectionInterlock</code></td>
+                <td>6</td><td>3</td>
+                <td>0</td><td>5</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (5 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_WinchStepShaper</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>1</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (1 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Winch</code></td>
-                <td>31</td><td>18</td>
-                <td>0</td><td>16</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (16 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>32</td><td>18</td>
+                <td>0</td><td>19</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1973,66 +2003,69 @@
         <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 32 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-winch-integ-0" class="test-card test-card-fail">
+        <article id="test-winch-integ-0" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
-                <ul class="scenario-list"><li>Config référence + reset demandes séquenceur</li><li>Armement homme-mort au neutre avant toute intention de mouvement.</li><li>Demande séquenceur : descente couplée 50 %, permis descente dive/benne ouvert</li><li>Convergence 10 × 300 ms : le dialecte test ne permet pas ADVANCE_TIME dans FOR.</li><li>ORACLE (main) : 50 % -&gt; palier 3 sur LES DEUX treuils (pont SEMI_AUTO des deux branches)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (6)</span></summary>
+                <ul class="scenario-list"><li>Config référence + reset demandes séquenceur</li><li>Armement homme-mort au neutre avant toute intention de mouvement.</li><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime
+       de la barriere PRG_06 avant toute demande nominale (jamais un forcage).</li><li>Demande séquenceur : descente couplée 50 %, permis descente dive/benne ouvert</li><li>Convergence 10 × 300 ms : le dialecte test ne permet pas ADVANCE_TIME dans FOR.</li><li>ORACLE (main) : 50 % -&gt; palier 3 sur LES DEUX treuils (pont SEMI_AUTO des deux branches)</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (9)</span></summary>
                 <ul class="checks-list"><li>HARN-10: precondition homme-mort arme</li><li>HARN-10: SEMI_AUTO doit etre arbitre</li><li>HARN-10: ErrorId M1 nominal</li><li>HARN-10: la demande doit atteindre FB_Winch M1</li><li>HARN-10: M1 palier 3 attendu pour 50 pourcent</li><li>HARN-10: M2 palier 3 attendu pour 50 pourcent</li><li>HARN-10: RelayRev M1 commande la descente</li><li>HARN-10: RelayRev M2 commande la descente</li><li>HARN-10: filet PRG_06 passif en nominal</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.BUSWINCH.WINCHM1SAFETY.ERRORID expected 0, got 32768</div><div class='failure-loc'>test_winch_integ.st:119</div><div class='failure-msg'>HARN-10: ErrorId M1 nominal</div><div class='failure-diff'>attendu <code class='val-expected'>0</code> · obtenu <code class='val-actual'>32768</code></div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-1" class="test-card test-card-fail">
+        <article id="test-winch-integ-1" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-11 : Extraction montee ForceMinSpeedStep -&gt; plafond palier 1 M1 ET M2 </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : plafond ascension effectif = 1 sur M1 ET M2 malgré demande 100 %</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : plafond ascension effectif = 1 sur M1 ET M2 malgré demande 100 %</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
                 <ul class="checks-list"><li>HARN-11: precondition homme-mort arme</li><li>HARN-11: M1 plafonne palier 1 (ForceMinSpeedStep)</li><li>HARN-11: M2 plafonne palier 1 (ForceMinSpeedStep)</li><li>HARN-11: montee maintenue au palier 1</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 1, got 0</div><div class='failure-loc'>test_winch_integ.st:167</div><div class='failure-msg'>HARN-11: M1 plafonne palier 1 (ForceMinSpeedStep)</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-2" class="test-card test-card-fail">
+        <article id="test-winch-integ-2" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : en zone (pos &gt;= limite - 1.0 m) plafond 1 ; butée haute jamais dépassée</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>PRECOND (durcissement T181-00b) : le treuil doit reellement monter en zone avant qu&#x27;on
+       puisse tester le plafond. Sans mouvement, StepNumber=0 rend l&#x27;oracle triviale/creuse.</li><li>ORACLE (main) : en zone (pos &gt;= limite - 1.0 m) le palier est plafonne a SlowdownMaxStep ;
+       la butee haute (7.5) n&#x27;est jamais depassee une fois atteinte (coupe propre).</li></ul>
             </details>
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
-                <ul class="checks-list"><li>HARN-12: precondition homme-mort arme</li><li>HARN-12: position M1 jamais au-dela de la limite haute</li><li>HARN-12: position M2 jamais au-dela de la limite haute</li><li>HARN-12: M1 plafonne au SlowdownMaxStep en zone haute</li><li>HARN-12: M2 plafonne au SlowdownMaxStep en zone haute</li></ul>
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary>
+                <ul class="checks-list"><li>HARN-12: precondition homme-mort arme</li><li>HARN-12: precondition - montee en zone haute engagee M1</li><li>HARN-12: precondition - montee en zone haute engagee M2</li><li>HARN-12: M1 plafonne au SlowdownMaxStep en zone haute</li><li>HARN-12: M2 plafonne au SlowdownMaxStep en zone haute</li><li>HARN-12: position M1 jamais au-dela de la limite haute</li><li>HARN-12: position M2 jamais au-dela de la limite haute</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 1, got 0</div><div class='failure-loc'>test_winch_integ.st:216</div><div class='failure-msg'>HARN-12: M1 plafonne au SlowdownMaxStep en zone haute</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
@@ -2044,33 +2077,37 @@
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li></ul>
+            </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-13a: precondition homme-mort arme</li><li>HARN-13a: 20 pourcent -&gt; palier 2 (table reference)</li><li>HARN-13a: 20 pourcent -&gt; palier 2 M2</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 2, got 0</div><div class='failure-loc'>test_winch_integ.st:257</div><div class='failure-msg'>HARN-13a: 20 pourcent -&gt; palier 2 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>2</code> · obtenu <code class='val-actual'>0</code></div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 2, got 1</div><div class='failure-loc'>test_winch_integ.st:269</div><div class='failure-msg'>HARN-13a: 20 pourcent -&gt; palier 2 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>2</code> · obtenu <code class='val-actual'>1</code></div></div>
                 
             </div>
         </article>
-        <article id="test-winch-integ-4" class="test-card test-card-fail">
+        <article id="test-winch-integ-4" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : 70 % demandé, clamp descente effectif = 3 (fallback PRG_04) -&gt; palier 3</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : 70 % demandé, clamp descente effectif = 3 (fallback PRG_04) -&gt; palier 3</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-13b: precondition homme-mort arme</li><li>HARN-13b: 70 pourcent descendu au clamp descente 3</li><li>HARN-13b: idem M2</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 3, got 0</div><div class='failure-loc'>test_winch_integ.st:300</div><div class='failure-msg'>HARN-13b: 70 pourcent descendu au clamp descente 3</div><div class='failure-diff'>attendu <code class='val-expected'>3</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
@@ -2082,12 +2119,16 @@
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li></ul>
+            </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-13c: precondition homme-mort arme</li><li>HARN-13c: 90 pourcent -&gt; palier 5 (table reference)</li><li>HARN-13c: 90 pourcent -&gt; palier 5 M2</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 5, got 0</div><div class='failure-loc'>test_winch_integ.st:341</div><div class='failure-msg'>HARN-13c: 90 pourcent -&gt; palier 5 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>5</code> · obtenu <code class='val-actual'>0</code></div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 5, got 1</div><div class='failure-loc'>test_winch_integ.st:356</div><div class='failure-msg'>HARN-13c: 90 pourcent -&gt; palier 5 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>5</code> · obtenu <code class='val-actual'>1</code></div></div>
                 
             </div>
         </article>
@@ -2100,42 +2141,42 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
-                <ul class="scenario-list"><li>Armement homme-mort (hold 50 ms harnais PRG_02)</li><li>Rampe : 20% -&gt; 40% -&gt; 75% ; 6 cycles (60 ms) par pas</li><li>ORACLE (main) : 20 % -&gt; jamais au-dela du palier 2 à ce pas (pas d&#x27;accostage brutal)</li><li>ORACLE (main) : 75 % -&gt; palier 4 (entre 70 et 90)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
+                <ul class="scenario-list"><li>Armement homme-mort (hold 50 ms harnais PRG_02)</li><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>Rampe : 20% -&gt; 40% -&gt; 75% ; 6 cycles (60 ms) par pas</li><li>ORACLE (main) : 20 % -&gt; jamais au-dela du palier 2 à ce pas (pas d&#x27;accostage brutal)</li><li>ORACLE (main) : 75 % -&gt; palier 4 (entre 70 et 90)</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
                 <ul class="checks-list"><li>HARN-20: pas de saut au-dela du palier cible (20%)</li><li>HARN-20: montee monotone (40%)</li><li>HARN-20: 75 pourcent -&gt; palier 4 (table reference)</li><li>HARN-20: montee commandee</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 4, got 0</div><div class='failure-loc'>test_winch_integ.st:385</div><div class='failure-msg'>HARN-20: 75 pourcent -&gt; palier 4 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>4</code> · obtenu <code class='val-actual'>0</code></div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 4, got 1</div><div class='failure-loc'>test_winch_integ.st:402</div><div class='failure-msg'>HARN-20: 75 pourcent -&gt; palier 4 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>4</code> · obtenu <code class='val-actual'>1</code></div></div>
                 
             </div>
         </article>
-        <article id="test-winch-integ-7" class="test-card test-card-fail">
+        <article id="test-winch-integ-7" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0 </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : neutre -&gt; palier 0 en &lt;= 2 cycles</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : neutre -&gt; palier 0 en &lt;= 2 cycles</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-21: precondition - en montee avant rampe retour</li><li>HARN-21: relache -&gt; palier 0</li><li>HARN-21: plus de commande de montee</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:407</div><div class='failure-msg'>HARN-21: precondition - en montee avant rampe retour</div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-8" class="test-card test-card-fail">
+        <article id="test-winch-integ-8" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2150,7 +2191,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
                 <ul class="checks-list"><li>HARN-22: effleurement -&gt; palier 1 stable (pas de plancher hors plongee)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 1, got 0</div><div class='failure-loc'>test_winch_integ.st:440</div><div class='failure-msg'>HARN-22: effleurement -&gt; palier 1 stable (pas de plancher hors plongee)</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
@@ -2163,15 +2204,15 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : perte homme-mort -&gt; tout retombe</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : perte homme-mort -&gt; tout retombe</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
                 <ul class="checks-list"><li>HARN-23: precondition - montee active</li><li>HARN-23: homme-mort relache -&gt; palier 0</li><li>HARN-23: RelayFwd retombe</li><li>HARN-23: frein M1 retombe (plus de sens commande)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:461</div><div class='failure-msg'>HARN-23: precondition - montee active</div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 0, got 1</div><div class='failure-loc'>test_winch_integ.st:493</div><div class='failure-msg'>HARN-23: homme-mort relache -&gt; palier 0</div><div class='failure-diff'>attendu <code class='val-expected'>0</code> · obtenu <code class='val-actual'>1</code></div></div>
                 
             </div>
         </article>
@@ -2184,36 +2225,38 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
-                <ul class="scenario-list"><li>Descente couplée douce (palier 1) — benne ouverte (seed)</li><li>Front montant Kobold dans la fenêtre d&#x27;immersion</li><li>Front descendant = toucher fond -&gt; latch + arrêt descente</li><li>ORACLE (main) : fond latché -&gt; descente coupée sur LES DEUX treuils</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>Descente couplée douce (palier 1) — benne ouverte (seed)</li><li>Front montant Kobold dans la fenêtre d&#x27;immersion</li><li>Front descendant = toucher fond -&gt; latch + arrêt descente</li><li>ORACLE (main) : fond latché -&gt; descente coupée sur LES DEUX treuils</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
                 <ul class="checks-list"><li>HARN-30: immersion confirmee au front montant en fenetre</li><li>HARN-30: fond latche au front descendant</li><li>HARN-30: descente M1 arretee (permits FALSE)</li><li>HARN-30: descente M2 arretee</li><li>HARN-30: plus de RelayRev M1</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.KOBOLDIMMERSIONCONFIRMED expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:502</div><div class='failure-msg'>HARN-30: immersion confirmee au front montant en fenetre</div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.KOBOLDIMMERSIONCONFIRMED expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:528</div><div class='failure-msg'>HARN-30: immersion confirmee au front montant en fenetre</div></div>
                 
             </div>
         </article>
-        <article id="test-winch-integ-11" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-winch-integ-11" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1;">HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : en contexte Kobold, demande plein pot -&gt; jamais palier 5 (cible D12)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Descente couplée plongée réelle (benne ouverte seed) à pleine vitesse : la cible D12
+       doit être exercée — pas de joystick neutre qui laisse StepNumber=0.</li><li>ORACLE (main) : la plongée s&#x27;exerce réellement (StepNumber &gt;= 1) ET en contexte Kobold
+       le palier est plafonné à 4 (cible D12). Un StepNumber=0 par joystick neutre = FAIL.</li></ul>
             </details>
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
-                <ul class="checks-list"><li>HARN-31: palier plafonne a 4 en Kobold (cible D12)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>HARN-31: la plongee Kobold est reellement exercee (StepNumber &gt;= 1)</li><li>HARN-31: palier plafonne a 4 en Kobold (cible D12)</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:563</div><div class='failure-msg'>HARN-31: la plongee Kobold est reellement exercee (StepNumber &gt;= 1)</div></div>
                 
             </div>
         </article>
@@ -2226,15 +2269,15 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : relâche -&gt; 0 immédiat ; re-demande -&gt; repart du palier bas (pas de plancher collant)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : relâche -&gt; 0 immédiat ; re-demande -&gt; repart du palier bas (pas de plancher collant)</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-32: precondition - descente active en plongee</li><li>HARN-32: relache -&gt; palier 0 immediat</li><li>HARN-32: reprise depuis palier bas (pas de plancher residuel)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:556</div><div class='failure-msg'>HARN-32: precondition - descente active en plongee</div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:590</div><div class='failure-msg'>HARN-32: precondition - descente active en plongee</div></div>
                 
             </div>
         </article>
@@ -2247,15 +2290,15 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : plafond zone basse (1) gagne sur plancher plongee (3) — amendement B</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : plafond zone basse (1) gagne sur plancher plongee (3) — amendement B</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
                 <ul class="checks-list"><li>HARN-33: plafond zone basse gagne sur plancher plongee (amendement B)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 1, got 0</div><div class='failure-loc'>test_winch_integ.st:588</div><div class='failure-msg'>HARN-33: plafond zone basse gagne sur plancher plongee (amendement B)</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 1, got 0</div><div class='failure-loc'>test_winch_integ.st:626</div><div class='failure-msg'>HARN-33: plafond zone basse gagne sur plancher plongee (amendement B)</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
                 
             </div>
         </article>
@@ -2268,16 +2311,16 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
                 <ul class="scenario-list"><li>Variante baseline : le jog benne (Busy) coupe les treuils (NOT instBucket.Busy).
-       Le clamp M2-only sans conflit Busy est couvert par HARN-42. Oracle baseline écrit à la main.</li><li>M1 demande palier 4 (75 %)</li><li>Jog fermeture benne maintenu -&gt; Busy -&gt; treuils coupes, M2 force lent</li><li>ORACLE (main) : benne busy -&gt; M1 coupe (anti-traversée amont), M2 &lt;= 1 (clamp benne propre)</li></ul>
+       Le clamp M2-only sans conflit Busy est couvert par HARN-42. Oracle baseline écrit à la main.</li><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>M1 demande palier 4 (75 %)</li><li>Jog fermeture benne maintenu -&gt; Busy -&gt; treuils coupes, M2 force lent</li><li>ORACLE (main) : benne busy -&gt; M1 coupe (anti-traversée amont), M2 &lt;= 1 (clamp benne propre)</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
                 <ul class="checks-list"><li>HARN-40: precondition - M1 au palier 4</li><li>HARN-40: benne en jog (Busy)</li><li>HARN-40: M1 coupe pendant jog benne (anti-traversee amont)</li><li>HARN-40: M2 bride palier 1 (clamp benne M2-propre)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 4, got 0</div><div class='failure-loc'>test_winch_integ.st:618</div><div class='failure-msg'>HARN-40: precondition - M1 au palier 4</div><div class='failure-diff'>attendu <code class='val-expected'>4</code> · obtenu <code class='val-actual'>0</code></div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 4, got 1</div><div class='failure-loc'>test_winch_integ.st:657</div><div class='failure-msg'>HARN-40: precondition - M1 au palier 4</div><div class='failure-diff'>attendu <code class='val-expected'>4</code> · obtenu <code class='val-actual'>1</code></div></div>
                 
             </div>
         </article>
@@ -2290,15 +2333,15 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
-                <ul class="scenario-list"><li>Montée couplée demandée plein pot -&gt; écart 0.3 m &gt; warn 0.10 -&gt; clamp 1 sur les deux</li><li>ORACLE (main) : SyncDeviationWarn -&gt; plafond 1 sur M1 ET M2 (clamp commun, pas juste M2)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>Montée couplée demandée plein pot -&gt; écart 0.3 m &gt; warn 0.10 -&gt; clamp 1 sur les deux</li><li>ORACLE (main) : SyncDeviationWarn -&gt; plafond 1 sur M1 ET M2 (clamp commun, pas juste M2)</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-41: SyncDeviationWarn actif (ecart 0.3 &gt; 0.10)</li><li>HARN-41: M1 plafonne palier 1 par la sync</li><li>HARN-41: M2 plafonne palier 1 par la sync</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 1, got 0</div><div class='failure-loc'>test_winch_integ.st:654</div><div class='failure-msg'>HARN-41: M1 plafonne palier 1 par la sync</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M2_STEPNUMBER expected 1, got 0</div><div class='failure-loc'>test_winch_integ.st:695</div><div class='failure-msg'>HARN-41: M2 plafonne palier 1 par la sync</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
                 
             </div>
         </article>
@@ -2311,15 +2354,15 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
-                <ul class="scenario-list"><li>Boutons : M1 monte plein pot ET M2 monte plein pot, M2-only clamp actif</li><li>ORACLE (main) : M1 libre (5), M2 plafonné 1 — la portée M2-only est respectée</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>Boutons : M1 monte plein pot ET M2 monte plein pot, M2-only clamp actif</li><li>ORACLE (main) : M1 libre (5), M2 plafonné 1 — la portée M2-only est respectée</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
                 <ul class="checks-list"><li>HARN-42: M1 libre jusqu au plafond general (5)</li><li>HARN-42: M2 plafonne palier 1 (clamp M2-propre)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 5, got 1</div><div class='failure-loc'>test_winch_integ.st:684</div><div class='failure-msg'>HARN-42: M1 libre jusqu au plafond general (5)</div><div class='failure-diff'>attendu <code class='val-expected'>5</code> · obtenu <code class='val-actual'>1</code></div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 5, got 0</div><div class='failure-loc'>test_winch_integ.st:726</div><div class='failure-msg'>HARN-42: M1 libre jusqu au plafond general (5)</div><div class='failure-diff'>attendu <code class='val-expected'>5</code> · obtenu <code class='val-actual'>0</code></div></div>
                 
             </div>
         </article>
@@ -2332,58 +2375,66 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : à mi-course la barrière est passive</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>PRECOND (durcissement T181-00b) : sans montee couplee reellement etablie,
+       FinalInterlockGoverned=FALSE est une tautologie (aucune demande n&#x27;atteint FB_Winch).
+       Le filet passif n&#x27;a de sens qu&#x27;en regime etabli.</li><li>ORACLE (main) : à mi-course la barrière est passive</li></ul>
             </details>
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
-                <ul class="checks-list"><li>HARN-50: filet passif M1 a mi-course</li><li>HARN-50: filet passif M2 a mi-course</li><li>HARN-50: filet passif M1 en regime</li><li>HARN-50: filet passif M2 en regime</li></ul>
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>HARN-50: precondition - montee couplee M1 etablie</li><li>HARN-50: precondition - pas M1 &gt;= 1 en montee</li><li>HARN-50: filet passif M1 a mi-course</li><li>HARN-50: filet passif M2 a mi-course</li><li>HARN-50: filet passif M1 en regime</li><li>HARN-50: filet passif M2 en regime</li></ul>
             </details>
                 
                 
             </div>
         </article>
-        <article id="test-winch-integ-18" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-winch-integ-18" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1;">HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : demande forcée hors FB_Winch -&gt; l&#x27;instance PRG_06 coupe.
-       À la baseline l&#x27;interlock de cadence n&#x27;existe pas (B2-S1) -&gt; ROUGE référence figée.</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>Phase A — etablir une montee NOMINALE reelle (bouton M1Up) et prouver la barriere PERMISSIVE.
+       Le faux vert HARN-51 vient de ce qu&#x27;on injectait depuis le neutre : le 1er appel prg06 de
+       chaque scan relatchait RestartRequired (gate §2-§3) -&gt; FinalInterlockGovernedM1=TRUE par
+       temps-mort, PAS par l&#x27;interlock de cadence. Il faut d&#x27;abord demontrer une barriere permissive.</li><li>PRECOND (durcissement T181-00b) : montee nominale etablie ET barriere permissive.</li><li>Phase B — injecter une cadence survitesse hors FB_Winch tout en gardant la montee active
+       (MotorRequest reste TRUE -&gt; pas de relatch RestartRequired). Seule l&#x27;interlock de CADENCE
+       (T181-01) peut couper cette cadence. A la baseline elle n&#x27;existe pas -&gt; la barriere permissive
+       la laisse passer -&gt; FinalInterlockGovernedM1=FALSE -&gt; ROUGE reference figee.</li><li>ORACLE (main) : la barrière de CADENCE (T181-01) coupe la cadence injectée.
+       À la baseline l&#x27;interlock de cadence n&#x27;existe pas -&gt; elle passe -&gt; ROUGE référence figée.</li></ul>
             </details>
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
-                <ul class="checks-list"><li>HARN-51: injection cadence presente en amont barriere</li><li>HARN-51: la barriere coupe la cadence forcee (cible T181-01)</li><li>HARN-51: FinalInterlockGoverned TRUE (cible T181-01)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>HARN-51: precondition - montee nominale M1 etablie</li><li>HARN-51: precondition - barriere permissive en nominal</li><li>HARN-51: injection cadence presente en amont barriere</li><li>HARN-51: la cadence injectee est gouvernee par la cadence (T181-01)</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:788</div><div class='failure-msg'>HARN-51: precondition - montee nominale M1 etablie</div></div>
                 
             </div>
         </article>
-        <article id="test-winch-integ-19" class="test-card test-card-fail">
+        <article id="test-winch-integ-19" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : mouvement nominal -&gt; barrière passive + cohérence frein = OR sens</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : mouvement nominal -&gt; barrière passive + cohérence frein = OR sens</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-52: pas de coupure non voulue</li><li>HARN-52: BrakeCmd = RelayFwd OR RelayRev (pas de double-freinage)</li><li>HARN-52: precondition - mouvement etabli</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:764</div><div class='failure-msg'>HARN-52: precondition - mouvement etabli</div></div>
+                
                 
             </div>
         </article>
@@ -2396,15 +2447,15 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
-                <ul class="scenario-list"><li>biais M2 : l&#x27;ecart croit</li><li>ORACLE (main) phase warn : écart &gt; 0.10 -&gt; plafond 1 sur les deux</li><li>Laisser l&#x27;écart dépasser 0.50 -&gt; critique -&gt; SafeStop des 2</li><li>ORACLE (main) phase critique : écart &gt; 0.50 -&gt; coupure des deux (couplage croisé SafeStop)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
+                <ul class="scenario-list"><li>biais M2 : l&#x27;ecart croit</li><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) phase warn : écart &gt; 0.10 -&gt; plafond 1 sur les deux</li><li>Laisser l&#x27;écart dépasser 0.50 -&gt; critique -&gt; SafeStop des 2</li><li>ORACLE (main) phase critique : écart &gt; 0.50 -&gt; coupure des deux (couplage croisé SafeStop)</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (9)</span></summary>
                 <ul class="checks-list"><li>HARN-60: ecart modelise a depasse le seuil warn</li><li>HARN-60: SyncDeviationWarn actif</li><li>HARN-60: warn -&gt; plafond 1 M1</li><li>HARN-60: warn -&gt; plafond 1 M2</li><li>HARN-60: ecart a depasse le seuil critique</li><li>HARN-60: critique -&gt; SafeStop M1</li><li>HARN-60: critique -&gt; SafeStop M2 (couplage croise)</li><li>HARN-60: montee M1 coupee au critique</li><li>HARN-60: montee M2 coupee au critique</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.SYNCDEVIATIONM_MODEL &gt; 0.10 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:790</div><div class='failure-msg'>HARN-60: ecart modelise a depasse le seuil warn</div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.SYNCDEVIATIONM_MODEL &gt; 0.10 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:857</div><div class='failure-msg'>HARN-60: ecart modelise a depasse le seuil warn</div></div>
                 
             </div>
         </article>
@@ -2417,50 +2468,50 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
-                <ul class="scenario-list"><li>M2 remonte plus vite : re-alignement</li><li>ORACLE (main) : M2 (factor 2.0) a rattrapé -&gt; écart &lt; 0.10 -&gt; warn retombe -&gt; plafond relâché</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>M2 remonte plus vite : re-alignement</li><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : M2 (factor 2.0) a rattrapé -&gt; écart &lt; 0.10 -&gt; warn retombe -&gt; plafond relâché</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
                 <ul class="checks-list"><li>HARN-61: re-alignement dans la tolerance</li><li>HARN-61: warn relache (hysteresis, pas de latch)</li><li>HARN-61: plafond relache -&gt; palier &gt; 1</li><li>HARN-61: aucun SafeStop residuel</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.SYNCDEVIATIONM_MODEL &lt; 0.10 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:827</div><div class='failure-msg'>HARN-61: re-alignement dans la tolerance</div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.SYNCDEVIATIONM_MODEL &lt; 0.10 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:895</div><div class='failure-msg'>HARN-61: re-alignement dans la tolerance</div></div>
                 
             </div>
         </article>
-        <article id="test-winch-integ-22" class="test-card test-card-fail">
+        <article id="test-winch-integ-22" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : coupure immédiate des 2 treuils + freins</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : coupure immédiate des 2 treuils + freins</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
                 <ul class="checks-list"><li>HARN-70: precondition - montee couplee active</li><li>HARN-70: RelayFwd M1 FALSE immediat</li><li>HARN-70: RelayFwd M2 FALSE immediat</li><li>HARN-70: frein M1 retombe</li><li>HARN-70: frein M2 retombe</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:854</div><div class='failure-msg'>HARN-70: precondition - montee couplee active</div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-23" class="test-card test-card-fail">
+        <article id="test-winch-integ-23" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : la reprise exige une NOUVELLE intention — l&#x27;adoption immédiate
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : la reprise exige une NOUVELLE intention — l&#x27;adoption immédiate
        au ré-Enable = défaut D18 (rouge baseline attendu, cible T181-05)</li></ul>
             </details>
                 
@@ -2468,7 +2519,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
                 <ul class="checks-list"><li>HARN-71: precondition - montee active</li><li>HARN-71: Enable=FALSE -&gt; sorties sures</li><li>HARN-71: palier neutralise</li><li>HARN-71: pas de redemarrage auto au re-Enable (cible D18)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:883</div><div class='failure-msg'>HARN-71: precondition - montee active</div></div>
+                
                 
             </div>
         </article>
@@ -2481,175 +2532,180 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
-                <ul class="scenario-list"><li>retour frein M1 ne s ouvre jamais</li><li>5 s : tout timeout frein realiste a expire</li><li>ORACLE (main) : frein incohérent -&gt; la barrière coupe la commande de sens (TC-P10-012)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>retour frein M1 ne s ouvre jamais</li><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>5 s : tout timeout frein realiste a expire</li><li>ORACLE (main) : frein incohérent -&gt; la barrière coupe la commande de sens (TC-P10-012)</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-72: FB_Winch demande toujours le sens (defaut cote barriere)</li><li>HARN-72: barriere a coupe (watchdog frein)</li><li>HARN-72: FinalInterlockGoverned TRUE</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSWINCH.WINCHM1FINALINTERLOCKREQUEST.REQUESTEDRELAYFWD expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:918</div><div class='failure-msg'>HARN-72: FB_Winch demande toujours le sens (defaut cote barriere)</div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD = FALSE expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:996</div><div class='failure-msg'>HARN-72: barriere a coupe (watchdog frein)</div></div>
                 
             </div>
         </article>
-        <article id="test-winch-integ-25" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-winch-integ-25" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1;">HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
-                <ul class="scenario-list"><li>Inversion 200 ms après l&#x27;arrêt</li><li>ORACLE (main) : délai interlock descente (400 ms) non écoulé -&gt; pas de réengagement (TC-P10-021/022)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>Inversion 200 ms après l&#x27;arrêt</li><li>PRECOND (durcissement T181-00b) : la barriere ne doit etre testee que si la demande de
+       descente est REELlement presente en amont (RequestedRelayRev). Sans elle, M1RelayRev=FALSE
+       est une tautologie (aucune demande a retenir).</li><li>ORACLE (main) : délai interlock descente (400 ms) non écoulé -&gt; la barriere retient RelayRev</li></ul>
             </details>
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
-                <ul class="checks-list"><li>HARN-73: temps mort directionnel respecte (cible T175)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>HARN-73: precondition - inversion descente reellement demandee</li><li>HARN-73: temps mort directionnel respecte (cible T175)</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSWINCH.WINCHM1FINALINTERLOCKREQUEST.REQUESTEDRELAYREV expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:1031</div><div class='failure-msg'>HARN-73: precondition - inversion descente reellement demandee</div></div>
                 
             </div>
         </article>
-        <article id="test-winch-integ-26" class="test-card test-card-fail">
+        <article id="test-winch-integ-26" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
-                <ul class="scenario-list"><li>Relâche homme-mort plein déflexion : coast 500 ms (contacteurs pas encore retombés, v &gt; 0)</li><li>100 ms au coeur de la fenêtre coast</li><li>ORACLE (main) : pendant le coast — mouvement résiduel SANS commande : Méca A ne doit PAS armer</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>Relâche homme-mort plein déflexion : coast 500 ms (contacteurs pas encore retombés, v &gt; 0)</li><li>100 ms au coeur de la fenêtre coast</li><li>ORACLE (main) : pendant le coast — mouvement résiduel SANS commande : Méca A ne doit PAS armer</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-74a: precondition - montee plein pot</li><li>HARN-74a: PAS de faux PowerCutOff pendant le coast (T178)</li><li>HARN-74a: PAS de SafeStop pendant le coast (Meca A)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:967</div><div class='failure-msg'>HARN-74a: precondition - montee plein pot</div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-27" class="test-card test-card-fail">
+        <article id="test-winch-integ-27" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
-                <ul class="scenario-list"><li>4 s &gt; 3 s</li><li>ORACLE (main) : Méca B (absence confirmation arrêt) arme à 3 s -&gt; SafeStop</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>4 s &gt; 3 s</li><li>ORACLE (main) : Méca B (absence confirmation arrêt) arme à 3 s -&gt; SafeStop</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
                 <ul class="checks-list"><li>HARN-74b: Meca B arme a 3 s (cible T178)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSWINCH.WINCHM1SAFETY.SAFESTOP expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:999</div><div class='failure-msg'>HARN-74b: Meca B arme a 3 s (cible T178)</div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-28" class="test-card test-card-fail">
+        <article id="test-winch-integ-28" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
                 <ul class="scenario-list"><li>Scénario D18 : direction ≠ 0 maintenue à travers une ré-init (Enable FALSE-&gt;TRUE) ;
-       l&#x27;interlock directionnel doit s&#x27;appliquer au front montant Enable — PAS via FirstScanDone.</li><li>ORACLE (main) : après hot-restart avec direction maintenue, le temps mort directionnel
-       est appliqué par AU MOINS UN niveau (métier ou barrière) -&gt; pas de réengagement direct</li></ul>
+       l&#x27;interlock directionnel doit s&#x27;appliquer au front montant Enable — PAS via FirstScanDone.</li><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : après hot-restart avec direction maintenue, un signal D18 REEL
+       (DirectionChangePending ou FinalRestartInhibit) doit etre pose. Retire l&#x27;echappatoire
+       &quot;OR M1RelayFwd=FALSE&quot; qui rendait l&#x27;assertion vraie par defaut (faux vert D18).</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
                 <ul class="checks-list"><li>HARN-75: precondition - montee active</li><li>HARN-75: temps mort applique au hot-restart (D18, cible T181-05)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:1020</div><div class='failure-msg'>HARN-75: precondition - montee active</div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-29" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-winch-integ-29" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1;">HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
-                <ul class="scenario-list"><li>contacteurs declares retombes ALORS qu on commande</li><li>ORACLE (main) : incohérence commande/feedback en marche -&gt; défaut détecté + mouvement neutralisé</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>contacteurs declares retombes ALORS qu on commande</li><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>PRECOND (durcissement T181-00b) : le defaut CAS-001 ne se teste qu en montee REELlement
+       commandee (sinon RelayFwd=FALSE est une tautologie : rien ne bouge -&gt; rien a neutraliser).</li><li>ORACLE (main) : en marche, retombee contacteur incoherente -&gt; defaut Error DETECTE.
+       Retire &quot;OR RelayFwd=FALSE&quot; (vrai par defaut). CAS-001 / T180.</li></ul>
             </details>
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
-                <ul class="checks-list"><li>HARN-80: CAS-001 detecte (defaut ou neutralisation, cible T180/T181-01)</li></ul>
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>HARN-80: precondition - montee M1 commandee</li><li>HARN-80: CAS-001 detecte (defaut Error, cible T180)</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSWINCH.WINCHM1SAFETY.ERROR expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:1162</div><div class='failure-msg'>HARN-80: CAS-001 detecte (defaut Error, cible T180)</div></div>
                 
             </div>
         </article>
-        <article id="test-winch-integ-30" class="test-card test-card-fail">
+        <article id="test-winch-integ-30" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : anti-traversée — la demande benne est refusée tant que les treuils agissent</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : anti-traversée — la demande benne est refusée tant que les treuils agissent</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
                 <ul class="checks-list"><li>HARN-81: precondition - treuils en mouvement</li><li>HARN-81: CAS-012 demande benne refusee (cible T175 AC3)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.M1_STEPNUMBER &gt; 0 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:1082</div><div class='failure-msg'>HARN-81: precondition - treuils en mouvement</div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-31" class="test-card test-card-fail">
+        <article id="test-winch-integ-31" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
-                <ul class="scenario-list"><li>ORACLE (main) : après réarmement, aucune reprise sans ordre explicite</li></ul>
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>T181-00b : retour neutre sans commande &gt;= 1500 ms pour purger RestartRequired/DeadTime</li><li>ORACLE (main) : après réarmement, aucune reprise sans ordre explicite</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
                 <ul class="checks-list"><li>HARN-82: precondition - mouvement semi-auto</li><li>HARN-82: coupure propre a l AU</li><li>HARN-82: pas de reprise apres rearmement sans ordre</li><li>HARN-82: idem M2</li><li>HARN-82: etat coherent (palier 0)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:1115</div><div class='failure-msg'>HARN-82: precondition - mouvement semi-auto</div></div>
+                
                 
             </div>
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (126)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/D_JOYSTICK/FB_AxisScale.st</code></li><li><code>CODE/D_JOYSTICK/FB_Joystick.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_SpeedCfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_Table.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Cfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Data.st</code></li><li><code>CODE/G_CYCLE/FB_DiveSearch.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/G_CYCLE/FB_Cycle.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchSync.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncDeviation.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncContactor.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st</code></li><li><code>CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st</code></li><li><code>CODE/I_TRANSLATION/FB_Safety_Translation.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_OperatorCoupledIntent.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCycleInterPrg.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_PreflightHMI.st</code></li><li><code>CODE/J_SUPERVISION/FB_AntiFlickerText.st</code></li><li><code>CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_05.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_06.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st</code></li></ul>
+        <summary>Fichiers source compilés (128)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/D_JOYSTICK/FB_AxisScale.st</code></li><li><code>CODE/D_JOYSTICK/FB_Joystick.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbCycle_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_SpeedCfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_Table.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Cfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Data.st</code></li><li><code>CODE/G_CYCLE/FB_DiveSearch.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/G_CYCLE/FB_Cycle.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchLoadEstimator.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchSync.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncDeviation.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SyncContactor.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st</code></li><li><code>CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st</code></li><li><code>CODE/I_TRANSLATION/FB_Safety_Translation.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_OperatorCoupledIntent.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCycleInterPrg.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_PreflightHMI.st</code></li><li><code>CODE/J_SUPERVISION/FB_AntiFlickerText.st</code></li><li><code>CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_05.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_06.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (126)</summary>
+        <summary>Code source ST original (128)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -5274,12 +5330,15 @@ END_TYPE
                 <pre>(* =======================================================================
    ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Source unique du mode arbitré et calcul du bus d&#x27;autorisations
-   🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur
-   🔌 Interface : Standard composant d&#x27;arbitrage applicatif
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
-   ======================================================================= *)
+    🎯 Rôle : Source unique du mode arbitré et calcul du bus d&#x27;autorisations
+    🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur ou de re-homing requis ;
+                  refus de toute bascule N1/N2/SEMI_AUTO tant que les treuils ne sont pas
+                  à l&#x27;arrêt mécanique confirmé ; re-homing obligatoire après usage effectif
+                  d&#x27;un override/bypass de position (AF-05 §4bis)
+    🔌 Interface : Standard composant d&#x27;arbitrage applicatif
+    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
+    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Modes
 VAR_INPUT
@@ -5299,6 +5358,31 @@ VAR_INPUT
 
     // === RETOURS CAPTEURS &amp; DIAGNOSTICS ===
     EncoderFaultPresent     : BOOL;   // --&gt; [HW] Defaut codeur agrege (1 cycle retard)
+
+    // === ARRÊT MÉCANIQUE CONFIRMÉ DES TREUILS (bascule de mode, AF-05 §4bis) ===
+    // Même composite que l&#x27;armement Méca B (FB_Safety_Winch.st:247) : contacteurs retombés
+    // ET frein serré, redondés par la mesure de vitesse.
+    M1ContactorsReleased      : BOOL; // --&gt; [HW] M1 : feedback retombée contacteurs
+    M1BrakeIsOpen             : BOOL; // --&gt; [HW] M1 : feedback frein ouvert
+    M1SpeedAbsMps             : REAL; // --&gt; [HW] M1 : vitesse absolue mesurée (m/s)
+    M2ContactorsReleased      : BOOL; // --&gt; [HW] M2 : feedback retombée contacteurs
+    M2BrakeIsOpen             : BOOL; // --&gt; [HW] M2 : feedback frein ouvert
+    M2SpeedAbsMps             : REAL; // --&gt; [HW] M2 : vitesse absolue mesurée (m/s)
+    MovementSpeedThresholdMps : REAL := 0.02; // --&gt; [CFG] Seuil « vitesse quasi nulle » (m/s)
+
+    // === ÉTATS HOMING &amp; USAGE EFFECTIF D&#x27;UN OVERRIDE/BYPASS DE POSITION ===
+    M1HomingDone              : BOOL; // --&gt; [HW] M1 : cycle de homing terminé
+    M1Homed                   : BOOL; // --&gt; [HW] M1 : treuil référencé
+    M1HomingSuspect           : BOOL; // --&gt; [HW] M1 : référencement suspect
+    M2HomingDone              : BOOL; // --&gt; [HW] M2 : cycle de homing terminé
+    M2Homed                   : BOOL; // --&gt; [HW] M2 : treuil référencé
+    M2HomingSuspect           : BOOL; // --&gt; [HW] M2 : référencement suspect
+    M1PositionLimitOverridden : BOOL; // --&gt; [CMD] M1 : limite de position levée (override N1 ou bypass N2 effectif)
+    M2PositionLimitOverridden : BOOL; // --&gt; [CMD] M2 : limite de position levée (override N1 ou bypass N2 effectif)
+
+    // === RESTAURATION BOOT DES DRAPEAUX PERSISTANTS ===
+    BootHomingRequiredM1      : BOOL; // --&gt; [CFG] M1 : valeur PERSISTENT relue au premier scan
+    BootHomingRequiredM2      : BOOL; // --&gt; [CFG] M2 : valeur PERSISTENT relue au premier scan
 END_VAR
 VAR_OUTPUT
     // === ETATS &amp; DIAGNOSTICS IEC ===
@@ -5321,6 +5405,14 @@ VAR
     // === VARIABLES LOCALES &amp; MEMOIRES ===
     PrevInhibitM1           : BOOL;   // . [LOC] Memoire etat inhibition M1 (exclusion mutuelle)
     PrevInhibitM2           : BOOL;   // . [LOC] Memoire etat inhibition M2 (exclusion mutuelle)
+
+    // === MAINTENANCE : BASCULE DE MODE &amp; RE-HOMING ===
+    PrevArbitratedMode      : E_Mode; // . [LOC] Mode arbitré au scan précédent (maintien si bascule refusée)
+    ModeChangeAllowed       : BOOL;   // . [LOC] Treuils à l&#x27;arrêt mécanique confirmé (condition de bascule)
+    MaintHomingRequiredM1   : BOOL;   // . [LOC] M1 : re-homing obligatoire avant tout SEMI_AUTO
+    MaintHomingRequiredM2   : BOOL;   // . [LOC] M2 : re-homing obligatoire avant tout SEMI_AUTO
+    SemiAutoRefusedHoming   : BOOL;   // . [LOC] Latch refus semi-auto pour re-homing obligatoire
+    FirstScanDone           : BOOL;   // . [LOC] Initialisation premier scan (restauration PERSISTENT)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -5329,17 +5421,63 @@ END_VAR
 // 🔑 1. RESET FRONT
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    SemiAutoRefusedFault := FALSE;
+    SemiAutoRefusedFault  := FALSE;
+    SemiAutoRefusedHoming := FALSE;
 END_IF;
 
-// Refus semi-auto si défaut codeur
+// 🔑 1bis. RESTAURATION BOOT DES DRAPEAUX PERSISTANTS
+// Non-RETAIN -&gt; réinitialisé à chaque warm/cold reset ; relu depuis GVL_PERSISTENT (miroir
+// réécrit chaque scan par PRG_03). Aucune perte du re-homing obligatoire sur coupure.
+IF NOT FirstScanDone THEN
+    FirstScanDone         := TRUE;
+    MaintHomingRequiredM1 := BootHomingRequiredM1;
+    MaintHomingRequiredM2 := BootHomingRequiredM2;
+    PrevArbitratedMode    := E_Mode.DISABLE;
+END_IF;
+
+// 🔑 1ter. RE-HOMING OBLIGATOIRE — ARMEMENT IMMÉDIAT (AF-05 §4bis)
+// Armé AVANT l&#x27;arbitrage de mode (§3) et non à la sortie du mode maintenance :
+//   1. pas de fenêtre d&#x27;un scan où SEMI_AUTO serait arbitré malgré un re-homing requis ;
+//   2. pas de perte de l&#x27;obligation sur coupure / download pendant la maintenance
+//      (la valeur est écrite dans le miroir PERSISTENT dès le scan courant, pas à la sortie).
+IF M1PositionLimitOverridden THEN
+    MaintHomingRequiredM1 := TRUE;
+END_IF;
+IF M2PositionLimitOverridden THEN
+    MaintHomingRequiredM2 := TRUE;
+END_IF;
+
+// Levée : UNIQUEMENT sur cycle de homing complet réussi (Done + Homed + non suspect).
+IF MaintHomingRequiredM1 AND M1HomingDone AND M1Homed AND NOT M1HomingSuspect THEN
+    MaintHomingRequiredM1 := FALSE;
+END_IF;
+IF MaintHomingRequiredM2 AND M2HomingDone AND M2Homed AND NOT M2HomingSuspect THEN
+    MaintHomingRequiredM2 := FALSE;
+END_IF;
+
+// Refus semi-auto — une cause = un fait (AF03 §4) : défaut codeur et re-homing sont distincts.
 IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
     SemiAutoRefusedFault := TRUE;
+END_IF;
+IF (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
+    SemiAutoRefusedHoming := TRUE;
 END_IF;
 
 instCauses[0].Active   := SemiAutoRefusedFault;
 instCauses[0].Latching := TRUE;
 instCauses[0].Texte    := &#x27;Mode Semi-Auto refuse car defaut codeur present&#x27;;
+
+instCauses[2].Active   := SemiAutoRefusedHoming;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := &#x27;Mode Semi-Auto refuse car re-homing obligatoire (depassement de limite de position)&#x27;;
+
+// Cause 1 — changement de mode refusé : treuils non à l&#x27;arrêt mécanique confirmé.
+// Non latchée (live) : l&#x27;information disparaît dès que la condition redevient vraie, sans
+// acquittement — c&#x27;est une consigne d&#x27;action IHM (« arrêter les treuils »), pas un défaut machine.
+// 📌 Lag 1 scan assumé : la cause est évaluée avant l&#x27;arbitrage §3 du cycle courant.
+instCauses[1].Active   := Auth.ModeChangePendingBlocked;
+instCauses[1].Latching := FALSE;
+instCauses[1].Texte    := &#x27;Changement de mode refuse : arreter les treuils avant de changer de mode&#x27;;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -5356,6 +5494,13 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.HomingApproachEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
     Auth.MaintenanceM3TargetEnable := FALSE;
+    // Faits persistants : PUBLIÉS même neutralisé (l&#x27;IHM doit continuer à voir
+    // qu&#x27;un re-homing est requis tant que la machine n&#x27;est pas réarmée). Aucune autorisation
+    // n&#x27;est accordée ici : Auth.Mode := DISABLE verrouille tout le reste.
+    Auth.ModeChangePendingBlocked := FALSE;
+    Auth.HomingRequiredM1 := MaintHomingRequiredM1;
+    Auth.HomingRequiredM2 := MaintHomingRequiredM2;
+    PrevArbitratedMode := Auth.Mode;
     Ready := FALSE;
     PrevInhibitM1 := FALSE;
     PrevInhibitM2 := FALSE;
@@ -5367,11 +5512,43 @@ Ready := Enable AND NOT Fault.Latched;
 
 {region &quot;§3 Arbitrage du mode&quot;}
 // ⚙️ 3. ARBITRAGE DU MODE
-IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
+
+// 3.1 ARRÊT MÉCANIQUE CONFIRMÉ DES DEUX TREUILS (condition de bascule, AF-05 §4bis)
+// Même composite que l&#x27;armement Méca B : contacteurs retombés + frein serré, redondé par
+// la mesure absolue de vitesse. Vaut pour les DEUX treuils (M1 ET M2).
+ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
+                     AND (ABS(M1SpeedAbsMps) &lt; MovementSpeedThresholdMps)
+                     AND M2ContactorsReleased AND NOT M2BrakeIsOpen
+                     AND (ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps);
+
+// 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
+IF (SelMode = E_Mode.SEMI_AUTO)
+   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
+    // Défaut codeur ou re-homing obligatoire : SEMI_AUTO interdit, repli MAINT_N1.
     Auth.Mode := E_Mode.MAINT_N1;
+    Auth.ModeChangePendingBlocked := FALSE;
+ELSIF (SelMode &lt;&gt; PrevArbitratedMode)
+      AND (SelMode &lt;&gt; E_Mode.DISABLE) AND (PrevArbitratedMode &lt;&gt; E_Mode.DISABLE)
+      AND NOT ModeChangeAllowed THEN
+    // Bascule N1/N2/SEMI_AUTO refusée : le mode courant est MAINTENU.
+    // ⚠️ Exception de sécurité (contrat D2) : une transition vers ou depuis DISABLE n&#x27;est
+    // JAMAIS bloquée — sortir d&#x27;un mode maintenance ne doit jamais dépendre d&#x27;un treuil à l&#x27;arrêt.
+    Auth.Mode := PrevArbitratedMode;
+    Auth.ModeChangePendingBlocked := TRUE;
 ELSE
     Auth.Mode := SelMode;
+    Auth.ModeChangePendingBlocked := FALSE;
 END_IF;
+
+PrevArbitratedMode := Auth.Mode;
+{endregion}
+
+{region &quot;§3bis Publication du re-homing obligatoire&quot;}
+// 🧭 3bis. PUBLICATION DU RE-HOMING OBLIGATOIRE
+// Armement et levée réalisés en §1ter, AVANT l&#x27;arbitrage de mode — voir le commentaire §1ter
+// (pas de fenêtre d&#x27;un scan, pas de perte sur coupure en cours de maintenance).
+Auth.HomingRequiredM1 := MaintHomingRequiredM1;
+Auth.HomingRequiredM2 := MaintHomingRequiredM2;
 {endregion}
 
 {region &quot;§4 Calcul autorisations machine&quot;}
@@ -7305,7 +7482,8 @@ TYPE E_WinchFinalInterlockState :
     WAIT_BRAKE_COMMAND_CONFIRMATION := 2,                             // Attente confirmation feedback frein
     WAIT_STEP_DELAY                 := 3,                             // Temporisation changement de palier
     WAIT_RESTART_DELAY              := 4,                             // Temporisation anti-court-cycle redemarrage
-    FAULT                           := 5                              // Etat de defaut
+    FAULT                           := 5,                             // Etat de defaut
+    WAIT_SENSE_DROP_CONFIRM         := 6                              // Maintien §3bis du contacteur de sens (AC6/AC7)
 );
 END_TYPE
 </pre>
@@ -7323,7 +7501,8 @@ TYPE E_WinchFinalInterlockReason :
 (
     NONE                        := 0,                                 // Aucun blocage actif
     BRAKE_COMMAND_NOT_CONFIRMED := 1,                                 // Absence confirmation ouverture frein &gt; 500ms
-    RESTART_INHIBITED           := 2                                  // Inhibition redemarrage actif
+    RESTART_INHIBITED           := 2,                                 // Inhibition redemarrage actif
+    SENSE_DROP_TIMEOUT          := 3                                  // T_max §3bis depasse sans confirmation retombee (AC7)
 );
 END_TYPE
 </pre>
@@ -7412,263 +7591,92 @@ END_TYPE</pre>
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\FB_SpeedStep.st</code></summary>
                 <pre>(* =======================================================================
-   🪜 FB_SpeedStep — Décodeur palier vitesse vers contacteurs
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Décodage consigne vitesse 0..100% en paliers et pilotage contacteurs
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Interface : Décodeur interne (compose FB_Winch)
-   🔒 Sécurité : Validation configuration table et anti-battement hysteresis
+   FB_SpeedStep — Décodeur palier vers contacteurs
+   Rôle : applique les bornes de palier puis lit la table contacteurs.
+   Le calcul de la consigne discrète est fait par le producteur amont.
    ======================================================================= *)
 
 {attribute &#x27;qualified_only&#x27;}
 {attribute &#x27;hide_all_locals&#x27;}
 
-// === DECLARATION (à coller dans la partie déclaration du POU FB_SpeedStep) ===
-
 FUNCTION_BLOCK PUBLIC FB_SpeedStep
 VAR_INPUT
-    // === COMMANDES ET CONSIGNES ===
-    Enable                          : BOOL;                           // --&gt; [CMD] Pilotage actif (FALSE = palier 0 / arret)
-    SpeedTgt_Pct                    : REAL;                           // --&gt; [CMD] Consigne vitesse 0..100%
-
-    // === REGLAGES ET CONFIGURATION ===
-    Table                           : ST_SpeedStepTable;              // --&gt; [CFG] Table des 5 paliers propre au treuil
-    HystMargin                      : REAL := 2.0;                    // --&gt; [CFG] Marge anti-battement (%)
-    MaxStepNumber                   : INT := 5;                       // --&gt; [CFG] Plafond palier atteignable (1..5)
-
-    // === MESURES ET GARDE-FOUS ===
-    MeasuredSpeedBand               : INT := 0;                       // --&gt; [HW] Bande vitesse reelle validee
-    SpeedGuardEnable                : BOOL := FALSE;                  // --&gt; [HW] Garde-fou palier activable
-    SpeedGuardReady                 : BOOL := FALSE;                  // --&gt; [HW] Conditions de passage validees
+    Enable                          : BOOL;
+    SpeedStepReq                    : INT := 0;                       // --&gt; [CMD] Palier demandé (0..5)
+    Table                           : ST_SpeedStepTable;              // --&gt; [CFG] Table contacteurs propre au treuil
+    MinStepNumber                   : INT := 1;                       // --&gt; [CFG] Plancher palier, rétro-compatible
+    MaxStepNumber                   : INT := 5;                       // --&gt; [CFG] Plafond palier atteignable
 END_VAR
 VAR_OUTPUT
-    // === ETATS IEC ET SYNOPTIQUE ===
-    StepNumber                      : INT;                            // &lt;-- [STAT] Numero de palier courant (0..5)
-
-    // === ORDRES ACTIONNEURS (CONTACTEURS) ===
+    StepNumber                      : INT;                            // &lt;-- [STAT] Palier actif (0..5)
     Contactor1                      : BOOL;                           // &lt;-- [ACT] Ordre contacteur vitesse palier 1
     Contactor2                      : BOOL;                           // &lt;-- [ACT] Ordre contacteur vitesse palier 2
     Contactor3                      : BOOL;                           // &lt;-- [ACT] Ordre contacteur vitesse palier 3
     Contactor4                      : BOOL;                           // &lt;-- [ACT] Ordre contacteur vitesse palier 4
-
-    // === DIAGNOSTICS ET ERREURS ===
-    SpeedGuardLimited               : BOOL;                           // &lt;-- [DIAG] Statut limitation par garde-fou
-    ConfigError                     : BOOL;                           // &lt;-- [DIAG] Synthese erreur configuration
-    ConfigErrorId                   : WORD;                           // &lt;-- [DIAG] Bitfield erreur configuration
+    ConfigError                     : BOOL;                           // &lt;-- [DIAG] Table de paliers invalide
+    ConfigErrorId                   : WORD;                           // &lt;-- [DIAG] Bitfield erreur table
 END_VAR
 VAR
-    // === SOUS-INSTANCES FB ===
-    Hyst1                           : HYSTERESIS;                     // * [INST] Transition palier 1 vers 2
-    Hyst2                           : HYSTERESIS;                     // * [INST] Transition palier 2 vers 3
-    Hyst3                           : HYSTERESIS;                     // * [INST] Transition palier 3 vers 4
-    Hyst4                           : HYSTERESIS;                     // * [INST] Transition palier 4 vers 5
-    _ConfigErrorTrig                : R_TRIG;                         // * [INST] Front montant erreur configuration
-
-    // === VARIABLES LOCALES INTERNES ===
-    SpeedTgtInt                     : INT;                            // . [LOC] Consigne convertie en INT pour Hysteresis
-    _ConfigValid                    : BOOL;                           // . [LOC] Resultat validation table et MaxStep
-    _ConfigValidPrev                : BOOL;                           // . [LOC] Memoire cycle precedent validation
-    _ConfigErrorIdInt               : WORD;                           // . [LOC] Accumulateur interne defauts config
-    _MaxStepClamped                 : INT;                            // . [LOC] MaxStepNumber borne dans [1..5]
+    _ConfigValid                    : BOOL;
+    _ConfigErrorIdInt               : WORD;
+    _MaxStepClamped                 : INT;
+    _MinStepClamped                 : INT;
 END_VAR
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_SpeedStep) ===
+{region &quot;§0 Bornes et validation table&quot;}
+// Le plafond est borné avant le plancher : si le plancher demandé dépasse le
+// plafond de sécurité, celui-ci garde la priorité.
+_MaxStepClamped := LIMIT(1, MaxStepNumber, 5);
+_MinStepClamped := LIMIT(1, MinStepNumber, _MaxStepClamped);
 
-{region &quot;§0 Validation configuration&quot;}
-// ─────────────────────────────────────────────────────────────────────────
-// 🛡️ 0. VALIDATION CONFIGURATION (P0.2) — exécutée CHAQUE cycle pour détecter
-//    toute corruption IHM/PERSISTENT, même siEnable=FALSE (sorties sûres forcée)
-// ─────────────────────────────────────────────────────────────────────────
-
-// 🔧 Bornage systématique MaxStepNumber ∈ [1..5]
-IF MaxStepNumber &lt; 1 THEN
-    _MaxStepClamped := 1;
-ELSIF MaxStepNumber &gt; 5 THEN
-    _MaxStepClamped := 5;
-ELSE
-    _MaxStepClamped := MaxStepNumber;
-END_IF;
-
-// 🔍 Validation table ST_SpeedStepTable
-// Critères (Partie 9 §2) :
-// 1. Seuils croissants stricts : StepThreshold_Pct[1] &lt; [2] &lt; [3] &lt; [4] &lt; [5]
-// 2. Seuils dans [0..100] %
-// 3. HystMargin &gt; 0
-// 4. Pour chaque palier 2.._MaxStepClamped : au moins 1 contacteur TRUE (cohérence câblage)
-//    Le palier 1 peut légitimement avoir les 4 contacteurs FALSE : résistances rotoriques
-//    toutes insérées = vitesse minimale. On ne valide pas les paliers jamais atteignables.
+// Les seuils restent validés pour conserver le diagnostic table historique.
+// Ils ne participent plus au calcul du palier dans ce FB.
 _ConfigValid := TRUE;
 _ConfigErrorIdInt := 16#0000;
-
-// Critère 1 : seuils croissants
 IF NOT (Table.StepThreshold_Pct[1] &lt; Table.StepThreshold_Pct[2] AND
         Table.StepThreshold_Pct[2] &lt; Table.StepThreshold_Pct[3] AND
         Table.StepThreshold_Pct[3] &lt; Table.StepThreshold_Pct[4] AND
         Table.StepThreshold_Pct[4] &lt; Table.StepThreshold_Pct[5]) THEN
     _ConfigValid := FALSE;
-    _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;  // bit0
+    _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
 END_IF;
-
-// Critère 2 : seuils dans [0..100]
 IF (Table.StepThreshold_Pct[1] &lt; 0.0) OR (Table.StepThreshold_Pct[5] &gt; 100.0) THEN
     _ConfigValid := FALSE;
     _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
 END_IF;
-
-// Critère 3 : hystérésis &gt; 0
-IF HystMargin &lt;= 0.0 THEN
-    _ConfigValid := FALSE;
-    _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
-END_IF;
-
-// Critère 4 : cohérence contacteurs par palier (seulement jusqu&#x27;au plafond actif)
-IF _ConfigValid THEN
-    // Palier 1 : les 4 sorties FALSE sont une configuration valide de vitesse minimale.
-    // Palier 2
-    IF _MaxStepClamped &gt;= 2 THEN
-        IF NOT (Table.P2R1 OR Table.P2R2 OR Table.P2R3 OR Table.P2R4) THEN
-            _ConfigValid := FALSE;
-            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
-        END_IF;
-    END_IF;
-    // Palier 3
-    IF _MaxStepClamped &gt;= 3 THEN
-        IF NOT (Table.P3R1 OR Table.P3R2 OR Table.P3R3 OR Table.P3R4) THEN
-            _ConfigValid := FALSE;
-            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
-        END_IF;
-    END_IF;
-    // Palier 4
-    IF _MaxStepClamped &gt;= 4 THEN
-        IF NOT (Table.P4R1 OR Table.P4R2 OR Table.P4R3 OR Table.P4R4) THEN
-            _ConfigValid := FALSE;
-            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
-        END_IF;
-    END_IF;
-    // Palier 5
-    IF _MaxStepClamped &gt;= 5 THEN
-        IF NOT (Table.P5R1 OR Table.P5R2 OR Table.P5R3 OR Table.P5R4) THEN
-            _ConfigValid := FALSE;
-            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
-        END_IF;
-    END_IF;
-END_IF;
-
-// 🛡️ Gestion erreur config : front montant + reset sur front Reset (cause disparue)
-// Note : pas d&#x27;entrée Reset dédiée (brique réduite) → on réarme quand config redevient valide
-//        (front descendant de _ConfigValid). Conforme Partie 3 §5 : cause disparue + front.
-_ConfigErrorTrig(CLK := NOT _ConfigValid);  // Front montant = apparition erreur
-
-// Mémoire erreur config : reste TRUE tant que config invalide OU pas de réarmement
-// Réarmement = front montant de _ConfigValid (cause disparue) — détecté via _ConfigValidPrev
-IF _ConfigErrorTrig.Q THEN
-    // Nouvelle erreur : on la mémorise
-    _ConfigValidPrev := FALSE;  // Force détection front montant au cycle suivant si redevient valide
-ELSIF _ConfigValid AND NOT _ConfigValidPrev THEN
-    // Config redevenue valide : front montant → on efface l&#x27;erreur (reset sur front)
-    _ConfigValidPrev := TRUE;
-ELSIF NOT _ConfigValid THEN
-    _ConfigValidPrev := FALSE;
-END_IF;
-
-// Sorties erreur config (miroir standard Partie 3)
 ConfigErrorId := _ConfigErrorIdInt;
-ConfigError   := (ConfigErrorId &lt;&gt; 16#0000);
+ConfigError := (ConfigErrorId &lt;&gt; 16#0000);
 {endregion}
 
 {region &quot;§1 Gate&quot;}
-// ─────────────────────────────────────────────────────────────────────────
-// 🛑 1. GATE — Enable FALSE OU config invalide = palier 0, sorties sûres
-// ─────────────────────────────────────────────────────────────────────────
-IF (NOT Enable) OR (NOT _ConfigValid) THEN
-    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+// Relâche ou table invalide : aucun plancher ne peut maintenir un contacteur.
+IF (NOT Enable) OR (NOT _ConfigValid) OR (SpeedStepReq &lt;= 0) THEN
     StepNumber := 0;
-    SpeedGuardLimited := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     RETURN;
 END_IF;
 {endregion}
 
-{region &quot;§2 Sélection palier&quot;}
-// ─────────────────────────────────────────────────────────────────────────
-// 🪜 2. SÉLECTION DU PALIER (HYSTERESIS lib Util : IN/HIGH/LOW → OUT)
-//    OUT = TRUE tant que IN &lt; LOW (régime &quot;bas&quot;) ; OUT bascule à FALSE une fois
-//    IN &gt; HIGH (régime &quot;haut&quot; confirmé) ; maintien entre LOW et HIGH (anti-battement).
-//    =&gt; NOT Hyst_n.OUT = &quot;on a franchi le seuil n vers le haut&quot; (palier n+1 atteint).
-// ─────────────────────────────────────────────────────────────────────────
-SpeedTgtInt := REAL_TO_INT(SpeedTgt_Pct);
+{region &quot;§2 Clamp et table contacteurs&quot;}
+// Le plancher agit sur la cible. StepNumber ne reçoit jamais directement
+// MinStepNumber ; LIMIT final garantit la plage 1..5 après le plafond.
+StepNumber := LIMIT(_MinStepClamped, SpeedStepReq, _MaxStepClamped);
 
-Hyst1(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
-Hyst2(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[2] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[2] - HystMargin));
-Hyst3(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[3] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[3] - HystMargin));
-Hyst4(IN := SpeedTgtInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[4] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[4] - HystMargin));
-
-StepNumber := 1;                          // Palier mini dès qu&#x27;Enable est actif
-IF NOT Hyst1.OUT THEN StepNumber := 2; END_IF;
-IF NOT Hyst2.OUT THEN StepNumber := 3; END_IF;
-IF NOT Hyst3.OUT THEN StepNumber := 4; END_IF;
-IF NOT Hyst4.OUT THEN StepNumber := 5; END_IF;
-
-// ─────────────────────────────────────────────────────────────────────────
-// 2bis. PLAFOND — appliqué APRÈS la sélection hystérésis,
-// AVANT la lecture table : le 0..100% de la consigne peut réclamer le palier 5,
-// mais ne dépassera jamais _MaxStepClamped (ex. limitation couple en descente)
-// ─────────────────────────────────────────────────────────────────────────
-IF StepNumber &gt; _MaxStepClamped THEN
-    StepNumber := _MaxStepClamped;
-END_IF;
-{endregion}
-
-{region &quot;§2ter Garde-fou vitesse&quot;}
-// ─────────────────────────────────────────────────────────────────────────
-// 🛡️ 2ter. GARDE-FOU VITESSE RÉELLE — limite uniquement la consigne de palier.
-// Si la vitesse n&#x27;est pas validée stable, seul le palier 1 reste autorisé.
-// ─────────────────────────────────────────────────────────────────────────
-SpeedGuardLimited := FALSE;
-IF SpeedGuardEnable THEN
-    IF NOT SpeedGuardReady THEN
-        IF StepNumber &gt; 1 THEN
-            StepNumber := 1;
-            SpeedGuardLimited := TRUE;
-        END_IF;
-    ELSIF (MeasuredSpeedBand &gt;= 1) AND (MeasuredSpeedBand &lt;= 5) AND (StepNumber &gt; MeasuredSpeedBand) THEN
-        StepNumber := MeasuredSpeedBand;
-        SpeedGuardLimited := TRUE;
-    END_IF;
-END_IF;
-{endregion}
-
-{region &quot;§3 Contacteurs&quot;}
-// ─────────────────────────────────────────────────────────────────────────
-// 📤 3. CONTACTEURS — lus dans la table (donnée, jamais codé en dur)
-//    CASE couvre explicitement 0..5 : StepNumber=0 → tous FALSE (sécurité)
-// ─────────────────────────────────────────────────────────────────────────
 CASE StepNumber OF
-    0:  // Arrêt / config invalide / Enable=FALSE — sécurité positive
-        Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     1:  Contactor1 := Table.P1R1; Contactor2 := Table.P1R2; Contactor3 := Table.P1R3; Contactor4 := Table.P1R4;
     2:  Contactor1 := Table.P2R1; Contactor2 := Table.P2R2; Contactor3 := Table.P2R3; Contactor4 := Table.P2R4;
     3:  Contactor1 := Table.P3R1; Contactor2 := Table.P3R2; Contactor3 := Table.P3R3; Contactor4 := Table.P3R4;
     4:  Contactor1 := Table.P4R1; Contactor2 := Table.P4R2; Contactor3 := Table.P4R3; Contactor4 := Table.P4R4;
     5:  Contactor1 := Table.P5R1; Contactor2 := Table.P5R2; Contactor3 := Table.P5R3; Contactor4 := Table.P5R4;
 ELSE
-    // Défense en profondeur : valeur StepNumber inattendue → sécurité
-    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    // Défense en profondeur face à une divergence type/outil.
     StepNumber := 0;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_CASE;
 {endregion}
 
-(* ═══════════════════════════════════════════════════════════════
-   📝 NOTE D&#x27;APPLICATION MANUELLE CODESYS 3.5
-   ═══════════════════════════════════════════════════════════════
-   1. Ouvrir le POU FB_SpeedStep dans l&#x27;arborescence CODESYS (dossier TREUILS)
-   2. Copier la partie DECLARATION (lignes 33-58) dans la zone VAR_INPUT/VAR_OUTPUT/VAR
-   3. Copier la partie IMPLEMENTATION (lignes 61 à fin) dans le corps ST
-   4. Vérifier que la librairie `Util` est référencée (HYSTERESIS, R_TRIG)
-   5. Rebuild (F11) → 0 erreur attendue
-   6. Vérifier dans FB_Winch que l&#x27;instance SpeedStep compile toujours
-      (interface compatible : nouvelles sorties ConfigError/ConfigErrorId ajoutées,
-       entrées/sorties existantes inchangées)
-   ═══════════════════════════════════════════════════════════════ *)</pre>
+END_FUNCTION_BLOCK
+</pre>
             </details>
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\FB_DriftGuard.st</code></summary>
@@ -7750,6 +7758,13 @@ VAR_INPUT
     // === TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
     DeadTimeSameDir                 : TIME := T#1s;                  // --&gt; [CFG] Temps mort redemarrage meme sens apres arret
     DeadTimeOppositeDir             : TIME := T#1s;                  // --&gt; [CFG] Temps mort redemarrage inversion sens apres arret
+
+    // === MAINTIEN BORNÉ DU CONTACTEUR DE SENS (§3bis / AC6-AC8) ===
+    // Paramètres DÉDIÉS, distincts de DeadTimeSameDir/OppositeDir et de tout délai
+    // d&#x27;interlock direction (ne pas réutiliser ni recouvrir D10). Ordre garanti :
+    // DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
+    DropConfirmDelay                : TIME := T#100ms;               // --&gt; [CFG] Debounce confirmation retombee contacteurs (AC7)
+    MaxSenseHoldTime                : TIME := T#1s;                  // --&gt; [CFG] T_max : borne superieure du maintien §3bis (AC7)
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
@@ -7778,6 +7793,11 @@ VAR_OUTPUT
     RestartDelayElapsed             : TIME;                           // &lt;-- [DIAG] Ecoule temporisation anti-court-cycle
     DeadTimeElapsed                 : TIME;                           // &lt;-- [DIAG] Ecoule temps mort directionnel
     StepDelayElapsed                : TIME;                           // &lt;-- [DIAG] Ecoule temporisation palier
+
+    // === DIAGNOSTICS MAINTIEN §3bis (AC6/AC7) ===
+    SenseHoldActive                 : BOOL;                           // &lt;-- [DIAG] Maintien du contacteur de sens en cours
+    ContactorStuck                  : BOOL;                           // &lt;-- [DIAG] Latch T_max depasse sans confirmation retombee (AC7)
+    SenseHoldElapsed                : TIME;                           // &lt;-- [DIAG] Ecoule temporisation T_max maintien §3bis
 END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===
@@ -7788,6 +7808,8 @@ VAR
     StepDelay                       : TON;                            // . [LOC] Temporisation changement de palier
     RestartDelay                    : TON;                            // . [LOC] Temporisation anti-court-cycle redemarrage
     DeadTime                        : TON;                            // . [LOC] Temporisation temps mort directionnel
+    SenseHoldTimer                  : TON;                            // . [LOC] Temporisation T_max maintien §3bis (AC7)
+    SenseHoldFeedbackTimer          : TON;                            // . [LOC] Debounce DropConfirmDelay retombee contacteurs (AC7)
 
     // === VARIABLES LOCALES CALCULÉES ===
     RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
@@ -7802,6 +7824,9 @@ VAR
     DeadTimePending                 : BOOL;                           // . [LOC] Temps mort directionnel en attente
     NewDirection                    : INT;                            // . [LOC] Sens de la nouvelle demande
     RequiredDeadTime                : TIME;                           // . [LOC] Temps mort requis selon sens de la demande
+    SenseHoldRequested              : BOOL;                           // . [LOC] Condition §3bis demandee (palier 0 + sens commande)
+    SenseHoldDone                   : BOOL;                           // . [LOC] One-shot maintien effectue (anti-bouclage)
+    ContactorStuckLatched           : BOOL;                           // . [LOC] Latch interne T_max depasse sans confirmation retombee
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
@@ -7820,6 +7845,11 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DeadTime(IN := FALSE);
     DeadTimePending := FALSE;
     DeadTimeElapsed := T#0ms;
+    // 🔒 Transitoires §3bis neutralisés à la gate (latches de sûreté conservés ci-dessous).
+    SenseHoldActive := FALSE; SenseHoldDone := FALSE;
+    SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
+    SenseHoldElapsed := T#0ms;
+    ContactorStuck := ContactorStuckLatched;
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     BrakeCmd := FALSE; AuthorizedStep := 0;
@@ -7923,10 +7953,64 @@ IF MotorRequest AND DeadTimePending THEN
     END_IF;
 END_IF;
 
+// ── 4ter. Maintien borné du contacteur de sens (§3bis) — AC6/AC7/AC8 ─────────
+// Règle §3bis : quand RequestedStep retombe à 0 mais RequestedRelayFwd/Rev reste
+// TRUE (demande transitoire de chute de palier portée par FB_Winch), la barrière NE
+// force PLUS RelayFwd/Rev à FALSE immédiatement — elle TIENT le contacteur de sens
+// (jamais relâché avant les contacteurs de vitesse) jusqu&#x27;à :
+//   - FwdRevSpeedFeedbackOff confirmé, debounced par DropConfirmDelay (AC7 : pas
+//     d&#x27;ouverture du sens sur retour simple voie seul) ; OU
+//   - T_max (MaxSenseHoldTime) écoulé -&gt; chute du sens FORCÉE + latch ContactorStuck.
+// Le maintien indéfini du stator sous tension est INTERDIT (AC7). Les coupures dures
+// (NOT Enable / PowerContactorEngaged=FALSE / Error / RestartInhibit) ne passent
+// JAMAIS par ce maintien (AC9) : elles coupent RelayFwd/Rev immédiatement.
+SenseHoldRequested := (RequestedStepClamped = 0) AND (RequestedRelayFwd OR RequestedRelayRev)
+                      AND NOT Error AND NOT RestartInhibit AND NOT ContactorStuckLatched;
+
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    // 🔒 Gate dur : pas de maintien possible (les sorties sont déjà coupées §2).
+    SenseHoldActive := FALSE; SenseHoldDone := FALSE;
+    SenseHoldTimer(IN := FALSE, PT := MaxSenseHoldTime);
+    SenseHoldFeedbackTimer(IN := FALSE, PT := DropConfirmDelay);
+ELSIF Error OR RestartInhibit THEN
+    // Coupure par défaut : le maintien ne survit pas à un défaut (AC9).
+    SenseHoldActive := FALSE; SenseHoldDone := FALSE;
+    SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
+ELSE
+    IF MotorRequest THEN
+        SenseHoldDone := FALSE;
+        SenseHoldActive := FALSE;               // vraie nouvelle demande interrompt le maintien transitoire
+    END_IF;
+    IF NOT (RequestedRelayFwd OR RequestedRelayRev) THEN
+        SenseHoldDone := FALSE;
+        SenseHoldActive := FALSE;               // retour au neutre complet : plus rien a tenir
+    END_IF;
+    IF SenseHoldRequested AND NOT SenseHoldActive AND NOT SenseHoldDone THEN
+        SenseHoldActive := TRUE;              // entrée en maintien §3bis
+        SenseHoldTimer(IN := FALSE, PT := MaxSenseHoldTime);        // T_max arme au scan suivant
+        SenseHoldFeedbackTimer(IN := FALSE, PT := DropConfirmDelay);
+    ELSIF SenseHoldActive THEN
+        SenseHoldFeedbackTimer(IN := FwdRevSpeedFeedbackOff, PT := DropConfirmDelay);
+        SenseHoldTimer(IN := NOT FwdRevSpeedFeedbackOff, PT := MaxSenseHoldTime);
+        IF SenseHoldFeedbackTimer.Q THEN
+            // Retombée contacteurs CONFIRMÉE -&gt; chute normale du sens (one-shot).
+            SenseHoldActive := FALSE; SenseHoldDone := TRUE;
+        ELSIF SenseHoldTimer.Q THEN
+            // T_max sans confirmation -&gt; chute du sens FORCÉE + latch à acquitter (AC7).
+            SenseHoldActive := FALSE;
+            ContactorStuckLatched := TRUE;
+        END_IF;
+    ELSE
+        SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
+    END_IF;
+END_IF;
+SenseHoldElapsed := SenseHoldTimer.ET;
+ContactorStuck := ContactorStuckLatched;
+
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-Busy := FALSE; Done := FALSE; Ready := NOT Error;
+Busy := FALSE; Done := FALSE; Ready := NOT Error AND NOT ContactorStuckLatched;
 
 IF Error THEN
     StepDelay(IN := FALSE, PT := T#1s250ms);
@@ -7941,6 +8025,28 @@ ELSIF RestartInhibit THEN
     AuthorizedStep := 0;
     Reason := E_WinchFinalInterlockReason.RESTART_INHIBITED;
     State := E_WinchFinalInterlockState.FAULT;
+ELSIF ContactorStuckLatched THEN
+    // AC7 : T_max §3bis dépassé sans confirmation retombée -&gt; chute du sens FORCÉE.
+    // RelayFwd/Rev et BrakeCmd (= RelayFwd OR RelayRev) retombent à FALSE ci-dessus.
+    // Latch à acquittement conscient (ResetEdge) — jamais de redémarrage auto.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    Reason := E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT;
+    State := E_WinchFinalInterlockState.FAULT;
+ELSIF SenseHoldActive THEN
+    // §3bis : RequestedStep retombé à 0 mais sens encore commandé -&gt; on TIENT le
+    // contacteur de sens jusqu&#x27;à FwdRevSpeedFeedbackOff (debounced DropConfirmDelay)
+    // OU T_max. AuthorizedStep=0 (aucun contacteur de vitesse), seul le sens est tenu.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    IF RequestedRelayFwd THEN RelayFwd := TRUE; END_IF;
+    IF RequestedRelayRev THEN RelayRev := TRUE; END_IF;
+    State := E_WinchFinalInterlockState.WAIT_SENSE_DROP_CONFIRM;
+    Busy := TRUE;
 ELSIF NOT MotorRequest THEN
     // Toute annulation de demande annule la temporisation de hausse en cours.
     StepDelay(IN := FALSE, PT := T#1s250ms);
@@ -8017,6 +8123,7 @@ END_IF;
 IF ResetEdge.Q THEN
     BrakeTimeoutAck := TRUE;     // toujours effectif, sans condition externe
     ResetRequired := FALSE;
+    ContactorStuckLatched := FALSE;   // acquittement conscient du latch T_max §3bis (AC7)
 END_IF;
 IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
     ErrorId := ErrorId OR 16#0001;
@@ -8119,6 +8226,7 @@ VAR_OUTPUT
     MecaADriftM                     : REAL;                           // &lt;-- [DIAG] Derive mesuree Meca A (m)
     MecaCDriftM                     : REAL;                           // &lt;-- [DIAG] Derive mesuree Meca C (m)
     MecaBElapsedTime                : TIME;                           // &lt;-- [DIAG] Ecoule confirmation contacteurs/frein
+    ContactorStuck                  : BOOL;                           // &lt;-- [DIAG] Contacteur colle (proprietaire unique, re-alimente IHM/Troubleshooting a la phase suivante)
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
@@ -8362,6 +8470,12 @@ ELSE
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
 END_IF;
+
+// ContactorStuck : proprietaire UNIQUE de la detection contacteur colle.
+// Escalade : Meca B (bit8) -&gt; SafeStop + PowerCutOff apres PostRampTimeout si le
+// collage persiste. Le champ ContactorsCheck.StuckClosed de FB_Winch est force a
+// FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
+ContactorStuck := MecaBFaultLatched;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -9057,6 +9171,170 @@ END_IF;
 </pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\FB_WinchDirectionInterlock.st</code></summary>
+                <pre>(* =======================================================================
+   🔀 FB_WinchDirectionInterlock — Interlock de changement de sens
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Temporise le changement de sens d&#x27;un treuil (dead time)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Interface : Brique technique (contrat light, pas de defaut)
+   🔒 Sécurité : D18 — au front montant Enable, n&#x27;adopte pas le sens
+                 immediatement (temps mort) ; pas de redemarrage inrush
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_WinchDirectionInterlock
+VAR_INPUT
+    Enable          : BOOL;   // --&gt; [CMD] Gate TON (TRUE = treuil arrete, contacteurs retombes)
+    EnableRising    : BOOL;   // --&gt; [CMD] Front montant Enable du FB parent (D18)
+    Reset           : BOOL;   // --&gt; [CMD] Acquittement defaut (front) : purge la memoire de direction
+    ReqDirection    : INT;    // --&gt; [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)
+    ChangeDelayUp   : TIME;   // --&gt; [CFG] Delai interlock changement de sens montee
+    ChangeDelayDown : TIME;   // --&gt; [CFG] Delai interlock changement de sens descente
+END_VAR
+VAR_OUTPUT
+    CommandedDirection      : INT;   // &lt;-- [DIAG] Sens interne memorise
+    DirectionChangePending  : BOOL;  // &lt;-- [DIAG] Changement de sens en attente
+    DelayElapsed            : TIME;  // &lt;-- [DIAG] Ecoule delai changement de sens
+END_VAR
+VAR
+    DirectionChangeDelay : TON;      // . [LOC] Temporisation changement de sens
+    EffectiveDelay       : TIME;     // . [LOC] Delai effectif selon sens
+    DeadTimeArmed        : BOOL;     // . [LOC] Temps mort D18 arme (front Enable)
+    LastDirection        : INT;      // . [LOC] Dernier sens non nul memorise (interlock apres neutre, T181-02)
+    ResetEdge            : R_TRIG;   // . [LOC] Front Reset : purge la memoire de direction
+END_VAR
+
+// === IMPLEMENTATION ===
+
+// Front Reset : purge la memoire de direction (un acquittement conscient reinitialise
+// l&#x27;historique, une reprise apres Reset est un depart propre, pas une inversion).
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    LastDirection := 0;
+    CommandedDirection := 0;
+    DeadTimeArmed := FALSE;
+    DirectionChangePending := FALSE;
+END_IF;
+
+// Delai effectif selon le sens demande
+IF ReqDirection &gt; 0 THEN
+    EffectiveDelay := ChangeDelayUp;
+ELSE
+    EffectiveDelay := ChangeDelayDown;
+END_IF;
+
+// D18 : au front montant Enable avec sens maintenu, armer le temps mort
+// (ne pas re-adopter le sens immediatement — pas de redemarrage inrush).
+IF EnableRising AND (ReqDirection &lt;&gt; 0) THEN
+    DeadTimeArmed := TRUE;
+END_IF;
+
+// Temporisation : compte quand un changement de sens est demande et treuil arrete
+DirectionChangeDelay(
+    IN := Enable AND (ReqDirection &lt;&gt; 0) AND (ReqDirection &lt;&gt; CommandedDirection),
+    PT := EffectiveDelay
+);
+DelayElapsed := DirectionChangeDelay.ET;
+
+// Adoption du sens
+IF ReqDirection = 0 THEN
+    // Neutre : CommandedDirection := 0 (relais/diagnostic neutres). La memoire du
+    // dernier sens non nul (LastDirection) est conservee pour l&#x27;interlock de reprise.
+    CommandedDirection := 0;
+    DirectionChangePending := FALSE;
+    DeadTimeArmed := FALSE;
+ELSIF DeadTimeArmed THEN
+    // D18 : temps mort au front Enable — pas d&#x27;adoption immediate
+    DirectionChangePending := TRUE;
+ELSIF DirectionChangeDelay.Q THEN
+    // Temps mort ecoule : adoption du sens
+    CommandedDirection := ReqDirection;
+    DirectionChangePending := FALSE;
+    DeadTimeArmed := FALSE;
+ELSIF (CommandedDirection = 0) AND (ReqDirection &lt;&gt; 0) THEN
+    // Depuis le neutre : depart immediat si reprise du MEME sens (ou premier sens),
+    // sinon (sens oppose) pending + delai dedie obligatoire.
+    IF (LastDirection = 0) OR (ReqDirection = LastDirection) THEN
+        CommandedDirection := ReqDirection;
+        DirectionChangePending := FALSE;
+    ELSE
+        DirectionChangePending := TRUE;
+    END_IF;
+ELSIF (ReqDirection &lt;&gt; 0) AND (ReqDirection &lt;&gt; CommandedDirection) THEN
+    // Inversion directe (sans passage au neutre) : pending + delai
+    DirectionChangePending := TRUE;
+ELSE
+    DirectionChangePending := FALSE;
+END_IF;
+
+// Memorise le dernier sens non nul ADOPTE (pas la simple demande) : c&#x27;est ce sens qui
+// sert de reference pour detecter une reprise opposee apres passage au neutre.
+IF CommandedDirection &lt;&gt; 0 THEN
+    LastDirection := CommandedDirection;
+END_IF;
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\FB_WinchStepShaper.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_WinchStepShaper — Cadencement de palier (montee cadencee)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Cadence la montee de palier (+1 cran / StepRampDelay),
+             descente immediate a 0 (aucune rampe descendante)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Interface : Brique technique (contrat light, pas de defaut)
+   🔒 Sécurité : D10 — StepRampDelay dedie, decouple des delais direction
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_WinchStepShaper
+VAR_INPUT
+    Enable        : BOOL;   // --&gt; [CMD] Autorisation FB (TRUE = actif)
+    TargetStep    : INT;    // --&gt; [CMD] Palier cible demande
+    StepRampDelay : TIME;   // --&gt; [CFG] Delai de cadence montee de palier
+END_VAR
+VAR_OUTPUT
+    ShapedStep       : INT;   // &lt;-- [DIAG] Palier metier temporise actif
+    StepDelayElapsed : TIME;  // &lt;-- [DIAG] Ecoule tempo metier palier
+END_VAR
+VAR
+    StepDelay : TON;          // . [LOC] Temporisation hausse de palier
+END_VAR
+
+// === IMPLEMENTATION ===
+
+IF NOT Enable THEN
+    ShapedStep := 0;
+    StepDelay(IN := FALSE);
+    StepDelayElapsed := T#0s;
+    RETURN;
+END_IF;
+
+// Temporisation : compte quand la cible est au-dessus du palier courant
+StepDelay(
+    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0),
+    PT := StepRampDelay
+);
+StepDelayElapsed := StepDelay.ET;
+
+// Cadencement asymetrique : montee +1 cran / StepRampDelay, descente immediate
+IF TargetStep = 0 THEN
+    ShapedStep := 0;
+ELSIF TargetStep &lt; ShapedStep THEN
+    ShapedStep := TargetStep;
+ELSIF TargetStep &gt; ShapedStep THEN
+    IF ShapedStep = 0 THEN
+        ShapedStep := 1;
+    ELSIF StepDelay.Q THEN
+        ShapedStep := ShapedStep + 1;
+    END_IF;
+END_IF;
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\FB_Winch.st</code></summary>
                 <pre>(* =======================================================================
    🪝 FB_Winch — Directeur d&#x27;un treuil individuel (M1 / M2)
@@ -9075,7 +9353,6 @@ VAR_INPUT
     StartStop                       : BOOL;                           // --&gt; [CMD] Ordre de marche/arret mouvement
     Direction                       : INT;                            // --&gt; [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)
     SpeedTgt_Pct                    : REAL;                           // --&gt; [CMD] Vitesse cible % (0.0 a 100.0)
-    Mode                            : E_Mode;                         // --&gt; [CMD] Mode d&#x27;exploitation actif
 
     // === SECOURS ET PERMIS DE SÉCURITÉ ===
     SafeStop                        : BOOL;                           // --&gt; [SAFE] Arret rapide de securite
@@ -9091,6 +9368,8 @@ VAR_INPUT
     SpeedStepHystMargin             : REAL := 2.0;                    // --&gt; [CFG] Marge d&#x27;hysteresis palier (%)
     DirectionInterlockDelayDescent  : TIME := T#400ms;                // --&gt; [CFG] Delai interlock changement de sens descente
     DirectionInterlockDelayAscent   : TIME := T#900ms;                // --&gt; [CFG] Delai interlock changement de sens montee
+    StepRampDelayAscent             : TIME := T#1000ms;               // --&gt; [CFG] Cadence palier montee (D10, dedie)
+    StepRampDelayDescente            : TIME := T#500ms;                // --&gt; [CFG] Cadence palier descente (D10, dedie)
     ContactorFeedbackTimeout        : TIME := T#500ms;                // --&gt; [CFG] Delai d&#x27;attente retombee des contacteurs
     TopLimitM                       : REAL := 8.5;                    // --&gt; [CFG] Position limite haute active (m)
     BottomLimitM                    : REAL := -20.0;                  // --&gt; [CFG] Position limite basse active (m)
@@ -9103,7 +9382,7 @@ VAR_INPUT
     HomingSuspect                   : BOOL;                           // --&gt; [HW] Incertitude / doute sur le referencement
     CablePosM                       : REAL;                           // --&gt; [HW] Position actuelle du cable (m)
     MeasuredSpeedBand               : INT := 0;                       // --&gt; [HW] Bande vitesse reelle validee
-    SpeedGuardEnable                : BOOL := FALSE;                  // --&gt; [HW] Activation garde-fou changement de palier
+    SpeedGuardEnable                : BOOL := TRUE;                   // --&gt; [HW] Activation garde-fou changement de palier
     SpeedGuardReady                 : BOOL := FALSE;                  // --&gt; [HW] Conditions de stabilite validees
 
     // === BYPASSES ET SIMULATION ===
@@ -9139,22 +9418,25 @@ END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
     SpeedStep                       : FB_SpeedStep;                   // * [INST] Decodage paliers vitesse
-    CycleTimeCalc                   : FB_CycleTime;                   // * [INST] Calcul temps de cycle
+    DirectionInterlock              : FB_WinchDirectionInterlock;     // * [INST] Interlock changement de sens (D18)
+    StepShaper                      : FB_WinchStepShaper;             // * [INST] Cadencement de palier (D10)
+    SpeedStepHyst1                  : HYSTERESIS;                     // * [INST] Décodage consigne -&gt; palier, seuil 1
+    SpeedStepHyst2                  : HYSTERESIS;                     // * [INST] Décodage consigne -&gt; palier, seuil 2
+    SpeedStepHyst3                  : HYSTERESIS;                     // * [INST] Décodage consigne -&gt; palier, seuil 3
+    SpeedStepHyst4                  : HYSTERESIS;                     // * [INST] Décodage consigne -&gt; palier, seuil 4
 
     // === DETECTEURS ET TIMERS INTERNES ===
     ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
-    DirectionChangeDelay            : TON;                            // . [LOC] Temporisation changement de sens
+    EnableRisingEdge                : R_TRIG;                         // . [LOC] Detecteur front montant Enable (D18)
     TonContactorsDropped            : TON;                            // . [LOC] Temporisation retombee contacteurs
-    BusinessStepDelay               : TON;                            // . [LOC] Temporisation hausse de palier
 
     // === VARIABLES LOCALES CALCULÉES ===
-    EffectiveDirectionInterlockDelay: TIME;                           // . [LOC] Delai interlock effectif selon sens
-    EffectiveStepDelay              : TIME;                           // . [LOC] Delai palier effectif selon sens
     AllContactorsCommandedOff       : BOOL;                           // . [LOC] Tous contacteurs commandes a FALSE
     RampTargetPct                   : REAL;                           // . [LOC] Consigne cible envoyee au SpeedStep
+    RampTargetStep                  : INT;                            // . [LOC] Palier demandé par le décodeur amont
     EffectiveSafeStop               : BOOL;                           // . [LOC] SafeStop effectif incluant permis
     ActiveMaxStep                   : INT;                            // . [LOC] Plafond palier actif dynamique
-    FirstScanDone                   : BOOL;                           // . [LOC] Indicateur premier cycle passe
+    EffectiveStepRampDelay          : TIME;                           // . [LOC] Cadence palier selon sens, distincte interlock
 
     // Latches défauts
     SpeedStepConfigFaultLatched     : BOOL;
@@ -9169,6 +9451,7 @@ END_VAR
 {region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
 // 🔑 1. FRONTS &amp; REARMEMENT
 ResetEdge(CLK := Reset);
+EnableRisingEdge(CLK := Enable);
 
 IF ResetEdge.Q OR BypassGlobal THEN
     SpeedStepConfigFaultLatched := FALSE;
@@ -9179,13 +9462,12 @@ IF Enable AND SpeedStep.ConfigError THEN
     SpeedStepConfigFaultLatched := TRUE;
 END_IF;
 
-IF NOT BypassGlobal AND NOT BypassContactorCheck THEN
-    instCauses[1].Active   := ContactorsCheck.StuckClosed;
-    instCauses[1].Latching := TRUE;
-    instCauses[1].Texte    := &#x27;Contacteurs sens ou vitesse bloques fermes&#x27;;
-ELSE
-    instCauses[1].Active := FALSE;
-END_IF;
+// FB_Safety_Winch est l&#x27;unique proprietaire de la detection contacteur colle.
+// FB_Winch conserve le champ public pour compatibilite IHM/Troubleshooting,
+// mais ne produit plus ce defaut.
+instCauses[1].Active   := FALSE;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte    := &#x27;Contacteur colle gere par FB_Safety_Winch (T181-08)&#x27;;
 
 instCauses[2].Active   := SpeedStepConfigFaultLatched;
 instCauses[2].Latching := TRUE;
@@ -9199,16 +9481,18 @@ Fault := instFault.Fault;
 {region &quot;§2 Gate neutralisation&quot;}
 // 🛑 2. GATE
 IF NOT Enable THEN
-    SpeedStep(Enable := FALSE, Table := SpeedStepTable);
+    SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := SpeedStepTable);
+    DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
+                       ChangeDelayUp := DirectionInterlockDelayAscent,
+                       ChangeDelayDown := DirectionInterlockDelayDescent);
+    StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := StepRampDelayAscent);
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     RequestedStep := 0;
-    StepNumber := 0;
-    CommandedDirection := 0;
-    DirectionChangePending := FALSE;
-    BusinessStepDelay(IN := FALSE);
-    DirectionChangeDelay(IN := FALSE);
+    StepNumber := StepShaper.ShapedStep;
+    CommandedDirection := DirectionInterlock.CommandedDirection;
+    DirectionChangePending := DirectionInterlock.DirectionChangePending;
     TonContactorsDropped(IN := FALSE);
     ContactorsCheck.Command := FALSE;
     ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
@@ -9221,16 +9505,7 @@ END_IF;
 Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
-{region &quot;§3 Premier scan et temps de cycle&quot;}
-IF NOT FirstScanDone THEN
-    FirstScanDone := TRUE;
-    CommandedDirection := Direction;
-END_IF;
-
-CycleTimeCalc();
-{endregion}
-
-{region &quot;§4 Permis et zones de ralentissement&quot;}
+{region &quot;§3 Permis et zones de ralentissement&quot;}
 EffectiveSafeStop := SafeStop OR (Direction &gt; 0 AND NOT AscentPermit) OR (Direction &lt; 0 AND NOT DescendPermit);
 
 InTopSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM &gt;= (TopLimitM - CfgSlowdownDistanceM));
@@ -9255,80 +9530,84 @@ IF HomingApproachActive THEN
 END_IF;
 {endregion}
 
-{region &quot;§5 Interlock direction&quot;}
-IF Direction &gt; 0 THEN
-    EffectiveDirectionInterlockDelay := DirectionInterlockDelayAscent;
-ELSE
-    EffectiveDirectionInterlockDelay := DirectionInterlockDelayDescent;
-END_IF;
-
-DirectionChangeDelay(
-    IN := (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) AND (StepNumber = 0) AND FwdRevSpeedFeedbackOff,
-    PT := EffectiveDirectionInterlockDelay
+{region &quot;§4 Interlock direction&quot;}
+// 🔀 4. INTERLOCK DIRECTION (extrait dans FB_WinchDirectionInterlock, D18)
+DirectionInterlock(
+    Enable := (StepNumber = 0) AND FwdRevSpeedFeedbackOff,
+    EnableRising := EnableRisingEdge.Q,
+    Reset := Reset,
+    ReqDirection := Direction,
+    ChangeDelayUp := DirectionInterlockDelayAscent,
+    ChangeDelayDown := DirectionInterlockDelayDescent
 );
-DirectionChangeDelayElapsed := DirectionChangeDelay.ET;
-
-IF (CommandedDirection = 0) AND (Direction &lt;&gt; 0) THEN
-    CommandedDirection := Direction;
-    DirectionChangePending := FALSE;
-ELSIF DirectionChangeDelay.Q THEN
-    CommandedDirection := Direction;
-    DirectionChangePending := FALSE;
-ELSIF (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) THEN
-    DirectionChangePending := TRUE;
-ELSE
-    DirectionChangePending := FALSE;
-END_IF;
-
-IF Direction = 0 THEN
-    CommandedDirection := 0;
-    DirectionChangePending := FALSE;
-END_IF;
+CommandedDirection := DirectionInterlock.CommandedDirection;
+DirectionChangePending := DirectionInterlock.DirectionChangePending;
+DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
-{region &quot;§6 Paliers vitesse et contacteurs&quot;}
+{region &quot;§5 Paliers vitesse et contacteurs&quot;}
 IF DirectionChangePending OR (Direction = 0) OR EffectiveSafeStop OR NOT StartStop THEN
     RampTargetPct := 0.0;
 ELSE
     RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
 END_IF;
 
+// Décodage consigne % -&gt; palier conservé ici, immédiatement en amont du
+// décodeur contacteurs. FB_SpeedStep ne reçoit plus que le palier discret.
+SpeedStepHyst1(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[1] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[1] - SpeedStepHystMargin));
+SpeedStepHyst2(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[2] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[2] - SpeedStepHystMargin));
+SpeedStepHyst3(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[3] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[3] - SpeedStepHystMargin));
+SpeedStepHyst4(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[4] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[4] - SpeedStepHystMargin));
+
+IF RampTargetPct &lt;= 0.1 THEN
+    RampTargetStep := 0;
+ELSE
+    RampTargetStep := 1;
+    IF NOT SpeedStepHyst1.OUT THEN RampTargetStep := 2; END_IF;
+    IF NOT SpeedStepHyst2.OUT THEN RampTargetStep := 3; END_IF;
+    IF NOT SpeedStepHyst3.OUT THEN RampTargetStep := 4; END_IF;
+    IF NOT SpeedStepHyst4.OUT THEN RampTargetStep := 5; END_IF;
+END_IF;
+
 SpeedStep(
     Enable := (RampTargetPct &gt; 0.1),
-    SpeedTgt_Pct := RampTargetPct,
+    SpeedStepReq := RampTargetStep,
     Table := SpeedStepTable,
-    HystMargin := SpeedStepHystMargin,
-    MaxStepNumber := ActiveMaxStep,
-    MeasuredSpeedBand := MeasuredSpeedBand,
-    SpeedGuardEnable := SpeedGuardEnable,
-    SpeedGuardReady := SpeedGuardReady
+    MaxStepNumber := ActiveMaxStep
 );
 RequestedStep := SpeedStep.StepNumber;
 
-EffectiveStepDelay := SEL(CommandedDirection = -1, DirectionInterlockDelayAscent, DirectionInterlockDelayDescent) + T#100ms;
-
-BusinessStepDelay(
-    IN := (RequestedStep &gt; StepNumber) AND (StepNumber &gt; 0),
-    PT := EffectiveStepDelay
-);
-BusinessStepDelayElapsed := BusinessStepDelay.ET;
-
-IF RequestedStep = 0 THEN
-    StepNumber := 0;
-ELSIF RequestedStep &lt; StepNumber THEN
-    StepNumber := RequestedStep;
-ELSIF RequestedStep &gt; StepNumber THEN
-    IF StepNumber = 0 THEN
-        StepNumber := 1;
-    ELSIF BusinessStepDelay.Q THEN
-        IF SpeedGuardEnable AND SpeedGuardReady AND (MeasuredSpeedBand &lt; StepNumber) THEN
+// 🛡️ Garde-fou vitesse : bride le palier demande si la vitesse n&#x27;est pas stable
+// (SpeedGuardReady=FALSE -&gt; palier 1) ou si la bande mesuree est inferieure au
+// palier demande (pas de passage aux paliers superieurs sans vitesse confirmee).
+SpeedGuardLimited := FALSE;
+IF SpeedGuardEnable THEN
+    IF NOT SpeedGuardReady THEN
+        IF RequestedStep &gt; 1 THEN
+            RequestedStep := 1;
             SpeedGuardLimited := TRUE;
-        ELSE
-            StepNumber := StepNumber + 1;
-            SpeedGuardLimited := FALSE;
         END_IF;
+    ELSIF (MeasuredSpeedBand &gt;= 1) AND (MeasuredSpeedBand &lt;= 5) AND (RequestedStep &gt; MeasuredSpeedBand) THEN
+        RequestedStep := MeasuredSpeedBand;
+        SpeedGuardLimited := TRUE;
     END_IF;
 END_IF;
+
+// ⚙️ Cadencement de palier (extrait dans FB_WinchStepShaper, D10).
+// Les deux cadences historiques sont preservees sans reutiliser les delais
+// d&#x27;interlock direction : 1 s en montee, 500 ms en descente.
+IF CommandedDirection = -1 THEN
+    EffectiveStepRampDelay := StepRampDelayDescente;
+ELSE
+    EffectiveStepRampDelay := StepRampDelayAscent;
+END_IF;
+StepShaper(
+    Enable := Enable,
+    TargetStep := RequestedStep,
+    StepRampDelay := EffectiveStepRampDelay
+);
+StepNumber := StepShaper.ShapedStep;
+BusinessStepDelayElapsed := StepShaper.StepDelayElapsed;
 
 IF StepNumber &gt; 0 AND CommandedDirection = 1 THEN
     RelayFwd := TRUE;
@@ -9351,10 +9630,8 @@ AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
 
 ContactorsCheck.Command  := NOT AllContactorsCommandedOff;
 ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
-TonContactorsDropped(IN := AllContactorsCommandedOff AND NOT FwdRevSpeedFeedbackOff, PT := ContactorFeedbackTimeout);
-IF TonContactorsDropped.Q THEN
-    ContactorsCheck.StuckClosed := TRUE;
-END_IF;
+TonContactorsDropped(IN := FALSE, PT := ContactorFeedbackTimeout);
+ContactorsCheck.StuckClosed := FALSE; // force a FALSE (Phase 0) : detection contacteur colle produite par FB_Safety_Winch, re-alimentee a la phase suivante
 ContactorsCheck.StuckOpen := FALSE;
 
 IF Fault.Error THEN
@@ -10749,6 +11026,16 @@ STRUCT
 
     // === 🛡️ Permission d&#x27;armement homme-mort (Option B — combiné interlock benne) ===
     ArmingPermit                 : BOOL;               // 🛡️ Permission d&#x27;armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)
+
+    // === Usage effectif d&#x27;un override/bypass de POSITION (consommé PRG_03 → FB_Modes) ===
+    // Producteur unique : PRG_04_Treuils_Benne §5. Lecteur : PRG_03_Modes_Cycle (lag 1 scan assumé,
+    // même doctrine que les autres échanges PRG_03/PRG_04 de ce bus).
+    // TRUE = la limite de position de cet axe est actuellement levée au-delà du nominal :
+    // override FDC logiciel N1 maintenu OU bypass N2 effectif de la famille position
+    // (TopLimitSwitch / TopLimitSoftware / CableLimitSwitch / LimitLegal / MecaD).
+    // Sert à armer le re-homing obligatoire (AF-05 §4bis) — n&#x27;est PAS un permis de mouvement.
+    PositionLimitOverriddenM1    : BOOL;               // 🧭 Treuil M1 — limite de position levée
+    PositionLimitOverriddenM2    : BOOL;               // 🧭 Treuil M2 — limite de position levée
 END_STRUCT
 END_TYPE
 </pre>
@@ -10943,6 +11230,18 @@ STRUCT
     JoystickWinchSelectArbitrated : INT;      // 0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)
     HomingApproachEnable        : BOOL;       // Dépassement butée haut (N2)
     MaintenanceM3TargetEnable   : BOOL;       // Cible Translation Maintenance (N2 only)
+
+    // AF-05 §4bis — matrice de maintenance
+    // ⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
+    // vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l&#x27;IHM).
+    ModeChangePendingBlocked    : BOOL;       // 🚦 Demande de changement de mode REFUSÉE : les treuils
+                                              //    ne sont pas à l&#x27;arrêt mécanique confirmé
+                                              //    (contacteurs retombés ET frein serré ET |v| &lt; seuil).
+                                              //    Le mode courant est maintenu. IHM : « arrêter les
+                                              //    treuils avant de changer de mode ».
+    HomingRequiredM1            : BOOL;       // 🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO
+                                              //    (usage effectif d&#x27;un override/bypass position en maintenance)
+    HomingRequiredM2            : BOOL;       // 🧭 M2 : idem
 END_STRUCT
 END_TYPE</pre>
             </details>
@@ -11120,6 +11419,14 @@ STRUCT
     Auth          : ST_fbModes_Autorisations; // Bus d&#x27;autorisations machine
     ReqProgram    : ST_ProgramRequest;        // Demandes programme vers PRG_04 / PRG_05
     SequenceState : ST_SequencePublicState;   // État public de la séquence
+    // 🧩 Défaut de l&#x27;arbitre de mode (FB_Modes), forme cible ST_Fault (AF03 §3).
+    // Producteur unique : FB_Modes (instancié par PRG_03_Modes_Cycle).
+    // Causes : [0] refus Semi-Auto pour défaut codeur (latchée) ;
+    //          [1] changement de mode refusé, treuils non à l&#x27;arrêt confirmé (live) ;
+    //          [2] refus Semi-Auto pour re-homing obligatoire (latchée).
+    // ⚠️ Sans cette publication, les refus de mode restaient invisibles de l&#x27;IHM :
+    //    un interlock qu&#x27;on ne voit pas est un interlock qu&#x27;on contourne.
+    ModesFault    : ST_Fault;                 // 🚨 Défauts d&#x27;arbitrage de mode (consommé PRG_07 → IHM)
 END_STRUCT
 END_TYPE
 </pre>
@@ -12521,6 +12828,9 @@ instJoystick(
 
 
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
+// Miroir fidèle de PRG_02_Acquisition : PRG_03/PRG_04 consomment l&#x27;axe Y
+// structuré pour arbitrer le sens et la vitesse des treuils.
+Data.Joystick.AxisY          := instJoystick.AxisCmdY;
 Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
 Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
 Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
@@ -12903,7 +13213,9 @@ VAR_INPUT
     M2BlockedBySafetyInfo   : BOOL := FALSE;
 
     // === 🧪 Seed état benne (miroir contenu NVRAM _BucketState au boot) ===
-    BucketSeedOpen          : BOOL := TRUE;
+    // Seed nominal fermé : les scénarios d&#x27;ascension doivent fournir une
+    // benne cohérente explicitement ouverte lorsqu&#x27;ils testent la plongée.
+    BucketSeedOpen          : BOOL := FALSE;
 END_VAR
 
 VAR_OUTPUT
@@ -13035,6 +13347,7 @@ END_VAR
 {region &quot;§0 Harnais : seed état benne (miroir NVRAM au boot)&quot;}
 IF firstScan THEN
     BucketMech.IsOpen := BucketSeedOpen;
+    BucketMech.IsClosed := NOT BucketSeedOpen;
     firstScan := FALSE;
 END_IF;
 {endregion}
@@ -13478,7 +13791,6 @@ instWinchM1(
     Enable                  := (ModesAuth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT ModesAuth.InhibitM1,
     Reset                   := FaultMachineResetIHM,
     PowerContactorEngaged   := PowerContactorEngaged,
-    Mode                    := ModesAuth.Mode,
     StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := EffectivePermitM1_Descend,
@@ -13508,7 +13820,6 @@ instWinchM2(
     Enable                  := (ModesAuth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT ModesAuth.InhibitM2,
     Reset                   := FaultMachineResetIHM,
     PowerContactorEngaged   := PowerContactorEngaged,
-    Mode                    := ModesAuth.Mode,
     StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := EffectivePermitM2_Descend,
@@ -14774,122 +15085,92 @@ END_FUNCTION_BLOCK
         <pre>STruC++ Test Runner v1.0
 
 test_winch_integ.st
-         ASSERT_EQ failed: MACHINE.BUSWINCH.WINCHM1SAFETY.ERRORID expected 0, got 32768
-         at test_winch_integ.st:119
-         Message: HARN-10: ErrorId M1 nominal
-  [FAIL] HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
-         at test_winch_integ.st:167
-         Message: HARN-11: M1 plafonne palier 1 (ForceMinSpeedStep)
-  [FAIL] HARN-11 : Extraction montee ForceMinSpeedStep -&gt; plafond palier 1 M1 ET M2
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
-         at test_winch_integ.st:216
-         Message: HARN-12: M1 plafonne au SlowdownMaxStep en zone haute
-  [FAIL] HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 2, got 0
-         at test_winch_integ.st:257
+  [PASS] HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev
+  [PASS] HARN-11 : Extraction montee ForceMinSpeedStep -&gt; plafond palier 1 M1 ET M2
+  [PASS] HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 2, got 1
+         at test_winch_integ.st:269
          Message: HARN-13a: 20 pourcent -&gt; palier 2 (table reference)
   [FAIL] HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 3, got 0
-         at test_winch_integ.st:300
-         Message: HARN-13b: 70 pourcent descendu au clamp descente 3
-  [FAIL] HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 0
-         at test_winch_integ.st:341
+  [PASS] HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 1
+         at test_winch_integ.st:356
          Message: HARN-13c: 90 pourcent -&gt; palier 5 (table reference)
   [FAIL] HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 4, got 0
-         at test_winch_integ.st:385
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 4, got 1
+         at test_winch_integ.st:402
          Message: HARN-20: 75 pourcent -&gt; palier 4 (table reference)
   [FAIL] HARN-20 : Rampe deflexion 0 a 100 pourcent -&gt; paliers monotones, jamais de saut brutal
-         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
-         at test_winch_integ.st:407
-         Message: HARN-21: precondition - en montee avant rampe retour
-  [FAIL] HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
-         at test_winch_integ.st:440
-         Message: HARN-22: effleurement -&gt; palier 1 stable (pas de plancher hors plongee)
-  [FAIL] HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:461
-         Message: HARN-23: precondition - montee active
+  [PASS] HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0
+  [PASS] HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 0, got 1
+         at test_winch_integ.st:493
+         Message: HARN-23: homme-mort relache -&gt; palier 0
   [FAIL] HARN-23 : Homme-mort relache en mouvement -&gt; arret immediat, frein retombe
          ASSERT_TRUE failed: MACHINE.KOBOLDIMMERSIONCONFIRMED expected TRUE, got FALSE
-         at test_winch_integ.st:502
+         at test_winch_integ.st:528
          Message: HARN-30: immersion confirmee au front montant en fenetre
   [FAIL] HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -&gt; immersion confirmee puis arret latche
-  [PASS] HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)
          ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
-         at test_winch_integ.st:556
+         at test_winch_integ.st:563
+         Message: HARN-31: la plongee Kobold est reellement exercee (StepNumber &gt;= 1)
+  [FAIL] HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)
+         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
+         at test_winch_integ.st:590
          Message: HARN-32: precondition - descente active en plongee
   [FAIL] HARN-32 : Relache joystick en contexte plongee -&gt; palier 0 immediat, pas de plancher residuel
          ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
-         at test_winch_integ.st:588
+         at test_winch_integ.st:626
          Message: HARN-33: plafond zone basse gagne sur plancher plongee (amendement B)
   [FAIL] HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 4, got 0
-         at test_winch_integ.st:618
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 4, got 1
+         at test_winch_integ.st:657
          Message: HARN-40: precondition - M1 au palier 4
   [FAIL] HARN-40 : Jog benne -&gt; M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
-         at test_winch_integ.st:654
-         Message: HARN-41: M1 plafonne palier 1 par la sync
+         ASSERT_EQ failed: MACHINE.M2_STEPNUMBER expected 1, got 0
+         at test_winch_integ.st:695
+         Message: HARN-41: M2 plafonne palier 1 par la sync
   [FAIL] HARN-41 : SyncDeviationWarn -&gt; plafond palier 1 sur M1 ET M2 (bornes communes identiques)
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 1
-         at test_winch_integ.st:684
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 0
+         at test_winch_integ.st:726
          Message: HARN-42: M1 libre jusqu au plafond general (5)
   [FAIL] HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre
   [PASS] HARN-50 : Nominal filet passif -&gt; FinalInterlockGoverned FALSE sur toute la montee couplee
-  [PASS] HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)
-         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
-         at test_winch_integ.st:764
-         Message: HARN-52: precondition - mouvement etabli
-  [FAIL] HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch
+         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
+         at test_winch_integ.st:788
+         Message: HARN-51: precondition - montee nominale M1 etablie
+  [FAIL] HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)
+  [PASS] HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch
          ASSERT_TRUE failed: MACHINE.SYNCDEVIATIONM_MODEL &gt; 0.10 expected TRUE, got FALSE
-         at test_winch_integ.st:790
+         at test_winch_integ.st:857
          Message: HARN-60: ecart modelise a depasse le seuil warn
   [FAIL] HARN-60 : Deviation croissante -&gt; warn plafond 1 puis critique SafeStop des 2
          ASSERT_TRUE failed: MACHINE.SYNCDEVIATIONM_MODEL &lt; 0.10 expected TRUE, got FALSE
-         at test_winch_integ.st:827
+         at test_winch_integ.st:895
          Message: HARN-61: re-alignement dans la tolerance
   [FAIL] HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:854
-         Message: HARN-70: precondition - montee couplee active
-  [FAIL] HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:883
-         Message: HARN-71: precondition - montee active
-  [FAIL] HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache
-         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1FINALINTERLOCKREQUEST.REQUESTEDRELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:918
-         Message: HARN-72: FB_Winch demande toujours le sens (defaut cote barriere)
+  [PASS] HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent
+  [PASS] HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache
+         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD = FALSE expected TRUE, got FALSE
+         at test_winch_integ.st:996
+         Message: HARN-72: barriere a coupe (watchdog frein)
   [FAIL] HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout
-  [PASS] HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:967
-         Message: HARN-74a: precondition - montee plein pot
-  [FAIL] HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)
-         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1SAFETY.SAFESTOP expected TRUE, got FALSE
-         at test_winch_integ.st:999
-         Message: HARN-74b: Meca B arme a 3 s (cible T178)
-  [FAIL] HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:1020
-         Message: HARN-75: precondition - montee active
-  [FAIL] HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)
-  [PASS] HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)
-         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt; 0 expected TRUE, got FALSE
-         at test_winch_integ.st:1082
-         Message: HARN-81: precondition - treuils en mouvement
-  [FAIL] HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:1115
-         Message: HARN-82: precondition - mouvement semi-auto
-  [FAIL] HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement
+         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1FINALINTERLOCKREQUEST.REQUESTEDRELAYREV expected TRUE, got FALSE
+         at test_winch_integ.st:1031
+         Message: HARN-73: precondition - inversion descente reellement demandee
+  [FAIL] HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)
+  [PASS] HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)
+  [PASS] HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)
+  [PASS] HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)
+         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1SAFETY.ERROR expected TRUE, got FALSE
+         at test_winch_integ.st:1162
+         Message: HARN-80: CAS-001 detecte (defaut Error, cible T180)
+  [FAIL] HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)
+  [PASS] HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)
+  [PASS] HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement
 
 -----------------------------------------
-32 tests, 5 passed, 27 failed
+32 tests, 15 passed, 17 failed
 </pre>
     </details>
 </div>

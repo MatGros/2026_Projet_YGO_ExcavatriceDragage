@@ -128,6 +128,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "481", "G481 — Harnais integration treuil WINCH_INTEG compile+execute (T181-00 AC7, baseline rouge OK)", [sys.executable, f"{S}/G481_check_winch_integ.py"]),
     ("C", "482", "G482 — Clamp bornes FB_SpeedStep (T181-07 AC6)", [sys.executable, f"{S}/G482_check_speedstep_clamp_bounds.py"]),
     ("C", "483", "G483 - Matrice maintenance N1/N2 : bypass gates MAINT_N2, override FDC borne, re-homing (T181-14 AC1-AC12)", [sys.executable, f"{S}/G483_check_bypass_matrix_mode_gated.py"]),
+    ("C", "484", "G484 - ContactorStuck proprietaire unique (T181-02/03 AC7)", [sys.executable, f"{S}/G484_check_stuckclosed_single_owner.py"]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

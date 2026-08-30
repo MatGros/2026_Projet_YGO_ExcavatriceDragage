@@ -1,5 +1,5 @@
 (* =======================================================================
-   🧪 test_fb_safety_winch.st — FB_Safety_Winch (TC-P10-001..010, 036.1, 037.1, 044.1, 051.1)
+   🧪 test_fb_safety_winch.st — FB_Safety_Winch (TC-P10-001..010, 018, 036.1, 037.1, 044.1, 051.1)
    ───────────────────────────────────────────────────────────────
    Fiche : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md
    Conventions : 1 appel fb() = 1 scan ; ADVANCE_TIME(10000000) entre les
@@ -77,6 +77,41 @@ TEST 'TC-P10-002 Meca B : non confirmation arret 3s -> SafeStop + PowerCutOff'
     ASSERT_TRUE(fb.SafeStop, 'Non confirmation arret 3s -> SafeStop');
     ASSERT_TRUE(fb.PowerCutOff, 'Non confirmation arret 3s -> PowerCutOff (bit8 dans masque)');
     ASSERT_TRUE(fb.Fault.Error, 'Meca B -> Error');
+END_TEST
+
+TEST 'TC-P10-018 ContactorStuck : contacteur colle -> ContactorStuck + SafeStop + PowerCutOff (action, pas seulement diagnostic)'
+    (* (adapte depuis TC-P10-018 FB_Winch, T181-02/03 AC5) : FB_Safety_Winch est le producteur
+       UNIQUE de ContactorStuck. Le TC prouve l'ACTION de securite (SafeStop + PowerCutOff),
+       pas seulement l'etat diagnostic. *)
+    (* Scan 1 : regime nominal *)
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    ADVANCE_TIME(10000000);
+    (* Scan 2 : joystick neutre mais contacteurs NON retombes (FwdRevSpeedFeedbackOff=FALSE) *)
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := FALSE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    ASSERT_FALSE(fb.ContactorStuck, 'Avant 3s : pas encore de ContactorStuck');
+    ASSERT_FALSE(fb.PowerCutOff, 'Avant 3s : pas encore de PowerCutOff');
+    (* Scan 3 : apres PostRampTimeout=3s -> ContactorStuck + SafeStop + PowerCutOff *)
+    ADVANCE_TIME(3000000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := FALSE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    ASSERT_TRUE(fb.ContactorStuck, 'Contacteur colle 3s -> ContactorStuck=TRUE');
+    ASSERT_TRUE(fb.SafeStop, 'Contacteur colle -> SafeStop (action)');
+    ASSERT_TRUE(fb.PowerCutOff, 'Contacteur colle -> PowerCutOff (action)');
+    ASSERT_TRUE(fb.Fault.Error, 'Contacteur colle -> Error');
 END_TEST
 
 TEST 'TC-P10-003 Meca C : glissement M1 >2.0m pendant maintien benne -> SafeStop + PowerCutOff'

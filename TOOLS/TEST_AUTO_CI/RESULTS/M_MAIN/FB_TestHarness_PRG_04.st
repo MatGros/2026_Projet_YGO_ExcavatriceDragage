@@ -154,7 +154,9 @@ VAR_INPUT
     M2BlockedBySafetyInfo   : BOOL := FALSE;
 
     // === 🧪 Seed état benne (miroir contenu NVRAM _BucketState au boot) ===
-    BucketSeedOpen          : BOOL := TRUE;
+    // Seed nominal fermé : les scénarios d'ascension doivent fournir une
+    // benne cohérente explicitement ouverte lorsqu'ils testent la plongée.
+    BucketSeedOpen          : BOOL := FALSE;
 END_VAR
 
 VAR_OUTPUT
@@ -286,6 +288,7 @@ END_VAR
 {region "§0 Harnais : seed état benne (miroir NVRAM au boot)"}
 IF firstScan THEN
     BucketMech.IsOpen := BucketSeedOpen;
+    BucketMech.IsClosed := NOT BucketSeedOpen;
     firstScan := FALSE;
 END_IF;
 {endregion}
@@ -729,7 +732,6 @@ instWinchM1(
     Enable                  := (ModesAuth.Mode <> E_Mode.DISABLE) AND NOT ModesAuth.InhibitM1,
     Reset                   := FaultMachineResetIHM,
     PowerContactorEngaged   := PowerContactorEngaged,
-    Mode                    := ModesAuth.Mode,
     StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := EffectivePermitM1_Descend,
@@ -759,7 +761,6 @@ instWinchM2(
     Enable                  := (ModesAuth.Mode <> E_Mode.DISABLE) AND NOT ModesAuth.InhibitM2,
     Reset                   := FaultMachineResetIHM,
     PowerContactorEngaged   := PowerContactorEngaged,
-    Mode                    := ModesAuth.Mode,
     StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := EffectivePermitM2_Descend,

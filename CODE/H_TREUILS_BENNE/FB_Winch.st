@@ -44,7 +44,7 @@ VAR_INPUT
     HomingSuspect                   : BOOL;                           // --> [HW] Incertitude / doute sur le referencement
     CablePosM                       : REAL;                           // --> [HW] Position actuelle du cable (m)
     MeasuredSpeedBand               : INT := 0;                       // --> [HW] Bande vitesse reelle validee
-    SpeedGuardEnable                : BOOL := FALSE;                  // --> [HW] Activation garde-fou changement de palier
+    SpeedGuardEnable                : BOOL := TRUE;                   // --> [HW] Activation garde-fou changement de palier
     SpeedGuardReady                 : BOOL := FALSE;                  // --> [HW] Conditions de stabilite validees
 
     // === BYPASSES ET SIMULATION ===
@@ -144,7 +144,7 @@ Fault := instFault.Fault;
 // 🛑 2. GATE
 IF NOT Enable THEN
     SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := SpeedStepTable);
-    DirectionInterlock(Enable := FALSE, EnableRising := FALSE, ReqDirection := 0,
+    DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
                        ChangeDelayUp := DirectionInterlockDelayAscent,
                        ChangeDelayDown := DirectionInterlockDelayDescent);
     StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := StepRampDelayAscent);
@@ -197,6 +197,7 @@ END_IF;
 DirectionInterlock(
     Enable := (StepNumber = 0) AND FwdRevSpeedFeedbackOff,
     EnableRising := EnableRisingEdge.Q,
+    Reset := Reset,
     ReqDirection := Direction,
     ChangeDelayUp := DirectionInterlockDelayAscent,
     ChangeDelayDown := DirectionInterlockDelayDescent
@@ -238,6 +239,22 @@ SpeedStep(
 );
 RequestedStep := SpeedStep.StepNumber;
 
+// 🛡️ Garde-fou vitesse : bride le palier demande si la vitesse n'est pas stable
+// (SpeedGuardReady=FALSE -> palier 1) ou si la bande mesuree est inferieure au
+// palier demande (pas de passage aux paliers superieurs sans vitesse confirmee).
+SpeedGuardLimited := FALSE;
+IF SpeedGuardEnable THEN
+    IF NOT SpeedGuardReady THEN
+        IF RequestedStep > 1 THEN
+            RequestedStep := 1;
+            SpeedGuardLimited := TRUE;
+        END_IF;
+    ELSIF (MeasuredSpeedBand >= 1) AND (MeasuredSpeedBand <= 5) AND (RequestedStep > MeasuredSpeedBand) THEN
+        RequestedStep := MeasuredSpeedBand;
+        SpeedGuardLimited := TRUE;
+    END_IF;
+END_IF;
+
 // ⚙️ Cadencement de palier (extrait dans FB_WinchStepShaper, D10).
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
@@ -253,7 +270,6 @@ StepShaper(
 );
 StepNumber := StepShaper.ShapedStep;
 BusinessStepDelayElapsed := StepShaper.StepDelayElapsed;
-SpeedGuardLimited := FALSE; // Garde-fou vitesse gere hors de ce FB
 
 IF StepNumber > 0 AND CommandedDirection = 1 THEN
     RelayFwd := TRUE;
@@ -277,7 +293,7 @@ AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
 ContactorsCheck.Command  := NOT AllContactorsCommandedOff;
 ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
 TonContactorsDropped(IN := FALSE, PT := ContactorFeedbackTimeout);
-ContactorsCheck.StuckClosed := FALSE; // proprietaire unique : FB_Safety_Winch
+ContactorsCheck.StuckClosed := FALSE; // force a FALSE (Phase 0) : detection contacteur colle produite par FB_Safety_Winch, re-alimentee a la phase suivante
 ContactorsCheck.StuckOpen := FALSE;
 
 IF Fault.Error THEN

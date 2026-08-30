@@ -11,6 +11,10 @@
       "passed": true
     },
     {
+      "name": "TC-P10-018 ContactorStuck : contacteur colle -> ContactorStuck + SafeStop + PowerCutOff (action, pas seulement diagnostic)",
+      "passed": true
+    },
+    {
       "name": "TC-P10-003 Meca C : glissement M1 >2.0m pendant maintien benne -> SafeStop + PowerCutOff",
       "passed": true
     },
@@ -60,8 +64,8 @@
     }
   ],
   "summary": {
-    "total": 14,
-    "passed": 14,
+    "total": 15,
+    "passed": 15,
     "failed": 0
   }
 }

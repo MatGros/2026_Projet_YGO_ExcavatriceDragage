@@ -43,6 +43,15 @@
                 ]
             },
             {
+                "name": "⚡ OpenCode-Go (glm-5.2)",
+                "autoExecuteCommands": true,
+                "icon": "zap",
+                "color": "terminal.ansiBrightCyan",
+                "commands": [
+                    "opencode-go --provider opencode --model glm-5.2 --permission-mode default"
+                ]
+            },
+            {
                 "name": "🌐 OmniRoute Server",
                 "autoExecuteCommands": true,
                 "icon": "server",

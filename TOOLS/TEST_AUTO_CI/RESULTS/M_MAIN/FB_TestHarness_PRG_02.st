@@ -132,6 +132,9 @@ instJoystick(
 
 
 Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
+// Miroir fidèle de PRG_02_Acquisition : PRG_03/PRG_04 consomment l'axe Y
+// structuré pour arbitrer le sens et la vitesse des treuils.
+Data.Joystick.AxisY          := instJoystick.AxisCmdY;
 Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
 Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
 Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;

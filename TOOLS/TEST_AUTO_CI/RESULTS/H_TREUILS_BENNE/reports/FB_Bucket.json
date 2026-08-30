@@ -19,6 +19,14 @@
       "passed": true
     },
     {
+      "name": "TC-P10-025.1 Anti-traversee : M2_Busy seul refuse une demande benne a l entree (AC3)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-025.2 Anti-traversee : mouvement deja engage + M2_Busy -> pas d avortement (AC3)",
+      "passed": true
+    },
+    {
       "name": "TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2",
       "passed": true
     },
@@ -32,6 +40,10 @@
     },
     {
       "name": "TC-P10-029 Recul (sens inverse) borne a la position de depart, jamais au-dela",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Direction/StartStop)",
       "passed": true
     },
     {
@@ -67,13 +79,24 @@
       "passed": true
     },
     {
+      "name": "TC-P10-047.2 Boot incoherent IsOpen=TRUE ET IsClosed=TRUE -> StateIncoherent (attendu ROUGE)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
+        "file": "test_fb_bucket.st",
+        "line": 665,
+        "message": "Boot IsOpen ET IsClosed -> StateIncoherent=TRUE (code ne le traite pas)"
+      }
+    },
+    {
       "name": "TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle",
       "passed": true
     }
   ],
   "summary": {
-    "total": 17,
-    "passed": 17,
-    "failed": 0
+    "total": 21,
+    "passed": 20,
+    "failed": 1
   }
 }

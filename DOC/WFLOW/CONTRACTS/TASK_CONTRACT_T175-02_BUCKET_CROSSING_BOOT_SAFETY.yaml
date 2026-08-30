@@ -1,0 +1,76 @@
+# Contrat T175-02 — verrouillage anti-traversée et cohérence boot FB_Bucket
+
+contract:
+  task_id: T175-02_BUCKET_CROSSING_BOOT_SAFETY
+  criticality: C0
+  strategy: patch
+
+  objective: >
+    Rendre sûre la benne sur deux transitions : une arrivée tardive de M1_Busy/M2_Busy
+    pendant une manoeuvre déjà engagée, et un boot contradictoire IsOpen=TRUE/IsClosed=TRUE.
+
+  acceptance:
+    - id: AC1
+      statement: "Une demande benne est refusée lorsque M1_Busy ou M2_Busy est déjà actif, sans distinguer artificiellement les deux axes."
+      verified_by: "TC P10-025, P10-025.1 et trace fichier:ligne"
+    - id: AC2
+      statement: "Si M1_Busy ou M2_Busy devient actif après l'engagement, FB_Bucket quitte la manoeuvre selon le comportement SafeStop validé, sans croisement de câbles."
+      verified_by: "TC multi-scan d'injection M1_Busy et M2_Busy en cours de Busy"
+    - id: AC3
+      statement: "Le M2_Busy causé légitimement par FB_Bucket pendant ouverture ou fermeture ne produit ni auto-avortement ni défaut parasite."
+      verified_by: "TC ouverture et fermeture nominales"
+    - id: AC4
+      statement: "Au premier cycle, IsOpen=TRUE et IsClosed=TRUE est classé StateIncoherent, ActiveOffsetValid=FALSE et aucune commande de mouvement n'est produite."
+      verified_by: "TC-P10-047.2 rouge devenu vert, assertions sortie et BucketState"
+    - id: AC5
+      statement: "Le cas IsOpen=FALSE et IsClosed=FALSE reste incohérent et conserve son comportement fail-safe existant."
+      verified_by: "TC-P10-047.1 non-régression"
+    - id: AC6
+      statement: "CoherenceLimitM est soit consommé par une règle explicitement validée, soit retiré avec mise à jour AF-10 ; aucune configuration morte ne reste silencieuse."
+      verified_by: "revue fichier:ligne + décision humaine tracée"
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU FB_Bucket."
+      verified_by: "inspection source et bundle frais"
+    - id: AC8
+      statement: "Le suffixe est identique au langage généré dans le bundle ; FB_Bucket.st reste du ST pur."
+      verified_by: "inspection source et bundle frais"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/TASKS.yaml
+
+  conservation:
+    must_survive:
+      - "Une manoeuvre nominale conserve M2_Busy comme effet normal du pilotage de benne."
+      - "Reset reste un front conscient et aucun défaut ne redémarre la benne automatiquement."
+      - "Le recul borné M2StartPosM et les confirmations ouvertes/fermées restent non-régressés."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    STOP avant code si l'arrêt requis pendant M1_Busy/M2_Busy en cours impose une catégorie
+    de sécurité, un temps de rampe, ou une sémantique SafeStop/PowerCutOff non définie dans AF-10.
+
+status: APPROVED
+execution:
+  executed_by: "Codex (orchestrateur)"
+  completed_at: ""
+  status: BLOCKED
+  summary: "Challenge C0 : doctrine M1/M2 Busy, coherence boot et arret doivent etre tranches avant patch."
+  evidence_submitted: []
+validation:
+  status: APPROVED
+  validated_by: "Humain (utilisateur)"
+  validated_at: "2026-08-30T09:50:00+02:00"
+  notes: "Visa général reçu ; visas V1/V2/V4/V6/V7 complémentaires requis après challenge C0."

@@ -5,6 +5,7 @@
    Conventions : 1 appel fb() = 1 scan ; ADVANCE_TIME(10000000) entre les
    scans pour les fronts R_TRIG ; hex décrit en décimal (bit 0 = 1).
    Watchdog frein = 500ms ; RestartDelay = 1500ms ; DeadTimeSameDir/OppositeDir = 1s (défaut).
+   Maintien §3bis : DropConfirmDelay = 100ms , MaxSenseHoldTime (T_max) = 1s (défauts, AC8).
    ======================================================================= *)
 
 SETUP
@@ -387,4 +388,202 @@ TEST 'TC-P10-039.1 Frein couple direct : BrakeCmd = RelayFwd OR RelayRev dans to
        RequestedStep := 0);
     ASSERT_FALSE(fb.RelayFwd, 'Arret -> RelayFwd=FALSE');
     ASSERT_FALSE(fb.BrakeCmd, 'Arret -> BrakeCmd=FALSE (jamais de divergence frein/mouvement)');
+END_TEST
+
+TEST 'TC-P10-023a §3bis : sens maintenu apres chute de palier a 0 tant que contacteurs non confirmes, puis chute sur DropConfirmDelay'
+    (* Chute de palier : RequestedStep -> 0 mais RequestedRelayFwd reste TRUE (demande transitoire
+       FB_Winch). La barriere TIENT le contacteur de sens jusqu a FwdRevSpeedFeedbackOff confirme
+       (debounced DropConfirmDelay=300ms) OU T_max. Aucun faux arret pendant le debounce. *)
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ADVANCE_TIME(1500000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ASSERT_TRUE(fb.Ready, 'Regime nominal -> Ready=TRUE');
+
+    (* Scan 2 : mouvement montee, frein confirme, contacteurs engages (FwdRevSpeedFeedbackOff=FALSE) *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 1, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ASSERT_TRUE(fb.RelayFwd, 'Mouvement -> RelayFwd');
+    ASSERT_TRUE(fb.BrakeCmd, 'Mouvement -> BrakeCmd');
+
+    (* Scan 3 : chute a palier 0, RequestedRelayFwd TOUJOURS TRUE, contacteurs pas encore retombes *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ASSERT_TRUE(fb.RelayFwd, 'Chute palier -> contacteur de sens MAINTENU (§3bis)');
+    ASSERT_TRUE(fb.BrakeCmd, 'Maintien -> BrakeCmd reste TRUE (couple direct)');
+    ASSERT_TRUE(fb.SenseHoldActive, 'Diag SenseHoldActive');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_SENSE_DROP_CONFIRM, 'Etat WAIT_SENSE_DROP_CONFIRM (6)');
+
+    (* Scan 4 : feedback retombee percu (FwdRevSpeedFeedbackOff=TRUE) mais debounce pas ecoule -> tenu *)
+    ADVANCE_TIME(100000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ASSERT_TRUE(fb.RelayFwd, 'Debounce DropConfirmDelay pas ecoule -> sens TOUJOURS tenu (AC7)');
+
+    (* Scan 5 : DropConfirmDelay (300ms) ecoule -> chute normale du sens *)
+    ADVANCE_TIME(300000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ASSERT_FALSE(fb.RelayFwd, 'Confirmation retombee -> chute du sens (§3bis)');
+    ASSERT_FALSE(fb.BrakeCmd, 'Apres chute -> BrakeCmd=FALSE');
+    ASSERT_FALSE(fb.SenseHoldActive, 'Fin du maintien');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#READY, 'Retour READY');
+END_TEST
+
+TEST 'TC-P10-023b §3bis : T_max atteint sans confirmation -> chute du sens FORCEE + latch ContactorStuck'
+    (* FwdRevSpeedFeedbackOff reste FALSE (contacteurs ne confirment pas la retombee). Apres
+       MaxSenseHoldTime (T_max=300ms) la barriere FORCE la chute du sens et latche
+       ContactorStuck (AC7). Le maintien indefini du stator est interdit. *)
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
+    ADVANCE_TIME(1500000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
+
+    (* Scan 2 : mouvement montee *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 1, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
+    ASSERT_TRUE(fb.RelayFwd, 'Mouvement -> RelayFwd');
+
+    (* Scan 3 : chute palier a 0, sens maintenu, MAIS contacteurs jamais confirmes retombes *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
+    ASSERT_TRUE(fb.RelayFwd, 'Entree en maintien -> sens tenu');
+    ASSERT_TRUE(fb.SenseHoldActive, 'SenseHoldActive');
+
+    (* Scan 4 : T_max (300ms) depasse sans confirmation -> chute forcee + latch *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
+    ADVANCE_TIME(400000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
+    ASSERT_FALSE(fb.RelayFwd, 'T_max sans confirmation -> chute du sens FORCEE (AC7)');
+    ASSERT_FALSE(fb.BrakeCmd, 'Chute forcee -> BrakeCmd=FALSE');
+    ASSERT_TRUE(fb.ContactorStuck, 'Diag ContactorStuck latche');
+    ASSERT_FALSE(fb.SenseHoldActive, 'Fin du maintien');
+    ASSERT_FALSE(fb.Ready, 'Latch -> barriere non pret (pas de redemarrage auto)');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#FAULT, 'Etat FAULT');
+    ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason#SENSE_DROP_TIMEOUT, 'Reason=SENSE_DROP_TIMEOUT');
+
+    (* Scan 5 : acquittement conscient (front Reset) -> latch leve (cause disparue = demande neutre) *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := TRUE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
+    ASSERT_FALSE(fb.ContactorStuck, 'Front Reset conscient -> latch ContactorStuck leve');
+END_TEST
+
+TEST 'TC-P10-023c §3bis : coupure dure (Enable=FALSE) pendant le maintien -> RelayFwd=FALSE immediat'
+    (* La coupure dure ne passe JAMAIS par le maintien §3bis (AC9) : Enable=FALSE en pleine
+       tenue du sens coupe RelayFwd/Rev au cycle suivant, sans attendre confirmation ni T_max. *)
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ADVANCE_TIME(1500000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+
+    (* Scan 2 : mouvement montee *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 1, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ASSERT_TRUE(fb.RelayFwd, 'Mouvement -> RelayFwd');
+
+    (* Scan 3 : chute palier a 0 -> maintien actif *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ASSERT_TRUE(fb.RelayFwd, 'Maintien actif -> sens tenu');
+    ASSERT_TRUE(fb.SenseHoldActive, 'SenseHoldActive');
+
+    (* Scan 4 : Enable=FALSE -> coupure dure immediate, meme en pleine tenue *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := FALSE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ASSERT_FALSE(fb.RelayFwd, 'Enable=FALSE -> RelayFwd=FALSE immediat (AC9)');
+    ASSERT_FALSE(fb.BrakeCmd, 'Enable=FALSE -> BrakeCmd=FALSE immediat');
+    ASSERT_FALSE(fb.SenseHoldActive, 'Maintien neutralise par la gate');
 END_TEST
