@@ -296,8 +296,8 @@ END_IF;
 
 // ---------- §3a. Faits machine communs (lecture seule) ----------
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
-    AND ((PRG_02_Acquisition.Data.Encoders.M1.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
-      OR (PRG_02_Acquisition.Data.Encoders.M2.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
+    AND ((PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
+      OR (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
 GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;
@@ -332,8 +332,8 @@ instPreflight(
     EncoderM2Operational      := PRG_02_Acquisition.Data.Network.EncoderM2.Operational,
     HomedM1                   := PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed,
     HomedM2                   := PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed,
-    M1PositionInBounds        := NOT PRG_02_Acquisition.Data.Encoders.M1.EncoderIncoherent,
-    M2PositionInBounds        := NOT PRG_02_Acquisition.Data.Encoders.M2.EncoderIncoherent
+    M1PositionInBounds        := NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.EncoderIncoherent,
+    M2PositionInBounds        := NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.EncoderIncoherent
 );
 GVL_IHM.Commun.Preflight.PreflightOk      := instPreflight.PreflightOk;
 GVL_IHM.Commun.Preflight.PreflightDone    := instPreflight.PreflightDone;
@@ -418,7 +418,7 @@ GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.Data.Joystick.AxisX;
 GVL_IHM.JOY1Joystick.State.AxisCmdY := PRG_02_Acquisition.Data.Joystick.AxisY;
 GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.Data.Joystick.NeutralXAct;
 GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.Data.Joystick.NeutralYAct;
-GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
+GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
 GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 GVL_IHM.JOY1Joystick.State.Online := PRG_02_Acquisition.Data.Network.Joystick.Online;
 GVL_IHM.JOY1Joystick.State.Operational := PRG_02_Acquisition.Data.Network.Joystick.Operational;
@@ -469,9 +469,9 @@ GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.WinchSyn
 GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
 GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
 GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
-GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
-GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
-GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
+GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
+GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
+GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
 GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
@@ -537,7 +537,7 @@ instHmiBannerFormatter(
     M1LogicRequestDirection     := PRG_04_Treuils_Benne.M1LogicRequestDirection,
     M2LogicRequestDirection     := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CycleRequestDirection       := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDirection,
-    DeadmanArmed                := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
+    DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
@@ -619,7 +619,7 @@ instTroubleshootingView(
     CycleSpeedMismatchActive := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive,
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
     CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Fault.Error,
-    JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
+    JoystickDeadmanArmed := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     HomedM1              := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomedM2              := PRG_02_Acquisition.Data.EncoderM2.Homed,

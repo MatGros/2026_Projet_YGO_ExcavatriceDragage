@@ -164,7 +164,7 @@ aucun calcul de mouvement décisionnel en JavaScript. **L'étape vient de `Cycle
       "t_ns": 0,
       "fields": {
         "CycleStep":            { "value": "X0_PREPARATION", "provenance": "COMPILED" },
-        "WinchM1Cmd.StartStop": { "value": false,           "provenance": "COMPILED" },
+        "WinchM1Cmd.ReqStartStop": { "value": false,           "provenance": "COMPILED" },
         "M1_CablePosM":         { "value": 7.0,             "provenance": "HARNESS_STIMULUS" },
         "Benne_IsOpen":         { "value": false,           "provenance": "HARNESS_STIMULUS" }
       }
@@ -319,7 +319,7 @@ sont rendus en états discrets captés ; aucun calcul cinématique en JS."
 
 | # | Faille | Localisation | Impact T171 | Décision requise |
 |---|---|---|---|---|
-| **F1** | **X11_OPEN_DUMP incohérent** : `BucketCmd.Open` évalue `Direction = -1` **après** qu'elle a été forcée à `1` (read-before-write, L.552-559) → ouverture **jamais commandée** → X11 ne peut pas sortir (Benne jamais ouverte). **Cause racine : aucune entrée joystick en `VAR_INPUT`** (`ExpectedDirection` est une sortie) | `FB_Cycle.st` L.552-563 | X0→X13 **infaisable** sans triche | 🔴 **Fix CODE prérequis** (entrée `JoystickY`) ; TC-P04-100 n'exerce pas l'ouverture réelle ; test T8 qui échoue |
+| **F1** | **X11_OPEN_DUMP incohérent** : `BucketCmd.ReqOpen` évalue `ReqDirection = -1` **après** qu'elle a été forcée à `1` (read-before-write, L.552-559) → ouverture **jamais commandée** → X11 ne peut pas sortir (Benne jamais ouverte). **Cause racine : aucune entrée joystick en `VAR_INPUT`** (`ExpectedDirection` est une sortie) | `FB_Cycle.st` L.552-563 | X0→X13 **infaisable** sans triche | 🔴 **Fix CODE prérequis** (entrée `JoystickY`) ; TC-P04-100 n'exerce pas l'ouverture réelle ; test T8 qui échoue |
 | **F2** | **`SampleCount` incrémenté à CHAQUE scan de X13** (pas de cadrage front) → compteur falsifié | `FB_Cycle.st` L.582 | AC « SampleCount sur X13 » non déterministe si >1 scan | ✅ **Corrigé dans la copie de travail** (front, +1 strict) + test d'inflation ; remonté à l'orchestrateur |
 | **F3** | **« 100 % cinématique » inatteignable** : pas de champ analogique pour pont M3 (seulement `Translation_At_*` BOOL), ouverture benne %, mou de câble | Interface `FB_Cycle` | AC1 T171-B sur-prometteur | ✅ **Phase 1 simple** : états discrets captés ; AC1 réécrit |
 | **F4** | **R6 faux** : `RESULTS/` n'est **pas** gitignoré (HTML déjà tracké) | `.gitignore` | Trace JSON + HTML régénérés polluent le diff worktree | ✅ **Versionnage assumé** (décision utilisateur) : les artefacts sont trackés, le conflit de merge est visible et résolvable |
@@ -347,7 +347,7 @@ sont rendus en états discrets captés ; aucun calcul cinématique en JS."
 |---|---|---|---|
 | T1 | `WinchSyncError` mi-cycle → STABILIZING → cause + Reset + Start → reprise → X13 | X4 | Repli + reprise complète |
 | T2 | Bascule MAINT mi-plongée → retour → `WaitingResume` → **StartCycle exigé** | X4 | `PausedState`/`WaitingResume` |
-| T3 | Relâchement manche en **chaque** étape de mouvement (X1/X4/X5/X6/X7/X8/X11) | tous | `StartStop=FALSE` + étape conservée |
+| T3 | Relâchement manche en **chaque** étape de mouvement (X1/X4/X5/X6/X7/X8/X11) | tous | `ReqStartStop=FALSE` + étape conservée |
 | T4 | Capteur Kobold jamais de front → `StepMaxTimer` → `cause[4]` | X4 | Tempo max anti-blocage |
 | T5 | `LimitLegalReached` en X4 → `cause[0]` | X4 | Cause L.163-165 |
 | T6 | `HeartbeatIhmOk` perdu → `cause[3]` | X5 | Cause L.175-177 |
@@ -364,7 +364,7 @@ sont rendus en états discrets captés ; aucun calcul cinématique en JS."
 
 | # | Point | ✅ Recommandé | 🔀 Alternative |
 |---|---|---|---|
-| D1 | F1 X11 | Corriger `BucketCmd.Open`/`StartStop` dans `CODE/` (re-scoper) puis tester la vraie ouverture | Forçage `Benne_IsOpen` MAIS avec **test dédié qui échoue** (révèle le bug, ne le masque pas) |
+| D1 | F1 X11 | Corriger `BucketCmd.ReqOpen`/`ReqStartStop` dans `CODE/` (re-scoper) puis tester la vraie ouverture | Forçage `Benne_IsOpen` MAIS avec **test dédié qui échoue** (révèle le bug, ne le masque pas) |
 | D2 | F2 SampleCount | Corriger `FB_Cycle` (front, +1 strict) + test d'inflation qui échoue | TC-P04-100 force X13 **mono-scan** + contournement documenté |
 | D3 | F3 axes sans analogique | Raboter l'animation : état discret pont/benne/mou ; suppression interpolation JS | Réécrire AC1 « décisions d'état + positions disponibles captées », rendu non-continu assumé |
 | D4 | R-A determinisme | `generate_trace_cycle.py` re-génère et **compare à l'octet** (fail si dérive) + **SHA-256 croisé** gelé dans le contrat + `ADVANCE_TIME` obligatoire entre scans | Geler le SHA-256 de la trace dans le contrat (adopté) |

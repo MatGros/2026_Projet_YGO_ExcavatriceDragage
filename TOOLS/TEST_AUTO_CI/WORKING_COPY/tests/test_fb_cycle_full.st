@@ -218,9 +218,9 @@ TEST 'TC-P04-100 : Cycle complet nominal X0->X13 sur la copie corrigee'
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X11_OPEN_DUMP, 'X10->X11 (trémie)');
-    (* 🔒 F1 : en X11, manche défléchi -> BucketCmd.Open doit être TRUE.
-       Sur l'original (read-before-write), Open serait FALSE → ce test distingue corrigé/non-corrigé. *)
-    ASSERT_TRUE(FB.BucketCmd.Open, 'F1: ouverture benne commandée en X11 (manche défléchi)');
+    (* 🔒 F1 : en X11, manche défléchi -> BucketCmd.ReqOpen doit être TRUE.
+       Sur l'original (read-before-write), ReqOpen serait FALSE → ce test distingue corrigé/non-corrigé. *)
+    ASSERT_TRUE(FB.BucketCmd.ReqOpen, 'F1: ouverture benne commandée en X11 (manche défléchi)');
 
     (* Call 14 : X11 (observe) ; benne ouverte -> X13 (déclenche) *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -251,7 +251,7 @@ TEST 'TC-P04-100 : Cycle complet nominal X0->X13 sur la copie corrigee'
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X13_DONE_SYNC, 'X11->X13 (ouverture benne, F1 corrigé)');
-    ASSERT_TRUE(FB.BucketCmd.Open = FALSE, 'Ouverture benne relâchée en X13');
+    ASSERT_TRUE(FB.BucketCmd.ReqOpen = FALSE, 'Ouverture benne relâchée en X13');
     ASSERT_EQ(FB.SampleCount, 1, 'SampleCount incrémenté une fois sur X13');
 END_TEST
 
@@ -444,8 +444,8 @@ TEST 'TC-P04-102 : Bascule MAINT mi-cycle -> retour -> reprise consciente exigee
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Étape X4 conservée');
-    ASSERT_FALSE(FB.WinchM1Cmd.StartStop, 'PAS de mouvement spontané (F6)');
-    ASSERT_FALSE(FB.WinchM2Cmd.StartStop, 'PAS de mouvement M2 (F6)');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqStartStop, 'PAS de mouvement spontané (F6)');
+    ASSERT_FALSE(FB.WinchM2Cmd.ReqStartStop, 'PAS de mouvement M2 (F6)');
 
     (* Reprise consciente : StartCycle exigé -> X5 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -570,8 +570,8 @@ TEST 'TC-P04-103 : Relachement manche en X4 stoppe les commandes sans perdre l e
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
-    ASSERT_FALSE(FB.WinchM1Cmd.StartStop, 'M1 coupé sur relâchement manche');
-    ASSERT_FALSE(FB.WinchM2Cmd.StartStop, 'M2 coupé sur relâchement manche');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqStartStop, 'M1 coupé sur relâchement manche');
+    ASSERT_FALSE(FB.WinchM2Cmd.ReqStartStop, 'M2 coupé sur relâchement manche');
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Étape X4 conservée');
 END_TEST
 

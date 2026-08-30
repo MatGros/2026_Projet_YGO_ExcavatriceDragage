@@ -95,10 +95,10 @@ sait pas (et ne doit pas savoir) d'où vient la frame.
     "t_ms": 8400                   // temps simulé (optionnel)
   },
   "actuators": {
-    "winchM1": { "startStop": 1, "direction": 1, "speedPct": 60 },
-    "winchM2": { "startStop": 1, "direction": 1, "speedPct": 60 },
-    "translation": { "start": 0, "target": 3 },
-    "bucket": { "open": 0, "close": 1, "koboldContactor": 0 }
+    "winchM1": { "reqStartStop": 1, "reqDirection": 1, "speedTgtPct": 60 },
+    "winchM2": { "reqStartStop": 1, "reqDirection": 1, "speedTgtPct": 60 },
+    "translation": { "reqStart": 0, "positionTgt": 3 },
+    "bucket": { "reqOpen": 0, "reqClose": 1, "reqKoboldMeasureEnable": 0 }
   },
   "sensors": {
     "cablePosM1": 7.0, "cablePosM2": 7.0,
@@ -114,7 +114,7 @@ sait pas (et ne doit pas savoir) d'où vient la frame.
     "waitingForOperator": 1, "waitingForProcess": 0
   },
   "provenance": {
-    "actuators.winchM1.startStop": "COMPILED",
+    "actuators.winchM1.reqStartStop": "COMPILED",
     "sensors.cablePosM1": "HARNESS_STIMULUS",
     "state.cycleStep": "COMPILED"
   }
@@ -159,32 +159,32 @@ class Actuator {
   apply(cmd) { throw new Error('apply() à implémenter'); }
 }
 
-// ── Treuil : StartStop + Direction + SpeedPct -> position câble ──
+// ── Treuil : ReqStartStop + ReqDirection + SpeedTgtPct -> position câble ──
 class WinchActuator extends Actuator {
   apply(cmd) {
     // La POSITION est fournie par la frame (sensors.cablePosM1) — le jumeau ne l'intègre pas.
     // La commande ne sert qu'à l'affichage (flèche montée/descente, % vitesse, couleur).
     this.scene.setWinch(this.id, {
-      running: cmd.startStop === 1,
-      direction: cmd.direction,   // 1 = montée, -1 = descente
-      speedPct: cmd.speedPct
+      running: cmd.reqStartStop === 1,
+      direction: cmd.reqDirection,   // 1 = montée, -1 = descente
+      speedPct: cmd.speedTgtPct
     });
   }
 }
 
-// ── Translation : Start + Target -> position pont M3 ──
+// ── Translation : ReqStart + PositionTgt -> position pont M3 ──
 class TranslationActuator extends Actuator {
   apply(cmd) {
     // La position du pont est fournie par sensors.translationAt* — le jumeau ne décide pas.
-    this.scene.setGantry({ running: cmd.start === 1, target: cmd.target });
+    this.scene.setGantry({ running: cmd.reqStart === 1, target: cmd.positionTgt });
   }
 }
 
-// ── Benne : Open/Close -> ouverture des mâchoires ──
+// ── Benne : ReqOpen/ReqClose -> ouverture des mâchoires ──
 class BucketActuator extends Actuator {
   apply(cmd) {
     // L'état ouvert/fermé est fourni par sensors.benneIsOpen/Closed — le jumeau ne décide pas.
-    this.scene.setBucket({ opening: cmd.open === 1, closing: cmd.close === 1 });
+    this.scene.setBucket({ opening: cmd.reqOpen === 1, closing: cmd.reqClose === 1 });
   }
 }
 

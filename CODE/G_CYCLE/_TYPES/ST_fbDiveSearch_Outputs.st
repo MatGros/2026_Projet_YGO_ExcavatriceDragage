@@ -9,8 +9,7 @@ STRUCT
 
     // === PERMIS & ORDRES ASSISTES ===
     DescendPermit          : BOOL;          // Autorisation de descente assistee
-    KoboldMeasureEnable    : BOOL;          // Activation mesure Kobold
-    KoboldContactorCmd     : BOOL;          // Commande alimentation Kobold
+    KoboldContactorCmd     : BOOL;          // Commande alimentation Kobold (fail-safe, coupe au front de fond)
     BottomTouchConfirmed   : BOOL;          // Fond confirme
     MinStepDown            : INT;           // Plancher palier descente
 

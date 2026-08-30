@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:31.449038" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:31.449038">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:30:03.893612" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:30:03.893612">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -436,20 +436,12 @@ Etape courante</xhtml>
 Autorisation de descente assistee</xhtml>
               </documentation>
             </variable>
-            <variable name="KoboldMeasureEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation mesure Kobold</xhtml>
-              </documentation>
-            </variable>
             <variable name="KoboldContactorCmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande alimentation Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande alimentation Kobold (fail-safe, coupe au front de fond)</xhtml>
               </documentation>
             </variable>
             <variable name="BottomTouchConfirmed">
@@ -1024,7 +1016,6 @@ IF NOT Enable OR NOT Inputs.PowerContactorEngaged THEN
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
     Outputs.DescendPermit := FALSE;
-    Outputs.KoboldMeasureEnable := FALSE;
     Outputs.KoboldContactorCmd := FALSE;
     Outputs.BottomTouchConfirmed := FALSE;
     Outputs.StepState := E_DiveSearchState.WAIT_PRECONDITIONS;
@@ -1040,7 +1031,6 @@ END_IF;
 
 Ready := Enable AND NOT Fault.Latched;
 Outputs.DescendPermit := FALSE;
-Outputs.KoboldMeasureEnable := FALSE;
 Outputs.KoboldContactorCmd := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
@@ -1082,7 +1072,6 @@ ELSE
         E_DiveSearchState.SEARCHING_IMMERSION:
             Lifecycle.Busy := TRUE;
             Outputs.DescendPermit := DescentActive;
-            Outputs.KoboldMeasureEnable := DescentActive;
             Outputs.KoboldContactorCmd := DescentActive;
             Outputs.OperatorActionId := 258;
             Outputs.OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
@@ -1120,7 +1109,6 @@ ELSE
         E_DiveSearchState.SEARCHING_BOTTOM:
             Lifecycle.Busy := TRUE;
             Outputs.DescendPermit := DescentActive;
-            Outputs.KoboldMeasureEnable := DescentActive;
             Outputs.KoboldContactorCmd := DescentActive;
             Outputs.OperatorActionId := 259;
             Outputs.OperatorAction := 'Maintenir la descente : immersion validee, recherche du fond.';

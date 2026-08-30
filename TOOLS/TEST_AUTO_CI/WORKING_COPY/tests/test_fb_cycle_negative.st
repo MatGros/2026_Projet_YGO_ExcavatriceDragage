@@ -12,8 +12,8 @@ END_SETUP
    ===================================================================== *)
 
 TEST 'NEG-F1 : X11 ouverture benne commandee (doit ECHOUER sur original)'
-    (* Atteindre X11 puis vérifier que BucketCmd.Open est TRUE quand le manche est défléchi.
-       Sur l'original (read-before-write), Open reste FALSE -> ce test échoue. *)
+    (* Atteindre X11 puis vérifier que BucketCmd.ReqOpen est TRUE quand le manche est défléchi.
+       Sur l'original (read-before-write), ReqOpen reste FALSE -> ce test échoue. *)
     (* X0 -> X1 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
@@ -171,7 +171,7 @@ TEST 'NEG-F1 : X11 ouverture benne commandee (doit ECHOUER sur original)'
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := SampleCount);
-    (* X11 : manche défléchi, benne PAS encore ouverte -> BucketCmd.Open doit être TRUE
+    (* X11 : manche défléchi, benne PAS encore ouverte -> BucketCmd.ReqOpen doit être TRUE
        (sur original : FALSE, read-before-write). Benne_Done=FALSE/IsOpen=FALSE pour ne PAS
        déclencher la transition X11->X13 dans ce scan. *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -186,7 +186,7 @@ TEST 'NEG-F1 : X11 ouverture benne commandee (doit ECHOUER sur original)'
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := SampleCount);
-    ASSERT_TRUE(FB.BucketCmd.Open, 'NEG-F1: ouverture benne commandée en X11 (échoue sur original)');
+    ASSERT_TRUE(FB.BucketCmd.ReqOpen, 'NEG-F1: ouverture benne commandée en X11 (échoue sur original)');
 END_TEST
 
 TEST 'NEG-F2 : SampleCount +1 strict sur X13 multi-scan (doit ECHOUER sur original)'
@@ -408,7 +408,7 @@ END_TEST
 
 TEST 'NEG-F6 : reprise consciente exigee apres bascule mode (doit ECHOUER sur original)'
     (* Atteindre X4, basculer MAINT, revenir SEMI_AUTO avec manche défléchi.
-       Sur l'original, le mouvement reprend AUTOMATIQUEMENT (WinchM1Cmd.StartStop=TRUE).
+       Sur l'original, le mouvement reprend AUTOMATIQUEMENT (WinchM1Cmd.ReqStartStop=TRUE).
        Sur la copie corrigée, il est neutralisé (F6). Ce test échoue sur l'original. *)
     (* X0 -> X1 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -501,5 +501,5 @@ TEST 'NEG-F6 : reprise consciente exigee apres bascule mode (doit ECHOUER sur or
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
-    ASSERT_FALSE(FB.WinchM1Cmd.StartStop, 'NEG-F6: PAS de mouvement spontané au retour (échoue sur original)');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqStartStop, 'NEG-F6: PAS de mouvement spontané au retour (échoue sur original)');
 END_TEST

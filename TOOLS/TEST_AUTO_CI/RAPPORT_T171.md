@@ -25,7 +25,7 @@ fictive de l'animation existante.
 - Séquence `[X0…X11, X13]` (pas de X12) · trace « binaire sous stimuli de harnais » · JSON+HTML versionnés avec SHA-256 croisé · garde-fou JS mécanique.
 
 **3 défauts CODE identifiés (hors périmètre T171, prérequis) :**
-- **F1** : X11 — `BucketCmd.Open` évalué avec `Direction=-1` après forçage à `1` (read-before-write) → ouverture jamais commandée.
+- **F1** : X11 — `BucketCmd.ReqOpen` évalué avec `ReqDirection=-1` après forçage à `1` (read-before-write) → ouverture jamais commandée.
 - **F2** : `SampleCount` incrémenté à CHAQUE scan en X13 (pas de front) → compteur falsifié.
 - **F6** : reprise après bascule de mode **automatique** (`WaitingResume` posé mais jamais lu pour couper les commandes) → faille sécurité.
 

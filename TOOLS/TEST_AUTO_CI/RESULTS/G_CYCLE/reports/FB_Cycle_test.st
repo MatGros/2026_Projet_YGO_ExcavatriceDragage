@@ -43,9 +43,9 @@ TEST 'TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les comma
        DeadmanArmed := TRUE, CycleMotionPermit := FALSE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SampleCount := SampleCount);
     
-    ASSERT_FALSE(FB.WinchM1Cmd.StartStop, 'M1 coupe sur retour neutre manche');
-    ASSERT_FALSE(FB.WinchM2Cmd.StartStop, 'M2 coupe sur retour neutre manche');
-    ASSERT_FALSE(FB.TranslationCmd.Start, 'Translation coupee');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqStartStop, 'M1 coupe sur retour neutre manche');
+    ASSERT_FALSE(FB.WinchM2Cmd.ReqStartStop, 'M2 coupe sur retour neutre manche');
+    ASSERT_FALSE(FB.TranslationCmd.ReqStart, 'Translation coupee');
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X0_PREPARATION OR FB.CycleStep = E_CycleStep.X1_HOMING, 'Etape conservee');
 END_TEST
 
@@ -85,7 +85,7 @@ TEST 'TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILI
     
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.STABILIZING, 'Bascule en STABILIZING');
     ASSERT_TRUE(FB.Fault.Error, 'Drapeau Fault.Error actif');
-    ASSERT_FALSE(FB.WinchM1Cmd.StartStop, 'Commandes treuils neutralisees');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqStartStop, 'Commandes treuils neutralisees');
 END_TEST
 
 TEST 'TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle'
@@ -150,7 +150,7 @@ TEST 'TC-P04-013 : Bascule Semi-Auto vers Maintenance preserve l etape et neutra
        StartCycle := FALSE, SampleCount := SampleCount);
     ASSERT_FALSE(FB.Ready, 'Ready retombe hors Semi-Auto');
     ASSERT_FALSE(FB.Lifecycle.Busy, 'Busy=FALSE en Maintenance');
-    ASSERT_FALSE(FB.WinchM1Cmd.StartStop, 'Demandes M1 neutralisees');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqStartStop, 'Demandes M1 neutralisees');
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X1_HOMING, 'Etape X1_HOMING preservee en memoire');
 
     // 3. Retour en mode SEMI_AUTO (Enable := TRUE) avec manche deflechi : PAS de mouvement spontane
@@ -229,7 +229,7 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Etabli en X4_DESCEND_OPEN');
-    ASSERT_TRUE(FB.WinchM1Cmd.StartStop, 'Descente M1 commandee avant relache');
+    ASSERT_TRUE(FB.WinchM1Cmd.ReqStartStop, 'Descente M1 commandee avant relache');
 
     (* Call 6 : relache homme-mort / manche au centre pendant la plongee -> neutralisation, etape maintenue *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -244,9 +244,9 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
-    ASSERT_FALSE(FB.WinchM1Cmd.StartStop, 'Descente M1 neutralisee au relache');
-    ASSERT_FALSE(FB.WinchM2Cmd.StartStop, 'Descente M2 neutralisee au relache');
-    ASSERT_FALSE(FB.BucketCmd.KoboldContactorCmd, 'Contacteur Kobold neutralise');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqStartStop, 'Descente M1 neutralisee au relache');
+    ASSERT_FALSE(FB.WinchM2Cmd.ReqStartStop, 'Descente M2 neutralisee au relache');
+    ASSERT_FALSE(FB.BucketCmd.ReqKoboldMeasureEnable, 'Contacteur Kobold neutralise');
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Etape X4 maintenue (pas de retour X0)');
     ASSERT_FALSE(FB.RequestActive, 'Aucune demande active');
 
@@ -265,7 +265,7 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Etape X4 figee apres 5 s de relache');
-    ASSERT_FALSE(FB.WinchM1Cmd.StartStop, 'Aucun redemarrage auto M1');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqStartStop, 'Aucun redemarrage auto M1');
     ASSERT_FALSE(FB.Fault.Error, 'Pas de defaut (le relache homme-mort n est pas un defaut)');
 
     (* Call 8 : re-armement conscient (manche re-deflechi + homme-mort) -> reprise a X4 SANS repartir de X0 *)
@@ -282,7 +282,7 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Reprise a X4 (pas de redemarrage depuis X0)');
-    ASSERT_TRUE(FB.WinchM1Cmd.StartStop, 'Descente M1 commandee apres re-armement');
+    ASSERT_TRUE(FB.WinchM1Cmd.ReqStartStop, 'Descente M1 commandee apres re-armement');
 END_TEST
 
 TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> STABILIZING, pas de redemarrage auto (T169-A S4)'
@@ -371,8 +371,8 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> ST
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.STABILIZING, 'Timeout etape -> STABILIZING');
     ASSERT_TRUE(FB.Fault.Error, 'Defaut tempo max d etape levee');
-    ASSERT_FALSE(FB.WinchM1Cmd.StartStop, 'Commandes M1 neutralisees sur defaut');
-    ASSERT_FALSE(FB.WinchM2Cmd.StartStop, 'Commandes M2 neutralisees sur defaut');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqStartStop, 'Commandes M1 neutralisees sur defaut');
+    ASSERT_FALSE(FB.WinchM2Cmd.ReqStartStop, 'Commandes M2 neutralisees sur defaut');
     ASSERT_FALSE(FB.RequestActive, 'Aucune demande active');
 
     (* Call 7 : cause disparue mais PAS de Reset -> reste STABILIZING (pas de redemarrage auto) *)

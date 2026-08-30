@@ -156,7 +156,6 @@ IF NOT Enable OR NOT Inputs.PowerContactorEngaged THEN
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
     Outputs.DescendPermit := FALSE;
-    Outputs.KoboldMeasureEnable := FALSE;
     Outputs.KoboldContactorCmd := FALSE;
     Outputs.BottomTouchConfirmed := FALSE;
     Outputs.StepState := E_DiveSearchState.WAIT_PRECONDITIONS;
@@ -172,7 +171,6 @@ END_IF;
 
 Ready := Enable AND NOT Fault.Latched;
 Outputs.DescendPermit := FALSE;
-Outputs.KoboldMeasureEnable := FALSE;
 Outputs.KoboldContactorCmd := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
@@ -214,7 +212,6 @@ ELSE
         E_DiveSearchState.SEARCHING_IMMERSION:
             Lifecycle.Busy := TRUE;
             Outputs.DescendPermit := DescentActive;
-            Outputs.KoboldMeasureEnable := DescentActive;
             Outputs.KoboldContactorCmd := DescentActive;
             Outputs.OperatorActionId := 258;
             Outputs.OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
@@ -252,7 +249,6 @@ ELSE
         E_DiveSearchState.SEARCHING_BOTTOM:
             Lifecycle.Busy := TRUE;
             Outputs.DescendPermit := DescentActive;
-            Outputs.KoboldMeasureEnable := DescentActive;
             Outputs.KoboldContactorCmd := DescentActive;
             Outputs.OperatorActionId := 259;
             Outputs.OperatorAction := 'Maintenir la descente : immersion validee, recherche du fond.';
